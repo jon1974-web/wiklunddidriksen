@@ -1,5 +1,9 @@
 # one.com DNS Setup for jwd.info
 
+## ⚠️ Important: For www.jwd.info to Work
+
+**You MUST add a CNAME record for `www`** pointing to `jon1974-web.github.io`. Without this record, `www.jwd.info` will not work, even if `jwd.info` is working.
+
 ## Step-by-Step Instructions for one.com
 
 ### 1. Access DNS Settings
@@ -53,7 +57,9 @@ After adding all records, you should see:
 
 - DNS changes can take **5 minutes to 48 hours** to propagate globally
 - Usually works within **30-60 minutes**
-- You can check propagation at: https://dnschecker.org/#A/jwd.info
+- You can check propagation at:
+  - https://dnschecker.org/#A/jwd.info (for apex domain)
+  - https://dnschecker.org/#CNAME/www.jwd.info (for www subdomain)
 
 ### 6. Verify on GitHub
 
@@ -75,9 +81,16 @@ Once DNS has propagated:
 - Refresh the page after adding records
 - Check that you used `@` or left Host/Name blank for A records
 
+**If www.jwd.info is not working:**
+- **Most common issue**: Make sure you added the CNAME record for `www` (not just the A records)
+- Verify the CNAME record exists: `dig www.jwd.info CNAME +short` (should return `jon1974-web.github.io`)
+- Check that the CNAME record points to `jon1974-web.github.io` (not `jwd.info`)
+
 **If still not working after 1 hour:**
 - Verify records are saved correctly
-- Check DNS propagation: `dig jwd.info +short`
+- Check DNS propagation: 
+  - `dig jwd.info +short` (should show 4 GitHub Pages IPs)
+  - `dig www.jwd.info CNAME +short` (should show `jon1974-web.github.io`)
 - Make sure GitHub Pages is enabled and set to deploy from `main` branch
 
 ### Note about www.jwd.info
