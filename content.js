@@ -1,5 +1,5 @@
 // Text content library - edit texts here instead of in HTML
-const CONTENT = {
+window.CONTENT = {
     hero: {
         title: "Welcome",
         subtitle: "Creative • Innovative • Inspiring",

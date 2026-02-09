@@ -1,52 +1,63 @@
 // Content injection from content.js
 function getByPath(obj, path) {
-    return path.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : o), obj);
+    return path.split('.').reduce(function(o, k) {
+        return (o && o[k] !== undefined ? o[k] : o);
+    }, obj);
 }
 
 function injectContent() {
+    var content = window.CONTENT;
+    if (!content) return;
+
     // Simple data-content elements
-    document.querySelectorAll('[data-content]').forEach(el => {
-        const path = el.getAttribute('data-content');
-        const value = getByPath(CONTENT, path);
+    document.querySelectorAll('[data-content]').forEach(function(el) {
+        var path = el.getAttribute('data-content');
+        var value = getByPath(content, path);
         if (value != null && typeof value === 'string') {
             el.textContent = value;
         }
     });
 
     // About paragraphs
-    const aboutParagraphs = document.getElementById('about-paragraphs');
-    if (aboutParagraphs && CONTENT.about?.paragraphs) {
-        aboutParagraphs.innerHTML = CONTENT.about.paragraphs.map(p => `<p>${p}</p>`).join('');
+    var aboutParagraphs = document.getElementById('about-paragraphs');
+    if (aboutParagraphs && content.about && content.about.paragraphs) {
+        aboutParagraphs.innerHTML = content.about.paragraphs.map(function(p) { return '<p>' + p + '</p>'; }).join('');
     }
 
     // Projects grid
-    const projectsGrid = document.getElementById('projects-grid');
-    if (projectsGrid && CONTENT.projects?.items) {
-        projectsGrid.innerHTML = CONTENT.projects.items.map(item =>
-            `<div class="project-card">
-                <div class="project-icon">${item.icon}</div>
-                <h3 class="project-title">${item.title}</h3>
-                <p class="project-description">${item.description}</p>
-            </div>`
-        ).join('');
+    var projectsGrid = document.getElementById('projects-grid');
+    if (projectsGrid && content.projects && content.projects.items) {
+        projectsGrid.innerHTML = content.projects.items.map(function(item) {
+            return '<div class="project-card">' +
+                '<div class="project-icon">' + item.icon + '</div>' +
+                '<h3 class="project-title">' + item.title + '</h3>' +
+                '<p class="project-description">' + item.description + '</p>' +
+                '</div>';
+        }).join('');
     }
 
     // Contact links
-    const contactLinks = document.getElementById('contact-links');
-    if (contactLinks && CONTENT.contact?.links) {
-        contactLinks.innerHTML = CONTENT.contact.links.map(link =>
-            `<a href="${link.href}" class="contact-link">
-                <span class="contact-icon">${link.icon}</span>
-                <span>${link.label}</span>
-            </a>`
-        ).join('');
+    var contactLinks = document.getElementById('contact-links');
+    if (contactLinks && content.contact && content.contact.links) {
+        contactLinks.innerHTML = content.contact.links.map(function(link) {
+            return '<a href="' + link.href + '" class="contact-link">' +
+                '<span class="contact-icon">' + link.icon + '</span>' +
+                '<span>' + link.label + '</span>' +
+                '</a>';
+        }).join('');
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initPage() {
     injectContent();
     initObservers();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPage);
+} else {
+    initPage();
+}
 
 // Mobile Navigation Toggle
 const navToggle = document.querySelector('.nav-toggle');
