@@ -1,22 +1,21 @@
 // Text content library - edit texts here instead of in HTML
 window.CONTENT = {
     hero: {
-        title: "Welcome",
-        subtitle: "Creative • Innovative • Inspiring",
-        btnPrimary: "Learn More",
-        btnSecondary: "Get in Touch",
-        scrollLabel: "Scroll"
+        title: "Velkommen",
+        subtitle: "Innovasjon • Kvalitet • Samarbeid",
+        btnPrimary: "Les mer",
+        btnSecondary: "Kontakt meg",
+        scrollLabel: "Skroll nedover"
     },
     about: {
-        sectionTitle: "About",
-        lead: "Hello, I'm Wiklund Didriksen.",
+        sectionTitle: "Om",
+        lead: "Hei, jeg heter Jon Wiklund Didriksen.",
         paragraphs: [
-            "Welcome to my personal homepage. This is a space where creativity meets innovation, and ideas come to life.",
-            "I'm passionate about building beautiful, functional experiences that make a difference."
+            "Velkommen til min personlige hjemmeside."
         ]
     },
     projects: {
-        sectionTitle: "Projects",
+        sectionTitle: "Erfaringer",
         items: [
             { icon: "🚀", title: "Project One", description: "A description of your first project goes here." },
             { icon: "💡", title: "Project Two", description: "A description of your second project goes here." },
@@ -24,21 +23,21 @@ window.CONTENT = {
         ]
     },
     contact: {
-        sectionTitle: "Get in Touch",
-        text: "I'd love to hear from you. Feel free to reach out!",
+        sectionTitle: "Kontakt meg",
+        text: "Jeg vil gjerne høre fra deg. Fyll ut skjemaet nedenfor eller kontakt meg på e-post eller telefon.",
         links: [
-            { icon: "✉️", label: "Email", href: "mailto:hello@wiklunddidriksen.com" },
+            { icon: "✉️", label: "Email", href: "mailto:jon@wiklunddidriksen.com" },
             { icon: "💼", label: "LinkedIn", href: "#" },
             { icon: "🐙", label: "GitHub", href: "#" }
         ]
     },
     nav: {
-        home: "Home",
-        about: "About",
-        projects: "Projects",
-        contact: "Contact"
+        home: "Hjem",
+        about: "Om",
+        projects: "Erfaringer",
+        contact: "Kontakt meg"
     },
     footer: {
-        copyright: "© 2024 Wiklund Didriksen. All rights reserved."
+        copyright: "© 2026 jwd.info. All rights reserved."
     }
 };
