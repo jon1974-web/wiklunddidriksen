@@ -2,7 +2,7 @@
 window.CONTENT = {
     hero: {
         title: "Velkommen",
-        subtitle: "Innovasjon • Kvalitet • Samarbeid",
+        subtitle: "Innovasjon • Endring • Kvalitet • Samarbeid",
         btnPrimary: "Les mer",
         btnSecondary: "Kontakt meg",
         scrollLabel: "Skroll nedover"
@@ -24,7 +24,7 @@ window.CONTENT = {
     },
     contact: {
         sectionTitle: "Kontakt meg",
-        text: "Jeg vil gjerne høre fra deg. Fyll ut skjemaet nedenfor eller kontakt meg på e-post eller telefon.",
+        text: "Jeg vil gjerne høre fra deg. Kontakt meg på e-post, telefon eller via LinkedIn.",
         links: [
             { icon: "✉️", label: "Email", href: "mailto:jon@wiklunddidriksen.com" },
             { icon: "💼", label: "LinkedIn", href: "#" },
