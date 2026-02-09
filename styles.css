@@ -302,7 +302,12 @@ body {
     margin-bottom: 1rem;
 }
 
-.project-icon .asset-icon,
+.project-icon .asset-icon {
+    width: 5rem;
+    height: 5rem;
+    object-fit: contain;
+}
+
 .contact-icon .asset-icon {
     width: 3rem;
     height: 3rem;

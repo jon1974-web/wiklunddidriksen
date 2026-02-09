@@ -6,7 +6,7 @@ function renderAsset(key) {
     if (!value) return key;
     // If it looks like an image path, render as img
     if (/\.(svg|png|jpg|jpeg|gif|webp)(\?|$)/i.test(value)) {
-        return '<img src="' + value + '" alt="" class="asset-icon">';
+        return '<img src="' + encodeURI(value) + '" alt="" class="asset-icon">';
     }
     return value;
 }

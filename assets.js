@@ -2,9 +2,9 @@
 // Reference these by key in content.js instead of hardcoding
 window.ASSETS = {
     // Project/experience icons
-    project1: "🚀",
-    project2: "💡",
-    project3: "✨",
+    project1: "assets/icons/Dfind Consulting logo.jpeg",
+    project2: "assets/icons/Computas Logo.png",
+    project3: "assets/icons/Berg-hansen logo.jpeg",
 
     // Contact icons
     email: "✉️",

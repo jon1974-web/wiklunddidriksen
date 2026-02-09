@@ -20,9 +20,9 @@ window.CONTENT = {
     projects: {
         sectionTitle: "Erfaringer",
         items: [
-            { icon: "project1", title: "Dfind Consulting/Randstad Digital", description: "A description of your first project goes here." },
-            { icon: "project2", title: "Computas AS", description: "A description of your second project goes here." },
-            { icon: "project3", title: "Berg-Hansen Reisebureau AS", description: "A description of your third project goes here." }
+            { icon: "project1", title: "Dfind Consulting", description: "5 år" },
+            { icon: "project2", title: "Computas", description: "10 år" },
+            { icon: "project3", title: "Berg-Hansen", description: "6 år" }
         ]
     },
     contact: {
