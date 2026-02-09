@@ -331,6 +331,120 @@ body {
     line-height: 1.6;
 }
 
+.project-card-expandable {
+    cursor: pointer;
+}
+
+.project-card-expandable:hover {
+    transform: translateY(-8px) rotate(2deg);
+}
+
+.project-card-hint {
+    display: block;
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--primary-color);
+    opacity: 0.8;
+}
+
+/* Project expanded overlay */
+.project-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    perspective: 1000px;
+}
+
+.project-overlay-visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.project-overlay-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+.project-expanded-card {
+    position: relative;
+    background: white;
+    border-radius: 20px;
+    padding: 3rem;
+    transform-style: preserve-3d;
+    max-width: 560px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+    transform: scale(0.8) rotateY(-90deg);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.4s ease;
+}
+
+.project-expanded-card-visible {
+    transform: scale(1) rotateY(0);
+    opacity: 1;
+}
+
+.project-expanded-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border: none;
+    background: var(--bg-secondary);
+    border-radius: 50%;
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--text-secondary);
+    transition: var(--transition);
+}
+
+.project-expanded-close:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.project-expanded-icon {
+    margin-bottom: 1.5rem;
+}
+
+.project-expanded-icon .asset-icon {
+    width: 5rem;
+    height: 5rem;
+    object-fit: contain;
+}
+
+.project-expanded-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.project-expanded-meta {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+}
+
+.project-expanded-details {
+    color: var(--text-primary);
+    line-height: 1.8;
+    font-size: 1.0625rem;
+}
+
 /* Contact Section */
 .contact-content {
     max-width: 600px;

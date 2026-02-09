@@ -2,7 +2,7 @@
 window.CONTENT = {
     hero: {
         title: "Velkommen",
-        subtitle: "Innovasjon • Endring • Kvalitet • Samarbeid",
+        subtitle: "Innovasjon • Endring • Kvalitet • Samarbeid • Brukeropplevelse • Agile",
         btnPrimary: "Les mer",
         btnSecondary: "Kontakt meg",
         scrollLabel: "Skroll nedover"
@@ -20,9 +20,9 @@ window.CONTENT = {
     projects: {
         sectionTitle: "Erfaringer",
         items: [
-            { icon: "project1", title: "Dfind Consulting", description: "5 år" },
-            { icon: "project2", title: "Computas", description: "10 år" },
-            { icon: "project3", title: "Berg-Hansen", description: "6 år" }
+            { icon: "project1", title: "Dfind Consulting", description: "5 år", details: "Her kan du skrive mer om erfaringen din hos Dfind Consulting. For eksempel roller, ansvarsområder, prestasjoner eller teknologier du jobbet med. Denne teksten vises når man klikker på kortet." },
+            { icon: "project2", title: "Computas", description: "10 år", details: "Her kan du skrive mer om erfaringen din hos Computas. For eksempel roller, ansvarsområder, prestasjoner eller teknologier du jobbet med." },
+            { icon: "project3", title: "Berg-Hansen", description: "6 år", details: "Her kan du skrive mer om erfaringen din hos Berg-Hansen. For eksempel roller, ansvarsområder, prestasjoner eller teknologier du jobbet med." }
         ]
     },
     contact: {

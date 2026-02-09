@@ -39,14 +39,18 @@ function injectContent() {
     // Projects grid
     var projectsGrid = document.getElementById('projects-grid');
     if (projectsGrid && content.projects && content.projects.items) {
-        projectsGrid.innerHTML = content.projects.items.map(function(item) {
+        projectsGrid.innerHTML = content.projects.items.map(function(item, index) {
             var iconHtml = renderAsset(item.icon);
-            return '<div class="project-card">' +
+            var hasDetails = item.details && item.details.length > 0;
+            var clickableClass = hasDetails ? ' project-card-expandable' : '';
+            return '<div class="project-card' + clickableClass + '" data-project-index="' + index + '">' +
                 '<div class="project-icon">' + iconHtml + '</div>' +
                 '<h3 class="project-title">' + item.title + '</h3>' +
                 '<p class="project-description">' + item.description + '</p>' +
+                (hasDetails ? '<span class="project-card-hint">Klikk for mer</span>' : '') +
                 '</div>';
         }).join('');
+        initExpandableCards(content.projects.items);
     }
 
     // Contact links
@@ -60,6 +64,56 @@ function injectContent() {
                 '</a>';
         }).join('');
     }
+}
+
+function initExpandableCards(items) {
+    var overlay = document.getElementById('project-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'project-overlay';
+        overlay.className = 'project-overlay';
+        overlay.innerHTML = '<div class="project-overlay-backdrop"></div>' +
+            '<div class="project-expanded-card">' +
+            '<button class="project-expanded-close" aria-label="Lukk">&times;</button>' +
+            '<div class="project-expanded-content"></div>' +
+            '</div>';
+        document.body.appendChild(overlay);
+    }
+    var contentEl = overlay.querySelector('.project-expanded-content');
+    var cardEl = overlay.querySelector('.project-expanded-card');
+    var backdrop = overlay.querySelector('.project-overlay-backdrop');
+
+    function openCard(index) {
+        var item = items[index];
+        if (!item || !item.details) return;
+        var iconHtml = renderAsset(item.icon);
+        contentEl.innerHTML = '<div class="project-expanded-icon">' + iconHtml + '</div>' +
+            '<h3 class="project-expanded-title">' + item.title + '</h3>' +
+            '<p class="project-expanded-meta">' + item.description + '</p>' +
+            '<div class="project-expanded-details">' + item.details + '</div>';
+        overlay.classList.add('project-overlay-visible');
+        cardEl.classList.add('project-expanded-card-visible');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeCard() {
+        overlay.classList.remove('project-overlay-visible');
+        cardEl.classList.remove('project-expanded-card-visible');
+        document.body.style.overflow = '';
+    }
+
+    document.querySelectorAll('.project-card-expandable').forEach(function(card) {
+        card.addEventListener('click', function() {
+            var index = parseInt(card.getAttribute('data-project-index'), 10);
+            openCard(index);
+        });
+    });
+
+    if (backdrop) backdrop.addEventListener('click', closeCard);
+    overlay.querySelector('.project-expanded-close').addEventListener('click', closeCard);
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && overlay.classList.contains('project-overlay-visible')) closeCard();
+    });
 }
 
 function initPage() {
