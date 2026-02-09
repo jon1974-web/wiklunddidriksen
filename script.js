@@ -1,4 +1,16 @@
 // Content injection from content.js
+function renderAsset(key) {
+    var assets = window.ASSETS;
+    if (!assets || !key) return '';
+    var value = assets[key];
+    if (!value) return key;
+    // If it looks like an image path, render as img
+    if (/\.(svg|png|jpg|jpeg|gif|webp)(\?|$)/i.test(value)) {
+        return '<img src="' + value + '" alt="" class="asset-icon">';
+    }
+    return value;
+}
+
 function getByPath(obj, path) {
     return path.split('.').reduce(function(o, k) {
         return (o && o[k] !== undefined ? o[k] : o);
@@ -28,8 +40,9 @@ function injectContent() {
     var projectsGrid = document.getElementById('projects-grid');
     if (projectsGrid && content.projects && content.projects.items) {
         projectsGrid.innerHTML = content.projects.items.map(function(item) {
+            var iconHtml = renderAsset(item.icon);
             return '<div class="project-card">' +
-                '<div class="project-icon">' + item.icon + '</div>' +
+                '<div class="project-icon">' + iconHtml + '</div>' +
                 '<h3 class="project-title">' + item.title + '</h3>' +
                 '<p class="project-description">' + item.description + '</p>' +
                 '</div>';
@@ -40,8 +53,9 @@ function injectContent() {
     var contactLinks = document.getElementById('contact-links');
     if (contactLinks && content.contact && content.contact.links) {
         contactLinks.innerHTML = content.contact.links.map(function(link) {
+            var iconHtml = renderAsset(link.icon);
             return '<a href="' + link.href + '" class="contact-link">' +
-                '<span class="contact-icon">' + link.icon + '</span>' +
+                '<span class="contact-icon">' + iconHtml + '</span>' +
                 '<span>' + link.label + '</span>' +
                 '</a>';
         }).join('');
