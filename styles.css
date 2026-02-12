@@ -443,6 +443,7 @@ body {
     color: var(--text-primary);
     line-height: 1.8;
     font-size: 1.0625rem;
+    white-space: pre-line;
 }
 
 /* Contact Section */
