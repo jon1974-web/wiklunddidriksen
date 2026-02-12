@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
 
     const contextParts = [];
     if (cvText) {
-      const maxCvChars = 10000;
+      const maxCvChars = 100000;
       const truncatedCv = cvText.length > maxCvChars
         ? cvText.slice(0, maxCvChars) + '\n\n[...truncated for token limit]'
         : cvText;
