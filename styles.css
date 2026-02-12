@@ -699,26 +699,25 @@ body {
 .chat-actions {
     display: flex;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
     border-top: 1px solid var(--border-color);
-    background: var(--bg-primary);
+    background: white;
 }
 
 .chat-action-btn {
-    padding: 0.4rem 0.75rem;
+    padding: 0.75rem 1.25rem;
     font-size: 0.8125rem;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    background: white;
-    color: var(--text-primary);
+    font-weight: normal;
+    border: none;
+    border-radius: 10px;
+    background: var(--primary-color);
+    color: white;
     cursor: pointer;
     transition: var(--transition);
 }
 
 .chat-action-btn:hover {
-    background: var(--bg-secondary);
-    border-color: var(--primary-color);
-    color: var(--primary-color);
+    background: var(--secondary-color);
 }
 
 .chat-input-wrap {
@@ -743,11 +742,12 @@ body {
 
 .chat-send {
     padding: 0.75rem 1.25rem;
+    font-size: 1rem;
     background: var(--primary-color);
     color: white;
     border: none;
     border-radius: 10px;
-    font-weight: 600;
+    font-weight: bold;
     cursor: pointer;
     transition: var(--transition);
 }
