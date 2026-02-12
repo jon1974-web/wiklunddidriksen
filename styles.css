@@ -697,6 +697,31 @@ body {
     color: var(--text-primary);
 }
 
+.chat-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-primary);
+}
+
+.chat-action-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8125rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background: white;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.chat-action-btn:hover {
+    background: var(--bg-secondary);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
 .chat-input-wrap {
     display: flex;
     gap: 0.5rem;

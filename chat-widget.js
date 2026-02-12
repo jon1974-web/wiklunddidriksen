@@ -1,5 +1,6 @@
 (function() {
   var API_URL = window.CHAT_API_URL || '';
+  var chatMessages = [];
 
   function getPageContent() {
     var content = window.CONTENT;
@@ -29,6 +30,10 @@
       '<button id="chat-close" class="chat-close" aria-label="Lukk">×</button>' +
       '</div>' +
       '<div id="chat-messages" class="chat-messages"></div>' +
+      '<div class="chat-actions">' +
+      '<button id="chat-clear" class="chat-action-btn" title="Tøm chat">Tøm</button>' +
+      '<button id="chat-export-pdf" class="chat-action-btn" title="Eksporter til PDF">Eksporter PDF</button>' +
+      '</div>' +
       '<div class="chat-input-wrap">' +
       '<input id="chat-input" type="text" placeholder="Spør om erfaring, utdanning..." maxlength="500">' +
       '<button id="chat-send" class="chat-send">Send</button>' +
@@ -53,11 +58,60 @@
     closeBtn.addEventListener('click', close);
 
     function addMessage(text, isUser) {
+      chatMessages.push({ text: text, isUser: isUser });
       var div = document.createElement('div');
       div.className = 'chat-msg ' + (isUser ? 'chat-msg-user' : 'chat-msg-bot');
       div.textContent = text;
       messages.appendChild(div);
       messages.scrollTop = messages.scrollHeight;
+    }
+
+    function clearChat() {
+      chatMessages = [];
+      messages.innerHTML = '';
+    }
+
+    function exportPdf() {
+      if (chatMessages.length === 0) {
+        alert('Ingen meldinger å eksportere. Start en samtale først.');
+        return;
+      }
+      var JsPDF = (window.jspdf && window.jspdf.jsPDF) || window.jsPDF || (typeof jspdf !== 'undefined' && jspdf.jsPDF);
+      if (!JsPDF) {
+        alert('PDF-bibliotek ikke lastet. Sjekk internettforbindelsen.');
+        return;
+      }
+      var doc = new JsPDF({ unit: 'mm', format: 'a4' });
+      var margin = 20;
+      var pageWidth = doc.internal.pageSize.getWidth();
+      var maxWidth = pageWidth - margin * 2;
+      var y = 20;
+      var lineHeight = 7;
+
+      doc.setFontSize(16);
+      doc.text('Chat med Jon – jwd.info', margin, y);
+      y += 12;
+      doc.setFontSize(10);
+      doc.text('Eksportert: ' + new Date().toLocaleString('nb-NO'), margin, y);
+      y += 15;
+
+      doc.setFontSize(11);
+      for (var i = 0; i < chatMessages.length; i++) {
+        var msg = chatMessages[i];
+        var label = msg.isUser ? 'Spørsmål:' : 'Svar:';
+        doc.setFont('helvetica', 'bold');
+        doc.text(label, margin, y);
+        y += lineHeight;
+        doc.setFont('helvetica', 'normal');
+        var lines = doc.splitTextToSize(msg.text, maxWidth);
+        doc.text(lines, margin, y);
+        y += lines.length * lineHeight + 6;
+        if (y > 270) {
+          doc.addPage();
+          y = 20;
+        }
+      }
+      doc.save('chat-jon-' + new Date().toISOString().slice(0, 10) + '.pdf');
     }
 
     function setLoading(on) {
@@ -108,6 +162,11 @@
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') send();
     });
+
+    var clearBtn = document.getElementById('chat-clear');
+    var exportBtn = document.getElementById('chat-export-pdf');
+    if (clearBtn) clearBtn.addEventListener('click', clearChat);
+    if (exportBtn) exportBtn.addEventListener('click', exportPdf);
   }
 
   if (document.readyState === 'loading') {
