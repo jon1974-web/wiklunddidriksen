@@ -25,15 +25,29 @@ module.exports = async function handler(req, res) {
   }
 
   try {
-    const { message, pageContent } = req.body || {};
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid JSON body' });
+      }
+    }
+    const { message, pageContent } = body || {};
     if (!message || typeof message !== 'string') {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    const cvPath = path.join(process.cwd(), 'assets', 'cv', 'cv.md');
+    const cvPaths = [
+      path.join(process.cwd(), 'assets', 'cv', 'cv.md'),
+      path.join(process.cwd(), 'assets', 'CV', 'cv.md'),
+    ];
     let cvText = '';
-    if (fs.existsSync(cvPath)) {
-      cvText = fs.readFileSync(cvPath, 'utf-8');
+    for (const cvPath of cvPaths) {
+      if (fs.existsSync(cvPath)) {
+        cvText = fs.readFileSync(cvPath, 'utf-8');
+        break;
+      }
     }
 
     const pageText = pageContent && typeof pageContent === 'string'
@@ -64,7 +78,7 @@ Svar på norsk med et vennlig og profesjonelt tonefall. Hold svarene konsise men
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'llama-3.1-70b-versatile',
+        model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userContent },
@@ -99,7 +113,8 @@ Svar på norsk med et vennlig og profesjonelt tonefall. Hold svarene konsise men
     console.error('Chat API error:', err);
     return res.status(500).json({
       error: 'An error occurred',
-      detail: err.message,
+      detail: err.message || String(err),
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
     });
   }
 }
