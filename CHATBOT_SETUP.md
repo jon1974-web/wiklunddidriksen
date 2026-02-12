@@ -2,15 +2,22 @@
 
 The site stays on GitHub Pages. The chat API runs on Vercel.
 
-## 1. Deploy API to Vercel
+## 1. Get Groq API Key (Free)
+
+1. Go to [console.groq.com](https://console.groq.com) and sign up (free account).
+2. Navigate to **API Keys**.
+3. Click **Create API Key**.
+4. Copy the key (you'll need it for Vercel).
+
+## 2. Deploy API to Vercel
 
 1. Go to [vercel.com](https://vercel.com) and sign in (use GitHub).
 2. Click **Add New** → **Project**.
 3. Import your `wiklunddidriksen` repository.
 4. Vercel will detect the project. Use default settings.
 5. Before deploying, add an **Environment Variable**:
-   - **Name:** `OPENAI_API_KEY`
-   - **Value:** your OpenAI API key (from [platform.openai.com](https://platform.openai.com/api-keys))
+   - **Name:** `GROQ_API_KEY`
+   - **Value:** your Groq API key (from [console.groq.com](https://console.groq.com))
 6. Deploy.
 
 ## 2. Get the API URL
@@ -57,4 +64,4 @@ window.CHAT_API_URL = 'https://api.jwd.info/api/chat';
 - **Site:** GitHub Pages (jwd.info)
 - **Chat API:** Vercel (`/api/chat`)
 - **CV:** `assets/cv/cv.md`
-- **AI:** OpenAI (gpt-4o-mini)
+- **AI:** Groq (llama-3.1-70b-versatile) - Free tier, no payment method required

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
 module.exports = async function handler(req, res) {
   // CORS headers for jwd.info and localhost
@@ -17,10 +17,10 @@ module.exports = async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
     return res.status(500).json({
-      error: 'Server configuration error: OPENAI_API_KEY not set',
+      error: 'Server configuration error: GROQ_API_KEY not set',
     });
   }
 
@@ -57,14 +57,14 @@ Svar på norsk med et vennlig og profesjonelt tonefall. Hold svarene konsise men
       ? `Kontekst:\n${contextParts.join('\n\n')}\n\n---\n\nSpørsmål: ${message}`
       : message;
 
-    const response = await fetch(OPENAI_API_URL, {
+    const response = await fetch(GROQ_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'llama-3.1-70b-versatile',
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userContent },
@@ -75,10 +75,19 @@ Svar på norsk med et vennlig og profesjonelt tonefall. Hold svarene konsise men
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
-      console.error('OpenAI API error:', response.status, errData);
+      console.error('Groq API error:', response.status, errData);
+      let errorMsg = 'Request failed';
+      if (response.status === 401) {
+        errorMsg = 'Invalid API key - check GROQ_API_KEY in Vercel';
+      } else if (response.status === 429) {
+        errorMsg = 'Rate limit exceeded - try again later';
+      } else if (errData.error && errData.error.message) {
+        errorMsg = errData.error.message;
+      }
       return res.status(502).json({
         error: 'AI service error',
-        detail: response.status === 401 ? 'Invalid API key' : 'Request failed',
+        detail: errorMsg,
+        status: response.status,
       });
     }
 
