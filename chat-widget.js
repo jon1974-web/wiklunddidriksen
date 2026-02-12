@@ -83,12 +83,23 @@
           pageContent: getPageContent()
         })
       })
-        .then(function(r) { return r.json(); })
+        .then(function(r) {
+          if (!r.ok) {
+            return r.json().then(function(err) {
+              throw new Error(err.detail || err.error || 'Request failed');
+            });
+          }
+          return r.json();
+        })
         .then(function(data) {
-          addMessage(data.reply || data.error || 'Ingen respons.', false);
+          if (data.error) {
+            addMessage('Feil: ' + (data.detail || data.error), false);
+          } else {
+            addMessage(data.reply || 'Ingen respons.', false);
+          }
         })
         .catch(function(err) {
-          addMessage('Kunne ikke få svar. Sjekk at API-en kjører.', false);
+          addMessage('Kunne ikke få svar: ' + err.message, false);
         })
         .finally(function() { setLoading(false); });
     }
