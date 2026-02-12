@@ -9,11 +9,11 @@
     --primary-color: #007FFF;
     --secondary-color: #3399FF;
     --accent-color: #00BFFF;
-    --text-primary: #1f2937;
-    --text-secondary: #6b7280;
-    --bg-primary: #ffffff;
-    --bg-secondary: #f9fafb;
-    --bg-dark: #111827;
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.85);
+    --bg-primary: #0039A9;
+    --bg-secondary: #0047c7;
+    --bg-dark: #002d82;
     --border-color: #e5e7eb;
     --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
     --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
@@ -128,7 +128,7 @@ body {
     justify-content: center;
     text-align: center;
     position: relative;
-    background: linear-gradient(135deg, #007FFF 0%, #00BFFF 100%);
+    background: linear-gradient(135deg, #0039A9 0%, #0047c7 100%);
     color: white;
     padding-top: 80px;
 }
@@ -237,21 +237,20 @@ body {
 /* Sections */
 .section {
     padding: 6rem 0;
+    background: white;
 }
 
 .section-alt {
-    background-color: var(--bg-secondary);
+    background: white;
 }
 
-.section-title {
+.section .section-title,
+.section-alt .section-title {
     font-size: clamp(2rem, 5vw, 3rem);
     font-weight: 700;
     text-align: center;
     margin-bottom: 3rem;
-    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #1f2937;
 }
 
 /* About Section */
@@ -261,16 +260,16 @@ body {
     text-align: center;
 }
 
-.lead {
+.section .lead {
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--text-primary);
+    color: #1f2937;
 }
 
-.about-text p {
+.section .about-text p {
     font-size: 1.125rem;
-    color: var(--text-secondary);
+    color: #6b7280;
     margin-bottom: 1rem;
     line-height: 1.8;
 }
@@ -323,11 +322,11 @@ body {
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: var(--text-primary);
+    color: #1f2937;
 }
 
 .project-description {
-    color: var(--text-secondary);
+    color: #6b7280;
     line-height: 1.6;
 }
 
@@ -430,17 +429,17 @@ body {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
-    color: var(--text-primary);
+    color: #1f2937;
 }
 
 .project-expanded-meta {
-    color: var(--text-secondary);
+    color: #6b7280;
     margin-bottom: 1.5rem;
     font-size: 1rem;
 }
 
 .project-expanded-details {
-    color: var(--text-primary);
+    color: #1f2937;
     line-height: 1.8;
     font-size: 1.0625rem;
     white-space: pre-line;
@@ -455,7 +454,7 @@ body {
 
 .contact-text {
     font-size: 1.125rem;
-    color: var(--text-secondary);
+    color: #6b7280;
     margin-bottom: 2rem;
 }
 
@@ -472,7 +471,7 @@ body {
     align-items: center;
     gap: 0.5rem;
     text-decoration: none;
-    color: var(--text-primary);
+    color: #1f2937;
     padding: 1.5rem;
     border-radius: 12px;
     background: white;
