@@ -85,21 +85,28 @@ Svar på norsk med et vennlig og profesjonelt tonefall. Hold svarene konsise men
       ? `Kontekst:\n${contextParts.join('\n\n')}\n\n---\n\nSpørsmål: ${message}`
       : message;
 
-    const response = await fetch(GROQ_API_URL, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userContent },
-        ],
-        max_tokens: 1024,
-      }),
+    const requestBody = JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userContent },
+      ],
+      max_tokens: 512,
     });
+
+    let response;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      response = await fetch(GROQ_API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: requestBody,
+      });
+      if (response.status !== 429 || attempt === 2) break;
+      await new Promise((r) => setTimeout(r, 2000 + attempt * 1000));
+    }
 
     if (!response.ok) {
       const errData = await response.json().catch(() => ({}));
@@ -108,7 +115,7 @@ Svar på norsk med et vennlig og profesjonelt tonefall. Hold svarene konsise men
       if (response.status === 401) {
         errorMsg = 'Invalid API key - check GROQ_API_KEY in Vercel';
       } else if (response.status === 429) {
-        errorMsg = 'Rate limit exceeded - try again later';
+        errorMsg = 'Rate limit exceeded - vent et øyeblikk og prøv igjen';
       } else if (errData.error && errData.error.message) {
         errorMsg = errData.error.message;
       }
