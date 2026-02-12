@@ -1,0 +1,96 @@
+const fs = require('fs');
+const path = require('path');
+
+const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+
+module.exports = async function handler(req, res) {
+  // CORS headers for jwd.info and localhost
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    return res.status(500).json({
+      error: 'Server configuration error: OPENAI_API_KEY not set',
+    });
+  }
+
+  try {
+    const { message, pageContent } = req.body || {};
+    if (!message || typeof message !== 'string') {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    const cvPath = path.join(process.cwd(), 'assets', 'cv', 'cv.md');
+    let cvText = '';
+    if (fs.existsSync(cvPath)) {
+      cvText = fs.readFileSync(cvPath, 'utf-8');
+    }
+
+    const pageText = pageContent && typeof pageContent === 'string'
+      ? pageContent.trim()
+      : '';
+
+    const contextParts = [];
+    if (cvText) {
+      contextParts.push('## CV / CV-data\n' + cvText);
+    }
+    if (pageText) {
+      contextParts.push('## Informasjon fra nettsiden\n' + pageText);
+    }
+
+    const systemPrompt = `Du er en hjelpsom assistent som svarer på spørsmål om Jon Wiklund Didriksen. 
+Du får informasjon fra CV-en hans og eventuelt andre kilder fra nettsiden hans.
+Svar basert utelukkende på den informasjonen du får. Hvis svaret ikke finnes i materialet, si det tydelig.
+Svar på norsk med et vennlig og profesjonelt tonefall. Hold svarene konsise men informative.`;
+
+    const userContent = contextParts.length > 0
+      ? `Kontekst:\n${contextParts.join('\n\n')}\n\n---\n\nSpørsmål: ${message}`
+      : message;
+
+    const response = await fetch(OPENAI_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userContent },
+        ],
+        max_tokens: 1024,
+      }),
+    });
+
+    if (!response.ok) {
+      const errData = await response.json().catch(() => ({}));
+      console.error('OpenAI API error:', response.status, errData);
+      return res.status(502).json({
+        error: 'AI service error',
+        detail: response.status === 401 ? 'Invalid API key' : 'Request failed',
+      });
+    }
+
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content?.trim() || 'Kunne ikke generere svar.';
+
+    return res.status(200).json({ reply });
+  } catch (err) {
+    console.error('Chat API error:', err);
+    return res.status(500).json({
+      error: 'An error occurred',
+      detail: err.message,
+    });
+  }
+}
