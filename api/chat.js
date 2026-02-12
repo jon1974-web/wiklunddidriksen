@@ -62,14 +62,18 @@ module.exports = async function handler(req, res) {
 
     const contextParts = [];
     if (cvText) {
-      const maxCvChars = 40000;
+      const maxCvChars = 10000;
       const truncatedCv = cvText.length > maxCvChars
-        ? cvText.slice(0, maxCvChars) + '\n\n[...truncated]'
+        ? cvText.slice(0, maxCvChars) + '\n\n[...truncated for token limit]'
         : cvText;
       contextParts.push('## CV / CV-data\n' + truncatedCv);
     }
     if (pageText) {
-      contextParts.push('## Informasjon fra nettsiden\n' + pageText);
+      const maxPageChars = 2000;
+      const truncatedPage = pageText.length > maxPageChars
+        ? pageText.slice(0, maxPageChars) + ' [...]'
+        : pageText;
+      contextParts.push('## Informasjon fra nettsiden\n' + truncatedPage);
     }
 
     const systemPrompt = `Du er en hjelpsom assistent som svarer på spørsmål om Jon Wiklund Didriksen. 
