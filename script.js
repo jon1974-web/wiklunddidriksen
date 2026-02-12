@@ -58,7 +58,10 @@ function injectContent() {
     if (contactLinks && content.contact && content.contact.links) {
         contactLinks.innerHTML = content.contact.links.map(function(link) {
             var iconHtml = renderAsset(link.icon);
-            return '<a href="' + link.href + '" class="contact-link">' +
+            var ext = link.href && (link.href.indexOf('http://') === 0 || link.href.indexOf('https://') === 0);
+            var attrs = 'href="' + link.href + '" class="contact-link"';
+            if (ext) attrs += ' target="_blank" rel="noopener noreferrer"';
+            return '<a ' + attrs + '>' +
                 '<span class="contact-icon">' + iconHtml + '</span>' +
                 '<span>' + link.label + '</span>' +
                 '</a>';
