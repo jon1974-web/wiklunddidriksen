@@ -30,7 +30,7 @@ window.CONTENT = {
         text: "Jeg vil gjerne høre fra deg. Kontakt meg på e-post, telefon eller via LinkedIn.",
         links: [
             { icon: "email", label: "Email", href: "mailto:jon@wiklunddidriksen.com" },
-            { icon: "linkedin", label: "LinkedIn", href: "#" },
+            { icon: "linkedin", label: "LinkedIn", href: "https://www.linkedin.com/in/jon-wiklund-didriksen-9a998148" },
             { icon: "github", label: "GitHub", href: "#" }
         ]
     },
