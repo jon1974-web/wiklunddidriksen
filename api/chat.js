@@ -3,8 +3,13 @@ const path = require('path');
 
 const GROQ_API_URL = 'https://api.groq.com/openai/v1/chat/completions';
 
+function sendError(res, status, error, detail) {
+  console.error('[Chat API]', status, error, detail);
+  return res.status(status).json({ error, detail });
+}
+
 module.exports = async function handler(req, res) {
-  // CORS headers for jwd.info and localhost
+  console.log('[Chat API] Request:', req.method);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -19,18 +24,19 @@ module.exports = async function handler(req, res) {
 
   const apiKey = process.env.GROQ_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({
-      error: 'Server configuration error: GROQ_API_KEY not set',
-    });
+    return sendError(res, 500, 'Server configuration error', 'GROQ_API_KEY not set');
   }
 
   try {
     let body = req.body;
+    if (body === undefined || body === null) {
+      return sendError(res, 400, 'No body', 'Request body is empty or not parsed');
+    }
     if (typeof body === 'string') {
       try {
         body = JSON.parse(body);
       } catch (e) {
-        return res.status(400).json({ error: 'Invalid JSON body' });
+        return sendError(res, 400, 'Invalid JSON', e.message);
       }
     }
     const { message, pageContent } = body || {};
@@ -56,7 +62,11 @@ module.exports = async function handler(req, res) {
 
     const contextParts = [];
     if (cvText) {
-      contextParts.push('## CV / CV-data\n' + cvText);
+      const maxCvChars = 40000;
+      const truncatedCv = cvText.length > maxCvChars
+        ? cvText.slice(0, maxCvChars) + '\n\n[...truncated]'
+        : cvText;
+      contextParts.push('## CV / CV-data\n' + truncatedCv);
     }
     if (pageText) {
       contextParts.push('## Informasjon fra nettsiden\n' + pageText);
@@ -110,11 +120,12 @@ Svar på norsk med et vennlig og profesjonelt tonefall. Hold svarene konsise men
 
     return res.status(200).json({ reply });
   } catch (err) {
-    console.error('Chat API error:', err);
+    const detail = err.message || String(err);
+    const stack = err.stack || '';
+    console.error('[Chat API] Caught error:', detail, stack);
     return res.status(500).json({
       error: 'An error occurred',
-      detail: err.message || String(err),
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined,
+      detail: detail,
     });
   }
 }
