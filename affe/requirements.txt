@@ -1,0 +1,5 @@
+# Auth and Microsoft Graph (Outlook subagent)
+msal>=1.24.0
+requests>=2.28.0
+python-dotenv>=1.0.0
+flask>=2.0.0

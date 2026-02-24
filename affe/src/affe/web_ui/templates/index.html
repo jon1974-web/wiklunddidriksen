@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AFFE</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 520px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+      background: #1a1a2e;
+      color: #eee;
+      min-height: 100vh;
+    }
+    h1 { font-size: 1.5rem; margin-bottom: 1.5rem; color: #7fdbff; }
+    .messages {
+      min-height: 200px;
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: #16213e;
+      border-radius: 12px;
+      overflow-y: auto;
+      max-height: 50vh;
+    }
+    .msg { margin-bottom: 0.75rem; }
+    .msg.user { color: #7fdbff; }
+    .msg.affe { color: #ddd; white-space: pre-wrap; }
+    .msg .label { font-size: 0.75rem; opacity: 0.8; margin-bottom: 0.25rem; }
+    .input-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    input[type="text"] {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid #333;
+      border-radius: 8px;
+      background: #16213e;
+      color: #eee;
+      font-size: 1rem;
+    }
+    input[type="text"]:focus {
+      outline: none;
+      border-color: #7fdbff;
+    }
+    button {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: #0f3460;
+      color: #eee;
+    }
+    button:hover { background: #1a4a7a; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.primary { background: #7fdbff; color: #1a1a2e; }
+    button.primary:hover { background: #9ee9ff; }
+    button.mic { padding: 0.75rem; min-width: 48px; }
+    button.mic.listening { background: #c0392b; animation: pulse 1s infinite; }
+    @keyframes pulse { 50% { opacity: 0.8; } }
+    .hint { font-size: 0.85rem; opacity: 0.7; margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+  <h1>AFFE</h1>
+  <div class="messages" id="messages"></div>
+  <div class="input-row">
+    <input type="text" id="input" placeholder="Type or use the mic…" autocomplete="off" />
+    <button type="button" id="send" class="primary">Send</button>
+    <button type="button" id="mic" class="mic" title="Push to talk">🎤</button>
+  </div>
+  <p class="hint">Click the mic, then speak. Say e.g. &quot;What meetings do I have tomorrow?&quot;</p>
+
+  <script>
+    const messagesEl = document.getElementById('messages');
+    const inputEl = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+    const micBtn = document.getElementById('mic');
+
+    function addMsg(who, text) {
+      const div = document.createElement('div');
+      div.className = 'msg ' + who;
+      div.innerHTML = '<div class="label">' + (who === 'user' ? 'You' : 'AFFE') + '</div><div>' + escapeHtml(text) + '</div>';
+      messagesEl.appendChild(div);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    async function sendMessage(text) {
+      text = (text || '').trim();
+      if (!text) return;
+      addMsg('user', text);
+      inputEl.value = '';
+      sendBtn.disabled = true;
+      try {
+        const r = await fetch('/api/message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text: text })
+        });
+        const data = await r.json();
+        addMsg('affe', data.reply || 'No reply.');
+      } catch (e) {
+        addMsg('affe', 'Error: ' + e.message);
+      }
+      sendBtn.disabled = false;
+    }
+
+    sendBtn.addEventListener('click', () => sendMessage(inputEl.value));
+    inputEl.addEventListener('keydown', (e) => { if (e.key === 'Enter') sendMessage(inputEl.value); });
+
+    // Voice: Web Speech API (uses Mac built-in mic in Safari/Chrome)
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let recognition = null;
+    if (SpeechRecognition) {
+      recognition = new SpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+      recognition.onresult = (e) => {
+        const t = e.results[0][0].transcript;
+        if (t) sendMessage(t);
+      };
+      recognition.onerror = () => { micBtn.classList.remove('listening'); micBtn.disabled = false; };
+      recognition.onend = () => { micBtn.classList.remove('listening'); micBtn.disabled = false; };
+    } else {
+      micBtn.title = 'Speech not supported in this browser';
+      micBtn.disabled = true;
+    }
+
+    micBtn.addEventListener('click', () => {
+      if (!recognition) return;
+      if (micBtn.classList.contains('listening')) {
+        recognition.stop();
+        return;
+      }
+      micBtn.classList.add('listening');
+      micBtn.disabled = true;
+      recognition.start();
+    });
+  </script>
+</body>
+</html>

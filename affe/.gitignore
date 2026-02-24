@@ -1,0 +1,25 @@
+# Environment and secrets
+.env
+.env.local
+*.token.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build / install
+build/
+dist/
+*.egg-info/
+*.egg
