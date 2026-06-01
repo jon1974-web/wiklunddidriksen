@@ -5,9 +5,14 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.anonymous.Familiesenter",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Familiesenter bruker kameraet til å ta bilder som kan deles i chatten.",
+        "NSPhotoLibraryUsageDescription": "Familiesenter bruker bildebiblioteket til å velge bilder som kan deles i chatten."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -20,6 +25,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-calendar",
+        {
+          "calendarPermission": "Familiesenter trenger tilgang til kalenderen din for a legge til arrangementer."
+        }
+      ]
+    ]
   }
 }

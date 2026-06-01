@@ -1,0 +1,12 @@
+export const CHAT_MESSAGE_LIMIT = 100;
+export const MAX_MESSAGE_LENGTH = 500;
+export const IMAGE_MAX_DIMENSION = 1024;
+export const IMAGE_QUALITY = 0.7;
+export const DEBOUNCE_MS = 300;
+export const MIN_SEARCH_LENGTH = 3;
+export const MAP_ZOOM = 15;
+export const MAP_SIZE = '100x100';
+export const LOCALE = 'nb-NO';
+export const SCROLL_DELAY_MS = 100;
+export const DEFAULT_DISPLAY_NAME = 'User';
+export const DATE_PICKER_RANGE_DAYS = 365;
