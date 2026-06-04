@@ -209,13 +209,15 @@ export const ChatScreen: React.FC = () => {
         >
           <Text style={[styles.iconText, { color: colors.text }]}>🖼</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: colors.inputBackground }]}
-          onPress={handleTakePhoto}
-          disabled={uploading}
-        >
-          <Text style={[styles.iconText, { color: colors.text }]}>📷</Text>
-        </TouchableOpacity>
+        {Platform.OS !== 'web' && (
+          <TouchableOpacity
+            style={[styles.iconButton, { backgroundColor: colors.inputBackground }]}
+            onPress={handleTakePhoto}
+            disabled={uploading}
+          >
+            <Text style={[styles.iconText, { color: colors.text }]}>📷</Text>
+          </TouchableOpacity>
+        )}
         <TextInput
           style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
           value={newMessage}

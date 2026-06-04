@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal, TouchableWithoutFeedback, Platform, Linking } from 'react-native';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
@@ -13,6 +13,11 @@ import { useUserStore } from '../store/userStore';
 import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } from '../constants/eventOptions';
 import { LOCALE, DATE_PICKER_RANGE_DAYS } from '../constants/limits';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
+
+interface EventDetailScreenProps {
+  navigation: any;
+  route: any;
+}
 
 export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation, route }) => {
   const { event } = route.params as { event: Event };
@@ -58,6 +63,19 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [customEndTime, setCustomEndTime] = useState(event.endTime && !getInitialEndTimeDuration() ? event.endTime : '');
   const [showCustomEndTimePicker, setShowCustomEndTimePicker] = useState(false);
   const [reminderMinutes, setReminderMinutes] = useState(event.reminderMinutes);
+  const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
+  const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
+
+  useEffect(() => {
+    if (user?.uid) {
+      getUserProfile(user.uid).then((profile) => {
+        if (profile?.calendarEmail && profile?.calendarProvider) {
+          setUserCalendarEmail(profile.calendarEmail);
+          setUserCalendarProvider(profile.calendarProvider);
+        }
+      });
+    }
+  }, [user?.uid]);
 
   const handleUpdate = useCallback(async () => {
     if (!title.trim()) {
@@ -370,6 +388,39 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
       </TouchableOpacity>
 
+      {Platform.OS === 'web' && (
+        <View style={{ marginTop: 16 }}>
+          {userCalendarProvider && userCalendarEmail ? (
+            <TouchableOpacity
+              style={[styles.calendarWebButton, { backgroundColor: userCalendarProvider === 'google' ? '#4285F4' : '#0078D4' }]}
+              onPress={() => {
+                const [h, m] = time.split(':').map(Number);
+                const start = new Date(date);
+                start.setHours(h, m, 0, 0);
+                const end = new Date(start.getTime() + 60 * 60 * 1000);
+                if (userCalendarProvider === 'google') {
+                  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(address)}`;
+                  Linking.openURL(url);
+                } else {
+                  const fmt = (d: Date) => d.toISOString();
+                  const url = `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(title)}&startdt=${fmt(start)}&enddt=${fmt(end)}&body=${encodeURIComponent(description)}&location=${encodeURIComponent(address)}`;
+                  Linking.openURL(url);
+                }
+              }}
+            >
+              <Text style={styles.calendarWebButtonText}>
+                Legg til i {userCalendarProvider === 'google' ? 'Google' : 'Outlook'} Calendar
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <Text style={[styles.sectionLabel, { color: colors.textDisabled, textAlign: 'center' }]}>
+              Lagre kalender-e-post i Profil for å legge til arrangementer direkte.
+            </Text>
+          )}
+        </View>
+      )}
+
       <Modal visible={showDatePicker} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setShowDatePicker(false)}>
           <View style={styles.modalOverlay}>
@@ -544,6 +595,21 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     fontSize: 18,
+    fontWeight: '600',
+  },
+  sectionLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  calendarWebButton: {
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  calendarWebButtonText: {
+    color: '#fff',
+    fontSize: 16,
     fontWeight: '600',
   },
   modalOverlay: {

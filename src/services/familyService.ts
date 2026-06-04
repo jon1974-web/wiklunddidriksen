@@ -20,7 +20,10 @@ export interface UserProfile {
   familyId: string | null;
   familyName: string | null;
   calendarId: string | null;
+  calendarEmail: string | null;
+  calendarProvider: 'google' | 'outlook' | null;
   avatarUrl: string | null;
+  notificationsEnabled: boolean;
   createdAt: number;
 }
 
@@ -46,7 +49,10 @@ export const createOrUpdateUser = async (uid: string, data: Partial<UserProfile>
       familyId: null,
       familyName: null,
       calendarId: null,
+      calendarEmail: null,
+      calendarProvider: null,
       avatarUrl: null,
+      notificationsEnabled: true,
       createdAt: Date.now(),
       ...data,
     });

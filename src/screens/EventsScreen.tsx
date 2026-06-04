@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Calendar } from 'react-native-calendars';
+import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
@@ -21,6 +21,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [showPastEvents, setShowPastEvents] = useState(false);
   const user = useUserStore((state) => state.user);
   const { colors } = useTheme();
 
@@ -55,17 +56,28 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     ]);
   }, []);
 
-  const filteredEvents = useMemo(() => {
-    return viewMode === 'calendar'
-      ? events.filter((e) => {
-          const start = e.date;
-          const end = e.endDate || e.date;
-          return selectedDate >= start && selectedDate <= end;
-        })
-      : events;
-  }, [events, viewMode, selectedDate]);
+  const today = new Date().toISOString().split('T')[0];
 
-  const sortedEvents = useMemo(() => sortEventsByDateTime(filteredEvents), [filteredEvents]);
+  const filteredEvents = useMemo(() => {
+    if (viewMode === 'calendar') {
+      return events.filter((e) => {
+        const start = e.date;
+        const end = e.endDate || e.date;
+        return selectedDate >= start && selectedDate <= end;
+      });
+    }
+    const upcoming = events.filter((e) => (e.endDate || e.date) >= today);
+    const past = events.filter((e) => (e.endDate || e.date) < today);
+    return showPastEvents
+      ? [...sortEventsByDateTime(upcoming), ...sortEventsByDateTime(past).reverse()]
+      : sortEventsByDateTime(upcoming);
+  }, [events, viewMode, selectedDate, showPastEvents, today]);
+
+  const hasPastEvents = useMemo(() => {
+    return events.some((e) => (e.endDate || e.date) < today);
+  }, [events, today]);
+
+  const sortedEvents = filteredEvents;
 
   const markedDates = useMemo(() => {
     const marks = events.reduce((acc, event) => {
@@ -133,7 +145,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <View style={styles.weekNumberContainer}>
             <Text style={[styles.weekNumber, { color: colors.textSecondary }]}>Uke {currentWeek}</Text>
           </View>
-          <Calendar
+          <WebCalendar
             current={selectedDate}
             onDayPress={(day: any) => setSelectedDate(day.dateString)}
             markedDates={markedDates}
@@ -148,6 +160,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               textDisabledColor: colors.textDisabled,
               dotColor: colors.accent,
               arrowColor: colors.accent,
+              textColor: colors.text,
+              accentColor: colors.accent,
             }}
           />
         </View>
@@ -165,8 +179,20 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>
             {viewMode === 'calendar'
               ? 'Ingen arrangementer på denne dagen'
-              : 'Ingen arrangementer. Legg til et nytt!'}
+              : 'Ingen kommende arrangementer. Legg til et nytt!'}
           </Text>
+        }
+        ListFooterComponent={
+          viewMode === 'list' && hasPastEvents ? (
+            <TouchableOpacity
+              style={styles.showPastButton}
+              onPress={() => setShowPastEvents(!showPastEvents)}
+            >
+              <Text style={[styles.showPastText, { color: colors.accent }]}>
+                {showPastEvents ? 'Skjul tidligere arrangementer' : 'Se tidligere arrangementer'}
+              </Text>
+            </TouchableOpacity>
+          ) : null
         }
       />
 
@@ -225,6 +251,14 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 16,
     marginTop: 40,
+  },
+  showPastButton: {
+    paddingVertical: 16,
+    alignItems: 'center',
+  },
+  showPastText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   fab: {
     position: 'absolute',

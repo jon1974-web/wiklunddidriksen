@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal, TouchableWithoutFeedback } from 'react-native';
 import { addDoc, collection, updateDoc, doc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
@@ -12,6 +12,10 @@ import { syncEventToCalendar } from '../services/calendarService';
 import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } from '../constants/eventOptions';
 import { LOCALE, DATE_PICKER_RANGE_DAYS } from '../constants/limits';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
+
+interface AddEventScreenProps {
+  navigation: any;
+}
 
 export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation }) => {
   const [title, setTitle] = useState('');

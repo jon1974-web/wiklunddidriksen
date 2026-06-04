@@ -24,7 +24,16 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro",
+      "name": "Familiesenter",
+      "shortName": "Familiesenter",
+      "description": "Familie arrangement administrasjon",
+      "lang": "no",
+      "startUrl": "/",
+      "display": "standalone",
+      "backgroundColor": "#f5f5f5",
+      "themeColor": "#4CAF50"
     },
     "plugins": [
       [

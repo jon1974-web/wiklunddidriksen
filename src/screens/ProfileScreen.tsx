@@ -10,6 +10,8 @@ import {
   Modal,
   Image,
   ActivityIndicator,
+  Platform,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signOut, updateProfile } from 'firebase/auth';
@@ -36,6 +38,7 @@ import {
 } from '../services/calendarService';
 import { isAdmin } from '../services/familyService';
 import { getErrorMessage } from '../utils/validation';
+import { crossAlert } from '../utils/alert';
 import { IMAGE_QUALITY } from '../constants/limits';
 
 export const ProfileScreen: React.FC = () => {
@@ -55,6 +58,9 @@ export const ProfileScreen: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Family[]>([]);
   const [loading, setLoading] = useState(true);
   const [calendarName, setCalendarName] = useState<string | null>(null);
+  const [calendarEmail, setCalendarEmail] = useState('');
+  const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -77,6 +83,15 @@ export const ProfileScreen: React.FC = () => {
       if (userProfile?.calendarId) {
         const name = await getCalendarName(userProfile.calendarId);
         setCalendarName(name);
+      }
+      if (userProfile?.calendarEmail) {
+        setCalendarEmail(userProfile.calendarEmail);
+      }
+      if (userProfile?.calendarProvider) {
+        setCalendarProvider(userProfile.calendarProvider);
+      }
+      if (userProfile?.notificationsEnabled !== undefined) {
+        setNotificationsEnabled(userProfile.notificationsEnabled);
       }
       setLoading(false);
     };
@@ -142,7 +157,7 @@ export const ProfileScreen: React.FC = () => {
 
   const handleLeaveFamily = () => {
     if (!user) return;
-    Alert.alert(
+    crossAlert(
       'Forlat familie',
       'Er du sikker på at du vil forlate denne familien?',
       [
@@ -153,7 +168,7 @@ export const ProfileScreen: React.FC = () => {
           onPress: async () => {
             await leaveFamily(user.uid);
             setFamily(null, null);
-            Alert.alert('Suksess', 'Du har forlatt familien');
+            crossAlert('Suksess', 'Du har forlatt familien');
           },
         },
       ]
@@ -229,7 +244,7 @@ export const ProfileScreen: React.FC = () => {
 
   const handleDisconnectCalendar = async () => {
     if (!user) return;
-    Alert.alert(
+    crossAlert(
       'Koble fra kalender',
       'Arrangementer vil ikke lenger synkroniseres med kalenderen din.',
       [
@@ -241,15 +256,53 @@ export const ProfileScreen: React.FC = () => {
             await createOrUpdateUser(user.uid, { calendarId: null });
             setProfile((prev) => prev ? { ...prev, calendarId: null } : prev);
             setCalendarName(null);
-            Alert.alert('Suksess', 'Kalender frakoblet');
+            crossAlert('Suksess', 'Kalender frakoblet');
           },
         },
       ]
     );
   };
 
+  const handleSaveCalendarPreference = useCallback(async (provider: 'google' | 'outlook') => {
+    if (!user || !calendarEmail.trim()) return;
+    try {
+      await createOrUpdateUser(user.uid, {
+        calendarEmail: calendarEmail.trim(),
+        calendarProvider: provider,
+      });
+      setCalendarProvider(provider);
+      setProfile((prev) => prev ? { ...prev, calendarEmail: calendarEmail.trim(), calendarProvider: provider } : prev);
+      crossAlert('Suksess', `Kalender koblet til ${provider === 'google' ? 'Google' : 'Outlook'}`);
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  }, [user, calendarEmail]);
+
+  const handleDisconnectCalendarEmail = useCallback(async () => {
+    if (!user) return;
+    try {
+      await createOrUpdateUser(user.uid, { calendarEmail: null, calendarProvider: null });
+      setCalendarEmail('');
+      setCalendarProvider(null);
+      setProfile((prev) => prev ? { ...prev, calendarEmail: null, calendarProvider: null } : prev);
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  }, [user]);
+
+  const handleToggleNotifications = useCallback(async (value: boolean) => {
+    if (!user) return;
+    try {
+      await createOrUpdateUser(user.uid, { notificationsEnabled: value });
+      setNotificationsEnabled(value);
+      setProfile((prev) => prev ? { ...prev, notificationsEnabled: value } : prev);
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  }, [user]);
+
   const handleLogout = async () => {
-    Alert.alert('Logg ut', 'Er du sikker på at du vil logge ut?', [
+    crossAlert('Logg ut', 'Er du sikker på at du vil logge ut?', [
       { text: 'Avbryt', style: 'cancel' },
       {
         text: 'Logg ut',
@@ -347,7 +400,60 @@ export const ProfileScreen: React.FC = () => {
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Kalender</Text>
-        {calendarName ? (
+        {calendarProvider && calendarEmail ? (
+          <View>
+            <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
+              <Text style={[styles.value, { color: colors.text }]}>
+                {calendarProvider === 'google' ? '📧 ' : '📧 '}{calendarEmail}
+              </Text>
+              <Text style={[styles.editIcon, { color: colors.accent }]}>
+                {calendarProvider === 'google' ? 'Google' : 'Outlook'}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
+              onPress={handleDisconnectCalendarEmail}
+            >
+              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Koble fra</Text>
+            </TouchableOpacity>
+          </View>
+        ) : Platform.OS === 'web' ? (
+          <View>
+            <Text style={[styles.noFamily, { color: colors.textSecondary, marginBottom: 8 }]}>
+              Lagre kalender-e-post for rask tilgang på arrangementer.
+            </Text>
+            <TextInput
+              style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+              value={calendarEmail}
+              onChangeText={setCalendarEmail}
+              placeholder="Din e-post (f.eks. navn@gmail.com)"
+              placeholderTextColor={colors.textDisabled}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+              <TouchableOpacity
+                style={[styles.calendarProviderButton, { backgroundColor: '#4285F4', opacity: calendarEmail.trim() ? 1 : 0.5 }]}
+                onPress={() => handleSaveCalendarPreference('google')}
+                disabled={!calendarEmail.trim()}
+              >
+                <Text style={styles.familyButtonText}>Google</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.calendarProviderButton, { backgroundColor: '#0078D4', opacity: calendarEmail.trim() ? 1 : 0.5 }]}
+                onPress={() => handleSaveCalendarPreference('outlook')}
+                disabled={!calendarEmail.trim()}
+              >
+                <Text style={styles.familyButtonText}>Outlook</Text>
+              </TouchableOpacity>
+            </View>
+            <View style={{ borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 12, marginTop: 12 }}>
+              <Text style={[styles.noFamily, { color: colors.textSecondary }]}>
+                Du kan også laste ned .ics-fil fra hvert enkelt arrangement.
+              </Text>
+            </View>
+          </View>
+        ) : calendarName ? (
           <View>
             <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
               <Text style={[styles.value, { color: colors.text }]}>{calendarName}</Text>
@@ -390,6 +496,29 @@ export const ProfileScreen: React.FC = () => {
           ))}
         </View>
       </View>
+
+      {Platform.OS !== 'web' && (
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Varsler</Text>
+          <View style={styles.themeOptions}>
+            <TouchableOpacity
+              style={[
+                styles.themeOption,
+                { backgroundColor: colors.inputBackground, borderColor: colors.border },
+                notificationsEnabled && { backgroundColor: colors.accent, borderColor: colors.accent },
+              ]}
+              onPress={() => handleToggleNotifications(!notificationsEnabled)}
+            >
+              <Text style={[styles.themeText, { color: notificationsEnabled ? '#fff' : colors.text }]}>
+                {notificationsEnabled ? 'På' : 'Av'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
+            {notificationsEnabled ? 'Påminnelser sendes før arrangementer.' : 'Varsler er deaktivert.'}
+          </Text>
+        </View>
+      )}
 
       {isAdmin(user?.email) && (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
@@ -751,5 +880,17 @@ const styles = StyleSheet.create({
   searchResultMembers: {
     fontSize: 14,
     marginTop: 2,
+  },
+  calendarInput: {
+    padding: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    borderWidth: 1,
+  },
+  calendarProviderButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
   },
 });

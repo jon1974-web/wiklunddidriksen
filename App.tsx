@@ -121,8 +121,14 @@ const AppContent = () => {
 
   useEffect(() => {
     configureNotifications();
-    requestNotificationPermission();
-  }, []);
+    if (user) {
+      getUserProfile(user.uid).then((profile) => {
+        if (profile?.notificationsEnabled !== false) {
+          requestNotificationPermission();
+        }
+      });
+    }
+  }, [user?.uid]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {

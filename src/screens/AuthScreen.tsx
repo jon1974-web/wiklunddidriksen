@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
-import { createOrUpdateUser, autoJoinFamily, isAdmin } from '../services/familyService';
+import { createOrUpdateUser, autoJoinFamily, isAdmin, getUserProfile } from '../services/familyService';
 
 export const AuthScreen: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -24,16 +24,19 @@ export const AuthScreen: React.FC = () => {
     try {
       if (isLogin) {
         const result = await signInWithEmailAndPassword(auth, email, password);
+        const userProfile = await getUserProfile(result.user.uid);
+        const displayName = userProfile?.displayName || result.user.displayName || 'User';
         setUser({
           uid: result.user.uid,
           email: result.user.email || '',
-          displayName: name || result.user.displayName || 'User',
+          displayName,
         });
       } else {
         const result = await createUserWithEmailAndPassword(auth, email, password);
         const uid = result.user.uid;
         const userEmail = result.user.email || '';
         const role = isAdmin(userEmail) ? 'admin' : 'member';
+        await updateProfile(result.user, { displayName: name });
         await createOrUpdateUser(uid, {
           uid,
           email: userEmail,

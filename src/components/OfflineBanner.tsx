@@ -1,27 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
-import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
+import { useNetworkStatus } from '../platform/NetworkStatus';
 import { useTheme } from '../theme/ThemeContext';
 
 export const OfflineBanner: React.FC = () => {
-  const [isConnected, setIsConnected] = useState(true);
+  const isConnected = useNetworkStatus();
   const [animValue] = useState(new Animated.Value(0));
   const { colors } = useTheme();
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener((state: NetInfoState) => {
-      const connected = state.isConnected ?? true;
-      setIsConnected(connected);
-
-      Animated.timing(animValue, {
-        toValue: connected ? 0 : 1,
-        duration: 300,
-        useNativeDriver: false,
-      }).start();
-    });
-
-    return () => unsubscribe();
-  }, []);
+    Animated.timing(animValue, {
+      toValue: isConnected ? 0 : 1,
+      duration: 300,
+      useNativeDriver: false,
+    }).start();
+  }, [isConnected]);
 
   if (isConnected) return null;
 

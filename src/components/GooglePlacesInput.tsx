@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { GOOGLE_MAPS_API_KEY } from '../constants/api';
 import { DEBOUNCE_MS, MIN_SEARCH_LENGTH } from '../constants/limits';
@@ -25,43 +25,78 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   const [predictions, setPredictions] = useState<Place[]>([]);
   const [showResults, setShowResults] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const autocompleteRef = useRef<any>(null);
   const { colors } = useTheme();
 
   useEffect(() => {
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && (window as any).google?.maps?.places) {
+        autocompleteRef.current = new (window as any).google.maps.places.AutocompleteService();
+        return;
       }
+
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=places&language=no`;
+      script.async = true;
+      script.onload = () => {
+        autocompleteRef.current = new (window as any).google.maps.places.AutocompleteService();
+      };
+      document.head.appendChild(script);
+    }
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, []);
 
-  const searchAddress = async (input: string) => {
-    if (input.length < MIN_SEARCH_LENGTH) {
+  const searchAddress = (input: string) => {
+    if (input.length < MIN_SEARCH_LENGTH || !autocompleteRef.current) {
       setPredictions([]);
+      setShowResults(false);
       return;
     }
 
-    try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${GOOGLE_MAPS_API_KEY}&language=no&types=address`
+    if (Platform.OS === 'web') {
+      const google = (window as any).google;
+      autocompleteRef.current.getQueryPredictions(
+        { input, types: ['address'], componentRestrictions: { country: 'no' } },
+        (results: any[] | null, status: string) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+            setPredictions(
+              results.map((r: any) => ({
+                description: r.description || '',
+                place_id: r.place_id || '',
+              }))
+            );
+            setShowResults(true);
+          } else {
+            setPredictions([]);
+            setShowResults(false);
+          }
+        }
       );
-      const data = await response.json();
-      if (data.predictions) {
-        setPredictions(data.predictions);
-        setShowResults(true);
-      }
-    } catch (error) {
-      setPredictions([]);
+    } else {
+      fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${GOOGLE_MAPS_API_KEY}&language=no&types=address`
+      )
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.predictions) {
+            setPredictions(data.predictions);
+            setShowResults(true);
+          }
+        })
+        .catch(() => setPredictions([]));
     }
   };
 
   const handleChange = (text: string) => {
     onChangeText(text);
-    
+
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
-    
+
     debounceRef.current = setTimeout(() => {
       searchAddress(text);
     }, DEBOUNCE_MS);
@@ -76,22 +111,26 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   return (
     <View style={styles.container}>
       <TextInput
-        style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+        style={[styles.input, { backgroundColor: colors.surface, color: colors.text, borderColor: colors.border }]}
         value={value}
         onChangeText={handleChange}
         placeholder={placeholder}
         placeholderTextColor={colors.textDisabled}
       />
-      
+
       {showResults && predictions.length > 0 && (
-        <View style={[styles.resultsContainer, { backgroundColor: colors.surface }]}>
+        <View style={[styles.resultsContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           {predictions.map((prediction) => (
             <TouchableOpacity
               key={prediction.place_id}
               style={[styles.resultItem, { borderBottomColor: colors.border }]}
               onPress={() => handleSelect(prediction)}
+              activeOpacity={0.7}
             >
-              <Text style={[styles.resultText, { color: colors.text }]}>{prediction.description}</Text>
+              <Text style={[styles.resultIcon, { color: colors.textDisabled }]}>📍</Text>
+              <Text style={[styles.resultText, { color: colors.text }]} numberOfLines={1}>
+                {prediction.description}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
@@ -102,34 +141,31 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
-    zIndex: 1000,
+    zIndex: 1,
   },
   input: {
     padding: 16,
     borderRadius: 12,
     fontSize: 16,
+    borderWidth: 1,
   },
   resultsContainer: {
-    position: 'absolute',
-    top: '100%',
-    left: 0,
-    right: 0,
+    borderWidth: 1,
     borderRadius: 12,
     marginTop: 4,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    maxHeight: 200,
-    zIndex: 1001,
   },
   resultItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 14,
     borderBottomWidth: 1,
+    gap: 10,
+  },
+  resultIcon: {
+    fontSize: 14,
   },
   resultText: {
     fontSize: 14,
+    flex: 1,
   },
 });
