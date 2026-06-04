@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, addDoc, collection } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
@@ -7,6 +7,7 @@ import { ShoppingList, ShoppingItem } from '../types';
 import { ShoppingItem as ShoppingItemComponent } from '../components/ShoppingItem';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
+import { crossAlert } from '../utils/alert';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -35,7 +36,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   }, [list.id]);
 
   const handleDeleteList = useCallback(() => {
-    Alert.alert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
+    crossAlert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
       { text: 'Avbryt', style: 'cancel' },
       {
         text: 'Slett',
@@ -45,7 +46,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
             await deleteDoc(doc(db, 'shoppingLists', list.id));
             navigation.goBack();
           } catch (error) {
-            Alert.alert('Error', getErrorMessage(error));
+            crossAlert('Error', getErrorMessage(error));
           }
         },
       },
@@ -62,13 +63,13 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       });
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
   }, [currentList, user, navigation]);
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) {
-      Alert.alert('Error', 'Vennligst skriv et varenavn');
+      crossAlert('Error', 'Vennligst skriv et varenavn');
       return;
     }
 
@@ -84,7 +85,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       });
       setNewItemName('');
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      crossAlert('Error', error.message);
     }
   };
 

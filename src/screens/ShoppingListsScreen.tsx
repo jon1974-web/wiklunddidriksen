@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, TextInput, Modal } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -7,6 +7,7 @@ import { useUserStore } from '../store/userStore';
 import { ShoppingList } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage, sanitizeInput } from '../utils/validation';
+import { crossAlert } from '../utils/alert';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -33,14 +34,14 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       })) as ShoppingList[];
       setLists(listsData);
     }, (error) => {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     });
     return () => unsubscribe();
   }, []);
 
   const handleCreateList = useCallback(async () => {
     if (!newListTitle.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en tittel');
+      crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
 
@@ -54,12 +55,12 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       setNewListTitle('');
       setModalVisible(false);
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
   }, [newListTitle, user]);
 
   const handleDeleteList = useCallback((listId: string) => {
-    Alert.alert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
+    crossAlert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
       { text: 'Avbryt', style: 'cancel' },
       {
         text: 'Slett',
@@ -68,7 +69,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
           try {
             await deleteDoc(doc(db, 'shoppingLists', listId));
           } catch (error) {
-            Alert.alert('Error', getErrorMessage(error));
+            crossAlert('Error', getErrorMessage(error));
           }
         },
       },
@@ -84,7 +85,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
         createdAt: Date.now(),
       });
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
   }, [user]);
 
