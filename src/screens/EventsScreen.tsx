@@ -197,6 +197,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       />
 
       <TouchableOpacity
+        style={[styles.fabMic, { backgroundColor: colors.accent }]}
+        onPress={() => navigation.navigate('VoiceEvent')}
+      >
+        <Text style={styles.fabMicText}>🎙️</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.accent }]}
         onPress={() => navigation.navigate('AddEvent')}
       >
@@ -279,5 +286,23 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#fff',
     fontWeight: '300',
+  },
+  fabMic: {
+    position: 'absolute',
+    right: 20,
+    bottom: 88,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  fabMicText: {
+    fontSize: 24,
   },
 });

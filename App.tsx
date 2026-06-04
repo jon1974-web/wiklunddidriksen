@@ -20,6 +20,7 @@ import { ShoppingListsScreen } from './src/screens/ShoppingListsScreen';
 import { ShoppingListDetailScreen } from './src/screens/ShoppingListDetailScreen';
 import { ChatScreen } from './src/screens/ChatScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
+import { VoiceEventScreen } from './src/screens/VoiceEventScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
 
 const Tab = createBottomTabNavigator();
@@ -48,6 +49,15 @@ const EventsStack = () => {
         component={EventDetailScreen}
         options={{
           title: 'Rediger',
+          headerStyle: { backgroundColor: colors.surface },
+          headerTintColor: colors.text,
+        }}
+      />
+      <Stack.Screen
+        name="VoiceEvent"
+        component={VoiceEventScreen}
+        options={{
+          title: 'Tal til arrangement',
           headerStyle: { backgroundColor: colors.surface },
           headerTintColor: colors.text,
         }}

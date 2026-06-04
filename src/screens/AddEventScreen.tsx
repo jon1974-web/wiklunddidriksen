@@ -15,27 +15,29 @@ import { sanitizeInput, getErrorMessage } from '../utils/validation';
 
 interface AddEventScreenProps {
   navigation: any;
+  route?: any;
 }
 
-export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation }) => {
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, route }) => {
+  const prefill = route?.params?.prefill;
+  const [title, setTitle] = useState(prefill?.title || '');
+  const [description, setDescription] = useState(prefill?.description || '');
   const [address, setAddress] = useState('');
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(prefill?.date || new Date().toISOString().split('T')[0]);
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState(new Date());
   const [endDateDays, setEndDateDays] = useState<number | null>(null);
-  const [customEndDate, setCustomEndDate] = useState('');
-  const [showEndDate, setShowEndDate] = useState(false);
+  const [customEndDate, setCustomEndDate] = useState(prefill?.endDate || '');
+  const [showEndDate, setShowEndDate] = useState(!!prefill?.endDate);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [tempEndDate, setTempEndDate] = useState(new Date());
-  const [time, setTime] = useState('12:00');
+  const [time, setTime] = useState(prefill?.time || '12:00');
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [endTime, setEndTime] = useState('');
-  const [showEndTime, setShowEndTime] = useState(false);
-  const [customEndTime, setCustomEndTime] = useState('');
+  const [showEndTime, setShowEndTime] = useState(!!prefill?.endTime);
+  const [customEndTime, setCustomEndTime] = useState(prefill?.endTime || '');
   const [showCustomEndTimePicker, setShowCustomEndTimePicker] = useState(false);
-  const [reminderMinutes, setReminderMinutes] = useState(120);
+  const [reminderMinutes, setReminderMinutes] = useState(prefill?.reminderMinutes || 120);
   const user = useUserStore((state) => state.user);
   const { colors } = useTheme();
 
