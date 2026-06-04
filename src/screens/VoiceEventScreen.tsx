@@ -26,7 +26,7 @@ interface ParsedEvent {
   reminderMinutes: number;
 }
 
-const CLOUD_FUNCTION_URL = 'https://europe-west1-familiesenter-837bb.cloudfunctions.net/voiceToEvent';
+const CLOUD_FUNCTION_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent';
 
 export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }) => {
   const [recording, setRecording] = useState<Audio.Recording | null>(null);

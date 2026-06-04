@@ -2,13 +2,12 @@ require("dotenv").config();
 const { onRequest } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
 const OpenAI = require("openai");
-const Busboy = require("busboy");
 
 initializeApp();
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-exports.voiceToEvent = onRequest({ region: "europe-west1", memory: "256MB" }, async (req, res) => {
+exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type");
@@ -28,29 +27,11 @@ exports.voiceToEvent = onRequest({ region: "europe-west1", memory: "256MB" }, as
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
   try {
-    const contentType = req.headers["content-type"] || "";
-    let audioBuffer;
-
-    if (contentType.includes("multipart/form-data")) {
-      const busboy = Busboy({ headers: req.headers });
-      const filePromise = new Promise((resolve, reject) => {
-        busboy.on("file", (fieldname, file, info) => {
-          const chunks = [];
-          file.on("data", (chunk) => chunks.push(chunk));
-          file.on("end", () => resolve(Buffer.concat(chunks)));
-          file.on("error", reject);
-        });
-        busboy.on("error", reject);
-      });
-      req.pipe(busboy);
-      audioBuffer = await filePromise;
-    } else {
-      const chunks = [];
-      for await (const chunk of req) {
-        chunks.push(chunk);
-      }
-      audioBuffer = Buffer.concat(chunks);
+    const chunks = [];
+    for await (const chunk of req) {
+      chunks.push(chunk);
     }
+    const audioBuffer = Buffer.concat(chunks);
 
     if (!audioBuffer || audioBuffer.length === 0) {
       return res.status(400).json({ error: "No audio data received" });
