@@ -8,6 +8,8 @@ import { ShoppingList } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage, sanitizeInput } from '../utils/validation';
 
+const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
+
 interface ShoppingListsScreenProps {
   navigation: any;
 }
@@ -73,18 +75,48 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
     ]);
   }, []);
 
+  const handleCopyList = useCallback(async (list: ShoppingList) => {
+    try {
+      await addDoc(collection(db, 'shoppingLists'), {
+        title: `${list.title} (kopiert)`,
+        items: list.items.map((item) => ({ ...item, id: generateId(), checked: false })),
+        createdBy: user?.uid,
+        createdAt: Date.now(),
+      });
+    } catch (error) {
+      Alert.alert('Error', getErrorMessage(error));
+    }
+  }, [user]);
+
   const renderList = ({ item }: { item: ShoppingList }) => {
     const checkedCount = item.items.filter((i) => i.checked).length;
     return (
       <TouchableOpacity
         style={[styles.listCard, { backgroundColor: colors.surface }]}
         onPress={() => navigation.navigate('ShoppingListDetail', { list: item })}
-        onLongPress={() => handleDeleteList(item.id)}
       >
-        <Text style={[styles.listTitle, { color: colors.text }]}>{item.title}</Text>
-        <Text style={[styles.listMeta, { color: colors.textSecondary }]}>
-          {checkedCount}/{item.items.length} varer krysset av
-        </Text>
+        <View style={styles.listCardBody}>
+          <View style={styles.listCardInfo}>
+            <Text style={[styles.listTitle, { color: colors.text }]}>{item.title}</Text>
+            <Text style={[styles.listMeta, { color: colors.textSecondary }]}>
+              {checkedCount}/{item.items.length} varer krysset av
+            </Text>
+          </View>
+          <View style={styles.listCardActions}>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
+              onPress={() => handleCopyList(item)}
+            >
+              <Text style={[styles.actionButtonText, { color: colors.text }]}>Kopier</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
+              onPress={() => handleDeleteList(item.id)}
+            >
+              <Text style={[styles.actionButtonText, { color: colors.danger }]}>Slett</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -178,6 +210,27 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  listCardBody: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  listCardInfo: {
+    flex: 1,
+  },
+  listCardActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   listTitle: {
     fontSize: 18,

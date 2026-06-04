@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Alert } from 'react-native';
-import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, addDoc, collection } from 'firebase/firestore';
 import { db } from '../services/firebase';
+import { useUserStore } from '../store/userStore';
 import { ShoppingList, ShoppingItem } from '../types';
 import { ShoppingItem as ShoppingItemComponent } from '../components/ShoppingItem';
 import { useTheme } from '../theme/ThemeContext';
+import { getErrorMessage } from '../utils/validation';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -18,6 +20,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   const [currentList, setCurrentList] = useState<ShoppingList>(list);
   const [newItemName, setNewItemName] = useState('');
   const { colors } = useTheme();
+  const user = useUserStore((state) => state.user);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'shoppingLists', list.id), (doc) => {
@@ -30,6 +33,38 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
     });
     return () => unsubscribe();
   }, [list.id]);
+
+  const handleDeleteList = useCallback(() => {
+    Alert.alert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
+      { text: 'Avbryt', style: 'cancel' },
+      {
+        text: 'Slett',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await deleteDoc(doc(db, 'shoppingLists', list.id));
+            navigation.goBack();
+          } catch (error) {
+            Alert.alert('Error', getErrorMessage(error));
+          }
+        },
+      },
+    ]);
+  }, [list.id, navigation]);
+
+  const handleCopyList = useCallback(async () => {
+    try {
+      const newListRef = await addDoc(collection(db, 'shoppingLists'), {
+        title: `${currentList.title} (kopiert)`,
+        items: currentList.items.map((item) => ({ ...item, id: generateId(), checked: false })),
+        createdBy: user?.uid,
+        createdAt: Date.now(),
+      });
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Error', getErrorMessage(error));
+    }
+  }, [currentList, user, navigation]);
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) {
@@ -80,10 +115,26 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>{currentList.title}</Text>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          {currentList.items.filter((i) => i.checked).length}/{currentList.items.length} varer krysset av
-        </Text>
+        <View style={styles.headerInfo}>
+          <Text style={[styles.title, { color: colors.text }]}>{currentList.title}</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            {currentList.items.filter((i) => i.checked).length}/{currentList.items.length} varer krysset av
+          </Text>
+        </View>
+        <View style={styles.headerActions}>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
+            onPress={handleCopyList}
+          >
+            <Text style={[styles.headerButtonText, { color: colors.text }]}>Kopier</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
+            onPress={handleDeleteList}
+          >
+            <Text style={[styles.headerButtonText, { color: colors.danger }]}>Slett</Text>
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={[styles.addItemContainer, { backgroundColor: colors.surface }]}>
@@ -118,8 +169,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
+  },
+  headerInfo: {
+    flex: 1,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  headerButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 8,
+  },
+  headerButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   title: {
     fontSize: 24,
