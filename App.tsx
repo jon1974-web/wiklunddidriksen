@@ -192,6 +192,7 @@ const AppContent = () => {
           <Tab.Navigator
             screenOptions={{
               headerShown: false,
+              tabBarShowLabel: false,
               tabBarActiveTintColor: colors.accent,
               tabBarInactiveTintColor: colors.textDisabled,
               tabBarStyle: {
