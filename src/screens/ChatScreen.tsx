@@ -11,6 +11,7 @@ import { MessageBubble } from '../components/MessageBubble';
 import { useTheme } from '../theme/ThemeContext';
 import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_MAX_DIMENSION, IMAGE_QUALITY, SCROLL_DELAY_MS, LOCALE } from '../constants/limits';
 import { getErrorMessage } from '../utils/validation';
+import { uriToBlob } from '../utils/upload';
 
 export const ChatScreen: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -87,8 +88,7 @@ export const ChatScreen: React.FC = () => {
   }, []);
 
   const uploadImage = async (uri: string): Promise<string> => {
-    const response = await fetch(uri);
-    const blob = await response.blob();
+    const blob = await uriToBlob(uri);
     const filename = `chat/${Date.now()}_${Math.random().toString(36).substr(2)}`;
     const storageRef = ref(storage, filename);
     await uploadBytes(storageRef, blob);

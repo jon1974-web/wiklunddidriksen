@@ -39,6 +39,7 @@ import {
 import { isAdmin } from '../services/familyService';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
+import { uriToBlob } from '../utils/upload';
 import { IMAGE_QUALITY } from '../constants/limits';
 
 export const ProfileScreen: React.FC = () => {
@@ -212,8 +213,7 @@ export const ProfileScreen: React.FC = () => {
     if (!user) return;
     setUploading(true);
     try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
+      const blob = await uriToBlob(uri);
       const storageRef = ref(storage, `avatars/${user.uid}`);
       await uploadBytes(storageRef, blob);
       const downloadUrl = await getDownloadURL(storageRef);
