@@ -397,7 +397,19 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                 const [h, m] = time.split(':').map(Number);
                 const start = new Date(date);
                 start.setHours(h, m, 0, 0);
-                const end = new Date(start.getTime() + 60 * 60 * 1000);
+
+                let end: Date;
+                if (endTime) {
+                  const [eh, em] = endTime.split(':').map(Number);
+                  end = new Date(date);
+                  end.setHours(eh, em, 0, 0);
+                } else if (endDate) {
+                  end = new Date(endDate);
+                  end.setHours(h, m, 0, 0);
+                  end.setDate(end.getDate() + 1);
+                } else {
+                  end = new Date(start.getTime() + 60 * 60 * 1000);
+                }
                 if (userCalendarProvider === 'google') {
                   const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
                   const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(address)}`;
