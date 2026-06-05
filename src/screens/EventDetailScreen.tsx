@@ -399,13 +399,17 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                 start.setHours(h, m, 0, 0);
 
                 let end: Date;
-                if (event.endTime) {
+                if (event.endDate && event.endTime) {
+                  const [eh, em] = event.endTime.split(':').map(Number);
+                  end = new Date(event.endDate);
+                  end.setHours(eh, em, 0, 0);
+                } else if (event.endTime) {
                   const [eh, em] = event.endTime.split(':').map(Number);
                   end = new Date(date);
                   end.setHours(eh, em, 0, 0);
                 } else if (event.endDate) {
                   end = new Date(event.endDate);
-                  end.setHours(h, m + 60, 0, 0);
+                  end.setHours(h, m, 0, 0);
                 } else {
                   end = new Date(start.getTime() + 60 * 60 * 1000);
                 }
