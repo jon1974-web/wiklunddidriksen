@@ -119,25 +119,27 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 8 }}>
           <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
         </TouchableOpacity>
-        <View style={styles.headerInfo}>
-          <Text style={[styles.title, { color: colors.text }]}>{currentList.title}</Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            {currentList.items.filter((i) => i.checked).length}/{currentList.items.length} varer krysset av
-          </Text>
-        </View>
-        <View style={styles.headerActions}>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
-            onPress={handleCopyList}
-          >
-            <Text style={[styles.headerButtonText, { color: colors.text }]}>Kopier</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
-            onPress={handleDeleteList}
-          >
-            <Text style={[styles.headerButtonText, { color: colors.danger }]}>Slett</Text>
-          </TouchableOpacity>
+        <View style={styles.headerRow}>
+          <View style={styles.headerInfo}>
+            <Text style={[styles.title, { color: colors.text }]}>{currentList.title}</Text>
+            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+              {currentList.items.filter((i) => i.checked).length}/{currentList.items.length} varer krysset av
+            </Text>
+          </View>
+          <View style={styles.headerActions}>
+            <TouchableOpacity
+              style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
+              onPress={handleCopyList}
+            >
+              <Text style={[styles.headerButtonText, { color: colors.text }]}>Kopier</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
+              onPress={handleDeleteList}
+            >
+              <Text style={[styles.headerButtonText, { color: colors.danger }]}>Slett</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
 
@@ -173,11 +175,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    alignItems: 'flex-start',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
+    width: '100%',
   },
   headerInfo: {
     flex: 1,
