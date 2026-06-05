@@ -215,7 +215,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 8 }}>
-        <Text style={{ color: colors.accent, fontSize: 16 }}>← Tilbake</Text>
+        <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
       </TouchableOpacity>
       <Text style={[styles.title, { color: colors.text }]}>Rediger arrangement</Text>
 
