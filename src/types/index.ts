@@ -91,3 +91,10 @@ export interface TripDocument {
   fileName?: string;
   createdAt: number;
 }
+
+export interface TripLink {
+  id: string;
+  title: string;
+  url: string;
+  createdAt: number;
+}

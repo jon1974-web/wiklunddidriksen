@@ -9,7 +9,7 @@ import {
   query,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Trip, TripRestaurant, TripActivity, TripDocument } from '../types';
+import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
 
 const TRIPS_COLLECTION = 'trips';
 
@@ -32,7 +32,7 @@ export const updateTrip = async (id: string, data: Partial<Trip>): Promise<void>
 };
 
 export const deleteTrip = async (id: string): Promise<void> => {
-  const subcollections = ['restaurants', 'activities', 'documents'];
+  const subcollections = ['restaurants', 'activities', 'documents', 'links'];
   for (const sub of subcollections) {
     const snap = await getDocs(collection(db, TRIPS_COLLECTION, id, sub));
     for (const d of snap.docs) {
@@ -97,4 +97,23 @@ export const addTripDocument = async (tripId: string, data: Omit<TripDocument, '
 
 export const deleteTripDocument = async (tripId: string, documentId: string): Promise<void> => {
   await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'documents', documentId));
+};
+
+// Links
+export const getTripLinks = async (tripId: string): Promise<TripLink[]> => {
+  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'links'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as TripLink));
+};
+
+export const addTripLink = async (tripId: string, data: Omit<TripLink, 'id' | 'createdAt'>): Promise<string> => {
+  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'links'), {
+    ...data,
+    createdAt: Date.now(),
+  });
+  return docRef.id;
+};
+
+export const deleteTripLink = async (tripId: string, linkId: string): Promise<void> => {
+  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'links', linkId));
 };
