@@ -12,6 +12,7 @@ import { syncEventToCalendar } from '../services/calendarService';
 import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } from '../constants/eventOptions';
 import { LOCALE, DATE_PICKER_RANGE_DAYS } from '../constants/limits';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
+import { getTodayLocal } from '../utils/dateUtils';
 
 interface AddEventScreenProps {
   navigation: any;
@@ -23,7 +24,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   const [title, setTitle] = useState(prefill?.title || '');
   const [description, setDescription] = useState(prefill?.description || '');
   const [address, setAddress] = useState('');
-  const [date, setDate] = useState(prefill?.date || new Date().toISOString().split('T')[0]);
+  const [date, setDate] = useState(prefill?.date || getTodayLocal());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [tempDate, setTempDate] = useState(new Date());
   const [endDateDays, setEndDateDays] = useState<number | null>(null);

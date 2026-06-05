@@ -7,7 +7,7 @@ import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { Event } from '../types';
 import { EventCard } from '../components/EventCard';
-import { sortEventsByDateTime, getWeekNumber } from '../utils/dateUtils';
+import { sortEventsByDateTime, getWeekNumber, getTodayLocal } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 
@@ -20,7 +20,7 @@ const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#0
 export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
-  const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
+  const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
   const user = useUserStore((state) => state.user);
   const { colors } = useTheme();
@@ -56,7 +56,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     ]);
   }, []);
 
-  const today = new Date().toISOString().split('T')[0];
+  const today = getTodayLocal();
 
   const filteredEvents = useMemo(() => {
     if (viewMode === 'calendar') {
