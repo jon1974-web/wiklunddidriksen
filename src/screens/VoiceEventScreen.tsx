@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Audio } from 'expo-av';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
@@ -29,32 +28,50 @@ interface ParsedEvent {
 const CLOUD_FUNCTION_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent';
 
 export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }) => {
-  const [recording, setRecording] = useState<Audio.Recording | null>(null);
+  const [recording, setRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [transcript, setTranscript] = useState<string | null>(null);
   const [parsedEvent, setParsedEvent] = useState<ParsedEvent | null>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
 
   const startRecording = useCallback(async () => {
     try {
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        crossAlert('Tilgang', 'Mikrofontilgang er nødvendig for å ta opp lyd.');
-        return;
+      if (Platform.OS === 'web') {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        chunksRef.current = [];
+
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            chunksRef.current.push(event.data);
+          }
+        };
+
+        mediaRecorderRef.current = mediaRecorder;
+        mediaRecorder.start();
+        setRecording(true);
+        setTranscript(null);
+        setParsedEvent(null);
+      } else {
+        const { Audio } = await import('expo-av');
+        const { status } = await Audio.requestPermissionsAsync();
+        if (status !== 'granted') {
+          crossAlert('Tilgang', 'Mikrofontilgang er nødvendig for å ta opp lyd.');
+          return;
+        }
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+        const { recording: newRecording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.HIGH_QUALITY
+        );
+        (globalThis as any).__voiceRecording = newRecording;
+        (globalThis as any).__voiceAudio = Audio;
+        setRecording(true);
+        setTranscript(null);
+        setParsedEvent(null);
       }
-
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
-
-      const { recording } = await Audio.Recording.createAsync(
-        Audio.RecordingOptionsPresets.HIGH_QUALITY
-      );
-      setRecording(recording);
-      setTranscript(null);
-      setParsedEvent(null);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -65,20 +82,30 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
     try {
       setProcessing(true);
-      await recording.stopAndUnloadAsync();
-      await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+      let audioBlob: Blob;
 
-      const uri = recording.getURI();
-      setRecording(null);
+      if (Platform.OS === 'web') {
+        const mediaRecorder = mediaRecorderRef.current;
+        if (!mediaRecorder) throw new Error('No MediaRecorder');
 
-      if (!uri) {
-        crossAlert('Error', 'Kunne ikke finne lydopptak.');
-        setProcessing(false);
-        return;
+        await new Promise<void>((resolve) => {
+          mediaRecorder.onstop = () => resolve();
+          mediaRecorder.stop();
+        });
+
+        mediaRecorder.stream.getTracks().forEach((track) => track.stop());
+        audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+      } else {
+        const Audio = (globalThis as any).__voiceAudio;
+        const rec = (globalThis as any).__voiceRecording;
+        await rec.stopAndUnloadAsync();
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+        const uri = rec.getURI();
+        const response = await fetch(uri);
+        audioBlob = await response.blob();
       }
 
-      const response = await fetch(uri);
-      const audioBlob = await response.blob();
+      setRecording(false);
 
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
@@ -132,9 +159,8 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         );
         if (notifId) {
           notificationId = notifId;
-          await import('firebase/firestore').then(({ updateDoc, doc }) =>
-            updateDoc(doc(db, 'events', docRef.id), { notificationId })
-          );
+          const { updateDoc, doc } = await import('firebase/firestore');
+          await updateDoc(doc(db, 'events', docRef.id), { notificationId });
         }
       } catch {}
 
@@ -219,7 +245,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
             </Text>
             {transcript && (
               <Text style={[styles.transcriptPreview, { color: colors.text }]}>
-                "{transcript}"
+                &quot;{transcript}&quot;
               </Text>
             )}
           </View>
@@ -232,7 +258,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
             {transcript && (
               <View style={[styles.transcriptCard, { backgroundColor: colors.inputBackground }]}>
                 <Text style={[styles.transcriptLabel, { color: colors.textSecondary }]}>Du sa:</Text>
-                <Text style={[styles.transcriptText, { color: colors.text }]}>{'"'}{transcript}{'"'}</Text>
+                <Text style={[styles.transcriptText, { color: colors.text }]}>&quot;{transcript}&quot;</Text>
               </View>
             )}
 
