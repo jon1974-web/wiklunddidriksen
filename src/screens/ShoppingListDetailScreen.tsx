@@ -116,7 +116,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginRight: 12 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 8 }}>
           <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
         </TouchableOpacity>
         <View style={styles.headerInfo}>
