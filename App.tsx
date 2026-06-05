@@ -48,9 +48,7 @@ const EventsStack = () => {
         name="EventDetail"
         component={EventDetailScreen}
         options={{
-          title: 'Rediger',
-          headerStyle: { backgroundColor: colors.surface },
-          headerTintColor: colors.text,
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -78,11 +76,9 @@ const ShoppingStack = () => {
       <Stack.Screen
         name="ShoppingListDetail"
         component={ShoppingListDetailScreen}
-        options={({ route }: any) => ({
-          title: route.params?.list?.title || 'Handleliste',
-          headerStyle: { backgroundColor: colors.surface },
-          headerTintColor: colors.text,
-        })}
+        options={{
+          headerShown: false,
+        }}
       />
     </Stack.Navigator>
   );
