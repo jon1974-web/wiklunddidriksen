@@ -21,6 +21,9 @@ import { ShoppingListDetailScreen } from './src/screens/ShoppingListDetailScreen
 import { ChatScreen } from './src/screens/ChatScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { VoiceEventScreen } from './src/screens/VoiceEventScreen';
+import { TripsScreen } from './src/screens/TripsScreen';
+import { AddTripScreen } from './src/screens/AddTripScreen';
+import { TripDetailScreen } from './src/screens/TripDetailScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
 
 const Tab = createBottomTabNavigator();
@@ -95,6 +98,33 @@ const ChatStack = () => {
           headerShown: false,
           headerStyle: { backgroundColor: colors.surface },
           headerTintColor: colors.text,
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const TripsStack = () => {
+  const { colors } = useTheme();
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="TripsList"
+        component={TripsScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="AddTrip"
+        component={AddTripScreen}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="TripDetail"
+        component={TripDetailScreen}
+        options={{
+          headerShown: false,
         }}
       />
     </Stack.Navigator>
@@ -226,6 +256,14 @@ const AppContent = () => {
               options={{
                 tabBarLabel: 'Chat',
                 tabBarIcon: ({ focused }) => <TabIcon label="💬" focused={focused} />,
+              }}
+            />
+            <Tab.Screen
+              name="Trips"
+              component={TripsStack}
+              options={{
+                tabBarLabel: 'Reise',
+                tabBarIcon: ({ focused }) => <TabIcon label="✈️" focused={focused} />,
               }}
             />
             <Tab.Screen

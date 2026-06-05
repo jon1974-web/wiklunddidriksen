@@ -52,3 +52,42 @@ export interface ChatMessage {
   imageUrl?: string;
   reactions?: MessageReaction[];
 }
+
+export interface Trip {
+  id: string;
+  title: string;
+  city: string;
+  country: string;
+  startDate: string;
+  endDate: string;
+  createdBy: string;
+  createdAt: number;
+}
+
+export interface TripRestaurant {
+  id: string;
+  name: string;
+  address?: string;
+  note?: string;
+  rating?: number;
+  createdAt: number;
+}
+
+export interface TripActivity {
+  id: string;
+  name: string;
+  date?: string;
+  time?: string;
+  address?: string;
+  note?: string;
+  createdAt: number;
+}
+
+export interface TripDocument {
+  id: string;
+  title: string;
+  note?: string;
+  fileUrl?: string;
+  fileName?: string;
+  createdAt: number;
+}
