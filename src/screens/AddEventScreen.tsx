@@ -13,6 +13,7 @@ import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } fr
 import { LOCALE, DATE_PICKER_RANGE_DAYS } from '../constants/limits';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { getTodayLocal } from '../utils/dateUtils';
+import { EVENT_ICONS } from '../constants/eventIcons';
 
 interface AddEventScreenProps {
   navigation: any;
@@ -39,6 +40,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   const [customEndTime, setCustomEndTime] = useState(prefill?.endTime || '');
   const [showCustomEndTimePicker, setShowCustomEndTimePicker] = useState(false);
   const [reminderMinutes, setReminderMinutes] = useState(prefill?.reminderMinutes || 120);
+  const [icon, setIcon] = useState(prefill?.icon || '');
   const user = useUserStore((state) => state.user);
   const { colors } = useTheme();
 
@@ -58,6 +60,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         reminderMinutes,
         createdBy: user?.uid,
         createdAt: Date.now(),
+        icon: icon || null,
       };
 
       if (showEndDate) {
@@ -136,7 +139,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, navigation]);
+  }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, navigation]);
 
   const handleDateConfirm = () => {
     setDate(tempDate.toISOString().split('T')[0]);
@@ -151,6 +154,22 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <Text style={[styles.title, { color: colors.text }]}>Nytt arrangement</Text>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+        <View style={styles.iconGrid}>
+          {EVENT_ICONS.map((item) => (
+            <TouchableOpacity
+              key={item.emoji}
+              style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, icon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+              onPress={() => setIcon(icon === item.emoji ? '' : item.emoji)}
+            >
+              <Text style={styles.iconEmoji}>{item.emoji}</Text>
+              <Text style={[styles.iconLabel, { color: icon === item.emoji ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
@@ -441,6 +460,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
+  },
+  iconGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  iconOption: {
+    width: 72,
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  iconEmoji: {
+    fontSize: 24,
+  },
+  iconLabel: {
+    fontSize: 10,
+    marginTop: 2,
   },
   input: {
     padding: 16,

@@ -13,6 +13,7 @@ import { useUserStore } from '../store/userStore';
 import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } from '../constants/eventOptions';
 import { LOCALE, DATE_PICKER_RANGE_DAYS } from '../constants/limits';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
+import { EVENT_ICONS } from '../constants/eventIcons';
 
 interface EventDetailScreenProps {
   navigation: any;
@@ -65,6 +66,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [reminderMinutes, setReminderMinutes] = useState(event.reminderMinutes);
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
+  const [icon, setIcon] = useState(event.icon || '');
 
   useEffect(() => {
     if (user?.uid) {
@@ -91,6 +93,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         date,
         time,
         reminderMinutes,
+        icon: icon || null,
       };
 
       if (showEndDate) {
@@ -186,7 +189,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, event, navigation]);
+  }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, event, navigation]);
 
   const handleDelete = useCallback(() => {
     Alert.alert('Slett arrangement', 'Er du sikker på at du vil slette dette?', [
@@ -218,6 +221,22 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
       </TouchableOpacity>
       <Text style={[styles.title, { color: colors.text }]}>Rediger arrangement</Text>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+        <View style={styles.iconGrid}>
+          {EVENT_ICONS.map((item) => (
+            <TouchableOpacity
+              key={item.emoji}
+              style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, icon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+              onPress={() => setIcon(icon === item.emoji ? '' : item.emoji)}
+            >
+              <Text style={styles.iconEmoji}>{item.emoji}</Text>
+              <Text style={[styles.iconLabel, { color: icon === item.emoji ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
@@ -553,6 +572,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 8,
+  },
+  iconGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  iconOption: {
+    width: 72,
+    paddingVertical: 10,
+    paddingHorizontal: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  iconEmoji: {
+    fontSize: 24,
+  },
+  iconLabel: {
+    fontSize: 10,
+    marginTop: 2,
   },
   input: {
     padding: 16,

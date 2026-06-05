@@ -35,7 +35,10 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress 
     <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface }]} onPress={onPress}>
       <View style={styles.row}>
         <View style={styles.content}>
-          <Text style={[styles.title, { color: colors.text }]}>{event.title}</Text>
+          <View style={styles.titleRow}>
+            {event.icon && <Text style={styles.icon}>{event.icon}</Text>}
+            <Text style={[styles.title, { color: colors.text }]}>{event.title}</Text>
+          </View>
           {event.description && (
             <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>{event.description}</Text>
           )}
@@ -76,6 +79,14 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     gap: 4,
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  icon: {
+    fontSize: 22,
   },
   title: {
     fontSize: 18,

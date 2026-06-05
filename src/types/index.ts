@@ -20,6 +20,7 @@ export interface Event {
   createdAt: number;
   notificationId?: string;
   calendarEventId?: string;
+  icon?: string;
 }
 
 export interface ShoppingItem {
