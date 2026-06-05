@@ -177,19 +177,15 @@ export const ProfileScreen: React.FC = () => {
   };
 
   const handlePickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Tillatelse', 'Vi trenger tilgang til bildebiblioteket.');
-      return;
-    }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [1, 1],
       quality: IMAGE_QUALITY,
+      base64: true,
     });
     if (!result.canceled && result.assets[0]) {
-      await uploadAvatar(result.assets[0].uri);
+      await uploadAvatar(result.assets[0].uri, result.assets[0].base64 || null);
     }
   };
 
@@ -203,17 +199,29 @@ export const ProfileScreen: React.FC = () => {
       allowsEditing: true,
       aspect: [1, 1],
       quality: IMAGE_QUALITY,
+      base64: true,
     });
     if (!result.canceled && result.assets[0]) {
-      await uploadAvatar(result.assets[0].uri);
+      await uploadAvatar(result.assets[0].uri, result.assets[0].base64 || null);
     }
   };
 
-  const uploadAvatar = async (uri: string) => {
+  const uploadAvatar = async (uri: string, base64Data: string | null = null) => {
     if (!user) return;
     setUploading(true);
     try {
-      const blob = await uriToBlob(uri);
+      let blob: Blob;
+      if (base64Data && Platform.OS === 'web') {
+        const byteString = atob(base64Data);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
+        }
+        blob = new Blob([ab], { type: 'image/jpeg' });
+      } else {
+        blob = await uriToBlob(uri);
+      }
       const storageRef = ref(storage, `avatars/${user.uid}`);
       await uploadBytes(storageRef, blob);
       const downloadUrl = await getDownloadURL(storageRef);

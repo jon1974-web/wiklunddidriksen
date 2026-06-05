@@ -17,6 +17,7 @@ export const ChatScreen: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImageBase64, setSelectedImageBase64] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
   const user = useUserStore((state) => state.user);
@@ -49,22 +50,18 @@ export const ChatScreen: React.FC = () => {
   }, []);
 
   const handlePickImage = useCallback(async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Tillatelse', 'Vi trenger tilgang til bildebiblioteket for å dele bilder.');
-      return;
-    }
-
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       allowsEditing: true,
       quality: IMAGE_QUALITY,
       maxWidth: IMAGE_MAX_DIMENSION,
       maxHeight: IMAGE_MAX_DIMENSION,
+      base64: true,
     });
 
     if (!result.canceled && result.assets[0]) {
       setSelectedImage(result.assets[0].uri);
+      setSelectedImageBase64(result.assets[0].base64 || null);
     }
   }, []);
 
@@ -87,8 +84,19 @@ export const ChatScreen: React.FC = () => {
     }
   }, []);
 
-  const uploadImage = async (uri: string): Promise<string> => {
-    const blob = await uriToBlob(uri);
+  const uploadImage = async (uri: string, base64Data: string | null): Promise<string> => {
+    let blob: Blob;
+    if (base64Data && Platform.OS === 'web') {
+      const byteString = atob(base64Data);
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      blob = new Blob([ab], { type: 'image/jpeg' });
+    } else {
+      blob = await uriToBlob(uri);
+    }
     const filename = `chat/${Date.now()}_${Math.random().toString(36).substr(2)}`;
     const storageRef = ref(storage, filename);
     await uploadBytes(storageRef, blob);
@@ -103,7 +111,7 @@ export const ChatScreen: React.FC = () => {
       let imageUrl: string | undefined;
 
       if (selectedImage) {
-        imageUrl = await uploadImage(selectedImage);
+        imageUrl = await uploadImage(selectedImage, selectedImageBase64);
       }
 
       await addDoc(collection(db, 'chat'), {
@@ -117,6 +125,7 @@ export const ChatScreen: React.FC = () => {
 
       setNewMessage('');
       setSelectedImage(null);
+      setSelectedImageBase64(null);
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, SCROLL_DELAY_MS);
