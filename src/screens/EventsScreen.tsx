@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Platform, Modal, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
@@ -34,6 +34,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [responseModal, setResponseModal] = useState<{ eventId: string; groupId: string; type: 'accept' | 'decline' } | null>(null);
+  const [responseListModal, setResponseListModal] = useState<{ eventId: string; groupId: string; type: 'accepted' | 'declined' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
@@ -324,27 +325,38 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               {item.address && (
                 <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
               )}
-              {item.responses && (
-                <Text style={[styles.spondCardResponses, { color: colors.textSecondary }]}>
-                  {accepted} akseptert · {declined} avslått · {unanswered} ikke svart
-                </Text>
-              )}
             </View>
+            {item.groupId && (
+              <View style={styles.spondCardIcons}>
+                <TouchableOpacity
+                  style={[styles.spondIconBtn, { backgroundColor: colors.accentLight }]}
+                  onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'accept' })}
+                >
+                  <Text style={styles.spondIconText}>✓</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.spondIconBtn, { backgroundColor: '#FFEBEE' }]}
+                  onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'decline' })}
+                >
+                  <Text style={[styles.spondIconText, { color: colors.danger }]}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            )}
           </View>
-          {item.groupId && (
-            <View style={styles.spondCardActions}>
-              <TouchableOpacity
-                style={[styles.spondActionButton, { backgroundColor: colors.accent }]}
-                onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'accept' })}
-              >
-                <Text style={styles.spondActionButtonText}>Aksepter</Text>
+          {item.responses && (
+            <View style={styles.spondCardResponseRow}>
+              <TouchableOpacity onPress={() => setResponseListModal({ eventId: item.id, groupId: item.groupId!, type: 'accepted' })}>
+                <Text style={[styles.spondCardResponseLink, { color: colors.accent }]}>
+                  {accepted} akseptert
+                </Text>
               </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.spondActionButton, { backgroundColor: colors.danger }]}
-                onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'decline' })}
-              >
-                <Text style={styles.spondActionButtonText}>Avslå</Text>
+              <Text style={{ color: colors.textDisabled }}> · </Text>
+              <TouchableOpacity onPress={() => setResponseListModal({ eventId: item.id, groupId: item.groupId!, type: 'declined' })}>
+                <Text style={[styles.spondCardResponseLink, { color: colors.danger }]}>
+                  {declined} avslått
+                </Text>
               </TouchableOpacity>
+              <Text style={{ color: colors.textDisabled }}> · {unanswered} ikke svart</Text>
             </View>
           )}
         </View>
@@ -356,7 +368,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         onPress={() => navigation.navigate('EventDetail', { event: item })}
       />
     );
-  }, [navigation, colors, setResponseModal]);
+  }, [navigation, colors, setResponseModal, setResponseListModal]);
 
   const handleSendResponse = useCallback(async (memberIds: string[]) => {
     if (!responseModal || !spondConfig) return;
@@ -473,6 +485,46 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           onClose={() => setResponseModal(null)}
         />
       )}
+
+      {responseListModal && (() => {
+        const event = spondEvents.find((e) => e.id === responseListModal.eventId);
+        if (!event?.responses) return null;
+        const ids = responseListModal.type === 'accepted' ? event.responses.acceptedIds : event.responses.declinedIds;
+        const members = spondRespondents
+          .filter((r) => r.groupId === responseListModal.groupId && ids.includes(r.spondId));
+        const title = responseListModal.type === 'accepted' ? 'Akseptert' : 'Avslått';
+        const color = responseListModal.type === 'accepted' ? colors.accent : colors.danger;
+        return (
+          <Modal visible={true} transparent animationType="fade">
+            <TouchableWithoutFeedback onPress={() => setResponseListModal(null)}>
+              <View style={styles.responseListOverlay}>
+                <TouchableWithoutFeedback>
+                  <View style={[styles.responseListContainer, { backgroundColor: colors.surface }]}>
+                    <Text style={[styles.responseListTitle, { color, borderBottomColor: colors.border }]}>{title} ({ids.length})</Text>
+                    {members.length === 0 ? (
+                      <Text style={[styles.responseListEmpty, { color: colors.textDisabled }]}>Ingen</Text>
+                    ) : (
+                      <FlatList
+                        data={members}
+                        keyExtractor={(item) => item.spondId}
+                        style={styles.responseListScroll}
+                        renderItem={({ item }) => (
+                          <Text style={[styles.responseListName, { color: colors.text, borderBottomColor: colors.border }]}>
+                            {item.firstName} {item.lastName}
+                          </Text>
+                        )}
+                      />
+                    )}
+                    <TouchableOpacity style={[styles.responseListClose, { borderTopColor: colors.border }]} onPress={() => setResponseListModal(null)}>
+                      <Text style={[styles.responseListCloseText, { color: colors.accent }]}>Lukk</Text>
+                    </TouchableOpacity>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </TouchableWithoutFeedback>
+          </Modal>
+        );
+      })()}
     </SafeAreaView>
   );
 };
@@ -613,25 +665,72 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontWeight: '500',
   },
-  spondCardResponses: {
-    fontSize: 14,
-    marginTop: 6,
+  spondCardIcons: {
+    flexDirection: 'column',
+    gap: 6,
   },
-  spondCardActions: {
+  spondIconBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  spondIconText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#4CAF50',
+  },
+  spondCardResponseRow: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-    gap: 8,
+    alignItems: 'center',
+    marginTop: 8,
+    paddingLeft: 36,
   },
-  spondActionButton: {
-    paddingVertical: 5,
-    paddingHorizontal: 14,
-    borderRadius: 6,
+  spondCardResponseLink: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  responseListOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  spondActionButtonText: {
-    color: '#fff',
-    fontSize: 13,
+  responseListContainer: {
+    width: '80%',
+    maxHeight: '60%',
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  responseListTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  responseListScroll: {
+    maxHeight: 350,
+  },
+  responseListName: {
+    fontSize: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  responseListEmpty: {
+    fontSize: 15,
+    textAlign: 'center',
+    paddingVertical: 24,
+  },
+  responseListClose: {
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderTopWidth: 1,
+  },
+  responseListCloseText: {
+    fontSize: 16,
     fontWeight: '600',
   },
   fab: {
