@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { db } from './firebase';
 import { SpondEvent, SpondGroup, SpondConfig, SpondMember } from '../types';
 
@@ -128,4 +128,20 @@ export const getSpondConfig = async (familyId: string): Promise<SpondConfig | nu
 
 export const clearSpondToken = (): void => {
   cachedToken = null;
+};
+
+export const saveSpondResponse = async (eventId: string, accepted: boolean): Promise<void> => {
+  await setDoc(doc(db, 'spondResponses', eventId), {
+    response: accepted,
+    updatedAt: new Date().toISOString(),
+  });
+};
+
+export const getSpondResponses = async (): Promise<Record<string, boolean>> => {
+  const snap = await getDocs(collection(db, 'spondResponses'));
+  const responses: Record<string, boolean> = {};
+  snap.forEach((doc) => {
+    responses[doc.id] = doc.data().response;
+  });
+  return responses;
 };

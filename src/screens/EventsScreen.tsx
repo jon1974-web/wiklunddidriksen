@@ -12,7 +12,7 @@ import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatT
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
-import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services/spondService';
+import { getSpondConfig, getSpondEvents, changeSpondResponse, saveSpondResponse, getSpondResponses } from '../services/spondService';
 
 interface EventsScreenProps {
   navigation: any;
@@ -33,6 +33,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
+  const [spondLocalResponses, setSpondLocalResponses] = useState<Record<string, boolean>>({});
   const [responseModal, setResponseModal] = useState<{ eventId: string; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
@@ -86,6 +87,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
         if (config.respondents && config.respondents.length > 0) {
           setSpondRespondents(config.respondents);
+        }
+
+        try {
+          const responses = await getSpondResponses();
+          setSpondLocalResponses(responses);
+        } catch {
+          // Silently fail
         }
       }
     } catch {
@@ -306,12 +314,25 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const accepted = item.responses?.acceptedIds?.length || 0;
       const declined = item.responses?.declinedIds?.length || 0;
       const unanswered = item.responses?.unansweredIds?.length || 0;
+      const localResponse = spondLocalResponses[item.id];
       return (
         <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
           <View style={styles.spondCardHeader}>
             <Text style={styles.spondCardIcon}>🏟️</Text>
             <View style={styles.spondCardContent}>
-              <Text style={[styles.spondCardTitle, { color: colors.text }]}>{item.heading}</Text>
+              <View style={styles.spondCardTitleRow}>
+                <Text style={[styles.spondCardTitle, { color: colors.text }]}>{item.heading}</Text>
+                {localResponse === true && (
+                  <View style={[styles.spondBadge, { backgroundColor: colors.accent }]}>
+                    <Text style={styles.spondBadgeText}>✓</Text>
+                  </View>
+                )}
+                {localResponse === false && (
+                  <View style={[styles.spondBadge, { backgroundColor: colors.danger }]}>
+                    <Text style={styles.spondBadgeText}>✕</Text>
+                  </View>
+                )}
+              </View>
               {item.description && (
                 <Text style={[styles.spondCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
               )}
@@ -375,6 +396,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       } catch {
         // Continue with next member
       }
+    }
+    try {
+      await saveSpondResponse(eventId, accepted);
+    } catch {
+      // Silently fail
     }
     loadSpondEvents();
   }, [responseModal, spondConfig, loadSpondEvents]);
@@ -601,6 +627,23 @@ const styles = StyleSheet.create({
   spondCardTitle: {
     fontSize: 18,
     fontWeight: '600',
+  },
+  spondCardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  spondBadge: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  spondBadgeText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: 'bold',
   },
   spondCardDesc: {
     fontSize: 14,
