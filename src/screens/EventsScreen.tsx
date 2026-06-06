@@ -126,8 +126,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const filteredItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
-      if (item._type === 'trip') return item.startDate;
-      if (item._type === 'spond') return item.startTimestamp.split('T')[0];
+      if (item._type === 'trip') return item.endDate || item.startDate;
+      if (item._type === 'spond') return item.endTimestamp?.split('T')[0] || item.startTimestamp.split('T')[0];
       return item.endDate || item.date;
     };
 
@@ -162,8 +162,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
-      if (item._type === 'trip') return item.startDate;
-      if (item._type === 'spond') return item.startTimestamp.split('T')[0];
+      if (item._type === 'trip') return item.endDate || item.startDate;
+      if (item._type === 'spond') return item.endTimestamp?.split('T')[0] || item.startTimestamp.split('T')[0];
       return item.endDate || item.date;
     };
     const allItems: UnifiedItem[] = [
