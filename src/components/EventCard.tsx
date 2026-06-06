@@ -32,7 +32,7 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress 
   };
 
   return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface }]} onPress={onPress}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]} onPress={onPress}>
       <View style={styles.row}>
         <View style={styles.content}>
           <View style={styles.titleRow}>
@@ -71,6 +71,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderLeftWidth: 4,
   },
   row: {
     flexDirection: 'row',
