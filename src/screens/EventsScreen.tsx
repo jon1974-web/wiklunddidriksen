@@ -5,13 +5,14 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent } from '../types';
+import { Event, Trip, SpondEvent, SpondMember } from '../types';
 import { EventCard } from '../components/EventCard';
+import { SpondResponseModal } from '../components/SpondResponseModal';
 import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatTime } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
-import { getSpondConfig, getSpondEvents } from '../services/spondService';
+import { getSpondConfig, getSpondEvents, getSpondMembers, changeSpondResponse } from '../services/spondService';
 
 interface EventsScreenProps {
   navigation: any;
@@ -30,6 +31,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
+  const [spondMembers, setSpondMembers] = useState<Record<string, SpondMember[]>>({});
+  const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
+  const [responseModal, setResponseModal] = useState<{ eventId: string; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
@@ -71,6 +75,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     try {
       const config = await getSpondConfig(familyId);
       if (config && config.email && config.password && config.groups.length > 0) {
+        setSpondConfig({ email: config.email, password: config.password });
         const groupIds = config.groups.map((g) => g.id);
         const events = await getSpondEvents(config.email, config.password, groupIds);
         const withGroupNames = events.map((e) => {
@@ -78,6 +83,17 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           return { ...e, groupName: group?.name };
         });
         setSpondEvents(withGroupNames);
+
+        const membersMap: Record<string, SpondMember[]> = {};
+        for (const group of config.groups) {
+          try {
+            const members = await getSpondMembers(config.email, config.password, group.id);
+            membersMap[group.id] = members;
+          } catch {
+            // Silently fail for members
+          }
+        }
+        setSpondMembers(membersMap);
       }
     } catch {
       // Silently fail for Spond
@@ -294,6 +310,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const timeText = item.endTimestamp
         ? `${item.startTimestamp.split('T')[1]?.substring(0, 5) || ''} - ${item.endTimestamp.split('T')[1]?.substring(0, 5) || ''}`
         : item.startTimestamp.split('T')[1]?.substring(0, 5) || '';
+      const accepted = item.responses?.acceptedIds?.length || 0;
+      const declined = item.responses?.declinedIds?.length || 0;
+      const unanswered = item.responses?.unansweredIds?.length || 0;
       return (
         <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
           <View style={styles.spondCardHeader}>
@@ -312,8 +331,29 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               {item.address && (
                 <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
               )}
+              {item.responses && (
+                <Text style={[styles.spondCardResponses, { color: colors.textSecondary }]}>
+                  {accepted} akseptert · {declined} avslått · {unanswered} ikke svart
+                </Text>
+              )}
             </View>
           </View>
+          {item.groupId && (
+            <View style={styles.spondCardActions}>
+              <TouchableOpacity
+                style={[styles.spondActionButton, { backgroundColor: colors.accent }]}
+                onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'accept' })}
+              >
+                <Text style={styles.spondActionButtonText}>Aksepter</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.spondActionButton, { backgroundColor: colors.danger }]}
+                onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'decline' })}
+              >
+                <Text style={styles.spondActionButtonText}>Avslå</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
       );
     }
@@ -323,7 +363,21 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         onPress={() => navigation.navigate('EventDetail', { event: item })}
       />
     );
-  }, [navigation, colors]);
+  }, [navigation, colors, setResponseModal]);
+
+  const handleSendResponse = useCallback(async (memberIds: string[]) => {
+    if (!responseModal || !spondConfig) return;
+    const { eventId, type } = responseModal;
+    const accepted = type === 'accept';
+    for (const memberId of memberIds) {
+      try {
+        await changeSpondResponse(spondConfig.email, spondConfig.password, eventId, memberId, accepted);
+      } catch {
+        // Continue with next member
+      }
+    }
+    loadSpondEvents();
+  }, [responseModal, spondConfig, loadSpondEvents]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -414,6 +468,16 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
+
+      {responseModal && spondConfig && (
+        <SpondResponseModal
+          visible={true}
+          type={responseModal.type}
+          members={spondMembers[responseModal.groupId] || []}
+          onSend={handleSendResponse}
+          onClose={() => setResponseModal(null)}
+        />
+      )}
     </SafeAreaView>
   );
 };
@@ -553,6 +617,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
     fontWeight: '500',
+  },
+  spondCardResponses: {
+    fontSize: 14,
+    marginTop: 6,
+  },
+  spondCardActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+    gap: 10,
+  },
+  spondActionButton: {
+    flex: 1,
+    paddingVertical: 8,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  spondActionButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   fab: {
     position: 'absolute',

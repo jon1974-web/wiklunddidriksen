@@ -108,6 +108,11 @@ export interface SpondEvent {
   address?: string;
   groupName?: string;
   groupId?: string;
+  responses?: {
+    acceptedIds: string[];
+    declinedIds: string[];
+    unansweredIds: string[];
+  };
 }
 
 export interface SpondGroup {
@@ -119,4 +124,10 @@ export interface SpondConfig {
   email: string;
   password: string;
   groups: SpondGroup[];
+}
+
+export interface SpondMember {
+  id: string;
+  firstName: string;
+  lastName: string;
 }

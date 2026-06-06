@@ -23,7 +23,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { action, email, password, token, groupId, groupIds, max } = req.body || {};
+  const { action, email, password, token, groupId, groupIds, max, eventId, memberId, accepted } = req.body || {};
 
   try {
     if (action === "login") {
@@ -59,6 +59,25 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
       return res.status(200).json(result);
     }
 
+    if (action === "members") {
+      if (!groupId) {
+        return res.status(400).json({ error: "Missing groupId" });
+      }
+      const response = await fetch(`${SPOND_API_BASE}/groups/${groupId}`, {
+        headers: authHeaders,
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        return res.status(response.status).json(result);
+      }
+      const members = (result.members || []).map((m) => ({
+        id: m.id,
+        firstName: m.firstName,
+        lastName: m.lastName,
+      }));
+      return res.status(200).json(members);
+    }
+
     if (action === "events") {
       const ids = groupIds || (groupId ? [groupId] : []);
       const allEvents = [];
@@ -73,6 +92,25 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
         }
       }
       return res.status(200).json(allEvents);
+    }
+
+    if (action === "changeResponse") {
+      if (!eventId || !memberId) {
+        return res.status(400).json({ error: "Missing eventId or memberId" });
+      }
+      const response = await fetch(
+        `${SPOND_API_BASE}/sponds/${eventId}/responses/${memberId}`,
+        {
+          method: "PUT",
+          headers: authHeaders,
+          body: JSON.stringify({ accepted: accepted ? "true" : "false" }),
+        }
+      );
+      const result = await response.json();
+      if (!response.ok) {
+        return res.status(response.status).json(result);
+      }
+      return res.status(200).json(result);
     }
 
     return res.status(400).json({ error: `Unknown action: ${action}` });

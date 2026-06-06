@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
-import { SpondEvent, SpondGroup, SpondConfig } from '../types';
+import { SpondEvent, SpondGroup, SpondConfig, SpondMember } from '../types';
 
 const SPOND_PROXY_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/spondProxy';
 
@@ -73,7 +73,48 @@ const mapSpondEvent = (e: any): SpondEvent => ({
   address: e.location?.address || undefined,
   groupName: undefined,
   groupId: e._groupId || undefined,
+  responses: e.responses
+    ? {
+        acceptedIds: e.responses.acceptedIds || [],
+        declinedIds: e.responses.declinedIds || [],
+        unansweredIds: e.responses.unansweredIds || [],
+      }
+    : undefined,
 });
+
+export const getSpondMembers = async (
+  email: string,
+  password: string,
+  groupId: string
+): Promise<SpondMember[]> => {
+  const token = await getToken(email, password);
+  try {
+    const members = await proxyCall({ action: 'members', token, groupId });
+    return members || [];
+  } catch {
+    cachedToken = null;
+    const newToken = await loginSpond(email, password);
+    const members = await proxyCall({ action: 'members', token: newToken, groupId });
+    return members || [];
+  }
+};
+
+export const changeSpondResponse = async (
+  email: string,
+  password: string,
+  eventId: string,
+  memberId: string,
+  accepted: boolean
+): Promise<void> => {
+  const token = await getToken(email, password);
+  try {
+    await proxyCall({ action: 'changeResponse', token, eventId, memberId, accepted });
+  } catch {
+    cachedToken = null;
+    const newToken = await loginSpond(email, password);
+    await proxyCall({ action: 'changeResponse', token: newToken, eventId, memberId, accepted });
+  }
+};
 
 export const saveSpondConfig = async (familyId: string, config: SpondConfig): Promise<void> => {
   await setDoc(doc(db, 'families', familyId, 'config', 'spond'), config);
