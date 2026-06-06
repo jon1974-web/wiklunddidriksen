@@ -63,14 +63,18 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
       if (!groupId) {
         return res.status(400).json({ error: "Missing groupId" });
       }
-      const response = await fetch(`${SPOND_API_BASE}/groups/${groupId}`, {
+      const response = await fetch(`${SPOND_API_BASE}/groups/`, {
         headers: authHeaders,
       });
       const result = await response.json();
       if (!response.ok) {
         return res.status(response.status).json(result);
       }
-      const members = (result.members || []).map((m) => ({
+      const group = (result || []).find((g) => g.id === groupId);
+      if (!group) {
+        return res.status(200).json([]);
+      }
+      const members = (group.members || []).map((m) => ({
         id: m.id,
         firstName: m.firstName,
         lastName: m.lastName,

@@ -626,17 +626,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 16,
     paddingBottom: 12,
-    gap: 10,
+    gap: 8,
   },
   spondActionButton: {
-    flex: 1,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingVertical: 5,
+    paddingHorizontal: 14,
+    borderRadius: 6,
     alignItems: 'center',
   },
   spondActionButtonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600',
   },
   fab: {
