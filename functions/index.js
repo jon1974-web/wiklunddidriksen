@@ -78,6 +78,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
         id: m.id,
         firstName: m.firstName,
         lastName: m.lastName,
+        profileId: m.profile?.id || m.id,
       }));
       return res.status(200).json(members);
     }

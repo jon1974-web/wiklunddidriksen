@@ -491,7 +491,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         if (!event?.responses) return null;
         const ids = responseListModal.type === 'accepted' ? event.responses.acceptedIds : event.responses.declinedIds;
         const members = spondRespondents
-          .filter((r) => r.groupId === responseListModal.groupId && ids.includes(r.spondId));
+          .filter((r) => r.groupId === responseListModal.groupId && (ids.includes(r.spondId) || ids.includes(r.profileId)));
         const title = responseListModal.type === 'accepted' ? 'Akseptert' : 'Avslått';
         const color = responseListModal.type === 'accepted' ? colors.accent : colors.danger;
         return (
@@ -506,7 +506,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
                     ) : (
                       <FlatList
                         data={members}
-                        keyExtractor={(item) => item.spondId}
+                        keyExtractor={(item) => item.profileId || item.spondId}
                         style={styles.responseListScroll}
                         renderItem={({ item }) => (
                           <Text style={[styles.responseListName, { color: colors.text, borderBottomColor: colors.border }]}>

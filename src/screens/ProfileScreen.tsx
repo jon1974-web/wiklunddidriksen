@@ -381,7 +381,7 @@ export const ProfileScreen: React.FC = () => {
       const selectedGroups = spondGroups.filter((g) => spondSelectedGroups.includes(g.id));
       const respondents = spondAllMembers
         .filter((m) => spondRespondents.includes(m.id))
-        .map((m) => ({ uid: '', spondId: m.id, firstName: m.firstName, lastName: m.lastName, groupId: m.groupId, groupName: m.groupName }));
+        .map((m) => ({ uid: '', spondId: m.id, profileId: m.profileId || m.id, firstName: m.firstName, lastName: m.lastName, groupId: m.groupId, groupName: m.groupName }));
       await saveSpondConfig(familyId, {
         email: spondEmail.trim(),
         password: spondPassword,
