@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondMember, SpondRespondent } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent } from '../types';
 import { EventCard } from '../components/EventCard';
 import { SpondResponseModal } from '../components/SpondResponseModal';
 import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatTime } from '../utils/dateUtils';
@@ -31,7 +31,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
-  const [spondMembers, setSpondMembers] = useState<Record<string, SpondMember[]>>({});
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [responseModal, setResponseModal] = useState<{ eventId: string; groupId: string; type: 'accept' | 'decline' } | null>(null);
@@ -467,7 +466,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         <SpondResponseModal
           visible={true}
           type={responseModal.type}
-          members={spondRespondents.map((r) => ({ id: r.spondId, firstName: r.firstName, lastName: r.lastName }))}
+          members={spondRespondents
+            .filter((r) => r.groupId === responseModal.groupId)
+            .map((r) => ({ id: r.spondId, firstName: r.firstName, lastName: r.lastName }))}
           onSend={handleSendResponse}
           onClose={() => setResponseModal(null)}
         />

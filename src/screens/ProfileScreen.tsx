@@ -41,7 +41,7 @@ import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { uriToBlob } from '../utils/upload';
 import { IMAGE_QUALITY } from '../constants/limits';
-import { SpondGroup, SpondMember } from '../types';
+import { SpondGroup, SpondMember, SpondGroupMember } from '../types';
 import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
 
 export const ProfileScreen: React.FC = () => {
@@ -71,7 +71,7 @@ export const ProfileScreen: React.FC = () => {
   const [spondSelectedGroups, setSpondSelectedGroups] = useState<string[]>([]);
   const [spondConnected, setSpondConnected] = useState(false);
   const [spondLoading, setSpondLoading] = useState(false);
-  const [spondAllMembers, setSpondAllMembers] = useState<SpondMember[]>([]);
+  const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
   const [spondRespondents, setSpondRespondents] = useState<string[]>([]);
 
   useEffect(() => {
@@ -341,17 +341,16 @@ export const ProfileScreen: React.FC = () => {
       setSpondGroups(groups);
       setSpondConnected(true);
 
-      const allMembers: SpondMember[] = [];
+      const allMembers: SpondGroupMember[] = [];
       for (const group of groups) {
         try {
           const members = await getSpondMembers(spondEmail.trim(), spondPassword, group.id);
-          allMembers.push(...members);
+          members.forEach((m) => allMembers.push({ ...m, groupId: group.id, groupName: group.name }));
         } catch {
           // Continue
         }
       }
-      const unique = allMembers.filter((m, i, arr) => arr.findIndex((x) => x.id === m.id) === i);
-      setSpondAllMembers(unique);
+      setSpondAllMembers(allMembers);
 
       crossAlert('Suksess', `Koblet til Spond. ${groups.length} gruppe(r) funnet.`);
     } catch (error) {
@@ -382,7 +381,7 @@ export const ProfileScreen: React.FC = () => {
       const selectedGroups = spondGroups.filter((g) => spondSelectedGroups.includes(g.id));
       const respondents = spondAllMembers
         .filter((m) => spondRespondents.includes(m.id))
-        .map((m) => ({ uid: '', spondId: m.id, firstName: m.firstName, lastName: m.lastName }));
+        .map((m) => ({ uid: '', spondId: m.id, firstName: m.firstName, lastName: m.lastName, groupId: m.groupId, groupName: m.groupName }));
       await saveSpondConfig(familyId, {
         email: spondEmail.trim(),
         password: spondPassword,
@@ -708,11 +707,14 @@ export const ProfileScreen: React.FC = () => {
                   <Text style={[styles.label, { color: colors.textSecondary, marginTop: 16 }]}>Velg respondenter (hvem kan svare)</Text>
                   {spondAllMembers.map((member) => (
                     <TouchableOpacity
-                      key={member.id}
+                      key={`${member.groupId}-${member.id}`}
                       style={[styles.valueRow, { backgroundColor: colors.inputBackground, marginBottom: 6 }]}
                       onPress={() => handleToggleSpondRespondent(member.id)}
                     >
-                      <Text style={[styles.value, { color: colors.text }]}>{member.firstName} {member.lastName}</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.value, { color: colors.text }]}>{member.firstName} {member.lastName}</Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{member.groupName}</Text>
+                      </View>
                       <Text style={[styles.editIcon, { color: spondRespondents.includes(member.id) ? colors.accent : colors.textDisabled }]}>
                         {spondRespondents.includes(member.id) ? '✅' : '⬜'}
                       </Text>

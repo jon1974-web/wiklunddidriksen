@@ -132,10 +132,20 @@ export interface SpondRespondent {
   spondId: string;
   firstName: string;
   lastName: string;
+  groupId: string;
+  groupName: string;
 }
 
 export interface SpondMember {
   id: string;
   firstName: string;
   lastName: string;
+}
+
+export interface SpondGroupMember {
+  id: string;
+  firstName: string;
+  lastName: string;
+  groupId: string;
+  groupName: string;
 }
