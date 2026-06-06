@@ -69,7 +69,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
         );
         if (response.ok) {
           const events = await response.json();
-          allEvents.push(...(events || []));
+          (events || []).forEach((e) => allEvents.push({ ...e, _groupId: gid }));
         }
       }
       return res.status(200).json(allEvents);

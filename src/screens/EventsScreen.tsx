@@ -74,7 +74,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         const groupIds = config.groups.map((g) => g.id);
         const events = await getSpondEvents(config.email, config.password, groupIds);
         const withGroupNames = events.map((e) => {
-          const group = config.groups.find((g) => g.id === groupIds.find((gid) => true));
+          const group = config.groups.find((g) => g.id === e.groupId);
           return { ...e, groupName: group?.name };
         });
         setSpondEvents(withGroupNames);

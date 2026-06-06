@@ -107,6 +107,7 @@ export interface SpondEvent {
   endTimestamp?: string;
   address?: string;
   groupName?: string;
+  groupId?: string;
 }
 
 export interface SpondGroup {

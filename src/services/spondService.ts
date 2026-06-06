@@ -72,6 +72,7 @@ const mapSpondEvent = (e: any): SpondEvent => ({
   endTimestamp: e.endTimestamp || undefined,
   address: e.location?.address || undefined,
   groupName: undefined,
+  groupId: e._groupId || undefined,
 });
 
 export const saveSpondConfig = async (familyId: string, config: SpondConfig): Promise<void> => {
