@@ -384,7 +384,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         onPress={() => navigation.navigate('EventDetail', { event: item })}
       />
     );
-  }, [navigation, colors, setResponseModal]);
+  }, [navigation, colors, setResponseModal, spondLocalResponses]);
 
   const handleSendResponse = useCallback(async (memberIds: string[]) => {
     if (!responseModal || !spondConfig) return;
