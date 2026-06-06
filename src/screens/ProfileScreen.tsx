@@ -41,8 +41,8 @@ import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { uriToBlob } from '../utils/upload';
 import { IMAGE_QUALITY } from '../constants/limits';
-import { SpondGroup } from '../types';
-import { loginSpond, getSpondGroups, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
+import { SpondGroup, SpondMember } from '../types';
+import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
 
 export const ProfileScreen: React.FC = () => {
   const user = useUserStore((state) => state.user);
@@ -71,6 +71,8 @@ export const ProfileScreen: React.FC = () => {
   const [spondSelectedGroups, setSpondSelectedGroups] = useState<string[]>([]);
   const [spondConnected, setSpondConnected] = useState(false);
   const [spondLoading, setSpondLoading] = useState(false);
+  const [spondAllMembers, setSpondAllMembers] = useState<SpondMember[]>([]);
+  const [spondRespondents, setSpondRespondents] = useState<string[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -108,6 +110,9 @@ export const ProfileScreen: React.FC = () => {
           setSpondEmail(spondConfig.email);
           setSpondConnected(true);
           setSpondSelectedGroups(spondConfig.groups.map((g) => g.id));
+          if (spondConfig.respondents) {
+            setSpondRespondents(spondConfig.respondents.map((r) => r.spondId));
+          }
         }
       }
       setLoading(false);
@@ -335,6 +340,19 @@ export const ProfileScreen: React.FC = () => {
       const groups = await getSpondGroups(spondEmail.trim(), spondPassword);
       setSpondGroups(groups);
       setSpondConnected(true);
+
+      const allMembers: SpondMember[] = [];
+      for (const group of groups) {
+        try {
+          const members = await getSpondMembers(spondEmail.trim(), spondPassword, group.id);
+          allMembers.push(...members);
+        } catch {
+          // Continue
+        }
+      }
+      const unique = allMembers.filter((m, i, arr) => arr.findIndex((x) => x.id === m.id) === i);
+      setSpondAllMembers(unique);
+
       crossAlert('Suksess', `Koblet til Spond. ${groups.length} gruppe(r) funnet.`);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -349,6 +367,12 @@ export const ProfileScreen: React.FC = () => {
     );
   }, []);
 
+  const handleToggleSpondRespondent = useCallback((spondId: string) => {
+    setSpondRespondents((prev) =>
+      prev.includes(spondId) ? prev.filter((id) => id !== spondId) : [...prev, spondId]
+    );
+  }, []);
+
   const handleSaveSpondConfig = useCallback(async () => {
     if (!familyId) {
       crossAlert('Error', 'Du må være med i en familie for å lagre Spond-konfigurasjon.');
@@ -356,17 +380,21 @@ export const ProfileScreen: React.FC = () => {
     }
     try {
       const selectedGroups = spondGroups.filter((g) => spondSelectedGroups.includes(g.id));
+      const respondents = spondAllMembers
+        .filter((m) => spondRespondents.includes(m.id))
+        .map((m) => ({ uid: '', spondId: m.id, firstName: m.firstName, lastName: m.lastName }));
       await saveSpondConfig(familyId, {
         email: spondEmail.trim(),
         password: spondPassword,
         groups: selectedGroups,
+        respondents,
       });
       clearSpondToken();
-      crossAlert('Suksess', `Spond konfigurasjon lagret. ${selectedGroups.length} gruppe(r) aktivert.`);
+      crossAlert('Suksess', `Spond konfigurasjon lagret. ${selectedGroups.length} gruppe(r) aktivert, ${respondents.length} respondenter.`);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [familyId, spondEmail, spondPassword, spondGroups, spondSelectedGroups]);
+  }, [familyId, spondEmail, spondPassword, spondGroups, spondSelectedGroups, spondAllMembers, spondRespondents]);
 
   const handleDisconnectSpond = useCallback(async () => {
     if (!familyId) return;
@@ -376,11 +404,13 @@ export const ProfileScreen: React.FC = () => {
         text: 'Koble fra',
         style: 'destructive',
         onPress: async () => {
-          await saveSpondConfig(familyId, { email: '', password: '', groups: [] });
+          await saveSpondConfig(familyId, { email: '', password: '', groups: [], respondents: [] });
           setSpondEmail('');
           setSpondPassword('');
           setSpondGroups([]);
           setSpondSelectedGroups([]);
+          setSpondAllMembers([]);
+          setSpondRespondents([]);
           setSpondConnected(false);
           clearSpondToken();
         },
@@ -672,6 +702,24 @@ export const ProfileScreen: React.FC = () => {
                   </Text>
                 </TouchableOpacity>
               ))}
+
+              {spondAllMembers.length > 0 && (
+                <>
+                  <Text style={[styles.label, { color: colors.textSecondary, marginTop: 16 }]}>Velg respondenter (hvem kan svare)</Text>
+                  {spondAllMembers.map((member) => (
+                    <TouchableOpacity
+                      key={member.id}
+                      style={[styles.valueRow, { backgroundColor: colors.inputBackground, marginBottom: 6 }]}
+                      onPress={() => handleToggleSpondRespondent(member.id)}
+                    >
+                      <Text style={[styles.value, { color: colors.text }]}>{member.firstName} {member.lastName}</Text>
+                      <Text style={[styles.editIcon, { color: spondRespondents.includes(member.id) ? colors.accent : colors.textDisabled }]}>
+                        {spondRespondents.includes(member.id) ? '✅' : '⬜'}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </>
+              )}
 
               <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                 <TouchableOpacity

@@ -5,14 +5,14 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondMember } from '../types';
+import { Event, Trip, SpondEvent, SpondMember, SpondRespondent } from '../types';
 import { EventCard } from '../components/EventCard';
 import { SpondResponseModal } from '../components/SpondResponseModal';
 import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatTime } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
-import { getSpondConfig, getSpondEvents, getSpondMembers, changeSpondResponse } from '../services/spondService';
+import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services/spondService';
 
 interface EventsScreenProps {
   navigation: any;
@@ -32,6 +32,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
   const [spondMembers, setSpondMembers] = useState<Record<string, SpondMember[]>>({});
+  const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [responseModal, setResponseModal] = useState<{ eventId: string; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
@@ -84,16 +85,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         });
         setSpondEvents(withGroupNames);
 
-        const membersMap: Record<string, SpondMember[]> = {};
-        for (const group of config.groups) {
-          try {
-            const members = await getSpondMembers(config.email, config.password, group.id);
-            membersMap[group.id] = members;
-          } catch {
-            // Silently fail for members
-          }
+        if (config.respondents && config.respondents.length > 0) {
+          setSpondRespondents(config.respondents);
         }
-        setSpondMembers(membersMap);
       }
     } catch {
       // Silently fail for Spond
@@ -473,7 +467,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         <SpondResponseModal
           visible={true}
           type={responseModal.type}
-          members={spondMembers[responseModal.groupId] || []}
+          members={spondRespondents.map((r) => ({ id: r.spondId, firstName: r.firstName, lastName: r.lastName }))}
           onSend={handleSendResponse}
           onClose={() => setResponseModal(null)}
         />

@@ -124,6 +124,14 @@ export interface SpondConfig {
   email: string;
   password: string;
   groups: SpondGroup[];
+  respondents?: SpondRespondent[];
+}
+
+export interface SpondRespondent {
+  uid: string;
+  spondId: string;
+  firstName: string;
+  lastName: string;
 }
 
 export interface SpondMember {
