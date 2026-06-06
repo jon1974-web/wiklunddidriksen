@@ -2,27 +2,29 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import { SpondEvent, SpondGroup, SpondConfig } from '../types';
 
-const SPOND_API_BASE = 'https://api.spond.com/core/v1';
+const SPOND_PROXY_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/spondProxy';
 
 let cachedToken: string | null = null;
 
-export const loginSpond = async (email: string, password: string): Promise<string> => {
-  const response = await fetch(`${SPOND_API_BASE}/auth2/login`, {
+const proxyCall = async (body: Record<string, any>): Promise<any> => {
+  const response = await fetch(SPOND_PROXY_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify(body),
   });
-
-  if (!response.ok) {
-    throw new Error('Spond innlogging feilet. Sjekk e-post og passord.');
-  }
-
   const result = await response.json();
+  if (!response.ok) {
+    throw new Error(result?.error || 'Spond API-feil.');
+  }
+  return result;
+};
+
+export const loginSpond = async (email: string, password: string): Promise<string> => {
+  const result = await proxyCall({ action: 'login', email, password });
   const accessToken = result?.accessToken?.token;
   if (!accessToken) {
     throw new Error('Spond innlogging feilet. Ingen token mottatt.');
   }
-
   cachedToken = accessToken;
   return accessToken;
 };
@@ -34,29 +36,15 @@ const getToken = async (email: string, password: string): Promise<string> => {
 
 export const getSpondGroups = async (email: string, password: string): Promise<SpondGroup[]> => {
   const token = await getToken(email, password);
-  const response = await fetch(`${SPOND_API_BASE}/groups/`, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
+  try {
+    const groups = await proxyCall({ action: 'groups', token });
+    return (groups || []).map((g: any) => ({ id: g.id, name: g.name }));
+  } catch {
     cachedToken = null;
     const newToken = await loginSpond(email, password);
-    const retryResponse = await fetch(`${SPOND_API_BASE}/groups/`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${newToken}`,
-      },
-    });
-    if (!retryResponse.ok) throw new Error('Kunne ikke hente Spond-grupper.');
-    const groups = await retryResponse.json();
+    const groups = await proxyCall({ action: 'groups', token: newToken });
     return (groups || []).map((g: any) => ({ id: g.id, name: g.name }));
   }
-
-  const groups = await response.json();
-  return (groups || []).map((g: any) => ({ id: g.id, name: g.name }));
 };
 
 export const getSpondEvents = async (
@@ -65,50 +53,15 @@ export const getSpondEvents = async (
   groupIds: string[]
 ): Promise<SpondEvent[]> => {
   const token = await getToken(email, password);
-  const allEvents: SpondEvent[] = [];
-
-  for (const groupId of groupIds) {
-    try {
-      const response = await fetch(
-        `${SPOND_API_BASE}/sponds/?groupId=${groupId}&max=100`,
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          cachedToken = null;
-          const newToken = await loginSpond(email, password);
-          const retryResponse = await fetch(
-            `${SPOND_API_BASE}/sponds/?groupId=${groupId}&max=100`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${newToken}`,
-              },
-            }
-          );
-          if (!retryResponse.ok) continue;
-          const events = await retryResponse.json();
-          const mapped = (events || []).map((e: any) => mapSpondEvent(e));
-          allEvents.push(...mapped);
-        }
-        continue;
-      }
-
-      const events = await response.json();
-      const mapped = (events || []).map((e: any) => mapSpondEvent(e));
-      allEvents.push(...mapped);
-    } catch {
-      continue;
-    }
+  let events: any[];
+  try {
+    events = await proxyCall({ action: 'events', token, groupIds });
+  } catch {
+    cachedToken = null;
+    const newToken = await loginSpond(email, password);
+    events = await proxyCall({ action: 'events', token: newToken, groupIds });
   }
-
-  return allEvents;
+  return (events || []).map((e: any) => mapSpondEvent(e));
 };
 
 const mapSpondEvent = (e: any): SpondEvent => ({

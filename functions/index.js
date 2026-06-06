@@ -2,10 +2,85 @@ require("dotenv").config();
 const { onRequest } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
 const OpenAI = require("openai");
+const functions = require("firebase-functions");
 
 initializeApp();
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+
+const SPOND_API_BASE = "https://api.spond.com/core/v1";
+
+exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  res.set("Access-Control-Allow-Origin", "*");
+  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { action, email, password, token, groupId, groupIds, max } = req.body || {};
+
+  try {
+    if (action === "login") {
+      const response = await fetch(`${SPOND_API_BASE}/auth2/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        return res.status(response.status).json(result);
+      }
+      return res.status(200).json(result);
+    }
+
+    if (!token) {
+      return res.status(400).json({ error: "Missing token" });
+    }
+
+    const authHeaders = {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+
+    if (action === "groups") {
+      const response = await fetch(`${SPOND_API_BASE}/groups/`, {
+        headers: authHeaders,
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        return res.status(response.status).json(result);
+      }
+      return res.status(200).json(result);
+    }
+
+    if (action === "events") {
+      const ids = groupIds || (groupId ? [groupId] : []);
+      const allEvents = [];
+      for (const gid of ids) {
+        const response = await fetch(
+          `${SPOND_API_BASE}/sponds/?groupId=${gid}&max=${max || 100}`,
+          { headers: authHeaders }
+        );
+        if (response.ok) {
+          const events = await response.json();
+          allEvents.push(...(events || []));
+        }
+      }
+      return res.status(200).json(allEvents);
+    }
+
+    return res.status(400).json({ error: `Unknown action: ${action}` });
+  } catch (error) {
+    console.error("Spond proxy error:", error);
+    return res.status(500).json({ error: error.message || "Internal server error" });
+  }
+});
 
 exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
