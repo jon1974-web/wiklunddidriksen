@@ -108,6 +108,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   }, []);
 
   const today = getTodayLocal();
+  const threeMonthsAgo = useMemo(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 3);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }, [today]);
 
   const filteredItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
@@ -136,14 +141,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       ...events.map((e) => ({ ...e, _type: 'event' as const })),
       ...trips.map((t) => ({ ...t, _type: 'trip' as const })),
       ...spondEvents.map((e) => ({ ...e, _type: 'spond' as const })),
-    ];
+    ].filter((i) => getDateStr(i) >= threeMonthsAgo);
     const upcoming = allItems.filter((i) => getDateStr(i) >= today);
     const past = allItems.filter((i) => getDateStr(i) < today);
     const sortByDate = (a: UnifiedItem, b: UnifiedItem) => getDateStr(a).localeCompare(getDateStr(b));
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
-  }, [events, trips, spondEvents, viewMode, selectedDate, showPastEvents, today]);
+  }, [events, trips, spondEvents, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo]);
 
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
@@ -156,8 +161,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       ...trips.map((t) => ({ ...t, _type: 'trip' as const })),
       ...spondEvents.map((e) => ({ ...e, _type: 'spond' as const })),
     ];
-    return allItems.some((i) => getDateStr(i) < today);
-  }, [events, trips, spondEvents, today]);
+    return allItems.some((i) => {
+      const ds = getDateStr(i);
+      return ds < today && ds >= threeMonthsAgo;
+    });
+  }, [events, trips, spondEvents, today, threeMonthsAgo]);
 
   const sortedEvents = filteredItems;
 
