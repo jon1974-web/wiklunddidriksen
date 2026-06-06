@@ -82,11 +82,15 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const filteredItems = useMemo(() => {
     if (viewMode === 'calendar') {
-      return events.filter((e) => {
+      const dayEvents = events.filter((e) => {
         const start = e.date;
         const end = e.endDate || e.date;
         return selectedDate >= start && selectedDate <= end;
       }).map((e) => ({ ...e, _type: 'event' as const }));
+      const dayTrips = trips.filter((t) => {
+        return selectedDate >= t.startDate && selectedDate <= t.endDate;
+      }).map((t) => ({ ...t, _type: 'trip' as const }));
+      return [...dayEvents, ...dayTrips];
     }
     const allItems: UnifiedItem[] = [
       ...events.map((e) => ({ ...e, _type: 'event' as const })),
