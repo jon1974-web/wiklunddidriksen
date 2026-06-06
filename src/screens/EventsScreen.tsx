@@ -5,12 +5,13 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip } from '../types';
+import { Event, Trip, SpondEvent } from '../types';
 import { EventCard } from '../components/EventCard';
-import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate } from '../utils/dateUtils';
+import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatTime } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
+import { getSpondConfig, getSpondEvents } from '../services/spondService';
 
 interface EventsScreenProps {
   navigation: any;
@@ -18,18 +19,22 @@ interface EventsScreenProps {
 
 const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#00BCD4', '#8BC34A', '#FF5722'];
 const TRIP_COLOR = '#0097A7';
+const SPOND_COLOR = '#E53935';
 
 type UnifiedItem =
   | (Event & { _type: 'event' })
-  | (Trip & { _type: 'trip' });
+  | (Trip & { _type: 'trip' })
+  | (SpondEvent & { _type: 'spond' });
 
 export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [events, setEvents] = useState<Event[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
+  const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
   const user = useUserStore((state) => state.user);
+  const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -61,6 +66,30 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     return unsubscribe;
   }, [navigation, loadTrips]);
 
+  const loadSpondEvents = useCallback(async () => {
+    if (!familyId) return;
+    try {
+      const config = await getSpondConfig(familyId);
+      if (config && config.email && config.password && config.groups.length > 0) {
+        const groupIds = config.groups.map((g) => g.id);
+        const events = await getSpondEvents(config.email, config.password, groupIds);
+        const withGroupNames = events.map((e) => {
+          const group = config.groups.find((g) => g.id === groupIds.find((gid) => true));
+          return { ...e, groupName: group?.name };
+        });
+        setSpondEvents(withGroupNames);
+      }
+    } catch {
+      // Silently fail for Spond
+    }
+  }, [familyId]);
+
+  useEffect(() => {
+    loadSpondEvents();
+    const unsubscribe = navigation.addListener('focus', loadSpondEvents);
+    return unsubscribe;
+  }, [navigation, loadSpondEvents]);
+
   const handleDelete = useCallback(async (eventId: string) => {
     Alert.alert('Slett arrangement', 'Er du sikker på at du vil slette dette?', [
       { text: 'Avbryt', style: 'cancel' },
@@ -81,6 +110,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const today = getTodayLocal();
 
   const filteredItems = useMemo(() => {
+    const getDateStr = (item: UnifiedItem): string => {
+      if (item._type === 'trip') return item.startDate;
+      if (item._type === 'spond') return item.startTimestamp.split('T')[0];
+      return item.endDate || item.date;
+    };
+
     if (viewMode === 'calendar') {
       const dayEvents = events.filter((e) => {
         const start = e.date;
@@ -90,35 +125,39 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const dayTrips = trips.filter((t) => {
         return selectedDate >= t.startDate && selectedDate <= t.endDate;
       }).map((t) => ({ ...t, _type: 'trip' as const }));
-      return [...dayEvents, ...dayTrips];
+      const daySpond = spondEvents.filter((e) => {
+        const start = e.startTimestamp.split('T')[0];
+        const end = e.endTimestamp ? e.endTimestamp.split('T')[0] : start;
+        return selectedDate >= start && selectedDate <= end;
+      }).map((e) => ({ ...e, _type: 'spond' as const }));
+      return [...dayEvents, ...dayTrips, ...daySpond];
     }
     const allItems: UnifiedItem[] = [
       ...events.map((e) => ({ ...e, _type: 'event' as const })),
       ...trips.map((t) => ({ ...t, _type: 'trip' as const })),
+      ...spondEvents.map((e) => ({ ...e, _type: 'spond' as const })),
     ];
-    const upcoming = allItems.filter((i) => {
-      const date = i._type === 'trip' ? i.startDate : (i.endDate || i.date);
-      return date >= today;
-    });
-    const past = allItems.filter((i) => {
-      const date = i._type === 'trip' ? i.startDate : (i.endDate || i.date);
-      return date < today;
-    });
-    const sortByDate = (a: UnifiedItem, b: UnifiedItem) => {
-      const dateA = a._type === 'trip' ? a.startDate : a.date;
-      const dateB = b._type === 'trip' ? b.startDate : b.date;
-      return dateA.localeCompare(dateB);
-    };
+    const upcoming = allItems.filter((i) => getDateStr(i) >= today);
+    const past = allItems.filter((i) => getDateStr(i) < today);
+    const sortByDate = (a: UnifiedItem, b: UnifiedItem) => getDateStr(a).localeCompare(getDateStr(b));
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
-  }, [events, trips, viewMode, selectedDate, showPastEvents, today]);
+  }, [events, trips, spondEvents, viewMode, selectedDate, showPastEvents, today]);
 
   const hasPastItems = useMemo(() => {
-    const hasPastEvents = events.some((e) => (e.endDate || e.date) < today);
-    const hasPastTrips = trips.some((t) => t.startDate < today);
-    return hasPastEvents || hasPastTrips;
-  }, [events, trips, today]);
+    const getDateStr = (item: UnifiedItem): string => {
+      if (item._type === 'trip') return item.startDate;
+      if (item._type === 'spond') return item.startTimestamp.split('T')[0];
+      return item.endDate || item.date;
+    };
+    const allItems: UnifiedItem[] = [
+      ...events.map((e) => ({ ...e, _type: 'event' as const })),
+      ...trips.map((t) => ({ ...t, _type: 'trip' as const })),
+      ...spondEvents.map((e) => ({ ...e, _type: 'spond' as const })),
+    ];
+    return allItems.some((i) => getDateStr(i) < today);
+  }, [events, trips, spondEvents, today]);
 
   const sortedEvents = filteredItems;
 
@@ -181,9 +220,40 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       }
     });
 
+    spondEvents.forEach((event) => {
+      const startStr = event.startTimestamp.split('T')[0];
+      const endStr = event.endTimestamp ? event.endTimestamp.split('T')[0] : startStr;
+      
+      const start = new Date(startStr);
+      const end = new Date(endStr);
+      
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const isStart = dateStr === startStr;
+        const isEnd = dateStr === endStr;
+        
+        if (marks[dateStr]) {
+          marks[dateStr] = {
+            ...marks[dateStr],
+            marked: true,
+            dotColor: SPOND_COLOR,
+          };
+        } else {
+          marks[dateStr] = {
+            marked: true,
+            dotColor: SPOND_COLOR,
+            color: SPOND_COLOR,
+            startingDay: isStart,
+            endingDay: isEnd,
+            textColor: '#fff',
+          };
+        }
+      }
+    });
+
     marks[selectedDate] = { ...marks[selectedDate], selected: true, selectedColor: colors.accent };
     return marks;
-  }, [events, trips, selectedDate, colors.accent]);
+  }, [events, trips, spondEvents, selectedDate, colors.accent]);
 
   const currentWeek = useMemo(() => getWeekNumber(new Date(selectedDate)), [selectedDate]);
 
@@ -207,6 +277,36 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             </View>
           </View>
         </TouchableOpacity>
+      );
+    }
+    if (item._type === 'spond') {
+      const dateText = item.endTimestamp
+        ? `${formatDate(item.startTimestamp.split('T')[0])} - ${formatDate(item.endTimestamp.split('T')[0])}`
+        : formatDate(item.startTimestamp.split('T')[0]);
+      const timeText = item.endTimestamp
+        ? `${item.startTimestamp.split('T')[1]?.substring(0, 5) || ''} - ${item.endTimestamp.split('T')[1]?.substring(0, 5) || ''}`
+        : item.startTimestamp.split('T')[1]?.substring(0, 5) || '';
+      return (
+        <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
+          <View style={styles.spondCardHeader}>
+            <Text style={styles.spondCardIcon}>🏟️</Text>
+            <View style={styles.spondCardContent}>
+              <Text style={[styles.spondCardTitle, { color: colors.text }]}>{item.heading}</Text>
+              {item.description && (
+                <Text style={[styles.spondCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
+              )}
+              <Text style={[styles.spondCardDates, { color: colors.textSecondary }]}>
+                {dateText}{timeText ? ` · ${timeText}` : ''}
+              </Text>
+              {item.groupName && (
+                <Text style={[styles.spondCardGroup, { color: SPOND_COLOR }]}>{item.groupName}</Text>
+              )}
+              {item.address && (
+                <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
+              )}
+            </View>
+          </View>
+        </View>
       );
     }
     return (
@@ -398,6 +498,53 @@ const styles = StyleSheet.create({
   },
   tripCardDates: {
     fontSize: 14,
+  },
+  spondCard: {
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 16,
+    marginVertical: 6,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderLeftWidth: 4,
+    borderLeftColor: SPOND_COLOR,
+  },
+  spondCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+  },
+  spondCardIcon: {
+    fontSize: 24,
+  },
+  spondCardContent: {
+    flex: 1,
+    gap: 2,
+  },
+  spondCardTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  spondCardDesc: {
+    fontSize: 14,
+    marginTop: 2,
+  },
+  spondCardDates: {
+    fontSize: 14,
+    marginTop: 4,
+  },
+  spondCardGroup: {
+    fontSize: 13,
+    fontWeight: '500',
+    marginTop: 2,
+  },
+  spondCardAddress: {
+    fontSize: 14,
+    marginTop: 4,
+    fontWeight: '500',
   },
   fab: {
     position: 'absolute',

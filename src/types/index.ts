@@ -98,3 +98,24 @@ export interface TripLink {
   url: string;
   createdAt: number;
 }
+
+export interface SpondEvent {
+  id: string;
+  heading: string;
+  description?: string;
+  startTimestamp: string;
+  endTimestamp?: string;
+  address?: string;
+  groupName?: string;
+}
+
+export interface SpondGroup {
+  id: string;
+  name: string;
+}
+
+export interface SpondConfig {
+  email: string;
+  password: string;
+  groups: SpondGroup[];
+}

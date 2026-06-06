@@ -41,6 +41,8 @@ import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { uriToBlob } from '../utils/upload';
 import { IMAGE_QUALITY } from '../constants/limits';
+import { SpondGroup } from '../types';
+import { loginSpond, getSpondGroups, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
 
 export const ProfileScreen: React.FC = () => {
   const user = useUserStore((state) => state.user);
@@ -63,6 +65,12 @@ export const ProfileScreen: React.FC = () => {
   const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [spondEmail, setSpondEmail] = useState('');
+  const [spondPassword, setSpondPassword] = useState('');
+  const [spondGroups, setSpondGroups] = useState<SpondGroup[]>([]);
+  const [spondSelectedGroups, setSpondSelectedGroups] = useState<string[]>([]);
+  const [spondConnected, setSpondConnected] = useState(false);
+  const [spondLoading, setSpondLoading] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -93,6 +101,14 @@ export const ProfileScreen: React.FC = () => {
       }
       if (userProfile?.notificationsEnabled !== undefined) {
         setNotificationsEnabled(userProfile.notificationsEnabled);
+      }
+      if (userProfile?.familyId) {
+        const spondConfig = await getSpondConfig(userProfile.familyId);
+        if (spondConfig) {
+          setSpondEmail(spondConfig.email);
+          setSpondConnected(true);
+          setSpondSelectedGroups(spondConfig.groups.map((g) => g.id));
+        }
       }
       setLoading(false);
     };
@@ -308,6 +324,69 @@ export const ProfileScreen: React.FC = () => {
       crossAlert('Error', getErrorMessage(error));
     }
   }, [user]);
+
+  const handleConnectSpond = useCallback(async () => {
+    if (!spondEmail.trim() || !spondPassword.trim()) {
+      crossAlert('Error', 'Vennligst fyll inn e-post og passord for Spond.');
+      return;
+    }
+    setSpondLoading(true);
+    try {
+      const groups = await getSpondGroups(spondEmail.trim(), spondPassword);
+      setSpondGroups(groups);
+      setSpondConnected(true);
+      crossAlert('Suksess', `Koblet til Spond. ${groups.length} gruppe(r) funnet.`);
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    } finally {
+      setSpondLoading(false);
+    }
+  }, [spondEmail, spondPassword]);
+
+  const handleToggleSpondGroup = useCallback((groupId: string) => {
+    setSpondSelectedGroups((prev) =>
+      prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]
+    );
+  }, []);
+
+  const handleSaveSpondConfig = useCallback(async () => {
+    if (!familyId) {
+      crossAlert('Error', 'Du må være med i en familie for å lagre Spond-konfigurasjon.');
+      return;
+    }
+    try {
+      const selectedGroups = spondGroups.filter((g) => spondSelectedGroups.includes(g.id));
+      await saveSpondConfig(familyId, {
+        email: spondEmail.trim(),
+        password: spondPassword,
+        groups: selectedGroups,
+      });
+      clearSpondToken();
+      crossAlert('Suksess', `Spond konfigurasjon lagret. ${selectedGroups.length} gruppe(r) aktivert.`);
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  }, [familyId, spondEmail, spondPassword, spondGroups, spondSelectedGroups]);
+
+  const handleDisconnectSpond = useCallback(async () => {
+    if (!familyId) return;
+    crossAlert('Koble fra Spond', 'Er du sikker?', [
+      { text: 'Avbryt', style: 'cancel' },
+      {
+        text: 'Koble fra',
+        style: 'destructive',
+        onPress: async () => {
+          await saveSpondConfig(familyId, { email: '', password: '', groups: [] });
+          setSpondEmail('');
+          setSpondPassword('');
+          setSpondGroups([]);
+          setSpondSelectedGroups([]);
+          setSpondConnected(false);
+          clearSpondToken();
+        },
+      },
+    ]);
+  }, [familyId]);
 
   const handleLogout = async () => {
     crossAlert('Logg ut', 'Er du sikker på at du vil logge ut?', [
@@ -564,6 +643,84 @@ export const ProfileScreen: React.FC = () => {
                   <Text style={[styles.familyButtonText, { color: colors.text }]}>Bli med i familie</Text>
                 </TouchableOpacity>
               </View>
+            </View>
+          )}
+        </View>
+      )}
+
+      {isAdmin(user?.email) && (
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Spond konfigurasjon</Text>
+
+          {spondConnected && spondGroups.length > 0 ? (
+            <View>
+              <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
+                <Text style={[styles.value, { color: colors.text }]}>{spondEmail}</Text>
+                <Text style={[styles.editIcon, { color: colors.accent }]}>Koblet til</Text>
+              </View>
+
+              <Text style={[styles.label, { color: colors.textSecondary, marginTop: 12 }]}>Velg grupper</Text>
+              {spondGroups.map((group) => (
+                <TouchableOpacity
+                  key={group.id}
+                  style={[styles.valueRow, { backgroundColor: colors.inputBackground, marginBottom: 6 }]}
+                  onPress={() => handleToggleSpondGroup(group.id)}
+                >
+                  <Text style={[styles.value, { color: colors.text }]}>{group.name}</Text>
+                  <Text style={[styles.editIcon, { color: spondSelectedGroups.includes(group.id) ? colors.accent : colors.textDisabled }]}>
+                    {spondSelectedGroups.includes(group.id) ? '✅' : '⬜'}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
+                <TouchableOpacity
+                  style={[styles.familyButton, { backgroundColor: colors.accent }]}
+                  onPress={handleSaveSpondConfig}
+                >
+                  <Text style={styles.familyButtonText}>Lagre</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.leaveButton, { borderColor: colors.danger }]}
+                  onPress={handleDisconnectSpond}
+                >
+                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Koble fra</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <View>
+              <Text style={[styles.noFamily, { color: colors.textSecondary }]}>
+                Koble til Spond for å vise lagets arrangementer.
+              </Text>
+              <View style={styles.field}>
+                <TextInput
+                  style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+                  value={spondEmail}
+                  onChangeText={setSpondEmail}
+                  placeholder="Spond e-post"
+                  placeholderTextColor={colors.textDisabled}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+              </View>
+              <View style={styles.field}>
+                <TextInput
+                  style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+                  value={spondPassword}
+                  onChangeText={setSpondPassword}
+                  placeholder="Spond passord"
+                  placeholderTextColor={colors.textDisabled}
+                  secureTextEntry
+                />
+              </View>
+              <TouchableOpacity
+                style={[styles.familyButton, { backgroundColor: colors.accent, opacity: spondLoading ? 0.5 : 1 }]}
+                onPress={handleConnectSpond}
+                disabled={spondLoading}
+              >
+                <Text style={styles.familyButtonText}>{spondLoading ? 'Kobler til...' : 'Koble til Spond'}</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
