@@ -23,7 +23,7 @@ const TRIP_COLOR = '#0097A7';
 const SPOND_COLOR = '#E53935';
 
 const SPOND_GROUP_LOGOS: Record<string, any> = {
-  'BSK Fotball': require('../../assets/Bekkelaget logo.png'),
+  'BSK Fotball J2010/2011': require('../../assets/Bekkelaget logo.png'),
   'Surprise 25/26': require('../../assets/Viqueens logo.png'),
 };
 
