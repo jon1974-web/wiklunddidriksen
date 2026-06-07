@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, addDoc, collection } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -20,6 +20,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   const { list } = route.params as { list: ShoppingList };
   const [currentList, setCurrentList] = useState<ShoppingList>(list);
   const [newItemName, setNewItemName] = useState('');
+  const newItemInputRef = useRef<TextInput>(null);
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
 
@@ -84,6 +85,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
         items: arrayUnion(newItem),
       });
       setNewItemName('');
+      setTimeout(() => newItemInputRef.current?.focus(), 100);
     } catch (error: any) {
       crossAlert('Error', error.message);
     }
@@ -145,6 +147,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
 
       <View style={[styles.addItemContainer, { backgroundColor: colors.surface }]}>
         <TextInput
+          ref={newItemInputRef}
           style={[styles.addItemInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
           value={newItemName}
           onChangeText={setNewItemName}
