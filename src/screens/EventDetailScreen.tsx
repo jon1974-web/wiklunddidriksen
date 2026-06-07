@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal, TouchableWithoutFeedback, Platform, Linking } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback, Platform, Linking, Image } from 'react-native';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
-import { DatePickerModal } from '../components/DatePickerModal';
 import { db } from '../services/firebase';
 import { Event } from '../types';
 import { useTheme } from '../theme/ThemeContext';
@@ -11,10 +10,11 @@ import { getUserProfile } from '../services/familyService';
 import { syncEventToCalendar, updateCalendarEvent, deleteCalendarEvent } from '../services/calendarService';
 import { useUserStore } from '../store/userStore';
 import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } from '../constants/eventOptions';
-import { LOCALE, DATE_PICKER_RANGE_DAYS } from '../constants/limits';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { EVENT_ICONS } from '../constants/eventIcons';
+import { formatDate, formatTime } from '../utils/dateUtils';
+import { GOOGLE_MAPS_API_KEY } from '../constants/api';
 
 interface EventDetailScreenProps {
   navigation: any;
@@ -25,6 +25,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const { event } = route.params as { event: Event };
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
+  const [isEditing, setIsEditing] = useState(false);
   
   const getInitialEndDateDays = () => {
     if (!event.endDate) return null;
@@ -186,7 +187,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         }
       }
 
-      navigation.goBack();
+      setIsEditing(false);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -216,9 +217,125 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     ]);
   }, [event, navigation]);
 
+  const dateText = event.endDate
+    ? `${formatDate(event.date)} - ${formatDate(event.endDate)}`
+    : formatDate(event.date);
+  const timeText = event.endTime
+    ? `${formatTime(event.time)} - ${formatTime(event.endTime)}`
+    : formatTime(event.time);
+  const eventIcon = event.icon || '📅';
+  const mapUrl = event.address
+    ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(event.address)}&zoom=15&size=600x300&markers=color:red%7C${encodeURIComponent(event.address)}&key=${GOOGLE_MAPS_API_KEY}`
+    : null;
+
+  if (!isEditing) {
+    return (
+      <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 8 }}>
+          <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
+        </TouchableOpacity>
+
+        <View style={[styles.viewCard, { backgroundColor: colors.surface }]}>
+          <Text style={styles.viewIcon}>{eventIcon}</Text>
+          <Text style={[styles.viewTitle, { color: colors.text }]}>{event.title}</Text>
+          {event.description && (
+            <Text style={[styles.viewDescription, { color: colors.textSecondary }]}>{event.description}</Text>
+          )}
+          <View style={[styles.viewDivider, { backgroundColor: colors.border }]} />
+          <View style={styles.viewDetailRow}>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅 Dato</Text>
+            <Text style={[styles.viewDetailValue, { color: colors.text }]}>{dateText}</Text>
+          </View>
+          <View style={styles.viewDetailRow}>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐 Tid</Text>
+            <Text style={[styles.viewDetailValue, { color: colors.text }]}>{timeText}</Text>
+          </View>
+          {event.address && (
+            <View style={styles.viewDetailRow}>
+              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍 Adresse</Text>
+              <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{event.address}</Text>
+            </View>
+          )}
+          <View style={styles.viewDetailRow}>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔 Påminnelse</Text>
+            <Text style={[styles.viewDetailValue, { color: colors.text }]}>
+              {REMINDER_OPTIONS.find((o) => o.value === reminderMinutes)?.label || `${reminderMinutes} min`}
+            </Text>
+          </View>
+        </View>
+
+        {mapUrl && (
+          <TouchableOpacity
+            style={[styles.viewMapContainer, { backgroundColor: colors.surface }]}
+            onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.address!)}`)}
+          >
+            <Image source={{ uri: mapUrl }} style={styles.viewMapImage} />
+            <Text style={[styles.viewMapLabel, { color: colors.accent }]}>Åpne i Google Maps →</Text>
+          </TouchableOpacity>
+        )}
+
+        <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.accent }]} onPress={() => setIsEditing(true)}>
+          <Text style={styles.editButtonText}>Rediger</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.surface, borderColor: colors.danger }]} onPress={handleDelete}>
+          <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
+        </TouchableOpacity>
+
+        {Platform.OS === 'web' && (
+          <View style={{ marginTop: 16 }}>
+            {userCalendarProvider && userCalendarEmail ? (
+              <TouchableOpacity
+                style={[styles.calendarWebButton, { backgroundColor: userCalendarProvider === 'google' ? '#4285F4' : '#0078D4' }]}
+                onPress={() => {
+                  const [h, m] = event.time.split(':').map(Number);
+                  const start = new Date(event.date);
+                  start.setHours(h, m, 0, 0);
+                  let end: Date;
+                  if (event.endDate && event.endTime) {
+                    const [eh, em] = event.endTime.split(':').map(Number);
+                    end = new Date(event.endDate);
+                    end.setHours(eh, em, 0, 0);
+                  } else if (event.endTime) {
+                    const [eh, em] = event.endTime.split(':').map(Number);
+                    end = new Date(event.date);
+                    end.setHours(eh, em, 0, 0);
+                  } else if (event.endDate) {
+                    end = new Date(event.endDate);
+                    end.setHours(h, m, 0, 0);
+                  } else {
+                    end = new Date(start.getTime() + 60 * 60 * 1000);
+                  }
+                  if (userCalendarProvider === 'google') {
+                    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.address || '')}`;
+                    Linking.openURL(url);
+                  } else {
+                    const fmt = (d: Date) => d.toISOString();
+                    const url = `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(event.title)}&startdt=${fmt(start)}&enddt=${fmt(end)}&body=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.address || '')}`;
+                    Linking.openURL(url);
+                  }
+                }}
+              >
+                <Text style={styles.calendarWebButtonText}>
+                  Legg til i {userCalendarProvider === 'google' ? 'Google' : 'Outlook'} Calendar
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <Text style={[styles.sectionLabel, { color: colors.textDisabled, textAlign: 'center' }]}>
+                Lagre kalender-e-post i Profil for å legge til arrangementer direkte.
+              </Text>
+            )}
+          </View>
+        )}
+        <View style={{ height: 40 }} />
+      </ScrollView>
+    );
+  }
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 8 }}>
+      <TouchableOpacity onPress={() => setIsEditing(false)} style={{ marginBottom: 8 }}>
         <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
       </TouchableOpacity>
       <Text style={[styles.title, { color: colors.text }]}>Rediger arrangement</Text>
@@ -565,6 +682,81 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
     marginBottom: 24,
+  },
+  viewCard: {
+    borderRadius: 12,
+    padding: 24,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  viewIcon: {
+    fontSize: 48,
+    marginBottom: 12,
+  },
+  viewTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  viewDescription: {
+    fontSize: 16,
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  viewDivider: {
+    height: 1,
+    marginBottom: 16,
+  },
+  viewDetailRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  viewDetailLabel: {
+    fontSize: 14,
+    flex: 1,
+  },
+  viewDetailValue: {
+    fontSize: 14,
+    fontWeight: '500',
+    flex: 2,
+    textAlign: 'right',
+  },
+  viewMapContainer: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  viewMapImage: {
+    width: '100%',
+    height: 200,
+  },
+  viewMapLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+    padding: 12,
+  },
+  editButton: {
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  editButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
   },
   field: {
     marginBottom: 20,
