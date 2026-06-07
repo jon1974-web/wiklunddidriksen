@@ -265,6 +265,12 @@ const AppContent = () => {
                 tabBarLabel: 'Reise',
                 tabBarIcon: ({ focused }) => <TabIcon label="✈️" focused={focused} />,
               }}
+              listeners={({ navigation }) => ({
+                tabPress: (e) => {
+                  e.preventDefault();
+                  navigation.navigate('Trips', { screen: 'TripsList' });
+                },
+              })}
             />
             <Tab.Screen
               name="Profile"
