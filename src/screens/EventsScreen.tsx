@@ -772,7 +772,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginTop: 8,
-    paddingLeft: 36,
   },
   spondCardResponseLink: {
     fontSize: 14,
