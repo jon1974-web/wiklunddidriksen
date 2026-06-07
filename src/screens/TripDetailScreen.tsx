@@ -10,6 +10,7 @@ import {
   Modal,
   TouchableWithoutFeedback,
   Linking,
+  Image,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { Trip, TripHotel, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
@@ -39,6 +40,8 @@ import { formatDate } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { TripDocumentUpload } from '../components/TripDocumentUpload';
+import { GOOGLE_MAPS_API_KEY } from '../constants/api';
+import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
 
 interface TripDetailScreenProps {
   navigation: any;
@@ -328,18 +331,35 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {hotels.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen hoteller lagt til</Text>
       ) : (
-        hotels.map((h) => (
-          <TouchableOpacity
-            key={h.id}
-            style={[styles.itemCard, { backgroundColor: colors.surface }]}
-            onPress={() => openEditModal('hotel', h)}
-            onLongPress={() => handleDeleteHotel(h.id)}
-          >
-            <Text style={[styles.itemName, { color: colors.text }]}>{h.name}</Text>
-            {h.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{h.address}</Text>}
-            {h.phone && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{h.phone}</Text>}
-          </TouchableOpacity>
-        ))
+        hotels.map((h) => {
+          const hotelMapUrl = h.address
+            ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(h.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(h.address)}&key=${GOOGLE_MAPS_API_KEY}`
+            : null;
+          return (
+            <TouchableOpacity
+              key={h.id}
+              style={[styles.itemCard, { backgroundColor: colors.surface }]}
+              onPress={() => openEditModal('hotel', h)}
+              onLongPress={() => handleDeleteHotel(h.id)}
+            >
+              <View style={styles.itemRow}>
+                <View style={styles.itemContent}>
+                  <Text style={[styles.itemName, { color: colors.text }]}>{h.name}</Text>
+                  {h.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{h.address}</Text>}
+                  {h.phone && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{h.phone}</Text>}
+                </View>
+                {hotelMapUrl && (
+                  <TouchableOpacity
+                    style={styles.itemMapContainer}
+                    onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.address!)}`)}
+                  >
+                    <Image source={{ uri: hotelMapUrl }} style={styles.itemMapImage} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })
       )}
 
       {/* Restaurants */}
@@ -347,18 +367,35 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {restaurants.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen restauranter lagt til</Text>
       ) : (
-        restaurants.map((r) => (
-          <TouchableOpacity
-            key={r.id}
-            style={[styles.itemCard, { backgroundColor: colors.surface }]}
-            onPress={() => openEditModal('restaurant', r)}
-            onLongPress={() => handleDeleteRestaurant(r.id)}
-          >
-            <Text style={[styles.itemName, { color: colors.text }]}>{r.name}</Text>
-            {r.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{r.address}</Text>}
-            {r.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{r.note}</Text>}
-          </TouchableOpacity>
-        ))
+        restaurants.map((r) => {
+          const restMapUrl = r.address
+            ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(r.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(r.address)}&key=${GOOGLE_MAPS_API_KEY}`
+            : null;
+          return (
+            <TouchableOpacity
+              key={r.id}
+              style={[styles.itemCard, { backgroundColor: colors.surface }]}
+              onPress={() => openEditModal('restaurant', r)}
+              onLongPress={() => handleDeleteRestaurant(r.id)}
+            >
+              <View style={styles.itemRow}>
+                <View style={styles.itemContent}>
+                  <Text style={[styles.itemName, { color: colors.text }]}>{r.name}</Text>
+                  {r.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{r.address}</Text>}
+                  {r.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{r.note}</Text>}
+                </View>
+                {restMapUrl && (
+                  <TouchableOpacity
+                    style={styles.itemMapContainer}
+                    onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.address!)}`)}
+                  >
+                    <Image source={{ uri: restMapUrl }} style={styles.itemMapImage} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })
       )}
 
       {/* Activities */}
@@ -366,23 +403,40 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {activities.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen aktiviteter lagt til</Text>
       ) : (
-        activities.map((a) => (
-          <TouchableOpacity
-            key={a.id}
-            style={[styles.itemCard, { backgroundColor: colors.surface }]}
-            onPress={() => openEditModal('activity', a)}
-            onLongPress={() => handleDeleteActivity(a.id)}
-          >
-            <Text style={[styles.itemName, { color: colors.text }]}>{a.name}</Text>
-            {(a.date || a.time) && (
-              <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>
-                {[a.date, a.time].filter(Boolean).join(' ')}
-              </Text>
-            )}
-            {a.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{a.address}</Text>}
-            {a.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{a.note}</Text>}
-          </TouchableOpacity>
-        ))
+        activities.map((a) => {
+          const actMapUrl = a.address
+            ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(a.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(a.address)}&key=${GOOGLE_MAPS_API_KEY}`
+            : null;
+          return (
+            <TouchableOpacity
+              key={a.id}
+              style={[styles.itemCard, { backgroundColor: colors.surface }]}
+              onPress={() => openEditModal('activity', a)}
+              onLongPress={() => handleDeleteActivity(a.id)}
+            >
+              <View style={styles.itemRow}>
+                <View style={styles.itemContent}>
+                  <Text style={[styles.itemName, { color: colors.text }]}>{a.name}</Text>
+                  {(a.date || a.time) && (
+                    <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>
+                      {[a.date, a.time].filter(Boolean).join(' ')}
+                    </Text>
+                  )}
+                  {a.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{a.address}</Text>}
+                  {a.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{a.note}</Text>}
+                </View>
+                {actMapUrl && (
+                  <TouchableOpacity
+                    style={styles.itemMapContainer}
+                    onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.address!)}`)}
+                  >
+                    <Image source={{ uri: actMapUrl }} style={styles.itemMapImage} />
+                  </TouchableOpacity>
+                )}
+              </View>
+            </TouchableOpacity>
+          );
+        })
       )}
 
       {/* Documents */}
@@ -846,6 +900,23 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 14,
     marginBottom: 8,
+  },
+  itemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  itemContent: {
+    flex: 1,
+  },
+  itemMapContainer: {
+    marginLeft: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  itemMapImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
   },
   itemName: {
     fontSize: 16,
