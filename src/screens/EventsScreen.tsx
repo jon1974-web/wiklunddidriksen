@@ -41,6 +41,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondLocalResponses, setSpondLocalResponses] = useState<Record<string, boolean>>({});
   const [responseModal, setResponseModal] = useState<{ eventId: string; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [filterSource, setFilterSource] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
   const user = useUserStore((state) => state.user);
@@ -157,20 +158,31 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         const end = e.endTimestamp ? formatSpondDate(e.endTimestamp) : start;
         return selectedDate >= start && selectedDate <= end;
       }).map((e) => ({ ...e, _type: 'spond' as const }));
-      return [...dayEvents, ...dayTrips, ...daySpond];
+      let dayItems = [...dayEvents, ...dayTrips, ...daySpond];
+      if (filterSource === 'viqueens') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === 'Surprise 25/26');
+      else if (filterSource === 'bekkelaget') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === 'BSK Fotball J2010/2011');
+      else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
+      return dayItems;
     }
     const allItems: UnifiedItem[] = [
       ...events.map((e) => ({ ...e, _type: 'event' as const })),
       ...trips.map((t) => ({ ...t, _type: 'trip' as const })),
       ...spondEvents.map((e) => ({ ...e, _type: 'spond' as const })),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
-    const upcoming = allItems.filter((i) => getDateStr(i) >= today);
-    const past = allItems.filter((i) => getDateStr(i) < today);
+    const filtered = filterSource === 'viqueens'
+      ? allItems.filter((i) => i._type === 'spond' && i.groupName === 'Surprise 25/26')
+      : filterSource === 'bekkelaget'
+      ? allItems.filter((i) => i._type === 'spond' && i.groupName === 'BSK Fotball J2010/2011')
+      : filterSource === 'app'
+      ? allItems.filter((i) => i._type === 'event' || i._type === 'trip')
+      : allItems;
+    const upcoming = filtered.filter((i) => getDateStr(i) >= today);
+    const past = filtered.filter((i) => getDateStr(i) < today);
     const sortByDate = (a: UnifiedItem, b: UnifiedItem) => getDateStr(a).localeCompare(getDateStr(b));
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
-  }, [events, trips, spondEvents, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo]);
+  }, [events, trips, spondEvents, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource]);
 
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
@@ -433,6 +445,25 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           >
             <Text style={[styles.toggleText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>Kalender</Text>
           </TouchableOpacity>
+          <View style={{ flex: 1 }} />
+          <TouchableOpacity
+            style={[styles.filterIcon, filterSource === 'viqueens' && styles.filterIconActive]}
+            onPress={() => setFilterSource(filterSource === 'viqueens' ? null : 'viqueens')}
+          >
+            <Image source={SPOND_GROUP_LOGOS['Surprise 25/26']} style={[styles.filterIconImg, filterSource === 'viqueens' && styles.filterIconImgActive]} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterIcon, filterSource === 'bekkelaget' && styles.filterIconActive]}
+            onPress={() => setFilterSource(filterSource === 'bekkelaget' ? null : 'bekkelaget')}
+          >
+            <Image source={SPOND_GROUP_LOGOS['BSK Fotball J2010/2011']} style={[styles.filterIconImg, filterSource === 'bekkelaget' && styles.filterIconImgActive]} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.filterIcon, filterSource === 'app' && styles.filterIconActive]}
+            onPress={() => setFilterSource(filterSource === 'app' ? null : 'app')}
+          >
+            <View style={[styles.filterIconCircle, filterSource === 'app' && styles.filterIconCircleActive]} />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -546,6 +577,43 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: 14,
+  },
+  filterIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+  },
+  filterIconActive: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    borderColor: '#333',
+  },
+  filterIconImg: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+  },
+  filterIconImgActive: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+  },
+  filterIconCircle: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    backgroundColor: '#4CAF50',
+  },
+  filterIconCircleActive: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
   },
   calendarContainer: {
     paddingBottom: 8,
