@@ -13,6 +13,7 @@ import { useUserStore } from '../store/userStore';
 import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } from '../constants/eventOptions';
 import { LOCALE, DATE_PICKER_RANGE_DAYS } from '../constants/limits';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
+import { crossAlert } from '../utils/alert';
 import { EVENT_ICONS } from '../constants/eventIcons';
 
 interface EventDetailScreenProps {
@@ -81,7 +82,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 
   const handleUpdate = useCallback(async () => {
     if (!title.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en tittel');
+      crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
 
@@ -187,12 +188,12 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
   }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, event, navigation]);
 
   const handleDelete = useCallback(() => {
-    Alert.alert('Slett arrangement', 'Er du sikker på at du vil slette dette?', [
+    crossAlert('Slett arrangement', 'Er du sikker på at du vil slette dette?', [
       { text: 'Avbryt', style: 'cancel' },
       {
         text: 'Slett',
@@ -208,7 +209,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             await deleteDoc(doc(db, 'events', event.id));
             navigation.goBack();
           } catch (error) {
-            Alert.alert('Error', getErrorMessage(error));
+            crossAlert('Error', getErrorMessage(error));
           }
         },
       },
