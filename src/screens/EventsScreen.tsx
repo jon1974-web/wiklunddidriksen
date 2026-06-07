@@ -693,16 +693,16 @@ const styles = StyleSheet.create({
   },
   spondCardHeader: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: 12,
+    alignItems: 'center',
+    gap: 8,
   },
   spondCardIcon: {
-    fontSize: 24,
+    fontSize: 22,
   },
   spondCardLogo: {
-    width: 40,
-    height: 40,
-    borderRadius: 6,
+    width: 22,
+    height: 22,
+    borderRadius: 11,
   },
   spondCardContent: {
     flex: 1,
