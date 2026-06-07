@@ -9,9 +9,10 @@ import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
 interface EventCardProps {
   event: Event;
   onPress: () => void;
+  onLongPress?: () => void;
 }
 
-export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress }) => {
+export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress, onLongPress }) => {
   const { colors } = useTheme();
   const dateText = event.endDate 
     ? `${formatDate(event.date)} - ${formatDate(event.endDate)}`
@@ -32,7 +33,7 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress 
   };
 
   return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]} onPress={onPress}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]} onPress={onPress} onLongPress={onLongPress}>
       <View style={styles.row}>
         <View style={styles.content}>
           <View style={styles.titleRow}>

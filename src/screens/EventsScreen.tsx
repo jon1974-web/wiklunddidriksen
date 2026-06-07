@@ -424,6 +424,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       <EventCard
         event={item}
         onPress={() => navigation.navigate('EventDetail', { event: item })}
+        onLongPress={() => handleDelete(item.id)}
       />
     );
   }, [navigation, colors, setResponseModal, spondLocalResponses]);
