@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { Trip } from '../types';
-import { getTrips, deleteTrip } from '../services/tripService';
+import { getTrips } from '../services/tripService';
 import { formatDate } from '../utils/dateUtils';
 import { getErrorMessage } from '../utils/validation';
+import { GOOGLE_MAPS_API_KEY } from '../constants/api';
+import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
 
 interface TripsScreenProps {
   navigation: any;
@@ -32,48 +34,44 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
     return unsubscribe;
   }, [navigation, loadTrips]);
 
-  const handleDelete = useCallback((trip: Trip) => {
-    Alert.alert('Slett reise', `Er du sikker på at du vil slette "${trip.title}"?`, [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Slett',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteTrip(trip.id);
-            setTrips((prev) => prev.filter((t) => t.id !== trip.id));
-          } catch (error) {
-            Alert.alert('Error', getErrorMessage(error));
-          }
-        },
-      },
-    ]);
-  }, []);
-
-  const renderTrip = ({ item }: { item: Trip }) => (
-    <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.surface }]}
-      onPress={() => navigation.navigate('TripDetail', { trip: item })}
-    >
-      <View style={styles.cardHeader}>
-        <Text style={styles.cardIcon}>✈️</Text>
-        <View style={styles.cardInfo}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>{item.title}</Text>
-          <Text style={[styles.cardLocation, { color: colors.textSecondary }]}>
-            {item.city}{item.country ? `, ${item.country}` : ''}
-          </Text>
+  const renderTrip = ({ item }: { item: Trip }) => {
+    const locationQuery = item.country ? `${item.city}, ${item.country}` : item.city;
+    const tripMapUrl = item.city
+      ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(locationQuery)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(locationQuery)}&key=${GOOGLE_MAPS_API_KEY}`
+      : null;
+    return (
+      <TouchableOpacity
+        style={[styles.card, { backgroundColor: colors.surface }]}
+        onPress={() => navigation.navigate('TripDetail', { trip: item })}
+      >
+        <View style={styles.cardRow}>
+          <View style={styles.cardContent}>
+            <View style={styles.cardTitleRow}>
+              <Text style={styles.cardIcon}>✈️</Text>
+              <Text style={[styles.cardTitle, { color: colors.text }]}>{item.title}</Text>
+            </View>
+            <Text style={[styles.cardLocation, { color: colors.textSecondary }]}>
+              {item.city}{item.country ? `, ${item.country}` : ''}
+            </Text>
+            <Text style={[styles.cardDateText, { color: colors.textSecondary }]}>
+              {formatDate(item.startDate)} - {formatDate(item.endDate)}
+            </Text>
+          </View>
+          {tripMapUrl && (
+            <TouchableOpacity
+              style={styles.mapContainer}
+              onPress={() => {
+                const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationQuery)}`;
+                Linking.openURL(url);
+              }}
+            >
+              <Image source={{ uri: tripMapUrl }} style={styles.mapImage} />
+            </TouchableOpacity>
+          )}
         </View>
-      </View>
-      <View style={styles.cardDates}>
-        <Text style={[styles.cardDateText, { color: colors.textSecondary }]}>
-          {formatDate(item.startDate)} - {formatDate(item.endDate)}
-        </Text>
-      </View>
-      <TouchableOpacity style={styles.deleteButton} onPress={() => handleDelete(item)}>
-        <Text style={[styles.deleteText, { color: colors.danger }]}>Slett</Text>
       </TouchableOpacity>
-    </TouchableOpacity>
-  );
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -133,17 +131,24 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+    borderLeftWidth: 4,
+    borderLeftColor: '#0097A7',
   },
-  cardHeader: {
+  cardRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+  },
+  cardContent: {
+    flex: 1,
+    gap: 2,
+  },
+  cardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   cardIcon: {
-    fontSize: 28,
-  },
-  cardInfo: {
-    flex: 1,
+    fontSize: 22,
   },
   cardTitle: {
     fontSize: 18,
@@ -151,21 +156,19 @@ const styles = StyleSheet.create({
   },
   cardLocation: {
     fontSize: 14,
-    marginTop: 2,
-  },
-  cardDates: {
-    marginTop: 8,
   },
   cardDateText: {
     fontSize: 14,
   },
-  deleteButton: {
-    marginTop: 10,
-    alignSelf: 'flex-end',
+  mapContainer: {
+    marginLeft: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
-  deleteText: {
-    fontSize: 14,
-    fontWeight: '500',
+  mapImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
   },
   emptyContainer: {
     flex: 1,
