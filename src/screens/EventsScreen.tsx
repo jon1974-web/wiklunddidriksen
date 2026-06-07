@@ -307,9 +307,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           onPress={() => navigation.navigate('Trips', { screen: 'TripDetail', params: { trip: item } })}
         >
           <View style={styles.tripCardHeader}>
-            <Text style={styles.tripCardIcon}>✈️</Text>
             <View style={styles.tripCardContent}>
-              <Text style={[styles.tripCardTitle, { color: colors.text }]}>{item.title}</Text>
+              <View style={styles.tripCardTitleRow}>
+                <Text style={styles.tripCardIcon}>✈️</Text>
+                <Text style={[styles.tripCardTitle, { color: colors.text }]}>{item.title}</Text>
+              </View>
               <Text style={[styles.tripCardLocation, { color: colors.textSecondary }]}>
                 {item.city}{item.country ? `, ${item.country}` : ''}
               </Text>
@@ -337,13 +339,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       return (
         <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
           <View style={styles.spondCardHeader}>
-            {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
-              <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
-            ) : (
-              <Text style={styles.spondCardIcon}>🏟️</Text>
-            )}
             <View style={styles.spondCardContent}>
               <View style={styles.spondCardTitleRow}>
+                {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
+                  <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
+                ) : (
+                  <Text style={styles.spondCardIcon}>🏟️</Text>
+                )}
                 <Text style={[styles.spondCardTitle, { color: colors.text }]}>{item.heading}</Text>
                 {localResponse === true && (
                   <View style={[styles.spondBadge, { backgroundColor: colors.accent }]}>
@@ -658,8 +660,7 @@ const styles = StyleSheet.create({
   },
   tripCardHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    alignItems: 'flex-start',
   },
   tripCardIcon: {
     fontSize: 22,
@@ -667,6 +668,11 @@ const styles = StyleSheet.create({
   tripCardContent: {
     flex: 1,
     gap: 2,
+  },
+  tripCardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
   tripCardTitle: {
     fontSize: 18,
@@ -693,8 +699,7 @@ const styles = StyleSheet.create({
   },
   spondCardHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
+    alignItems: 'flex-start',
   },
   spondCardIcon: {
     fontSize: 22,
