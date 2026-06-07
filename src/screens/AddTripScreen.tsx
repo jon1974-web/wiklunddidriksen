@@ -5,6 +5,7 @@ import { useUserStore } from '../store/userStore';
 import { addTrip } from '../services/tripService';
 import { getTodayLocal } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
+import { GooglePlacesInput } from '../components/GooglePlacesInput';
 
 interface AddTripScreenProps {
   navigation: any;
@@ -68,12 +69,18 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>By</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+        <GooglePlacesInput
           value={city}
           onChangeText={setCity}
           placeholder="F.eks. Barcelona"
-          placeholderTextColor={colors.textDisabled}
+          types={['(cities)']}
+          onSelect={(address) => {
+            const parts = address.split(',').map((p) => p.trim());
+            setCity(parts[0] || address);
+            if (parts.length > 1) {
+              setCountry(parts[parts.length - 1]);
+            }
+          }}
         />
       </View>
 

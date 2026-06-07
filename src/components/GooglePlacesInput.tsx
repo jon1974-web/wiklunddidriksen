@@ -14,6 +14,7 @@ interface GooglePlacesInputProps {
   onChangeText: (text: string) => void;
   placeholder?: string;
   onSelect: (address: string) => void;
+  types?: string[];
 }
 
 export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
@@ -21,6 +22,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
   onChangeText,
   placeholder = 'Søk etter adresse...',
   onSelect,
+  types = ['address'],
 }) => {
   const [predictions, setPredictions] = useState<Place[]>([]);
   const [showResults, setShowResults] = useState(false);
@@ -59,7 +61,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
     if (Platform.OS === 'web') {
       const google = (window as any).google;
       autocompleteRef.current.getQueryPredictions(
-        { input, types: ['address'], componentRestrictions: { country: 'no' } },
+        { input, types, componentRestrictions: { country: 'no' } },
         (results: any[] | null, status: string) => {
           if (status === google.maps.places.PlacesServiceStatus.OK && results) {
             setPredictions(
@@ -77,7 +79,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
       );
     } else {
       fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${GOOGLE_MAPS_API_KEY}&language=no&types=address`
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&key=${GOOGLE_MAPS_API_KEY}&language=no&types=${types.join('|')}`
       )
         .then((res) => res.json())
         .then((data) => {
