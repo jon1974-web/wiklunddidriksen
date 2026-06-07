@@ -8,7 +8,7 @@ import { useUserStore } from '../store/userStore';
 import { Event, Trip, SpondEvent, SpondRespondent } from '../types';
 import { EventCard } from '../components/EventCard';
 import { SpondResponseModal } from '../components/SpondResponseModal';
-import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatTime } from '../utils/dateUtils';
+import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
@@ -134,7 +134,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const filteredItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
       if (item._type === 'trip') return item.endDate || item.startDate;
-      if (item._type === 'spond') return item.endTimestamp?.split('T')[0] || item.startTimestamp.split('T')[0];
+      if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
       return item.endDate || item.date;
     };
 
@@ -148,8 +148,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         return selectedDate >= t.startDate && selectedDate <= t.endDate;
       }).map((t) => ({ ...t, _type: 'trip' as const }));
       const daySpond = spondEvents.filter((e) => {
-        const start = e.startTimestamp.split('T')[0];
-        const end = e.endTimestamp ? e.endTimestamp.split('T')[0] : start;
+        const start = formatSpondDate(e.startTimestamp);
+        const end = e.endTimestamp ? formatSpondDate(e.endTimestamp) : start;
         return selectedDate >= start && selectedDate <= end;
       }).map((e) => ({ ...e, _type: 'spond' as const }));
       return [...dayEvents, ...dayTrips, ...daySpond];
@@ -170,7 +170,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
       if (item._type === 'trip') return item.endDate || item.startDate;
-      if (item._type === 'spond') return item.endTimestamp?.split('T')[0] || item.startTimestamp.split('T')[0];
+      if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
       return item.endDate || item.date;
     };
     const allItems: UnifiedItem[] = [
@@ -246,8 +246,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     });
 
     spondEvents.forEach((event) => {
-      const startStr = event.startTimestamp.split('T')[0];
-      const endStr = event.endTimestamp ? event.endTimestamp.split('T')[0] : startStr;
+      const startStr = formatSpondDate(event.startTimestamp);
+      const endStr = event.endTimestamp ? formatSpondDate(event.endTimestamp) : startStr;
       
       const start = new Date(startStr);
       const end = new Date(endStr);
@@ -305,12 +305,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       );
     }
     if (item._type === 'spond') {
-      const dateText = item.endTimestamp
-        ? `${formatDate(item.startTimestamp.split('T')[0])} - ${formatDate(item.endTimestamp.split('T')[0])}`
-        : formatDate(item.startTimestamp.split('T')[0]);
-      const timeText = item.endTimestamp
-        ? `${item.startTimestamp.split('T')[1]?.substring(0, 5) || ''} - ${item.endTimestamp.split('T')[1]?.substring(0, 5) || ''}`
-        : item.startTimestamp.split('T')[1]?.substring(0, 5) || '';
+      const startDate = formatSpondDate(item.startTimestamp);
+      const endDate = item.endTimestamp ? formatSpondDate(item.endTimestamp) : null;
+      const dateText = endDate
+        ? `${formatDate(startDate)} - ${formatDate(endDate)}`
+        : formatDate(startDate);
+      const startTime = formatSpondTimestamp(item.startTimestamp);
+      const endTime = item.endTimestamp ? formatSpondTimestamp(item.endTimestamp) : null;
+      const timeText = endTime ? `${startTime} - ${endTime}` : startTime;
       const accepted = item.responses?.acceptedIds?.length || 0;
       const declined = item.responses?.declinedIds?.length || 0;
       const unanswered = item.responses?.unansweredIds?.length || 0;
