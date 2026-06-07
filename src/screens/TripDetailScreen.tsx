@@ -9,24 +9,30 @@ import {
   Alert,
   Modal,
   TouchableWithoutFeedback,
-  FlatList,
   Linking,
-  Platform,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
+import { Trip, TripHotel, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
 import {
+  getTripHotels,
+  addTripHotel,
+  updateTripHotel,
+  deleteTripHotel,
   getTripRestaurants,
   addTripRestaurant,
+  updateTripRestaurant,
   deleteTripRestaurant,
   getTripActivities,
   addTripActivity,
+  updateTripActivity,
   deleteTripActivity,
   getTripDocuments,
   addTripDocument,
+  updateTripDocument,
   deleteTripDocument,
   getTripLinks,
   addTripLink,
+  updateTripLink,
   deleteTripLink,
 } from '../services/tripService';
 import { formatDate } from '../utils/dateUtils';
@@ -39,17 +45,24 @@ interface TripDetailScreenProps {
   route: any;
 }
 
-type ModalType = 'restaurant' | 'activity' | 'document' | 'link' | null;
+type ModalType = 'hotel' | 'restaurant' | 'activity' | 'document' | 'link' | null;
 
 export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, route }) => {
   const { trip } = route.params as { trip: Trip };
   const { colors } = useTheme();
 
+  const [hotels, setHotels] = useState<TripHotel[]>([]);
   const [restaurants, setRestaurants] = useState<TripRestaurant[]>([]);
   const [activities, setActivities] = useState<TripActivity[]>([]);
   const [documents, setDocuments] = useState<TripDocument[]>([]);
   const [links, setLinks] = useState<TripLink[]>([]);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Hotel form
+  const [hotelName, setHotelName] = useState('');
+  const [hotelAddress, setHotelAddress] = useState('');
+  const [hotelPhone, setHotelPhone] = useState('');
 
   // Restaurant form
   const [restName, setRestName] = useState('');
@@ -77,12 +90,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const loadSubData = useCallback(async () => {
     try {
-      const [r, a, d, l] = await Promise.all([
+      const [h, r, a, d, l] = await Promise.all([
+        getTripHotels(trip.id),
         getTripRestaurants(trip.id),
         getTripActivities(trip.id),
         getTripDocuments(trip.id),
         getTripLinks(trip.id),
       ]);
+      setHotels(h);
       setRestaurants(r);
       setActivities(a);
       setDocuments(d);
@@ -97,6 +112,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   }, [loadSubData]);
 
   const resetForms = () => {
+    setHotelName('');
+    setHotelAddress('');
+    setHotelPhone('');
     setRestName('');
     setRestAddress('');
     setRestNote('');
@@ -111,69 +129,129 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     setDocFileName('');
     setLinkTitle('');
     setLinkUrl('');
+    setEditingId(null);
   };
 
-  const handleAddRestaurant = useCallback(async () => {
+  const openAddModal = (modal: ModalType) => {
+    resetForms();
+    setActiveModal(modal);
+  };
+
+  const openEditModal = (modal: ModalType, item: any) => {
+    resetForms();
+    setEditingId(item.id);
+    if (modal === 'hotel') {
+      setHotelName(item.name || '');
+      setHotelAddress(item.address || '');
+      setHotelPhone(item.phone || '');
+    } else if (modal === 'restaurant') {
+      setRestName(item.name || '');
+      setRestAddress(item.address || '');
+      setRestNote(item.note || '');
+    } else if (modal === 'activity') {
+      setActName(item.name || '');
+      setActDate(item.date || '');
+      setActTime(item.time || '');
+      setActAddress(item.address || '');
+      setActNote(item.note || '');
+    } else if (modal === 'document') {
+      setDocTitle(item.title || '');
+      setDocNote(item.note || '');
+      setDocFileUrl(item.fileUrl || '');
+      setDocFileName(item.fileName || '');
+    } else if (modal === 'link') {
+      setLinkTitle(item.title || '');
+      setLinkUrl(item.url || '');
+    }
+    setActiveModal(modal);
+  };
+
+  // Hotel handlers
+  const handleSaveHotel = useCallback(async () => {
+    if (!hotelName.trim()) {
+      Alert.alert('Error', 'Vennligst skriv et navn');
+      return;
+    }
+    try {
+      const data = { name: sanitizeInput(hotelName), address: hotelAddress.trim() ? sanitizeInput(hotelAddress) : undefined, phone: hotelPhone.trim() ? sanitizeInput(hotelPhone) : undefined };
+      if (editingId) {
+        await updateTripHotel(trip.id, editingId, data);
+      } else {
+        await addTripHotel(trip.id, data);
+      }
+      resetForms();
+      setActiveModal(null);
+      loadSubData();
+    } catch (error) {
+      Alert.alert('Error', getErrorMessage(error));
+    }
+  }, [trip.id, hotelName, hotelAddress, hotelPhone, editingId, loadSubData]);
+
+  // Restaurant handlers
+  const handleSaveRestaurant = useCallback(async () => {
     if (!restName.trim()) {
       Alert.alert('Error', 'Vennligst skriv et navn');
       return;
     }
     try {
-      await addTripRestaurant(trip.id, {
-        name: sanitizeInput(restName),
-        address: restAddress.trim() ? sanitizeInput(restAddress) : undefined,
-        note: restNote.trim() ? sanitizeInput(restNote) : undefined,
-      });
+      const data = { name: sanitizeInput(restName), address: restAddress.trim() ? sanitizeInput(restAddress) : undefined, note: restNote.trim() ? sanitizeInput(restNote) : undefined };
+      if (editingId) {
+        await updateTripRestaurant(trip.id, editingId, data);
+      } else {
+        await addTripRestaurant(trip.id, data);
+      }
       resetForms();
       setActiveModal(null);
       loadSubData();
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [trip.id, restName, restAddress, restNote, loadSubData]);
+  }, [trip.id, restName, restAddress, restNote, editingId, loadSubData]);
 
-  const handleAddActivity = useCallback(async () => {
+  // Activity handlers
+  const handleSaveActivity = useCallback(async () => {
     if (!actName.trim()) {
       Alert.alert('Error', 'Vennligst skriv et navn');
       return;
     }
     try {
-      await addTripActivity(trip.id, {
-        name: sanitizeInput(actName),
-        date: actDate || undefined,
-        time: actTime || undefined,
-        address: actAddress.trim() ? sanitizeInput(actAddress) : undefined,
-        note: actNote.trim() ? sanitizeInput(actNote) : undefined,
-      });
+      const data = { name: sanitizeInput(actName), date: actDate || undefined, time: actTime || undefined, address: actAddress.trim() ? sanitizeInput(actAddress) : undefined, note: actNote.trim() ? sanitizeInput(actNote) : undefined };
+      if (editingId) {
+        await updateTripActivity(trip.id, editingId, data);
+      } else {
+        await addTripActivity(trip.id, data);
+      }
       resetForms();
       setActiveModal(null);
       loadSubData();
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [trip.id, actName, actDate, actTime, actAddress, actNote, loadSubData]);
+  }, [trip.id, actName, actDate, actTime, actAddress, actNote, editingId, loadSubData]);
 
-  const handleAddDocument = useCallback(async () => {
+  // Document handlers
+  const handleSaveDocument = useCallback(async () => {
     if (!docTitle.trim()) {
       Alert.alert('Error', 'Vennligst skriv en tittel');
       return;
     }
     try {
-      await addTripDocument(trip.id, {
-        title: sanitizeInput(docTitle),
-        note: docNote.trim() ? sanitizeInput(docNote) : undefined,
-        fileUrl: docFileUrl || undefined,
-        fileName: docFileName || undefined,
-      });
+      const data = { title: sanitizeInput(docTitle), note: docNote.trim() ? sanitizeInput(docNote) : undefined, fileUrl: docFileUrl || undefined, fileName: docFileName || undefined };
+      if (editingId) {
+        await updateTripDocument(trip.id, editingId, data);
+      } else {
+        await addTripDocument(trip.id, data);
+      }
       resetForms();
       setActiveModal(null);
       loadSubData();
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [trip.id, docTitle, docNote, docFileUrl, docFileName, loadSubData]);
+  }, [trip.id, docTitle, docNote, docFileUrl, docFileName, editingId, loadSubData]);
 
-  const handleAddLink = useCallback(async () => {
+  // Link handlers
+  const handleSaveLink = useCallback(async () => {
     if (!linkTitle.trim()) {
       Alert.alert('Error', 'Vennligst skriv en tittel');
       return;
@@ -183,85 +261,33 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      await addTripLink(trip.id, {
-        title: sanitizeInput(linkTitle),
-        url: linkUrl.trim(),
-      });
+      const data = { title: sanitizeInput(linkTitle), url: linkUrl.trim() };
+      if (editingId) {
+        await updateTripLink(trip.id, editingId, data);
+      } else {
+        await addTripLink(trip.id, data);
+      }
       resetForms();
       setActiveModal(null);
       loadSubData();
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [trip.id, linkTitle, linkUrl, loadSubData]);
+  }, [trip.id, linkTitle, linkUrl, editingId, loadSubData]);
 
-  const handleDeleteRestaurant = useCallback(
-    (id: string) => {
-      Alert.alert('Slett restaurant', 'Er du sikker?', [
-        { text: 'Avbryt', style: 'cancel' },
-        {
-          text: 'Slett',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteTripRestaurant(trip.id, id);
-            loadSubData();
-          },
-        },
-      ]);
-    },
-    [trip.id, loadSubData]
-  );
+  // Delete handlers
+  const confirmDelete = (title: string, onConfirm: () => void) => {
+    Alert.alert(`Slett ${title}`, 'Er du sikker?', [
+      { text: 'Avbryt', style: 'cancel' },
+      { text: 'Slett', style: 'destructive', onPress: onConfirm },
+    ]);
+  };
 
-  const handleDeleteActivity = useCallback(
-    (id: string) => {
-      Alert.alert('Slett aktivitet', 'Er du sikker?', [
-        { text: 'Avbryt', style: 'cancel' },
-        {
-          text: 'Slett',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteTripActivity(trip.id, id);
-            loadSubData();
-          },
-        },
-      ]);
-    },
-    [trip.id, loadSubData]
-  );
-
-  const handleDeleteDocument = useCallback(
-    (id: string) => {
-      Alert.alert('Slett dokument', 'Er du sikker?', [
-        { text: 'Avbryt', style: 'cancel' },
-        {
-          text: 'Slett',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteTripDocument(trip.id, id);
-            loadSubData();
-          },
-        },
-      ]);
-    },
-    [trip.id, loadSubData]
-  );
-
-  const handleDeleteLink = useCallback(
-    (id: string) => {
-      Alert.alert('Slett lenke', 'Er du sikker?', [
-        { text: 'Avbryt', style: 'cancel' },
-        {
-          text: 'Slett',
-          style: 'destructive',
-          onPress: async () => {
-            await deleteTripLink(trip.id, id);
-            loadSubData();
-          },
-        },
-      ]);
-    },
-    [trip.id, loadSubData]
-  );
+  const handleDeleteHotel = useCallback((id: string) => confirmDelete('hotell', async () => { await deleteTripHotel(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteRestaurant = useCallback((id: string) => confirmDelete('restaurant', async () => { await deleteTripRestaurant(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteActivity = useCallback((id: string) => confirmDelete('aktivitet', async () => { await deleteTripActivity(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteDocument = useCallback((id: string) => confirmDelete('dokument', async () => { await deleteTripDocument(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteLink = useCallback((id: string) => confirmDelete('lenke', async () => { await deleteTripLink(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
 
   const renderSectionHeader = (title: string, icon: string, onAdd: () => void) => (
     <View style={styles.sectionHeader}>
@@ -297,7 +323,27 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </Text>
       </View>
 
-      {renderSectionHeader('Restauranter', '🍽️', () => { resetForms(); setActiveModal('restaurant'); })}
+      {/* Hotels */}
+      {renderSectionHeader('Hotell', '🛏️', () => openAddModal('hotel'))}
+      {hotels.length === 0 ? (
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen hoteller lagt til</Text>
+      ) : (
+        hotels.map((h) => (
+          <TouchableOpacity
+            key={h.id}
+            style={[styles.itemCard, { backgroundColor: colors.surface }]}
+            onPress={() => openEditModal('hotel', h)}
+            onLongPress={() => handleDeleteHotel(h.id)}
+          >
+            <Text style={[styles.itemName, { color: colors.text }]}>{h.name}</Text>
+            {h.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{h.address}</Text>}
+            {h.phone && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{h.phone}</Text>}
+          </TouchableOpacity>
+        ))
+      )}
+
+      {/* Restaurants */}
+      {renderSectionHeader('Restauranter', '🍽️', () => openAddModal('restaurant'))}
       {restaurants.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen restauranter lagt til</Text>
       ) : (
@@ -305,6 +351,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <TouchableOpacity
             key={r.id}
             style={[styles.itemCard, { backgroundColor: colors.surface }]}
+            onPress={() => openEditModal('restaurant', r)}
             onLongPress={() => handleDeleteRestaurant(r.id)}
           >
             <Text style={[styles.itemName, { color: colors.text }]}>{r.name}</Text>
@@ -314,7 +361,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         ))
       )}
 
-      {renderSectionHeader('Aktiviteter', '🎯', () => { resetForms(); setActiveModal('activity'); })}
+      {/* Activities */}
+      {renderSectionHeader('Aktiviteter', '🎯', () => openAddModal('activity'))}
       {activities.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen aktiviteter lagt til</Text>
       ) : (
@@ -322,6 +370,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <TouchableOpacity
             key={a.id}
             style={[styles.itemCard, { backgroundColor: colors.surface }]}
+            onPress={() => openEditModal('activity', a)}
             onLongPress={() => handleDeleteActivity(a.id)}
           >
             <Text style={[styles.itemName, { color: colors.text }]}>{a.name}</Text>
@@ -336,7 +385,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         ))
       )}
 
-      {renderSectionHeader('Reisedokumenter', '📄', () => { resetForms(); setActiveModal('document'); })}
+      {/* Documents */}
+      {renderSectionHeader('Reisedokumenter', '📄', () => openAddModal('document'))}
       {documents.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen dokumenter lagt til</Text>
       ) : (
@@ -344,8 +394,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <TouchableOpacity
             key={d.id}
             style={[styles.itemCard, { backgroundColor: colors.surface }]}
+            onPress={() => d.fileUrl ? Linking.openURL(d.fileUrl) : openEditModal('document', d)}
             onLongPress={() => handleDeleteDocument(d.id)}
-            onPress={() => d.fileUrl && Linking.openURL(d.fileUrl)}
           >
             <Text style={[styles.itemName, { color: colors.text }]}>{d.title}</Text>
             {d.fileName && <Text style={[styles.itemDetail, { color: colors.accent }]}>{d.fileName}</Text>}
@@ -354,7 +404,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         ))
       )}
 
-      {renderSectionHeader('Nyttige lenker', '🔗', () => { resetForms(); setActiveModal('link'); })}
+      {/* Links */}
+      {renderSectionHeader('Nyttige lenker', '🔗', () => openAddModal('link'))}
       {links.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen lenker lagt til</Text>
       ) : (
@@ -362,8 +413,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <TouchableOpacity
             key={l.id}
             style={[styles.itemCard, { backgroundColor: colors.surface }]}
-            onLongPress={() => handleDeleteLink(l.id)}
             onPress={() => Linking.openURL(l.url)}
+            onLongPress={() => handleDeleteLink(l.id)}
           >
             <Text style={[styles.itemName, { color: colors.text }]}>{l.title}</Text>
             <Text style={[styles.itemDetail, { color: colors.accent }]} numberOfLines={1}>{l.url}</Text>
@@ -373,12 +424,70 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       <View style={{ height: 40 }} />
 
+      {/* Hotel Modal */}
+      <Modal visible={activeModal === 'hotel'} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger hotell' : 'Legg til hotell'}
+                </Text>
+                <ScrollView style={styles.modalScroll}>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={hotelName}
+                      onChangeText={setHotelName}
+                      placeholder="F.eks. Grand Hotel"
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Adresse</Text>
+                    <GooglePlacesInput
+                      value={hotelAddress}
+                      onChangeText={setHotelAddress}
+                      placeholder="Søk etter adresse..."
+                      onSelect={setHotelAddress}
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Telefonnr</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={hotelPhone}
+                      onChangeText={setHotelPhone}
+                      placeholder="F.eks. +46 8 123 456"
+                      placeholderTextColor={colors.textDisabled}
+                      keyboardType="phone-pad"
+                    />
+                  </View>
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveHotel}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Restaurant Modal */}
       <Modal visible={activeModal === 'restaurant'} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>Legg til restaurant</Text>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger restaurant' : 'Legg til restaurant'}
+                </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
@@ -414,8 +523,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleAddRestaurant}>
-                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>Legg til</Text>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveRestaurant}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -424,12 +533,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
+      {/* Activity Modal */}
       <Modal visible={activeModal === 'activity'} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>Legg til aktivitet</Text>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger aktivitet' : 'Legg til aktivitet'}
+                </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
@@ -487,8 +599,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleAddActivity}>
-                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>Legg til</Text>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveActivity}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -497,12 +609,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
+      {/* Document Modal */}
       <Modal visible={activeModal === 'document'} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>Legg til reisedokument</Text>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger dokument' : 'Legg til reisedokument'}
+                </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Tittel *</Text>
@@ -542,8 +657,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleAddDocument}>
-                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>Legg til</Text>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveDocument}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -552,12 +667,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
+      {/* Link Modal */}
       <Modal visible={activeModal === 'link'} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>Legg til lenke</Text>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger lenke' : 'Legg til lenke'}
+                </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Tittel *</Text>
@@ -587,8 +705,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleAddLink}>
-                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>Legg til</Text>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveLink}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -597,6 +715,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
+      {/* Date Picker */}
       <Modal visible={showActDatePicker} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setShowActDatePicker(false)}>
           <View style={styles.modalOverlay}>
@@ -630,6 +749,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
+      {/* Time Picker */}
       <Modal visible={showActTimePicker} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setShowActTimePicker(false)}>
           <View style={styles.modalOverlay}>

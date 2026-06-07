@@ -9,7 +9,7 @@ import {
   query,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
+import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink, TripHotel } from '../types';
 
 const TRIPS_COLLECTION = 'trips';
 
@@ -32,7 +32,7 @@ export const updateTrip = async (id: string, data: Partial<Trip>): Promise<void>
 };
 
 export const deleteTrip = async (id: string): Promise<void> => {
-  const subcollections = ['restaurants', 'activities', 'documents', 'links'];
+  const subcollections = ['restaurants', 'activities', 'documents', 'links', 'hotels'];
   for (const sub of subcollections) {
     const snap = await getDocs(collection(db, TRIPS_COLLECTION, id, sub));
     for (const d of snap.docs) {
@@ -116,4 +116,44 @@ export const addTripLink = async (tripId: string, data: Omit<TripLink, 'id' | 'c
 
 export const deleteTripLink = async (tripId: string, linkId: string): Promise<void> => {
   await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'links', linkId));
+};
+
+// Hotels
+export const getTripHotels = async (tripId: string): Promise<TripHotel[]> => {
+  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'hotels'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as TripHotel));
+};
+
+export const addTripHotel = async (tripId: string, data: Omit<TripHotel, 'id' | 'createdAt'>): Promise<string> => {
+  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'hotels'), {
+    ...data,
+    createdAt: Date.now(),
+  });
+  return docRef.id;
+};
+
+export const updateTripHotel = async (tripId: string, hotelId: string, data: Partial<TripHotel>): Promise<void> => {
+  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'hotels', hotelId), data);
+};
+
+export const deleteTripHotel = async (tripId: string, hotelId: string): Promise<void> => {
+  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'hotels', hotelId));
+};
+
+// Update functions
+export const updateTripRestaurant = async (tripId: string, restaurantId: string, data: Partial<TripRestaurant>): Promise<void> => {
+  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'restaurants', restaurantId), data);
+};
+
+export const updateTripActivity = async (tripId: string, activityId: string, data: Partial<TripActivity>): Promise<void> => {
+  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'activities', activityId), data);
+};
+
+export const updateTripDocument = async (tripId: string, documentId: string, data: Partial<TripDocument>): Promise<void> => {
+  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'documents', documentId), data);
+};
+
+export const updateTripLink = async (tripId: string, linkId: string, data: Partial<TripLink>): Promise<void> => {
+  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'links', linkId), data);
 };

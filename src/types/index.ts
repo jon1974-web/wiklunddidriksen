@@ -99,6 +99,14 @@ export interface TripLink {
   createdAt: number;
 }
 
+export interface TripHotel {
+  id: string;
+  name: string;
+  address?: string;
+  phone?: string;
+  createdAt: number;
+}
+
 export interface SpondEvent {
   id: string;
   heading: string;
