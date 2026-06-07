@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Platform, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
@@ -13,6 +13,8 @@ import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse, saveSpondResponse, getSpondResponses } from '../services/spondService';
+import { GOOGLE_MAPS_API_KEY } from '../constants/api';
+import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
 
 interface EventsScreenProps {
   navigation: any;
@@ -301,12 +303,16 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const renderItem = useCallback(({ item }: { item: UnifiedItem }) => {
     if (item._type === 'trip') {
+      const locationQuery = item.country ? `${item.city}, ${item.country}` : item.city;
+      const tripMapUrl = item.city
+        ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(locationQuery)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(locationQuery)}&key=${GOOGLE_MAPS_API_KEY}`
+        : null;
       return (
         <TouchableOpacity
           style={[styles.tripCard, { backgroundColor: colors.surface }]}
           onPress={() => navigation.navigate('Trips', { screen: 'TripDetail', params: { trip: item } })}
         >
-          <View style={styles.tripCardHeader}>
+          <View style={styles.tripCardRow}>
             <View style={styles.tripCardContent}>
               <View style={styles.tripCardTitleRow}>
                 <Text style={styles.tripCardIcon}>✈️</Text>
@@ -319,6 +325,17 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
                 {formatDate(item.startDate)} - {formatDate(item.endDate)}
               </Text>
             </View>
+            {tripMapUrl && (
+              <TouchableOpacity
+                style={styles.tripMapContainer}
+                onPress={() => {
+                  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationQuery)}`;
+                  Linking.openURL(url);
+                }}
+              >
+                <Image source={{ uri: tripMapUrl }} style={styles.tripMapImage} />
+              </TouchableOpacity>
+            )}
           </View>
         </TouchableOpacity>
       );
@@ -658,9 +675,9 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     borderLeftColor: TRIP_COLOR,
   },
-  tripCardHeader: {
+  tripCardRow: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
+    alignItems: 'center',
   },
   tripCardIcon: {
     fontSize: 22,
@@ -683,6 +700,16 @@ const styles = StyleSheet.create({
   },
   tripCardDates: {
     fontSize: 14,
+  },
+  tripMapContainer: {
+    marginLeft: 12,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  tripMapImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
   },
   spondCard: {
     borderRadius: 12,
