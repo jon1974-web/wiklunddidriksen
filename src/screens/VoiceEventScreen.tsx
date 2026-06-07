@@ -41,7 +41,14 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
     try {
       if (Platform.OS === 'web') {
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+        let mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = 'audio/mp4';
+        }
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = '';
+        }
+        const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
         chunksRef.current = [];
 
         mediaRecorder.ondataavailable = (event) => {
@@ -94,7 +101,9 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         });
 
         mediaRecorder.stream.getTracks().forEach((track) => track.stop());
-        audioBlob = new Blob(chunksRef.current, { type: 'audio/webm' });
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
+        audioBlob = new Blob(chunksRef.current, { type: mimeType });
       } else {
         const Audio = (globalThis as any).__voiceAudio;
         const rec = (globalThis as any).__voiceRecording;
@@ -108,7 +117,8 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
       setRecording(false);
 
       const formData = new FormData();
-      formData.append('audio', audioBlob, 'recording.webm');
+      const ext = audioBlob.type.includes('mp4') ? 'm4a' : 'webm';
+      formData.append('audio', audioBlob, `recording.${ext}`);
 
       const apiResponse = await fetch(CLOUD_FUNCTION_URL, {
         method: 'POST',

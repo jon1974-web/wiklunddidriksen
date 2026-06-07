@@ -155,7 +155,14 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
       return res.status(400).json({ error: "No audio data received" });
     }
 
-    const audioFile = new File([audioBuffer], "recording.webm", { type: "audio/webm" });
+    const contentType = req.headers['content-type'] || '';
+    let filename = 'recording.webm';
+    let filetype = 'audio/webm';
+    if (contentType.includes('mp4') || contentType.includes('m4a')) {
+      filename = 'recording.m4a';
+      filetype = 'audio/mp4';
+    }
+    const audioFile = new File([audioBuffer], filename, { type: filetype });
 
     const transcription = await openai.audio.transcriptions.create({
       model: "whisper-1",
