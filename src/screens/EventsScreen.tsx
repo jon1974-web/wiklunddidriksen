@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
@@ -21,6 +21,11 @@ interface EventsScreenProps {
 const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#00BCD4', '#8BC34A', '#FF5722'];
 const TRIP_COLOR = '#0097A7';
 const SPOND_COLOR = '#E53935';
+
+const SPOND_GROUP_LOGOS: Record<string, any> = {
+  'BSK Fotball': require('../../assets/Bekkelaget logo.png'),
+  'Surprise 25/26': require('../../assets/Viqueens logo.png'),
+};
 
 type UnifiedItem =
   | (Event & { _type: 'event' })
@@ -320,7 +325,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       return (
         <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
           <View style={styles.spondCardHeader}>
-            <Text style={styles.spondCardIcon}>🏟️</Text>
+            {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
+              <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
+            ) : (
+              <Text style={styles.spondCardIcon}>🏟️</Text>
+            )}
             <View style={styles.spondCardContent}>
               <View style={styles.spondCardTitleRow}>
                 <Text style={[styles.spondCardTitle, { color: colors.text }]}>{item.heading}</Text>
@@ -621,6 +630,11 @@ const styles = StyleSheet.create({
   },
   spondCardIcon: {
     fontSize: 24,
+  },
+  spondCardLogo: {
+    width: 40,
+    height: 40,
+    borderRadius: 6,
   },
   spondCardContent: {
     flex: 1,
