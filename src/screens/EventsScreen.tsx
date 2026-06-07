@@ -659,10 +659,10 @@ const styles = StyleSheet.create({
   tripCardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 8,
   },
   tripCardIcon: {
-    fontSize: 24,
+    fontSize: 22,
   },
   tripCardContent: {
     flex: 1,
