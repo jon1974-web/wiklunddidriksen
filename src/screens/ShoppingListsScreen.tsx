@@ -127,7 +127,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <CartIcon size={24} color="#FFFFFF" />
+          <CartIcon size={24} color={colors.accent} />
           <Text style={[styles.title, { color: colors.text, marginLeft: 8 }]}>Handlelister</Text>
         </View>
       </View>
