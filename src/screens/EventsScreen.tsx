@@ -49,7 +49,10 @@ const getEventRespondents = (
       r.groupId === event.groupId &&
       (event.responses!.acceptedIds?.includes(r.spondId) ||
        event.responses!.declinedIds?.includes(r.spondId) ||
-       event.responses!.unansweredIds?.includes(r.spondId))
+       event.responses!.unansweredIds?.includes(r.spondId) ||
+       event.responses!.acceptedIds?.includes(r.profileId) ||
+       event.responses!.declinedIds?.includes(r.profileId) ||
+       event.responses!.unansweredIds?.includes(r.profileId))
   );
 };
 
@@ -63,10 +66,10 @@ const getSpondStampStatus = (
   if (!eventRespondents.length) return null;
 
   const details: StampDetail[] = eventRespondents.map((r) => {
-    if (event.responses!.acceptedIds?.includes(r.spondId)) {
+    if (event.responses!.acceptedIds?.includes(r.spondId) || event.responses!.acceptedIds?.includes(r.profileId)) {
       return { name: r.firstName, status: 'accepted' };
     }
-    if (event.responses!.declinedIds?.includes(r.spondId)) {
+    if (event.responses!.declinedIds?.includes(r.spondId) || event.responses!.declinedIds?.includes(r.profileId)) {
       return { name: r.firstName, status: 'declined' };
     }
     return { name: r.firstName, status: 'unanswered' };
