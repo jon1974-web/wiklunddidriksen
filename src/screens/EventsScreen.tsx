@@ -39,15 +39,27 @@ interface StampStatus {
   details: StampDetail[];
 }
 
+const getEventRespondents = (
+  event: SpondEvent,
+  respondents: SpondRespondent[]
+): SpondRespondent[] => {
+  if (!event.responses) return [];
+  return respondents.filter(
+    (r) =>
+      r.groupId === event.groupId &&
+      (event.responses!.acceptedIds?.includes(r.spondId) ||
+       event.responses!.declinedIds?.includes(r.spondId) ||
+       event.responses!.unansweredIds?.includes(r.spondId))
+  );
+};
+
 const getSpondStampStatus = (
   event: SpondEvent,
   respondents: SpondRespondent[]
 ): StampStatus | null => {
   if (!respondents.length || !event.responses) return null;
 
-  const eventRespondents = respondents.filter(
-    (r) => r.groupId === event.groupId
-  );
+  const eventRespondents = getEventRespondents(event, respondents);
   if (!eventRespondents.length) return null;
 
   const details: StampDetail[] = eventRespondents.map((r) => {
@@ -81,7 +93,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
-  const [responseModal, setResponseModal] = useState<{ eventId: string; groupId: string; type: 'accept' | 'decline' } | null>(null);
+  const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [filterSource, setFilterSource] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
@@ -432,13 +444,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             <View style={styles.spondCardIconsRow}>
               <TouchableOpacity
                 style={[styles.spondIconBtn, { backgroundColor: colors.accentLight }]}
-                onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'accept' })}
+                onPress={() => setResponseModal({ event: item, groupId: item.groupId!, type: 'accept' })}
               >
                 <Text style={styles.spondIconText}>✓</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.spondIconBtn, { backgroundColor: '#FFEBEE' }]}
-                onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'decline' })}
+                onPress={() => setResponseModal({ event: item, groupId: item.groupId!, type: 'decline' })}
               >
                 <Text style={[styles.spondIconText, { color: colors.danger }]}>✕</Text>
               </TouchableOpacity>
@@ -493,11 +505,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const handleSendResponse = useCallback(async (memberIds: string[]) => {
     if (!responseModal || !spondConfig) return;
-    const { eventId, type } = responseModal;
+    const { event: spondEvent, type } = responseModal;
     const accepted = type === 'accept';
     for (const memberId of memberIds) {
       try {
-        await changeSpondResponse(spondConfig.email, spondConfig.password, eventId, memberId, accepted);
+        await changeSpondResponse(spondConfig.email, spondConfig.password, spondEvent.id, memberId, accepted);
       } catch {
         // Continue with next member
       }
@@ -618,8 +630,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         <SpondResponseModal
           visible={true}
           type={responseModal.type}
-          members={spondRespondents
-            .filter((r) => r.groupId === responseModal.groupId)
+          members={getEventRespondents(responseModal.event, spondRespondents)
             .map((r) => ({ id: r.spondId, firstName: r.firstName, lastName: r.lastName }))}
           onSend={handleSendResponse}
           onClose={() => setResponseModal(null)}
