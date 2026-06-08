@@ -102,7 +102,6 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
         mediaRecorder.stream.getTracks().forEach((track) => track.stop());
         const mimeType = mediaRecorder.mimeType || 'audio/webm';
-        const ext = mimeType.includes('mp4') ? 'm4a' : 'webm';
         audioBlob = new Blob(chunksRef.current, { type: mimeType });
       } else {
         const Audio = (globalThis as any).__voiceAudio;

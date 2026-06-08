@@ -3,6 +3,7 @@ const { onRequest } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
 const OpenAI = require("openai");
 const functions = require("firebase-functions");
+const Busboy = require("busboy");
 
 initializeApp();
 
@@ -145,23 +146,35 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
   try {
-    const chunks = [];
-    for await (const chunk of req) {
-      chunks.push(chunk);
+    const contentType = req.headers['content-type'] || '';
+    if (!contentType.includes('multipart/form-data')) {
+      return res.status(400).json({ error: "Expected multipart/form-data" });
     }
-    const audioBuffer = Buffer.concat(chunks);
+
+    const audioBuffer = await new Promise((resolve, reject) => {
+      const busboy = Busboy({ headers: { 'content-type': contentType } });
+      let fileBuffer = null;
+      let filename = 'recording.webm';
+
+      busboy.on('file', (fieldname, file, info) => {
+        filename = info.filename || 'recording.webm';
+        const chunks = [];
+        file.on('data', (chunk) => chunks.push(chunk));
+        file.on('end', () => { fileBuffer = Buffer.concat(chunks); });
+      });
+
+      busboy.on('finish', () => resolve(fileBuffer));
+      busboy.on('error', reject);
+
+      req.pipe(busboy);
+    });
 
     if (!audioBuffer || audioBuffer.length === 0) {
       return res.status(400).json({ error: "No audio data received" });
     }
 
-    const contentType = req.headers['content-type'] || '';
-    let filename = 'recording.webm';
-    let filetype = 'audio/webm';
-    if (contentType.includes('mp4') || contentType.includes('m4a')) {
-      filename = 'recording.m4a';
-      filetype = 'audio/mp4';
-    }
+    const ext = filename.split('.').pop() || 'webm';
+    const filetype = ext === 'm4a' ? 'audio/mp4' : `audio/${ext}`;
     const audioFile = new File([audioBuffer], filename, { type: filetype });
 
     const transcription = await openai.audio.transcriptions.create({
