@@ -90,6 +90,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
               firstName: g.firstName,
               lastName: g.lastName,
               profileId: g.profile?.id || g.id,
+              childId: m.id,
             });
           }
         }
@@ -107,7 +108,9 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
         );
         if (response.ok) {
           const events = await response.json();
-          (events || []).forEach((e) => allEvents.push({ ...e, _groupId: gid }));
+          (events || []).forEach((e) => {
+            allEvents.push({ ...e, _groupId: gid });
+          });
         } else {
           const err = await response.json().catch(() => ({}));
           return res.status(response.status).json(err);

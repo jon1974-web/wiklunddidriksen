@@ -52,6 +52,29 @@ const getEventRespondents = (
        event.responses!.unansweredIds?.includes(r.spondId) ||
        event.responses!.acceptedIds?.includes(r.profileId) ||
        event.responses!.declinedIds?.includes(r.profileId) ||
+       event.responses!.unansweredIds?.includes(r.profileId) ||
+       (r.childId && (
+         event.responses!.acceptedIds?.includes(r.childId) ||
+         event.responses!.declinedIds?.includes(r.childId) ||
+         event.responses!.unansweredIds?.includes(r.childId)
+       ))
+      )
+  );
+};
+
+const getModalRespondents = (
+  event: SpondEvent,
+  respondents: SpondRespondent[]
+): SpondRespondent[] => {
+  if (!event.responses) return [];
+  return respondents.filter(
+    (r) =>
+      r.groupId === event.groupId &&
+      (event.responses!.acceptedIds?.includes(r.spondId) ||
+       event.responses!.declinedIds?.includes(r.spondId) ||
+       event.responses!.unansweredIds?.includes(r.spondId) ||
+       event.responses!.acceptedIds?.includes(r.profileId) ||
+       event.responses!.declinedIds?.includes(r.profileId) ||
        event.responses!.unansweredIds?.includes(r.profileId))
   );
 };
@@ -66,10 +89,10 @@ const getSpondStampStatus = (
   if (!eventRespondents.length) return null;
 
   const details: StampDetail[] = eventRespondents.map((r) => {
-    if (event.responses!.acceptedIds?.includes(r.spondId) || event.responses!.acceptedIds?.includes(r.profileId)) {
+    if (event.responses!.acceptedIds?.includes(r.spondId) || event.responses!.acceptedIds?.includes(r.profileId) || (r.childId && event.responses!.acceptedIds?.includes(r.childId))) {
       return { name: r.firstName, status: 'accepted' };
     }
-    if (event.responses!.declinedIds?.includes(r.spondId) || event.responses!.declinedIds?.includes(r.profileId)) {
+    if (event.responses!.declinedIds?.includes(r.spondId) || event.responses!.declinedIds?.includes(r.profileId) || (r.childId && event.responses!.declinedIds?.includes(r.childId))) {
       return { name: r.firstName, status: 'declined' };
     }
     return { name: r.firstName, status: 'unanswered' };
@@ -633,7 +656,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         <SpondResponseModal
           visible={true}
           type={responseModal.type}
-          members={getEventRespondents(responseModal.event, spondRespondents)
+          members={getModalRespondents(responseModal.event, spondRespondents)
             .map((r) => ({ id: r.spondId, firstName: r.firstName, lastName: r.lastName }))}
           onSend={handleSendResponse}
           onClose={() => setResponseModal(null)}

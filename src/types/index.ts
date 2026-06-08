@@ -143,6 +143,7 @@ export interface SpondRespondent {
   lastName: string;
   groupId: string;
   groupName: string;
+  childId?: string;
 }
 
 export interface SpondMember {
@@ -150,6 +151,7 @@ export interface SpondMember {
   firstName: string;
   lastName: string;
   profileId?: string;
+  childId?: string;
 }
 
 export interface SpondGroupMember {
@@ -159,4 +161,5 @@ export interface SpondGroupMember {
   groupId: string;
   groupName: string;
   profileId?: string;
+  childId?: string;
 }
