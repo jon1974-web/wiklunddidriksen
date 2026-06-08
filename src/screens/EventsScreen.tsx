@@ -180,7 +180,19 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       : allItems;
     const upcoming = filtered.filter((i) => getDateStr(i) >= today);
     const past = filtered.filter((i) => getDateStr(i) < today);
-    const sortByDate = (a: UnifiedItem, b: UnifiedItem) => getDateStr(a).localeCompare(getDateStr(b));
+    const getTimeStr = (item: UnifiedItem): string => {
+      if (item._type === 'event') return item.time || '99:99';
+      if (item._type === 'spond') {
+        const d = new Date(item.startTimestamp);
+        return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      }
+      return '00:00';
+    };
+    const sortByDate = (a: UnifiedItem, b: UnifiedItem) => {
+      const dateCmp = getDateStr(a).localeCompare(getDateStr(b));
+      if (dateCmp !== 0) return dateCmp;
+      return getTimeStr(a).localeCompare(getTimeStr(b));
+    };
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
