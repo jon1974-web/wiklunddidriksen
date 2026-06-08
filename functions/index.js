@@ -75,12 +75,25 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
       if (!group) {
         return res.status(200).json([]);
       }
-      const members = (group.members || []).map((m) => ({
-        id: m.id,
-        firstName: m.firstName,
-        lastName: m.lastName,
-        profileId: m.profile?.id || m.id,
-      }));
+      const members = [];
+      for (const m of group.members || []) {
+        members.push({
+          id: m.id,
+          firstName: m.firstName,
+          lastName: m.lastName,
+          profileId: m.profile?.id || m.id,
+        });
+        if (m.guardians) {
+          for (const g of m.guardians) {
+            members.push({
+              id: g.id,
+              firstName: g.firstName,
+              lastName: g.lastName,
+              profileId: g.profile?.id || g.id,
+            });
+          }
+        }
+      }
       return res.status(200).json(members);
     }
 
@@ -95,6 +108,9 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
         if (response.ok) {
           const events = await response.json();
           (events || []).forEach((e) => allEvents.push({ ...e, _groupId: gid }));
+        } else {
+          const err = await response.json().catch(() => ({}));
+          return res.status(response.status).json(err);
         }
       }
       return res.status(200).json(allEvents);
@@ -129,7 +145,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
 exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   res.set("Access-Control-Allow-Origin", "*");
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
+  res.set("Access-Control-Allow-Headers", "Content-Type, X-Filename");
 
   if (req.method === "OPTIONS") {
     return res.status(204).send("");
@@ -147,27 +163,55 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
 
   try {
     const contentType = req.headers['content-type'] || '';
-    if (!contentType.includes('multipart/form-data')) {
-      return res.status(400).json({ error: "Expected multipart/form-data" });
+    const isMultipart = contentType.includes('multipart/form-data');
+    console.log(`Received audio upload, content-type: ${contentType}, isMultipart: ${isMultipart}`);
+
+    const rawBody = Buffer.isBuffer(req.rawBody) ? req.rawBody : Buffer.from(req.rawBody || []);
+    console.log(`Raw body size: ${rawBody.length} bytes`);
+
+    let audioBuffer;
+    let filename = 'recording.webm';
+
+    if (rawBody.length === 0) {
+      return res.status(400).json({ error: "No audio data received" });
     }
 
-    const audioBuffer = await new Promise((resolve, reject) => {
-      const busboy = Busboy({ headers: { 'content-type': contentType } });
-      let fileBuffer = null;
-      let filename = 'recording.webm';
+    if (isMultipart) {
+      console.log('Parsing multipart form data with busboy...');
+      const { Readable } = require('stream');
+      audioBuffer = await new Promise((resolve, reject) => {
+        const busboy = Busboy({ headers: { 'content-type': contentType } });
+        let fileBuffer = null;
 
-      busboy.on('file', (fieldname, file, info) => {
-        filename = info.filename || 'recording.webm';
-        const chunks = [];
-        file.on('data', (chunk) => chunks.push(chunk));
-        file.on('end', () => { fileBuffer = Buffer.concat(chunks); });
+        busboy.on('file', (fieldname, file, info) => {
+          filename = info.filename || 'recording.webm';
+          console.log(`Busboy found file: ${filename}`);
+          const chunks = [];
+          file.on('data', (chunk) => chunks.push(chunk));
+          file.on('end', () => {
+            fileBuffer = Buffer.concat(chunks);
+            console.log(`Busboy file parsed: ${fileBuffer.length} bytes`);
+          });
+        });
+
+        busboy.on('finish', () => resolve(fileBuffer));
+        busboy.on('error', (err) => {
+          console.error('Busboy error:', err);
+          reject(err);
+        });
+
+        const readable = new Readable();
+        readable.push(rawBody);
+        readable.push(null);
+        readable.pipe(busboy);
       });
+    } else {
+      console.log('Reading raw binary body...');
+      filename = req.headers['x-filename'] || 'recording.webm';
+      audioBuffer = rawBody;
+    }
 
-      busboy.on('finish', () => resolve(fileBuffer));
-      busboy.on('error', reject);
-
-      req.pipe(busboy);
-    });
+    console.log(`Audio buffer: ${audioBuffer ? audioBuffer.length : 0} bytes, filename: ${filename}`);
 
     if (!audioBuffer || audioBuffer.length === 0) {
       return res.status(400).json({ error: "No audio data received" });
@@ -177,6 +221,7 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
     const filetype = ext === 'm4a' ? 'audio/mp4' : `audio/${ext}`;
     const audioFile = new File([audioBuffer], filename, { type: filetype });
 
+    console.log(`Sending to Whisper API: ${filename} (${filetype}, ${audioBuffer.length} bytes)`);
     const transcription = await openai.audio.transcriptions.create({
       model: "whisper-1",
       file: audioFile,
@@ -184,6 +229,7 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
     });
 
     const transcript = transcription.text;
+    console.log(`Transcript: ${transcript}`);
 
     if (!transcript || transcript.trim().length === 0) {
       return res.status(400).json({ error: "Could not transcribe audio" });
@@ -251,7 +297,7 @@ Always extract a meaningful title from the speech.`,
       },
     });
   } catch (error) {
-    console.error("Voice to event error:", error);
+    console.error("Voice to event error:", error.message, error.stack);
     return res.status(500).json({ error: error.message || "Internal server error" });
   }
 });

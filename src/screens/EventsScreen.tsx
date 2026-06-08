@@ -12,7 +12,7 @@ import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatT
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
-import { getSpondConfig, getSpondEvents, changeSpondResponse, saveSpondResponse, getSpondResponses } from '../services/spondService';
+import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services/spondService';
 import { GOOGLE_MAPS_API_KEY } from '../constants/api';
 import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
 
@@ -29,6 +29,47 @@ const SPOND_GROUP_LOGOS: Record<string, any> = {
   'Surprise 25/26': require('../../assets/Viqueens logo.png'),
 };
 
+interface StampDetail {
+  name: string;
+  status: 'accepted' | 'declined' | 'unanswered';
+}
+
+interface StampStatus {
+  type: 'accepted' | 'declined' | 'unanswered' | 'partial';
+  details: StampDetail[];
+}
+
+const getSpondStampStatus = (
+  event: SpondEvent,
+  respondents: SpondRespondent[]
+): StampStatus | null => {
+  if (!respondents.length || !event.responses) return null;
+
+  const eventRespondents = respondents.filter(
+    (r) => r.groupId === event.groupId
+  );
+  if (!eventRespondents.length) return null;
+
+  const details: StampDetail[] = eventRespondents.map((r) => {
+    if (event.responses!.acceptedIds?.includes(r.spondId)) {
+      return { name: r.firstName, status: 'accepted' };
+    }
+    if (event.responses!.declinedIds?.includes(r.spondId)) {
+      return { name: r.firstName, status: 'declined' };
+    }
+    return { name: r.firstName, status: 'unanswered' };
+  });
+
+  const allAccepted = details.every((d) => d.status === 'accepted');
+  const allDeclined = details.every((d) => d.status === 'declined');
+  const allUnanswered = details.every((d) => d.status === 'unanswered');
+
+  if (allAccepted) return { type: 'accepted', details };
+  if (allDeclined) return { type: 'declined', details };
+  if (allUnanswered) return { type: 'unanswered', details };
+  return { type: 'partial', details };
+};
+
 type UnifiedItem =
   | (Event & { _type: 'event' })
   | (Trip & { _type: 'trip' })
@@ -40,7 +81,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
-  const [spondLocalResponses, setSpondLocalResponses] = useState<Record<string, boolean>>({});
   const [responseModal, setResponseModal] = useState<{ eventId: string; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [filterSource, setFilterSource] = useState<string | null>(null);
@@ -95,13 +135,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
         if (config.respondents && config.respondents.length > 0) {
           setSpondRespondents(config.respondents);
-        }
-
-        try {
-          const responses = await getSpondResponses();
-          setSpondLocalResponses(responses);
-        } catch {
-          // Silently fail
         }
       }
     } catch {
@@ -364,69 +397,86 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const accepted = item.responses?.acceptedIds?.length || 0;
       const declined = item.responses?.declinedIds?.length || 0;
       const unanswered = item.responses?.unansweredIds?.length || 0;
-      const localResponse = spondLocalResponses[item.id];
+      const stampStatus = getSpondStampStatus(item, spondRespondents);
       return (
         <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
-          <View style={styles.spondCardHeader}>
-            <View style={styles.spondCardContent}>
-              <View style={styles.spondCardTitleRow}>
-                {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
-                  <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
-                ) : (
-                  <Text style={styles.spondCardIcon}>🏟️</Text>
-                )}
-                <Text style={[styles.spondCardTitle, { color: colors.text }]}>{item.heading}</Text>
-                {localResponse === true && (
-                  <View style={[styles.spondBadge, { backgroundColor: colors.accent }]}>
-                    <Text style={styles.spondBadgeText}>✓</Text>
-                  </View>
-                )}
-                {localResponse === false && (
-                  <View style={[styles.spondBadge, { backgroundColor: colors.danger }]}>
-                    <Text style={styles.spondBadgeText}>✕</Text>
-                  </View>
-                )}
-              </View>
-              {item.description && (
-                <Text style={[styles.spondCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
+          <View style={styles.spondCardContent}>
+            <View style={styles.spondCardTitleRow}>
+              {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
+                <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
+              ) : (
+                <Text style={styles.spondCardIcon}>🏟️</Text>
               )}
-              <Text style={[styles.spondCardDates, { color: colors.textSecondary }]}>
-                {dateText}{timeText ? ` · ${timeText}` : ''}
-              </Text>
-              {item.groupName && (
-                <Text style={[styles.spondCardGroup, { color: SPOND_COLOR }]}>{item.groupName}</Text>
-              )}
-              {item.address && (
-                <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
-              )}
+              <Text style={[styles.spondCardTitle, { color: colors.text }]}>{item.heading}</Text>
             </View>
-            {item.groupId && (
-              <View style={styles.spondCardIcons}>
-                <TouchableOpacity
-                  style={[styles.spondIconBtn, { backgroundColor: colors.accentLight }]}
-                  onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'accept' })}
-                >
-                  <Text style={styles.spondIconText}>✓</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.spondIconBtn, { backgroundColor: '#FFEBEE' }]}
-                  onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'decline' })}
-                >
-                  <Text style={[styles.spondIconText, { color: colors.danger }]}>✕</Text>
-                </TouchableOpacity>
-              </View>
+            {item.description && (
+              <Text style={[styles.spondCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
+            )}
+            <Text style={[styles.spondCardDates, { color: colors.textSecondary }]}>
+              {dateText}{timeText ? ` · ${timeText}` : ''}
+            </Text>
+            {item.address && (
+              <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
             )}
           </View>
           {item.responses && (
-            <View style={styles.spondCardResponseRow}>
-              <Text style={[styles.spondCardResponseLink, { color: colors.accent }]}>
-                {accepted} akseptert
-              </Text>
+            <Text style={styles.spondCardResponseCounts}>
+              <Text style={{ color: '#4CAF50' }}>{accepted} akseptert</Text>
               <Text style={{ color: colors.textDisabled }}> · </Text>
-              <Text style={[styles.spondCardResponseLink, { color: colors.danger }]}>
-                {declined} avslått
-              </Text>
-              <Text style={{ color: colors.textDisabled }}> · {unanswered} ikke svart</Text>
+              <Text style={{ color: '#E53935' }}>{declined} avslått</Text>
+              <Text style={{ color: colors.textDisabled }}> · </Text>
+              <Text style={{ color: '#C8A96E' }}>{unanswered} ikke svart</Text>
+            </Text>
+          )}
+          {item.groupId && (
+            <View style={styles.spondCardIconsRow}>
+              <TouchableOpacity
+                style={[styles.spondIconBtn, { backgroundColor: colors.accentLight }]}
+                onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'accept' })}
+              >
+                <Text style={styles.spondIconText}>✓</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.spondIconBtn, { backgroundColor: '#FFEBEE' }]}
+                onPress={() => setResponseModal({ eventId: item.id, groupId: item.groupId!, type: 'decline' })}
+              >
+                <Text style={[styles.spondIconText, { color: colors.danger }]}>✕</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+          {stampStatus?.type === 'accepted' && (
+            <View style={styles.spondStampAccepted} pointerEvents="none">
+              <Text style={styles.spondStampTextAccepted}>AKSEPTERT</Text>
+            </View>
+          )}
+          {stampStatus?.type === 'declined' && (
+            <View style={styles.spondStampDeclined} pointerEvents="none">
+              <Text style={styles.spondStampTextDeclined}>AVSLÅTT</Text>
+            </View>
+          )}
+          {stampStatus?.type === 'unanswered' && (
+            <View style={styles.spondStampUnanswered} pointerEvents="none">
+              <Text style={styles.spondStampTextUnanswered}>IKKE SVART</Text>
+            </View>
+          )}
+          {stampStatus?.type === 'partial' && (
+            <View style={styles.spondStampPartial} pointerEvents="none">
+              <Text style={styles.spondStampTextPartial}>DELVIS</Text>
+              {stampStatus.details.length > 1 && (
+                <View style={styles.spondStampNames}>
+                  {stampStatus.details.map((d, i) => (
+                    <Text
+                      key={i}
+                      style={[
+                        styles.spondStampName,
+                        { color: d.status === 'accepted' ? '#4CAF50' : d.status === 'declined' ? '#E53935' : colors.textDisabled },
+                      ]}
+                    >
+                      {d.name}
+                    </Text>
+                  ))}
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -439,7 +489,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         onLongPress={() => handleDelete(item.id)}
       />
     );
-  }, [navigation, colors, setResponseModal, spondLocalResponses]);
+  }, [navigation, colors, setResponseModal, spondRespondents]);
 
   const handleSendResponse = useCallback(async (memberIds: string[]) => {
     if (!responseModal || !spondConfig) return;
@@ -452,18 +502,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         // Continue with next member
       }
     }
-    try {
-      await saveSpondResponse(eventId, accepted);
-    } catch {
-      // Silently fail
-    }
     loadSpondEvents();
   }, [responseModal, spondConfig, loadSpondEvents]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Arrangementer</Text>
+        <Text style={[styles.title, { color: colors.text }]}>📅 Arrangementer</Text>
         <View style={styles.viewToggle}>
           <TouchableOpacity
             style={[styles.toggleButton, viewMode === 'list' && { backgroundColor: colors.accent }]}
@@ -736,10 +781,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     borderLeftWidth: 4,
     borderLeftColor: SPOND_COLOR,
-  },
-  spondCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    overflow: 'hidden',
   },
   spondCardIcon: {
     fontSize: 22,
@@ -750,7 +792,6 @@ const styles = StyleSheet.create({
     borderRadius: 11,
   },
   spondCardContent: {
-    flex: 1,
     gap: 2,
   },
   spondCardTitle: {
@@ -762,18 +803,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  spondBadge: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  spondBadgeText: {
-    color: '#fff',
-    fontSize: 13,
-    fontWeight: 'bold',
-  },
   spondCardDesc: {
     fontSize: 14,
     marginTop: 2,
@@ -782,19 +811,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
   },
-  spondCardGroup: {
-    fontSize: 13,
-    fontWeight: '500',
-    marginTop: 2,
-  },
   spondCardAddress: {
     fontSize: 14,
     marginTop: 4,
     fontWeight: '500',
   },
-  spondCardIcons: {
-    flexDirection: 'column',
+  spondCardResponseIcons: {
+    flexDirection: 'row',
     gap: 6,
+    marginRight: 8,
   },
   spondIconBtn: {
     width: 32,
@@ -808,14 +833,95 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4CAF50',
   },
-  spondCardResponseRow: {
+  spondCardIconsRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 8,
+    gap: 8,
+    marginTop: 20,
   },
-  spondCardResponseLink: {
-    fontSize: 14,
-    fontWeight: '500',
+  spondCardResponseCounts: {
+    fontSize: 13,
+    marginTop: 6,
+  },
+  spondStampAccepted: {
+    position: 'absolute',
+    right: 8,
+    bottom: 44,
+    transform: [{ rotate: '-20deg' }],
+    borderWidth: 2,
+    borderColor: '#4CAF50',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    opacity: 0.7,
+  },
+  spondStampTextAccepted: {
+    color: '#4CAF50',
+    fontSize: 13,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  spondStampDeclined: {
+    position: 'absolute',
+    right: 8,
+    bottom: 44,
+    transform: [{ rotate: '-20deg' }],
+    borderWidth: 2,
+    borderColor: '#E53935',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    opacity: 0.7,
+  },
+  spondStampTextDeclined: {
+    color: '#E53935',
+    fontSize: 13,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  spondStampUnanswered: {
+    position: 'absolute',
+    right: 8,
+    bottom: 44,
+    transform: [{ rotate: '-20deg' }],
+    borderWidth: 2,
+    borderColor: '#C8A96E',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    opacity: 0.7,
+  },
+  spondStampTextUnanswered: {
+    color: '#C8A96E',
+    fontSize: 13,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  spondStampPartial: {
+    position: 'absolute',
+    right: 8,
+    bottom: 44,
+    transform: [{ rotate: '-20deg' }],
+    borderWidth: 2,
+    borderColor: '#C8A96E',
+    borderRadius: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    opacity: 0.7,
+    alignItems: 'center',
+  },
+  spondStampTextPartial: {
+    color: '#C8A96E',
+    fontSize: 13,
+    fontWeight: 'bold',
+    letterSpacing: 2,
+  },
+  spondStampNames: {
+    marginTop: 2,
+    alignItems: 'center',
+  },
+  spondStampName: {
+    fontSize: 9,
+    fontWeight: '600',
   },
   fab: {
     position: 'absolute',

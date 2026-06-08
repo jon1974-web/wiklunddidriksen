@@ -32,6 +32,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
   const [processing, setProcessing] = useState(false);
   const [transcript, setTranscript] = useState<string | null>(null);
   const [parsedEvent, setParsedEvent] = useState<ParsedEvent | null>(null);
+  const [creating, setCreating] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const { colors } = useTheme();
@@ -115,13 +116,15 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
       setRecording(false);
 
-      const formData = new FormData();
       const ext = audioBlob.type.includes('mp4') ? 'm4a' : 'webm';
-      formData.append('audio', audioBlob, `recording.${ext}`);
 
       const apiResponse = await fetch(CLOUD_FUNCTION_URL, {
         method: 'POST',
-        body: formData,
+        headers: {
+          'Content-Type': audioBlob.type || 'audio/webm',
+          'X-Filename': `recording.${ext}`,
+        },
+        body: audioBlob,
       });
 
       if (!apiResponse.ok) {
@@ -140,7 +143,8 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
   }, [recording]);
 
   const handleCreateEvent = useCallback(async () => {
-    if (!parsedEvent || !user) return;
+    if (!parsedEvent || !user || creating) return;
+    setCreating(true);
 
     try {
       const eventData = {
@@ -196,21 +200,23 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
       navigation.goBack();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
+      setCreating(false);
     }
-  }, [parsedEvent, user, navigation]);
+  }, [parsedEvent, user, navigation, creating]);
 
   const handleEditManually = useCallback(() => {
-    navigation.navigate('AddEvent', {
-      prefill: parsedEvent ? {
-        title: parsedEvent.title,
-        description: parsedEvent.description,
-        date: parsedEvent.date,
-        endDate: parsedEvent.endDate,
-        time: parsedEvent.time,
-        endTime: parsedEvent.endTime,
-        reminderMinutes: parsedEvent.reminderMinutes,
-      } : undefined,
-    });
+    const prefillData = parsedEvent ? {
+      title: parsedEvent.title,
+      description: parsedEvent.description,
+      date: parsedEvent.date,
+      endDate: parsedEvent.endDate,
+      time: parsedEvent.time,
+      endTime: parsedEvent.endTime,
+      reminderMinutes: parsedEvent.reminderMinutes,
+    } : undefined;
+    setParsedEvent(null);
+    setTranscript(null);
+    navigation.navigate('AddEvent', { prefill: prefillData });
   }, [parsedEvent, navigation]);
 
   const handleReset = useCallback(() => {
@@ -286,10 +292,11 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
             <View style={styles.resultActions}>
               <TouchableOpacity
-                style={[styles.primaryButton, { backgroundColor: colors.accent }]}
+                style={[styles.primaryButton, { backgroundColor: colors.accent, opacity: creating ? 0.6 : 1 }]}
                 onPress={handleCreateEvent}
+                disabled={creating}
               >
-                <Text style={styles.primaryButtonText}>Opprett arrangement</Text>
+                <Text style={styles.primaryButtonText}>{creating ? 'Oppretter...' : 'Opprett arrangement'}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.secondaryButton, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}

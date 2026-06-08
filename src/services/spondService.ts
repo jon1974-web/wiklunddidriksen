@@ -1,10 +1,44 @@
 import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
+import { Platform } from 'react-native';
 import { db } from './firebase';
 import { SpondEvent, SpondGroup, SpondConfig, SpondMember } from '../types';
 
 const SPOND_PROXY_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/spondProxy';
+const SPOND_TOKEN_KEY = 'spond_cached_token';
 
 let cachedToken: string | null = null;
+
+const getPersistedToken = (): string | null => {
+  if (cachedToken) return cachedToken;
+  if (Platform.OS === 'web') {
+    try {
+      const stored = localStorage.getItem(SPOND_TOKEN_KEY);
+      if (stored) {
+        cachedToken = stored;
+        return stored;
+      }
+    } catch {}
+  }
+  return null;
+};
+
+const persistToken = (token: string): void => {
+  cachedToken = token;
+  if (Platform.OS === 'web') {
+    try {
+      localStorage.setItem(SPOND_TOKEN_KEY, token);
+    } catch {}
+  }
+};
+
+const clearPersistedToken = (): void => {
+  cachedToken = null;
+  if (Platform.OS === 'web') {
+    try {
+      localStorage.removeItem(SPOND_TOKEN_KEY);
+    } catch {}
+  }
+};
 
 const proxyCall = async (body: Record<string, any>): Promise<any> => {
   const response = await fetch(SPOND_PROXY_URL, {
@@ -25,12 +59,13 @@ export const loginSpond = async (email: string, password: string): Promise<strin
   if (!accessToken) {
     throw new Error('Spond innlogging feilet. Ingen token mottatt.');
   }
-  cachedToken = accessToken;
+  persistToken(accessToken);
   return accessToken;
 };
 
 const getToken = async (email: string, password: string): Promise<string> => {
-  if (cachedToken) return cachedToken;
+  const existing = getPersistedToken();
+  if (existing) return existing;
   return await loginSpond(email, password);
 };
 
@@ -40,7 +75,7 @@ export const getSpondGroups = async (email: string, password: string): Promise<S
     const groups = await proxyCall({ action: 'groups', token });
     return (groups || []).map((g: any) => ({ id: g.id, name: g.name }));
   } catch {
-    cachedToken = null;
+    clearPersistedToken();
     const newToken = await loginSpond(email, password);
     const groups = await proxyCall({ action: 'groups', token: newToken });
     return (groups || []).map((g: any) => ({ id: g.id, name: g.name }));
@@ -57,7 +92,7 @@ export const getSpondEvents = async (
   try {
     events = await proxyCall({ action: 'events', token, groupIds });
   } catch {
-    cachedToken = null;
+    clearPersistedToken();
     const newToken = await loginSpond(email, password);
     events = await proxyCall({ action: 'events', token: newToken, groupIds });
   }
@@ -92,7 +127,7 @@ export const getSpondMembers = async (
     const members = await proxyCall({ action: 'members', token, groupId });
     return members || [];
   } catch {
-    cachedToken = null;
+    clearPersistedToken();
     const newToken = await loginSpond(email, password);
     const members = await proxyCall({ action: 'members', token: newToken, groupId });
     return members || [];
@@ -110,7 +145,7 @@ export const changeSpondResponse = async (
   try {
     await proxyCall({ action: 'changeResponse', token, eventId, memberId, accepted });
   } catch {
-    cachedToken = null;
+    clearPersistedToken();
     const newToken = await loginSpond(email, password);
     await proxyCall({ action: 'changeResponse', token: newToken, eventId, memberId, accepted });
   }
@@ -127,7 +162,7 @@ export const getSpondConfig = async (familyId: string): Promise<SpondConfig | nu
 };
 
 export const clearSpondToken = (): void => {
-  cachedToken = null;
+  clearPersistedToken();
 };
 
 export const saveSpondResponse = async (eventId: string, accepted: boolean): Promise<void> => {

@@ -8,6 +8,7 @@ import { ShoppingList } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage, sanitizeInput } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
+import { CartIcon } from '../components/CartIcon';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -125,7 +126,10 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Handlelister</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <CartIcon size={24} color="#FFFFFF" />
+          <Text style={[styles.title, { color: colors.text, marginLeft: 8 }]}>Handlelister</Text>
+        </View>
       </View>
 
       <FlatList

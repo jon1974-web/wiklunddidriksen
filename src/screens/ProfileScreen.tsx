@@ -444,7 +444,7 @@ export const ProfileScreen: React.FC = () => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Profil</Text>
+        <Text style={[styles.title, { color: colors.text }]}>👤 Profil</Text>
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface, alignItems: 'center' }]}>
@@ -712,7 +712,7 @@ export const ProfileScreen: React.FC = () => {
                       onPress={() => handleToggleSpondRespondent(member.id)}
                     >
                       <View style={{ flex: 1 }}>
-                        <Text style={[styles.value, { color: colors.text }]}>{member.firstName} {member.lastName}</Text>
+                        <Text style={[styles.value, { color: colors.text }]}>{member.firstName} {member.lastName} ({member.id})</Text>
                         <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{member.groupName}</Text>
                       </View>
                       <Text style={[styles.editIcon, { color: spondRespondents.includes(member.id) ? colors.accent : colors.textDisabled }]}>

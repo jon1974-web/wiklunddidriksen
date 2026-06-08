@@ -25,6 +25,7 @@ import { TripsScreen } from './src/screens/TripsScreen';
 import { AddTripScreen } from './src/screens/AddTripScreen';
 import { TripDetailScreen } from './src/screens/TripDetailScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
+import { CartIcon } from './src/components/CartIcon';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -247,7 +248,7 @@ const AppContent = () => {
               component={ShoppingStack}
               options={{
                 tabBarLabel: 'Handleliste',
-                tabBarIcon: ({ focused }) => <TabIcon label="🛒" focused={focused} />,
+                tabBarIcon: ({ focused }) => <CartIcon size={20} color={focused ? colors.accent : colors.textDisabled} />,
               }}
             />
             <Tab.Screen

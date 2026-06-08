@@ -75,7 +75,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <Text style={[styles.screenTitle, { color: colors.text }]}>Reiser</Text>
+      <Text style={[styles.screenTitle, { color: colors.text }]}>✈️ Reiser</Text>
 
       {loading ? (
         <View style={styles.emptyContainer}>

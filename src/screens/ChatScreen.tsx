@@ -183,7 +183,7 @@ export const ChatScreen: React.FC = () => {
         keyboardVerticalOffset={0}
       >
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Familiechat</Text>
+        <Text style={[styles.title, { color: colors.text }]}>💬 Familiechat</Text>
       </View>
 
       <FlatList

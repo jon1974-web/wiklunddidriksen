@@ -339,6 +339,10 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         <Text style={styles.buttonText}>Lagre</Text>
       </TouchableOpacity>
 
+      <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]} onPress={() => navigation.goBack()}>
+        <Text style={[styles.buttonText, { color: colors.text }]}>Avbryt</Text>
+      </TouchableOpacity>
+
       <Modal visible={showDatePicker} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setShowDatePicker(false)}>
           <View style={styles.modalOverlay}>
