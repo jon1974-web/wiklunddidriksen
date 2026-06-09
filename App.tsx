@@ -24,6 +24,7 @@ import { VoiceEventScreen } from './src/screens/VoiceEventScreen';
 import { TripsScreen } from './src/screens/TripsScreen';
 import { AddTripScreen } from './src/screens/AddTripScreen';
 import { TripDetailScreen } from './src/screens/TripDetailScreen';
+import { SpondEventDetailScreen } from './src/screens/SpondEventDetailScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
 import { CartIcon } from './src/components/CartIcon';
 
@@ -63,6 +64,11 @@ const EventsStack = () => {
           headerStyle: { backgroundColor: colors.surface },
           headerTintColor: colors.text,
         }}
+      />
+      <Stack.Screen
+        name="EventDetail_Spond"
+        component={SpondEventDetailScreen}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

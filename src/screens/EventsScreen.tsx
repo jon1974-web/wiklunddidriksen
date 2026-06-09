@@ -24,22 +24,22 @@ const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#0
 const TRIP_COLOR = '#0097A7';
 const SPOND_COLOR = '#E53935';
 
-const SPOND_GROUP_LOGOS: Record<string, any> = {
+export const SPOND_GROUP_LOGOS: Record<string, any> = {
   'BSK Fotball J2010/2011': require('../../assets/Bekkelaget logo.png'),
   'Surprise 25/26': require('../../assets/Viqueens logo.png'),
 };
 
-interface StampDetail {
+export interface StampDetail {
   name: string;
   status: 'accepted' | 'declined' | 'unanswered';
 }
 
-interface StampStatus {
+export interface StampStatus {
   type: 'accepted' | 'declined' | 'unanswered' | 'partial';
   details: StampDetail[];
 }
 
-const getEventRespondents = (
+export const getEventRespondents = (
   event: SpondEvent,
   respondents: SpondRespondent[]
 ): SpondRespondent[] => {
@@ -62,7 +62,7 @@ const getEventRespondents = (
   );
 };
 
-const getModalRespondents = (
+export const getModalRespondents = (
   event: SpondEvent,
   respondents: SpondRespondent[]
 ): SpondRespondent[] => {
@@ -79,7 +79,7 @@ const getModalRespondents = (
   );
 };
 
-const getSpondStampStatus = (
+export const getSpondStampStatus = (
   event: SpondEvent,
   respondents: SpondRespondent[]
 ): StampStatus | null => {
@@ -438,7 +438,15 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const stampStatus = getSpondStampStatus(item, spondRespondents);
       return (
         <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
-          <View style={styles.spondCardContent}>
+          <TouchableOpacity
+            style={styles.spondCardContent}
+            activeOpacity={0.7}
+            onPress={() => navigation.navigate('EventDetail_Spond', {
+              event: item,
+              spondRespondents,
+              spondConfig,
+            })}
+          >
             <View style={styles.spondCardTitleRow}>
               {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
                 <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
@@ -456,7 +464,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             {item.address && (
               <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
             )}
-          </View>
+          </TouchableOpacity>
           {item.responses && (
             <Text style={styles.spondCardResponseCounts}>
               <Text style={{ color: '#4CAF50' }}>{accepted} akseptert</Text>
@@ -527,7 +535,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         onLongPress={() => handleDelete(item.id)}
       />
     );
-  }, [navigation, colors, setResponseModal, spondRespondents]);
+  }, [navigation, colors, setResponseModal, spondRespondents, spondConfig]);
 
   const handleSendResponse = useCallback(async (memberIds: string[]) => {
     if (!responseModal || !spondConfig) return;
