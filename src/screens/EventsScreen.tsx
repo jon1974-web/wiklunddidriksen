@@ -436,10 +436,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const declined = item.responses?.declinedIds?.length || 0;
       const unanswered = item.responses?.unansweredIds?.length || 0;
       const stampStatus = getSpondStampStatus(item, spondRespondents);
+      const spondMapUrl = item.address
+        ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(item.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(item.address)}&key=${GOOGLE_MAPS_API_KEY}`
+        : null;
       return (
         <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
           <TouchableOpacity
-            style={styles.spondCardContent}
+            style={styles.spondCardRow}
             activeOpacity={0.7}
             onPress={() => navigation.navigate('EventDetail_Spond', {
               event: item,
@@ -447,22 +450,29 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               spondConfig,
             })}
           >
-            <View style={styles.spondCardTitleRow}>
-              {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
-                <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
-              ) : (
-                <Text style={styles.spondCardIcon}>🏟️</Text>
+            <View style={styles.spondCardContent}>
+              <View style={styles.spondCardTitleRow}>
+                {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
+                  <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
+                ) : (
+                  <Text style={styles.spondCardIcon}>🏟️</Text>
+                )}
+                <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.heading}</Text>
+              </View>
+              {item.description && (
+                <Text style={[styles.spondCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
               )}
-              <Text style={[styles.spondCardTitle, { color: colors.text }]}>{item.heading}</Text>
+              <Text style={[styles.spondCardDates, { color: colors.textSecondary }]}>
+                {dateText}{timeText ? ` · ${timeText}` : ''}
+              </Text>
+              {item.address && (
+                <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
+              )}
             </View>
-            {item.description && (
-              <Text style={[styles.spondCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
-            )}
-            <Text style={[styles.spondCardDates, { color: colors.textSecondary }]}>
-              {dateText}{timeText ? ` · ${timeText}` : ''}
-            </Text>
-            {item.address && (
-              <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
+            {spondMapUrl && (
+              <TouchableOpacity style={styles.spondCardMapContainer} onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address!)}`)}>
+                <Image source={{ uri: spondMapUrl }} style={styles.spondCardMap} />
+              </TouchableOpacity>
             )}
           </TouchableOpacity>
           {item.responses && (
@@ -837,7 +847,12 @@ const styles = StyleSheet.create({
     borderRadius: 11,
   },
   spondCardContent: {
+    flex: 1,
     gap: 2,
+  },
+  spondCardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   spondCardTitle: {
     fontSize: 18,
@@ -860,6 +875,15 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
     fontWeight: '500',
+  },
+  spondCardMapContainer: {
+    marginLeft: 8,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  spondCardMap: {
+    width: 80,
+    height: 80,
   },
   spondCardResponseIcons: {
     flexDirection: 'row',
