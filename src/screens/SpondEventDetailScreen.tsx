@@ -7,7 +7,6 @@ import { useTheme } from '../theme/ThemeContext';
 import { formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { getEventRespondents, getModalRespondents, getSpondStampStatus, SPOND_GROUP_LOGOS } from './EventsScreen';
 import { GOOGLE_MAPS_API_KEY } from '../constants/api';
-import { MAP_SIZE } from '../constants/limits';
 
 interface SpondEventDetailParams {
   event: SpondEvent;
@@ -36,7 +35,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const stampStatus = getSpondStampStatus(event, spondRespondents);
 
   const mapUrl = event.address
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(event.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}x${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(event.address)}&key=${GOOGLE_MAPS_API_KEY}`
+    ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(event.address)}&zoom=15&size=600x300&markers=color:red%7C${encodeURIComponent(event.address)}&key=${GOOGLE_MAPS_API_KEY}`
     : null;
 
   const groupLogo = event.groupName ? SPOND_GROUP_LOGOS[event.groupName] : undefined;
