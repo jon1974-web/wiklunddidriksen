@@ -105,7 +105,7 @@ const mapSpondEvent = (e: any): SpondEvent => ({
   description: e.description || undefined,
   startTimestamp: e.startTimestamp || '',
   endTimestamp: e.endTimestamp || undefined,
-  address: e.location?.address || undefined,
+  address: e.location?.address || e.location?.name || e.location?.feature || undefined,
   groupName: undefined,
   groupId: e._groupId || undefined,
   responses: e.responses
