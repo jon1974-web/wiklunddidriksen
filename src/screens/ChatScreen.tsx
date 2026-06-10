@@ -12,6 +12,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_MAX_DIMENSION, IMAGE_QUALITY, SCROLL_DELAY_MS, LOCALE } from '../constants/limits';
 import { getErrorMessage } from '../utils/validation';
 import { uriToBlob } from '../utils/upload';
+import { getUserProfile } from '../services/familyService';
 
 export const ChatScreen: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -19,6 +20,7 @@ export const ChatScreen: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedImageBase64, setSelectedImageBase64] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [userAvatars, setUserAvatars] = useState<Record<string, string>>({});
   const flatListRef = useRef<FlatList>(null);
   const user = useUserStore((state) => state.user);
   const { colors } = useTheme();
@@ -48,6 +50,25 @@ export const ChatScreen: React.FC = () => {
 
     return () => unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (messages.length === 0) return;
+    const uniqueSenderIds = [...new Set(messages.map((m) => m.senderId).filter(Boolean))];
+    const missing = uniqueSenderIds.filter((id) => !(id in userAvatars));
+    if (missing.length === 0) return;
+    missing.forEach(async (uid) => {
+      try {
+        const profile = await getUserProfile(uid);
+        if (profile?.avatarUrl) {
+          setUserAvatars((prev) => ({ ...prev, [uid]: profile.avatarUrl! }));
+        } else {
+          setUserAvatars((prev) => ({ ...prev, [uid]: '' }));
+        }
+      } catch {
+        setUserAvatars((prev) => ({ ...prev, [uid]: '' }));
+      }
+    });
+  }, [messages]);
 
   const handlePickImage = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -172,8 +193,9 @@ export const ChatScreen: React.FC = () => {
       isOwnMessage={item.senderId === user?.uid}
       currentUserId={user?.uid}
       onReaction={handleReaction}
+      liveAvatarUrl={item.senderId ? userAvatars[item.senderId] : undefined}
     />
-  ), [user?.uid, handleReaction]);
+  ), [user?.uid, handleReaction, userAvatars]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>

@@ -9,6 +9,7 @@ interface MessageBubbleProps {
   isOwnMessage: boolean;
   currentUserId?: string;
   onReaction?: (messageId: string, type: MessageReaction['type']) => void;
+  liveAvatarUrl?: string;
 }
 
 const REACTIONS = [
@@ -27,10 +28,12 @@ const getInitials = (name: string): string => {
     .toUpperCase();
 };
 
-export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message, isOwnMessage, currentUserId, onReaction }) => {
+export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message, isOwnMessage, currentUserId, onReaction, liveAvatarUrl }) => {
   const { colors } = useTheme();
   const [showFullImage, setShowFullImage] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
+
+  const avatarUrl = liveAvatarUrl || message.senderAvatarUrl;
 
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -61,8 +64,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
     <>
       <View style={[styles.container, isOwnMessage ? styles.ownContainer : styles.otherContainer]}>
         <View style={styles.senderRow}>
-          {message.senderAvatarUrl && message.senderAvatarUrl.length > 0 ? (
-            <Image source={{ uri: message.senderAvatarUrl }} style={styles.avatar} />
+          {avatarUrl && avatarUrl.length > 0 ? (
+            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
           ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder, { backgroundColor: colors.accent + '40' }]}>
               <Text style={[styles.avatarInitial, { color: colors.accent }]}>

@@ -248,6 +248,7 @@ export const ProfileScreen: React.FC = () => {
       const downloadUrl = await getDownloadURL(storageRef);
       await createOrUpdateUser(user.uid, { avatarUrl: downloadUrl });
       setProfile((prev) => prev ? { ...prev, avatarUrl: downloadUrl } : prev);
+      setUser({ ...user, avatarUrl: downloadUrl });
     } catch (error) {
       Alert.alert('Error', 'Kunne ikke laste opp bildet.');
     } finally {
