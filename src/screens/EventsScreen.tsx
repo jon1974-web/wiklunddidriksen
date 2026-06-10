@@ -123,6 +123,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [filterSource, setFilterSource] = useState<string | null>(null);
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
+  const [visibleDate, setVisibleDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
@@ -210,11 +211,41 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   }, [today]);
 
+  const calendarMinMax = useMemo(() => {
+    const now = new Date();
+    const min = new Date(now);
+    min.setFullYear(min.getFullYear() - 1);
+    const max = new Date(now);
+    max.setFullYear(max.getFullYear() + 1);
+    return {
+      min: `${min.getFullYear()}-${String(min.getMonth() + 1).padStart(2, '0')}-${String(min.getDate()).padStart(2, '0')}`,
+      max: `${max.getFullYear()}-${String(max.getMonth() + 1).padStart(2, '0')}-${String(max.getDate()).padStart(2, '0')}`,
+    };
+  }, []);
+
+  const handleMonthChange = useCallback((year: number, month: number) => {
+    const newDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+    setVisibleDate(newDate);
+  }, []);
+
   const filteredItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
       if (item._type === 'trip') return item.endDate || item.startDate;
       if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
       return item.endDate || item.date;
+    };
+    const getTimeStr = (item: UnifiedItem): string => {
+      if (item._type === 'event') return item.time || '99:99';
+      if (item._type === 'spond') {
+        const d = new Date(item.startTimestamp);
+        return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      }
+      return '00:00';
+    };
+    const sortByDate = (a: UnifiedItem, b: UnifiedItem) => {
+      const dateCmp = getDateStr(a).localeCompare(getDateStr(b));
+      if (dateCmp !== 0) return dateCmp;
+      return getTimeStr(a).localeCompare(getTimeStr(b));
     };
 
     if (viewMode === 'calendar') {
@@ -235,6 +266,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       if (filterSource === 'viqueens') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === 'Surprise 25/26');
       else if (filterSource === 'bekkelaget') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === 'BSK Fotball J2010/2011');
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
+      dayItems.sort(sortByDate);
       return dayItems;
     }
     const allItems: UnifiedItem[] = [
@@ -251,19 +283,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       : allItems;
     const upcoming = filtered.filter((i) => getDateStr(i) >= today);
     const past = filtered.filter((i) => getDateStr(i) < today);
-    const getTimeStr = (item: UnifiedItem): string => {
-      if (item._type === 'event') return item.time || '99:99';
-      if (item._type === 'spond') {
-        const d = new Date(item.startTimestamp);
-        return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-      }
-      return '00:00';
-    };
-    const sortByDate = (a: UnifiedItem, b: UnifiedItem) => {
-      const dateCmp = getDateStr(a).localeCompare(getDateStr(b));
-      if (dateCmp !== 0) return dateCmp;
-      return getTimeStr(a).localeCompare(getTimeStr(b));
-    };
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
@@ -596,10 +615,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             <Text style={[styles.weekNumber, { color: colors.textSecondary }]}>Uke {currentWeek}</Text>
           </View>
           <WebCalendar
-            current={selectedDate}
+            current={visibleDate}
             onDayPress={(day: any) => setSelectedDate(day.dateString)}
             markedDates={markedDates}
             markingType="period"
+            onMonthChange={handleMonthChange}
+            minDate={calendarMinMax.min}
+            maxDate={calendarMinMax.max}
             theme={{
               calendarBackground: colors.surface,
               textSectionTitleColor: colors.textSecondary,

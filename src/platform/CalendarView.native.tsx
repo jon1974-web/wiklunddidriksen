@@ -7,9 +7,14 @@ interface WebCalendarProps {
   markedDates: Record<string, any>;
   markingType?: string;
   theme?: Record<string, string>;
+  onMonthChange?: (year: number, month: number) => void;
+  minDate?: string;
+  maxDate?: string;
 }
 
-export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, markedDates, markingType, theme }) => {
+export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, markedDates, markingType, theme, minDate, maxDate }) => {
+  const handleMonthChange = (month: { year: number; month: number }) => {};
+
   return (
     <Calendar
       current={current}
@@ -17,6 +22,9 @@ export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, m
       markedDates={markedDates}
       markingType={markingType as CalendarProps['markingType']}
       theme={theme as CalendarProps['theme']}
+      minDate={minDate}
+      maxDate={maxDate}
+      onMonthChange={handleMonthChange}
     />
   );
 };

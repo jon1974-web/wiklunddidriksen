@@ -7,6 +7,9 @@ interface WebCalendarProps {
   markedDates: Record<string, any>;
   markingType?: string;
   theme?: Record<string, string>;
+  onMonthChange?: (year: number, month: number) => void;
+  minDate?: string;
+  maxDate?: string;
 }
 
 const DAYS = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
@@ -21,10 +24,13 @@ const getFirstDayOfMonth = (year: number, month: number) => {
   return day === 0 ? 6 : day - 1; // Monday = 0
 };
 
-export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, markedDates, theme }) => {
+export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, markedDates, theme, onMonthChange, minDate, maxDate }) => {
   const currentDate = new Date(current);
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
+
+  const canGoPrev = !minDate || `${year}-${String(month + 1).padStart(2, '0')}` > minDate;
+  const canGoNext = !maxDate || `${year}-${String(month + 1).padStart(2, '0')}` < maxDate;
 
   const weeks = useMemo(() => {
     const daysInMonth = getDaysInMonth(year, month);
@@ -52,9 +58,37 @@ export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, m
   const textDisabled = theme?.textDisabledColor || '#999';
   const selectedBg = theme?.selectedDayBackgroundColor || accent;
 
+  const handlePrev = () => {
+    if (!canGoPrev || !onMonthChange) return;
+    const newMonth = month - 1;
+    if (newMonth < 0) {
+      onMonthChange(year - 1, 11);
+    } else {
+      onMonthChange(year, newMonth);
+    }
+  };
+
+  const handleNext = () => {
+    if (!canGoNext || !onMonthChange) return;
+    const newMonth = month + 1;
+    if (newMonth > 11) {
+      onMonthChange(year + 1, 0);
+    } else {
+      onMonthChange(year, newMonth);
+    }
+  };
+
   return (
     <View style={[styles.container, { backgroundColor: bg }]}>
-      <Text style={[styles.monthTitle, { color: text }]}>{MONTHS[month]} {year}</Text>
+      <View style={styles.headerRow}>
+        <TouchableOpacity onPress={handlePrev} style={styles.arrow} disabled={!canGoPrev}>
+          <Text style={[styles.arrowText, { color: canGoPrev ? accent : textDisabled }]}>{'‹'}</Text>
+        </TouchableOpacity>
+        <Text style={[styles.monthTitle, { color: text }]}>{MONTHS[month]} {year}</Text>
+        <TouchableOpacity onPress={handleNext} style={styles.arrow} disabled={!canGoNext}>
+          <Text style={[styles.arrowText, { color: canGoNext ? accent : textDisabled }]}>{'›'}</Text>
+        </TouchableOpacity>
+      </View>
       <View style={styles.dayHeader}>
         {DAYS.map((day) => (
           <Text key={day} style={[styles.dayHeaderText, { color: textDisabled }]}>{day}</Text>
@@ -108,11 +142,28 @@ const styles = StyleSheet.create({
   container: {
     padding: 12,
   },
+  headerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+    gap: 16,
+  },
   monthTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 12,
+    minWidth: 150,
+  },
+  arrow: {
+    width: 36,
+    height: 36,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arrowText: {
+    fontSize: 28,
+    fontWeight: 'bold',
   },
   dayHeader: {
     flexDirection: 'row',
