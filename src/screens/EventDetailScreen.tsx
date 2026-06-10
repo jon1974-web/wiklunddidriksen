@@ -26,6 +26,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
   const [isEditing, setIsEditing] = useState(false);
+  const [eventData, setEventData] = useState(event);
   
   const getInitialEndDateDays = () => {
     if (!event.endDate) return null;
@@ -187,6 +188,11 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         }
       }
 
+      setEventData({
+        ...eventData,
+        ...updateData,
+        notificationId: newNotificationId || eventData.notificationId,
+      });
       setIsEditing(false);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -217,15 +223,15 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     ]);
   }, [event, navigation]);
 
-  const dateText = event.endDate
-    ? `${formatDate(event.date)} - ${formatDate(event.endDate)}`
-    : formatDate(event.date);
-  const timeText = event.endTime
-    ? `${formatTime(event.time)} - ${formatTime(event.endTime)}`
-    : formatTime(event.time);
-  const eventIcon = event.icon || '📅';
-  const mapUrl = event.address
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(event.address)}&zoom=15&size=600x300&markers=color:red%7C${encodeURIComponent(event.address)}&key=${GOOGLE_MAPS_API_KEY}`
+  const dateText = eventData.endDate
+    ? `${formatDate(eventData.date)} - ${formatDate(eventData.endDate)}`
+    : formatDate(eventData.date);
+  const timeText = eventData.endTime
+    ? `${formatTime(eventData.time)} - ${formatTime(eventData.endTime)}`
+    : formatTime(eventData.time);
+  const eventIcon = eventData.icon || '📅';
+  const mapUrl = eventData.address
+    ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(eventData.address)}&zoom=15&size=600x300&markers=color:red%7C${encodeURIComponent(eventData.address)}&key=${GOOGLE_MAPS_API_KEY}`
     : null;
 
   if (!isEditing) {
@@ -237,9 +243,9 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 
         <View style={[styles.viewCard, { backgroundColor: colors.surface }]}>
           <Text style={styles.viewIcon}>{eventIcon}</Text>
-          <Text style={[styles.viewTitle, { color: colors.text }]}>{event.title}</Text>
-          {event.description && (
-            <Text style={[styles.viewDescription, { color: colors.textSecondary }]}>{event.description}</Text>
+          <Text style={[styles.viewTitle, { color: colors.text }]}>{eventData.title}</Text>
+          {eventData.description && (
+            <Text style={[styles.viewDescription, { color: colors.textSecondary }]}>{eventData.description}</Text>
           )}
           <View style={[styles.viewDivider, { backgroundColor: colors.border }]} />
           <View style={styles.viewDetailRow}>
@@ -250,10 +256,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐 Tid</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>{timeText}</Text>
           </View>
-          {event.address && (
+          {eventData.address && (
             <View style={styles.viewDetailRow}>
               <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍 Adresse</Text>
-              <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{event.address}</Text>
+              <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{eventData.address}</Text>
             </View>
           )}
           <View style={styles.viewDetailRow}>
@@ -267,7 +273,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         {mapUrl && (
           <TouchableOpacity
             style={[styles.viewMapContainer, { backgroundColor: colors.surface }]}
-            onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.address!)}`)}
+            onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventData.address!)}`)}
           >
             <Image source={{ uri: mapUrl }} style={styles.viewMapImage} />
             <Text style={[styles.viewMapLabel, { color: colors.accent }]}>Åpne i Google Maps →</Text>
@@ -288,31 +294,31 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               <TouchableOpacity
                 style={[styles.calendarWebButton, { backgroundColor: userCalendarProvider === 'google' ? '#4285F4' : '#0078D4' }]}
                 onPress={() => {
-                  const [h, m] = event.time.split(':').map(Number);
-                  const start = new Date(event.date);
+                  const [h, m] = eventData.time.split(':').map(Number);
+                  const start = new Date(eventData.date);
                   start.setHours(h, m, 0, 0);
                   let end: Date;
-                  if (event.endDate && event.endTime) {
-                    const [eh, em] = event.endTime.split(':').map(Number);
-                    end = new Date(event.endDate);
+                  if (eventData.endDate && eventData.endTime) {
+                    const [eh, em] = eventData.endTime.split(':').map(Number);
+                    end = new Date(eventData.endDate);
                     end.setHours(eh, em, 0, 0);
-                  } else if (event.endTime) {
-                    const [eh, em] = event.endTime.split(':').map(Number);
-                    end = new Date(event.date);
+                  } else if (eventData.endTime) {
+                    const [eh, em] = eventData.endTime.split(':').map(Number);
+                    end = new Date(eventData.date);
                     end.setHours(eh, em, 0, 0);
-                  } else if (event.endDate) {
-                    end = new Date(event.endDate);
+                  } else if (eventData.endDate) {
+                    end = new Date(eventData.endDate);
                     end.setHours(h, m, 0, 0);
                   } else {
                     end = new Date(start.getTime() + 60 * 60 * 1000);
                   }
                   if (userCalendarProvider === 'google') {
                     const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-                    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.address || '')}`;
+                    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventData.title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(eventData.description || '')}&location=${encodeURIComponent(eventData.address || '')}`;
                     Linking.openURL(url);
                   } else {
                     const fmt = (d: Date) => d.toISOString();
-                    const url = `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(event.title)}&startdt=${fmt(start)}&enddt=${fmt(end)}&body=${encodeURIComponent(event.description || '')}&location=${encodeURIComponent(event.address || '')}`;
+                    const url = `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(eventData.title)}&startdt=${fmt(start)}&enddt=${fmt(end)}&body=${encodeURIComponent(eventData.description || '')}&location=${encodeURIComponent(eventData.address || '')}`;
                     Linking.openURL(url);
                   }
                 }}
