@@ -15,6 +15,7 @@ import { getTrips } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services/spondService';
 import { GOOGLE_MAPS_API_KEY } from '../constants/api';
 import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
+import { WeeklySummary } from '../components/WeeklySummary';
 
 interface EventsScreenProps {
   navigation: any;
@@ -125,6 +126,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
   const [visibleDate, setVisibleDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
+  const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
@@ -587,6 +589,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           >
             <Text style={[styles.toggleText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>Kalender</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.toggleButton, { backgroundColor: TRIP_COLOR }]}
+            onPress={() => setShowWeeklySummary(true)}
+          >
+            <Text style={[styles.toggleText, { color: '#fff' }]}>Din uke</Text>
+          </TouchableOpacity>
           <View style={{ flex: 1 }} />
           <TouchableOpacity
             style={[styles.filterIcon, filterSource === 'viqueens' && styles.filterIconActive]}
@@ -692,6 +700,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           onClose={() => setResponseModal(null)}
         />
       )}
+
+      <WeeklySummary
+        visible={showWeeklySummary}
+        onClose={() => setShowWeeklySummary(false)}
+        events={events}
+        trips={trips}
+        spondEvents={spondEvents}
+      />
     </SafeAreaView>
   );
 };
