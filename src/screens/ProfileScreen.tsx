@@ -28,6 +28,7 @@ import {
   joinFamily,
   leaveFamily,
   searchFamilyByName,
+  getFamilyMembers,
   UserProfile,
   Family,
 } from '../services/familyService';
@@ -59,6 +60,7 @@ export const ProfileScreen: React.FC = () => {
   const [newFamilyName, setNewFamilyName] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<Family[]>([]);
+  const [familyMembers, setFamilyMembers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [calendarName, setCalendarName] = useState<string | null>(null);
   const [calendarEmail, setCalendarEmail] = useState('');
@@ -120,6 +122,18 @@ export const ProfileScreen: React.FC = () => {
 
     loadProfile();
   }, [user?.uid]);
+
+  useEffect(() => {
+    if (!familyId) {
+      setFamilyMembers([]);
+      return;
+    }
+    let cancelled = false;
+    getFamilyMembers(familyId).then((members) => {
+      if (!cancelled) setFamilyMembers(members);
+    });
+    return () => { cancelled = true; };
+  }, [familyId]);
 
   const handleUpdateName = useCallback(async () => {
     if (!newName.trim() || !user) return;
@@ -651,6 +665,22 @@ export const ProfileScreen: React.FC = () => {
                 <Text style={[styles.familyName, { color: colors.text }]}>{familyName}</Text>
                 <Text style={[styles.familyId, { color: colors.textSecondary }]}>ID: {familyId}</Text>
               </View>
+              {familyMembers.length > 0 && (
+                <View style={[styles.memberList, { borderTopColor: colors.border }]}>
+                  <Text style={[styles.memberListTitle, { color: colors.text }]}>Medlemmer ({familyMembers.length})</Text>
+                  {familyMembers.map((member) => (
+                    <View key={member.uid} style={[styles.memberRow, { borderBottomColor: colors.border }]}>
+                      <View style={styles.memberInfo}>
+                        <Text style={[styles.memberName, { color: colors.text }]}>{member.displayName}</Text>
+                        <Text style={[styles.memberEmail, { color: colors.textSecondary }]}>{member.email}</Text>
+                      </View>
+                      {member.uid === user?.uid && (
+                        <Text style={[styles.memberBadge, { color: colors.accent }]}>Deg</Text>
+                      )}
+                    </View>
+                  ))}
+                </View>
+              )}
               <TouchableOpacity
                 style={[styles.leaveButton, { borderColor: colors.danger }]}
                 onPress={handleLeaveFamily}
@@ -993,6 +1023,39 @@ const styles = StyleSheet.create({
   familyId: {
     fontSize: 12,
     marginTop: 4,
+  },
+  memberList: {
+    marginTop: 12,
+    borderTopWidth: 1,
+    paddingTop: 12,
+  },
+  memberListTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  memberRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+  },
+  memberInfo: {
+    flex: 1,
+  },
+  memberName: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  memberEmail: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  memberBadge: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginLeft: 8,
   },
   noFamily: {
     fontSize: 14,

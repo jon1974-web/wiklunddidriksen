@@ -144,6 +144,18 @@ export const getFamilyById = async (familyId: string): Promise<Family | null> =>
   return null;
 };
 
+export const getFamilyMembers = async (familyId: string): Promise<UserProfile[]> => {
+  const family = await getFamilyById(familyId);
+  if (!family || family.members.length === 0) return [];
+  const profiles = await Promise.all(
+    family.members.map(async (uid) => {
+      const profile = await getUserProfile(uid);
+      return profile;
+    })
+  );
+  return profiles.filter((p): p is UserProfile => p !== null);
+};
+
 export const ADMIN_EMAIL = 'jon@wiklunddidriksen.com';
 export const AUTO_FAMILY_ID = 'AVCUsb8X6GdRM3f0EBf0';
 
