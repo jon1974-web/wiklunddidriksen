@@ -110,6 +110,7 @@ export interface TripHotel {
 
 export interface TripFlight {
   id: string;
+  type?: 'utreise' | 'hjemreise';
   airline?: string;
   flightNumber?: string;
   reference?: string;

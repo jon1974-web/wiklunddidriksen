@@ -88,6 +88,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [hotelPhone, setHotelPhone] = useState('');
 
   // Flight form
+  const [flightType, setFlightType] = useState<'utreise' | 'hjemreise'>('utreise');
   const [flightAirline, setFlightAirline] = useState('');
   const [flightNumber, setFlightNumber] = useState('');
   const [flightReference, setFlightReference] = useState('');
@@ -151,6 +152,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     setHotelName('');
     setHotelAddress('');
     setHotelPhone('');
+    setFlightType('utreise');
     setFlightAirline('');
     setFlightNumber('');
     setFlightReference('');
@@ -213,6 +215,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setHotelAddress(item.address || '');
       setHotelPhone(item.phone || '');
     } else if (modal === 'flight') {
+      setFlightType(item.type || 'utreise');
       setFlightAirline(item.airline || '');
       setFlightNumber(item.flightNumber || '');
       setFlightReference(item.reference || '');
@@ -269,6 +272,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const handleSaveFlight = useCallback(async () => {
     try {
       const data = {
+        type: flightType,
         airline: flightAirline.trim() ? sanitizeInput(flightAirline) : undefined,
         flightNumber: flightNumber.trim() ? sanitizeInput(flightNumber) : undefined,
         reference: flightReference.trim() ? sanitizeInput(flightReference) : undefined,
@@ -290,7 +294,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [trip.id, flightAirline, flightNumber, flightReference, flightDepartureDate, flightDepartureTime, flightArrivalDate, flightArrivalTime, flightPhone, flightNote, editingId, loadSubData]);
+  }, [trip.id, flightType, flightAirline, flightNumber, flightReference, flightDepartureDate, flightDepartureTime, flightArrivalDate, flightArrivalTime, flightPhone, flightNote, editingId, loadSubData]);
 
   // Restaurant handlers
   const handleSaveRestaurant = useCallback(async () => {
@@ -478,6 +482,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           >
             <View style={styles.itemRow}>
               <View style={styles.itemContent}>
+                {f.type && (
+                  <Text style={[styles.itemDetail, { color: f.type === 'utreise' ? colors.accent : '#E53935', fontWeight: '600' }]}>
+                    {f.type === 'utreise' ? '🛫 Utreise' : '🛬 Hjemreise'}
+                  </Text>
+                )}
                 {f.airline && <Text style={[styles.itemName, { color: colors.text }]}>{f.airline}</Text>}
                 {f.flightNumber && <Text style={[styles.itemDetail, { color: colors.accent }]}>{f.flightNumber}</Text>}
                 {f.reference && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>Ref: {f.reference}</Text>}
@@ -817,6 +826,20 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   {editingId ? 'Rediger fly' : 'Legg til fly'}
                 </Text>
                 <ScrollView style={styles.modalScroll}>
+                  <View style={styles.flightTypeRow}>
+                    <TouchableOpacity
+                      style={[styles.flightTypeOption, { backgroundColor: flightType === 'utreise' ? colors.accent : colors.inputBackground }]}
+                      onPress={() => setFlightType('utreise')}
+                    >
+                      <Text style={[styles.flightTypeText, { color: flightType === 'utreise' ? '#fff' : colors.text }]}>🛫 Utreise</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.flightTypeOption, { backgroundColor: flightType === 'hjemreise' ? '#E53935' : colors.inputBackground }]}
+                      onPress={() => setFlightType('hjemreise')}
+                    >
+                      <Text style={[styles.flightTypeText, { color: flightType === 'hjemreise' ? '#fff' : colors.text }]}>🛬 Hjemreise</Text>
+                    </TouchableOpacity>
+                  </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Flyselskap</Text>
                     <TextInput
@@ -1515,5 +1538,20 @@ const styles = StyleSheet.create({
   },
   flightTimeField: {
     flex: 1,
+  },
+  flightTypeRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  flightTypeOption: {
+    flex: 1,
+    padding: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  flightTypeText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
