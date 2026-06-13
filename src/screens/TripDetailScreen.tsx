@@ -98,6 +98,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [flightArrivalTime, setFlightArrivalTime] = useState('');
   const [flightPhone, setFlightPhone] = useState('');
   const [flightNote, setFlightNote] = useState('');
+  const [showFlightDepDatePicker, setShowFlightDepDatePicker] = useState(false);
+  const [showFlightArrDatePicker, setShowFlightArrDatePicker] = useState(false);
+  const [showFlightDepTimePicker, setShowFlightDepTimePicker] = useState(false);
+  const [showFlightArrTimePicker, setShowFlightArrTimePicker] = useState(false);
 
   // Restaurant form
   const [restName, setRestName] = useState('');
@@ -876,9 +880,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <Text style={[styles.label, { color: colors.text }]}>Avreisedato</Text>
                       <TouchableOpacity
                         style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                        onPress={() => {
-                          setFlightDepartureDate(getTodayLocal());
-                        }}
+                        onPress={() => setShowFlightDepDatePicker(true)}
                       >
                         <Text style={{ color: flightDepartureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
                           {flightDepartureDate || 'Velg dato'}
@@ -887,13 +889,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </View>
                     <View style={[styles.flightTimeField, { flex: 1 }]}>
                       <Text style={[styles.label, { color: colors.text }]}>Avreisetid</Text>
-                      <TextInput
-                        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                        value={flightDepartureTime}
-                        onChangeText={setFlightDepartureTime}
-                        placeholder="HH:MM"
-                        placeholderTextColor={colors.textDisabled}
-                      />
+                      <TouchableOpacity
+                        style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                        onPress={() => setShowFlightDepTimePicker(true)}
+                      >
+                        <Text style={{ color: flightDepartureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                          {flightDepartureTime || 'Velg tid'}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                   <View style={styles.flightTimeRow}>
@@ -901,9 +904,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <Text style={[styles.label, { color: colors.text }]}>Ankomstdato</Text>
                       <TouchableOpacity
                         style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                        onPress={() => {
-                          setFlightArrivalDate(getTodayLocal());
-                        }}
+                        onPress={() => setShowFlightArrDatePicker(true)}
                       >
                         <Text style={{ color: flightArrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
                           {flightArrivalDate || 'Velg dato'}
@@ -912,13 +913,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </View>
                     <View style={[styles.flightTimeField, { flex: 1 }]}>
                       <Text style={[styles.label, { color: colors.text }]}>Ankomsttid</Text>
-                      <TextInput
-                        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                        value={flightArrivalTime}
-                        onChangeText={setFlightArrivalTime}
-                        placeholder="HH:MM"
-                        placeholderTextColor={colors.textDisabled}
-                      />
+                      <TouchableOpacity
+                        style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                        onPress={() => setShowFlightArrTimePicker(true)}
+                      >
+                        <Text style={{ color: flightArrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                          {flightArrivalTime || 'Velg tid'}
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                   <View style={styles.field}>
@@ -951,6 +953,132 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
                   </TouchableOpacity>
                 </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Flight Departure Date Picker */}
+      <Modal visible={showFlightDepDatePicker} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowFlightDepDatePicker(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg avreisedato</Text>
+                <ScrollView style={styles.datePickerScroll}>
+                  {Array.from({ length: 365 }, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + i);
+                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    return (
+                      <TouchableOpacity
+                        key={dateStr}
+                        style={[styles.dateOption, { borderBottomColor: colors.border }, flightDepartureDate === dateStr && { backgroundColor: colors.accent }]}
+                        onPress={() => { setFlightDepartureDate(dateStr); setShowFlightDepDatePicker(false); }}
+                      >
+                        <Text style={[styles.dateOptionText, { color: flightDepartureDate === dateStr ? '#fff' : colors.text }]}>
+                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowFlightDepDatePicker(false)}>
+                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Flight Departure Time Picker */}
+      <Modal visible={showFlightDepTimePicker} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowFlightDepTimePicker(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg avreisetid</Text>
+                <ScrollView style={styles.datePickerScroll}>
+                  {timeOptions.map((t) => (
+                    <TouchableOpacity
+                      key={t}
+                      style={[styles.dateOption, { borderBottomColor: colors.border }, flightDepartureTime === t && { backgroundColor: colors.accent }]}
+                      onPress={() => { setFlightDepartureTime(t); setShowFlightDepTimePicker(false); }}
+                    >
+                      <Text style={[styles.dateOptionText, { color: flightDepartureTime === t ? '#fff' : colors.text }]}>
+                        {t}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowFlightDepTimePicker(false)}>
+                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Flight Arrival Date Picker */}
+      <Modal visible={showFlightArrDatePicker} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowFlightArrDatePicker(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg ankomstdato</Text>
+                <ScrollView style={styles.datePickerScroll}>
+                  {Array.from({ length: 365 }, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + i);
+                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    return (
+                      <TouchableOpacity
+                        key={dateStr}
+                        style={[styles.dateOption, { borderBottomColor: colors.border }, flightArrivalDate === dateStr && { backgroundColor: colors.accent }]}
+                        onPress={() => { setFlightArrivalDate(dateStr); setShowFlightArrDatePicker(false); }}
+                      >
+                        <Text style={[styles.dateOptionText, { color: flightArrivalDate === dateStr ? '#fff' : colors.text }]}>
+                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowFlightArrDatePicker(false)}>
+                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Flight Arrival Time Picker */}
+      <Modal visible={showFlightArrTimePicker} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowFlightArrTimePicker(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg ankomsttid</Text>
+                <ScrollView style={styles.datePickerScroll}>
+                  {timeOptions.map((t) => (
+                    <TouchableOpacity
+                      key={t}
+                      style={[styles.dateOption, { borderBottomColor: colors.border }, flightArrivalTime === t && { backgroundColor: colors.accent }]}
+                      onPress={() => { setFlightArrivalTime(t); setShowFlightArrTimePicker(false); }}
+                    >
+                      <Text style={[styles.dateOptionText, { color: flightArrivalTime === t ? '#fff' : colors.text }]}>
+                        {t}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowFlightArrTimePicker(false)}>
+                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
+                </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
           </View>
