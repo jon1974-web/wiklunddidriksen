@@ -13,12 +13,16 @@ import {
   Image,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip, TripHotel, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
+import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
 import {
   getTripHotels,
   addTripHotel,
   updateTripHotel,
   deleteTripHotel,
+  getTripFlights,
+  addTripFlight,
+  updateTripFlight,
+  deleteTripFlight,
   getTripRestaurants,
   addTripRestaurant,
   updateTripRestaurant,
@@ -36,6 +40,8 @@ import {
   updateTripLink,
   deleteTripLink,
 } from '../services/tripService';
+import { ref, deleteObject } from 'firebase/storage';
+import { storage } from '../services/firebase';
 import { formatDate } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
@@ -48,13 +54,14 @@ interface TripDetailScreenProps {
   route: any;
 }
 
-type ModalType = 'hotel' | 'restaurant' | 'activity' | 'document' | 'link' | null;
+type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | null;
 
 export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, route }) => {
   const { trip } = route.params as { trip: Trip };
   const { colors } = useTheme();
 
   const [hotels, setHotels] = useState<TripHotel[]>([]);
+  const [flights, setFlights] = useState<TripFlight[]>([]);
   const [restaurants, setRestaurants] = useState<TripRestaurant[]>([]);
   const [activities, setActivities] = useState<TripActivity[]>([]);
   const [documents, setDocuments] = useState<TripDocument[]>([]);
@@ -66,6 +73,13 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [hotelName, setHotelName] = useState('');
   const [hotelAddress, setHotelAddress] = useState('');
   const [hotelPhone, setHotelPhone] = useState('');
+
+  // Flight form
+  const [flightAirline, setFlightAirline] = useState('');
+  const [flightNumber, setFlightNumber] = useState('');
+  const [flightReference, setFlightReference] = useState('');
+  const [flightPhone, setFlightPhone] = useState('');
+  const [flightNote, setFlightNote] = useState('');
 
   // Restaurant form
   const [restName, setRestName] = useState('');
@@ -93,14 +107,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const loadSubData = useCallback(async () => {
     try {
-      const [h, r, a, d, l] = await Promise.all([
+      const [h, f, r, a, d, l] = await Promise.all([
         getTripHotels(trip.id),
+        getTripFlights(trip.id),
         getTripRestaurants(trip.id),
         getTripActivities(trip.id),
         getTripDocuments(trip.id),
         getTripLinks(trip.id),
       ]);
       setHotels(h);
+      setFlights(f);
       setRestaurants(r);
       setActivities(a);
       setDocuments(d);
@@ -118,6 +134,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     setHotelName('');
     setHotelAddress('');
     setHotelPhone('');
+    setFlightAirline('');
+    setFlightNumber('');
+    setFlightReference('');
+    setFlightPhone('');
+    setFlightNote('');
     setRestName('');
     setRestAddress('');
     setRestNote('');
@@ -147,6 +168,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setHotelName(item.name || '');
       setHotelAddress(item.address || '');
       setHotelPhone(item.phone || '');
+    } else if (modal === 'flight') {
+      setFlightAirline(item.airline || '');
+      setFlightNumber(item.flightNumber || '');
+      setFlightReference(item.reference || '');
+      setFlightPhone(item.phone || '');
+      setFlightNote(item.note || '');
     } else if (modal === 'restaurant') {
       setRestName(item.name || '');
       setRestAddress(item.address || '');
@@ -189,6 +216,29 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       Alert.alert('Error', getErrorMessage(error));
     }
   }, [trip.id, hotelName, hotelAddress, hotelPhone, editingId, loadSubData]);
+
+  // Flight handlers
+  const handleSaveFlight = useCallback(async () => {
+    try {
+      const data = {
+        airline: flightAirline.trim() ? sanitizeInput(flightAirline) : undefined,
+        flightNumber: flightNumber.trim() ? sanitizeInput(flightNumber) : undefined,
+        reference: flightReference.trim() ? sanitizeInput(flightReference) : undefined,
+        phone: flightPhone.trim() ? sanitizeInput(flightPhone) : undefined,
+        note: flightNote.trim() ? sanitizeInput(flightNote) : undefined,
+      };
+      if (editingId) {
+        await updateTripFlight(trip.id, editingId, data);
+      } else {
+        await addTripFlight(trip.id, data);
+      }
+      resetForms();
+      setActiveModal(null);
+      loadSubData();
+    } catch (error) {
+      Alert.alert('Error', getErrorMessage(error));
+    }
+  }, [trip.id, flightAirline, flightNumber, flightReference, flightPhone, flightNote, editingId, loadSubData]);
 
   // Restaurant handlers
   const handleSaveRestaurant = useCallback(async () => {
@@ -239,6 +289,17 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
+      if (editingId) {
+        const oldDoc = documents.find(d => d.id === editingId);
+        if (oldDoc?.fileUrl && oldDoc.fileUrl !== docFileUrl) {
+          try {
+            const oldRef = ref(storage, oldDoc.fileUrl);
+            await deleteObject(oldRef);
+          } catch (e) {
+            console.log('Could not delete old file:', e);
+          }
+        }
+      }
       const data = { title: sanitizeInput(docTitle), note: docNote.trim() ? sanitizeInput(docNote) : undefined, fileUrl: docFileUrl || undefined, fileName: docFileName || undefined };
       if (editingId) {
         await updateTripDocument(trip.id, editingId, data);
@@ -251,7 +312,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [trip.id, docTitle, docNote, docFileUrl, docFileName, editingId, loadSubData]);
+  }, [trip.id, docTitle, docNote, docFileUrl, docFileName, editingId, loadSubData, documents]);
 
   // Link handlers
   const handleSaveLink = useCallback(async () => {
@@ -287,6 +348,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   };
 
   const handleDeleteHotel = useCallback((id: string) => confirmDelete('hotell', async () => { await deleteTripHotel(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteFlight = useCallback((id: string) => confirmDelete('fly', async () => { await deleteTripFlight(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteRestaurant = useCallback((id: string) => confirmDelete('restaurant', async () => { await deleteTripRestaurant(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteActivity = useCallback((id: string) => confirmDelete('aktivitet', async () => { await deleteTripActivity(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteDocument = useCallback((id: string) => confirmDelete('dokument', async () => { await deleteTripDocument(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
@@ -325,6 +387,31 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
         </Text>
       </View>
+
+      {/* Flights */}
+      {renderSectionHeader('Fly', '✈️', () => openAddModal('flight'))}
+      {flights.length === 0 ? (
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen fly lagt til</Text>
+      ) : (
+        flights.map((f) => (
+          <TouchableOpacity
+            key={f.id}
+            style={[styles.itemCard, { backgroundColor: colors.surface }]}
+            onPress={() => openEditModal('flight', f)}
+            onLongPress={() => handleDeleteFlight(f.id)}
+          >
+            <View style={styles.itemRow}>
+              <View style={styles.itemContent}>
+                {f.airline && <Text style={[styles.itemName, { color: colors.text }]}>{f.airline}</Text>}
+                {f.flightNumber && <Text style={[styles.itemDetail, { color: colors.accent }]}>{f.flightNumber}</Text>}
+                {f.reference && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>Ref: {f.reference}</Text>}
+                {f.phone && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>📞 {f.phone}</Text>}
+                {f.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{f.note}</Text>}
+              </View>
+            </View>
+          </TouchableOpacity>
+        ))
+      )}
 
       {/* Hotels */}
       {renderSectionHeader('Hotell', '🛏️', () => openAddModal('hotel'))}
@@ -448,12 +535,26 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <TouchableOpacity
             key={d.id}
             style={[styles.itemCard, { backgroundColor: colors.surface }]}
-            onPress={() => d.fileUrl ? Linking.openURL(d.fileUrl) : openEditModal('document', d)}
+            onPress={() => openEditModal('document', d)}
             onLongPress={() => handleDeleteDocument(d.id)}
           >
-            <Text style={[styles.itemName, { color: colors.text }]}>{d.title}</Text>
-            {d.fileName && <Text style={[styles.itemDetail, { color: colors.accent }]}>{d.fileName}</Text>}
-            {d.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{d.note}</Text>}
+            <View style={styles.docRow}>
+              <View style={styles.docContent}>
+                <Text style={[styles.itemName, { color: colors.text }]}>{d.title}</Text>
+                {d.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{d.note}</Text>}
+                {d.fileName && <Text style={[styles.itemDetail, { color: colors.accent }]}>📎 {d.fileName}</Text>}
+              </View>
+              <View style={styles.docActions}>
+                {d.fileUrl && (
+                  <TouchableOpacity onPress={() => Linking.openURL(d.fileUrl)} style={styles.docAction}>
+                    <Text style={{ color: colors.accent, fontSize: 14 }}>Åpne</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity onPress={() => handleDeleteDocument(d.id)} style={styles.docAction}>
+                  <Text style={{ color: '#E53935', fontSize: 14 }}>Slett</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </TouchableOpacity>
         ))
       )}
@@ -477,6 +578,83 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       <View style={{ height: 40 }} />
+
+      {/* Flight Modal */}
+      <Modal visible={activeModal === 'flight'} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger fly' : 'Legg til fly'}
+                </Text>
+                <ScrollView style={styles.modalScroll}>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Flyselskap</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={flightAirline}
+                      onChangeText={setFlightAirline}
+                      placeholder="F.eks. Norwegian, SAS"
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Flightnummer</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={flightNumber}
+                      onChangeText={setFlightNumber}
+                      placeholder="F.eks. DY1234"
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Referanse (PNR)</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={flightReference}
+                      onChangeText={setFlightReference}
+                      placeholder="F.eks. ABC123"
+                      placeholderTextColor={colors.textDisabled}
+                      autoCapitalize="characters"
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={flightPhone}
+                      onChangeText={setFlightPhone}
+                      placeholder="F.eks. +47 000 00 000"
+                      placeholderTextColor={colors.textDisabled}
+                      keyboardType="phone-pad"
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Notater</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={flightNote}
+                      onChangeText={setFlightNote}
+                      placeholder="F.eks. Utreise, retur, bagasje..."
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveFlight}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
       {/* Hotel Modal */}
       <Modal visible={activeModal === 'hotel'} transparent animationType="slide">
@@ -907,6 +1085,23 @@ const styles = StyleSheet.create({
   },
   itemContent: {
     flex: 1,
+  },
+  docRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  docContent: {
+    flex: 1,
+    marginRight: 12,
+  },
+  docActions: {
+    alignItems: 'flex-end',
+    gap: 8,
+  },
+  docAction: {
+    paddingVertical: 4,
+    paddingHorizontal: 8,
   },
   itemMapContainer: {
     marginLeft: 12,

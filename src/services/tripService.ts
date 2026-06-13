@@ -9,7 +9,7 @@ import {
   query,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink, TripHotel } from '../types';
+import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink, TripHotel, TripFlight } from '../types';
 
 const TRIPS_COLLECTION = 'trips';
 
@@ -32,7 +32,7 @@ export const updateTrip = async (id: string, data: Partial<Trip>): Promise<void>
 };
 
 export const deleteTrip = async (id: string): Promise<void> => {
-  const subcollections = ['restaurants', 'activities', 'documents', 'links', 'hotels'];
+  const subcollections = ['restaurants', 'activities', 'documents', 'links', 'hotels', 'flights'];
   for (const sub of subcollections) {
     const snap = await getDocs(collection(db, TRIPS_COLLECTION, id, sub));
     for (const d of snap.docs) {
@@ -156,4 +156,27 @@ export const updateTripDocument = async (tripId: string, documentId: string, dat
 
 export const updateTripLink = async (tripId: string, linkId: string, data: Partial<TripLink>): Promise<void> => {
   await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'links', linkId), data);
+};
+
+// Flights
+export const getTripFlights = async (tripId: string): Promise<TripFlight[]> => {
+  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'flights'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as TripFlight));
+};
+
+export const addTripFlight = async (tripId: string, data: Omit<TripFlight, 'id' | 'createdAt'>): Promise<string> => {
+  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'flights'), {
+    ...data,
+    createdAt: Date.now(),
+  });
+  return docRef.id;
+};
+
+export const updateTripFlight = async (tripId: string, flightId: string, data: Partial<TripFlight>): Promise<void> => {
+  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'flights', flightId), data);
+};
+
+export const deleteTripFlight = async (tripId: string, flightId: string): Promise<void> => {
+  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'flights', flightId));
 };

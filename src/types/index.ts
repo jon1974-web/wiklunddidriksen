@@ -107,6 +107,16 @@ export interface TripHotel {
   createdAt: number;
 }
 
+export interface TripFlight {
+  id: string;
+  airline?: string;
+  flightNumber?: string;
+  reference?: string;
+  phone?: string;
+  note?: string;
+  createdAt: number;
+}
+
 export interface SpondEvent {
   id: string;
   heading: string;
