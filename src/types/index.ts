@@ -110,6 +110,7 @@ export interface TripHotel {
 
 export interface TripFlight {
   id: string;
+  transportType?: 'fly' | 'tog' | 'bil';
   type?: 'utreise' | 'hjemreise';
   airline?: string;
   flightNumber?: string;
@@ -120,6 +121,10 @@ export interface TripFlight {
   arrivalTime?: string;
   phone?: string;
   note?: string;
+  address?: string;
+  driver?: string;
+  passengers?: string;
+  wagon?: string;
   createdAt: number;
 }
 
