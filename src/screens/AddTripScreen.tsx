@@ -11,12 +11,15 @@ interface AddTripScreenProps {
   navigation: any;
 }
 
+const TRIP_ICONS = ['✈️', '🏖️', '🏔️', '🏕️', '⛷️', '⛷️', '🚂', '🚗', '🚌', '🚢', '🌍', '🗺️', '⛰️', '🏂', '🏄', '🤿', '🎿', '🏕️', '🎒', '🧳'];
+
 export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('Norge');
   const [startDate, setStartDate] = useState(getTodayLocal());
   const [endDate, setEndDate] = useState(getTodayLocal());
+  const [icon, setIcon] = useState('✈️');
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const user = useUserStore((state) => state.user);
@@ -43,6 +46,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         country: sanitizeInput(country),
         startDate,
         endDate,
+        icon,
         createdBy: user?.uid || '',
       });
       navigation.goBack();
@@ -65,6 +69,21 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
           placeholder="F.eks. Sommerferie i Spania"
           placeholderTextColor={colors.textDisabled}
         />
+      </View>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+        <View style={styles.iconGrid}>
+          {TRIP_ICONS.map((i) => (
+            <TouchableOpacity
+              key={i}
+              style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: icon === i ? colors.accent : colors.border }]}
+              onPress={() => setIcon(i)}
+            >
+              <Text style={styles.iconText}>{i}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
 
       <View style={styles.field}>
@@ -213,6 +232,22 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16,
+  },
+  iconGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  iconOption: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconText: {
+    fontSize: 22,
   },
   button: {
     padding: 16,

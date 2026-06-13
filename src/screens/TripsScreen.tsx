@@ -47,7 +47,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
         <View style={styles.cardRow}>
           <View style={styles.cardContent}>
             <View style={styles.cardTitleRow}>
-              <Text style={styles.cardIcon}>✈️</Text>
+              <Text style={styles.cardIcon}>{item.icon || '✈️'}</Text>
               <Text style={[styles.cardTitle, { color: colors.text }]}>{item.title}</Text>
             </View>
             <Text style={[styles.cardLocation, { color: colors.textSecondary }]}>

@@ -39,6 +39,7 @@ import {
   addTripLink,
   updateTripLink,
   deleteTripLink,
+  updateTrip,
 } from '../services/tripService';
 import { ref, deleteObject } from 'firebase/storage';
 import { storage } from '../services/firebase';
@@ -54,12 +55,15 @@ interface TripDetailScreenProps {
   route: any;
 }
 
-type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | null;
+const TRIP_ICONS = ['✈️', '🏖️', '🏔️', '🏕️', '⛷️', '⛷️', '🚂', '🚗', '🚌', '🚢', '🌍', '🗺️', '⛰️', '🏂', '🏄', '🤿', '🎿', '🏕️', '🎒', '🧳'];
+
+type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | 'tripEdit' | null;
 
 export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, route }) => {
-  const { trip } = route.params as { trip: Trip };
+  const { trip: initialTrip } = route.params as { trip: Trip };
   const { colors } = useTheme();
 
+  const [trip, setTrip] = useState<Trip>(initialTrip);
   const [hotels, setHotels] = useState<TripHotel[]>([]);
   const [flights, setFlights] = useState<TripFlight[]>([]);
   const [restaurants, setRestaurants] = useState<TripRestaurant[]>([]);
@@ -68,6 +72,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [links, setLinks] = useState<TripLink[]>([]);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
+
+  // Trip edit form
+  const [tripTitle, setTripTitle] = useState(trip.title);
+  const [tripStartDate, setTripStartDate] = useState(trip.startDate);
+  const [tripEndDate, setTripEndDate] = useState(trip.endDate);
+  const [tripIcon, setTripIcon] = useState(trip.icon || '✈️');
+  const [showTripStartDatePicker, setShowTripStartDatePicker] = useState(false);
+  const [showTripEndDatePicker, setShowTripEndDatePicker] = useState(false);
 
   // Hotel form
   const [hotelName, setHotelName] = useState('');
@@ -155,6 +167,29 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     setLinkUrl('');
     setEditingId(null);
   };
+
+  const handleSaveTripEdit = useCallback(async () => {
+    if (!tripTitle.trim()) {
+      Alert.alert('Error', 'Vennligst skriv en tittel');
+      return;
+    }
+    if (tripEndDate < tripStartDate) {
+      Alert.alert('Error', 'Sluttdato kan ikke være før startdato');
+      return;
+    }
+    try {
+      await updateTrip(trip.id, {
+        title: sanitizeInput(tripTitle),
+        startDate: tripStartDate,
+        endDate: tripEndDate,
+        icon: tripIcon,
+      });
+      setTrip({ ...trip, title: tripTitle, startDate: tripStartDate, endDate: tripEndDate, icon: tripIcon });
+      setActiveModal(null);
+    } catch (error) {
+      Alert.alert('Error', getErrorMessage(error));
+    }
+  }, [trip, tripTitle, tripStartDate, tripEndDate, tripIcon]);
 
   const openAddModal = (modal: ModalType) => {
     resetForms();
@@ -377,8 +412,17 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
       </TouchableOpacity>
 
-      <View style={[styles.tripCard, { backgroundColor: colors.surface }]}>
-        <Text style={styles.tripIcon}>✈️</Text>
+      <TouchableOpacity
+        style={[styles.tripCard, { backgroundColor: colors.surface }]}
+        onPress={() => {
+          setTripTitle(trip.title);
+          setTripStartDate(trip.startDate);
+          setTripEndDate(trip.endDate);
+          setTripIcon(trip.icon || '✈️');
+          setActiveModal('tripEdit');
+        }}
+      >
+        <Text style={styles.tripIcon}>{trip.icon || '✈️'}</Text>
         <Text style={[styles.tripTitle, { color: colors.text }]}>{trip.title}</Text>
         <Text style={[styles.tripLocation, { color: colors.textSecondary }]}>
           {trip.city}{trip.country ? `, ${trip.country}` : ''}
@@ -386,7 +430,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         <Text style={[styles.tripDates, { color: colors.textSecondary }]}>
           {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
         </Text>
-      </View>
+      </TouchableOpacity>
 
       {/* Flights */}
       {renderSectionHeader('Fly', '✈️', () => openAddModal('flight'))}
@@ -578,6 +622,148 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       <View style={{ height: 40 }} />
+
+      {/* Trip Edit Modal */}
+      <Modal visible={activeModal === 'tripEdit'} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  Rediger reise
+                </Text>
+                <ScrollView style={styles.modalScroll}>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={tripTitle}
+                      onChangeText={setTripTitle}
+                      placeholder="F.eks. Sommerferie i Spania"
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+                    <View style={styles.iconGrid}>
+                      {TRIP_ICONS.map((i) => (
+                        <TouchableOpacity
+                          key={i}
+                          style={[styles.iconOption, { backgroundColor: colors.inputBackground, borderColor: tripIcon === i ? colors.accent : colors.border }]}
+                          onPress={() => setTripIcon(i)}
+                        >
+                          <Text style={styles.iconText}>{i}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Fra dato</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setShowTripStartDatePicker(true)}
+                    >
+                      <Text style={{ color: tripStartDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {tripStartDate || 'Velg startdato'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Til dato</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setShowTripEndDatePicker(true)}
+                    >
+                      <Text style={{ color: tripEndDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {tripEndDate || 'Velg sluttdato'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveTripEdit}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>Lagre</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Trip Start Date Picker */}
+      <Modal visible={showTripStartDatePicker} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowTripStartDatePicker(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg startdato</Text>
+                <ScrollView style={styles.datePickerScroll}>
+                  {Array.from({ length: 365 }, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + i);
+                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    return (
+                      <TouchableOpacity
+                        key={dateStr}
+                        style={[styles.dateOption, { borderBottomColor: colors.border }, tripStartDate === dateStr && { backgroundColor: colors.accent }]}
+                        onPress={() => { setTripStartDate(dateStr); setShowTripStartDatePicker(false); }}
+                      >
+                        <Text style={[styles.dateOptionText, { color: tripStartDate === dateStr ? '#fff' : colors.text }]}>
+                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowTripStartDatePicker(false)}>
+                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Trip End Date Picker */}
+      <Modal visible={showTripEndDatePicker} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowTripEndDatePicker(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg sluttdato</Text>
+                <ScrollView style={styles.datePickerScroll}>
+                  {Array.from({ length: 365 }, (_, i) => {
+                    const d = new Date();
+                    d.setDate(d.getDate() + i);
+                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+                    return (
+                      <TouchableOpacity
+                        key={dateStr}
+                        style={[styles.dateOption, { borderBottomColor: colors.border }, tripEndDate === dateStr && { backgroundColor: colors.accent }]}
+                        onPress={() => { setTripEndDate(dateStr); setShowTripEndDatePicker(false); }}
+                      >
+                        <Text style={[styles.dateOptionText, { color: tripEndDate === dateStr ? '#fff' : colors.text }]}>
+                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </ScrollView>
+                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowTripEndDatePicker(false)}>
+                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
       {/* Flight Modal */}
       <Modal visible={activeModal === 'flight'} transparent animationType="slide">
@@ -1213,5 +1399,21 @@ const styles = StyleSheet.create({
   datePickerCloseText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  iconGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  iconOption: {
+    width: 44,
+    height: 44,
+    borderRadius: 10,
+    borderWidth: 2,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconText: {
+    fontSize: 22,
   },
 });

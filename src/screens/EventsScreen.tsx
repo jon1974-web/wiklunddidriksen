@@ -419,7 +419,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <View style={styles.tripCardRow}>
             <View style={styles.tripCardContent}>
               <View style={styles.tripCardTitleRow}>
-                <Text style={styles.tripCardIcon}>✈️</Text>
+                <Text style={styles.tripCardIcon}>{item.icon || '✈️'}</Text>
                 <Text style={[styles.tripCardTitle, { color: colors.text }]}>{item.title}</Text>
               </View>
               <Text style={[styles.tripCardLocation, { color: colors.textSecondary }]}>

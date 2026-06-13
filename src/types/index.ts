@@ -60,6 +60,7 @@ export interface Trip {
   country: string;
   startDate: string;
   endDate: string;
+  icon?: string;
   createdBy: string;
   createdAt: number;
 }
