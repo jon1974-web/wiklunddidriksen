@@ -113,6 +113,10 @@ export interface TripFlight {
   airline?: string;
   flightNumber?: string;
   reference?: string;
+  departureDate?: string;
+  departureTime?: string;
+  arrivalDate?: string;
+  arrivalTime?: string;
   phone?: string;
   note?: string;
   createdAt: number;

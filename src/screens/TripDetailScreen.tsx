@@ -44,7 +44,7 @@ import {
 } from '../services/tripService';
 import { ref, deleteObject } from 'firebase/storage';
 import { storage } from '../services/firebase';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { TripDocumentUpload } from '../components/TripDocumentUpload';
@@ -91,6 +91,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [flightAirline, setFlightAirline] = useState('');
   const [flightNumber, setFlightNumber] = useState('');
   const [flightReference, setFlightReference] = useState('');
+  const [flightDepartureDate, setFlightDepartureDate] = useState('');
+  const [flightDepartureTime, setFlightDepartureTime] = useState('');
+  const [flightArrivalDate, setFlightArrivalDate] = useState('');
+  const [flightArrivalTime, setFlightArrivalTime] = useState('');
   const [flightPhone, setFlightPhone] = useState('');
   const [flightNote, setFlightNote] = useState('');
 
@@ -150,6 +154,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     setFlightAirline('');
     setFlightNumber('');
     setFlightReference('');
+    setFlightDepartureDate('');
+    setFlightDepartureTime('');
+    setFlightArrivalDate('');
+    setFlightArrivalTime('');
     setFlightPhone('');
     setFlightNote('');
     setRestName('');
@@ -208,6 +216,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setFlightAirline(item.airline || '');
       setFlightNumber(item.flightNumber || '');
       setFlightReference(item.reference || '');
+      setFlightDepartureDate(item.departureDate || '');
+      setFlightDepartureTime(item.departureTime || '');
+      setFlightArrivalDate(item.arrivalDate || '');
+      setFlightArrivalTime(item.arrivalTime || '');
       setFlightPhone(item.phone || '');
       setFlightNote(item.note || '');
     } else if (modal === 'restaurant') {
@@ -260,6 +272,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         airline: flightAirline.trim() ? sanitizeInput(flightAirline) : undefined,
         flightNumber: flightNumber.trim() ? sanitizeInput(flightNumber) : undefined,
         reference: flightReference.trim() ? sanitizeInput(flightReference) : undefined,
+        departureDate: flightDepartureDate || undefined,
+        departureTime: flightDepartureTime || undefined,
+        arrivalDate: flightArrivalDate || undefined,
+        arrivalTime: flightArrivalTime || undefined,
         phone: flightPhone.trim() ? sanitizeInput(flightPhone) : undefined,
         note: flightNote.trim() ? sanitizeInput(flightNote) : undefined,
       };
@@ -274,7 +290,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [trip.id, flightAirline, flightNumber, flightReference, flightPhone, flightNote, editingId, loadSubData]);
+  }, [trip.id, flightAirline, flightNumber, flightReference, flightDepartureDate, flightDepartureTime, flightArrivalDate, flightArrivalTime, flightPhone, flightNote, editingId, loadSubData]);
 
   // Restaurant handlers
   const handleSaveRestaurant = useCallback(async () => {
@@ -465,6 +481,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 {f.airline && <Text style={[styles.itemName, { color: colors.text }]}>{f.airline}</Text>}
                 {f.flightNumber && <Text style={[styles.itemDetail, { color: colors.accent }]}>{f.flightNumber}</Text>}
                 {f.reference && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>Ref: {f.reference}</Text>}
+                {(f.departureDate || f.departureTime) && (
+                  <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>
+                    🛫 {[f.departureDate, f.departureTime].filter(Boolean).join(' ')}
+                  </Text>
+                )}
+                {(f.arrivalDate || f.arrivalTime) && (
+                  <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>
+                    🛬 {[f.arrivalDate, f.arrivalTime].filter(Boolean).join(' ')}
+                  </Text>
+                )}
                 {f.phone && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>📞 {f.phone}</Text>}
                 {f.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{f.note}</Text>}
               </View>
@@ -821,6 +847,56 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       placeholderTextColor={colors.textDisabled}
                       autoCapitalize="characters"
                     />
+                  </View>
+                  <View style={styles.flightTimeRow}>
+                    <View style={[styles.flightTimeField, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>Avreisedato</Text>
+                      <TouchableOpacity
+                        style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                        onPress={() => {
+                          setFlightDepartureDate(getTodayLocal());
+                        }}
+                      >
+                        <Text style={{ color: flightDepartureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                          {flightDepartureDate || 'Velg dato'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={[styles.flightTimeField, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>Avreisetid</Text>
+                      <TextInput
+                        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                        value={flightDepartureTime}
+                        onChangeText={setFlightDepartureTime}
+                        placeholder="HH:MM"
+                        placeholderTextColor={colors.textDisabled}
+                      />
+                    </View>
+                  </View>
+                  <View style={styles.flightTimeRow}>
+                    <View style={[styles.flightTimeField, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>Ankomstdato</Text>
+                      <TouchableOpacity
+                        style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                        onPress={() => {
+                          setFlightArrivalDate(getTodayLocal());
+                        }}
+                      >
+                        <Text style={{ color: flightArrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                          {flightArrivalDate || 'Velg dato'}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={[styles.flightTimeField, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>Ankomsttid</Text>
+                      <TextInput
+                        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                        value={flightArrivalTime}
+                        onChangeText={setFlightArrivalTime}
+                        placeholder="HH:MM"
+                        placeholderTextColor={colors.textDisabled}
+                      />
+                    </View>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
@@ -1431,5 +1507,13 @@ const styles = StyleSheet.create({
   },
   iconText: {
     fontSize: 22,
+  },
+  flightTimeRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  flightTimeField: {
+    flex: 1,
   },
 });
