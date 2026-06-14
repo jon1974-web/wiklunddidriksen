@@ -555,11 +555,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     {calDate && (
                       <View style={styles.calendarIcon}>
                         <View style={[styles.calendarTop, { backgroundColor: typeColor }]} />
-                        <View style={styles.calendarDateRow}>
+                        <Text style={[styles.calendarDay, { color: colors.text, textAlign: 'center' }]}>{calDay}</Text>
+                        <Text style={[styles.calendarMonth, { color: colors.textSecondary, textAlign: 'center' }]}>{calMonth}</Text>
+                        <View style={[styles.tileTransportIcon, { color: colors.textSecondary }]}>
                           <Text style={{ fontSize: 14 }}>{transportIcon}</Text>
-                          <Text style={[styles.calendarDay, { color: colors.text }]}>{calDay}</Text>
                         </View>
-                        <Text style={[styles.calendarMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
                       </View>
                     )}
                     <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />
@@ -1852,13 +1852,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 8,
     paddingBottom: 4,
+    position: 'relative',
   },
   calendarDateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    paddingLeft: 6,
-    justifyContent: 'center',
+    alignSelf: 'stretch',
+    paddingHorizontal: 6,
+  },
+  tileTransportIcon: {
+    position: 'absolute',
+    left: 6,
+    top: 32,
   },
   calendarTop: {
     width: '100%',
