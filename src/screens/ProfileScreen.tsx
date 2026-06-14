@@ -464,6 +464,7 @@ export const ProfileScreen: React.FC = () => {
       <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.title, { color: colors.text }]}>👤 Profil</Text>
+        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface, alignItems: 'center' }]}>
@@ -906,6 +907,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+  },
+  familySubtitle: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginTop: 2,
+    marginBottom: 8,
   },
   avatar: {
     width: 100,

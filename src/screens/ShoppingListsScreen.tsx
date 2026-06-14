@@ -21,6 +21,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
   const [modalVisible, setModalVisible] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
   const user = useUserStore((state) => state.user);
+  const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -130,6 +131,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
           <CartIcon size={24} color={colors.accent} />
           <Text style={[styles.title, { color: colors.text, marginLeft: 8 }]}>Handlelister</Text>
         </View>
+        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
       <FlatList
@@ -201,6 +203,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+  },
+  familySubtitle: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginTop: 2,
+    marginBottom: 8,
   },
   listContent: {
     padding: 16,

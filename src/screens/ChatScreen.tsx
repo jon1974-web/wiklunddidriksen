@@ -23,6 +23,7 @@ export const ChatScreen: React.FC = () => {
   const [userAvatars, setUserAvatars] = useState<Record<string, string>>({});
   const flatListRef = useRef<FlatList>(null);
   const user = useUserStore((state) => state.user);
+  const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -207,6 +208,7 @@ export const ChatScreen: React.FC = () => {
       >
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.title, { color: colors.text }]}>💬 Familiechat</Text>
+        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
       <FlatList
@@ -287,6 +289,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+  },
+  familySubtitle: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginTop: 2,
+    marginBottom: 8,
   },
   messagesList: {
     paddingVertical: 8,

@@ -7,6 +7,7 @@ import { getTrips } from '../services/tripService';
 import { formatDate } from '../utils/dateUtils';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { useUserStore } from '../store/userStore';
 
 interface TripsScreenProps {
   navigation: any;
@@ -15,6 +16,7 @@ interface TripsScreenProps {
 export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+  const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
 
   const loadTrips = useCallback(async () => {
@@ -70,6 +72,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <Text style={[styles.screenTitle, { color: colors.text }]}>✈️ Reiser</Text>
+      {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
 
       {loading ? (
         <View style={styles.emptyContainer}>
@@ -111,6 +114,13 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     padding: 16,
     paddingBottom: 8,
+  },
+  familySubtitle: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    paddingHorizontal: 16,
+    marginTop: -4,
+    marginBottom: 8,
   },
   list: {
     padding: 16,

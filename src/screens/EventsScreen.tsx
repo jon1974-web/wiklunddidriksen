@@ -128,6 +128,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
+  const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -584,6 +585,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.title, { color: colors.text }]}>📅 Arrangementer</Text>
+        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
         <View style={styles.viewToggle}>
           <TouchableOpacity
             style={[styles.toggleButton, viewMode === 'list' && { backgroundColor: colors.accent }]}
@@ -719,6 +721,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  familySubtitle: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginTop: -8,
     marginBottom: 12,
   },
   viewToggle: {
