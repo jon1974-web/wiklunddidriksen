@@ -501,6 +501,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           const sorted = [...flights].sort((a, b) => {
             if (a.type === 'utreise' && b.type !== 'utreise') return -1;
             if (a.type !== 'utreise' && b.type === 'utreise') return 1;
+            const dateA = a.departureDate || '';
+            const dateB = b.departureDate || '';
+            if (dateA < dateB) return -1;
+            if (dateA > dateB) return 1;
+            const timeA = a.departureTime || '';
+            const timeB = b.departureTime || '';
+            if (timeA < timeB) return -1;
+            if (timeA > timeB) return 1;
             return 0;
           });
           const rows: TripFlight[][] = [];
