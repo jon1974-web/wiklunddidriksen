@@ -434,3 +434,33 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
   console.log(`checkReminders: ${sent} sent, ${failed} failed, ${notifications.length} total`);
   return { sent, failed, total: notifications.length };
 });
+
+// One-time migration: add familyId to all existing documents
+// Call with ?col=events, ?col=chat, ?col=shoppingLists, ?col=trips
+exports.migrateFamilyId = onRequest({ cors: true, timeoutSeconds: 300, memory: "512MiB" }, async (req, res) => {
+  const FAMILY_ID = "AVCUsb8X6GdRM3f0EBf0";
+  const db = getFirestore();
+  const col = req.query.col;
+
+  if (!col || !["events", "chat", "shoppingLists", "trips"].includes(col)) {
+    return res.status(400).json({ error: "Missing ?col= parameter. Options: events, chat, shoppingLists, trips" });
+  }
+
+  const snapshot = await db.collection(col).get();
+  let updated = 0;
+  const batch = [];
+
+  for (const d of snapshot.docs) {
+    if (d.data().familyId !== FAMILY_ID) {
+      batch.push(d.ref.update({ familyId: FAMILY_ID }));
+      updated++;
+    }
+  }
+
+  // Firestore batch limit is 500
+  for (let i = 0; i < batch.length; i += 500) {
+    await Promise.all(batch.slice(i, i + 500));
+  }
+
+  return { col, total: snapshot.size, updated };
+});
