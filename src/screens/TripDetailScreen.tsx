@@ -527,7 +527,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
                 const depDate = f.departureDate;
                 const arrDate = f.arrivalDate;
-                const sameDay = depDate && arrDate && depDate === arrDate;
                 const calDate = depDate || arrDate;
                 let calDay = '';
                 let calMonth = '';
@@ -569,22 +568,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       {f.driver && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>Fører: {f.driver}</Text>}
                       {f.address && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{f.address}</Text>}
                       <View style={[styles.tileDivider, { backgroundColor: colors.border }]} />
-                      {f.departureDate || f.departureTime ? (
+                      {f.departureTime ? (
                         <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>
-                          {depLabel} {f.departureTime || ''}
-                          {sameDay && f.departureDate ? ` ${f.departureDate}` : ''}
-                          {!sameDay && f.departureDate ? ` ${f.departureDate}` : ''}
+                          {depLabel} {f.departureTime}
                         </Text>
                       ) : null}
-                      {f.arrivalDate || f.arrivalTime ? (
+                      {f.arrivalTime ? (
                         <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>
-                          {arrLabel} {f.arrivalTime || ''}
-                          {sameDay && f.arrivalDate && f.departureDate !== f.arrivalDate ? ` ${f.arrivalDate}` : ''}
+                          {arrLabel} {f.arrivalTime}
                         </Text>
                       ) : null}
-                      {sameDay && calDate && (
-                        <Text style={[styles.tileDate, { color: colors.textDisabled }]}>{calDate}</Text>
-                      )}
                     </View>
                   </TouchableOpacity>
                 );
