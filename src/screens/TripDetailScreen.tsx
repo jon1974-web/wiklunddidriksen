@@ -556,8 +556,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <View style={styles.calendarIcon}>
                         <View style={[styles.calendarTop, { backgroundColor: typeColor }]} />
                         <View style={styles.calendarDateRow}>
-                          <Text style={{ fontSize: 16 }}>{transportIcon}</Text>
+                          <Text style={{ fontSize: 14 }}>{transportIcon}</Text>
                           <Text style={[styles.calendarDay, { color: colors.text }]}>{calDay}</Text>
+                          <View style={{ width: 14 }} />
                         </View>
                         <Text style={[styles.calendarMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
                       </View>
@@ -1868,7 +1869,8 @@ const styles = StyleSheet.create({
   calendarDateRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    justifyContent: 'space-between',
+    paddingHorizontal: 6,
   },
   calendarMonth: {
     fontSize: 12,
