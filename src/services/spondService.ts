@@ -1,6 +1,6 @@
 import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { Platform } from 'react-native';
-import { db } from './firebase';
+import { db, auth } from './firebase';
 import { SpondEvent, SpondGroup, SpondConfig, SpondMember } from '../types';
 
 const SPOND_PROXY_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/spondProxy';
@@ -40,10 +40,21 @@ const clearPersistedToken = (): void => {
   }
 };
 
+const getAuthHeaders = async (): Promise<Record<string, string>> => {
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    const idToken = await currentUser.getIdToken();
+    headers['Authorization'] = `Bearer ${idToken}`;
+  }
+  return headers;
+};
+
 const proxyCall = async (body: Record<string, any>): Promise<any> => {
+  const headers = await getAuthHeaders();
   const response = await fetch(SPOND_PROXY_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers,
     body: JSON.stringify(body),
   });
   const result = await response.json();

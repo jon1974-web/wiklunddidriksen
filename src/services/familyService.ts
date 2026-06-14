@@ -12,28 +12,7 @@ import {
   arrayRemove,
   getDocs,
 } from 'firebase/firestore';
-
-export interface UserProfile {
-  uid: string;
-  email: string;
-  displayName: string;
-  familyId: string | null;
-  familyName: string | null;
-  calendarId: string | null;
-  calendarEmail: string | null;
-  calendarProvider: 'google' | 'outlook' | null;
-  avatarUrl: string | null;
-  notificationsEnabled: boolean;
-  createdAt: number;
-}
-
-export interface Family {
-  id: string;
-  name: string;
-  createdBy: string;
-  members: string[];
-  createdAt: number;
-}
+import { UserProfile, Family } from '../types';
 
 export const createOrUpdateUser = async (uid: string, data: Partial<UserProfile>) => {
   const userRef = doc(db, 'users', uid);

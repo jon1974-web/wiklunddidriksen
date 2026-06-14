@@ -2,19 +2,18 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Platform, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebCalendar } from '../platform/CalendarView';
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, deleteDoc, doc, limit } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { Event, Trip, SpondEvent, SpondRespondent } from '../types';
 import { EventCard } from '../components/EventCard';
 import { SpondResponseModal } from '../components/SpondResponseModal';
-import { sortEventsByDateTime, getWeekNumber, getTodayLocal, formatDate, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
+import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services/spondService';
-import { GOOGLE_MAPS_API_KEY } from '../constants/api';
-import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
+import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
 
 interface EventsScreenProps {
@@ -132,7 +131,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
 
   useEffect(() => {
-    const q = query(collection(db, 'events'), orderBy('date'));
+    const q = query(collection(db, 'events'), orderBy('date'), limit(500));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const eventsData = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -405,12 +404,24 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const currentWeek = useMemo(() => getWeekNumber(new Date(selectedDate)), [selectedDate]);
 
+  const calendarTheme = useMemo(() => ({
+    calendarBackground: colors.surface,
+    textSectionTitleColor: colors.textSecondary,
+    selectedDayBackgroundColor: colors.accent,
+    selectedDayTextColor: '#fff',
+    todayTextColor: colors.accent,
+    dayTextColor: colors.text,
+    textDisabledColor: colors.textDisabled,
+    dotColor: colors.accent,
+    arrowColor: colors.accent,
+    textColor: colors.text,
+    accentColor: colors.accent,
+  }), [colors.surface, colors.textSecondary, colors.accent, colors.text, colors.textDisabled]);
+
   const renderItem = useCallback(({ item }: { item: UnifiedItem }) => {
     if (item._type === 'trip') {
       const locationQuery = item.country ? `${item.city}, ${item.country}` : item.city;
-      const tripMapUrl = item.city
-        ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(locationQuery)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(locationQuery)}&key=${GOOGLE_MAPS_API_KEY}`
-        : null;
+      const tripMapUrl = item.city ? getStaticMapUrl(locationQuery) : null;
       return (
         <TouchableOpacity
           style={[styles.tripCard, { backgroundColor: colors.surface }]}
@@ -432,10 +443,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             {tripMapUrl && (
               <TouchableOpacity
                 style={styles.tripMapContainer}
-                onPress={() => {
-                  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationQuery)}`;
-                  Linking.openURL(url);
-                }}
+                onPress={() => Linking.openURL(getGoogleMapsUrl(locationQuery))}
               >
                 <Image source={{ uri: tripMapUrl }} style={styles.tripMapImage} />
               </TouchableOpacity>
@@ -630,19 +638,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             onMonthChange={handleMonthChange}
             minDate={calendarMinMax.min}
             maxDate={calendarMinMax.max}
-            theme={{
-              calendarBackground: colors.surface,
-              textSectionTitleColor: colors.textSecondary,
-              selectedDayBackgroundColor: colors.accent,
-              selectedDayTextColor: '#fff',
-              todayTextColor: colors.accent,
-              dayTextColor: colors.text,
-              textDisabledColor: colors.textDisabled,
-              dotColor: colors.accent,
-              arrowColor: colors.accent,
-              textColor: colors.text,
-              accentColor: colors.accent,
-            }}
+            theme={calendarTheme}
           />
         </View>
       )}

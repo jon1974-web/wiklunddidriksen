@@ -1,17 +1,17 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useUserStore } from '../store/userStore';
 import { addTrip } from '../services/tripService';
 import { getTodayLocal } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
+import { DatePickerModal } from '../components/DatePickerModal';
+import { TRIP_ICONS } from '../constants/tripIcons';
 
 interface AddTripScreenProps {
   navigation: any;
 }
-
-const TRIP_ICONS = ['✈️', '🏖️', '🏔️', '🏕️', '⛷️', '⛷️', '🚂', '🚗', '🚌', '🚢', '🌍', '🗺️', '⛰️', '🏂', '🏄', '🤿', '🎿', '🏕️', '🎒', '🧳'];
 
 export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   const [title, setTitle] = useState('');
@@ -20,8 +20,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   const [startDate, setStartDate] = useState(getTodayLocal());
   const [endDate, setEndDate] = useState(getTodayLocal());
   const [icon, setIcon] = useState('✈️');
-  const [showStartDatePicker, setShowStartDatePicker] = useState(false);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
+  const [activePicker, setActivePicker] = useState<'start' | 'end' | null>(null);
   const user = useUserStore((state) => state.user);
   const { colors } = useTheme();
 
@@ -118,7 +117,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         <Text style={[styles.label, { color: colors.text }]}>Fra dato</Text>
         <TouchableOpacity
           style={[styles.input, { backgroundColor: colors.surface }]}
-          onPress={() => setShowStartDatePicker(true)}
+          onPress={() => setActivePicker('start')}
         >
           <Text style={[styles.dateText, { color: colors.text }]}>{startDate}</Text>
         </TouchableOpacity>
@@ -128,7 +127,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         <Text style={[styles.label, { color: colors.text }]}>Til dato</Text>
         <TouchableOpacity
           style={[styles.input, { backgroundColor: colors.surface }]}
-          onPress={() => setShowEndDatePicker(true)}
+          onPress={() => setActivePicker('end')}
         >
           <Text style={[styles.dateText, { color: colors.text }]}>{endDate}</Text>
         </TouchableOpacity>
@@ -138,71 +137,14 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         <Text style={styles.buttonText}>Lagre reise</Text>
       </TouchableOpacity>
 
-      <Modal visible={showStartDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowStartDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg startdato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, startDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setStartDate(dateStr); setShowStartDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: startDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowStartDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      <Modal visible={showEndDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowEndDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg sluttdato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, endDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setEndDate(dateStr); setShowEndDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: endDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowEndDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={activePicker === 'start' ? 'Velg startdato' : 'Velg sluttdato'}
+        mode="date"
+        selectedValue={activePicker === 'start' ? startDate : endDate}
+        onSelect={(value) => activePicker === 'start' ? setStartDate(value) : setEndDate(value)}
+        onClose={() => setActivePicker(null)}
+      />
     </ScrollView>
   );
 };
@@ -258,44 +200,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  datePickerContainer: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '70%',
-    paddingBottom: 20,
-  },
-  datePickerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  datePickerScroll: {
-    maxHeight: 400,
-  },
-  dateOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-  },
-  dateOptionText: {
-    fontSize: 16,
-  },
-  datePickerClose: {
-    padding: 16,
-    alignItems: 'center',
-    borderTopWidth: 1,
-  },
-  datePickerCloseText: {
-    fontSize: 16,
     fontWeight: '600',
   },
 });

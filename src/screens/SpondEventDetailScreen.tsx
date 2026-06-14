@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { SpondEvent, SpondRespondent } from '../types';
 import { SpondResponseModal } from '../components/SpondResponseModal';
@@ -6,7 +6,7 @@ import { changeSpondResponse } from '../services/spondService';
 import { useTheme } from '../theme/ThemeContext';
 import { formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { getEventRespondents, getModalRespondents, getSpondStampStatus, SPOND_GROUP_LOGOS } from './EventsScreen';
-import { GOOGLE_MAPS_API_KEY } from '../constants/api';
+import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 interface SpondEventDetailParams {
   event: SpondEvent;
@@ -19,26 +19,24 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const { colors } = useTheme();
   const [responseModal, setResponseModal] = useState<{ type: 'accept' | 'decline' } | null>(null);
 
-  const dateText = (() => {
+  const dateText = useMemo(() => {
     const startStr = formatSpondDate(event.startTimestamp);
     const endStr = event.endTimestamp ? formatSpondDate(event.endTimestamp) : null;
     return endStr && startStr !== endStr ? `${startStr} – ${endStr}` : startStr;
-  })();
+  }, [event.startTimestamp, event.endTimestamp]);
 
-  const timeText = (() => {
+  const timeText = useMemo(() => {
     const startTime = formatSpondTimestamp(event.startTimestamp);
     const endTime = event.endTimestamp ? formatSpondTimestamp(event.endTimestamp) : null;
     return endTime ? `${startTime} – ${endTime}` : startTime;
-  })();
+  }, [event.startTimestamp, event.endTimestamp]);
 
-  const eventRespondents = getEventRespondents(event, spondRespondents);
-  const stampStatus = getSpondStampStatus(event, spondRespondents);
+  const eventRespondents = useMemo(() => getEventRespondents(event, spondRespondents), [event, spondRespondents]);
+  const stampStatus = useMemo(() => getSpondStampStatus(event, spondRespondents), [event, spondRespondents]);
 
-  const mapUrl = event.address
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(event.address)}&zoom=15&size=600x300&markers=color:red%7C${encodeURIComponent(event.address)}&key=${GOOGLE_MAPS_API_KEY}`
-    : null;
+  const mapUrl = useMemo(() => event.address ? getStaticMapUrl(event.address, 15, '600x300') : null, [event.address]);
 
-  const groupLogo = event.groupName ? SPOND_GROUP_LOGOS[event.groupName] : undefined;
+  const groupLogo = useMemo(() => event.groupName ? SPOND_GROUP_LOGOS[event.groupName] : undefined, [event.groupName]);
 
   const handleSendResponse = useCallback(async (memberIds: string[]) => {
     if (!responseModal || !spondConfig) return;
@@ -53,9 +51,15 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
     setResponseModal(null);
   }, [responseModal, spondConfig, event.id]);
 
-  const acceptedNames = stampStatus?.details.filter((d) => d.status === 'accepted') || [];
-  const declinedNames = stampStatus?.details.filter((d) => d.status === 'declined') || [];
-  const unansweredNames = stampStatus?.details.filter((d) => d.status === 'unanswered') || [];
+  const acceptedNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'accepted') || [], [stampStatus]);
+  const declinedNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'declined') || [], [stampStatus]);
+  const unansweredNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'unanswered') || [], [stampStatus]);
+
+  const modalMembers = useMemo(() =>
+    getModalRespondents(event, spondRespondents)
+      .map((r) => ({ id: r.spondId, firstName: r.firstName, lastName: r.lastName })),
+    [event, spondRespondents]
+  );
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -107,7 +111,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       {event.address && mapUrl && (
         <TouchableOpacity
           style={[styles.mapContainer, { backgroundColor: colors.surface }]}
-          onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.address!)}`)}
+          onPress={() => Linking.openURL(getGoogleMapsUrl(event.address!))}
         >
           <Image source={{ uri: mapUrl }} style={styles.mapImage} />
           <Text style={[styles.mapLabel, { color: colors.accent }]}>Åpne i Google Maps →</Text>
@@ -168,8 +172,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
         <SpondResponseModal
           visible={true}
           type={responseModal.type}
-          members={getModalRespondents(event, spondRespondents)
-            .map((r) => ({ id: r.spondId, firstName: r.firstName, lastName: r.lastName }))}
+          members={modalMembers}
           onSend={handleSendResponse}
           onClose={() => setResponseModal(null)}
         />

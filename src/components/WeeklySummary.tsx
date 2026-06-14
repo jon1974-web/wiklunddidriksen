@@ -39,7 +39,7 @@ interface DayItem {
   groupName?: string;
 }
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ visible, onClose, events, trips, spondEvents }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents }) => {
   const { colors } = useTheme();
 
   const weekData = useMemo(() => {
@@ -168,7 +168,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = ({ visible, onClose, 
       </View>
     </Modal>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

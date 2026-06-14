@@ -17,6 +17,7 @@ export interface Event {
   endTime?: string;
   reminderMinutes: number;
   createdBy: string;
+  familyId?: string | null;
   createdAt: number;
   notificationId?: string;
   calendarEventId?: string;
@@ -183,4 +184,26 @@ export interface SpondGroupMember {
   groupName: string;
   profileId?: string;
   childId?: string;
+}
+
+export interface UserProfile {
+  uid: string;
+  email: string;
+  displayName: string;
+  familyId: string | null;
+  familyName: string | null;
+  calendarId: string | null;
+  calendarEmail: string | null;
+  calendarProvider: 'google' | 'outlook' | null;
+  avatarUrl: string | null;
+  notificationsEnabled: boolean;
+  createdAt: number;
+}
+
+export interface Family {
+  id: string;
+  name: string;
+  createdBy: string;
+  members: string[];
+  createdAt: number;
 }

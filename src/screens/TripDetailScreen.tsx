@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -6,15 +6,14 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
   Modal,
   TouchableWithoutFeedback,
   Linking,
-  Image,
   Platform,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
+import { crossAlert } from '../utils/alert';
 import {
   getTripHotels,
   addTripHotel,
@@ -48,15 +47,16 @@ import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { TripDocumentUpload } from '../components/TripDocumentUpload';
-import { GOOGLE_MAPS_API_KEY } from '../constants/api';
-import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
+import { DatePickerModal } from '../components/DatePickerModal';
+import { TransportTile } from '../components/TransportTile';
+import { AddressItemCard } from '../components/AddressItemCard';
+import { TransportFormModal } from '../components/TransportFormModal';
+import { TRIP_ICONS } from '../constants/tripIcons';
 
 interface TripDetailScreenProps {
   navigation: any;
   route: any;
 }
-
-const TRIP_ICONS = ['✈️', '🏖️', '🏔️', '🏕️', '⛷️', '⛷️', '🚂', '🚗', '🚌', '🚢', '🌍', '🗺️', '⛰️', '🏂', '🏄', '🤿', '🎿', '🏕️', '🎒', '🧳'];
 
 type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | 'tripEdit' | null;
 
@@ -79,58 +79,60 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [tripStartDate, setTripStartDate] = useState(trip.startDate);
   const [tripEndDate, setTripEndDate] = useState(trip.endDate);
   const [tripIcon, setTripIcon] = useState(trip.icon || '✈️');
-  const [showTripStartDatePicker, setShowTripStartDatePicker] = useState(false);
-  const [showTripEndDatePicker, setShowTripEndDatePicker] = useState(false);
 
-  // Hotel form
-  const [hotelName, setHotelName] = useState('');
-  const [hotelAddress, setHotelAddress] = useState('');
-  const [hotelPhone, setHotelPhone] = useState('');
+  // Form state (consolidated)
+  const emptyHotel = { name: '', address: '', phone: '' };
+  const emptyFlight = { transportType: 'fly' as 'fly' | 'tog' | 'bil', type: 'utreise' as 'utreise' | 'hjemreise', airline: '', flightNumber: '', reference: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '' };
+  const emptyRest = { name: '', address: '', note: '' };
+  const emptyAct = { name: '', date: '', time: '', address: '', note: '' };
+  const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
+  const emptyLink = { title: '', url: '' };
 
-  // Flight/Transport form
-  const [flightTransportType, setFlightTransportType] = useState<'fly' | 'tog' | 'bil'>('fly');
-  const [flightType, setFlightType] = useState<'utreise' | 'hjemreise'>('utreise');
-  const [flightAirline, setFlightAirline] = useState('');
-  const [flightNumber, setFlightNumber] = useState('');
-  const [flightReference, setFlightReference] = useState('');
-  const [flightWagon, setFlightWagon] = useState('');
-  const [flightDriver, setFlightDriver] = useState('');
-  const [flightPassengers, setFlightPassengers] = useState('');
-  const [flightAddress, setFlightAddress] = useState('');
-  const [flightDepartureDate, setFlightDepartureDate] = useState('');
-  const [flightDepartureTime, setFlightDepartureTime] = useState('');
-  const [flightArrivalDate, setFlightArrivalDate] = useState('');
-  const [flightArrivalTime, setFlightArrivalTime] = useState('');
-  const [flightPhone, setFlightPhone] = useState('');
-  const [flightNote, setFlightNote] = useState('');
-  const [showFlightDepDatePicker, setShowFlightDepDatePicker] = useState(false);
-  const [showFlightArrDatePicker, setShowFlightArrDatePicker] = useState(false);
-  const [showFlightDepTimePicker, setShowFlightDepTimePicker] = useState(false);
-  const [showFlightArrTimePicker, setShowFlightArrTimePicker] = useState(false);
+  const [hotelForm, setHotelForm] = useState(emptyHotel);
+  const [flightForm, setFlightForm] = useState(emptyFlight);
+  const [restForm, setRestForm] = useState(emptyRest);
+  const [actForm, setActForm] = useState(emptyAct);
+  const [docForm, setDocForm] = useState(emptyDoc);
+  const [linkForm, setLinkForm] = useState(emptyLink);
 
-  // Restaurant form
-  const [restName, setRestName] = useState('');
-  const [restAddress, setRestAddress] = useState('');
-  const [restNote, setRestNote] = useState('');
+  // Unified picker state
+  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actDate' | 'actTime' | null;
+  const [activePicker, setActivePicker] = useState<PickerField>(null);
 
-  // Activity form
-  const [actName, setActName] = useState('');
-  const [actDate, setActDate] = useState('');
-  const [actTime, setActTime] = useState('');
-  const [actAddress, setActAddress] = useState('');
-  const [actNote, setActNote] = useState('');
-  const [showActDatePicker, setShowActDatePicker] = useState(false);
-  const [showActTimePicker, setShowActTimePicker] = useState(false);
+  const handlePickerSelect = (value: string) => {
+    if (activePicker === 'tripStart') setTripStartDate(value);
+    else if (activePicker === 'tripEnd') setTripEndDate(value);
+    else if (activePicker === 'flightDepDate') setFlightForm(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'flightArrDate') setFlightForm(f => ({ ...f, arrivalDate: value }));
+    else if (activePicker === 'flightDepTime') setFlightForm(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'flightArrTime') setFlightForm(f => ({ ...f, arrivalTime: value }));
+    else if (activePicker === 'actDate') setActForm(f => ({ ...f, date: value }));
+    else if (activePicker === 'actTime') setActForm(f => ({ ...f, time: value }));
+    setActivePicker(null);
+  };
 
-  // Document form
-  const [docTitle, setDocTitle] = useState('');
-  const [docNote, setDocNote] = useState('');
-  const [docFileUrl, setDocFileUrl] = useState('');
-  const [docFileName, setDocFileName] = useState('');
+  const getPickerTitle = () => {
+    const titles: Record<string, string> = {
+      tripStart: 'Velg startdato', tripEnd: 'Velg sluttdato',
+      flightDepDate: 'Velg avreisedato', flightArrDate: 'Velg ankomstdato',
+      flightDepTime: 'Velg avreisetid', flightArrTime: 'Velg ankomsttid',
+      actDate: 'Velg dato', actTime: 'Velg tid',
+    };
+    return activePicker ? titles[activePicker] : '';
+  };
 
-  // Link form
-  const [linkTitle, setLinkTitle] = useState('');
-  const [linkUrl, setLinkUrl] = useState('');
+  const getPickerValue = () => {
+    const values: Record<string, string> = {
+      tripStart: tripStartDate, tripEnd: tripEndDate,
+      flightDepDate: flightForm.departureDate, flightArrDate: flightForm.arrivalDate,
+      flightDepTime: flightForm.departureTime, flightArrTime: flightForm.arrivalTime,
+      actDate: actForm.date, actTime: actForm.time,
+    };
+    return activePicker ? values[activePicker] || '' : '';
+  };
+
+  const isDatePicker = activePicker && activePicker.includes('Date') || activePicker === 'tripStart' || activePicker === 'tripEnd';
+  const isTimePicker = activePicker && activePicker.includes('Time');
 
   const loadSubData = useCallback(async () => {
     try {
@@ -149,7 +151,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setDocuments(d);
       setLinks(l);
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
   }, [trip.id]);
 
@@ -158,48 +160,22 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   }, [loadSubData]);
 
   const resetForms = () => {
-    setHotelName('');
-    setHotelAddress('');
-    setHotelPhone('');
-    setFlightTransportType('fly');
-    setFlightType('utreise');
-    setFlightAirline('');
-    setFlightNumber('');
-    setFlightReference('');
-    setFlightWagon('');
-    setFlightDriver('');
-    setFlightPassengers('');
-    setFlightAddress('');
-    setFlightDepartureDate('');
-    setFlightDepartureTime('');
-    setFlightArrivalDate('');
-    setFlightArrivalTime('');
-    setFlightPhone('');
-    setFlightNote('');
-    setRestName('');
-    setRestAddress('');
-    setRestNote('');
-    setActName('');
-    setActDate('');
-    setActTime('');
-    setActAddress('');
-    setActNote('');
-    setDocTitle('');
-    setDocNote('');
-    setDocFileUrl('');
-    setDocFileName('');
-    setLinkTitle('');
-    setLinkUrl('');
+    setHotelForm(emptyHotel);
+    setFlightForm(emptyFlight);
+    setRestForm(emptyRest);
+    setActForm(emptyAct);
+    setDocForm(emptyDoc);
+    setLinkForm(emptyLink);
     setEditingId(null);
   };
 
   const handleSaveTripEdit = useCallback(async () => {
     if (!tripTitle.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en tittel');
+      crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
     if (tripEndDate < tripStartDate) {
-      Alert.alert('Error', 'Sluttdato kan ikke være før startdato');
+      crossAlert('Error', 'Sluttdato kan ikke være før startdato');
       return;
     }
     try {
@@ -212,7 +188,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setTrip({ ...trip, title: tripTitle, startDate: tripStartDate, endDate: tripEndDate, icon: tripIcon });
       setActiveModal(null);
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
   }, [trip, tripTitle, tripStartDate, tripEndDate, tripIcon]);
 
@@ -225,55 +201,45 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     resetForms();
     setEditingId(item.id);
     if (modal === 'hotel') {
-      setHotelName(item.name || '');
-      setHotelAddress(item.address || '');
-      setHotelPhone(item.phone || '');
+      setHotelForm({ name: item.name || '', address: item.address || '', phone: item.phone || '' });
     } else if (modal === 'flight') {
-      setFlightTransportType(item.transportType || 'fly');
-      setFlightType(item.type || 'utreise');
-      setFlightAirline(item.airline || '');
-      setFlightNumber(item.flightNumber || '');
-      setFlightReference(item.reference || '');
-      setFlightWagon(item.wagon || '');
-      setFlightDriver(item.driver || '');
-      setFlightPassengers(item.passengers || '');
-      setFlightAddress(item.address || '');
-      setFlightDepartureDate(item.departureDate || '');
-      setFlightDepartureTime(item.departureTime || '');
-      setFlightArrivalDate(item.arrivalDate || '');
-      setFlightArrivalTime(item.arrivalTime || '');
-      setFlightPhone(item.phone || '');
-      setFlightNote(item.note || '');
+      setFlightForm({
+        transportType: item.transportType || 'fly',
+        type: item.type || 'utreise',
+        airline: item.airline || '',
+        flightNumber: item.flightNumber || '',
+        reference: item.reference || '',
+        wagon: item.wagon || '',
+        driver: item.driver || '',
+        passengers: item.passengers || '',
+        address: item.address || '',
+        departureDate: item.departureDate || '',
+        departureTime: item.departureTime || '',
+        arrivalDate: item.arrivalDate || '',
+        arrivalTime: item.arrivalTime || '',
+        phone: item.phone || '',
+        note: item.note || '',
+      });
     } else if (modal === 'restaurant') {
-      setRestName(item.name || '');
-      setRestAddress(item.address || '');
-      setRestNote(item.note || '');
+      setRestForm({ name: item.name || '', address: item.address || '', note: item.note || '' });
     } else if (modal === 'activity') {
-      setActName(item.name || '');
-      setActDate(item.date || '');
-      setActTime(item.time || '');
-      setActAddress(item.address || '');
-      setActNote(item.note || '');
+      setActForm({ name: item.name || '', date: item.date || '', time: item.time || '', address: item.address || '', note: item.note || '' });
     } else if (modal === 'document') {
-      setDocTitle(item.title || '');
-      setDocNote(item.note || '');
-      setDocFileUrl(item.fileUrl || '');
-      setDocFileName(item.fileName || '');
+      setDocForm({ title: item.title || '', note: item.note || '', fileUrl: item.fileUrl || '', fileName: item.fileName || '' });
     } else if (modal === 'link') {
-      setLinkTitle(item.title || '');
-      setLinkUrl(item.url || '');
+      setLinkForm({ title: item.title || '', url: item.url || '' });
     }
     setActiveModal(modal);
   };
 
   // Hotel handlers
   const handleSaveHotel = useCallback(async () => {
-    if (!hotelName.trim()) {
-      Alert.alert('Error', 'Vennligst skriv et navn');
+    if (!hotelForm.name.trim()) {
+      crossAlert('Error', 'Vennligst skriv et navn');
       return;
     }
     try {
-      const data = { name: sanitizeInput(hotelName), address: hotelAddress.trim() ? sanitizeInput(hotelAddress) : undefined, phone: hotelPhone.trim() ? sanitizeInput(hotelPhone) : undefined };
+      const data = { name: sanitizeInput(hotelForm.name), address: hotelForm.address.trim() ? sanitizeInput(hotelForm.address) : undefined, phone: hotelForm.phone.trim() ? sanitizeInput(hotelForm.phone) : undefined };
       if (editingId) {
         await updateTripHotel(trip.id, editingId, data);
       } else {
@@ -283,29 +249,29 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip.id, hotelName, hotelAddress, hotelPhone, editingId, loadSubData]);
+  }, [trip.id, hotelForm, editingId, loadSubData]);
 
   // Flight handlers
   const handleSaveFlight = useCallback(async () => {
     try {
       const data = {
-        transportType: flightTransportType,
-        type: flightType,
-        airline: flightAirline.trim() ? sanitizeInput(flightAirline) : undefined,
-        flightNumber: flightNumber.trim() ? sanitizeInput(flightNumber) : undefined,
-        reference: flightReference.trim() ? sanitizeInput(flightReference) : undefined,
-        wagon: flightWagon.trim() ? sanitizeInput(flightWagon) : undefined,
-        driver: flightDriver.trim() ? sanitizeInput(flightDriver) : undefined,
-        passengers: flightPassengers.trim() ? sanitizeInput(flightPassengers) : undefined,
-        address: flightAddress.trim() ? sanitizeInput(flightAddress) : undefined,
-        departureDate: flightDepartureDate || undefined,
-        departureTime: flightDepartureTime || undefined,
-        arrivalDate: flightArrivalDate || undefined,
-        arrivalTime: flightArrivalTime || undefined,
-        phone: flightPhone.trim() ? sanitizeInput(flightPhone) : undefined,
-        note: flightNote.trim() ? sanitizeInput(flightNote) : undefined,
+        transportType: flightForm.transportType,
+        type: flightForm.type,
+        airline: flightForm.airline.trim() ? sanitizeInput(flightForm.airline) : undefined,
+        flightNumber: flightForm.flightNumber.trim() ? sanitizeInput(flightForm.flightNumber) : undefined,
+        reference: flightForm.reference.trim() ? sanitizeInput(flightForm.reference) : undefined,
+        wagon: flightForm.wagon.trim() ? sanitizeInput(flightForm.wagon) : undefined,
+        driver: flightForm.driver.trim() ? sanitizeInput(flightForm.driver) : undefined,
+        passengers: flightForm.passengers.trim() ? sanitizeInput(flightForm.passengers) : undefined,
+        address: flightForm.address.trim() ? sanitizeInput(flightForm.address) : undefined,
+        departureDate: flightForm.departureDate || undefined,
+        departureTime: flightForm.departureTime || undefined,
+        arrivalDate: flightForm.arrivalDate || undefined,
+        arrivalTime: flightForm.arrivalTime || undefined,
+        phone: flightForm.phone.trim() ? sanitizeInput(flightForm.phone) : undefined,
+        note: flightForm.note.trim() ? sanitizeInput(flightForm.note) : undefined,
       };
       if (editingId) {
         await updateTripFlight(trip.id, editingId, data);
@@ -316,18 +282,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip.id, flightTransportType, flightType, flightAirline, flightNumber, flightReference, flightWagon, flightDriver, flightPassengers, flightAddress, flightDepartureDate, flightDepartureTime, flightArrivalDate, flightArrivalTime, flightPhone, flightNote, editingId, loadSubData]);
+  }, [trip.id, flightForm, editingId, loadSubData]);
 
   // Restaurant handlers
   const handleSaveRestaurant = useCallback(async () => {
-    if (!restName.trim()) {
-      Alert.alert('Error', 'Vennligst skriv et navn');
+    if (!restForm.name.trim()) {
+      crossAlert('Error', 'Vennligst skriv et navn');
       return;
     }
     try {
-      const data = { name: sanitizeInput(restName), address: restAddress.trim() ? sanitizeInput(restAddress) : undefined, note: restNote.trim() ? sanitizeInput(restNote) : undefined };
+      const data = { name: sanitizeInput(restForm.name), address: restForm.address.trim() ? sanitizeInput(restForm.address) : undefined, note: restForm.note.trim() ? sanitizeInput(restForm.note) : undefined };
       if (editingId) {
         await updateTripRestaurant(trip.id, editingId, data);
       } else {
@@ -337,18 +303,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip.id, restName, restAddress, restNote, editingId, loadSubData]);
+  }, [trip.id, restForm, editingId, loadSubData]);
 
   // Activity handlers
   const handleSaveActivity = useCallback(async () => {
-    if (!actName.trim()) {
-      Alert.alert('Error', 'Vennligst skriv et navn');
+    if (!actForm.name.trim()) {
+      crossAlert('Error', 'Vennligst skriv et navn');
       return;
     }
     try {
-      const data = { name: sanitizeInput(actName), date: actDate || undefined, time: actTime || undefined, address: actAddress.trim() ? sanitizeInput(actAddress) : undefined, note: actNote.trim() ? sanitizeInput(actNote) : undefined };
+      const data = { name: sanitizeInput(actForm.name), date: actForm.date || undefined, time: actForm.time || undefined, address: actForm.address.trim() ? sanitizeInput(actForm.address) : undefined, note: actForm.note.trim() ? sanitizeInput(actForm.note) : undefined };
       if (editingId) {
         await updateTripActivity(trip.id, editingId, data);
       } else {
@@ -358,29 +324,29 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip.id, actName, actDate, actTime, actAddress, actNote, editingId, loadSubData]);
+  }, [trip.id, actForm, editingId, loadSubData]);
 
   // Document handlers
   const handleSaveDocument = useCallback(async () => {
-    if (!docTitle.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en tittel');
+    if (!docForm.title.trim()) {
+      crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
     try {
       if (editingId) {
         const oldDoc = documents.find(d => d.id === editingId);
-        if (oldDoc?.fileUrl && oldDoc.fileUrl !== docFileUrl) {
+        if (oldDoc?.fileUrl && oldDoc.fileUrl !== docForm.fileUrl) {
           try {
             const oldRef = ref(storage, oldDoc.fileUrl);
             await deleteObject(oldRef);
           } catch (e) {
-            console.log('Could not delete old file:', e);
+            // Old file deletion failed — non-critical, continue with save
           }
         }
       }
-      const data = { title: sanitizeInput(docTitle), note: docNote.trim() ? sanitizeInput(docNote) : undefined, fileUrl: docFileUrl || undefined, fileName: docFileName || undefined };
+      const data = { title: sanitizeInput(docForm.title), note: docForm.note.trim() ? sanitizeInput(docForm.note) : undefined, fileUrl: docForm.fileUrl || undefined, fileName: docForm.fileName || undefined };
       if (editingId) {
         await updateTripDocument(trip.id, editingId, data);
       } else {
@@ -390,22 +356,22 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip.id, docTitle, docNote, docFileUrl, docFileName, editingId, loadSubData, documents]);
+  }, [trip.id, docForm, editingId, loadSubData, documents]);
 
   // Link handlers
   const handleSaveLink = useCallback(async () => {
-    if (!linkTitle.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en tittel');
+    if (!linkForm.title.trim()) {
+      crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
-    if (!linkUrl.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en URL');
+    if (!linkForm.url.trim()) {
+      crossAlert('Error', 'Vennligst skriv en URL');
       return;
     }
     try {
-      const data = { title: sanitizeInput(linkTitle), url: linkUrl.trim() };
+      const data = { title: sanitizeInput(linkForm.title), url: linkForm.url.trim() };
       if (editingId) {
         await updateTripLink(trip.id, editingId, data);
       } else {
@@ -415,13 +381,13 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip.id, linkTitle, linkUrl, editingId, loadSubData]);
+  }, [trip.id, linkForm, editingId, loadSubData]);
 
   // Delete handlers
   const confirmDelete = (title: string, onConfirm: () => void) => {
-    Alert.alert(`Slett ${title}`, 'Er du sikker?', [
+    crossAlert(`Slett ${title}`, 'Er du sikker?', [
       { text: 'Avbryt', style: 'cancel' },
       { text: 'Slett', style: 'destructive', onPress: onConfirm },
     ]);
@@ -445,12 +411,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     </View>
   );
 
-  const timeOptions = Array.from({ length: 48 }, (_, i) => {
-    const h = Math.floor(i / 2);
-    const m = (i % 2) * 30;
-    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-  });
-
   const openFileUrl = async (url: string) => {
     if (Platform.OS === 'web') {
       try {
@@ -465,6 +425,40 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       Linking.openURL(url);
     }
   };
+
+  const sortedTransportRows = useMemo(() => {
+    const sorted = [...flights].sort((a, b) => {
+      if (a.type === 'utreise' && b.type !== 'utreise') return -1;
+      if (a.type !== 'utreise' && b.type === 'utreise') return 1;
+      const dateA = a.departureDate || '';
+      const dateB = b.departureDate || '';
+      if (dateA < dateB) return -1;
+      if (dateA > dateB) return 1;
+      const timeA = a.departureTime || '';
+      const timeB = b.departureTime || '';
+      if (timeA < timeB) return -1;
+      if (timeA > timeB) return 1;
+      return 0;
+    });
+    const rows: TripFlight[][] = [];
+    let i = 0;
+    while (i < sorted.length) {
+      const current = sorted[i];
+      if (current.type === 'utreise') {
+        const match = sorted.findIndex((s, idx) => idx > i && s.type === 'hjemreise');
+        if (match !== -1) {
+          rows.push([current, sorted[match]]);
+          sorted.splice(match, 1);
+        } else {
+          rows.push([current]);
+        }
+      } else {
+        rows.push([current]);
+      }
+      i++;
+    }
+    return rows;
+  }, [flights]);
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -497,104 +491,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {flights.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen transport lagt til</Text>
       ) : (
-        (() => {
-          const sorted = [...flights].sort((a, b) => {
-            if (a.type === 'utreise' && b.type !== 'utreise') return -1;
-            if (a.type !== 'utreise' && b.type === 'utreise') return 1;
-            const dateA = a.departureDate || '';
-            const dateB = b.departureDate || '';
-            if (dateA < dateB) return -1;
-            if (dateA > dateB) return 1;
-            const timeA = a.departureTime || '';
-            const timeB = b.departureTime || '';
-            if (timeA < timeB) return -1;
-            if (timeA > timeB) return 1;
-            return 0;
-          });
-          const rows: TripFlight[][] = [];
-          let i = 0;
-          while (i < sorted.length) {
-            const current = sorted[i];
-            if (current.type === 'utreise') {
-              const match = sorted.findIndex((s, idx) => idx > i && s.type === 'hjemreise');
-              if (match !== -1) {
-                rows.push([current, sorted[match]]);
-                sorted.splice(match, 1);
-              } else {
-                rows.push([current]);
-              }
-            } else {
-              rows.push([current]);
-            }
-            i++;
-          }
-          return rows.map((row, rowIdx) => (
-            <View key={rowIdx} style={styles.transportGrid}>
-              {row.map((f) => {
-                const transportIcon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
-                const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
-                const depDate = f.departureDate;
-                const arrDate = f.arrivalDate;
-                const calDate = depDate || arrDate;
-                let calDay = '';
-                let calMonth = '';
-                if (calDate) {
-                  const d = new Date(calDate + 'T12:00:00');
-                  calDay = String(d.getDate());
-                  calMonth = d.toLocaleDateString('nb-NO', { month: 'short' });
-                }
-                const depLabel = f.transportType === 'bil' ? '🔑' : '🛫';
-                const arrLabel = f.transportType === 'bil' ? '📋' : '🛬';
-                return (
-                  <TouchableOpacity
-                    key={f.id}
-                    style={[styles.transportTile, { backgroundColor: colors.surface, borderLeftColor: typeColor }]}
-                    onPress={() => openEditModal('flight', f)}
-                    onLongPress={() => handleDeleteFlight(f.id)}
-                  >
-                    {calDate && (
-                      <View style={styles.calendarIcon}>
-                        <View style={[styles.calendarTop, { backgroundColor: typeColor }]} />
-                        <Text style={[styles.calendarDay, { color: colors.text, textAlign: 'center' }]}>{calDay}</Text>
-                        <Text style={[styles.calendarMonth, { color: colors.textSecondary, textAlign: 'center' }]}>{calMonth}</Text>
-                        <View style={[styles.tileTransportIcon, { color: colors.textSecondary }]}>
-                          <Text style={{ fontSize: 20 }}>{transportIcon}</Text>
-                        </View>
-                      </View>
-                    )}
-                    <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />
-                    <View style={styles.tileContent}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                        {f.type && (
-                          <Text style={{ color: typeColor, fontWeight: '600', fontSize: 12 }}>
-                            {f.type === 'utreise' ? 'Utreise' : 'Hjemreise'}
-                          </Text>
-                        )}
-                      </View>
-                      {f.airline && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{f.airline}</Text>}
-                      {f.flightNumber && <Text style={[styles.tileDetail, { color: colors.accent }]}>{f.flightNumber}</Text>}
-                      {f.reference && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>Ref: {f.reference}</Text>}
-                      {f.wagon && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>{f.wagon}</Text>}
-                      {f.driver && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>Fører: {f.driver}</Text>}
-                      {f.address && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{f.address}</Text>}
-                      <View style={[styles.tileDivider, { backgroundColor: colors.border }]} />
-                      {f.departureTime ? (
-                        <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>
-                          {depLabel} {f.departureTime}
-                        </Text>
-                      ) : null}
-                      {f.arrivalTime ? (
-                        <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>
-                          {arrLabel} {f.arrivalTime}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          ));
-        })()
+        sortedTransportRows.map((row, rowIdx) => (
+          <View key={rowIdx} style={styles.transportGrid}>
+            {row.map((f) => (
+              <TransportTile
+                key={f.id}
+                flight={f}
+                onPress={() => openEditModal('flight', f)}
+                onLongPress={() => handleDeleteFlight(f.id)}
+              />
+            ))}
+          </View>
+        ))
       )}
 
       {/* Hotels */}
@@ -602,35 +510,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {hotels.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen hoteller lagt til</Text>
       ) : (
-        hotels.map((h) => {
-          const hotelMapUrl = h.address
-            ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(h.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(h.address)}&key=${GOOGLE_MAPS_API_KEY}`
-            : null;
-          return (
-            <TouchableOpacity
-              key={h.id}
-              style={[styles.itemCard, { backgroundColor: colors.surface }]}
-              onPress={() => openEditModal('hotel', h)}
-              onLongPress={() => handleDeleteHotel(h.id)}
-            >
-              <View style={styles.itemRow}>
-                <View style={styles.itemContent}>
-                  <Text style={[styles.itemName, { color: colors.text }]}>{h.name}</Text>
-                  {h.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{h.address}</Text>}
-                  {h.phone && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{h.phone}</Text>}
-                </View>
-                {hotelMapUrl && (
-                  <TouchableOpacity
-                    style={styles.itemMapContainer}
-                    onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(h.address!)}`)}
-                  >
-                    <Image source={{ uri: hotelMapUrl }} style={styles.itemMapImage} />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </TouchableOpacity>
-          );
-        })
+        hotels.map((h) => (
+          <AddressItemCard
+            key={h.id}
+            name={h.name}
+            address={h.address}
+            detail={h.phone}
+            onPress={() => openEditModal('hotel', h)}
+            onLongPress={() => handleDeleteHotel(h.id)}
+          />
+        ))
       )}
 
       {/* Restaurants */}
@@ -638,35 +527,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {restaurants.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen restauranter lagt til</Text>
       ) : (
-        restaurants.map((r) => {
-          const restMapUrl = r.address
-            ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(r.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(r.address)}&key=${GOOGLE_MAPS_API_KEY}`
-            : null;
-          return (
-            <TouchableOpacity
-              key={r.id}
-              style={[styles.itemCard, { backgroundColor: colors.surface }]}
-              onPress={() => openEditModal('restaurant', r)}
-              onLongPress={() => handleDeleteRestaurant(r.id)}
-            >
-              <View style={styles.itemRow}>
-                <View style={styles.itemContent}>
-                  <Text style={[styles.itemName, { color: colors.text }]}>{r.name}</Text>
-                  {r.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{r.address}</Text>}
-                  {r.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{r.note}</Text>}
-                </View>
-                {restMapUrl && (
-                  <TouchableOpacity
-                    style={styles.itemMapContainer}
-                    onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(r.address!)}`)}
-                  >
-                    <Image source={{ uri: restMapUrl }} style={styles.itemMapImage} />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </TouchableOpacity>
-          );
-        })
+        restaurants.map((r) => (
+          <AddressItemCard
+            key={r.id}
+            name={r.name}
+            address={r.address}
+            note={r.note}
+            onPress={() => openEditModal('restaurant', r)}
+            onLongPress={() => handleDeleteRestaurant(r.id)}
+          />
+        ))
       )}
 
       {/* Activities */}
@@ -674,40 +544,17 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {activities.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen aktiviteter lagt til</Text>
       ) : (
-        activities.map((a) => {
-          const actMapUrl = a.address
-            ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(a.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(a.address)}&key=${GOOGLE_MAPS_API_KEY}`
-            : null;
-          return (
-            <TouchableOpacity
-              key={a.id}
-              style={[styles.itemCard, { backgroundColor: colors.surface }]}
-              onPress={() => openEditModal('activity', a)}
-              onLongPress={() => handleDeleteActivity(a.id)}
-            >
-              <View style={styles.itemRow}>
-                <View style={styles.itemContent}>
-                  <Text style={[styles.itemName, { color: colors.text }]}>{a.name}</Text>
-                  {(a.date || a.time) && (
-                    <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>
-                      {[a.date, a.time].filter(Boolean).join(' ')}
-                    </Text>
-                  )}
-                  {a.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{a.address}</Text>}
-                  {a.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{a.note}</Text>}
-                </View>
-                {actMapUrl && (
-                  <TouchableOpacity
-                    style={styles.itemMapContainer}
-                    onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(a.address!)}`)}
-                  >
-                    <Image source={{ uri: actMapUrl }} style={styles.itemMapImage} />
-                  </TouchableOpacity>
-                )}
-              </View>
-            </TouchableOpacity>
-          );
-        })
+        activities.map((a) => (
+          <AddressItemCard
+            key={a.id}
+            name={a.name}
+            address={a.address}
+            detail={(a.date || a.time) ? [a.date, a.time].filter(Boolean).join(' ') : undefined}
+            note={a.note}
+            onPress={() => openEditModal('activity', a)}
+            onLongPress={() => handleDeleteActivity(a.id)}
+          />
+        ))
       )}
 
       {/* Documents */}
@@ -803,7 +650,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Fra dato</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                      onPress={() => setShowTripStartDatePicker(true)}
+                      onPress={() => setActivePicker('tripStart')}
                     >
                       <Text style={{ color: tripStartDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
                         {tripStartDate || 'Velg startdato'}
@@ -815,7 +662,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Til dato</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                      onPress={() => setShowTripEndDatePicker(true)}
+                      onPress={() => setActivePicker('tripEnd')}
                     >
                       <Text style={{ color: tripEndDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
                         {tripEndDate || 'Velg sluttdato'}
@@ -837,408 +684,17 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Trip Start Date Picker */}
-      <Modal visible={showTripStartDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowTripStartDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg startdato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, tripStartDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setTripStartDate(dateStr); setShowTripStartDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: tripStartDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowTripStartDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      {/* Trip End Date Picker */}
-      <Modal visible={showTripEndDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowTripEndDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg sluttdato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, tripEndDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setTripEndDate(dateStr); setShowTripEndDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: tripEndDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowTripEndDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
       {/* Transport Modal */}
-      <Modal visible={activeModal === 'flight'} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                  {editingId ? 'Rediger transport' : 'Legg til transport'}
-                </Text>
-                <ScrollView style={styles.modalScroll}>
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Transporttype</Text>
-                    <View style={styles.flightTypeRow}>
-                      {(['fly', 'tog', 'bil'] as const).map((tt) => (
-                        <TouchableOpacity
-                          key={tt}
-                          style={[styles.flightTypeOption, { backgroundColor: flightTransportType === tt ? colors.accent : colors.inputBackground }]}
-                          onPress={() => setFlightTransportType(tt)}
-                        >
-                          <Text style={[styles.flightTypeText, { color: flightTransportType === tt ? '#fff' : colors.text }]}>
-                            {tt === 'fly' ? '✈️ Fly' : tt === 'tog' ? '🚆 Tog' : '🚗 Bil'}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-                  <View style={styles.flightTypeRow}>
-                    <TouchableOpacity
-                      style={[styles.flightTypeOption, { backgroundColor: flightType === 'utreise' ? colors.accent : colors.inputBackground }]}
-                      onPress={() => setFlightType('utreise')}
-                    >
-                      <Text style={[styles.flightTypeText, { color: flightType === 'utreise' ? '#fff' : colors.text }]}>
-                        {flightTransportType === 'bil' ? '🔑 Henting' : '🛫 Utreise'}
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[styles.flightTypeOption, { backgroundColor: flightType === 'hjemreise' ? '#E53935' : colors.inputBackground }]}
-                      onPress={() => setFlightType('hjemreise')}
-                    >
-                      <Text style={[styles.flightTypeText, { color: flightType === 'hjemreise' ? '#fff' : colors.text }]}>
-                        {flightTransportType === 'bil' ? '📋 Levering' : '🛬 Hjemreise'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>
-                      {flightTransportType === 'fly' ? 'Flyselskap' : flightTransportType === 'tog' ? 'Togoperatør' : 'Utleieselskap'}
-                    </Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={flightAirline}
-                      onChangeText={setFlightAirline}
-                      placeholder={flightTransportType === 'fly' ? 'F.eks. Norwegian, SAS' : flightTransportType === 'tog' ? 'F.eks. Vy, SJ' : 'F.eks. Hertz, Avis'}
-                      placeholderTextColor={colors.textDisabled}
-                    />
-                  </View>
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>
-                      {flightTransportType === 'fly' ? 'Flightnummer' : flightTransportType === 'tog' ? 'Togrute' : 'Registreringsnummer'}
-                    </Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={flightNumber}
-                      onChangeText={setFlightNumber}
-                      placeholder={flightTransportType === 'fly' ? 'F.eks. DY1234' : flightTransportType === 'tog' ? 'F.eks. 521, 71' : 'F.eks. AB 12345'}
-                      placeholderTextColor={colors.textDisabled}
-                      autoCapitalize={flightTransportType === 'bil' ? 'characters' : 'none'}
-                    />
-                  </View>
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>
-                      {flightTransportType === 'fly' ? 'Referanse (PNR)' : 'Referansenr'}
-                    </Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={flightReference}
-                      onChangeText={setFlightReference}
-                      placeholder="F.eks. ABC123"
-                      placeholderTextColor={colors.textDisabled}
-                      autoCapitalize="characters"
-                    />
-                  </View>
-                  {flightTransportType === 'tog' && (
-                    <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>Vogn og plass</Text>
-                      <TextInput
-                        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                        value={flightWagon}
-                        onChangeText={setFlightWagon}
-                        placeholder="F.eks. Vogn 3, Plass 22"
-                        placeholderTextColor={colors.textDisabled}
-                      />
-                    </View>
-                  )}
-                  {flightTransportType === 'bil' && (
-                    <>
-                      <View style={styles.field}>
-                        <Text style={[styles.label, { color: colors.text }]}>Fører</Text>
-                        <TextInput
-                          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                          value={flightDriver}
-                          onChangeText={setFlightDriver}
-                          placeholder="Navn på fører"
-                          placeholderTextColor={colors.textDisabled}
-                        />
-                      </View>
-                      <View style={styles.field}>
-                        <Text style={[styles.label, { color: colors.text }]}>Adresse</Text>
-                        <GooglePlacesInput
-                          value={flightAddress}
-                          onChangeText={setFlightAddress}
-                          placeholder="Søk etter adresse..."
-                          onSelect={setFlightAddress}
-                        />
-                      </View>
-                    </>
-                  )}
-                  <View style={styles.flightTimeRow}>
-                    <View style={[styles.flightTimeField, { flex: 1 }]}>
-                      <Text style={[styles.label, { color: colors.text }]}>
-                        {flightTransportType === 'bil' ? 'Hentedato' : 'Avreisedato'}
-                      </Text>
-                      <TouchableOpacity
-                        style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                        onPress={() => setShowFlightDepDatePicker(true)}
-                      >
-                        <Text style={{ color: flightDepartureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                          {flightDepartureDate || 'Velg dato'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={[styles.flightTimeField, { flex: 1 }]}>
-                      <Text style={[styles.label, { color: colors.text }]}>
-                        {flightTransportType === 'bil' ? 'Hentetid' : 'Avreisetid'}
-                      </Text>
-                      <TouchableOpacity
-                        style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                        onPress={() => setShowFlightDepTimePicker(true)}
-                      >
-                        <Text style={{ color: flightDepartureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                          {flightDepartureTime || 'Velg tid'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <View style={styles.flightTimeRow}>
-                    <View style={[styles.flightTimeField, { flex: 1 }]}>
-                      <Text style={[styles.label, { color: colors.text }]}>
-                        {flightTransportType === 'bil' ? 'Leveringsdato' : 'Ankomstdato'}
-                      </Text>
-                      <TouchableOpacity
-                        style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                        onPress={() => setShowFlightArrDatePicker(true)}
-                      >
-                        <Text style={{ color: flightArrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                          {flightArrivalDate || 'Velg dato'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                    <View style={[styles.flightTimeField, { flex: 1 }]}>
-                      <Text style={[styles.label, { color: colors.text }]}>
-                        {flightTransportType === 'bil' ? 'Leveringstid' : 'Ankomsttid'}
-                      </Text>
-                      <TouchableOpacity
-                        style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                        onPress={() => setShowFlightArrTimePicker(true)}
-                      >
-                        <Text style={{ color: flightArrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                          {flightArrivalTime || 'Velg tid'}
-                        </Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={flightPhone}
-                      onChangeText={setFlightPhone}
-                      placeholder="F.eks. +47 000 00 000"
-                      placeholderTextColor={colors.textDisabled}
-                      keyboardType="phone-pad"
-                    />
-                  </View>
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Notater</Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={flightNote}
-                      onChangeText={setFlightNote}
-                      placeholder="F.eks. Utreise, retur, bagasje..."
-                      placeholderTextColor={colors.textDisabled}
-                    />
-                  </View>
-                </ScrollView>
-                <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
-                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveFlight}>
-                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      {/* Flight Departure Date Picker */}
-      <Modal visible={showFlightDepDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowFlightDepDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg avreisedato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, flightDepartureDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setFlightDepartureDate(dateStr); setShowFlightDepDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: flightDepartureDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowFlightDepDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      {/* Flight Departure Time Picker */}
-      <Modal visible={showFlightDepTimePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowFlightDepTimePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg avreisetid</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {timeOptions.map((t) => (
-                    <TouchableOpacity
-                      key={t}
-                      style={[styles.dateOption, { borderBottomColor: colors.border }, flightDepartureTime === t && { backgroundColor: colors.accent }]}
-                      onPress={() => { setFlightDepartureTime(t); setShowFlightDepTimePicker(false); }}
-                    >
-                      <Text style={[styles.dateOptionText, { color: flightDepartureTime === t ? '#fff' : colors.text }]}>
-                        {t}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowFlightDepTimePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      {/* Flight Arrival Date Picker */}
-      <Modal visible={showFlightArrDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowFlightArrDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg ankomstdato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, flightArrivalDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setFlightArrivalDate(dateStr); setShowFlightArrDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: flightArrivalDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowFlightArrDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      {/* Flight Arrival Time Picker */}
-      <Modal visible={showFlightArrTimePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowFlightArrTimePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg ankomsttid</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {timeOptions.map((t) => (
-                    <TouchableOpacity
-                      key={t}
-                      style={[styles.dateOption, { borderBottomColor: colors.border }, flightArrivalTime === t && { backgroundColor: colors.accent }]}
-                      onPress={() => { setFlightArrivalTime(t); setShowFlightArrTimePicker(false); }}
-                    >
-                      <Text style={[styles.dateOptionText, { color: flightArrivalTime === t ? '#fff' : colors.text }]}>
-                        {t}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowFlightArrTimePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      <TransportFormModal
+        visible={activeModal === 'flight'}
+        editingId={editingId}
+        flightForm={flightForm}
+        onFlightFormChange={setFlightForm}
+        onSave={handleSaveFlight}
+        onCancel={() => setActiveModal(null)}
+        onOpenPicker={(field) => setActivePicker(field)}
+        colors={colors}
+      />
 
       {/* Hotel Modal */}
       <Modal visible={activeModal === 'hotel'} transparent animationType="slide">
@@ -1254,8 +710,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={hotelName}
-                      onChangeText={setHotelName}
+                      value={hotelForm.name}
+                      onChangeText={(v) => setHotelForm(f => ({ ...f, name: v }))}
                       placeholder="F.eks. Grand Hotel"
                       placeholderTextColor={colors.textDisabled}
                     />
@@ -1263,18 +719,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Adresse</Text>
                     <GooglePlacesInput
-                      value={hotelAddress}
-                      onChangeText={setHotelAddress}
+                      value={hotelForm.address}
+                      onChangeText={(v) => setHotelForm(f => ({ ...f, address: v }))}
                       placeholder="Søk etter adresse..."
-                      onSelect={setHotelAddress}
+                      onSelect={(v) => setHotelForm(f => ({ ...f, address: v }))}
                     />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Telefonnr</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={hotelPhone}
-                      onChangeText={setHotelPhone}
+                      value={hotelForm.phone}
+                      onChangeText={(v) => setHotelForm(f => ({ ...f, phone: v }))}
                       placeholder="F.eks. +46 8 123 456"
                       placeholderTextColor={colors.textDisabled}
                       keyboardType="phone-pad"
@@ -1309,8 +765,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={restName}
-                      onChangeText={setRestName}
+                      value={restForm.name}
+                      onChangeText={(v) => setRestForm(f => ({ ...f, name: v }))}
                       placeholder="F.eks. pizza stedet"
                       placeholderTextColor={colors.textDisabled}
                     />
@@ -1318,18 +774,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Adresse</Text>
                     <GooglePlacesInput
-                      value={restAddress}
-                      onChangeText={setRestAddress}
+                      value={restForm.address}
+                      onChangeText={(v) => setRestForm(f => ({ ...f, address: v }))}
                       placeholder="Søk etter adresse..."
-                      onSelect={setRestAddress}
+                      onSelect={(v) => setRestForm(f => ({ ...f, address: v }))}
                     />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Notat</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={restNote}
-                      onChangeText={setRestNote}
+                      value={restForm.note}
+                      onChangeText={(v) => setRestForm(f => ({ ...f, note: v }))}
                       placeholder="F.eks. Reservasjon kl. 19"
                       placeholderTextColor={colors.textDisabled}
                     />
@@ -1363,8 +819,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={actName}
-                      onChangeText={setActName}
+                      value={actForm.name}
+                      onChangeText={(v) => setActForm(f => ({ ...f, name: v }))}
                       placeholder="F.eks. Sightseeing"
                       placeholderTextColor={colors.textDisabled}
                     />
@@ -1373,10 +829,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Dato</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                      onPress={() => setShowActDatePicker(true)}
+                      onPress={() => setActivePicker('actDate')}
                     >
-                      <Text style={{ color: actDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {actDate || 'Velg dato'}
+                      <Text style={{ color: actForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {actForm.date || 'Velg dato'}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1384,28 +840,28 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Tid</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                      onPress={() => setShowActTimePicker(true)}
+                      onPress={() => setActivePicker('actTime')}
                     >
-                      <Text style={{ color: actTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {actTime || 'Velg tid'}
+                      <Text style={{ color: actForm.time ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {actForm.time || 'Velg tid'}
                       </Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Adresse</Text>
                     <GooglePlacesInput
-                      value={actAddress}
-                      onChangeText={setActAddress}
+                      value={actForm.address}
+                      onChangeText={(v) => setActForm(f => ({ ...f, address: v }))}
                       placeholder="Søk etter adresse..."
-                      onSelect={setActAddress}
+                      onSelect={(v) => setActForm(f => ({ ...f, address: v }))}
                     />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Notat</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={actNote}
-                      onChangeText={setActNote}
+                      value={actForm.note}
+                      onChangeText={(v) => setActForm(f => ({ ...f, note: v }))}
                       placeholder="F.eks. Billetter bestilt"
                       placeholderTextColor={colors.textDisabled}
                     />
@@ -1439,8 +895,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Tittel *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={docTitle}
-                      onChangeText={setDocTitle}
+                      value={docForm.title}
+                      onChangeText={(v) => setDocForm(f => ({ ...f, title: v }))}
                       placeholder="F.eks. Hotell booking"
                       placeholderTextColor={colors.textDisabled}
                     />
@@ -1449,8 +905,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Notat</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={docNote}
-                      onChangeText={setDocNote}
+                      value={docForm.note}
+                      onChangeText={(v) => setDocForm(f => ({ ...f, note: v }))}
                       placeholder="F.eks. Bekreftelsesnummer"
                       placeholderTextColor={colors.textDisabled}
                     />
@@ -1460,12 +916,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <TripDocumentUpload
                       tripId={trip.id}
                       onUploaded={(url, name) => {
-                        setDocFileUrl(url);
-                        setDocFileName(name);
+                        setDocForm(f => ({ ...f, fileUrl: url, fileName: name }));
                       }}
                     />
-                    {docFileName ? (
-                      <Text style={[styles.fileInfo, { color: colors.accent }]}>📎 {docFileName}</Text>
+                    {docForm.fileName ? (
+                      <Text style={[styles.fileInfo, { color: colors.accent }]}>📎 {docForm.fileName}</Text>
                     ) : null}
                   </View>
                 </ScrollView>
@@ -1497,8 +952,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>Tittel *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={linkTitle}
-                      onChangeText={setLinkTitle}
+                      value={linkForm.title}
+                      onChangeText={(v) => setLinkForm(f => ({ ...f, title: v }))}
                       placeholder="F.eks. Hotell nettside"
                       placeholderTextColor={colors.textDisabled}
                     />
@@ -1507,8 +962,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>URL *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={linkUrl}
-                      onChangeText={setLinkUrl}
+                      value={linkForm.url}
+                      onChangeText={(v) => setLinkForm(f => ({ ...f, url: v }))}
                       placeholder="https://..."
                       placeholderTextColor={colors.textDisabled}
                       autoCapitalize="none"
@@ -1531,68 +986,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Date Picker */}
-      <Modal visible={showActDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowActDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg dato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, actDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setActDate(dateStr); setShowActDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: actDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowActDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      {/* Time Picker */}
-      <Modal visible={showActTimePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowActTimePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg tid</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {timeOptions.map((t) => (
-                    <TouchableOpacity
-                      key={t}
-                      style={[styles.dateOption, { borderBottomColor: colors.border }, actTime === t && { backgroundColor: colors.accent }]}
-                      onPress={() => { setActTime(t); setShowActTimePicker(false); }}
-                    >
-                      <Text style={[styles.dateOptionText, { color: actTime === t ? '#fff' : colors.text }]}>
-                        {t}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowActTimePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      {/* Unified Date/Time Picker */}
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={getPickerTitle()}
+        mode={isTimePicker ? 'time' : 'date'}
+        selectedValue={getPickerValue()}
+        onSelect={handlePickerSelect}
+        onClose={() => setActivePicker(null)}
+      />
     </ScrollView>
   );
 };
@@ -1659,16 +1061,21 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   itemCard: {
-    borderRadius: 10,
+    borderRadius: 12,
     padding: 14,
     marginBottom: 8,
   },
-  itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  itemName: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 2,
   },
-  itemContent: {
-    flex: 1,
+  itemNote: {
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  itemDetail: {
+    fontSize: 14,
   },
   docRow: {
     flexDirection: 'row',
@@ -1686,29 +1093,6 @@ const styles = StyleSheet.create({
   docAction: {
     paddingVertical: 4,
     paddingHorizontal: 8,
-  },
-  itemMapContainer: {
-    marginLeft: 12,
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  itemMapImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-  },
-  itemName: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  itemDetail: {
-    fontSize: 14,
-    marginTop: 2,
-  },
-  itemNote: {
-    fontSize: 13,
-    marginTop: 4,
-    fontStyle: 'italic',
   },
   modalOverlay: {
     flex: 1,
@@ -1765,39 +1149,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     fontSize: 14,
   },
-  datePickerContainer: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '60%',
-    paddingBottom: 20,
-  },
-  datePickerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  datePickerScroll: {
-    maxHeight: 350,
-  },
-  dateOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-  },
-  dateOptionText: {
-    fontSize: 16,
-  },
-  datePickerClose: {
-    padding: 16,
-    alignItems: 'center',
-    borderTopWidth: 1,
-  },
-  datePickerCloseText: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
   iconGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -1814,105 +1165,9 @@ const styles = StyleSheet.create({
   iconText: {
     fontSize: 22,
   },
-  flightTimeRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  flightTimeField: {
-    flex: 1,
-  },
-  flightTypeRow: {
-    flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
-  },
-  flightTypeOption: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 10,
-    alignItems: 'center',
-  },
-  flightTypeText: {
-    fontSize: 15,
-    fontWeight: '600',
-  },
   transportGrid: {
     flexDirection: 'row',
     gap: 10,
     marginBottom: 10,
-  },
-  transportTile: {
-    flex: 1,
-    borderRadius: 12,
-    borderLeftWidth: 4,
-    overflow: 'hidden',
-  },
-  calendarIcon: {
-    alignItems: 'center',
-    paddingTop: 8,
-    paddingBottom: 4,
-    position: 'relative',
-  },
-  calendarDateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'stretch',
-    paddingHorizontal: 6,
-  },
-  tileTransportIcon: {
-    position: 'absolute',
-    left: 6,
-    top: 30,
-  },
-  calendarTop: {
-    width: '100%',
-    height: 4,
-    borderTopLeftRadius: 8,
-    borderTopRightRadius: 8,
-  },
-  calendarDay: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    marginTop: 4,
-    lineHeight: 30,
-  },
-  calendarDateRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 6,
-  },
-  calendarMonth: {
-    fontSize: 12,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-  },
-  calendarSeparator: {
-    height: 1,
-    marginHorizontal: 10,
-    marginVertical: 6,
-  },
-  tileContent: {
-    paddingHorizontal: 10,
-    paddingBottom: 10,
-  },
-  tileName: {
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 2,
-  },
-  tileDetail: {
-    fontSize: 12,
-    marginTop: 1,
-  },
-  tileDate: {
-    fontSize: 11,
-    marginTop: 2,
-    fontStyle: 'italic',
-  },
-  tileDivider: {
-    height: 1,
-    marginVertical: 6,
   },
 });

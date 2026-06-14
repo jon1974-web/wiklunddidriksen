@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
@@ -10,21 +10,53 @@ interface Option {
 interface DatePickerModalProps {
   visible: boolean;
   title: string;
-  options: Option[];
   selectedValue: string;
   onSelect: (value: string) => void;
   onClose: () => void;
+  options?: Option[];
+  mode?: 'date' | 'time';
+  dateCount?: number;
+  dateOffset?: number;
 }
 
-export const DatePickerModal: React.FC<DatePickerModalProps> = ({
+function generateDateOptions(count: number, offset: number): Option[] {
+  return Array.from({ length: count }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset + i);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const label = d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    return { label, value: dateStr };
+  });
+}
+
+function generateTimeOptions(): Option[] {
+  return Array.from({ length: 48 }, (_, i) => {
+    const h = Math.floor(i / 2);
+    const m = (i % 2) * 30;
+    const value = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+    return { label: value, value };
+  });
+}
+
+export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
   visible,
   title,
-  options,
+  options: customOptions,
   selectedValue,
   onSelect,
   onClose,
+  mode,
+  dateCount = 365,
+  dateOffset = 0,
 }) => {
   const { colors } = useTheme();
+
+  const options = useMemo(() => {
+    if (customOptions) return customOptions;
+    if (mode === 'date') return generateDateOptions(dateCount, dateOffset);
+    if (mode === 'time') return generateTimeOptions();
+    return [];
+  }, [customOptions, mode, dateCount, dateOffset]);
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -55,7 +87,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = ({
       </TouchableWithoutFeedback>
     </Modal>
   );
-};
+});
 
 const styles = StyleSheet.create({
   overlay: {

@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { onRequest } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
+const { getAuth } = require("firebase-admin/auth");
 const OpenAI = require("openai");
 const functions = require("firebase-functions");
 const Busboy = require("busboy");
@@ -11,10 +12,38 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const SPOND_API_BASE = "https://api.spond.com/core/v1";
 
-exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "*");
+const ALLOWED_ORIGINS = [
+  "https://familiesenter-837bb.web.app",
+  "https://familiesenter-837bb.firebaseapp.com",
+  "http://localhost:8081",
+  "http://localhost:19006",
+];
+
+function setCorsHeaders(res, req) {
+  const origin = req.headers.origin;
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.set("Access-Control-Allow-Origin", origin);
+  }
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+}
+
+async function verifyAuth(req) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return null;
+  }
+  const idToken = authHeader.split("Bearer ")[1];
+  try {
+    const decoded = await getAuth().verifyIdToken(idToken);
+    return decoded.uid;
+  } catch {
+    return null;
+  }
+}
+
+exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
 
   if (req.method === "OPTIONS") {
     return res.status(204).send("");
@@ -22,6 +51,11 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   const { action, email, password, token, groupId, groupIds, max, eventId, memberId, accepted } = req.body || {};
@@ -146,9 +180,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
 });
 
 exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
-  res.set("Access-Control-Allow-Origin", "*");
-  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type, X-Filename");
+  setCorsHeaders(res, req);
 
   if (req.method === "OPTIONS") {
     return res.status(204).send("");
@@ -156,6 +188,11 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
 
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
   }
 
   if (!OPENAI_API_KEY) {

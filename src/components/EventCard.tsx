@@ -1,10 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity, Image, Linking, StyleSheet } from 'react-native';
 import { Event } from '../types';
 import { formatDate, formatTime } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
-import { GOOGLE_MAPS_API_KEY } from '../constants/api';
-import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
+import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 interface EventCardProps {
   event: Event;
@@ -22,14 +21,11 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
     ? `${formatTime(event.time)} - ${formatTime(event.endTime)}`
     : formatTime(event.time);
 
-  const mapUrl = event.address
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(event.address)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(event.address)}&key=${GOOGLE_MAPS_API_KEY}`
-    : null;
+  const mapUrl = event.address ? getStaticMapUrl(event.address) : null;
 
   const openGoogleMaps = () => {
     if (!event.address) return;
-    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.address)}`;
-    Linking.openURL(url);
+    Linking.openURL(getGoogleMapsUrl(event.address));
   };
 
   return (

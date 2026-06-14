@@ -12,7 +12,7 @@ interface TripDocumentUploadProps {
   onUploaded: (url: string, fileName: string) => void;
 }
 
-export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = ({ tripId, onUploaded }) => {
+export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(({ tripId, onUploaded }) => {
   const [uploading, setUploading] = useState(false);
   const { colors } = useTheme();
 
@@ -56,7 +56,7 @@ export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = ({ tripId, 
       )}
     </TouchableOpacity>
   );
-};
+});
 
 const styles = StyleSheet.create({
   uploadButton: {

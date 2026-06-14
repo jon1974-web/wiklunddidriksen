@@ -7,6 +7,7 @@ import {
   doc,
   orderBy,
   query,
+  limit,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink, TripHotel, TripFlight } from '../types';
@@ -14,7 +15,7 @@ import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink, TripHotel, 
 const TRIPS_COLLECTION = 'trips';
 
 export const getTrips = async (): Promise<Trip[]> => {
-  const q = query(collection(db, TRIPS_COLLECTION), orderBy('startDate', 'desc'));
+  const q = query(collection(db, TRIPS_COLLECTION), orderBy('startDate', 'desc'), limit(100));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Trip));
 };

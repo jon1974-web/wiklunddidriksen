@@ -18,7 +18,7 @@ interface GooglePlacesInputProps {
   country?: string;
 }
 
-export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
+export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = React.memo(({
   value,
   onChangeText,
   placeholder = 'Søk etter adresse...',
@@ -141,7 +141,7 @@ export const GooglePlacesInput: React.FC<GooglePlacesInputProps> = ({
       )}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {

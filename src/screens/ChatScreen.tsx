@@ -9,7 +9,7 @@ import { useUserStore } from '../store/userStore';
 import { ChatMessage, MessageReaction } from '../types';
 import { MessageBubble } from '../components/MessageBubble';
 import { useTheme } from '../theme/ThemeContext';
-import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_MAX_DIMENSION, IMAGE_QUALITY, SCROLL_DELAY_MS, LOCALE } from '../constants/limits';
+import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_MAX_DIMENSION, IMAGE_QUALITY, SCROLL_DELAY_MS } from '../constants/limits';
 import { getErrorMessage } from '../utils/validation';
 import { uriToBlob } from '../utils/upload';
 import { getUserProfile } from '../services/familyService';
@@ -56,18 +56,19 @@ export const ChatScreen: React.FC = () => {
     const uniqueSenderIds = [...new Set(messages.map((m) => m.senderId).filter(Boolean))];
     const missing = uniqueSenderIds.filter((id) => !(id in userAvatars));
     if (missing.length === 0) return;
-    missing.forEach(async (uid) => {
-      try {
-        const profile = await getUserProfile(uid);
-        if (profile?.avatarUrl) {
-          setUserAvatars((prev) => ({ ...prev, [uid]: profile.avatarUrl! }));
-        } else {
-          setUserAvatars((prev) => ({ ...prev, [uid]: '' }));
+    (async () => {
+      const profiles = await Promise.all(missing.map(async (uid) => {
+        try {
+          const profile = await getUserProfile(uid);
+          return { uid, avatarUrl: profile?.avatarUrl || '' };
+        } catch {
+          return { uid, avatarUrl: '' };
         }
-      } catch {
-        setUserAvatars((prev) => ({ ...prev, [uid]: '' }));
-      }
-    });
+      }));
+      const updates: Record<string, string> = {};
+      profiles.forEach(({ uid, avatarUrl }) => { updates[uid] = avatarUrl; });
+      setUserAvatars((prev) => ({ ...prev, ...updates }));
+    })();
   }, [messages]);
 
   const handlePickImage = useCallback(async () => {

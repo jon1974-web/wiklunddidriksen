@@ -2,7 +2,7 @@ import React, { useState, useCallback, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { addDoc, collection } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { db, auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
 import { scheduleEventReminder } from '../services/notificationService';
@@ -37,6 +37,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
   const chunksRef = useRef<Blob[]>([]);
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
+  const familyId = useUserStore((state) => state.familyId);
 
   const startRecording = useCallback(async () => {
     try {
@@ -118,12 +119,19 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
       const ext = audioBlob.type.includes('mp4') ? 'm4a' : 'webm';
 
+      const headers: Record<string, string> = {
+        'Content-Type': audioBlob.type || 'audio/webm',
+        'X-Filename': `recording.${ext}`,
+      };
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        const idToken = await currentUser.getIdToken();
+        headers['Authorization'] = `Bearer ${idToken}`;
+      }
+
       const apiResponse = await fetch(CLOUD_FUNCTION_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': audioBlob.type || 'audio/webm',
-          'X-Filename': `recording.${ext}`,
-        },
+        headers,
         body: audioBlob,
       });
 
@@ -157,6 +165,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         reminderMinutes: parsedEvent.reminderMinutes,
         address: '',
         createdBy: user.uid,
+        familyId: familyId || null,
         createdAt: Date.now(),
       };
 

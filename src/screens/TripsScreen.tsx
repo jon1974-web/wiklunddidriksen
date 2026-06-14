@@ -6,8 +6,7 @@ import { Trip } from '../types';
 import { getTrips } from '../services/tripService';
 import { formatDate } from '../utils/dateUtils';
 import { getErrorMessage } from '../utils/validation';
-import { GOOGLE_MAPS_API_KEY } from '../constants/api';
-import { MAP_ZOOM, MAP_SIZE } from '../constants/limits';
+import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 interface TripsScreenProps {
   navigation: any;
@@ -36,9 +35,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
 
   const renderTrip = ({ item }: { item: Trip }) => {
     const locationQuery = item.country ? `${item.city}, ${item.country}` : item.city;
-    const tripMapUrl = item.city
-      ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(locationQuery)}&zoom=${MAP_ZOOM}&size=${MAP_SIZE}&markers=color:red%7C${encodeURIComponent(locationQuery)}&key=${GOOGLE_MAPS_API_KEY}`
-      : null;
+    const tripMapUrl = item.city ? getStaticMapUrl(locationQuery) : null;
     return (
       <TouchableOpacity
         style={[styles.card, { backgroundColor: colors.surface }]}
@@ -60,10 +57,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
           {tripMapUrl && (
             <TouchableOpacity
               style={styles.mapContainer}
-              onPress={() => {
-                const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(locationQuery)}`;
-                Linking.openURL(url);
-              }}
+              onPress={() => Linking.openURL(getGoogleMapsUrl(locationQuery))}
             >
               <Image source={{ uri: tripMapUrl }} style={styles.mapImage} />
             </TouchableOpacity>

@@ -21,7 +21,7 @@ interface SpondResponseModalProps {
   onClose: () => void;
 }
 
-export const SpondResponseModal: React.FC<SpondResponseModalProps> = ({
+export const SpondResponseModal: React.FC<SpondResponseModalProps> = React.memo(({
   visible,
   type,
   members,
@@ -164,7 +164,7 @@ export const SpondResponseModal: React.FC<SpondResponseModalProps> = ({
       </TouchableWithoutFeedback>
     </Modal>
   );
-};
+});
 
 const styles = StyleSheet.create({
   overlay: {

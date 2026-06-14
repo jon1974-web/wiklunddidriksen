@@ -6,7 +6,7 @@ interface CartIconProps {
   color?: string;
 }
 
-export const CartIcon: React.FC<CartIconProps> = ({ size = 20, color = '#FFFFFF' }) => {
+export const CartIcon: React.FC<CartIconProps> = React.memo(({ size = 20, color = '#FFFFFF' }) => {
   const s = size / 20;
 
   return (
@@ -76,7 +76,7 @@ export const CartIcon: React.FC<CartIconProps> = ({ size = 20, color = '#FFFFFF'
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   root: {

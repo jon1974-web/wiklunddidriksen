@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { TouchableOpacity, Text } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
 
 import { auth } from './src/services/firebase';
 import { useUserStore } from './src/store/userStore';
@@ -14,83 +14,109 @@ import { configureNotifications, requestNotificationPermission } from './src/ser
 
 import { AuthScreen } from './src/screens/AuthScreen';
 import { EventsScreen } from './src/screens/EventsScreen';
-import { AddEventScreen } from './src/screens/AddEventScreen';
-import { EventDetailScreen } from './src/screens/EventDetailScreen';
 import { ShoppingListsScreen } from './src/screens/ShoppingListsScreen';
-import { ShoppingListDetailScreen } from './src/screens/ShoppingListDetailScreen';
 import { ChatScreen } from './src/screens/ChatScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
-import { VoiceEventScreen } from './src/screens/VoiceEventScreen';
 import { TripsScreen } from './src/screens/TripsScreen';
-import { AddTripScreen } from './src/screens/AddTripScreen';
-import { TripDetailScreen } from './src/screens/TripDetailScreen';
-import { SpondEventDetailScreen } from './src/screens/SpondEventDetailScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
 import { CartIcon } from './src/components/CartIcon';
 
+const AddEventScreen = React.lazy(() => import('./src/screens/AddEventScreen').then(m => ({ default: m.AddEventScreen })));
+const EventDetailScreen = React.lazy(() => import('./src/screens/EventDetailScreen').then(m => ({ default: m.EventDetailScreen })));
+const ShoppingListDetailScreen = React.lazy(() => import('./src/screens/ShoppingListDetailScreen').then(m => ({ default: m.ShoppingListDetailScreen })));
+const VoiceEventScreen = React.lazy(() => import('./src/screens/VoiceEventScreen').then(m => ({ default: m.VoiceEventScreen })));
+const AddTripScreen = React.lazy(() => import('./src/screens/AddTripScreen').then(m => ({ default: m.AddTripScreen })));
+const TripDetailScreen = React.lazy(() => import('./src/screens/TripDetailScreen').then(m => ({ default: m.TripDetailScreen })));
+const SpondEventDetailScreen = React.lazy(() => import('./src/screens/SpondEventDetailScreen').then(m => ({ default: m.SpondEventDetailScreen })));
+
+const SuspenseFallback = () => (
+  <ActivityIndicator size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />
+);
+
+import { Event, Trip, SpondEvent, SpondRespondent } from './src/types';
+
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+type RootStackParamList = {
+  EventsList: undefined;
+  AddEvent: { event?: Event } | undefined;
+  EventDetail: { event: Event };
+  EventDetail_Spond: { event: SpondEvent; spondRespondents: SpondRespondent[]; spondConfig: { email: string; password: string } | null };
+  VoiceEvent: undefined;
+  ShoppingLists: undefined;
+  ShoppingListDetail: { listId: string; listTitle: string };
+  ChatMain: undefined;
+  TripsList: undefined;
+  AddTrip: undefined;
+  TripDetail: { trip: Trip };
+  ProfileMain: undefined;
+};
 
 const EventsStack = () => {
   const { colors } = useTheme();
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="EventsList"
-        component={EventsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="AddEvent"
-        component={AddEventScreen}
-        options={{
-          title: 'Nytt arrangement',
-          headerStyle: { backgroundColor: colors.surface },
-          headerTintColor: colors.text,
-        }}
-      />
-      <Stack.Screen
-        name="EventDetail"
-        component={EventDetailScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="VoiceEvent"
-        component={VoiceEventScreen}
-        options={{
-          title: 'Tal til arrangement',
-          headerStyle: { backgroundColor: colors.surface },
-          headerTintColor: colors.text,
-        }}
-      />
-      <Stack.Screen
-        name="EventDetail_Spond"
-        component={SpondEventDetailScreen}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
+    <Suspense fallback={<SuspenseFallback />}>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="EventsList"
+          component={EventsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddEvent"
+          component={AddEventScreen}
+          options={{
+            title: 'Nytt arrangement',
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+        <Stack.Screen
+          name="EventDetail"
+          component={EventDetailScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="VoiceEvent"
+          component={VoiceEventScreen}
+          options={{
+            title: 'Tal til arrangement',
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+        <Stack.Screen
+          name="EventDetail_Spond"
+          component={SpondEventDetailScreen}
+          options={{ headerShown: false }}
+        />
+      </Stack.Navigator>
+    </Suspense>
   );
 };
 
 const ShoppingStack = () => {
   const { colors } = useTheme();
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="ShoppingLists"
-        component={ShoppingListsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="ShoppingListDetail"
-        component={ShoppingListDetailScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack.Navigator>
+    <Suspense fallback={<SuspenseFallback />}>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="ShoppingLists"
+          component={ShoppingListsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ShoppingListDetail"
+          component={ShoppingListDetailScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack.Navigator>
+    </Suspense>
   );
 };
 
@@ -114,27 +140,29 @@ const ChatStack = () => {
 const TripsStack = () => {
   const { colors } = useTheme();
   return (
-    <Stack.Navigator>
-      <Stack.Screen
-        name="TripsList"
-        component={TripsScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="AddTrip"
-        component={AddTripScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-      <Stack.Screen
-        name="TripDetail"
-        component={TripDetailScreen}
-        options={{
-          headerShown: false,
-        }}
-      />
-    </Stack.Navigator>
+    <Suspense fallback={<SuspenseFallback />}>
+      <Stack.Navigator>
+        <Stack.Screen
+          name="TripsList"
+          component={TripsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AddTrip"
+          component={AddTripScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="TripDetail"
+          component={TripDetailScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+      </Stack.Navigator>
+    </Suspense>
   );
 };
 

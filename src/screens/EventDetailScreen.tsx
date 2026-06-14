@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback, Platform, Linking, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Linking, Image } from 'react-native';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
@@ -9,12 +9,13 @@ import { scheduleEventReminder, cancelNotification } from '../services/notificat
 import { getUserProfile } from '../services/familyService';
 import { syncEventToCalendar, updateCalendarEvent, deleteCalendarEvent } from '../services/calendarService';
 import { useUserStore } from '../store/userStore';
-import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } from '../constants/eventOptions';
+import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS } from '../constants/eventOptions';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { EVENT_ICONS } from '../constants/eventIcons';
+import { DatePickerModal } from '../components/DatePickerModal';
 import { formatDate, formatTime } from '../utils/dateUtils';
-import { GOOGLE_MAPS_API_KEY } from '../constants/api';
+import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 interface EventDetailScreenProps {
   navigation: any;
@@ -55,21 +56,40 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [description, setDescription] = useState(event.description || '');
   const [address, setAddress] = useState(event.address || '');
   const [date, setDate] = useState(event.date);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
   const [endDateDays, setEndDateDays] = useState<number | null>(getInitialEndDateDays());
   const [customEndDate, setCustomEndDate] = useState(event.endDate && !getInitialEndDateDays() ? event.endDate : '');
   const [showEndDate, setShowEndDate] = useState(!!event.endDate);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
   const [time, setTime] = useState(event.time);
   const [endTime, setEndTime] = useState(getInitialEndTimeDuration());
   const [showEndTime, setShowEndTime] = useState(!!event.endTime);
   const [customEndTime, setCustomEndTime] = useState(event.endTime && !getInitialEndTimeDuration() ? event.endTime : '');
-  const [showCustomEndTimePicker, setShowCustomEndTimePicker] = useState(false);
   const [reminderMinutes, setReminderMinutes] = useState(event.reminderMinutes);
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [icon, setIcon] = useState(event.icon || '');
+
+  type DetailPickerField = 'date' | 'time' | 'endDate' | 'endTime' | null;
+  const [activePicker, setActivePicker] = useState<DetailPickerField>(null);
+
+  const getPickerTitle = () => {
+    const titles: Record<string, string> = { date: 'Velg dato', time: 'Velg tid', endDate: 'Velg sluttdato', endTime: 'Velg sluttid' };
+    return activePicker ? titles[activePicker] : '';
+  };
+
+  const getPickerValue = () => {
+    const values: Record<string, string> = { date, time, endDate: customEndDate, endTime: customEndTime };
+    return activePicker ? values[activePicker] || '' : '';
+  };
+
+  const handlePickerSelect = (value: string) => {
+    if (activePicker === 'date') setDate(value);
+    else if (activePicker === 'time') setTime(value);
+    else if (activePicker === 'endDate') setCustomEndDate(value);
+    else if (activePicker === 'endTime') setCustomEndTime(value);
+    setActivePicker(null);
+  };
+
+  const isTimePicker = activePicker === 'time' || activePicker === 'endTime';
 
   useEffect(() => {
     if (user?.uid) {
@@ -231,7 +251,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     : formatTime(eventData.time);
   const eventIcon = eventData.icon || '📅';
   const mapUrl = eventData.address
-    ? `https://maps.googleapis.com/maps/api/staticmap?center=${encodeURIComponent(eventData.address)}&zoom=15&size=600x300&markers=color:red%7C${encodeURIComponent(eventData.address)}&key=${GOOGLE_MAPS_API_KEY}`
+    ? getStaticMapUrl(eventData.address, 15, '600x300')
     : null;
 
   if (!isEditing) {
@@ -273,7 +293,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         {mapUrl && (
           <TouchableOpacity
             style={[styles.viewMapContainer, { backgroundColor: colors.surface }]}
-            onPress={() => Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(eventData.address!)}`)}
+            onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))}
           >
             <Image source={{ uri: mapUrl }} style={styles.viewMapImage} />
             <Text style={[styles.viewMapLabel, { color: colors.accent }]}>Åpne i Google Maps →</Text>
@@ -398,7 +418,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Start dato</Text>
-        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setShowDatePicker(true)}>
+        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setActivePicker('date')}>
           <Text style={[styles.dateText, { color: colors.text }]}>{date}</Text>
         </TouchableOpacity>
       </View>
@@ -424,7 +444,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             ))}
             <TouchableOpacity
               style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, customEndDate && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-              onPress={() => setShowEndDatePicker(true)}
+              onPress={() => setActivePicker('endDate')}
             >
               <Text style={[styles.reminderText, { color: customEndDate ? '#fff' : colors.textSecondary }]}>
                 Velg dato
@@ -442,38 +462,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Starttid</Text>
-        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setShowTimePicker(true)}>
+        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setActivePicker('time')}>
           <Text style={[styles.dateText, { color: colors.text }]}>{time}</Text>
         </TouchableOpacity>
       </View>
-
-      <Modal visible={showTimePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowTimePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg tid</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {TIME_OPTIONS.map((option) => (
-                    <TouchableOpacity
-                      key={option.value}
-                      style={[styles.dateOption, { borderBottomColor: colors.border }, time === option.value && { backgroundColor: colors.accent }]}
-                      onPress={() => { setTime(option.value); setShowTimePicker(false); }}
-                    >
-                      <Text style={[styles.dateOptionText, { color: time === option.value ? '#fff' : colors.text }]}>
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowTimePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
 
       {!showEndTime ? (
         <TouchableOpacity onPress={() => setShowEndTime(true)}>
@@ -495,9 +487,9 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               </TouchableOpacity>
             ))}
           </View>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, customEndTime && !endTime && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-            onPress={() => { setShowCustomEndTimePicker(true); setEndTime(''); }}
+            onPress={() => { setActivePicker('endTime'); setEndTime(''); }}
           >
             <Text style={[styles.reminderText, { color: customEndTime && !endTime ? '#fff' : colors.textSecondary }]}>
               {customEndTime || 'Velg tidspunkt'}
@@ -534,147 +526,14 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
       </TouchableOpacity>
 
-      {Platform.OS === 'web' && (
-        <View style={{ marginTop: 16 }}>
-          {userCalendarProvider && userCalendarEmail ? (
-            <TouchableOpacity
-              style={[styles.calendarWebButton, { backgroundColor: userCalendarProvider === 'google' ? '#4285F4' : '#0078D4' }]}
-              onPress={() => {
-                const [h, m] = time.split(':').map(Number);
-                const start = new Date(date);
-                start.setHours(h, m, 0, 0);
-
-                let end: Date;
-                if (event.endDate && event.endTime) {
-                  const [eh, em] = event.endTime.split(':').map(Number);
-                  end = new Date(event.endDate);
-                  end.setHours(eh, em, 0, 0);
-                } else if (event.endTime) {
-                  const [eh, em] = event.endTime.split(':').map(Number);
-                  end = new Date(date);
-                  end.setHours(eh, em, 0, 0);
-                } else if (event.endDate) {
-                  end = new Date(event.endDate);
-                  end.setHours(h, m, 0, 0);
-                } else {
-                  end = new Date(start.getTime() + 60 * 60 * 1000);
-                }
-                if (userCalendarProvider === 'google') {
-                  const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-                  const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(description)}&location=${encodeURIComponent(address)}`;
-                  Linking.openURL(url);
-                } else {
-                  const fmt = (d: Date) => d.toISOString();
-                  const url = `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(title)}&startdt=${fmt(start)}&enddt=${fmt(end)}&body=${encodeURIComponent(description)}&location=${encodeURIComponent(address)}`;
-                  Linking.openURL(url);
-                }
-              }}
-            >
-              <Text style={styles.calendarWebButtonText}>
-                Legg til i {userCalendarProvider === 'google' ? 'Google' : 'Outlook'} Calendar
-              </Text>
-            </TouchableOpacity>
-          ) : (
-            <Text style={[styles.sectionLabel, { color: colors.textDisabled, textAlign: 'center' }]}>
-              Lagre kalender-e-post i Profil for å legge til arrangementer direkte.
-            </Text>
-          )}
-        </View>
-      )}
-
-      <Modal visible={showDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg dato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = d.toISOString().split('T')[0];
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, date === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setDate(dateStr); setShowDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: date === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      <Modal visible={showEndDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowEndDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg sluttdato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = d.toISOString().split('T')[0];
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, customEndDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setCustomEndDate(dateStr); setShowEndDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: customEndDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowEndDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      <Modal visible={showCustomEndTimePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowCustomEndTimePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg sluttid</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {TIME_OPTIONS.map((option) => (
-                    <TouchableOpacity
-                      key={option.value}
-                      style={[styles.dateOption, { borderBottomColor: colors.border }, customEndTime === option.value && { backgroundColor: colors.accent }]}
-                      onPress={() => { setCustomEndTime(option.value); setShowCustomEndTimePicker(false); }}
-                    >
-                      <Text style={[styles.dateOptionText, { color: customEndTime === option.value ? '#fff' : colors.text }]}>
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowCustomEndTimePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={getPickerTitle()}
+        mode={isTimePicker ? 'time' : 'date'}
+        selectedValue={getPickerValue()}
+        onSelect={handlePickerSelect}
+        onClose={() => setActivePicker(null)}
+      />
     </ScrollView>
   );
 };
@@ -865,44 +724,6 @@ const styles = StyleSheet.create({
   },
   calendarWebButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  datePickerContainer: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '70%',
-    paddingBottom: 20,
-  },
-  datePickerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  datePickerScroll: {
-    maxHeight: 400,
-  },
-  dateOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-  },
-  dateOptionText: {
-    fontSize: 16,
-  },
-  datePickerClose: {
-    padding: 16,
-    alignItems: 'center',
-    borderTopWidth: 1,
-  },
-  datePickerCloseText: {
     fontSize: 16,
     fontWeight: '600',
   },

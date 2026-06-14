@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { addDoc, collection, updateDoc, doc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
@@ -9,11 +9,11 @@ import { useTheme } from '../theme/ThemeContext';
 import { scheduleEventReminder } from '../services/notificationService';
 import { getUserProfile } from '../services/familyService';
 import { syncEventToCalendar } from '../services/calendarService';
-import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS, TIME_OPTIONS } from '../constants/eventOptions';
-import { LOCALE, DATE_PICKER_RANGE_DAYS } from '../constants/limits';
+import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS } from '../constants/eventOptions';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { getTodayLocal } from '../utils/dateUtils';
 import { EVENT_ICONS } from '../constants/eventIcons';
+import { crossAlert } from '../utils/alert';
 
 interface AddEventScreenProps {
   navigation: any;
@@ -26,27 +26,45 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   const [description, setDescription] = useState(prefill?.description || '');
   const [address, setAddress] = useState('');
   const [date, setDate] = useState(prefill?.date || getTodayLocal());
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [tempDate, setTempDate] = useState(new Date());
   const [endDateDays, setEndDateDays] = useState<number | null>(null);
   const [customEndDate, setCustomEndDate] = useState(prefill?.endDate || '');
   const [showEndDate, setShowEndDate] = useState(!!prefill?.endDate);
-  const [showEndDatePicker, setShowEndDatePicker] = useState(false);
-  const [tempEndDate, setTempEndDate] = useState(new Date());
   const [time, setTime] = useState(prefill?.time || '12:00');
-  const [showTimePicker, setShowTimePicker] = useState(false);
   const [endTime, setEndTime] = useState('');
   const [showEndTime, setShowEndTime] = useState(!!prefill?.endTime);
   const [customEndTime, setCustomEndTime] = useState(prefill?.endTime || '');
-  const [showCustomEndTimePicker, setShowCustomEndTimePicker] = useState(false);
   const [reminderMinutes, setReminderMinutes] = useState(prefill?.reminderMinutes || 120);
   const [icon, setIcon] = useState(prefill?.icon || '');
   const user = useUserStore((state) => state.user);
+  const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
+
+  type AddPickerField = 'date' | 'time' | 'endDate' | 'endTime' | null;
+  const [activePicker, setActivePicker] = useState<AddPickerField>(null);
+
+  const getPickerTitle = () => {
+    const titles: Record<string, string> = { date: 'Velg dato', time: 'Velg tid', endDate: 'Velg sluttdato', endTime: 'Velg sluttid' };
+    return activePicker ? titles[activePicker] : '';
+  };
+
+  const getPickerValue = () => {
+    const values: Record<string, string> = { date, time, endDate: customEndDate, endTime: customEndTime };
+    return activePicker ? values[activePicker] || '' : '';
+  };
+
+  const handlePickerSelect = (value: string) => {
+    if (activePicker === 'date') setDate(value);
+    else if (activePicker === 'time') setTime(value);
+    else if (activePicker === 'endDate') setCustomEndDate(value);
+    else if (activePicker === 'endTime') setCustomEndTime(value);
+    setActivePicker(null);
+  };
+
+  const isTimePicker = activePicker === 'time' || activePicker === 'endTime';
 
   const handleSave = useCallback(async () => {
     if (!title.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en tittel');
+      crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
 
@@ -59,6 +77,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         time,
         reminderMinutes,
         createdBy: user?.uid,
+        familyId: familyId || null,
         createdAt: Date.now(),
         icon: icon || null,
       };
@@ -137,19 +156,9 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
       navigation.goBack();
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
-  }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, navigation]);
-
-  const handleDateConfirm = () => {
-    setDate(tempDate.toISOString().split('T')[0]);
-    setShowDatePicker(false);
-  };
-
-  const handleEndDateConfirm = () => {
-    setCustomEndDate(tempEndDate.toISOString().split('T')[0]);
-    setShowEndDatePicker(false);
-  };
+  }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, navigation, familyId]);
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -207,7 +216,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Start dato</Text>
-        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => { setTempDate(new Date(date)); setShowDatePicker(true); }}>
+        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setActivePicker('date')}>
           <Text style={[styles.dateText, { color: colors.text }]}>{date}</Text>
         </TouchableOpacity>
       </View>
@@ -233,7 +242,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
             ))}
             <TouchableOpacity
               style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, customEndDate && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-              onPress={() => { setTempEndDate(new Date(date)); setShowEndDatePicker(true); }}
+              onPress={() => setActivePicker('endDate')}
             >
               <Text style={[styles.reminderText, { color: customEndDate ? '#fff' : colors.textSecondary }]}>
                 Velg dato
@@ -251,38 +260,10 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Starttid</Text>
-        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setShowTimePicker(true)}>
+        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setActivePicker('time')}>
           <Text style={[styles.dateText, { color: colors.text }]}>{time}</Text>
         </TouchableOpacity>
       </View>
-
-      <Modal visible={showTimePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowTimePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg tid</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {TIME_OPTIONS.map((option) => (
-                    <TouchableOpacity
-                      key={option.value}
-                      style={[styles.dateOption, { borderBottomColor: colors.border }, time === option.value && { backgroundColor: colors.accent }]}
-                      onPress={() => { setTime(option.value); setShowTimePicker(false); }}
-                    >
-                      <Text style={[styles.dateOptionText, { color: time === option.value ? '#fff' : colors.text }]}>
-                        {option.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowTimePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
 
       {!showEndTime ? (
         <TouchableOpacity onPress={() => setShowEndTime(true)}>
@@ -306,7 +287,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
           </View>
           <TouchableOpacity 
             style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, customEndTime && !endTime && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-            onPress={() => { setShowCustomEndTimePicker(true); setEndTime(''); }}
+            onPress={() => { setActivePicker('endTime'); setEndTime(''); }}
           >
             <Text style={[styles.reminderText, { color: customEndTime && !endTime ? '#fff' : colors.textSecondary }]}>
               {customEndTime || 'Velg tidspunkt'}
@@ -343,106 +324,14 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         <Text style={[styles.buttonText, { color: colors.text }]}>Avbryt</Text>
       </TouchableOpacity>
 
-      <Modal visible={showDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg dato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = d.toISOString().split('T')[0];
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, date === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setDate(dateStr); setShowDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: date === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      <Modal visible={showEndDatePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowEndDatePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg sluttdato</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {Array.from({ length: 365 }, (_, i) => {
-                    const d = new Date();
-                    d.setDate(d.getDate() + i);
-                    const dateStr = d.toISOString().split('T')[0];
-                    return (
-                      <TouchableOpacity
-                        key={dateStr}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, customEndDate === dateStr && { backgroundColor: colors.accent }]}
-                        onPress={() => { setCustomEndDate(dateStr); setShowEndDatePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: customEndDate === dateStr ? '#fff' : colors.text }]}>
-                          {d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowEndDatePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
-
-      <Modal visible={showCustomEndTimePicker} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setShowCustomEndTimePicker(false)}>
-          <View style={styles.modalOverlay}>
-            <TouchableWithoutFeedback>
-              <View style={[styles.datePickerContainer, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.datePickerTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg sluttid</Text>
-                <ScrollView style={styles.datePickerScroll}>
-                  {TIME_OPTIONS.map((option) => {
-                    const [startHour, startMin] = time.split(':').map(Number);
-                    const [endHour, endMin] = option.value.split(':').map(Number);
-                    const startMins = startHour * 60 + startMin;
-                    const endMins = endHour * 60 + endMin;
-                    const isAfter = endMins > startMins;
-                    return (
-                      <TouchableOpacity
-                        key={option.value}
-                        style={[styles.dateOption, { borderBottomColor: colors.border }, customEndTime === option.value && { backgroundColor: colors.accent }]}
-                        onPress={() => { setCustomEndTime(option.value); setShowCustomEndTimePicker(false); }}
-                      >
-                        <Text style={[styles.dateOptionText, { color: customEndTime === option.value ? '#fff' : colors.text }]}>
-                          {option.label}
-                        </Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </ScrollView>
-                <TouchableOpacity style={[styles.datePickerClose, { borderTopColor: colors.border }]} onPress={() => setShowCustomEndTimePicker(false)}>
-                  <Text style={[styles.datePickerCloseText, { color: colors.accent }]}>Lukk</Text>
-                </TouchableOpacity>
-              </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </Modal>
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={getPickerTitle()}
+        mode={isTimePicker ? 'time' : 'date'}
+        selectedValue={getPickerValue()}
+        onSelect={handlePickerSelect}
+        onClose={() => setActivePicker(null)}
+      />
     </ScrollView>
   );
 };
@@ -533,44 +422,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: '600',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'flex-end',
-  },
-  datePickerContainer: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '70%',
-    paddingBottom: 20,
-  },
-  datePickerTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-  },
-  datePickerScroll: {
-    maxHeight: 400,
-  },
-  dateOption: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-  },
-  dateOptionText: {
-    fontSize: 16,
-  },
-  datePickerClose: {
-    padding: 16,
-    alignItems: 'center',
-    borderTopWidth: 1,
-  },
-  datePickerCloseText: {
-    fontSize: 16,
     fontWeight: '600',
   },
 });
