@@ -1857,6 +1857,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+    paddingLeft: 6,
+    justifyContent: 'center',
   },
   calendarTop: {
     width: '100%',
