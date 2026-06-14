@@ -54,7 +54,7 @@ const registerFcmToken = async () => {
     if (!m) return;
 
     const token = await getToken(m, {
-      vapidKey: 'BPHKbRzrE7bQ_M7GPEfJlVJnEHCvqPz4Ue9BjHk2bQ1wJ9fK8gV3dR7tY5mN6pL2sX4aC8eF0gH',
+      vapidKey: 'BPwXjaC9BQLFaOOVfAmQBretc3xYQ154HMmaPbCnuljuT-TG7t3w0CsJID2SjqTYxa3z_LGqW8_5LzjPjGqeKMQ',
     });
 
     if (token) {
