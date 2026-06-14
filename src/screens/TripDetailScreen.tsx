@@ -497,52 +497,101 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {flights.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen transport lagt til</Text>
       ) : (
-        [...flights].sort((a, b) => {
-          if (a.type === 'utreise' && b.type !== 'utreise') return -1;
-          if (a.type !== 'utreise' && b.type === 'utreise') return 1;
-          return 0;
-        }).map((f) => {
-          const transportIcon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
-          return (
-            <TouchableOpacity
-              key={f.id}
-              style={[styles.itemCard, { backgroundColor: colors.surface }]}
-              onPress={() => openEditModal('flight', f)}
-              onLongPress={() => handleDeleteFlight(f.id)}
-            >
-              <View style={styles.itemRow}>
-                <View style={styles.itemContent}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                    {f.type && (
-                      <Text style={[styles.itemDetail, { color: f.type === 'utreise' ? colors.accent : '#E53935', fontWeight: '600' }]}>
-                        {f.type === 'utreise' ? 'Utreise' : 'Hjemreise'}
-                      </Text>
+        (() => {
+          const sorted = [...flights].sort((a, b) => {
+            if (a.type === 'utreise' && b.type !== 'utreise') return -1;
+            if (a.type !== 'utreise' && b.type === 'utreise') return 1;
+            return 0;
+          });
+          const rows: TripFlight[][] = [];
+          let i = 0;
+          while (i < sorted.length) {
+            const current = sorted[i];
+            if (current.type === 'utreise') {
+              const match = sorted.findIndex((s, idx) => idx > i && s.type === 'hjemreise');
+              if (match !== -1) {
+                rows.push([current, sorted[match]]);
+                sorted.splice(match, 1);
+              } else {
+                rows.push([current]);
+              }
+            } else {
+              rows.push([current]);
+            }
+            i++;
+          }
+          return rows.map((row, rowIdx) => (
+            <View key={rowIdx} style={styles.transportGrid}>
+              {row.map((f) => {
+                const transportIcon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
+                const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
+                const depDate = f.departureDate;
+                const arrDate = f.arrivalDate;
+                const sameDay = depDate && arrDate && depDate === arrDate;
+                const calDate = depDate || arrDate;
+                let calDay = '';
+                let calMonth = '';
+                if (calDate) {
+                  const d = new Date(calDate + 'T12:00:00');
+                  calDay = String(d.getDate());
+                  calMonth = d.toLocaleDateString('nb-NO', { month: 'short' });
+                }
+                const depLabel = f.transportType === 'bil' ? '🔑' : '🛫';
+                const arrLabel = f.transportType === 'bil' ? '📋' : '🛬';
+                return (
+                  <TouchableOpacity
+                    key={f.id}
+                    style={[styles.transportTile, { backgroundColor: colors.surface, borderLeftColor: typeColor }]}
+                    onPress={() => openEditModal('flight', f)}
+                    onLongPress={() => handleDeleteFlight(f.id)}
+                  >
+                    {calDate && (
+                      <View style={styles.calendarIcon}>
+                        <View style={[styles.calendarTop, { backgroundColor: typeColor }]} />
+                        <Text style={[styles.calendarDay, { color: colors.text }]}>{calDay}</Text>
+                        <Text style={[styles.calendarMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
+                      </View>
                     )}
-                    <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{transportIcon}</Text>
-                  </View>
-                  {f.airline && <Text style={[styles.itemName, { color: colors.text }]}>{f.airline}</Text>}
-                  {f.flightNumber && <Text style={[styles.itemDetail, { color: colors.accent }]}>{f.flightNumber}</Text>}
-                  {f.reference && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>Ref: {f.reference}</Text>}
-                  {f.wagon && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{f.wagon}</Text>}
-                  {f.driver && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>Fører: {f.driver}</Text>}
-                  {f.address && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>{f.address}</Text>}
-                  {f.departureDate || f.departureTime ? (
-                    <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>
-                      {f.transportType === 'bil' ? '🔑' : '🛫'} {[f.departureDate, f.departureTime].filter(Boolean).join(' ')}
-                    </Text>
-                  ) : null}
-                  {f.arrivalDate || f.arrivalTime ? (
-                    <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>
-                      {f.transportType === 'bil' ? '📋' : '🛬'} {[f.arrivalDate, f.arrivalTime].filter(Boolean).join(' ')}
-                    </Text>
-                  ) : null}
-                {f.phone && <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>📞 {f.phone}</Text>}
-                {f.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{f.note}</Text>}
-              </View>
+                    <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />
+                    <View style={styles.tileContent}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                        {f.type && (
+                          <Text style={{ color: typeColor, fontWeight: '600', fontSize: 12 }}>
+                            {f.type === 'utreise' ? 'Utreise' : 'Hjemreise'}
+                          </Text>
+                        )}
+                        <Text style={{ fontSize: 14 }}>{transportIcon}</Text>
+                      </View>
+                      {f.airline && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{f.airline}</Text>}
+                      {f.flightNumber && <Text style={[styles.tileDetail, { color: colors.accent }]}>{f.flightNumber}</Text>}
+                      {f.reference && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>Ref: {f.reference}</Text>}
+                      {f.wagon && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>{f.wagon}</Text>}
+                      {f.driver && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>Fører: {f.driver}</Text>}
+                      {f.address && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{f.address}</Text>}
+                      <View style={[styles.tileDivider, { backgroundColor: colors.border }]} />
+                      {f.departureDate || f.departureTime ? (
+                        <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>
+                          {depLabel} {f.departureTime || ''}
+                          {sameDay && f.departureDate ? ` ${f.departureDate}` : ''}
+                          {!sameDay && f.departureDate ? ` ${f.departureDate}` : ''}
+                        </Text>
+                      ) : null}
+                      {f.arrivalDate || f.arrivalTime ? (
+                        <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>
+                          {arrLabel} {f.arrivalTime || ''}
+                          {sameDay && f.arrivalDate && f.departureDate !== f.arrivalDate ? ` ${f.arrivalDate}` : ''}
+                        </Text>
+                      ) : null}
+                      {sameDay && calDate && (
+                        <Text style={[styles.tileDate, { color: colors.textDisabled }]}>{calDate}</Text>
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
             </View>
-          </TouchableOpacity>
-          );
-        })
+          ));
+        })()
       )}
 
       {/* Hotels */}
@@ -1784,5 +1833,65 @@ const styles = StyleSheet.create({
   flightTypeText: {
     fontSize: 15,
     fontWeight: '600',
+  },
+  transportGrid: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 10,
+  },
+  transportTile: {
+    flex: 1,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    overflow: 'hidden',
+  },
+  calendarIcon: {
+    alignItems: 'center',
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  calendarTop: {
+    width: '100%',
+    height: 4,
+    borderTopLeftRadius: 8,
+    borderTopRightRadius: 8,
+  },
+  calendarDay: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    marginTop: 4,
+    lineHeight: 30,
+  },
+  calendarMonth: {
+    fontSize: 12,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+  },
+  calendarSeparator: {
+    height: 1,
+    marginHorizontal: 10,
+    marginVertical: 6,
+  },
+  tileContent: {
+    paddingHorizontal: 10,
+    paddingBottom: 10,
+  },
+  tileName: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 2,
+  },
+  tileDetail: {
+    fontSize: 12,
+    marginTop: 1,
+  },
+  tileDate: {
+    fontSize: 11,
+    marginTop: 2,
+    fontStyle: 'italic',
+  },
+  tileDivider: {
+    height: 1,
+    marginVertical: 6,
   },
 });
