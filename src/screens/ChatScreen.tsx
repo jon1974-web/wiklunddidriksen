@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { collection, query, orderBy, limit, onSnapshot, addDoc, updateDoc, doc, runTransaction } from 'firebase/firestore';
+import { collection, query, where, orderBy, limit, onSnapshot, addDoc, updateDoc, doc, runTransaction } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 import { db, storage } from '../services/firebase';
@@ -23,12 +23,15 @@ export const ChatScreen: React.FC = () => {
   const [userAvatars, setUserAvatars] = useState<Record<string, string>>({});
   const flatListRef = useRef<FlatList>(null);
   const user = useUserStore((state) => state.user);
+  const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
 
   useEffect(() => {
+    if (!familyId) return;
     const q = query(
       collection(db, 'chat'),
+      where('familyId', '==', familyId),
       orderBy('timestamp', 'desc'),
       limit(CHAT_MESSAGE_LIMIT)
     );
@@ -50,7 +53,7 @@ export const ChatScreen: React.FC = () => {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [familyId]);
 
   useEffect(() => {
     if (messages.length === 0) return;
@@ -144,6 +147,7 @@ export const ChatScreen: React.FC = () => {
         ...(user.avatarUrl && { senderAvatarUrl: user.avatarUrl }),
         timestamp: Date.now(),
         ...(imageUrl && { imageUrl }),
+        familyId: familyId || null,
       });
 
       setNewMessage('');
@@ -157,7 +161,7 @@ export const ChatScreen: React.FC = () => {
     } finally {
       setUploading(false);
     }
-  }, [newMessage, selectedImage, user]);
+  }, [newMessage, selectedImage, user, familyId]);
 
   const canSend = newMessage.trim() || selectedImage;
 

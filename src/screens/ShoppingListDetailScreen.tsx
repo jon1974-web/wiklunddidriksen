@@ -23,6 +23,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   const newItemInputRef = useRef<TextInput>(null);
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
+  const familyId = useUserStore((state) => state.familyId);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(doc(db, 'shoppingLists', list.id), (doc) => {
@@ -61,12 +62,13 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
         items: currentList.items.map((item) => ({ ...item, id: generateId(), checked: false })),
         createdBy: user?.uid,
         createdAt: Date.now(),
+        familyId: familyId || null,
       });
       navigation.goBack();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [currentList, user, navigation]);
+  }, [currentList, user, familyId, navigation]);
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) {

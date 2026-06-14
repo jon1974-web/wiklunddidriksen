@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Platform, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebCalendar } from '../platform/CalendarView';
-import { collection, query, orderBy, onSnapshot, deleteDoc, doc, limit } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { Event, Trip, SpondEvent, SpondRespondent } from '../types';
@@ -133,7 +133,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
 
   useEffect(() => {
-    const q = query(collection(db, 'events'), orderBy('date'), limit(500));
+    if (!familyId) return;
+    const q = query(collection(db, 'events'), where('familyId', '==', familyId), orderBy('date'), limit(500));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const eventsData = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -144,16 +145,17 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       Alert.alert('Error', getErrorMessage(error));
     });
     return () => unsubscribe();
-  }, []);
+  }, [familyId]);
 
   const loadTrips = useCallback(async () => {
+    if (!familyId) return;
     try {
-      const data = await getTrips();
+      const data = await getTrips(familyId);
       setTrips(data);
     } catch (error) {
       // Silently fail for trips
     }
-  }, []);
+  }, [familyId]);
 
   useEffect(() => {
     loadTrips();

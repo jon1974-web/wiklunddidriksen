@@ -16,19 +16,21 @@ interface TripsScreenProps {
 export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+  const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
 
   const loadTrips = useCallback(async () => {
+    if (!familyId) return;
     try {
-      const data = await getTrips();
+      const data = await getTrips(familyId);
       setTrips(data);
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [familyId]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', loadTrips);

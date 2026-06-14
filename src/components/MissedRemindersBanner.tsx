@@ -9,10 +9,11 @@ export const MissedRemindersBanner: React.FC = () => {
   const [missedCount, setMissedCount] = useState(0);
   const [dismissed, setDismissed] = useState(false);
   const user = useUserStore((state) => state.user);
+  const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
 
   useEffect(() => {
-    if (!user || dismissed) return;
+    if (!user || !familyId || dismissed) return;
 
     const checkMissedReminders = async () => {
       try {
@@ -21,6 +22,7 @@ export const MissedRemindersBanner: React.FC = () => {
 
         const q = query(
           collection(db, 'events'),
+          where('familyId', '==', familyId),
           where('createdBy', '==', user.uid),
           where('date', '<=', today),
           orderBy('date', 'desc'),
@@ -53,7 +55,7 @@ export const MissedRemindersBanner: React.FC = () => {
     };
 
     checkMissedReminders();
-  }, [user, dismissed]);
+  }, [user, familyId, dismissed]);
 
   if (dismissed || missedCount === 0) return null;
 

@@ -6,6 +6,7 @@ import {
   deleteDoc,
   doc,
   orderBy,
+  where,
   query,
   limit,
 } from 'firebase/firestore';
@@ -14,15 +15,16 @@ import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink, TripHotel, 
 
 const TRIPS_COLLECTION = 'trips';
 
-export const getTrips = async (): Promise<Trip[]> => {
-  const q = query(collection(db, TRIPS_COLLECTION), orderBy('startDate', 'desc'), limit(100));
+export const getTrips = async (familyId: string): Promise<Trip[]> => {
+  const q = query(collection(db, TRIPS_COLLECTION), where('familyId', '==', familyId), orderBy('startDate', 'desc'), limit(100));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Trip));
 };
 
-export const addTrip = async (data: Omit<Trip, 'id' | 'createdAt'>): Promise<string> => {
+export const addTrip = async (data: Omit<Trip, 'id' | 'createdAt'>, familyId: string): Promise<string> => {
   const docRef = await addDoc(collection(db, TRIPS_COLLECTION), {
     ...data,
+    familyId,
     createdAt: Date.now(),
   });
   return docRef.id;

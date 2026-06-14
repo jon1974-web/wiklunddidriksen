@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { collection, query, orderBy, onSnapshot, addDoc, deleteDoc, doc, limit } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, doc, limit } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { ShoppingList } from '../types';
@@ -21,11 +21,13 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
   const [modalVisible, setModalVisible] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
   const user = useUserStore((state) => state.user);
+  const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
 
   useEffect(() => {
-    const q = query(collection(db, 'shoppingLists'), orderBy('createdAt', 'desc'), limit(100));
+    if (!familyId) return;
+    const q = query(collection(db, 'shoppingLists'), where('familyId', '==', familyId), orderBy('createdAt', 'desc'), limit(100));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const listsData = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -39,7 +41,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       crossAlert('Error', getErrorMessage(error));
     });
     return () => unsubscribe();
-  }, []);
+  }, [familyId]);
 
   const handleCreateList = useCallback(async () => {
     if (!newListTitle.trim()) {
@@ -53,13 +55,14 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
         items: [],
         createdBy: user?.uid,
         createdAt: Date.now(),
+        familyId: familyId || null,
       });
       setNewListTitle('');
       setModalVisible(false);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [newListTitle, user]);
+  }, [newListTitle, user, familyId]);
 
   const handleDeleteList = useCallback((listId: string) => {
     crossAlert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
@@ -85,11 +88,12 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
         items: list.items.map((item) => ({ ...item, id: generateId(), checked: false })),
         createdBy: user?.uid,
         createdAt: Date.now(),
+        familyId: familyId || null,
       });
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [user]);
+  }, [user, familyId]);
 
   const renderList = ({ item }: { item: ShoppingList }) => {
     const checkedCount = item.items.filter((i) => i.checked).length;

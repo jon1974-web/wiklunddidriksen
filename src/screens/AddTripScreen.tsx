@@ -22,6 +22,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   const [icon, setIcon] = useState('✈️');
   const [activePicker, setActivePicker] = useState<'start' | 'end' | null>(null);
   const user = useUserStore((state) => state.user);
+  const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
 
   const handleSave = useCallback(async () => {
@@ -47,12 +48,12 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         endDate,
         icon,
         createdBy: user?.uid || '',
-      });
+      }, familyId || '');
       navigation.goBack();
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [title, city, country, startDate, endDate, user, navigation]);
+  }, [title, city, country, startDate, endDate, icon, user, familyId, navigation]);
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
