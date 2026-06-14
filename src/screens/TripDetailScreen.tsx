@@ -552,14 +552,13 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     onPress={() => openEditModal('flight', f)}
                     onLongPress={() => handleDeleteFlight(f.id)}
                   >
+                    <View style={styles.tileTransportIcon}>
+                      <Text style={{ fontSize: 16 }}>{transportIcon}</Text>
+                    </View>
                     {calDate && (
                       <View style={styles.calendarIcon}>
                         <View style={[styles.calendarTop, { backgroundColor: typeColor }]} />
-                        <View style={styles.calendarDateRow}>
-                          <Text style={{ fontSize: 14 }}>{transportIcon}</Text>
-                          <Text style={[styles.calendarDay, { color: colors.text }]}>{calDay}</Text>
-                          <View style={{ width: 14 }} />
-                        </View>
+                        <Text style={[styles.calendarDay, { color: colors.text }]}>{calDay}</Text>
                         <Text style={[styles.calendarMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
                       </View>
                     )}
@@ -1848,6 +1847,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderLeftWidth: 4,
     overflow: 'hidden',
+  },
+  tileTransportIcon: {
+    position: 'absolute',
+    top: 8,
+    left: 8,
+    zIndex: 1,
   },
   calendarIcon: {
     alignItems: 'center',
