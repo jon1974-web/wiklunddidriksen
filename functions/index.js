@@ -1,7 +1,10 @@
 require("dotenv").config();
 const { onRequest } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
+const { getMessaging } = require("firebase-admin/messaging");
+const { getFirestore } = require("firebase-admin/firestore");
 const OpenAI = require("openai");
 const functions = require("firebase-functions");
 const Busboy = require("busboy");
@@ -340,4 +343,94 @@ Always extract a meaningful title from the speech.`,
     console.error("Voice to event error:", error.message, error.stack);
     return res.status(500).json({ error: error.message || "Internal server error" });
   }
+});
+
+// Scheduled function: check reminders every minute and send FCM push notifications
+exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-central1" }, async (event) => {
+  const db = getFirestore();
+  const now = new Date();
+  const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000);
+  const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+
+  const eventsSnap = await db.collection("events").where("reminderMinutes", ">", 0).limit(500).get();
+
+  const notifications = [];
+
+  for (const doc of eventsSnap.docs) {
+    const eventData = doc.data();
+    if (!eventData.date || !eventData.time || !eventData.createdBy) continue;
+
+    const [h, m] = eventData.time.split(":").map(Number);
+    const eventDate = new Date(eventData.date);
+    eventDate.setHours(h, m, 0, 0);
+
+    const reminderTime = new Date(eventDate.getTime() - (eventData.reminderMinutes || 0) * 60 * 1000);
+
+    if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
+      const notifRef = db.collection("sentNotifications").doc(doc.id);
+      const notifSnap = await notifRef.get();
+      if (notifSnap.exists) continue;
+
+      const userSnap = await db.collection("users").doc(eventData.createdBy).get();
+      if (!userSnap.exists) continue;
+      const userData = userSnap.data();
+      const fcmToken = userData.fcmToken;
+      if (!fcmToken) continue;
+
+      notifications.push({
+        docId: doc.id,
+        token: fcmToken,
+        title: `📅 ${eventData.title}`,
+        body: `Påminnelse om ${eventData.reminderMinutes} minutter`,
+        eventId: doc.id,
+        createdBy: eventData.createdBy,
+      });
+    }
+  }
+
+  const results = await Promise.allSettled(
+    notifications.map(async (n) => {
+      try {
+        await getMessaging().send({
+          token: n.token,
+          notification: {
+            title: n.title,
+            body: n.body,
+          },
+          webpush: {
+            notification: {
+              icon: "/favicon.ico",
+              badge: "/favicon.ico",
+              tag: n.eventId,
+            },
+            fcmOptions: {
+              link: "/",
+            },
+          },
+          data: {
+            eventId: n.eventId,
+            url: "/",
+          },
+        });
+
+        await db.collection("sentNotifications").doc(n.docId).set({
+          sentAt: new Date().toISOString(),
+          createdBy: n.createdBy,
+        });
+
+        return { status: "sent", docId: n.docId };
+      } catch (error) {
+        if (error.code === "messaging/registration-token-not-registered") {
+          await db.collection("users").doc(n.createdBy).update({ fcmToken: null });
+        }
+        return { status: "error", docId: n.docId, error: error.message };
+      }
+    })
+  );
+
+  const sent = results.filter((r) => r.status === "fulfilled" && r.value?.status === "sent").length;
+  const failed = results.filter((r) => r.status === "fulfilled" && r.value?.status === "error").length;
+
+  console.log(`checkReminders: ${sent} sent, ${failed} failed, ${notifications.length} total`);
+  return { sent, failed, total: notifications.length };
 });

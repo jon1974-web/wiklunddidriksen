@@ -15,6 +15,7 @@ import { getTrips } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services/spondService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
+import { MissedRemindersBanner } from '../components/MissedRemindersBanner';
 
 interface EventsScreenProps {
   navigation: any;
@@ -626,6 +627,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
       </View>
+
+      <MissedRemindersBanner />
 
       {viewMode === 'calendar' && (
         <View style={[styles.calendarContainer, { backgroundColor: colors.surface }]}>
