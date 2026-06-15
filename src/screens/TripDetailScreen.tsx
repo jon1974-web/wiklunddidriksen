@@ -564,7 +564,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             <>
               <View style={styles.weatherHeaderRow}>
                 <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 3 }]} numberOfLines={1}>Dag</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1 }]} numberOfLines={1}>Var</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>Vær</Text>
                 <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 2, textAlign: 'center' }]} numberOfLines={1}>Temp</Text>
                 <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>UV</Text>
                 <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'right' }]} numberOfLines={1}>Vann</Text>
