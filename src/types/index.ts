@@ -63,6 +63,16 @@ export interface WeatherDay {
   waterTemp?: number;
 }
 
+export interface DestinationTips {
+  overview: string;
+  thingsToDo: string[];
+  restaurants: string[];
+  localPhrases: { no: string; local: string; pronunciation: string }[];
+  transportTips: string[];
+  scamWarnings: string[];
+  generatedAt: string;
+}
+
 export interface Trip {
   id: string;
   title: string;
@@ -74,6 +84,7 @@ export interface Trip {
   latitude?: number;
   longitude?: number;
   weatherSummary?: WeatherDay[];
+  destinationTips?: DestinationTips;
   createdBy: string;
   createdAt: number;
 }

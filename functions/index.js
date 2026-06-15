@@ -471,3 +471,87 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
   console.log(`checkReminders: ${sent} sent, ${failed} failed, ${notifications.length} total`);
   return { sent, failed, total: notifications.length };
 });
+
+exports.destinationTips = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const { city, country, startDate, endDate, weather } = req.body || {};
+
+  if (!city) {
+    return res.status(400).json({ error: "city is required" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    let weatherContext = "";
+    if (weather && weather.length > 0) {
+      weatherContext = `\n\nWeather forecast for the stay:\n${weather.slice(0, 7).map((d) => `${d.date}: ${d.weatherDescription || "unknown"}, ${d.tempMin}°C to ${d.tempMax}°C`).join("\n")}`;
+    }
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a travel advisor for Norwegian families. Generate practical, local tips for a trip to ${city}${country ? ", " + country : ""}.
+The trip is from ${startDate || "unknown"} to ${endDate || "unknown"}.
+${weatherContext}
+
+IMPORTANT: Focus on things happening DURING the specific dates of the stay. If there are festivals, events, seasonal activities, or time-specific experiences, put them FIRST in the thingsToDo list.
+
+Respond in Norwegian. Return ONLY valid JSON with this exact structure:
+{
+  "overview": "A 2-3 sentence overview of the destination and what makes it great for this time of year",
+  "thingsToDo": ["Specific event/activity happening during their dates...", "General must-see...", "..."],
+  "restaurants": ["Local restaurant tip 1...", "..."],
+  "localPhrases": [{"no": "Norwegian phrase", "local": "Local translation", "pronunciation": "How to say it"}],
+  "transportTips": ["Practical transport advice...", "..."],
+  "scamWarnings": ["Common tourist traps to avoid...", "..."]
+}
+
+Include 5-7 items in thingsToDo and restaurants. Include 3-5 local phrases. Include 3-4 transport tips and 2-3 scam warnings. Be specific and practical, not generic.`,
+        },
+        {
+          role: "user",
+          content: `Give me destination tips for ${city}${country ? ", " + country : ""} from ${startDate} to ${endDate}.`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    });
+
+    const result = JSON.parse(completion.choices[0].message.content);
+
+    const tips = {
+      overview: result.overview || "",
+      thingsToDo: result.thingsToDo || [],
+      restaurants: result.restaurants || [],
+      localPhrases: result.localPhrases || [],
+      transportTips: result.transportTips || [],
+      scamWarnings: result.scamWarnings || [],
+      generatedAt: new Date().toISOString(),
+    };
+
+    return res.status(200).json({ tips });
+  } catch (error) {
+    console.error("Destination tips error:", error.message);
+    return res.status(500).json({ error: "Failed to generate tips" });
+  }
+});

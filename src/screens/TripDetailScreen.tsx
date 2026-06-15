@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink } from '../types';
+import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink, DestinationTips } from '../types';
 import { crossAlert } from '../utils/alert';
 import {
   getTripHotels,
@@ -56,7 +56,7 @@ import { TRIP_ICONS } from '../constants/tripIcons';
 import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
 import { WeatherDay } from '../types';
 import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
+import { db, auth } from '../services/firebase';
 
 interface TripDetailScreenProps {
   navigation: any;
@@ -213,6 +213,48 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     const d = new Date(dateStr);
     return `${d.toLocaleDateString('nb-NO', { weekday: 'short' })} ${d.getDate()}.${d.getMonth() + 1}`;
   };
+
+  const [tips, setTips] = useState<DestinationTips | null>(trip.destinationTips || null);
+  const [tipsLoading, setTipsLoading] = useState(false);
+  const [tipsError, setTipsError] = useState<string | null>(null);
+
+  const generateTips = useCallback(async (regenerate = false) => {
+    if (tips && !regenerate) return;
+    setTipsLoading(true);
+    setTipsError(null);
+    try {
+      const user = auth.currentUser;
+      if (!user) throw new Error('Ikke innlogget');
+      const token = await user.getIdToken();
+
+      const weatherSummary = trip.weatherSummary || [];
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/destinationTips', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          city: trip.city,
+          country: trip.country,
+          startDate: trip.startDate,
+          endDate: trip.endDate,
+          weather: weatherSummary,
+        }),
+      });
+      if (!res.ok) throw new Error('Kunne ikke generere tips');
+      const data = await res.json();
+      setTips(data.tips);
+      try {
+        await updateDoc(doc(db, 'trips', trip.id), { destinationTips: data.tips });
+      } catch {}
+    } catch (error: any) {
+      setTipsError(error.message || 'Noe gikk galt');
+    } finally {
+      setTipsLoading(false);
+    }
+  }, [trip, tips]);
+
+  useEffect(() => {
+    if (trip.destinationTips) setTips(trip.destinationTips);
+  }, [trip.destinationTips]);
 
   const resetForms = () => {
     setHotelForm(emptyHotel);
@@ -708,6 +750,91 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             </View>
           </TouchableOpacity>
         ))
+      )}
+
+      {/* Destination Tips */}
+      <View style={styles.sectionHeader}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 Destinasjonstips</Text>
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: colors.accent }]}
+          onPress={() => generateTips(!!tips)}
+          disabled={tipsLoading}
+        >
+          <Text style={styles.addButtonText}>{tipsLoading ? '...' : tips ? '↻' : '+'}</Text>
+        </TouchableOpacity>
+      </View>
+      {tipsLoading ? (
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Genererer tips...</Text>
+      ) : tipsError ? (
+        <Text style={[styles.emptySection, { color: '#E53935' }]}>{tipsError}</Text>
+      ) : tips ? (
+        <View>
+          {tips.overview ? (
+            <Text style={[styles.tipsOverview, { color: colors.text }]}>{tips.overview}</Text>
+          ) : null}
+
+          {tips.thingsToDo.length > 0 && (
+            <View style={styles.tipsGroup}>
+              <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🗓️ Ting å gjøre</Text>
+              {tips.thingsToDo.map((item, i) => (
+                <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+              ))}
+            </View>
+          )}
+
+          {tips.restaurants.length > 0 && (
+            <View style={styles.tipsGroup}>
+              <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🍽️ Restauranter</Text>
+              {tips.restaurants.map((item, i) => (
+                <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+              ))}
+            </View>
+          )}
+
+          {tips.localPhrases.length > 0 && (
+            <View style={styles.tipsGroup}>
+              <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>💬 Nyttige fraser</Text>
+              {tips.localPhrases.map((p, i) => (
+                <View key={i} style={styles.phraseRow}>
+                  <Text style={[styles.phraseText, { color: colors.text }]}>{p.no}</Text>
+                  <Text style={[styles.phraseArrow, { color: colors.textSecondary }]}> → </Text>
+                  <Text style={[styles.phraseText, { color: colors.accent }]}>{p.local}</Text>
+                  {p.pronunciation ? (
+                    <Text style={[styles.phrasePron, { color: colors.textSecondary }]}> ({p.pronunciation})</Text>
+                  ) : null}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {tips.transportTips.length > 0 && (
+            <View style={styles.tipsGroup}>
+              <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🚗 Transport</Text>
+              {tips.transportTips.map((item, i) => (
+                <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+              ))}
+            </View>
+          )}
+
+          {tips.scamWarnings.length > 0 && (
+            <View style={styles.tipsGroup}>
+              <Text style={[styles.tipsGroupTitle, { color: '#E53935' }]}>⚠️ Varsler</Text>
+              {tips.scamWarnings.map((item, i) => (
+                <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+              ))}
+            </View>
+          )}
+
+          {tips.generatedAt ? (
+            <Text style={[styles.tipsGenerated, { color: colors.textDisabled }]}>
+              Generert {new Date(tips.generatedAt).toLocaleDateString('nb-NO')}
+            </Text>
+          ) : null}
+        </View>
+      ) : (
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>
+          Trykk + for å generere tips for {trip.city}
+        </Text>
       )}
 
       {/* Links */}
@@ -1322,5 +1449,46 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 12,
+  },
+  tipsOverview: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  tipsGroup: {
+    marginBottom: 12,
+  },
+  tipsGroupTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  tipsItem: {
+    fontSize: 13,
+    lineHeight: 19,
+    marginBottom: 2,
+    paddingLeft: 8,
+  },
+  phraseRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+    paddingLeft: 8,
+  },
+  phraseText: {
+    fontSize: 13,
+  },
+  phraseArrow: {
+    fontSize: 13,
+  },
+  phrasePron: {
+    fontSize: 12,
+    fontStyle: 'italic',
+  },
+  tipsGenerated: {
+    fontSize: 11,
+    marginTop: 8,
+    fontStyle: 'italic',
   },
 });
