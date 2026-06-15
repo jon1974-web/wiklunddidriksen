@@ -10,6 +10,7 @@ import {
   TouchableWithoutFeedback,
   Linking,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink, DestinationTips, CityTips } from '../types';
@@ -794,13 +795,19 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {stagedCity && (
         <View style={[styles.stagedCityRow, { borderColor: colors.accent, backgroundColor: colors.surface }]}>
           <Text style={[styles.stagedCityName, { color: colors.text }]}>📍 {stagedCity}</Text>
-          <TouchableOpacity
-            style={[styles.generateButton, { backgroundColor: colors.accent }]}
-            onPress={() => handleGenerateTips(stagedCity)}
-            disabled={tipsLoading}
-          >
-            <Text style={styles.generateButtonText}>{tipsLoading ? '...' : 'Generer'}</Text>
-          </TouchableOpacity>
+          {tipsLoading ? (
+            <View style={[styles.generateButton, { backgroundColor: colors.accent, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={styles.generateButtonText}>Genererer...</Text>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[styles.generateButton, { backgroundColor: colors.accent }]}
+              onPress={() => handleGenerateTips(stagedCity)}
+            >
+              <Text style={styles.generateButtonText}>Generer</Text>
+            </TouchableOpacity>
+          )}
         </View>
       )}
 
