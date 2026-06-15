@@ -12,7 +12,7 @@ import {
   Platform,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink, DestinationTips } from '../types';
+import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink, DestinationTips, CityTips } from '../types';
 import { crossAlert } from '../utils/alert';
 import {
   getTripHotels,
@@ -214,12 +214,24 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     return `${d.toLocaleDateString('nb-NO', { weekday: 'short' })} ${d.getDate()}.${d.getMonth() + 1}`;
   };
 
-  const [tips, setTips] = useState<DestinationTips | null>(trip.destinationTips || null);
+  const [cityTipsList, setCityTipsList] = useState<CityTips[]>(
+    Array.isArray(trip.destinationTips) ? trip.destinationTips : []
+  );
+  const [tipsSearchValue, setTipsSearchValue] = useState('');
+  const [stagedCity, setStagedCity] = useState<string | null>(null);
+  const [expandedTipsCity, setExpandedTipsCity] = useState<string | null>(null);
   const [tipsLoading, setTipsLoading] = useState(false);
   const [tipsError, setTipsError] = useState<string | null>(null);
 
-  const generateTips = useCallback(async (regenerate = false) => {
-    if (tips && !regenerate) return;
+  useEffect(() => {
+    if (Array.isArray(trip.destinationTips)) {
+      setCityTipsList(trip.destinationTips);
+    } else if (trip.destinationTips && typeof trip.destinationTips === 'object') {
+      setCityTipsList([{ city: trip.city, tips: trip.destinationTips as unknown as DestinationTips }]);
+    }
+  }, [trip.destinationTips, trip.city]);
+
+  const handleGenerateTips = useCallback(async (city: string, existingIndex?: number) => {
     setTipsLoading(true);
     setTipsError(null);
     try {
@@ -232,7 +244,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
-          city: trip.city,
+          city,
           country: trip.country,
           startDate: trip.startDate,
           endDate: trip.endDate,
@@ -241,20 +253,30 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       });
       if (!res.ok) throw new Error('Kunne ikke generere tips');
       const data = await res.json();
-      setTips(data.tips);
+
+      const newEntry: CityTips = { city, tips: data.tips };
+      let updatedList: CityTips[];
+      if (existingIndex !== undefined && existingIndex >= 0) {
+        updatedList = [...cityTipsList];
+        updatedList[existingIndex] = newEntry;
+      } else {
+        updatedList = [...cityTipsList, newEntry];
+      }
+
+      setCityTipsList(updatedList);
+      setExpandedTipsCity(city);
+      setStagedCity(null);
+      setTipsSearchValue('');
+
       try {
-        await updateDoc(doc(db, 'trips', trip.id), { destinationTips: data.tips });
+        await updateDoc(doc(db, 'trips', trip.id), { destinationTips: updatedList });
       } catch {}
     } catch (error: any) {
       setTipsError(error.message || 'Noe gikk galt');
     } finally {
       setTipsLoading(false);
     }
-  }, [trip, tips]);
-
-  useEffect(() => {
-    if (trip.destinationTips) setTips(trip.destinationTips);
-  }, [trip.destinationTips]);
+  }, [trip, cityTipsList]);
 
   const resetForms = () => {
     setHotelForm(emptyHotel);
@@ -755,85 +777,133 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {/* Destination Tips */}
       <View style={styles.sectionHeader}>
         <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 Destinasjonstips</Text>
-        <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: colors.accent }]}
-          onPress={() => generateTips(!!tips)}
-          disabled={tipsLoading}
-        >
-          <Text style={styles.addButtonText}>{tipsLoading ? '...' : tips ? '↻' : '+'}</Text>
-        </TouchableOpacity>
       </View>
-      {tipsLoading ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Genererer tips...</Text>
-      ) : tipsError ? (
-        <Text style={[styles.emptySection, { color: '#E53935' }]}>{tipsError}</Text>
-      ) : tips ? (
-        <View>
-          {tips.overview ? (
-            <Text style={[styles.tipsOverview, { color: colors.text }]}>{tips.overview}</Text>
-          ) : null}
 
-          {tips.thingsToDo.length > 0 && (
-            <View style={styles.tipsGroup}>
-              <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🗓️ Ting å gjøre</Text>
-              {tips.thingsToDo.map((item, i) => (
-                <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
-              ))}
-            </View>
-          )}
+      <GooglePlacesInput
+        value={tipsSearchValue}
+        onChangeText={setTipsSearchValue}
+        placeholder="Søk etter by..."
+        onSelect={(description) => {
+          const cityName = description.split(',')[0].trim();
+          setStagedCity(cityName);
+          setTipsSearchValue(cityName);
+        }}
+        types={['(cities)']}
+      />
 
-          {tips.restaurants.length > 0 && (
-            <View style={styles.tipsGroup}>
-              <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🍽️ Restauranter</Text>
-              {tips.restaurants.map((item, i) => (
-                <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
-              ))}
-            </View>
-          )}
-
-          {tips.localPhrases.length > 0 && (
-            <View style={styles.tipsGroup}>
-              <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>💬 Nyttige fraser</Text>
-              {tips.localPhrases.map((p, i) => (
-                <View key={i} style={styles.phraseRow}>
-                  <Text style={[styles.phraseText, { color: colors.text }]}>{p.no}</Text>
-                  <Text style={[styles.phraseArrow, { color: colors.textSecondary }]}> → </Text>
-                  <Text style={[styles.phraseText, { color: colors.accent }]}>{p.local}</Text>
-                  {p.pronunciation ? (
-                    <Text style={[styles.phrasePron, { color: colors.textSecondary }]}> ({p.pronunciation})</Text>
-                  ) : null}
-                </View>
-              ))}
-            </View>
-          )}
-
-          {tips.transportTips.length > 0 && (
-            <View style={styles.tipsGroup}>
-              <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🚗 Transport</Text>
-              {tips.transportTips.map((item, i) => (
-                <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
-              ))}
-            </View>
-          )}
-
-          {tips.scamWarnings.length > 0 && (
-            <View style={styles.tipsGroup}>
-              <Text style={[styles.tipsGroupTitle, { color: '#E53935' }]}>⚠️ Varsler</Text>
-              {tips.scamWarnings.map((item, i) => (
-                <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
-              ))}
-            </View>
-          )}
-
-          {tips.generatedAt ? (
-            <Text style={[styles.tipsGenerated, { color: colors.textDisabled }]}>
-              Generert {new Date(tips.generatedAt).toLocaleDateString('nb-NO')}
-            </Text>
-          ) : null}
+      {stagedCity && (
+        <View style={styles.stagedCityRow}>
+          <Text style={[styles.stagedCityName, { color: colors.text }]}>{stagedCity}</Text>
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: colors.accent }]}
+            onPress={() => handleGenerateTips(stagedCity)}
+            disabled={tipsLoading}
+          >
+            <Text style={styles.addButtonText}>{tipsLoading ? '...' : 'Generer +'}</Text>
+          </TouchableOpacity>
         </View>
-      ) : (
+      )}
+
+      {tipsLoading && !stagedCity && (
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Genererer tips...</Text>
+      )}
+      {tipsError && (
+        <Text style={[styles.emptySection, { color: '#E53935' }]}>{tipsError}</Text>
+      )}
+
+      {cityTipsList.map((entry) => {
+        const isExpanded = expandedTipsCity === entry.city;
+        return (
+          <View key={entry.city} style={[styles.tipsExpandable, { borderColor: colors.border }]}>
+            <TouchableOpacity
+              style={[styles.tipsExpandHeader, { backgroundColor: colors.surface }]}
+              onPress={() => setExpandedTipsCity(isExpanded ? null : entry.city)}
+            >
+              <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{isExpanded ? '▼' : '▶'}</Text>
+              <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>{entry.city}</Text>
+              <Text style={[styles.tipsExpandDate, { color: colors.textDisabled }]}>
+                {new Date(entry.tips.generatedAt).toLocaleDateString('nb-NO')}
+              </Text>
+              <TouchableOpacity
+                onPress={() => {
+                  const idx = cityTipsList.findIndex((e) => e.city === entry.city);
+                  handleGenerateTips(entry.city, idx);
+                }}
+                disabled={tipsLoading}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={[styles.tipsRefreshBtn, { color: colors.accent }]}>
+                  {tipsLoading ? '...' : '↻'}
+                </Text>
+              </TouchableOpacity>
+            </TouchableOpacity>
+
+            {isExpanded && (
+              <View style={[styles.tipsExpandBody, { backgroundColor: colors.background }]}>
+                {entry.tips.overview ? (
+                  <Text style={[styles.tipsOverview, { color: colors.text }]}>{entry.tips.overview}</Text>
+                ) : null}
+
+                {entry.tips.thingsToDo.length > 0 && (
+                  <View style={styles.tipsGroup}>
+                    <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🗓️ Ting å gjøre</Text>
+                    {entry.tips.thingsToDo.map((item, i) => (
+                      <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+                    ))}
+                  </View>
+                )}
+
+                {entry.tips.restaurants.length > 0 && (
+                  <View style={styles.tipsGroup}>
+                    <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🍽️ Restauranter</Text>
+                    {entry.tips.restaurants.map((item, i) => (
+                      <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+                    ))}
+                  </View>
+                )}
+
+                {entry.tips.localPhrases.length > 0 && (
+                  <View style={styles.tipsGroup}>
+                    <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>💬 Nyttige fraser</Text>
+                    {entry.tips.localPhrases.map((p, i) => (
+                      <View key={i} style={styles.phraseRow}>
+                        <Text style={[styles.phraseText, { color: colors.text }]}>{p.no}</Text>
+                        <Text style={[styles.phraseArrow, { color: colors.textSecondary }]}> → </Text>
+                        <Text style={[styles.phraseText, { color: colors.accent }]}>{p.local}</Text>
+                        {p.pronunciation ? (
+                          <Text style={[styles.phrasePron, { color: colors.textSecondary }]}> ({p.pronunciation})</Text>
+                        ) : null}
+                      </View>
+                    ))}
+                  </View>
+                )}
+
+                {entry.tips.transportTips.length > 0 && (
+                  <View style={styles.tipsGroup}>
+                    <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🚗 Transport</Text>
+                    {entry.tips.transportTips.map((item, i) => (
+                      <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+                    ))}
+                  </View>
+                )}
+
+                {entry.tips.scamWarnings.length > 0 && (
+                  <View style={styles.tipsGroup}>
+                    <Text style={[styles.tipsGroupTitle, { color: '#E53935' }]}>⚠️ Varsler</Text>
+                    {entry.tips.scamWarnings.map((item, i) => (
+                      <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+        );
+      })}
+
+      {cityTipsList.length === 0 && !tipsLoading && !stagedCity && (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>
-          Trykk + for å generere tips for {trip.city}
+          Søk etter en by for å generere destinasjonstips
         </Text>
       )}
 
@@ -1486,9 +1556,52 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontStyle: 'italic',
   },
-  tipsGenerated: {
-    fontSize: 11,
+  stagedCityRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 12,
     marginTop: 8,
-    fontStyle: 'italic',
+    marginBottom: 4,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#0097A7',
+    borderStyle: 'dashed',
+  },
+  stagedCityName: {
+    fontSize: 15,
+    fontWeight: '600',
+    flex: 1,
+  },
+  tipsExpandable: {
+    borderRadius: 8,
+    borderWidth: 1,
+    marginTop: 8,
+    overflow: 'hidden',
+  },
+  tipsExpandHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+  tipsExpandIcon: {
+    fontSize: 12,
+    marginRight: 8,
+  },
+  tipsExpandTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    flex: 1,
+  },
+  tipsExpandDate: {
+    fontSize: 12,
+    marginRight: 8,
+  },
+  tipsRefreshBtn: {
+    fontSize: 16,
+  },
+  tipsExpandBody: {
+    padding: 12,
+    paddingTop: 0,
   },
 });

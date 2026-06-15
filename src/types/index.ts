@@ -73,6 +73,11 @@ export interface DestinationTips {
   generatedAt: string;
 }
 
+export interface CityTips {
+  city: string;
+  tips: DestinationTips;
+}
+
 export interface Trip {
   id: string;
   title: string;
@@ -84,7 +89,7 @@ export interface Trip {
   latitude?: number;
   longitude?: number;
   weatherSummary?: WeatherDay[];
-  destinationTips?: DestinationTips;
+  destinationTips?: CityTips[];
   createdBy: string;
   createdAt: number;
 }
