@@ -53,6 +53,10 @@ import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
 import { TRIP_ICONS } from '../constants/tripIcons';
+import { getForecast, getHistoricalWeather, wmoToEmoji } from '../services/weatherService';
+import { WeatherDay } from '../types';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
 
 interface TripDetailScreenProps {
   navigation: any;
@@ -159,6 +163,43 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   useEffect(() => {
     loadSubData();
   }, [loadSubData]);
+
+  const [weather, setWeather] = useState<WeatherDay[]>([]);
+  const [weatherPage, setWeatherPage] = useState(0);
+  const [weatherLoading, setWeatherLoading] = useState(true);
+  const [refreshingWeather, setRefreshingWeather] = useState(false);
+  const WEATHER_PAGE_SIZE = 5;
+
+  const today = getTodayLocal();
+  const isActive = trip.endDate >= today;
+
+  const fetchWeather = useCallback(async (showRefresh = false) => {
+    if (!trip.latitude || !trip.longitude) { setWeatherLoading(false); return; }
+    if (showRefresh) setRefreshingWeather(true);
+    try {
+      if (isActive) {
+        const forecast = await getForecast(trip.latitude, trip.longitude, 2);
+        setWeather(forecast);
+      } else if (trip.weatherSummary && trip.weatherSummary.length > 0) {
+        setWeather(trip.weatherSummary);
+      } else {
+        const historical = await getHistoricalWeather(trip.latitude, trip.longitude, trip.startDate, trip.endDate);
+        setWeather(historical);
+        if (historical.length > 0) {
+          try {
+            const tripRef = doc(db, 'trips', trip.id);
+            await updateDoc(tripRef, { weatherSummary: historical });
+          } catch {}
+        }
+      }
+    } catch {}
+    finally { setWeatherLoading(false); setRefreshingWeather(false); }
+  }, [trip, isActive]);
+
+  useEffect(() => { fetchWeather(); }, [fetchWeather]);
+
+  const pagedWeather = weather.slice(weatherPage * WEATHER_PAGE_SIZE, (weatherPage + 1) * WEATHER_PAGE_SIZE);
+  const weatherPages = Math.ceil(weather.length / WEATHER_PAGE_SIZE);
 
   const resetForms = () => {
     setHotelForm(emptyHotel);
@@ -486,6 +527,59 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
         </Text>
       </TouchableOpacity>
+
+      {/* Vær */}
+      {(trip.latitude && trip.longitude) && (
+        <View>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>🌤️ Vær</Text>
+            {isActive && (
+              <TouchableOpacity
+                onPress={() => fetchWeather(true)}
+                disabled={refreshingWeather}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={{ color: colors.accent, fontSize: 14 }}>{refreshingWeather ? '⟳ Oppdaterer...' : '↻ Oppdater'}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {weatherLoading ? (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Henter værdata...</Text>
+          ) : weather.length === 0 ? (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen værdata tilgjengelig</Text>
+          ) : (
+            <>
+              <View style={styles.weatherHeaderRow}>
+                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 2 }]}>Dag</Text>
+                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 2, textAlign: 'center' }]}>Vær</Text>
+                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 2, textAlign: 'center' }]}>Temperatur</Text>
+                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 1, textAlign: 'center' }]}>UV</Text>
+                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 2, textAlign: 'right' }]}>Vann</Text>
+              </View>
+              {pagedWeather.map((day, i) => (
+                <View key={day.date} style={[styles.weatherRow, i % 2 === 0 ? { backgroundColor: colors.surface } : { backgroundColor: colors.background }]}>
+                  <Text style={[styles.weatherDayText, { color: colors.text, flex: 2 }]}>{formatDate(day.date)}</Text>
+                  <Text style={{ flex: 2, textAlign: 'center' }}>{wmoToEmoji(day.weatherCode)}</Text>
+                  <Text style={[styles.weatherDayText, { color: colors.text, flex: 2, textAlign: 'center' }]}>{day.tempMin}° / {day.tempMax}°</Text>
+                  <Text style={[styles.weatherDayText, { color: day.uvIndex >= 8 ? '#E53935' : colors.text, flex: 1, textAlign: 'center' }]}>{day.uvIndex}</Text>
+                  <Text style={[styles.weatherDayText, { color: colors.textSecondary, flex: 2, textAlign: 'right' }]}>{day.waterTemp != null ? `${day.waterTemp}°` : '—'}</Text>
+                </View>
+              ))}
+              {weatherPages > 1 && (
+                <View style={styles.weatherPagination}>
+                  <TouchableOpacity disabled={weatherPage === 0} onPress={() => setWeatherPage((p) => p - 1)}>
+                    <Text style={{ color: weatherPage === 0 ? colors.textDisabled : colors.accent }}>← Forrige</Text>
+                  </TouchableOpacity>
+                  <Text style={{ color: colors.textSecondary }}>{weatherPage + 1} / {weatherPages}</Text>
+                  <TouchableOpacity disabled={weatherPage >= weatherPages - 1} onPress={() => setWeatherPage((p) => p + 1)}>
+                    <Text style={{ color: weatherPage >= weatherPages - 1 ? colors.textDisabled : colors.accent }}>Neste →</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
+          )}
+        </View>
+      )}
 
       {/* Transport */}
       {renderSectionHeader('Transport', '🚀', () => openAddModal('flight'))}
@@ -1167,5 +1261,32 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 10,
     marginBottom: 10,
+  },
+  weatherHeaderRow: {
+    flexDirection: 'row',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+  },
+  weatherHeaderText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  weatherRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+  },
+  weatherDayText: {
+    fontSize: 14,
+  },
+  weatherPagination: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
   },
 });

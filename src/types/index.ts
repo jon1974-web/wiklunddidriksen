@@ -54,6 +54,15 @@ export interface ChatMessage {
   reactions?: MessageReaction[];
 }
 
+export interface WeatherDay {
+  date: string;
+  tempMin: number;
+  tempMax: number;
+  weatherCode: number;
+  uvIndex: number;
+  waterTemp?: number;
+}
+
 export interface Trip {
   id: string;
   title: string;
@@ -62,6 +71,9 @@ export interface Trip {
   startDate: string;
   endDate: string;
   icon?: string;
+  latitude?: number;
+  longitude?: number;
+  weatherSummary?: WeatherDay[];
   createdBy: string;
   createdAt: number;
 }

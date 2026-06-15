@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip } from '../types';
+import { Trip, WeatherDay } from '../types';
 import { getTrips } from '../services/tripService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { useUserStore } from '../store/userStore';
+import { getForecast, wmoToEmoji } from '../services/weatherService';
 
 interface TripsScreenProps {
   navigation: any;
@@ -16,9 +17,30 @@ interface TripsScreenProps {
 export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [weatherMap, setWeatherMap] = useState<Record<string, WeatherDay[]>>({});
+  const [refreshingWeather, setRefreshingWeather] = useState<Record<string, boolean>>({});
+  const fetchedRef = useRef<Set<string>>(new Set());
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
+
+  const today = getTodayLocal();
+
+  const isUpcomingOrActive = useCallback((trip: Trip) => {
+    return trip.endDate >= today;
+  }, [today]);
+
+  const fetchWeatherForTrip = useCallback(async (trip: Trip) => {
+    if (!trip.latitude || !trip.longitude) return;
+    if (isUpcomingOrActive(trip)) {
+      const forecast = await getForecast(trip.latitude, trip.longitude, 1);
+      if (forecast.length > 0) {
+        setWeatherMap((prev) => ({ ...prev, [trip.id]: forecast }));
+      }
+    } else if (trip.weatherSummary && trip.weatherSummary.length > 0) {
+      setWeatherMap((prev) => ({ ...prev, [trip.id]: trip.weatherSummary! }));
+    }
+  }, [isUpcomingOrActive]);
 
   const loadTrips = useCallback(async () => {
     if (!familyId) return;
@@ -37,9 +59,28 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
     return unsubscribe;
   }, [navigation, loadTrips]);
 
+  useEffect(() => {
+    for (const trip of trips) {
+      if (!fetchedRef.current.has(trip.id)) {
+        fetchedRef.current.add(trip.id);
+        fetchWeatherForTrip(trip);
+      }
+    }
+  }, [trips, fetchWeatherForTrip]);
+
+  const handleRefreshWeather = useCallback(async (trip: Trip) => {
+    setRefreshingWeather((prev) => ({ ...prev, [trip.id]: true }));
+    fetchedRef.current.delete(trip.id);
+    await fetchWeatherForTrip(trip);
+    setRefreshingWeather((prev) => ({ ...prev, [trip.id]: false }));
+  }, [fetchWeatherForTrip]);
+
   const renderTrip = ({ item }: { item: Trip }) => {
     const locationQuery = item.country ? `${item.city}, ${item.country}` : item.city;
     const tripMapUrl = item.city ? getStaticMapUrl(locationQuery) : null;
+    const weather = weatherMap[item.id];
+    const isActive = isUpcomingOrActive(item);
+
     return (
       <TouchableOpacity
         style={[styles.card, { backgroundColor: colors.surface }]}
@@ -57,6 +98,25 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
             <Text style={[styles.cardDateText, { color: colors.textSecondary }]}>
               {formatDate(item.startDate)} - {formatDate(item.endDate)}
             </Text>
+            {weather && weather.length > 0 && (
+              <View style={styles.weatherRow}>
+                <Text style={styles.weatherIcon}>{wmoToEmoji(weather[0].weatherCode)}</Text>
+                <Text style={[styles.weatherTemp, { color: colors.text }]}>
+                  {weather[0].tempMin}° / {weather[0].tempMax}°
+                </Text>
+                {isActive && (
+                  <TouchableOpacity
+                    onPress={() => handleRefreshWeather(item)}
+                    disabled={refreshingWeather[item.id]}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Text style={[styles.refreshIcon, { color: colors.accent }]}>
+                      {refreshingWeather[item.id] ? '⟳' : '↻'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
           </View>
           {tripMapUrl && (
             <TouchableOpacity
@@ -164,6 +224,22 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   cardDateText: {
+    fontSize: 14,
+  },
+  weatherRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+  },
+  weatherIcon: {
+    fontSize: 16,
+  },
+  weatherTemp: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  refreshIcon: {
     fontSize: 14,
   },
   mapContainer: {

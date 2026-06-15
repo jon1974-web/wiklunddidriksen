@@ -8,6 +8,7 @@ import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { TRIP_ICONS } from '../constants/tripIcons';
+import { geocodeCity } from '../services/weatherService';
 
 interface AddTripScreenProps {
   navigation: any;
@@ -40,6 +41,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
     }
 
     try {
+      const coords = await geocodeCity(city);
       await addTrip({
         title: sanitizeInput(title),
         city: sanitizeInput(city),
@@ -47,6 +49,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         startDate,
         endDate,
         icon,
+        ...(coords ? { latitude: coords.latitude, longitude: coords.longitude } : {}),
         createdBy: user?.uid || '',
       }, familyId || '');
       navigation.goBack();

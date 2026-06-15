@@ -1,0 +1,189 @@
+import { WeatherDay } from '../types';
+
+const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
+const FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
+const MARINE_URL = 'https://marine-api.open-meteo.com/v1/marine';
+const HISTORICAL_URL = 'https://archive-api.open-meteo.com/v1/archive';
+
+interface CacheEntry {
+  data: any;
+  expiresAt: number;
+}
+
+const cache = new Map<string, CacheEntry>();
+const CACHE_TTL = 30 * 60 * 1000;
+
+function getCacheKey(...parts: (string | number)[]): string {
+  return parts.join('|');
+}
+
+function getCached<T>(key: string): T | null {
+  const entry = cache.get(key);
+  if (!entry) return null;
+  if (Date.now() > entry.expiresAt) {
+    cache.delete(key);
+    return null;
+  }
+  return entry.data as T;
+}
+
+function setCache(key: string, data: any): void {
+  cache.set(key, { data, expiresAt: Date.now() + CACHE_TTL });
+}
+
+export async function geocodeCity(city: string): Promise<{ latitude: number; longitude: number } | null> {
+  const key = getCacheKey('geo', city);
+  const cached = getCached<{ latitude: number; longitude: number }>(key);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(`${GEOCODING_URL}?name=${encodeURIComponent(city)}&count=1&language=no`);
+    const data = await res.json();
+    if (data.results && data.results.length > 0) {
+      const result = data.results[0];
+      const coords = { latitude: result.latitude, longitude: result.longitude };
+      setCache(key, coords);
+      return coords;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function wmoToEmoji(code: number): string {
+  if (code === 0) return '☀️';
+  if (code <= 3) return code === 1 ? '🌤️' : code === 2 ? '⛅' : '☁️';
+  if (code <= 48) return '🌫️';
+  if (code <= 55) return '🌧️';
+  if (code <= 57) return '🌧️';
+  if (code <= 65) return '🌧️';
+  if (code <= 67) return '🌧️';
+  if (code <= 75) return '❄️';
+  if (code <= 77) return '❄️';
+  if (code <= 82) return '🌦️';
+  if (code <= 86) return '❄️';
+  if (code <= 99) return '⛈️';
+  return '🌤️';
+}
+
+function wmoToDescription(code: number): string {
+  if (code === 0) return 'Sol';
+  if (code === 1) return 'Nesten klar';
+  if (code === 2) return 'Delvis skyet';
+  if (code === 3) return 'Skyet';
+  if (code <= 48) return 'Tåke';
+  if (code <= 55) return 'Dugg';
+  if (code <= 65) return 'Regn';
+  if (code <= 67) return 'Sludd';
+  if (code <= 75) return 'Snø';
+  if (code <= 77) return 'Snø';
+  if (code <= 82) return 'Regnbyger';
+  if (code <= 86) return 'Snøbyger';
+  if (code <= 99) return 'Tordenvær';
+  return 'Ukjent';
+}
+
+export { wmoToEmoji, wmoToDescription };
+
+export async function getForecast(
+  latitude: number,
+  longitude: number,
+  days: number = 10
+): Promise<WeatherDay[]> {
+  const key = getCacheKey('forecast', latitude, longitude, days);
+  const cached = getCached<WeatherDay[]>(key);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(
+      `${FORECAST_URL}?latitude=${latitude}&longitude=${longitude}` +
+      `&daily=weather_code,temperature_2m_max,temperature_2m_min,uv_index_max` +
+      `&timezone=auto&forecast_days=${days}`
+    );
+    const data = await res.json();
+    if (!data.daily) return [];
+
+    const days_: WeatherDay[] = data.daily.time.map((date: string, i: number) => ({
+      date,
+      tempMin: Math.round(data.daily.temperature_2m_min[i]),
+      tempMax: Math.round(data.daily.temperature_2m_max[i]),
+      weatherCode: data.daily.weather_code[i],
+      uvIndex: Math.round(data.daily.uv_index_max[i] ?? 0),
+    }));
+
+    const waterTemp = await getWaterTemperature(latitude, longitude);
+    if (waterTemp !== null) {
+      days_.forEach((d) => { d.waterTemp = waterTemp; });
+    }
+
+    setCache(key, days_);
+    return days_;
+  } catch {
+    return [];
+  }
+}
+
+export async function getWaterTemperature(
+  latitude: number,
+  longitude: number
+): Promise<number | null> {
+  const key = getCacheKey('marine', latitude, longitude);
+  const cached = getCached<number>(key);
+  if (cached !== null) return cached;
+
+  try {
+    const res = await fetch(
+      `${MARINE_URL}?latitude=${latitude}&longitude=${longitude}&current=sea_surface_temperature`
+    );
+    const data = await res.json();
+    if (data.current && data.current.sea_surface_temperature != null) {
+      const temp = Math.round(data.current.sea_surface_temperature);
+      setCache(key, temp);
+      return temp;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+export async function getHistoricalWeather(
+  latitude: number,
+  longitude: number,
+  startDate: string,
+  endDate: string
+): Promise<WeatherDay[]> {
+  const key = getCacheKey('hist', latitude, longitude, startDate, endDate);
+  const cached = getCached<WeatherDay[]>(key);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(
+      `${HISTORICAL_URL}?latitude=${latitude}&longitude=${longitude}` +
+      `&start_date=${startDate}&end_date=${endDate}` +
+      `&daily=weather_code,temperature_2m_max,temperature_2m_min` +
+      `&timezone=auto`
+    );
+    const data = await res.json();
+    if (!data.daily) return [];
+
+    const result: WeatherDay[] = data.daily.time.map((date: string, i: number) => ({
+      date,
+      tempMin: Math.round(data.daily.temperature_2m_min[i]),
+      tempMax: Math.round(data.daily.temperature_2m_max[i]),
+      weatherCode: data.daily.weather_code[i],
+      uvIndex: 0,
+    }));
+
+    const waterTemp = await getWaterTemperature(latitude, longitude);
+    if (waterTemp !== null) {
+      result.forEach((d) => { d.waterTemp = waterTemp; });
+    }
+
+    setCache(key, result);
+    return result;
+  } catch {
+    return [];
+  }
+}
