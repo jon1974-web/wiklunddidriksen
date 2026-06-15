@@ -786,20 +786,20 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         onSelect={(description) => {
           const cityName = description.split(',')[0].trim();
           setStagedCity(cityName);
-          setTipsSearchValue(cityName);
+          setTipsSearchValue('');
         }}
         types={['(cities)']}
       />
 
       {stagedCity && (
-        <View style={styles.stagedCityRow}>
-          <Text style={[styles.stagedCityName, { color: colors.text }]}>{stagedCity}</Text>
+        <View style={[styles.stagedCityRow, { borderColor: colors.accent, backgroundColor: colors.surface }]}>
+          <Text style={[styles.stagedCityName, { color: colors.text }]}>📍 {stagedCity}</Text>
           <TouchableOpacity
-            style={[styles.addButton, { backgroundColor: colors.accent }]}
+            style={[styles.generateButton, { backgroundColor: colors.accent }]}
             onPress={() => handleGenerateTips(stagedCity)}
             disabled={tipsLoading}
           >
-            <Text style={styles.addButtonText}>{tipsLoading ? '...' : 'Generer +'}</Text>
+            <Text style={styles.generateButtonText}>{tipsLoading ? '...' : 'Generer'}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -1563,15 +1563,23 @@ const styles = StyleSheet.create({
     padding: 12,
     marginTop: 8,
     marginBottom: 4,
-    borderRadius: 8,
+    borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#0097A7',
-    borderStyle: 'dashed',
   },
   stagedCityName: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '500',
     flex: 1,
+  },
+  generateButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  generateButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   tipsExpandable: {
     borderRadius: 8,
