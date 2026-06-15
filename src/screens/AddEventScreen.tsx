@@ -35,6 +35,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   const [customEndTime, setCustomEndTime] = useState(prefill?.endTime || '');
   const [reminderMinutes, setReminderMinutes] = useState(prefill?.reminderMinutes || 120);
   const [icon, setIcon] = useState(prefill?.icon || '');
+  const [saving, setSaving] = useState(false);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
@@ -63,11 +64,13 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   const isTimePicker = activePicker === 'time' || activePicker === 'endTime';
 
   const handleSave = useCallback(async () => {
+    if (saving) return;
     if (!title.trim()) {
       crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
 
+    setSaving(true);
     try {
       const eventData: any = {
         title: sanitizeInput(title),
@@ -316,8 +319,12 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         </View>
       </View>
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleSave}>
-        <Text style={styles.buttonText}>Lagre</Text>
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: colors.accent, opacity: saving ? 0.5 : 1 }]}
+        onPress={handleSave}
+        disabled={saving}
+      >
+        <Text style={styles.buttonText}>{saving ? 'Lagrer...' : 'Lagre'}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]} onPress={() => navigation.goBack()}>
