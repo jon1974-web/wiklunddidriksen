@@ -889,6 +889,31 @@ export const ProfileScreen: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      {Platform.OS === 'web' && (
+        <View style={[styles.section, { backgroundColor: colors.surface, marginHorizontal: 16, marginBottom: 16 }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>App</Text>
+          <TouchableOpacity
+            style={[styles.themeOption, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+            onPress={async () => {
+              if ('serviceWorker' in navigator) {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const reg of registrations) await reg.unregister();
+              }
+              if ('caches' in window) {
+                const keys = await caches.keys();
+                for (const key of keys) await caches.delete(key);
+              }
+              window.location.reload();
+            }}
+          >
+            <Text style={[styles.themeText, { color: colors.text }]}>Last inn på nytt</Text>
+          </TouchableOpacity>
+          <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
+            Henter nyeste versjon av appen.
+          </Text>
+        </View>
+      )}
       </ScrollView>
     </SafeAreaView>
   );
