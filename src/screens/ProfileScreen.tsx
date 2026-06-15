@@ -633,8 +633,7 @@ export const ProfileScreen: React.FC = () => {
         </View>
       </View>
 
-      {Platform.OS !== 'web' && (
-        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Varsler</Text>
           <View style={styles.themeOptions}>
             <TouchableOpacity
@@ -654,7 +653,6 @@ export const ProfileScreen: React.FC = () => {
             {notificationsEnabled ? 'Påminnelser sendes før arrangementer.' : 'Varsler er deaktivert.'}
           </Text>
         </View>
-      )}
 
       {isAdmin(user?.email) && (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>

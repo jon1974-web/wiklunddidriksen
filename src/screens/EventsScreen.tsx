@@ -630,7 +630,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         </View>
       </View>
 
-      <MissedRemindersBanner />
+      <MissedRemindersBanner navigation={navigation} />
 
       {viewMode === 'calendar' && (
         <View style={[styles.calendarContainer, { backgroundColor: colors.surface }]}>

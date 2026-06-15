@@ -20,6 +20,7 @@ messaging.onBackgroundMessage((payload) => {
     badge: '/favicon.ico',
     tag: payload.data?.eventId || 'familiesenter',
     data: payload.data || {},
+    requireInteraction: true,
   };
 
   self.registration.showNotification(notificationTitle, notificationOptions);

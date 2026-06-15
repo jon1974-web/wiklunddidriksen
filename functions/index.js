@@ -346,6 +346,7 @@ Always extract a meaningful title from the speech.`,
 });
 
 // Scheduled function: check reminders every minute and send FCM push notifications
+// Notifies ALL family members, not just the event creator
 exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
@@ -354,11 +355,13 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
 
   const eventsSnap = await db.collection("events").where("reminderMinutes", ">", 0).limit(500).get();
 
+  // Cache family members per familyId to avoid duplicate lookups
+  const familyMembersCache = {};
   const notifications = [];
 
   for (const doc of eventsSnap.docs) {
     const eventData = doc.data();
-    if (!eventData.date || !eventData.time || !eventData.createdBy) continue;
+    if (!eventData.date || !eventData.time) continue;
 
     const [h, m] = eventData.time.split(":").map(Number);
     const eventDate = new Date(eventData.date);
@@ -367,24 +370,53 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
     const reminderTime = new Date(eventDate.getTime() - (eventData.reminderMinutes || 0) * 60 * 1000);
 
     if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
-      const notifRef = db.collection("sentNotifications").doc(doc.id);
-      const notifSnap = await notifRef.get();
-      if (notifSnap.exists) continue;
+      const familyId = eventData.familyId;
+      if (!familyId) continue;
 
-      const userSnap = await db.collection("users").doc(eventData.createdBy).get();
-      if (!userSnap.exists) continue;
-      const userData = userSnap.data();
-      const fcmToken = userData.fcmToken;
-      if (!fcmToken) continue;
+      // Look up family members (with cache)
+      if (!familyMembersCache[familyId]) {
+        const familySnap = await db.collection("families").doc(familyId).get();
+        if (!familySnap.exists) {
+          familyMembersCache[familyId] = [];
+          continue;
+        }
+        const familyData = familySnap.data();
+        const memberUids = familyData.members || [];
+        if (memberUids.length === 0) {
+          familyMembersCache[familyId] = [];
+          continue;
+        }
 
-      notifications.push({
-        docId: doc.id,
-        token: fcmToken,
-        title: `📅 ${eventData.title}`,
-        body: `Påminnelse om ${eventData.reminderMinutes} minutter`,
-        eventId: doc.id,
-        createdBy: eventData.createdBy,
-      });
+        // Fetch user profiles in parallel (batch of up to 10 with 'in' query)
+        const members = [];
+        for (let i = 0; i < memberUids.length; i += 10) {
+          const batch = memberUids.slice(i, i + 10);
+          const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
+          usersSnap.forEach((uDoc) => {
+            const uData = uDoc.data();
+            if (uData.fcmToken && uData.notificationsEnabled !== false) {
+              members.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
+            }
+          });
+        }
+        familyMembersCache[familyId] = members;
+      }
+
+      const members = familyMembersCache[familyId];
+      for (const member of members) {
+        const notifId = `${doc.id}_${member.uid}`;
+        const notifSnap = await db.collection("sentNotifications").doc(notifId).get();
+        if (notifSnap.exists) continue;
+
+        notifications.push({
+          notifId,
+          token: member.fcmToken,
+          title: `📅 ${eventData.title}`,
+          body: `Påminnelse om ${eventData.reminderMinutes} minutter`,
+          eventId: doc.id,
+          uid: member.uid,
+        });
+      }
     }
   }
 
@@ -413,17 +445,18 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
           },
         });
 
-        await db.collection("sentNotifications").doc(n.docId).set({
+        await db.collection("sentNotifications").doc(n.notifId).set({
           sentAt: new Date().toISOString(),
-          createdBy: n.createdBy,
+          uid: n.uid,
+          eventId: n.eventId,
         });
 
-        return { status: "sent", docId: n.docId };
+        return { status: "sent", notifId: n.notifId };
       } catch (error) {
         if (error.code === "messaging/registration-token-not-registered") {
-          await db.collection("users").doc(n.createdBy).update({ fcmToken: null });
+          await db.collection("users").doc(n.uid).update({ fcmToken: null });
         }
-        return { status: "error", docId: n.docId, error: error.message };
+        return { status: "error", notifId: n.notifId, error: error.message };
       }
     })
   );

@@ -14,7 +14,8 @@ const initMessaging = () => {
     const app = getApp();
     messaging = getMessaging(app);
     return messaging;
-  } catch {
+  } catch (e) {
+    console.log('[Notifications] initMessaging failed:', e);
     return null;
   }
 };
@@ -58,7 +59,6 @@ const registerFcmToken = async () => {
     });
 
     if (token) {
-      // Store token in user profile for the Cloud Function
       const { auth } = await import('../services/firebase');
       const user = auth.currentUser;
       if (user) {
@@ -66,7 +66,7 @@ const registerFcmToken = async () => {
       }
     }
   } catch (error) {
-    // FCM registration failed — web push not supported or blocked
+    console.log('[Notifications] FCM registration failed:', error);
   }
 };
 
