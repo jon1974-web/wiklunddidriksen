@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   Text,
@@ -163,10 +163,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   }, [loadSubData]);
 
   // Backfill link previews for links that don't have them yet
+  const backfilledIds = useRef(new Set<string>());
   useEffect(() => {
-    const missingPreview = links.filter((l) => !l.previewImageUrl && !l.previewTitle);
+    const missingPreview = links.filter((l) => !l.previewImageUrl && !l.previewTitle && !backfilledIds.current.has(l.id));
     if (missingPreview.length === 0) return;
     for (const link of missingPreview) {
+      backfilledIds.current.add(link.id);
       fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/linkPreview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -174,6 +176,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       })
         .then((r) => r.json())
         .then((preview) => {
+          console.log('Link preview result:', link.url, preview);
           if (preview.title || preview.imageUrl) {
             updateDoc(doc(db, 'trips', trip.id, 'links', link.id), {
               previewTitle: preview.title || null,
@@ -182,7 +185,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             }).then(() => loadSubData());
           }
         })
-        .catch(() => {});
+        .catch((err) => console.log('Link preview error:', link.url, err));
     }
   }, [links]);
 
