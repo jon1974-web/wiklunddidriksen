@@ -98,6 +98,9 @@ export interface TripLink {
   id: string;
   title: string;
   url: string;
+  previewTitle?: string;
+  previewDescription?: string;
+  previewImageUrl?: string;
   createdAt: number;
 }
 

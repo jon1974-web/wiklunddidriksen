@@ -464,3 +464,90 @@ exports.migrateFamilyId = onRequest({ cors: true, timeoutSeconds: 300, memory: "
 
   return { col, total: snapshot.size, updated };
 });
+
+// Link preview: extract Open Graph meta tags from a URL
+exports.linkPreview = onRequest({ cors: true, timeoutSeconds: 30 }, async (req, res) => {
+  const origin = req.headers.origin || "";
+  if (ALLOWED_ORIGINS.includes(origin)) {
+    res.set("Access-Control-Allow-Origin", origin);
+  }
+
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const { url } = req.body;
+  if (!url || typeof url !== "string") {
+    return res.status(400).json({ error: "Missing url" });
+  }
+
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
+
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; FamiliesenterBot/1.0)",
+        "Accept": "text/html",
+      },
+      signal: controller.signal,
+      redirect: "follow",
+    });
+    clearTimeout(timeout);
+
+    if (!response.ok) {
+      return res.json({ title: null, description: null, imageUrl: null });
+    }
+
+    const contentType = response.headers.get("content-type") || "";
+    if (!contentType.includes("text/html")) {
+      return res.json({ title: null, description: null, imageUrl: null });
+    }
+
+    const html = await response.text();
+    const head = html.substring(0, html.indexOf("</head>") > -1 ? html.indexOf("</head>") : 50000);
+
+    const getMeta = (property) => {
+      const patterns = [
+        new RegExp(`<meta[^>]*property=["']${property}["'][^>]*content=["']([^"']*)["']`, "i"),
+        new RegExp(`<meta[^>]*content=["']([^"']*)["'][^>]*property=["']${property}["']`, "i"),
+        new RegExp(`<meta[^>]*name=["']${property}["'][^>]*content=["']([^"']*)["']`, "i"),
+        new RegExp(`<meta[^>]*content=["']([^"']*)["'][^>]*name=["']${property}["']`, "i"),
+      ];
+      for (const p of patterns) {
+        const m = head.match(p);
+        if (m && m[1]) return m[1].trim();
+      }
+      return null;
+    };
+
+    const ogTitle = getMeta("og:title");
+    const ogDesc = getMeta("og:description");
+    const ogImage = getMeta("og:image");
+    const twitterImage = getMeta("twitter:image");
+    const titleTag = head.match(/<title[^>]*>([^<]*)<\/title>/i);
+
+    let imageUrl = ogImage || twitterImage;
+    if (imageUrl && !imageUrl.startsWith("http")) {
+      try {
+        imageUrl = new URL(imageUrl, url).href;
+      } catch {
+        imageUrl = null;
+      }
+    }
+
+    return res.json({
+      title: ogTitle || (titleTag ? titleTag[1].trim() : null),
+      description: ogDesc || null,
+      imageUrl: imageUrl || null,
+    });
+  } catch (error) {
+    return res.json({ title: null, description: null, imageUrl: null });
+  }
+});
