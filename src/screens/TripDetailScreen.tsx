@@ -53,7 +53,7 @@ import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
 import { TRIP_ICONS } from '../constants/tripIcons';
-import { getForecast, getHistoricalWeather, wmoToEmoji } from '../services/weatherService';
+import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity } from '../services/weatherService';
 import { WeatherDay } from '../types';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -174,16 +174,24 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const isActive = trip.endDate >= today;
 
   const fetchWeather = useCallback(async (showRefresh = false) => {
-    if (!trip.latitude || !trip.longitude) { setWeatherLoading(false); return; }
+    let lat = trip.latitude;
+    let lon = trip.longitude;
+    if (!lat || !lon) {
+      const locationQuery = trip.country ? `${trip.city}, ${trip.country}` : trip.city;
+      const coords = await geocodeCity(locationQuery);
+      if (!coords) { setWeatherLoading(false); return; }
+      lat = coords.latitude;
+      lon = coords.longitude;
+    }
     if (showRefresh) setRefreshingWeather(true);
     try {
       if (isActive) {
-        const forecast = await getForecast(trip.latitude, trip.longitude, 2);
+        const forecast = await getForecast(lat, lon, 2);
         setWeather(forecast);
       } else if (trip.weatherSummary && trip.weatherSummary.length > 0) {
         setWeather(trip.weatherSummary);
       } else {
-        const historical = await getHistoricalWeather(trip.latitude, trip.longitude, trip.startDate, trip.endDate);
+        const historical = await getHistoricalWeather(lat, lon, trip.startDate, trip.endDate);
         setWeather(historical);
         if (historical.length > 0) {
           try {
@@ -529,7 +537,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       </TouchableOpacity>
 
       {/* Vær */}
-      {(trip.latitude && trip.longitude) && (
+      {trip.city && (
         <View>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>🌤️ Vær</Text>

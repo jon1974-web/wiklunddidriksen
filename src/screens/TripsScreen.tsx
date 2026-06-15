@@ -8,7 +8,7 @@ import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { useUserStore } from '../store/userStore';
-import { getForecast, wmoToEmoji } from '../services/weatherService';
+import { getForecast, wmoToEmoji, geocodeCity } from '../services/weatherService';
 
 interface TripsScreenProps {
   navigation: any;
@@ -31,9 +31,17 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   }, [today]);
 
   const fetchWeatherForTrip = useCallback(async (trip: Trip) => {
-    if (!trip.latitude || !trip.longitude) return;
+    let lat = trip.latitude;
+    let lon = trip.longitude;
+    if (!lat || !lon) {
+      const locationQuery = trip.country ? `${trip.city}, ${trip.country}` : trip.city;
+      const coords = await geocodeCity(locationQuery);
+      if (!coords) return;
+      lat = coords.latitude;
+      lon = coords.longitude;
+    }
     if (isUpcomingOrActive(trip)) {
-      const forecast = await getForecast(trip.latitude, trip.longitude, 1);
+      const forecast = await getForecast(lat, lon, 1);
       if (forecast.length > 0) {
         setWeatherMap((prev) => ({ ...prev, [trip.id]: forecast }));
       }
