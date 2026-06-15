@@ -364,8 +364,8 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
     if (!eventData.date || !eventData.time) continue;
 
     const [h, m] = eventData.time.split(":").map(Number);
-    const eventDate = new Date(eventData.date);
-    eventDate.setHours(h, m, 0, 0);
+    const [year, month, day] = eventData.date.split("-").map(Number);
+    const eventDate = new Date(year, month - 1, day, h, m, 0, 0);
 
     const reminderTime = new Date(eventDate.getTime() - (eventData.reminderMinutes || 0) * 60 * 1000);
 
