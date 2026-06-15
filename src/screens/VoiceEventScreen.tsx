@@ -155,6 +155,9 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
     setCreating(true);
 
     try {
+      const eventStartDate = new Date(`${parsedEvent.date}T${parsedEvent.time}`);
+      const reminderAt = new Date(eventStartDate.getTime() - parsedEvent.reminderMinutes * 60 * 1000);
+
       const eventData = {
         title: parsedEvent.title,
         description: parsedEvent.description,
@@ -163,6 +166,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         time: parsedEvent.time,
         endTime: parsedEvent.endTime,
         reminderMinutes: parsedEvent.reminderMinutes,
+        reminderAt: reminderAt.toISOString(),
         address: '',
         createdBy: user.uid,
         familyId: familyId || null,
@@ -176,7 +180,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         const notifId = await scheduleEventReminder(
           eventData.title,
           eventData.description || 'Arrangement starter snart',
-          new Date(`${eventData.date}T${eventData.time}`),
+          eventStartDate,
           eventData.reminderMinutes
         );
         if (notifId) {

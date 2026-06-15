@@ -363,11 +363,15 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
     const eventData = doc.data();
     if (!eventData.date || !eventData.time) continue;
 
-    const [h, m] = eventData.time.split(":").map(Number);
-    const [year, month, day] = eventData.date.split("-").map(Number);
-    const eventDate = new Date(year, month - 1, day, h, m, 0, 0);
-
-    const reminderTime = new Date(eventDate.getTime() - (eventData.reminderMinutes || 0) * 60 * 1000);
+    let reminderTime;
+    if (eventData.reminderAt) {
+      reminderTime = new Date(eventData.reminderAt);
+    } else {
+      const [h, m] = eventData.time.split(":").map(Number);
+      const [year, month, day] = eventData.date.split("-").map(Number);
+      const eventDate = new Date(year, month - 1, day, h, m, 0, 0);
+      reminderTime = new Date(eventDate.getTime() - (eventData.reminderMinutes || 0) * 60 * 1000);
+    }
 
     if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
       const familyId = eventData.familyId;

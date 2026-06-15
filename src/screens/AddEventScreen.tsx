@@ -72,6 +72,11 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
     setSaving(true);
     try {
+      const [hours, mins] = time.split(':').map(Number);
+      const eventStartDate = new Date(date);
+      eventStartDate.setHours(hours, mins, 0, 0);
+      const reminderAt = new Date(eventStartDate.getTime() - reminderMinutes * 60 * 1000);
+
       const eventData: any = {
         title: sanitizeInput(title),
         description: description.trim() ? sanitizeInput(description) : null,
@@ -79,6 +84,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         date,
         time,
         reminderMinutes,
+        reminderAt: reminderAt.toISOString(),
         createdBy: user?.uid,
         familyId: familyId || null,
         createdAt: Date.now(),
@@ -110,14 +116,10 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
       const docRef = await addDoc(collection(db, 'events'), eventData);
 
-      const [hours, mins] = time.split(':').map(Number);
-      const eventDate = new Date(date);
-      eventDate.setHours(hours, mins, 0, 0);
-
       const notificationId = await scheduleEventReminder(
         sanitizeInput(title),
         description.trim() ? sanitizeInput(description) : `Arrangement starter om ${reminderMinutes} minutter`,
-        eventDate,
+        eventStartDate,
         reminderMinutes
       );
 

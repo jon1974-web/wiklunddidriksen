@@ -109,6 +109,11 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     }
 
     try {
+      const [hours, mins] = time.split(':').map(Number);
+      const eventStartDate = new Date(date);
+      eventStartDate.setHours(hours, mins, 0, 0);
+      const reminderAt = new Date(eventStartDate.getTime() - reminderMinutes * 60 * 1000);
+
       const updateData: any = {
         title: title.trim(),
         description: description.trim() || null,
@@ -116,6 +121,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         date,
         time,
         reminderMinutes,
+        reminderAt: reminderAt.toISOString(),
         icon: icon || null,
       };
 
@@ -156,14 +162,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         await cancelNotification(event.notificationId);
       }
 
-      const [hours, mins] = time.split(':').map(Number);
-      const eventDate = new Date(date);
-      eventDate.setHours(hours, mins, 0, 0);
-
       const newNotificationId = await scheduleEventReminder(
         title.trim(),
         description.trim() || `Arrangement starter om ${reminderMinutes} minutter`,
-        eventDate,
+        eventStartDate,
         reminderMinutes
       );
 
