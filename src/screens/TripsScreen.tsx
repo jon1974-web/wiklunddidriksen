@@ -8,7 +8,7 @@ import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { useUserStore } from '../store/userStore';
-import { getForecast, wmoToEmoji, geocodeCity } from '../services/weatherService';
+import { getForecast, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
 
 interface TripsScreenProps {
   navigation: any;
@@ -29,6 +29,14 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const isUpcomingOrActive = useCallback((trip: Trip) => {
     return trip.endDate >= today;
   }, [today]);
+
+  const getChipBg = (min: number, max: number) => {
+    const avg = (min + max) / 2;
+    if (avg >= 25) return 'rgba(252, 228, 236, 0.9)';
+    if (avg >= 15) return 'rgba(255, 243, 224, 0.9)';
+    if (avg >= 10) return 'rgba(232, 234, 246, 0.9)';
+    return 'rgba(224, 242, 241, 0.9)';
+  };
 
   const fetchWeatherForTrip = useCallback(async (trip: Trip) => {
     let lat = trip.latitude;
@@ -107,10 +115,12 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
               {formatDate(item.startDate)} - {formatDate(item.endDate)}
             </Text>
             {weather && weather.length > 0 && (
-              <View style={styles.weatherRow}>
-                <Text style={styles.weatherIcon}>{wmoToEmoji(weather[0].weatherCode)}</Text>
+              <View style={[styles.weatherChip, { backgroundColor: getChipBg(weather[0].tempMin, weather[0].tempMax) }]}>
+                <Text style={styles.weatherEmoji}>{wmoToEmoji(weather[0].weatherCode)}</Text>
                 <Text style={[styles.weatherTemp, { color: colors.text }]}>
-                  {weather[0].tempMin}° / {weather[0].tempMax}°
+                  <Text style={{ color: tempColor(weather[0].tempMin) }}>{weather[0].tempMin}°</Text>
+                  {' / '}
+                  <Text style={{ color: tempColor(weather[0].tempMax) }}>{weather[0].tempMax}°</Text>
                 </Text>
                 {isActive && (
                   <TouchableOpacity
@@ -118,7 +128,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
                     disabled={refreshingWeather[item.id]}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
-                    <Text style={[styles.refreshIcon, { color: colors.accent }]}>
+                    <Text style={styles.refreshIcon}>
                       {refreshingWeather[item.id] ? '⟳' : '↻'}
                     </Text>
                   </TouchableOpacity>
@@ -234,21 +244,29 @@ const styles = StyleSheet.create({
   cardDateText: {
     fontSize: 14,
   },
-  weatherRow: {
+  weatherChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    marginTop: 4,
+    gap: 5,
+    borderRadius: 20,
+    paddingLeft: 6,
+    paddingRight: 10,
+    paddingTop: 4,
+    paddingBottom: 4,
+    marginTop: 6,
+    alignSelf: 'flex-start',
   },
-  weatherIcon: {
-    fontSize: 16,
+  weatherEmoji: {
+    fontSize: 18,
   },
   weatherTemp: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '500',
   },
   refreshIcon: {
-    fontSize: 14,
+    fontSize: 12,
+    color: '#0097A7',
+    marginLeft: 2,
   },
   mapContainer: {
     marginLeft: 12,

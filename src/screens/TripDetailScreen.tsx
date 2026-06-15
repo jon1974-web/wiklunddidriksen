@@ -53,7 +53,7 @@ import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
 import { TRIP_ICONS } from '../constants/tripIcons';
-import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity } from '../services/weatherService';
+import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
 import { WeatherDay } from '../types';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -563,21 +563,33 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           ) : (
             <>
               <View style={styles.weatherHeaderRow}>
-                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 3 }]} numberOfLines={1}>Dag</Text>
-                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 1 }]} numberOfLines={1}>Var</Text>
-                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 2, textAlign: 'center' }]} numberOfLines={1}>Temp</Text>
-                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 1, textAlign: 'center' }]} numberOfLines={1}>UV</Text>
-                <Text style={[styles.weatherHeaderText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]} numberOfLines={1}>Vann</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 3 }]} numberOfLines={1}>Dag</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1 }]} numberOfLines={1}>Var</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 2, textAlign: 'center' }]} numberOfLines={1}>Temp</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>UV</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'right' }]} numberOfLines={1}>Vann</Text>
               </View>
-              {pagedWeather.map((day, i) => (
-                <View key={day.date} style={[styles.weatherRow, i % 2 === 0 ? { backgroundColor: colors.surface } : { backgroundColor: colors.background }]}>
-                  <Text style={[styles.weatherDayText, { color: colors.text, flex: 3 }]} numberOfLines={1}>{formatShortDate(day.date)}</Text>
-                  <Text style={{ flex: 1, textAlign: 'center' }}>{wmoToEmoji(day.weatherCode)}</Text>
-                  <Text style={[styles.weatherDayText, { color: colors.text, flex: 2, textAlign: 'center' }]} numberOfLines={1}>{day.tempMin}° / {day.tempMax}°</Text>
-                  <Text style={[styles.weatherDayText, { color: day.uvIndex >= 8 ? '#E53935' : colors.text, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{day.uvIndex}</Text>
-                  <Text style={[styles.weatherDayText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]} numberOfLines={1}>{day.waterTemp != null ? `${day.waterTemp}°` : '—'}</Text>
-                </View>
-              ))}
+              {pagedWeather.map((day, i) => {
+                const isToday = day.date === today;
+                return (
+                  <View key={day.date} style={[
+                    styles.weatherRow,
+                    isToday && styles.weatherTodayRow,
+                    !isToday && i % 2 === 0 && { backgroundColor: colors.surface },
+                    !isToday && i % 2 !== 0 && { backgroundColor: colors.background },
+                  ]}>
+                    <Text style={[styles.weatherDayText, { color: colors.text, flex: 3, ...(isToday && { fontWeight: '600' }) }]} numberOfLines={1}>{formatShortDate(day.date)}</Text>
+                    <Text style={{ flex: 1, textAlign: 'center', fontSize: 22 }}>{wmoToEmoji(day.weatherCode)}</Text>
+                    <Text style={[styles.weatherDayText, { color: colors.text, flex: 2, textAlign: 'center' }]} numberOfLines={1}>
+                      <Text style={{ color: tempColor(day.tempMin) }}>{day.tempMin}°</Text>
+                      {' / '}
+                      <Text style={{ color: tempColor(day.tempMax) }}>{day.tempMax}°</Text>
+                    </Text>
+                    <Text style={[styles.weatherDayText, { color: day.uvIndex >= 8 ? '#E53935' : colors.text, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{day.uvIndex}</Text>
+                    <Text style={[styles.weatherDayText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]} numberOfLines={1}>{day.waterTemp != null ? `${day.waterTemp}°` : '—'}</Text>
+                  </View>
+                );
+              })}
               {weatherPages > 1 && (
                 <View style={styles.weatherPagination}>
                   <TouchableOpacity disabled={weatherPage === 0} onPress={() => setWeatherPage((p) => p - 1)}>
@@ -1291,6 +1303,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
+  },
+  weatherTodayRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    backgroundColor: '#e0f7fa',
+    borderLeftWidth: 3,
+    borderLeftColor: '#0097A7',
   },
   weatherDayText: {
     fontSize: 13,

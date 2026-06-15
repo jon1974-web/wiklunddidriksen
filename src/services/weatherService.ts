@@ -55,11 +55,10 @@ function wmoToEmoji(code: number): string {
   if (code === 0) return '☀️';
   if (code <= 3) return code === 1 ? '🌤️' : code === 2 ? '⛅' : '☁️';
   if (code <= 48) return '🌫️';
-  if (code <= 55) return '🌧️';
-  if (code <= 57) return '🌧️';
+  if (code <= 53) return '🌦️';
   if (code <= 65) return '🌧️';
-  if (code <= 67) return '🌧️';
-  if (code <= 75) return '❄️';
+  if (code <= 67) return '🧊';
+  if (code <= 73) return '🌨️';
   if (code <= 77) return '❄️';
   if (code <= 82) return '🌦️';
   if (code <= 86) return '❄️';
@@ -85,6 +84,14 @@ function wmoToDescription(code: number): string {
 }
 
 export { wmoToEmoji, wmoToDescription };
+
+export function tempColor(temp: number): string {
+  if (temp >= 25) return '#E53935';
+  if (temp >= 15) return '#FB8C00';
+  if (temp >= 10) return '#43A047';
+  if (temp >= 0) return '#1E88E5';
+  return '#5C6BC0';
+}
 
 export async function getForecast(
   latitude: number,

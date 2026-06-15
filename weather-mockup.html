@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vær UI Mockup</title>
+<style>
+  body { font-family: -apple-system, sans-serif; background: #f5f5f5; padding: 20px; max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 20px; color: #333; }
+  h2 { font-size: 16px; color: #666; margin-top: 32px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+  h3 { font-size: 13px; color: #999; margin-top: 20px; }
+
+  .card { background: #fff; border-radius: 12px; padding: 16px; margin: 10px 0; border-left: 4px solid #0097A7; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  .card-title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+  .card-sub { font-size: 14px; color: #666; }
+
+  .weather-row { display: flex; align-items: center; gap: 6px; margin-top: 4px; font-size: 14px; }
+
+  /* Option A: Weather chip */
+  .weather-chip { display: inline-flex; align-items: center; gap: 5px; border-radius: 20px; padding: 4px 10px 4px 6px; margin-top: 6px; font-size: 13px; font-weight: 500; }
+  .weather-chip.warm { background: linear-gradient(135deg, #fff3e0, #ffe0b2); }
+  .weather-chip.hot { background: linear-gradient(135deg, #fce4ec, #ffcdd2); }
+  .weather-chip.cold { background: linear-gradient(135deg, #e8eaf6, #c5cae9); }
+  .weather-chip.rain { background: linear-gradient(135deg, #e0f2f1, #b2dfdb); }
+  .weather-chip .emoji { font-size: 18px; }
+  .weather-chip .temp { font-size: 13px; color: #333; }
+
+  /* Option B: 3-day mini strip */
+  .mini-strip { display: flex; gap: 12px; margin-top: 8px; }
+  .mini-day { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+  .mini-day .label { font-size: 10px; color: #999; }
+  .mini-day .emoji { font-size: 20px; }
+  .mini-day .temp { font-size: 11px; color: #333; font-weight: 500; }
+
+  /* Option C: Temp color coding */
+  .temp-hot { color: #E53935; font-weight: 600; }
+  .temp-warm { color: #FB8C00; font-weight: 500; }
+  .temp-mild { color: #43A047; font-weight: 500; }
+  .temp-cool { color: #1E88E5; font-weight: 500; }
+  .temp-cold { color: #5C6BC0; font-weight: 600; }
+
+  /* Option D: Table headers */
+  .table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+  .table th { text-align: left; font-size: 11px; font-weight: 700; padding: 6px 8px; color: #0097A7; }
+  .table td { font-size: 13px; padding: 8px; }
+  .table tr:nth-child(even) { background: #f9f9f9; }
+  .table .today-row { background: #e0f7fa; font-weight: 600; border-left: 3px solid #0097A7; }
+
+  /* Option E: Bigger emoji */
+  .emoji-big { font-size: 22px; }
+
+  /* Option F: Better icons */
+  .icon-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
+  .icon-item { text-align: center; background: #fff; border-radius: 8px; padding: 10px 5px; box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+  .icon-item .emoji { font-size: 28px; }
+  .icon-item .code { font-size: 10px; color: #999; }
+  .icon-item .label { font-size: 12px; color: #333; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+<h1>🌤️ Vær UI — Alternativer</h1>
+
+<!-- CURRENT -->
+<h2>🔧 Nåværende (kort)</h2>
+<div class="card">
+  <div class="card-title">✈️ Kroatia 2026</div>
+  <div class="card-sub">Split, Kroatia</div>
+  <div class="card-sub">15. juni - 22. juni</div>
+  <div class="weather-row">
+    <span>☀️</span>
+    <span style="font-weight:500">18° / 26°</span>
+  </div>
+</div>
+
+<!-- OPTION A: Weather chip -->
+<h2>🅰️ Vær-chip (anbefalt)</h2>
+<div class="card">
+  <div class="card-title">✈️ Kroatia 2026</div>
+  <div class="card-sub">Split, Kroatia</div>
+  <div class="card-sub">15. juni - 22. juni</div>
+  <div class="weather-chip warm">
+    <span class="emoji">☀️</span>
+    <span class="temp">18° / 26°</span>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">✈️ London 2026</div>
+  <div class="card-sub">London, Storbritannia</div>
+  <div class="card-sub">1. juli - 5. juli</div>
+  <div class="weather-chip rain">
+    <span class="emoji">🌧️</span>
+    <span class="temp">11° / 16°</span>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">✈️ Lapland 2026</div>
+  <div class="card-sub">Rovaniemi, Finland</div>
+  <div class="card-sub">15. des - 20. des</div>
+  <div class="weather-chip cold">
+    <span class="emoji">❄️</span>
+    <span class="temp">-8° / -2°</span>
+  </div>
+</div>
+
+<!-- OPTION B: Mini 3-day strip -->
+<h2>🅱️ Mini 3-dagers strip</h2>
+<div class="card">
+  <div class="card-title">✈️ Kroatia 2026</div>
+  <div class="card-sub">Split, Kroatia</div>
+  <div class="card-sub">15. juni - 22. juni</div>
+  <div class="mini-strip">
+    <div class="mini-day">
+      <span class="label">I dag</span>
+      <span class="emoji">☀️</span>
+      <span class="temp">26°</span>
+    </div>
+    <div class="mini-day">
+      <span class="label">I morgen</span>
+      <span class="emoji">🌤️</span>
+      <span class="temp">24°</span>
+    </div>
+    <div class="mini-day">
+      <span class="label">Ons</span>
+      <span class="emoji">⛅</span>
+      <span class="temp">22°</span>
+    </div>
+  </div>
+</div>
+
+<!-- OPTION C: Temp color coding -->
+<h2>🅲️ Temperatur-fargekoding</h2>
+<div class="card">
+  <div class="card-title">✈️ Kroatia 2026</div>
+  <div class="card-sub">Split, Kroatia</div>
+  <div class="weather-row" style="gap:12px">
+    <span>☀️</span>
+    <span class="temp-warm">18°</span>
+    <span>/</span>
+    <span class="temp-hot">26°</span>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">✈️ London 2026</div>
+  <div class="card-sub">London, Storbritannia</div>
+  <div class="weather-row" style="gap:12px">
+    <span>🌧️</span>
+    <span class="temp-cool">11°</span>
+    <span>/</span>
+    <span class="temp-mild">16°</span>
+  </div>
+</div>
+<div class="card">
+  <div class="card-title">✈️ Lapland 2026</div>
+  <div class="card-sub">Rovaniemi, Finland</div>
+  <div class="weather-row" style="gap:12px">
+    <span>❄️</span>
+    <span class="temp-cold">-8°</span>
+    <span>/</span>
+    <span class="temp-cool">-2°</span>
+  </div>
+</div>
+
+<!-- OPTION D+E: Table with bold headers + big emoji -->
+<h2>🅳️ Tabell: Bold headers + 🅴️ stor emoji + i-dag markering</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th style="width:30%">Dag</th>
+      <th style="width:10%">Var</th>
+      <th style="width:25%">Temp</th>
+      <th style="width:10%">UV</th>
+      <th style="width:25%; text-align:right">Vann</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="today-row">
+      <td>Man 16.6</td>
+      <td style="text-align:center" class="emoji-big">☀️</td>
+      <td style="text-align:center"><span class="temp-warm">18°</span> / <span class="temp-hot">26°</span></td>
+      <td style="text-align:center;color:#E53935">8</td>
+      <td style="text-align:right">21°</td>
+    </tr>
+    <tr>
+      <td>Tir 17.6</td>
+      <td style="text-align:center" class="emoji-big">🌤️</td>
+      <td style="text-align:center"><span class="temp-warm">17°</span> / <span class="temp-warm">24°</span></td>
+      <td style="text-align:center">6</td>
+      <td style="text-align:right">21°</td>
+    </tr>
+    <tr>
+      <td>Ons 18.6</td>
+      <td style="text-align:center" class="emoji-big">⛅</td>
+      <td style="text-align:center"><span class="temp-mild">15°</span> / <span class="temp-warm">22°</span></td>
+      <td style="text-align:center">5</td>
+      <td style="text-align:right">21°</td>
+    </tr>
+    <tr>
+      <td>Tor 19.6</td>
+      <td style="text-align:center" class="emoji-big">🌦️</td>
+      <td style="text-align:center"><span class="temp-cool">13°</span> / <span class="temp-mild">18°</span></td>
+      <td style="text-align:center">3</td>
+      <td style="text-align:right">21°</td>
+    </tr>
+    <tr>
+      <td>Fre 20.6</td>
+      <td style="text-align:center" class="emoji-big">🌧️</td>
+      <td style="text-align:center"><span class="temp-cool">11°</span> / <span class="temp-mild">15°</span></td>
+      <td style="text-align:center">2</td>
+      <td style="text-align:right">20°</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- OPTION F: Better weather icons -->
+<h2>🅵️ Bedre vær-ikoner</h2>
+<div class="icon-grid">
+  <div class="icon-item"><div class="emoji">☀️</div><div class="code">0</div><div class="label">Sol</div></div>
+  <div class="icon-item"><div class="emoji">🌤️</div><div class="code">1</div><div class="label">Nesten klar</div></div>
+  <div class="icon-item"><div class="emoji">⛅</div><div class="code">2</div><div class="label">Delvis skyet</div></div>
+  <div class="icon-item"><div class="emoji">☁️</div><div class="code">3</div><div class="label">Skyet</div></div>
+  <div class="icon-item"><div class="emoji">🌫️</div><div class="code">45-48</div><div class="label">Tåke</div></div>
+  <div class="icon-item"><div class="emoji">🌦️</div><div class="code">51-53</div><div class="label"> lett regn</div></div>
+  <div class="icon-item"><div class="emoji">🌧️</div><div class="code">61-65</div><div class="label">Regn</div></div>
+  <div class="icon-item"><div class="emoji">⛈️</div><div class="code">95-99</div><div class="label">Tordenvær</div></div>
+  <div class="icon-item"><div class="emoji">🌨️</div><div class="code">71-73</div><div class="label"> lett snø</div></div>
+  <div class="icon-item"><div class="emoji">❄️</div><div class="code">75-77</div><div class="label">Snø</div></div>
+  <div class="icon-item"><div class="emoji">🧊</div><div class="code">66-67</div><div class="label">Underkjølt regn</div></div>
+  <div class="icon-item"><div class="emoji">🌊</div><div class="code">61+ hav</div><div class="label">Sterk regn</div></div>
+</div>
+
+<!-- COMBO: All together -->
+<h2>✨ Alt sammen (anbefalt combo)</h2>
+<div class="card">
+  <div class="card-title">✈️ Kroatia 2026</div>
+  <div class="card-sub">Split, Kroatia</div>
+  <div class="card-sub">15. juni - 22. juni</div>
+  <div class="weather-chip warm">
+    <span class="emoji">☀️</span>
+    <span class="temp"><span class="temp-warm">18°</span> / <span class="temp-hot">26°</span></span>
+  </div>
+</div>
+
+</body>
+</html>
