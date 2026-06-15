@@ -162,6 +162,30 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     loadSubData();
   }, [loadSubData]);
 
+  // Backfill link previews for links that don't have them yet
+  useEffect(() => {
+    const missingPreview = links.filter((l) => !l.previewImageUrl && !l.previewTitle);
+    if (missingPreview.length === 0) return;
+    for (const link of missingPreview) {
+      fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/linkPreview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: link.url }),
+      })
+        .then((r) => r.json())
+        .then((preview) => {
+          if (preview.title || preview.imageUrl) {
+            updateDoc(doc(db, 'trips', trip.id, 'links', link.id), {
+              previewTitle: preview.title || null,
+              previewDescription: preview.description || null,
+              previewImageUrl: preview.imageUrl || null,
+            }).then(() => loadSubData());
+          }
+        })
+        .catch(() => {});
+    }
+  }, [links]);
+
   const resetForms = () => {
     setHotelForm(emptyHotel);
     setFlightForm(emptyFlight);

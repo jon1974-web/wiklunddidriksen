@@ -493,7 +493,7 @@ exports.linkPreview = onRequest({ cors: true, timeoutSeconds: 30 }, async (req, 
 
     const response = await fetch(url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; FamiliesenterBot/1.0)",
+        "User-Agent": "facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)",
         "Accept": "text/html",
       },
       signal: controller.signal,
