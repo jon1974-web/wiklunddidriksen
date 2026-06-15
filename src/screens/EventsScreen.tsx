@@ -147,23 +147,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     return () => unsubscribe();
   }, [familyId]);
 
-  // One-time migration: add familyId to existing documents
-  useEffect(() => {
-    if (!user) return;
-    const key = 'familyIdMigrationDone';
-    const alreadyDone = typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null;
-    if (alreadyDone) return;
-    (async () => {
-      try {
-        const { migrateAddFamilyId } = await import('../utils/migrate');
-        await migrateAddFamilyId();
-        if (typeof localStorage !== 'undefined') localStorage.setItem(key, '1');
-      } catch {
-        // Silently fail — will retry next load
-      }
-    })();
-  }, [user]);
-
   const loadTrips = useCallback(async () => {
     if (!familyId) return;
     try {

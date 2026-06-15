@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
@@ -53,8 +53,6 @@ import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
 import { TRIP_ICONS } from '../constants/tripIcons';
-import { doc, updateDoc } from 'firebase/firestore';
-import { db } from '../services/firebase';
 
 interface TripDetailScreenProps {
   navigation: any;
@@ -161,33 +159,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   useEffect(() => {
     loadSubData();
   }, [loadSubData]);
-
-  // Backfill link previews for links that don't have them yet
-  const backfilledIds = useRef(new Set<string>());
-  useEffect(() => {
-    const missingPreview = links.filter((l) => !l.previewImageUrl && !l.previewTitle && !backfilledIds.current.has(l.id));
-    if (missingPreview.length === 0) return;
-    for (const link of missingPreview) {
-      backfilledIds.current.add(link.id);
-      fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/linkPreview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ url: link.url }),
-      })
-        .then((r) => r.json())
-        .then((preview) => {
-          console.log('Link preview result:', link.url, preview);
-          if (preview.title || preview.imageUrl) {
-            updateDoc(doc(db, 'trips', trip.id, 'links', link.id), {
-              previewTitle: preview.title || null,
-              previewDescription: preview.description || null,
-              previewImageUrl: preview.imageUrl || null,
-            }).then(() => loadSubData());
-          }
-        })
-        .catch((err) => console.log('Link preview error:', link.url, err));
-    }
-  }, [links]);
 
   const resetForms = () => {
     setHotelForm(emptyHotel);
@@ -402,33 +373,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     }
     try {
       const data = { title: sanitizeInput(linkForm.title), url: linkForm.url.trim() };
-      let linkId = editingId;
       if (editingId) {
         await updateTripLink(trip.id, editingId, data);
       } else {
-        linkId = await addTripLink(trip.id, data);
+        await addTripLink(trip.id, data);
       }
-
-      // Fetch link preview in background (non-blocking)
-      if (linkId) {
-        fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/linkPreview', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: linkForm.url.trim() }),
-        })
-          .then((r) => r.json())
-          .then((preview) => {
-            if (preview.title || preview.imageUrl) {
-              updateDoc(doc(db, 'trips', trip.id, 'links', linkId!), {
-                previewTitle: preview.title || null,
-                previewDescription: preview.description || null,
-                previewImageUrl: preview.imageUrl || null,
-              }).then(() => loadSubData());
-            }
-          })
-          .catch(() => {});
-      }
-
       resetForms();
       setActiveModal(null);
       loadSubData();

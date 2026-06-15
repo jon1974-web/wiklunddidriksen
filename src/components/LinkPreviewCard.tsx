@@ -13,11 +13,18 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = React.memo(({ lin
   const { colors } = useTheme();
 
   let domain = '';
+  let hostname = '';
   try {
-    domain = new URL(link.url).hostname.replace('www.', '');
+    const urlObj = new URL(link.url);
+    hostname = urlObj.hostname;
+    domain = hostname.replace('www.', '');
   } catch {
     domain = link.url;
   }
+
+  const faviconUrl = hostname
+    ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`
+    : '';
 
   return (
     <TouchableOpacity
@@ -26,23 +33,18 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = React.memo(({ lin
       onLongPress={onLongPress}
     >
       <View style={styles.thumbnailContainer}>
-        {link.previewImageUrl ? (
-          <Image source={{ uri: link.previewImageUrl }} style={styles.thumbnail} resizeMode="cover" />
+        {faviconUrl ? (
+          <Image source={{ uri: faviconUrl }} style={styles.favicon} resizeMode="contain" />
         ) : (
-          <View style={[styles.thumbnailFallback, { backgroundColor: colors.inputBackground }]}>
+          <View style={[styles.faviconFallback, { backgroundColor: colors.inputBackground }]}>
             <Text style={styles.linkIcon}>🔗</Text>
           </View>
         )}
       </View>
       <View style={styles.content}>
         <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
-          {link.previewTitle || link.title}
+          {link.title}
         </Text>
-        {link.previewDescription ? (
-          <Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>
-            {link.previewDescription}
-          </Text>
-        ) : null}
         <Text style={[styles.domain, { color: colors.accent }]} numberOfLines={1}>
           🔗 {domain}
         </Text>
@@ -61,12 +63,14 @@ const styles = StyleSheet.create({
   thumbnailContainer: {
     width: 120,
     height: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  thumbnail: {
-    width: 120,
-    height: 80,
+  favicon: {
+    width: 48,
+    height: 48,
   },
-  thumbnailFallback: {
+  faviconFallback: {
     width: 120,
     height: 80,
     justifyContent: 'center',
@@ -84,11 +88,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 2,
-  },
-  description: {
-    fontSize: 12,
-    lineHeight: 16,
-    marginBottom: 4,
   },
   domain: {
     fontSize: 11,
