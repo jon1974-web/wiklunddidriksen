@@ -167,6 +167,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     </View>
                   </>
                 )}
+                {(flightForm.transportType !== 'bil' || flightForm.type === 'utreise') && (
                 <View style={styles.flightTimeRow}>
                   <View style={[styles.flightTimeField, { flex: 1 }]}>
                     <Text style={[styles.label, { color: colors.text }]}>
@@ -195,6 +196,8 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     </TouchableOpacity>
                   </View>
                 </View>
+                )}
+                {(flightForm.transportType !== 'bil' || flightForm.type === 'hjemreise') && (
                 <View style={styles.flightTimeRow}>
                   <View style={[styles.flightTimeField, { flex: 1 }]}>
                     <Text style={[styles.label, { color: colors.text }]}>
@@ -223,6 +226,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     </TouchableOpacity>
                   </View>
                 </View>
+                )}
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
                   <TextInput
