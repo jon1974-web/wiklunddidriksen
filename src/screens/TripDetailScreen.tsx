@@ -767,12 +767,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       >
         <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
         <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>📄 Reisedokumenter</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.addButton, { backgroundColor: colors.accent, alignSelf: 'flex-end', marginTop: 4, marginBottom: 8 }]}
-        onPress={() => openAddModal('document')}
-      >
-        <Text style={styles.addButtonText}>+</Text>
+        {docsExpanded && (
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: colors.accent }]}
+            onPress={() => openAddModal('document')}
+          >
+            <Text style={styles.addButtonText}>+</Text>
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
       {docsExpanded && (
         <>
