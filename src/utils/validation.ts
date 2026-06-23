@@ -15,5 +15,6 @@ export const getErrorMessage = (error: any): string => {
   if (code.includes('not-found')) return 'Ressursen ble ikke funnet';
   if (code.includes('already-exists')) return 'Ressursen finnes allerede';
 
+  if (message && message !== 'TypeError: Failed to fetch') return message;
   return 'Noe gikk galt. Prøv igjen.';
 };

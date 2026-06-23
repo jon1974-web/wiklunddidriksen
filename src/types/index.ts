@@ -106,8 +106,10 @@ export interface TripRestaurant {
 export interface TripActivity {
   id: string;
   name: string;
-  date?: string;
-  time?: string;
+  startDate?: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
   address?: string;
   note?: string;
   createdAt: number;
@@ -134,6 +136,10 @@ export interface TripHotel {
   name: string;
   address?: string;
   phone?: string;
+  startDate?: string;
+  endDate?: string;
+  checkInTime?: string;
+  checkOutTime?: string;
   createdAt: number;
 }
 
@@ -144,6 +150,7 @@ export interface TripFlight {
   airline?: string;
   flightNumber?: string;
   reference?: string;
+  seatNumber?: string;
   departureDate?: string;
   departureTime?: string;
   arrivalDate?: string;
@@ -218,8 +225,10 @@ export interface UserProfile {
   uid: string;
   email: string;
   displayName: string;
+  phoneNumber?: string;
   familyId: string | null;
   familyName: string | null;
+  familyRole?: 'owner' | 'admin' | 'member';
   calendarId: string | null;
   calendarEmail: string | null;
   calendarProvider: 'google' | 'outlook' | null;
@@ -228,10 +237,18 @@ export interface UserProfile {
   createdAt: number;
 }
 
+export interface FamilyMember {
+  role: 'owner' | 'admin' | 'member';
+  displayName: string;
+}
+
 export interface Family {
   id: string;
   name: string;
   createdBy: string;
-  members: string[];
+  members: { [uid: string]: FamilyMember };
+  inviteCode?: string;
+  inviteCreatedAt?: number;
+  inviteExpiresAt?: number;
   createdAt: number;
 }

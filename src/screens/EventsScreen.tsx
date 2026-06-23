@@ -130,6 +130,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
+  const familyRole = useUserStore((state) => state.familyRole);
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -566,6 +567,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         event={item}
         onPress={() => navigation.navigate('EventDetail', { event: item })}
         onLongPress={() => handleDelete(item.id)}
+        canDelete={item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin'}
       />
     );
   }, [navigation, colors, setResponseModal, spondRespondents, spondConfig]);
@@ -587,8 +589,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>📅 Arrangementer</Text>
-        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={[styles.title, { color: colors.text }]}>📅 Arrangementer</Text>
+          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
+        </View>
+        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}
         <View style={styles.viewToggle}>
           <TouchableOpacity
             style={[styles.toggleButton, viewMode === 'list' && { backgroundColor: colors.accent }]}
@@ -610,22 +615,22 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
           <TouchableOpacity
-            style={[styles.filterIcon, filterSource === 'viqueens' && styles.filterIconActive]}
+            style={[styles.filterIcon, filterSource === 'viqueens' && { borderColor: colors.accent }]}
             onPress={() => setFilterSource(filterSource === 'viqueens' ? null : 'viqueens')}
           >
             <Image source={SPOND_GROUP_LOGOS['Surprise 25/26']} style={[styles.filterIconImg, filterSource === 'viqueens' && styles.filterIconImgActive]} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.filterIcon, filterSource === 'bekkelaget' && styles.filterIconActive]}
+            style={[styles.filterIcon, filterSource === 'bekkelaget' && { borderColor: colors.accent }]}
             onPress={() => setFilterSource(filterSource === 'bekkelaget' ? null : 'bekkelaget')}
           >
             <Image source={SPOND_GROUP_LOGOS['BSK Fotball J2010/2011']} style={[styles.filterIconImg, filterSource === 'bekkelaget' && styles.filterIconImgActive]} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.filterIcon, filterSource === 'app' && styles.filterIconActive]}
+            style={[styles.filterIcon, filterSource === 'app' && { borderColor: colors.accent }]}
             onPress={() => setFilterSource(filterSource === 'app' ? null : 'app')}
           >
-            <View style={[styles.filterIconCircle, filterSource === 'app' && styles.filterIconCircleActive]} />
+            <View style={[styles.filterIconCircle, { backgroundColor: colors.accent }, filterSource === 'app' && styles.filterIconCircleActive]} />
           </TouchableOpacity>
         </View>
       </View>
@@ -726,7 +731,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    marginBottom: 12,
   },
   familySubtitle: {
     fontSize: 14,
@@ -1033,7 +1037,9 @@ const styles = StyleSheet.create({
   fabText: {
     fontSize: 28,
     color: '#fff',
-    fontWeight: '300',
+    fontWeight: 'bold',
+    lineHeight: 30,
+    textAlign: 'center',
   },
   fabMic: {
     position: 'absolute',

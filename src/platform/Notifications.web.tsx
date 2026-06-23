@@ -71,24 +71,14 @@ const registerFcmToken = async () => {
 };
 
 export const scheduleEventReminder = async (
-  title: string,
-  body: string,
-  date: Date,
-  reminderMinutes: number
+  _title: string,
+  _body: string,
+  _date: Date,
+  _reminderMinutes: number
 ): Promise<string | null> => {
-  const triggerTime = date.getTime() - reminderMinutes * 60 * 1000;
-  if (triggerTime <= Date.now()) return null;
-
-  const delay = triggerTime - Date.now();
-  const id = `web_${Date.now()}`;
-
-  setTimeout(() => {
-    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
-      new Notification(`📅 ${title}`, { body });
-    }
-  }, delay);
-
-  return id;
+  // FCM via checkReminders Cloud Function handles all reminders for web
+  // Local setTimeout caused duplicate notifications
+  return null;
 };
 
 export const cancelNotification = async (_notificationId: string) => {

@@ -26,8 +26,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const { event } = route.params as { event: Event };
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
+  const familyRole = useUserStore((state) => state.familyRole);
   const [isEditing, setIsEditing] = useState(false);
   const [eventData, setEventData] = useState(event);
+  const canDelete = eventData.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
   
   const getInitialEndDateDays = () => {
     if (!event.endDate) return null;
@@ -306,9 +308,11 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <Text style={styles.editButtonText}>Rediger</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.surface, borderColor: colors.danger }]} onPress={handleDelete}>
-          <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
-        </TouchableOpacity>
+        {canDelete && (
+          <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.surface, borderColor: colors.danger }]} onPress={handleDelete}>
+            <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
+          </TouchableOpacity>
+        )}
 
         {Platform.OS === 'web' && (
           <View style={{ marginTop: 16 }}>
@@ -524,9 +528,11 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         <Text style={styles.buttonText}>Oppdater</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.surface, borderColor: colors.danger }]} onPress={handleDelete}>
-        <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
-      </TouchableOpacity>
+      {canDelete && (
+        <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.surface, borderColor: colors.danger }]} onPress={handleDelete}>
+          <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
+        </TouchableOpacity>
+      )}
 
       <DatePickerModal
         visible={activePicker !== null}

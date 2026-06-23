@@ -12,7 +12,7 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - **NEVER** use wide-open rules (`allow read, write: if request.auth != null`)
 - Every collection must have per-user or per-family scoping
 - Users can only read/write their own profile (`request.auth.uid == uid`)
-- Family data must be scoped to `request.auth.uid in resource.data.members`
+- Family data must be scoped to `resource.data.members[request.auth.uid] != null` (map-based members)
 - Subcollections inherit parent scoping
 - Test rules with Firebase Emulator before deploying
 
@@ -32,6 +32,15 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - Never store passwords in plaintext in Firestore
 - Use Firebase Auth for all user identity
 - Admin roles must be verified server-side, not just client-side
+
+### Family Role System
+- `Family.members` is a map: `{ [uid]: { role: 'owner'|'admin'|'member', displayName: string } }`
+- `UserProfile.familyRole` stores the user's role
+- Only admins/owners can generate invite codes
+- Invite codes: 6-char hex, 1-hour expiry, one-time use
+- All write operations (create family, join, remove, leave) go through Cloud Functions
+- Cloud Functions verify auth + role server-side before any mutation
+- Client reads direct Firestore; client writes call Cloud Functions via `callFunction()` helper
 
 ## Performance (HIGH PRIORITY)
 
@@ -160,8 +169,11 @@ npx firebase-tools deploy --only storage --project familiesenter-837bb
 ## Architecture Reference
 
 - **Firebase project**: `familiesenter-837bb`
-- **Auto-join family ID**: `AVCUsb8X6GdRM3f0EBf0`
-- **Admin email**: `jon@wiklunddidriksen.com`
+- **Family ID**: `AVCUsb8X6GdRM3f0EBf0` (Familien Wiklund Didriksen)
+- **Admin/Owner**: `jon@wiklunddidriksen.com`
 - **GitHub repo**: `jon1974-web/wiklunddidriksen`
 - **Spond proxy**: Cloud Function `spondProxy` (avoids CORS)
 - **Voice transcription**: Cloud Function `voiceToEvent` (Whisper + GPT-4o-mini)
+- **Destination tips**: Cloud Function `destinationTips` (GPT-4o-mini)
+- **Invite codes**: Cloud Function `generateInviteCode` (6-char, 1-hour expiry)
+- **Family operations**: Cloud Function `createFamily`, `joinFamilyByInviteCode`, `leaveFamily`, `removeFamilyMember`

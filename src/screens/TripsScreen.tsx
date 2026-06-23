@@ -151,8 +151,13 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <Text style={[styles.screenTitle, { color: colors.text }]}>✈️ Reiser</Text>
-      {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={[styles.screenTitle, { color: colors.text }]}>✈️ Reiser</Text>
+          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
+        </View>
+        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
+      </View>
 
       {loading ? (
         <View style={styles.emptyContainer}>
@@ -189,11 +194,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    padding: 16,
+    paddingBottom: 8,
+    borderBottomWidth: 1,
+  },
   screenTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    padding: 16,
-    paddingBottom: 8,
   },
   familySubtitle: {
     fontSize: 14,
@@ -315,6 +323,8 @@ const styles = StyleSheet.create({
   fabText: {
     color: '#fff',
     fontSize: 28,
+    fontWeight: 'bold',
     lineHeight: 30,
+    textAlign: 'center',
   },
 });

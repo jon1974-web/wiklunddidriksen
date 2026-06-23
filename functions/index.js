@@ -4,10 +4,11 @@ const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getMessaging } = require("firebase-admin/messaging");
-const { getFirestore } = require("firebase-admin/firestore");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const OpenAI = require("openai");
 const functions = require("firebase-functions");
 const Busboy = require("busboy");
+const crypto = require("crypto");
 
 initializeApp();
 
@@ -24,11 +25,11 @@ const ALLOWED_ORIGINS = [
 
 function setCorsHeaders(res, req) {
   const origin = req.headers.origin;
-  if (ALLOWED_ORIGINS.includes(origin)) {
+  if (ALLOWED_ORIGINS.includes(origin) || (origin && /^http:\/\/localhost:\d+$/.test(origin))) {
     res.set("Access-Control-Allow-Origin", origin);
   }
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Filename");
 }
 
 async function verifyAuth(req) {
@@ -385,7 +386,8 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
           continue;
         }
         const familyData = familySnap.data();
-        const memberUids = familyData.members || [];
+        const membersMap = familyData.members || {};
+        const memberUids = Object.keys(membersMap);
         if (memberUids.length === 0) {
           familyMembersCache[familyId] = [];
           continue;
@@ -554,4 +556,376 @@ Include 5-7 items in thingsToDo and restaurants. Include 3-5 local phrases. Incl
     console.error("Destination tips error:", error.message);
     return res.status(500).json({ error: "Failed to generate tips" });
   }
+});
+
+// --- Family Management Cloud Functions ---
+
+exports.createFamily = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { name } = req.body || {};
+  if (!name || typeof name !== "string" || name.trim().length === 0) {
+    return res.status(400).json({ error: "Familienavn er påkrevd" });
+  }
+
+  const db = getFirestore();
+  const userSnap = await db.collection("users").doc(uid).get();
+  if (!userSnap.exists) return res.status(404).json({ error: "Bruker ikke funnet" });
+  const userData = userSnap.data();
+  if (userData.familyId) return res.status(400).json({ error: "Du er allerede i en familie" });
+
+  const familyRef = db.collection("families").doc();
+  await familyRef.set({
+    name: name.trim(),
+    createdBy: uid,
+    members: {
+      [uid]: { role: "owner", displayName: userData.displayName || "User" },
+    },
+    createdAt: Date.now(),
+  });
+
+  await db.collection("users").doc(uid).update({
+    familyId: familyRef.id,
+    familyName: name.trim(),
+    familyRole: "owner",
+  });
+
+  return res.status(200).json({ familyId: familyRef.id });
+});
+
+exports.generateInviteCode = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { familyId } = req.body || {};
+  if (!familyId) return res.status(400).json({ error: "familyId er påkrevd" });
+
+  const db = getFirestore();
+  const familyRef = db.collection("families").doc(familyId);
+  const familySnap = await familyRef.get();
+  if (!familySnap.exists) return res.status(404).json({ error: "Familie ikke funnet" });
+
+  const familyData = familySnap.data();
+  const callerMember = familyData.members && familyData.members[uid];
+  if (!callerMember || (callerMember.role !== "owner" && callerMember.role !== "admin")) {
+    return res.status(403).json({ error: "Mangler tillatelse" });
+  }
+
+  const code = crypto.randomBytes(3).toString("hex").toUpperCase();
+  const now = Date.now();
+  const expiresAt = now + 60 * 60 * 1000; // 1 hour
+
+  await familyRef.update({
+    inviteCode: code,
+    inviteCreatedAt: now,
+    inviteExpiresAt: expiresAt,
+  });
+
+  return res.status(200).json({ code, expiresAt, familyName: familyData.name });
+});
+
+exports.joinFamilyByInviteCode = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { code } = req.body || {};
+  if (!code || typeof code !== "string") return res.status(400).json({ error: "Kode er påkrevd" });
+
+  const db = getFirestore();
+  const userSnap = await db.collection("users").doc(uid).get();
+  if (!userSnap.exists) return res.status(404).json({ error: "Bruker ikke funnet" });
+  const userData = userSnap.data();
+  if (userData.familyId) return res.status(400).json({ error: "Du er allerede i en familie" });
+
+  const normalizedCode = code.trim().toUpperCase();
+  const familiesRef = db.collection("families");
+  const q = familiesRef.where("inviteCode", "==", normalizedCode).limit(1);
+  const querySnap = await q.get();
+  if (querySnap.empty) return res.status(404).json({ error: "Ugyldig kode" });
+
+  const familyDoc = querySnap.docs[0];
+  const familyData = familyDoc.data();
+
+  if (!familyData.inviteExpiresAt || Date.now() > familyData.inviteExpiresAt) {
+    return res.status(400).json({ error: "Koden har utløpt" });
+  }
+
+  if (familyData.members && familyData.members[uid]) {
+    return res.status(400).json({ error: "Du er allerede i denne familien" });
+  }
+
+  await familyDoc.ref.update({
+    [`members.${uid}`]: { role: "member", displayName: userData.displayName || "User" },
+    inviteCode: FieldValue.delete(),
+    inviteCreatedAt: FieldValue.delete(),
+    inviteExpiresAt: FieldValue.delete(),
+  });
+
+  await db.collection("users").doc(uid).update({
+    familyId: familyDoc.id,
+    familyName: familyData.name,
+    familyRole: "member",
+  });
+
+  return res.status(200).json({ familyId: familyDoc.id, familyName: familyData.name });
+});
+
+exports.leaveFamily = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const db = getFirestore();
+  const userSnap = await db.collection("users").doc(uid).get();
+  if (!userSnap.exists) return res.status(404).json({ error: "Bruker ikke funnet" });
+  const userData = userSnap.data();
+  if (!userData.familyId) return res.status(400).json({ error: "Du er ikke i noen familie" });
+
+  const familyRef = db.collection("families").doc(userData.familyId);
+  const familySnap = await familyRef.get();
+  if (!familySnap.exists) return res.status(404).json({ error: "Familie ikke funnet" });
+
+  const familyData = familySnap.data();
+  const memberInfo = familyData.members && familyData.members[uid];
+  if (!memberInfo) return res.status(400).json({ error: "Du er ikke medlem av denne familien" });
+  if (memberInfo.role === "owner") return res.status(400).json({ error: "Eieren kan ikke forlate familien" });
+
+  await familyRef.update({
+    [`members.${uid}`]: FieldValue.delete(),
+  });
+
+  await db.collection("users").doc(uid).update({
+    familyId: null,
+    familyName: null,
+    familyRole: FieldValue.delete(),
+  });
+
+  return res.status(200).json({ success: true });
+});
+
+exports.removeFamilyMember = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { familyId, targetUid } = req.body || {};
+  if (!familyId || !targetUid) return res.status(400).json({ error: "familyId og targetUid er påkrevd" });
+
+  const db = getFirestore();
+  const familyRef = db.collection("families").doc(familyId);
+  const familySnap = await familyRef.get();
+  if (!familySnap.exists) return res.status(404).json({ error: "Familie ikke funnet" });
+
+  const familyData = familySnap.data();
+  const callerMember = familyData.members && familyData.members[uid];
+  const targetMember = familyData.members && familyData.members[targetUid];
+
+  if (!callerMember || (callerMember.role !== "owner" && callerMember.role !== "admin")) {
+    return res.status(403).json({ error: "Mangler tillatelse" });
+  }
+  if (!targetMember) return res.status(404).json({ error: "Medlem ikke funnet" });
+  if (targetMember.role === "owner") return res.status(400).json({ error: "Kan ikke fjerne eieren" });
+  if (uid === targetUid) return res.status(400).json({ error: "Bruk 'Forlat familie' for å fjerne deg selv" });
+
+  await familyRef.update({
+    [`members.${targetUid}`]: FieldValue.delete(),
+  });
+
+  await db.collection("users").doc(targetUid).update({
+    familyId: null,
+    familyName: null,
+    familyRole: FieldValue.delete(),
+  });
+
+  return res.status(200).json({ success: true });
+});
+
+// Temporary: Migrate family members from array to map with roles
+// DELETE after running once
+exports.migrateFamilyMembers = onRequest({ region: "us-central1" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Ikke autentisert" });
+
+  const ADMIN_EMAILS = ["jon@wiklunddidriksen.com"];
+  const userEmail = (await getAuth().getUser(uid)).email;
+  if (!ADMIN_EMAILS.includes(userEmail)) {
+    return res.status(403).json({ error: "Kun admin kan kjøre migrering" });
+  }
+
+  const db = getFirestore();
+  const familyId = "AVCUsb8X6GdRM3f0EBf0";
+  const familyRef = db.collection("families").doc(familyId);
+  const familySnap = await familyRef.get();
+
+  if (!familySnap.exists) return res.status(404).json({ error: "Familie ikke funnet" });
+
+  const familyData = familySnap.data();
+  const oldMembers = familyData.members;
+
+  if (oldMembers && typeof oldMembers === "object" && !Array.isArray(oldMembers)) {
+    const firstKey = Object.keys(oldMembers)[0];
+    if (firstKey && typeof oldMembers[firstKey] === "object" && oldMembers[firstKey].role) {
+      return res.status(200).json({ message: "Already migrated", members: oldMembers });
+    }
+  }
+
+  const membersArray = Array.isArray(oldMembers) ? oldMembers : Object.keys(oldMembers || {});
+  const newMembers = {};
+
+  for (const memberUid of membersArray) {
+    let displayName = "Medlem";
+    try {
+      const userProfile = await db.collection("users").doc(memberUid).get();
+      if (userProfile.exists) {
+        displayName = userProfile.data().displayName || "Medlem";
+      }
+    } catch {}
+
+    if (memberUid === uid) {
+      newMembers[memberUid] = { role: "owner", displayName };
+    } else {
+      newMembers[memberUid] = { role: "member", displayName };
+    }
+  }
+
+  await familyRef.update({ members: newMembers });
+
+  for (const [memberUid, memberData] of Object.entries(newMembers)) {
+    await db.collection("users").doc(memberUid).update({
+      familyRole: memberData.role,
+    });
+  }
+
+  return res.status(200).json({
+    message: "Migration complete",
+    oldMembers: membersArray,
+    newMembers,
+  });
+});
+
+exports.updateMemberRole = onRequest({ region: "us-central1" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Ikke autentisert" });
+
+  const { familyId, targetUid, newRole } = req.body || {};
+  if (!familyId || !targetUid || !newRole) {
+    return res.status(400).json({ error: "familyId, targetUid og newRole er påkrevd" });
+  }
+  if (!["admin", "member"].includes(newRole)) {
+    return res.status(400).json({ error: "newRole må være 'admin' eller 'member'" });
+  }
+
+  const db = getFirestore();
+  const familyRef = db.collection("families").doc(familyId);
+  const familySnap = await familyRef.get();
+  if (!familySnap.exists) return res.status(404).json({ error: "Familie ikke funnet" });
+
+  const familyData = familySnap.data();
+  const callerMember = familyData.members && familyData.members[uid];
+  const targetMember = familyData.members && familyData.members[targetUid];
+
+  if (!callerMember || (callerMember.role !== "owner" && callerMember.role !== "admin")) {
+    return res.status(403).json({ error: "Mangler tillatelse" });
+  }
+  if (!targetMember) return res.status(404).json({ error: "Medlem ikke funnet" });
+  if (targetMember.role === "owner") return res.status(400).json({ error: "Kan ikke endre eierens rolle" });
+  if (uid === targetUid) return res.status(400).json({ error: "Kan ikke endre din egen rolle" });
+
+  await familyRef.update({
+    [`members.${targetUid}.role`]: newRole,
+  });
+
+  await db.collection("users").doc(targetUid).update({
+    familyRole: newRole,
+  });
+
+  return res.status(200).json({ success: true, targetUid, newRole });
+});
+
+exports.notifyNewEvent = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { familyId, eventTitle, eventDate, eventTime, creatorName } = req.body || {};
+  if (!familyId || !eventTitle) return res.status(400).json({ error: "familyId og eventTitle er påkrevd" });
+
+  const db = getFirestore();
+  const familySnap = await db.collection("families").doc(familyId).get();
+  if (!familySnap.exists) return res.status(404).json({ error: "Familie ikke funnet" });
+
+  const membersMap = familySnap.data().members || {};
+  const memberUids = Object.keys(membersMap).filter((u) => u !== uid);
+
+  const tokens = [];
+  for (let i = 0; i < memberUids.length; i += 10) {
+    const batch = memberUids.slice(i, i + 10);
+    const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
+    usersSnap.forEach((uDoc) => {
+      const uData = uDoc.data();
+      if (uData.fcmToken && uData.notificationsEnabled !== false) {
+        tokens.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
+      }
+    });
+  }
+
+  if (tokens.length === 0) return res.status(200).json({ sent: 0 });
+
+  const dateLabel = eventDate && eventTime
+    ? `${eventDate} ${eventTime}`
+    : eventDate || "";
+
+  const results = await Promise.allSettled(
+    tokens.map(async (t) => {
+      await getMessaging().send({
+        token: t.fcmToken,
+        notification: {
+          title: `📅 ${creatorName || 'En i familien'} la til et arrangement`,
+          body: `${eventTitle}${dateLabel ? ` — ${dateLabel}` : ""}`,
+        },
+        webpush: {
+          notification: {
+            icon: "/favicon.ico",
+            badge: "/favicon.ico",
+            tag: "new-event",
+          },
+          fcmOptions: { link: "/" },
+        },
+        data: { url: "/", type: "new-event" },
+      });
+    })
+  );
+
+  const sent = results.filter((r) => r.status === "fulfilled").length;
+  return res.status(200).json({ sent });
 });

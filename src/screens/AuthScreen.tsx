@@ -1,26 +1,54 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
-import { createOrUpdateUser, autoJoinFamily, isAdmin, getUserProfile } from '../services/familyService';
+import { createOrUpdateUser, getUserProfile, joinFamilyByInviteCode } from '../services/familyService';
+import { getErrorMessage } from '../utils/validation';
+import { crossAlert } from '../utils/alert';
 
 export const AuthScreen: React.FC = () => {
+  const setUser = useUserStore((state) => state.setUser);
+  const setFamily = useUserStore((state) => state.setFamily);
+  const pendingInviteCode = useUserStore((state) => state.pendingInviteCode);
+  const pendingInviteFamilyName = useUserStore((state) => state.pendingInviteFamilyName);
+  const setPendingInviteCode = useUserStore((state) => state.setPendingInviteCode);
+  const { colors } = useTheme();
+
+  const hasInvite = !!pendingInviteCode;
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
-  const [isLogin, setIsLogin] = useState(true);
-  const setUser = useUserStore((state) => state.setUser);
-  const { colors } = useTheme();
+  const [isLogin, setIsLogin] = useState(!hasInvite);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (hasInvite) setIsLogin(false);
+  }, [hasInvite]);
+
+  const handleJoin = async () => {
+    if (!pendingInviteCode) return;
+    try {
+      const joinResult = await joinFamilyByInviteCode(pendingInviteCode);
+      setFamily(joinResult.familyId, joinResult.familyName, 'member');
+      setPendingInviteCode(null);
+      try { localStorage.removeItem('pendingInviteCode'); } catch {}
+      try { localStorage.removeItem('pendingInviteFamilyName'); } catch {}
+    } catch (joinError) {
+      crossAlert('Kunne ikke bli med', getErrorMessage(joinError) + '\n\nDu kan prøve igjen fra Profil-fanen.');
+    }
+  };
 
   const handleAuth = async () => {
     if (!email || !password || (!isLogin && !name)) {
-      Alert.alert('Error', 'Please fill in all fields');
+      crossAlert('Error', 'Vennligst fyll inn alle feltene');
       return;
     }
 
+    setLoading(true);
     try {
       if (isLogin) {
         const result = await signInWithEmailAndPassword(auth, email, password);
@@ -31,34 +59,75 @@ export const AuthScreen: React.FC = () => {
           email: result.user.email || '',
           displayName,
         });
+
+        if (hasInvite) {
+          await handleJoin();
+        }
       } else {
-        const result = await createUserWithEmailAndPassword(auth, email, password);
-        const uid = result.user.uid;
-        const userEmail = result.user.email || '';
-        const role = isAdmin(userEmail) ? 'admin' : 'member';
-        await updateProfile(result.user, { displayName: name });
-        await createOrUpdateUser(uid, {
-          uid,
-          email: userEmail,
-          displayName: name,
-        });
-        await autoJoinFamily(uid);
-        setUser({
-          uid,
-          email: userEmail,
-          displayName: name,
-          role,
-        });
+        try {
+          const result = await createUserWithEmailAndPassword(auth, email, password);
+          const uid = result.user.uid;
+          const userEmail = result.user.email || '';
+          await updateProfile(result.user, { displayName: name });
+          await createOrUpdateUser(uid, {
+            uid,
+            email: userEmail,
+            displayName: name,
+          });
+
+          if (hasInvite) {
+            await handleJoin();
+          }
+
+          setUser({
+            uid,
+            email: userEmail,
+            displayName: name,
+          });
+        } catch (registerError: any) {
+          if (registerError?.code === 'auth/email-already-in-use') {
+            const result = await signInWithEmailAndPassword(auth, email, password);
+            const userProfile = await getUserProfile(result.user.uid);
+            const displayName = userProfile?.displayName || result.user.displayName || name;
+            setUser({
+              uid: result.user.uid,
+              email: result.user.email || '',
+              displayName,
+            });
+
+            if (hasInvite) {
+              await handleJoin();
+            }
+          } else {
+            throw registerError;
+          }
+        }
       }
     } catch (error: any) {
-      Alert.alert('Error', error.message);
+      crossAlert('Error', getErrorMessage(error));
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.accent }]}>Familiesenter</Text>
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{isLogin ? 'Logg inn' : 'Registrer deg'}</Text>
+      <Image source={require('../../assets/icon.png')} style={{ width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }} />
+      <Text style={[styles.title, { color: '#0097A7' }]}>Familiesenter</Text>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+        {hasInvite ? 'Bli med i familie' : isLogin ? 'Logg inn' : 'Registrer deg'}
+      </Text>
+
+      {hasInvite && (
+        <View style={[styles.inviteBanner, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+          <Text style={[styles.inviteBannerText, { color: colors.text }]}>
+            Du er invitert til <Text style={{ fontWeight: 'bold' }}>{pendingInviteFamilyName || 'en familie'}</Text>
+          </Text>
+          <Text style={[styles.inviteBannerSubtext, { color: colors.textSecondary }]}>
+            Registrer deg for å bli med.
+          </Text>
+        </View>
+      )}
 
       {!isLogin && (
         <TextInput
@@ -90,15 +159,29 @@ export const AuthScreen: React.FC = () => {
         secureTextEntry
       />
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleAuth}>
-        <Text style={styles.buttonText}>{isLogin ? 'Logg inn' : 'Registrer'}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-        <Text style={[styles.switchText, { color: colors.accent }]}>
-          {isLogin ? 'Har du ikke en konto? Registrer deg' : 'Har du allerede en konto? Logg inn'}
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: '#0097A7', opacity: loading ? 0.6 : 1 }]}
+        onPress={handleAuth}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>
+          {loading ? 'Venter...' : hasInvite ? (isLogin ? 'Logg inn og bli med' : 'Registrer og bli med') : isLogin ? 'Logg inn' : 'Registrer'}
         </Text>
       </TouchableOpacity>
+
+      {!hasInvite && (
+      <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
+        <Text style={[styles.switchText, { color: '#0097A7' }]}>
+            {isLogin ? 'Har du ikke en konto? Registrer deg' : 'Har du allerede en konto? Logg inn'}
+          </Text>
+        </TouchableOpacity>
+      )}
+
+      {!hasInvite && !isLogin && (
+        <Text style={[styles.hintText, { color: colors.textDisabled }]}>
+          Registrer deg for å opprette en ny familie.
+        </Text>
+      )}
     </SafeAreaView>
   );
 };
@@ -119,6 +202,22 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     marginBottom: 32,
+  },
+  inviteBanner: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+  },
+  inviteBannerText: {
+    fontSize: 16,
+    textAlign: 'center',
+  },
+  inviteBannerSubtext: {
+    fontSize: 14,
+    marginTop: 4,
+    textAlign: 'center',
   },
   input: {
     padding: 16,
@@ -141,5 +240,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 24,
     fontSize: 14,
+  },
+  hintText: {
+    textAlign: 'center',
+    marginTop: 12,
+    fontSize: 13,
   },
 });

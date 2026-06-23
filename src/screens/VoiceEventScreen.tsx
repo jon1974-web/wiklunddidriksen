@@ -6,7 +6,7 @@ import { db, auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
 import { scheduleEventReminder } from '../services/notificationService';
-import { getUserProfile } from '../services/familyService';
+import { getUserProfile, notifyNewEvent } from '../services/familyService';
 import { syncEventToCalendar } from '../services/calendarService';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
@@ -209,6 +209,10 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         }
       } catch {}
 
+      if (familyId && user) {
+        notifyNewEvent(familyId, eventData.title, eventData.date, eventData.time, user.displayName || 'En i familien').catch(() => {});
+      }
+
       crossAlert('Suksess', `"${eventData.title}" er opprettet!`);
       navigation.goBack();
     } catch (error) {
@@ -239,10 +243,13 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Tal til arrangement</Text>
+
+      <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           Snakk i mikrofonen for å opprette et arrangement
+        </Text>
+        <Text style={[styles.helperExample, { color: colors.textDisabled }]}>
+          F.eks. &quot;Fotballtrening på Ekebergsletta på torsdag klokken 19 til 21 på Ekeberg kunstgress bane 2&quot;
         </Text>
       </View>
 
@@ -336,6 +343,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 16,
     borderBottomWidth: 1,
   },
@@ -346,6 +355,15 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     marginTop: 4,
+  },
+  helperSection: {
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  helperExample: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    marginTop: 6,
   },
   content: {
     flex: 1,

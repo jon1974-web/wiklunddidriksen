@@ -7,7 +7,7 @@ import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
 import { scheduleEventReminder } from '../services/notificationService';
-import { getUserProfile } from '../services/familyService';
+import { getUserProfile, notifyNewEvent } from '../services/familyService';
 import { syncEventToCalendar } from '../services/calendarService';
 import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS } from '../constants/eventOptions';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
@@ -157,6 +157,10 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
             await updateDoc(doc(db, 'events', docRef.id), { calendarEventId: calEventId });
           }
         }
+      }
+
+      if (familyId && user) {
+        notifyNewEvent(familyId, sanitizeInput(title), date, time, user.displayName || 'En i familien').catch(() => {});
       }
 
       navigation.goBack();

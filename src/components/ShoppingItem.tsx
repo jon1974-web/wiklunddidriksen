@@ -7,9 +7,10 @@ interface ShoppingItemProps {
   item: ShoppingItemType;
   onToggle: () => void;
   onDelete?: () => void;
+  onRename?: () => void;
 }
 
-export const ShoppingItem: React.FC<ShoppingItemProps> = React.memo(({ item, onToggle, onDelete }) => {
+export const ShoppingItem: React.FC<ShoppingItemProps> = React.memo(({ item, onToggle, onDelete, onRename }) => {
   const { colors } = useTheme();
 
   return (
@@ -22,11 +23,18 @@ export const ShoppingItem: React.FC<ShoppingItemProps> = React.memo(({ item, onT
           {item.name}
         </Text>
       </TouchableOpacity>
-      {onDelete && (
-        <TouchableOpacity style={styles.deleteButton} onPress={onDelete}>
-          <Text style={[styles.deleteText, { color: colors.danger }]}>✕</Text>
-        </TouchableOpacity>
-      )}
+      <View style={styles.actions}>
+        {onRename && (
+          <TouchableOpacity style={styles.actionButton} onPress={onRename}>
+            <Text style={[styles.actionText, { color: colors.textSecondary }]}>✎</Text>
+          </TouchableOpacity>
+        )}
+        {onDelete && (
+          <TouchableOpacity style={styles.actionButton} onPress={onDelete}>
+            <Text style={[styles.actionText, { color: colors.danger }]}>✕</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 });
@@ -63,11 +71,15 @@ const styles = StyleSheet.create({
   textChecked: {
     textDecorationLine: 'line-through',
   },
-  deleteButton: {
+  actions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  actionButton: {
     padding: 12,
   },
-  deleteText: {
-    fontSize: 16,
+  actionText: {
+    fontSize: 20,
     fontWeight: 'bold',
   },
 });

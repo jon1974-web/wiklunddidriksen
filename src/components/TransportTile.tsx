@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { TripFlight } from '../types';
 import { useTheme } from '../theme/ThemeContext';
+import { getCarrierDomain } from '../constants/carrierDomains';
+import { getFaviconUrl } from '../utils/favicon';
 
 interface TransportTileProps {
   flight: TripFlight;
   onPress: () => void;
-  onLongPress: () => void;
+  onLongPress?: () => void;
 }
 
 export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight, onPress, onLongPress }) => {
@@ -26,6 +28,9 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
   const depLabel = f.transportType === 'bil' ? '🔑' : '🛫';
   const arrLabel = f.transportType === 'bil' ? '📋' : '🛬';
 
+  const carrierDomain = f.airline ? getCarrierDomain(f.airline) : null;
+  const logoUrl = carrierDomain ? getFaviconUrl(carrierDomain) : null;
+
   return (
     <TouchableOpacity
       style={[styles.tile, { backgroundColor: colors.surface, borderLeftColor: typeColor }]}
@@ -40,6 +45,11 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
           <View style={styles.tileTransportIcon}>
             <Text style={{ fontSize: 20 }}>{transportIcon}</Text>
           </View>
+          {logoUrl && (
+            <View style={styles.tileCompanyLogo}>
+              <Image source={{ uri: logoUrl }} style={styles.companyLogo} resizeMode="contain" />
+            </View>
+          )}
         </View>
       )}
       <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />
@@ -47,24 +57,27 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
           {f.type && (
             <Text style={{ color: typeColor, fontWeight: '600', fontSize: 12 }}>
-              {f.type === 'utreise' ? 'Utreise' : 'Hjemreise'}
+              {f.transportType === 'bil'
+                ? (f.type === 'utreise' ? 'Henting' : 'Levering')
+                : (f.type === 'utreise' ? 'Utreise' : 'Hjemreise')}
             </Text>
           )}
         </View>
         {f.airline && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{f.airline}</Text>}
-        {f.flightNumber && <Text style={[styles.tileDetail, { color: colors.accent }]}>{f.flightNumber}</Text>}
-        {f.reference && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>Ref: {f.reference}</Text>}
-        {f.wagon && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>{f.wagon}</Text>}
-        {f.driver && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>Fører: {f.driver}</Text>}
+        {f.flightNumber && <Text style={[styles.tileDetail, { color: colors.accent }]} numberOfLines={1}>{f.flightNumber}</Text>}
+        {f.reference && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>Ref: {f.reference}</Text>}
+        {f.seatNumber && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>Sete: {f.seatNumber}</Text>}
+        {f.wagon && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{f.wagon}</Text>}
+        {f.driver && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>Fører: {f.driver}</Text>}
         {f.address && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{f.address}</Text>}
         <View style={[styles.tileDivider, { backgroundColor: colors.border }]} />
         {f.departureTime ? (
-          <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>
+          <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>
             {depLabel} {f.departureTime}
           </Text>
         ) : null}
         {f.arrivalTime ? (
-          <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>
+          <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>
             {arrLabel} {f.arrivalTime}
           </Text>
         ) : null}
@@ -82,24 +95,24 @@ const styles = StyleSheet.create({
   },
   calendarIcon: {
     alignItems: 'center',
-    paddingTop: 8,
+    paddingTop: 6,
     paddingBottom: 4,
     position: 'relative',
   },
   calendarTop: {
     width: '100%',
-    height: 4,
+    height: 3,
     borderTopLeftRadius: 8,
     borderTopRightRadius: 8,
   },
   calendarDay: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: 'bold',
     marginTop: 4,
-    lineHeight: 30,
+    lineHeight: 26,
   },
   calendarMonth: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '500',
     textTransform: 'uppercase',
   },
@@ -108,12 +121,24 @@ const styles = StyleSheet.create({
     left: 6,
     top: 30,
   },
+  tileCompanyLogo: {
+    position: 'absolute',
+    right: 6,
+    top: 30,
+  },
+  companyLogo: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+  },
   calendarSeparator: {
     height: 1,
     marginHorizontal: 10,
     marginVertical: 6,
   },
   tileContent: {
+    flex: 1,
+    minWidth: 0,
     paddingHorizontal: 10,
     paddingBottom: 10,
   },

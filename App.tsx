@@ -1,16 +1,17 @@
-import React, { useEffect, useState, Suspense } from 'react';
+import React, { useEffect, useState, Suspense, useRef } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { TouchableOpacity, Text, ActivityIndicator } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator, Image, Animated } from 'react-native';
 
 import { auth } from './src/services/firebase';
 import { useUserStore } from './src/store/userStore';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
-import { getUserProfile, createOrUpdateUser, isAdmin } from './src/services/familyService';
+import { getUserProfile, createOrUpdateUser } from './src/services/familyService';
 import { configureNotifications, requestNotificationPermission } from './src/services/notificationService';
+import { crossAlert } from './src/utils/alert';
 
 import { AuthScreen } from './src/screens/AuthScreen';
 import { EventsScreen } from './src/screens/EventsScreen';
@@ -27,13 +28,15 @@ const ShoppingListDetailScreen = React.lazy(() => import('./src/screens/Shopping
 const VoiceEventScreen = React.lazy(() => import('./src/screens/VoiceEventScreen').then(m => ({ default: m.VoiceEventScreen })));
 const AddTripScreen = React.lazy(() => import('./src/screens/AddTripScreen').then(m => ({ default: m.AddTripScreen })));
 const TripDetailScreen = React.lazy(() => import('./src/screens/TripDetailScreen').then(m => ({ default: m.TripDetailScreen })));
+const TransportDetailScreen = React.lazy(() => import('./src/screens/TransportDetailScreen').then(m => ({ default: m.TransportDetailScreen })));
 const SpondEventDetailScreen = React.lazy(() => import('./src/screens/SpondEventDetailScreen').then(m => ({ default: m.SpondEventDetailScreen })));
+const TripItemDetailScreen = React.lazy(() => import('./src/screens/TripItemDetailScreen').then(m => ({ default: m.TripItemDetailScreen })));
 
 const SuspenseFallback = () => (
   <ActivityIndicator size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />
 );
 
-import { Event, Trip, SpondEvent, SpondRespondent } from './src/types';
+import { Event, Trip, SpondEvent, SpondRespondent, TripHotel, TripRestaurant, TripActivity } from './src/types';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -50,6 +53,8 @@ type RootStackParamList = {
   TripsList: undefined;
   AddTrip: undefined;
   TripDetail: { trip: Trip };
+  TransportDetail: { flight: import('./src/types').TripFlight; tripId: string };
+  TripItemDetail: { item: any; tripId: string; trip: Trip; itemType: 'hotel' | 'restaurant' | 'activity' };
   ProfileMain: undefined;
 };
 
@@ -161,6 +166,20 @@ const TripsStack = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="TransportDetail"
+          component={TransportDetailScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="TripItemDetail"
+          component={TripItemDetailScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
       </Stack.Navigator>
     </Suspense>
   );
@@ -185,10 +204,35 @@ const TabIcon = ({ label, focused }: { label: string; focused: boolean }) => (
 
 const AppContent = () => {
   const [loading, setLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
+  const splashOpacity = useRef(new Animated.Value(1)).current;
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const setFamily = useUserStore((state) => state.setFamily);
+  const setPendingInviteCode = useUserStore((state) => state.setPendingInviteCode);
   const { colors } = useTheme();
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const match = window.location.pathname.match(/^\/invite\/([A-Z0-9]{6})$/);
+      if (match) {
+        const params = new URLSearchParams(window.location.search);
+        const familyName = params.get('name') || null;
+        setPendingInviteCode(match[1], familyName);
+        try { localStorage.setItem('pendingInviteCode', match[1]); } catch {}
+        try { if (familyName) localStorage.setItem('pendingInviteFamilyName', familyName); } catch {}
+        window.history.replaceState({}, '', '/');
+      } else {
+        try {
+          const storedCode = localStorage.getItem('pendingInviteCode');
+          const storedName = localStorage.getItem('pendingInviteFamilyName');
+          if (storedCode) {
+            setPendingInviteCode(storedCode, storedName);
+          }
+        } catch {}
+      }
+    }
+  }, []);
 
   useEffect(() => {
     configureNotifications();
@@ -209,7 +253,6 @@ const AppContent = () => {
           uid: firebaseUser.uid,
           email: userEmail,
           displayName: firebaseUser.displayName || 'User',
-          role: isAdmin(userEmail) ? 'admin' as const : 'member' as const,
         };
         setUser(userData);
 
@@ -227,7 +270,7 @@ const AppContent = () => {
             setUser({ ...userData, avatarUrl: profile.avatarUrl || undefined });
           }
           if (profile?.familyId) {
-            setFamily(profile.familyId, profile.familyName);
+            setFamily(profile.familyId, profile.familyName, profile.familyRole || null);
           }
         } catch (error) {
           console.log('Error loading profile:', error);
@@ -241,8 +284,23 @@ const AppContent = () => {
     return () => unsubscribe();
   }, []);
 
-  if (loading) {
-    return null;
+  useEffect(() => {
+    if (!loading) {
+      Animated.timing(splashOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => setShowSplash(false));
+    }
+  }, [loading]);
+
+  if (showSplash) {
+    return (
+      <Animated.View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', opacity: splashOpacity }}>
+        <Image source={require('./assets/icon.png')} style={{ width: 120, height: 120, borderRadius: 28, marginBottom: 24 }} />
+        <Text style={{ fontSize: 22, fontWeight: '600', color: colors.text }}>Velkommen til Familiesenter</Text>
+      </Animated.View>
+    );
   }
 
   return (

@@ -9,9 +9,10 @@ interface EventCardProps {
   event: Event;
   onPress: () => void;
   onLongPress?: () => void;
+  canDelete?: boolean;
 }
 
-export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress, onLongPress }) => {
+export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress, onLongPress, canDelete }) => {
   const { colors } = useTheme();
   const dateText = event.endDate 
     ? `${formatDate(event.date)} - ${formatDate(event.endDate)}`
@@ -29,7 +30,7 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
   };
 
   return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]} onPress={onPress} onLongPress={onLongPress}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]} onPress={onPress} onLongPress={canDelete ? onLongPress : undefined}>
       <View style={styles.row}>
         <View style={styles.content}>
           <View style={styles.titleRow}>

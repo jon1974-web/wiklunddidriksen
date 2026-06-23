@@ -1,5 +1,8 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
+import { doc, updateDoc } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { auth } from '../services/firebase';
 
 export const configureNotifications = () => {
   Notifications.setNotificationHandler({
@@ -11,6 +14,19 @@ export const configureNotifications = () => {
       shouldShowList: true,
     }),
   });
+};
+
+const registerFcmToken = async () => {
+  try {
+    const user = auth.currentUser;
+    if (!user) return;
+    const { data } = await Notifications.getExpoPushTokenAsync();
+    if (data) {
+      await updateDoc(doc(db, 'users', user.uid), { fcmToken: data });
+    }
+  } catch (error) {
+    console.log('[Notifications] Native FCM registration failed:', error);
+  }
 };
 
 export const requestNotificationPermission = async (): Promise<boolean> => {
@@ -35,6 +51,7 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
     });
   }
 
+  await registerFcmToken();
   return true;
 };
 

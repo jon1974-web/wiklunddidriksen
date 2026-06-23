@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Platform,
   Linking,
+  Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signOut, updateProfile } from 'firebase/auth';
@@ -25,24 +26,23 @@ import {
   getUserProfile,
   updateDisplayName,
   createFamily,
-  joinFamily,
   leaveFamily,
-  searchFamilyByName,
-  getFamilyMembers,
-  UserProfile,
-  Family,
+  removeFamilyMember,
+  generateInviteCode,
+  getFamilyMembersWithRoles,
+  listenToFamily,
+  updateMemberRole,
 } from '../services/familyService';
 import {
   requestCalendarPermission,
   pickCalendar,
   getCalendarName,
 } from '../services/calendarService';
-import { isAdmin } from '../services/familyService';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { uriToBlob } from '../utils/upload';
 import { IMAGE_QUALITY } from '../constants/limits';
-import { SpondGroup, SpondMember, SpondGroupMember } from '../types';
+import { SpondGroup, SpondMember, SpondGroupMember, UserProfile, Family } from '../types';
 import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
 
 export const ProfileScreen: React.FC = () => {
@@ -50,18 +50,23 @@ export const ProfileScreen: React.FC = () => {
   const setUser = useUserStore((state) => state.setUser);
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
+  const familyRole = useUserStore((state) => state.familyRole);
   const setFamily = useUserStore((state) => state.setFamily);
   const { colors, mode, setMode } = useTheme();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(user?.displayName || '');
+  const [editingPhone, setEditingPhone] = useState(false);
+  const [newPhone, setNewPhone] = useState(profile?.phoneNumber || '');
   const [showCreateFamily, setShowCreateFamily] = useState(false);
-  const [showJoinFamily, setShowJoinFamily] = useState(false);
   const [newFamilyName, setNewFamilyName] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<Family[]>([]);
-  const [familyMembers, setFamilyMembers] = useState<UserProfile[]>([]);
+  const [familyMembers, setFamilyMembers] = useState<{ profile: UserProfile; role: 'owner' | 'admin' | 'member' }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [inviteCode, setInviteCode] = useState('');
+  const [inviteFamilyName, setInviteFamilyName] = useState('');
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [migrating, setMigrating] = useState(false);
+  const [familyListener, setFamilyListener] = useState<(() => void) | null>(null);
   const [calendarName, setCalendarName] = useState<string | null>(null);
   const [calendarEmail, setCalendarEmail] = useState('');
   const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null);
@@ -107,14 +112,18 @@ export const ProfileScreen: React.FC = () => {
         setNotificationsEnabled(userProfile.notificationsEnabled);
       }
       if (userProfile?.familyId) {
-        const spondConfig = await getSpondConfig(userProfile.familyId);
-        if (spondConfig) {
-          setSpondEmail(spondConfig.email);
-          setSpondConnected(true);
-          setSpondSelectedGroups(spondConfig.groups.map((g) => g.id));
-          if (spondConfig.respondents) {
-            setSpondRespondents(spondConfig.respondents.map((r) => r.spondId));
+        try {
+          const spondConfig = await getSpondConfig(userProfile.familyId);
+          if (spondConfig) {
+            setSpondEmail(spondConfig.email);
+            setSpondConnected(true);
+            setSpondSelectedGroups(spondConfig.groups.map((g) => g.id));
+            if (spondConfig.respondents) {
+              setSpondRespondents(spondConfig.respondents.map((r) => r.spondId));
+            }
           }
+        } catch (e) {
+          console.log('Error loading Spond config:', e);
         }
       }
       setLoading(false);
@@ -129,11 +138,24 @@ export const ProfileScreen: React.FC = () => {
       return;
     }
     let cancelled = false;
-    getFamilyMembers(familyId).then((members) => {
+    getFamilyMembersWithRoles(familyId).then((members) => {
       if (!cancelled) setFamilyMembers(members);
     });
     return () => { cancelled = true; };
   }, [familyId]);
+
+  useEffect(() => {
+    if (!familyId) return;
+    const unsub = listenToFamily(familyId, (family) => {
+      if (family && user) {
+        const myMember = family.members[user.uid];
+        if (myMember) {
+          setFamily(familyId, family.name, myMember.role);
+        }
+      }
+    });
+    return () => unsub();
+  }, [familyId, user?.uid]);
 
   const handleUpdateName = useCallback(async () => {
     if (!newName.trim() || !user) return;
@@ -150,11 +172,23 @@ export const ProfileScreen: React.FC = () => {
     }
   }, [newName, user, setUser]);
 
+  const handleUpdatePhone = useCallback(async () => {
+    if (!user) return;
+    try {
+      await createOrUpdateUser(user.uid, { phoneNumber: newPhone.trim() || undefined });
+      setProfile((prev: UserProfile | null) => prev ? { ...prev, phoneNumber: newPhone.trim() || undefined } : prev);
+      setEditingPhone(false);
+      Alert.alert('Suksess', 'Telefonnummer er oppdatert');
+    } catch (error) {
+      Alert.alert('Error', getErrorMessage(error));
+    }
+  }, [newPhone, user]);
+
   const handleCreateFamily = useCallback(async () => {
     if (!newFamilyName.trim() || !user) return;
     try {
       const id = await createFamily(newFamilyName.trim(), user.uid);
-      setFamily(id, newFamilyName.trim());
+      setFamily(id, newFamilyName.trim(), 'owner');
       setNewFamilyName('');
       setShowCreateFamily(false);
       Alert.alert('Suksess', `Familie "${newFamilyName.trim()}" er opprettet`);
@@ -163,33 +197,42 @@ export const ProfileScreen: React.FC = () => {
     }
   }, [newFamilyName, user, setFamily]);
 
-  const handleSearchFamily = useCallback(async () => {
-    if (!searchQuery.trim()) return;
+  const handleGenerateInvite = useCallback(async () => {
+    if (!familyId) return;
+    setInviteLoading(true);
     try {
-      const results = await searchFamilyByName(searchQuery.trim());
-      setSearchResults(results.filter((f) => f.id !== familyId));
+      const result = await generateInviteCode(familyId);
+      setInviteCode(result.code);
+      setInviteFamilyName(result.familyName);
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
+    } finally {
+      setInviteLoading(false);
     }
-  }, [searchQuery, familyId]);
+  }, [familyId]);
 
-  const handleJoinFamily = useCallback(async (family: Family) => {
-    if (!user) return;
-    try {
-      const success = await joinFamily(family.id, user.uid);
-      if (success) {
-        setFamily(family.id, family.name);
-        setShowJoinFamily(false);
-        setSearchQuery('');
-        setSearchResults([]);
-        Alert.alert('Suksess', `Du har blitt med i "${family.name}"`);
+  const handleShareInvite = useCallback(async () => {
+    const link = `https://familiesenter-837bb.web.app/invite/${inviteCode}?name=${encodeURIComponent(inviteFamilyName || familyName || '')}`;
+    const message = `Bli med i ${inviteFamilyName || familyName}: ${link}`;
+    if (Platform.OS === 'web') {
+      if (navigator.share) {
+        try {
+          await navigator.share({ title: 'Invitasjon', text: message });
+        } catch {}
+      } else if (navigator.clipboard) {
+        try {
+          await navigator.clipboard.writeText(message);
+          Alert.alert('Kopiert', 'Lenken er kopiert til utklippstavlen.');
+        } catch {
+          window.prompt('Kopier lenken:', message);
+        }
       } else {
-        Alert.alert('Error', 'Kunne ikke bli med i familien');
+        window.prompt('Kopier lenken:', message);
       }
-    } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+    } else {
+      await Share.share({ message });
     }
-  }, [user, setFamily]);
+  }, [inviteCode, inviteFamilyName, familyName]);
 
   const handleLeaveFamily = () => {
     if (!user) return;
@@ -210,6 +253,81 @@ export const ProfileScreen: React.FC = () => {
       ]
     );
   };
+
+  const handleRemoveMember = (targetUid: string, targetName: string) => {
+    if (!familyId || !user) return;
+    crossAlert(
+      'Fjern medlem',
+      `Er du sikker på at du vil fjerne ${targetName}?`,
+      [
+        { text: 'Avbryt', style: 'cancel' },
+        {
+          text: 'Fjern',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await removeFamilyMember(familyId, targetUid);
+              const updated = await getFamilyMembersWithRoles(familyId);
+              setFamilyMembers(updated);
+            } catch (error) {
+              Alert.alert('Error', getErrorMessage(error));
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleChangeRole = (targetUid: string, targetName: string, currentRole: 'owner' | 'admin' | 'member') => {
+    if (!familyId || !user || currentRole === 'owner') return;
+    const newRole = currentRole === 'admin' ? 'member' : 'admin';
+    const label = newRole === 'admin' ? 'Admin' : 'Medlem';
+    crossAlert(
+      'Endre rolle',
+      `Sett ${targetName} som ${label}?`,
+      [
+        { text: 'Avbryt', style: 'cancel' },
+        {
+          text: label,
+          onPress: async () => {
+            try {
+              await updateMemberRole(familyId, targetUid, newRole);
+              const updated = await getFamilyMembersWithRoles(familyId);
+              setFamilyMembers(updated);
+            } catch (error) {
+              Alert.alert('Error', getErrorMessage(error));
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleMigrate = useCallback(async () => {
+    if (!user) return;
+    setMigrating(true);
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/migrateFamilyMembers', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Migrering feilet');
+      Alert.alert('Suksess', 'Migrering fullført! Familien bruker nå det nye rollesystemet.');
+      if (familyId) {
+        const updated = await getFamilyMembersWithRoles(familyId);
+        setFamilyMembers(updated);
+      }
+    } catch (error) {
+      Alert.alert('Error', getErrorMessage(error));
+    } finally {
+      setMigrating(false);
+    }
+  }, [user, familyId]);
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -261,7 +379,7 @@ export const ProfileScreen: React.FC = () => {
       await uploadBytes(storageRef, blob);
       const downloadUrl = await getDownloadURL(storageRef);
       await createOrUpdateUser(user.uid, { avatarUrl: downloadUrl });
-      setProfile((prev) => prev ? { ...prev, avatarUrl: downloadUrl } : prev);
+      setProfile((prev: UserProfile | null) => prev ? { ...prev, avatarUrl: downloadUrl } : prev);
       setUser({ ...user, avatarUrl: downloadUrl });
     } catch (error) {
       Alert.alert('Error', 'Kunne ikke laste opp bildet.');
@@ -281,7 +399,7 @@ export const ProfileScreen: React.FC = () => {
     if (!calendar) return;
 
     await createOrUpdateUser(user.uid, { calendarId: calendar.id });
-    setProfile((prev) => prev ? { ...prev, calendarId: calendar.id } : prev);
+    setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarId: calendar.id } : prev);
     setCalendarName(calendar.title);
     Alert.alert('Suksess', `Koblet til "${calendar.title}"`);
   };
@@ -298,7 +416,7 @@ export const ProfileScreen: React.FC = () => {
           style: 'destructive',
           onPress: async () => {
             await createOrUpdateUser(user.uid, { calendarId: null });
-            setProfile((prev) => prev ? { ...prev, calendarId: null } : prev);
+            setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarId: null } : prev);
             setCalendarName(null);
             crossAlert('Suksess', 'Kalender frakoblet');
           },
@@ -315,7 +433,7 @@ export const ProfileScreen: React.FC = () => {
         calendarProvider: provider,
       });
       setCalendarProvider(provider);
-      setProfile((prev) => prev ? { ...prev, calendarEmail: calendarEmail.trim(), calendarProvider: provider } : prev);
+      setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarEmail: calendarEmail.trim(), calendarProvider: provider } : prev);
       crossAlert('Suksess', `Kalender koblet til ${provider === 'google' ? 'Google' : 'Outlook'}`);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -328,7 +446,7 @@ export const ProfileScreen: React.FC = () => {
       await createOrUpdateUser(user.uid, { calendarEmail: null, calendarProvider: null });
       setCalendarEmail('');
       setCalendarProvider(null);
-      setProfile((prev) => prev ? { ...prev, calendarEmail: null, calendarProvider: null } : prev);
+      setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarEmail: null, calendarProvider: null } : prev);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -339,7 +457,7 @@ export const ProfileScreen: React.FC = () => {
     try {
       await createOrUpdateUser(user.uid, { notificationsEnabled: value });
       setNotificationsEnabled(value);
-      setProfile((prev) => prev ? { ...prev, notificationsEnabled: value } : prev);
+      setProfile((prev: UserProfile | null) => prev ? { ...prev, notificationsEnabled: value } : prev);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -376,13 +494,13 @@ export const ProfileScreen: React.FC = () => {
   }, [spondEmail, spondPassword]);
 
   const handleToggleSpondGroup = useCallback((groupId: string) => {
-    setSpondSelectedGroups((prev) =>
+    setSpondSelectedGroups((prev: string[]) =>
       prev.includes(groupId) ? prev.filter((id) => id !== groupId) : [...prev, groupId]
     );
   }, []);
 
   const handleToggleSpondRespondent = useCallback((spondId: string) => {
-    setSpondRespondents((prev) =>
+    setSpondRespondents((prev: string[]) =>
       prev.includes(spondId) ? prev.filter((id) => id !== spondId) : [...prev, spondId]
     );
   }, []);
@@ -463,7 +581,10 @@ export const ProfileScreen: React.FC = () => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>👤 Profil</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Text style={[styles.title, { color: colors.text }]}>👤 Profil</Text>
+          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
+        </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
@@ -531,6 +652,47 @@ export const ProfileScreen: React.FC = () => {
           <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
             <Text style={[styles.value, { color: colors.text }]}>{user?.email}</Text>
           </View>
+        </View>
+
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>Telefonnummer</Text>
+          {editingPhone ? (
+            <View>
+              <TextInput
+                style={[styles.valueRow, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                value={newPhone}
+                onChangeText={setNewPhone}
+                placeholder="Legg til telefonnummer"
+                placeholderTextColor={colors.textDisabled}
+                keyboardType="phone-pad"
+                autoFocus
+              />
+              <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                <TouchableOpacity
+                  style={[styles.saveButton, { backgroundColor: colors.accent }]}
+                  onPress={handleUpdatePhone}
+                >
+                  <Text style={styles.saveButtonText}>Lagre</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.cancelButton, { borderColor: colors.border }]}
+                  onPress={() => { setEditingPhone(false); setNewPhone(profile?.phoneNumber || ''); }}
+                >
+                  <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Avbryt</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}
+              onPress={() => { setNewPhone(profile?.phoneNumber || ''); setEditingPhone(true); }}
+            >
+              <Text style={[styles.value, { color: profile?.phoneNumber ? colors.text : colors.textDisabled }]}>
+                {profile?.phoneNumber || 'Legg til telefonnummer'}
+              </Text>
+              <Text style={[styles.editIcon, { color: colors.accent }]}>Rediger</Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -614,21 +776,30 @@ export const ProfileScreen: React.FC = () => {
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Tema</Text>
-        <View style={styles.themeOptions}>
-          {(['light', 'dark', 'system'] as const).map((themeMode) => (
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, paddingVertical: 8 }}>
+          {([
+            { key: 'light' as const, color: '#4CAF50', border: false },
+            { key: 'dark' as const, color: '#333', border: true },
+            { key: 'orange' as const, color: '#E87C3E', border: false },
+            { key: 'deepblue' as const, color: '#1A3A5C', border: false },
+            { key: 'silver' as const, color: '#8E8E93', border: false },
+            { key: 'purple' as const, color: '#9C27B0', border: false },
+            { key: 'pink' as const, color: '#F48FB1', border: false },
+            { key: 'teal' as const, color: '#0097A7', border: false },
+            { key: 'system' as const, color: '#999', border: false },
+          ]).map((t) => (
             <TouchableOpacity
-              key={themeMode}
-              style={[
-                styles.themeOption,
-                { backgroundColor: colors.inputBackground, borderColor: colors.border },
-                mode === themeMode && { backgroundColor: colors.accent, borderColor: colors.accent },
-              ]}
-              onPress={() => setMode(themeMode)}
-            >
-              <Text style={[styles.themeText, { color: mode === themeMode ? '#fff' : colors.text }]}>
-                {themeMode === 'light' ? 'Lys' : themeMode === 'dark' ? 'Mørk' : 'System'}
-              </Text>
-            </TouchableOpacity>
+              key={t.key}
+              onPress={() => setMode(t.key)}
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 18,
+                backgroundColor: t.color,
+                borderWidth: mode === t.key ? 3 : (t.border ? 2 : 0),
+                borderColor: mode === t.key ? colors.accent : (t.border ? '#fff' : 'transparent'),
+              }}
+            />
           ))}
         </View>
       </View>
@@ -654,38 +825,103 @@ export const ProfileScreen: React.FC = () => {
           </Text>
         </View>
 
-      {isAdmin(user?.email) && (
-        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Familie</Text>
 
           {familyId ? (
             <View>
               <View style={[styles.familyCard, { backgroundColor: colors.inputBackground }]}>
                 <Text style={[styles.familyName, { color: colors.text }]}>{familyName}</Text>
-                <Text style={[styles.familyId, { color: colors.textSecondary }]}>ID: {familyId}</Text>
               </View>
               {familyMembers.length > 0 && (
                 <View style={[styles.memberList, { borderTopColor: colors.border }]}>
                   <Text style={[styles.memberListTitle, { color: colors.text }]}>Medlemmer ({familyMembers.length})</Text>
-                  {familyMembers.map((member) => (
-                    <View key={member.uid} style={[styles.memberRow, { borderBottomColor: colors.border }]}>
+                  {familyMembers.map((m) => (
+                    <View key={m.profile.uid} style={[styles.memberRow, { borderBottomColor: colors.border }]}>
                       <View style={styles.memberInfo}>
-                        <Text style={[styles.memberName, { color: colors.text }]}>{member.displayName}</Text>
-                        <Text style={[styles.memberEmail, { color: colors.textSecondary }]}>{member.email}</Text>
+                        <Text style={[styles.memberName, { color: colors.text }]}>{m.profile.displayName}</Text>
+                        <Text style={[styles.memberEmail, { color: colors.textSecondary }]}>{m.profile.email}</Text>
                       </View>
-                      {member.uid === user?.uid && (
-                        <Text style={[styles.memberBadge, { color: colors.accent }]}>Deg</Text>
-                      )}
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        {(familyRole === 'owner' || familyRole === 'admin') && m.role !== 'owner' ? (
+                          <TouchableOpacity onPress={() => handleChangeRole(m.profile.uid, m.profile.displayName, m.role)}>
+                            <Text style={{ color: colors.accent, fontSize: 12, fontWeight: m.role === 'admin' ? '600' : '400' }}>
+                              {m.role === 'admin' ? 'Admin' : 'Medlem'} ▾
+                            </Text>
+                          </TouchableOpacity>
+                        ) : m.role === 'owner' ? (
+                          <Text style={{ color: colors.accent, fontSize: 12, fontWeight: '600' }}>Eier</Text>
+                        ) : (
+                          <Text style={{ color: colors.accent, fontSize: 12 }}>{m.role === 'admin' ? 'Admin' : 'Medlem'}</Text>
+                        )}
+                        {m.profile.uid === user?.uid && (
+                          <Text style={[styles.memberBadge, { color: colors.accent }]}>Deg</Text>
+                        )}
+                        {(familyRole === 'owner' || familyRole === 'admin') && m.profile.uid !== user?.uid && m.role !== 'owner' && (
+                          <TouchableOpacity onPress={() => handleRemoveMember(m.profile.uid, m.profile.displayName)}>
+                            <Text style={{ color: colors.danger, fontSize: 12 }}>Fjern</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
                     </View>
                   ))}
                 </View>
               )}
-              <TouchableOpacity
-                style={[styles.leaveButton, { borderColor: colors.danger }]}
-                onPress={handleLeaveFamily}
-              >
-                <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Forlat familie</Text>
-              </TouchableOpacity>
+
+              {familyId && !familyRole && user?.email === 'jon@wiklunddidriksen.com' && (
+                <View style={{ marginTop: 12 }}>
+                  <TouchableOpacity
+                    style={[styles.familyButton, { backgroundColor: colors.danger, opacity: migrating ? 0.6 : 1 }]}
+                    onPress={handleMigrate}
+                    disabled={migrating}
+                  >
+                    <Text style={styles.familyButtonText}>{migrating ? 'Migrerer...' : 'Kjør migrering (admin)'}</Text>
+                  </TouchableOpacity>
+                  <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 4 }}>
+                    Konverter familiedata til nytt rollesystem. Kjøres én gang.
+                  </Text>
+                </View>
+              )}
+
+              {(familyRole === 'owner' || familyRole === 'admin') && (
+                <View style={{ marginTop: 12 }}>
+                  <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 8 }]}>Invitasjonskode</Text>
+                  {inviteCode ? (
+                    <View>
+                      <View style={[styles.familyCard, { backgroundColor: colors.inputBackground, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
+                        <Text style={[styles.familyName, { color: colors.accent, fontSize: 20, fontWeight: 'bold', letterSpacing: 2 }]}>{inviteCode}</Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>Gyldig i 1 time</Text>
+                      </View>
+                      <TouchableOpacity
+                        style={[styles.familyButton, { backgroundColor: colors.accent, marginTop: 8 }]}
+                        onPress={handleShareInvite}
+                      >
+                        <Text style={styles.familyButtonText}>Del lenke</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={[styles.familyButton, { backgroundColor: colors.accent, opacity: inviteLoading ? 0.6 : 1 }]}
+                      onPress={handleGenerateInvite}
+                      disabled={inviteLoading}
+                    >
+                      <Text style={styles.familyButtonText}>{inviteLoading ? 'Genererer...' : 'Generer kode'}</Text>
+                    </TouchableOpacity>
+                  )}
+                  <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 6 }}>
+                    Del koden med den som skal bli med. Engangskode, utløper etter 1 time.
+                  </Text>
+                </View>
+              )}
+
+              {familyRole !== 'owner' && (
+                <TouchableOpacity
+                  style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
+                  onPress={handleLeaveFamily}
+                >
+                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Forlat familie</Text>
+                </TouchableOpacity>
+              )}
             </View>
           ) : (
             <View>
@@ -699,19 +935,15 @@ export const ProfileScreen: React.FC = () => {
                 >
                   <Text style={styles.familyButtonText}>Opprett familie</Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.familyButton, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
-                  onPress={() => setShowJoinFamily(true)}
-                >
-                  <Text style={[styles.familyButtonText, { color: colors.text }]}>Bli med i familie</Text>
-                </TouchableOpacity>
               </View>
+              <Text style={{ color: colors.textDisabled, fontSize: 13, marginTop: 8, textAlign: 'center' }}>
+                Eller bruk en invitasjonslenke for å bli med i en eksisterende familie.
+              </Text>
             </View>
           )}
         </View>
-      )}
 
-      {isAdmin(user?.email) && (
+      {(familyRole === 'owner' || familyRole === 'admin') && (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Spond konfigurasjon</Text>
 
@@ -837,53 +1069,6 @@ export const ProfileScreen: React.FC = () => {
                 onPress={handleCreateFamily}
               >
                 <Text style={styles.modalCreateText}>Opprett</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      <Modal visible={showJoinFamily} transparent animationType="fade">
-        <View style={styles.modalOverlay}>
-          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Bli med i familie</Text>
-            <TextInput
-              style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-              placeholder="Søk etter familienavn"
-              placeholderTextColor={colors.textDisabled}
-              onSubmitEditing={handleSearchFamily}
-            />
-            <TouchableOpacity
-              style={[styles.searchButton, { backgroundColor: colors.accent }]}
-              onPress={handleSearchFamily}
-            >
-              <Text style={styles.searchButtonText}>Søk</Text>
-            </TouchableOpacity>
-
-            {searchResults.length > 0 && (
-              <View style={styles.searchResults}>
-                {searchResults.map((family) => (
-                  <TouchableOpacity
-                    key={family.id}
-                    style={[styles.searchResultItem, { borderBottomColor: colors.border }]}
-                    onPress={() => handleJoinFamily(family)}
-                  >
-                    <Text style={[styles.searchResultName, { color: colors.text }]}>{family.name}</Text>
-                    <Text style={[styles.searchResultMembers, { color: colors.textSecondary }]}>
-                      {family.members.length} medlemmer
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                onPress={() => { setShowJoinFamily(false); setSearchQuery(''); setSearchResults([]); }}
-              >
-                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Lukk</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -1142,6 +1327,10 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 14,
     marginBottom: 16,
   },
   modalInput: {

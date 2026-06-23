@@ -9,7 +9,7 @@ interface AddressItemCardProps {
   detail?: string;
   note?: string;
   onPress: () => void;
-  onLongPress: () => void;
+  onLongPress?: () => void;
 }
 
 export const AddressItemCard: React.FC<AddressItemCardProps> = React.memo(({

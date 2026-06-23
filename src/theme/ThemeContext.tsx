@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
-import { lightColors, darkColors, Colors } from './colors';
+import { lightColors, darkColors, orangeColors, deepBlueColors, silverColors, purpleColors, pinkColors, tealColors, Colors } from './colors';
 
-type ThemeMode = 'light' | 'dark' | 'system';
+type ThemeMode = 'light' | 'dark' | 'system' | 'orange' | 'deepblue' | 'silver' | 'purple' | 'pink' | 'teal';
 
 interface ThemeContextValue {
   colors: Colors;
@@ -20,15 +20,47 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 export const useTheme = () => useContext(ThemeContext);
 
+function getStoredMode(): ThemeMode {
+  try {
+    const stored = localStorage.getItem('themeMode');
+    if (stored && ['light', 'dark', 'system', 'orange', 'deepblue', 'silver', 'purple', 'pink', 'teal'].includes(stored)) {
+      return stored as ThemeMode;
+    }
+  } catch {}
+  return 'system';
+}
+
+function storeMode(mode: ThemeMode) {
+  try { localStorage.setItem('themeMode', mode); } catch {}
+}
+
+function resolveColors(mode: ThemeMode, systemScheme: string | null | undefined): { colors: Colors; isDark: boolean } {
+  if (mode === 'orange') return { colors: orangeColors, isDark: false };
+  if (mode === 'deepblue') return { colors: deepBlueColors, isDark: false };
+  if (mode === 'silver') return { colors: silverColors, isDark: false };
+  if (mode === 'purple') return { colors: purpleColors, isDark: false };
+  if (mode === 'pink') return { colors: pinkColors, isDark: false };
+  if (mode === 'teal') return { colors: tealColors, isDark: false };
+  if (mode === 'dark') return { colors: darkColors, isDark: true };
+  if (mode === 'light') return { colors: lightColors, isDark: false };
+  // system
+  const isDark = systemScheme === 'dark';
+  return { colors: isDark ? darkColors : lightColors, isDark };
+}
+
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const systemScheme = useColorScheme();
-  const [mode, setMode] = useState<ThemeMode>('system');
+  const [mode, setMode] = useState<ThemeMode>(getStoredMode);
 
-  const isDark = mode === 'system' ? systemScheme === 'dark' : mode === 'dark';
-  const colors = isDark ? darkColors : lightColors;
+  const { colors, isDark } = resolveColors(mode, systemScheme);
+
+  const handleSetMode = (newMode: ThemeMode) => {
+    setMode(newMode);
+    storeMode(newMode);
+  };
 
   return (
-    <ThemeContext.Provider value={{ colors, mode, isDark, setMode }}>
+    <ThemeContext.Provider value={{ colors, mode, isDark, setMode: handleSetMode }}>
       {children}
     </ThemeContext.Provider>
   );

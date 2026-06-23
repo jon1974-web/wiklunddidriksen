@@ -2,29 +2,26 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { TripLink } from '../types';
 import { useTheme } from '../theme/ThemeContext';
+import { getFaviconUrl, extractDomain } from '../utils/favicon';
 
 interface LinkPreviewCardProps {
   link: TripLink;
   onPress: () => void;
-  onLongPress: () => void;
+  onLongPress?: () => void;
 }
 
 export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = React.memo(({ link, onPress, onLongPress }) => {
   const { colors } = useTheme();
 
-  let domain = '';
+  const domain = extractDomain(link.url);
   let hostname = '';
   try {
-    const urlObj = new URL(link.url);
-    hostname = urlObj.hostname;
-    domain = hostname.replace('www.', '');
+    hostname = new URL(link.url).hostname;
   } catch {
-    domain = link.url;
+    hostname = link.url;
   }
 
-  const faviconUrl = hostname
-    ? `https://www.google.com/s2/favicons?domain=${hostname}&sz=64`
-    : '';
+  const faviconUrl = getFaviconUrl(link.url);
 
   return (
     <TouchableOpacity

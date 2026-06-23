@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, query, where, orderBy, onSnapshot, addDoc, deleteDoc, doc, limit } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -20,9 +20,13 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
+  const [copyModalVisible, setCopyModalVisible] = useState(false);
+  const [copyListTitle, setCopyListTitle] = useState('');
+  const [copyingList, setCopyingList] = useState<ShoppingList | null>(null);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
+  const familyRole = useUserStore((state) => state.familyRole);
   const { colors } = useTheme();
 
   useEffect(() => {
@@ -81,19 +85,29 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
     ]);
   }, []);
 
-  const handleCopyList = useCallback(async (list: ShoppingList) => {
+  const handleCopyList = useCallback((list: ShoppingList) => {
+    setCopyingList(list);
+    setCopyListTitle(`${list.title} (kopiert)`);
+    setCopyModalVisible(true);
+  }, []);
+
+  const handleConfirmCopy = useCallback(async () => {
+    if (!copyingList || !copyListTitle.trim()) return;
     try {
       await addDoc(collection(db, 'shoppingLists'), {
-        title: `${list.title} (kopiert)`,
-        items: list.items.map((item) => ({ ...item, id: generateId(), checked: false })),
+        title: sanitizeInput(copyListTitle),
+        items: copyingList.items.map((item) => ({ ...item, id: generateId(), checked: false })),
         createdBy: user?.uid,
         createdAt: Date.now(),
         familyId: familyId || null,
       });
+      setCopyModalVisible(false);
+      setCopyingList(null);
+      setCopyListTitle('');
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [user, familyId]);
+  }, [copyingList, copyListTitle, user, familyId]);
 
   const renderList = ({ item }: { item: ShoppingList }) => {
     const checkedCount = item.items.filter((i) => i.checked).length;
@@ -116,12 +130,14 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
             >
               <Text style={[styles.actionButtonText, { color: colors.text }]}>Kopier</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
-              onPress={() => handleDeleteList(item.id)}
-            >
-              <Text style={[styles.actionButtonText, { color: colors.danger }]}>Slett</Text>
-            </TouchableOpacity>
+            {(item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin') && (
+              <TouchableOpacity
+                style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
+                onPress={() => handleDeleteList(item.id)}
+              >
+                <Text style={[styles.actionButtonText, { color: colors.danger }]}>Slett</Text>
+              </TouchableOpacity>
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -131,9 +147,12 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <CartIcon size={24} color={colors.accent} />
-          <Text style={[styles.title, { color: colors.text, marginLeft: 8 }]}>Handlelister</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+            <CartIcon size={24} color={colors.accent} />
+            <Text style={[styles.title, { color: colors.text, marginLeft: 8 }]}>Lister</Text>
+          </View>
+          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
@@ -143,8 +162,17 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
         renderItem={renderList}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
+        ListHeaderComponent={
+          lists.length > 0 ? (
+            <View style={[styles.helperCard, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+              <Text style={[styles.helperText, { color: colors.textSecondary }]}>
+                Her kan du legge til forskjellige lister f.eks. handlelister eller pakkelister.
+              </Text>
+            </View>
+          ) : null
+        }
         ListEmptyComponent={
-          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>Ingen handlelister. Lag en ny!</Text>
+          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>Ingen lister. Lag en ny!</Text>
         }
       />
 
@@ -163,7 +191,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Ny handleliste</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Ny liste</Text>
             <TextInput
               style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
               value={newListTitle}
@@ -187,6 +215,45 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
                 onPress={handleCreateList}
               >
                 <Text style={styles.modalCreateText}>Lag</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
+        visible={copyModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCopyModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Kopier liste</Text>
+            <TextInput
+              style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+              value={copyListTitle}
+              onChangeText={setCopyListTitle}
+              placeholder="Listetittel"
+              placeholderTextColor={colors.textDisabled}
+              autoFocus
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={styles.modalCancelButton}
+                onPress={() => {
+                  setCopyModalVisible(false);
+                  setCopyingList(null);
+                  setCopyListTitle('');
+                }}
+              >
+                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Avbryt</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalCreateButton, { backgroundColor: colors.accent }]}
+                onPress={handleConfirmCopy}
+              >
+                <Text style={styles.modalCreateText}>Kopier</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -217,6 +284,16 @@ const styles = StyleSheet.create({
   listContent: {
     padding: 16,
     flexGrow: 1,
+  },
+  helperCard: {
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 12,
+    borderWidth: 1,
+  },
+  helperText: {
+    fontSize: 14,
+    lineHeight: 20,
   },
   listCard: {
     borderRadius: 12,
@@ -281,6 +358,8 @@ const styles = StyleSheet.create({
     fontSize: 28,
     color: '#fff',
     fontWeight: '300',
+    lineHeight: 30,
+    textAlign: 'center',
   },
   modalOverlay: {
     flex: 1,

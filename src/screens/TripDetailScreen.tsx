@@ -58,6 +58,7 @@ import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity, tempColor }
 import { WeatherDay } from '../types';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
+import { useUserStore } from '../store/userStore';
 
 interface TripDetailScreenProps {
   navigation: any;
@@ -69,8 +70,11 @@ type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | '
 export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, route }) => {
   const { trip: initialTrip } = route.params as { trip: Trip };
   const { colors } = useTheme();
+  const user = useUserStore((state) => state.user);
+  const familyRole = useUserStore((state) => state.familyRole);
 
   const [trip, setTrip] = useState<Trip>(initialTrip);
+  const canDelete = trip.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
   const [hotels, setHotels] = useState<TripHotel[]>([]);
   const [flights, setFlights] = useState<TripFlight[]>([]);
   const [restaurants, setRestaurants] = useState<TripRestaurant[]>([]);
@@ -87,33 +91,50 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [tripIcon, setTripIcon] = useState(trip.icon || '✈️');
 
   // Form state (consolidated)
-  const emptyHotel = { name: '', address: '', phone: '' };
-  const emptyFlight = { transportType: 'fly' as 'fly' | 'tog' | 'bil', type: 'utreise' as 'utreise' | 'hjemreise', airline: '', flightNumber: '', reference: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '' };
+  const emptyHotel = { name: '', address: '', phone: '', startDate: '', endDate: '', checkInTime: '', checkOutTime: '', note: '' };
+  const emptyFlight = { transportType: 'fly' as 'fly' | 'tog' | 'bil', type: 'utreise' as 'utreise' | 'hjemreise', airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '' };
   const emptyRest = { name: '', address: '', note: '' };
-  const emptyAct = { name: '', date: '', time: '', address: '', note: '' };
+  const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
   const emptyLink = { title: '', url: '' };
 
   const [hotelForm, setHotelForm] = useState(emptyHotel);
-  const [flightForm, setFlightForm] = useState(emptyFlight);
+  const [flightFormUtreise, setFlightFormUtreise] = useState(emptyFlight);
+  const [flightFormHjemreise, setFlightFormHjemreise] = useState(emptyFlight);
+  const [activeDirection, setActiveDirection] = useState<'utreise' | 'hjemreise'>('utreise');
+  const flightForm = activeDirection === 'utreise' ? flightFormUtreise : flightFormHjemreise;
+
+  const handleFlightFormChange = useCallback((updater: React.SetStateAction<typeof emptyFlight>) => {
+    if (activeDirection === 'utreise') {
+      setFlightFormUtreise(updater);
+    } else {
+      setFlightFormHjemreise(updater);
+    }
+  }, [activeDirection]);
   const [restForm, setRestForm] = useState(emptyRest);
   const [actForm, setActForm] = useState(emptyAct);
   const [docForm, setDocForm] = useState(emptyDoc);
   const [linkForm, setLinkForm] = useState(emptyLink);
 
   // Unified picker state
-  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actDate' | 'actTime' | null;
+  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | null;
   const [activePicker, setActivePicker] = useState<PickerField>(null);
 
   const handlePickerSelect = (value: string) => {
     if (activePicker === 'tripStart') setTripStartDate(value);
     else if (activePicker === 'tripEnd') setTripEndDate(value);
-    else if (activePicker === 'flightDepDate') setFlightForm(f => ({ ...f, departureDate: value }));
-    else if (activePicker === 'flightArrDate') setFlightForm(f => ({ ...f, arrivalDate: value }));
-    else if (activePicker === 'flightDepTime') setFlightForm(f => ({ ...f, departureTime: value }));
-    else if (activePicker === 'flightArrTime') setFlightForm(f => ({ ...f, arrivalTime: value }));
-    else if (activePicker === 'actDate') setActForm(f => ({ ...f, date: value }));
-    else if (activePicker === 'actTime') setActForm(f => ({ ...f, time: value }));
+    else if (activePicker === 'flightDepDate') handleFlightFormChange(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'flightArrDate') handleFlightFormChange(f => ({ ...f, arrivalDate: value }));
+    else if (activePicker === 'flightDepTime') handleFlightFormChange(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'flightArrTime') handleFlightFormChange(f => ({ ...f, arrivalTime: value }));
+    else if (activePicker === 'actStartDate') setActForm(f => ({ ...f, startDate: value }));
+    else if (activePicker === 'actEndDate') setActForm(f => ({ ...f, endDate: value }));
+    else if (activePicker === 'actStartTime') setActForm(f => ({ ...f, startTime: value }));
+    else if (activePicker === 'actEndTime') setActForm(f => ({ ...f, endTime: value }));
+    else if (activePicker === 'hotelStartDate') setHotelForm(f => ({ ...f, startDate: value }));
+    else if (activePicker === 'hotelEndDate') setHotelForm(f => ({ ...f, endDate: value }));
+    else if (activePicker === 'hotelCheckIn') setHotelForm(f => ({ ...f, checkInTime: value }));
+    else if (activePicker === 'hotelCheckOut') setHotelForm(f => ({ ...f, checkOutTime: value }));
     setActivePicker(null);
   };
 
@@ -122,7 +143,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       tripStart: 'Velg startdato', tripEnd: 'Velg sluttdato',
       flightDepDate: 'Velg avreisedato', flightArrDate: 'Velg ankomstdato',
       flightDepTime: 'Velg avreisetid', flightArrTime: 'Velg ankomsttid',
-      actDate: 'Velg dato', actTime: 'Velg tid',
+      actStartDate: 'Velg startdato', actEndDate: 'Velg sluttdato', actStartTime: 'Velg starttid', actEndTime: 'Velg sluttid',
+      hotelStartDate: 'Velg startdato', hotelEndDate: 'Velg sluttdato',
+      hotelCheckIn: 'Velg innsjekkingstid', hotelCheckOut: 'Velg utsjekkingstid',
     };
     return activePicker ? titles[activePicker] : '';
   };
@@ -132,13 +155,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       tripStart: tripStartDate, tripEnd: tripEndDate,
       flightDepDate: flightForm.departureDate, flightArrDate: flightForm.arrivalDate,
       flightDepTime: flightForm.departureTime, flightArrTime: flightForm.arrivalTime,
-      actDate: actForm.date, actTime: actForm.time,
+      actStartDate: actForm.startDate, actEndDate: actForm.endDate, actStartTime: actForm.startTime, actEndTime: actForm.endTime,
+      hotelStartDate: hotelForm.startDate, hotelEndDate: hotelForm.endDate, hotelCheckIn: hotelForm.checkInTime, hotelCheckOut: hotelForm.checkOutTime,
     };
     return activePicker ? values[activePicker] || '' : '';
   };
 
   const isDatePicker = activePicker && activePicker.includes('Date') || activePicker === 'tripStart' || activePicker === 'tripEnd';
-  const isTimePicker = activePicker && activePicker.includes('Time');
+  const isTimePicker = activePicker && (activePicker.includes('Time') || activePicker === 'hotelCheckIn' || activePicker === 'hotelCheckOut');
 
   const loadSubData = useCallback(async () => {
     try {
@@ -282,7 +306,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const resetForms = () => {
     setHotelForm(emptyHotel);
-    setFlightForm(emptyFlight);
+    setFlightFormUtreise(emptyFlight);
+    setFlightFormHjemreise(emptyFlight);
+    setActiveDirection('utreise');
     setRestForm(emptyRest);
     setActForm(emptyAct);
     setDocForm(emptyDoc);
@@ -322,14 +348,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     resetForms();
     setEditingId(item.id);
     if (modal === 'hotel') {
-      setHotelForm({ name: item.name || '', address: item.address || '', phone: item.phone || '' });
+      setHotelForm({ name: item.name || '', address: item.address || '', phone: item.phone || '', startDate: item.startDate || '', endDate: item.endDate || '', checkInTime: item.checkInTime || '', checkOutTime: item.checkOutTime || '', note: item.note || '' });
     } else if (modal === 'flight') {
-      setFlightForm({
+      const formData = {
         transportType: item.transportType || 'fly',
         type: item.type || 'utreise',
         airline: item.airline || '',
         flightNumber: item.flightNumber || '',
         reference: item.reference || '',
+        seatNumber: item.seatNumber || '',
         wagon: item.wagon || '',
         driver: item.driver || '',
         passengers: item.passengers || '',
@@ -340,11 +367,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         arrivalTime: item.arrivalTime || '',
         phone: item.phone || '',
         note: item.note || '',
-      });
+      };
+      if (item.type === 'hjemreise') {
+        setActiveDirection('hjemreise');
+        setFlightFormHjemreise(formData);
+      } else {
+        setActiveDirection('utreise');
+        setFlightFormUtreise(formData);
+      }
     } else if (modal === 'restaurant') {
       setRestForm({ name: item.name || '', address: item.address || '', note: item.note || '' });
     } else if (modal === 'activity') {
-      setActForm({ name: item.name || '', date: item.date || '', time: item.time || '', address: item.address || '', note: item.note || '' });
+      setActForm({ name: item.name || '', startDate: item.startDate || item.date || '', endDate: item.endDate || '', startTime: item.startTime || item.time || '', endTime: item.endTime || '', address: item.address || '', note: item.note || '' });
     } else if (modal === 'document') {
       setDocForm({ title: item.title || '', note: item.note || '', fileUrl: item.fileUrl || '', fileName: item.fileName || '' });
     } else if (modal === 'link') {
@@ -353,6 +387,31 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     setActiveModal(modal);
   };
 
+  useEffect(() => {
+    const editId = route.params?.openFlightEditId;
+    if (editId && flights.length > 0) {
+      const flight = flights.find(f => f.id === editId);
+      if (flight) {
+        openEditModal('flight', flight);
+        navigation.setParams({ openFlightEditId: undefined });
+      }
+    }
+  }, [route.params?.openFlightEditId, flights]);
+
+  useEffect(() => {
+    const editId = route.params?.openItemEditId;
+    const itemType = route.params?.openItemType;
+    if (editId && itemType) {
+      const collections: Record<string, any[]> = { hotel: hotels, restaurant: restaurants, activity: activities };
+      const items = collections[itemType] || [];
+      const found = items.find((i: any) => i.id === editId);
+      if (found) {
+        openEditModal(itemType as ModalType, found);
+        navigation.setParams({ openItemEditId: undefined, openItemType: undefined });
+      }
+    }
+  }, [route.params?.openItemEditId, route.params?.openItemType, hotels, restaurants, activities]);
+
   // Hotel handlers
   const handleSaveHotel = useCallback(async () => {
     if (!hotelForm.name.trim()) {
@@ -360,7 +419,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      const data = { name: sanitizeInput(hotelForm.name), address: hotelForm.address.trim() ? sanitizeInput(hotelForm.address) : undefined, phone: hotelForm.phone.trim() ? sanitizeInput(hotelForm.phone) : undefined };
+      const data = { name: sanitizeInput(hotelForm.name), address: hotelForm.address.trim() ? sanitizeInput(hotelForm.address) : undefined, phone: hotelForm.phone.trim() ? sanitizeInput(hotelForm.phone) : undefined, startDate: hotelForm.startDate || undefined, endDate: hotelForm.endDate || undefined, checkInTime: hotelForm.checkInTime || undefined, checkOutTime: hotelForm.checkOutTime || undefined, note: hotelForm.note.trim() ? sanitizeInput(hotelForm.note) : undefined };
       if (editingId) {
         await updateTripHotel(trip.id, editingId, data);
       } else {
@@ -377,35 +436,57 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   // Flight handlers
   const handleSaveFlight = useCallback(async () => {
     try {
-      const data = {
-        transportType: flightForm.transportType,
-        type: flightForm.type,
-        airline: flightForm.airline.trim() ? sanitizeInput(flightForm.airline) : undefined,
-        flightNumber: flightForm.flightNumber.trim() ? sanitizeInput(flightForm.flightNumber) : undefined,
-        reference: flightForm.reference.trim() ? sanitizeInput(flightForm.reference) : undefined,
-        wagon: flightForm.wagon.trim() ? sanitizeInput(flightForm.wagon) : undefined,
-        driver: flightForm.driver.trim() ? sanitizeInput(flightForm.driver) : undefined,
-        passengers: flightForm.passengers.trim() ? sanitizeInput(flightForm.passengers) : undefined,
-        address: flightForm.address.trim() ? sanitizeInput(flightForm.address) : undefined,
-        departureDate: flightForm.departureDate || undefined,
-        departureTime: flightForm.departureTime || undefined,
-        arrivalDate: flightForm.arrivalDate || undefined,
-        arrivalTime: flightForm.arrivalTime || undefined,
-        phone: flightForm.phone.trim() ? sanitizeInput(flightForm.phone) : undefined,
-        note: flightForm.note.trim() ? sanitizeInput(flightForm.note) : undefined,
+      const buildDataFrom = (type: 'utreise' | 'hjemreise', form: typeof emptyFlight) => {
+        const rawData: Record<string, any> = {
+          transportType: form.transportType,
+          type,
+          airline: form.airline.trim() ? sanitizeInput(form.airline) : undefined,
+          flightNumber: form.flightNumber.trim() ? sanitizeInput(form.flightNumber) : undefined,
+          reference: form.reference.trim() ? sanitizeInput(form.reference) : undefined,
+          seatNumber: form.seatNumber.trim() ? sanitizeInput(form.seatNumber) : undefined,
+          wagon: form.wagon.trim() ? sanitizeInput(form.wagon) : undefined,
+          driver: form.driver.trim() ? sanitizeInput(form.driver) : undefined,
+          passengers: form.passengers.trim() ? sanitizeInput(form.passengers) : undefined,
+          address: form.address.trim() ? sanitizeInput(form.address) : undefined,
+          phone: form.phone.trim() ? sanitizeInput(form.phone) : undefined,
+          note: form.note.trim() ? sanitizeInput(form.note) : undefined,
+        };
+        if (form.transportType === 'bil') {
+          if (type === 'utreise') {
+            rawData.departureDate = form.departureDate || undefined;
+            rawData.departureTime = form.departureTime || undefined;
+          } else {
+            rawData.arrivalDate = form.arrivalDate || undefined;
+            rawData.arrivalTime = form.arrivalTime || undefined;
+          }
+        } else {
+          rawData.departureDate = form.departureDate || undefined;
+          rawData.departureTime = form.departureTime || undefined;
+          rawData.arrivalDate = form.arrivalDate || undefined;
+          rawData.arrivalTime = form.arrivalTime || undefined;
+        }
+        return Object.fromEntries(Object.entries(rawData).filter(([, v]) => v !== undefined));
       };
+
       if (editingId) {
+        const editingType = (editingFlight?: TripFlight) => editingFlight?.type || activeDirection;
+        const originalFlight = flights.find(f => f.id === editingId);
+        const resolvedType = editingType(originalFlight);
+        const form = resolvedType === 'utreise' ? flightFormUtreise : flightFormHjemreise;
+        const data = buildDataFrom(resolvedType, form);
         await updateTripFlight(trip.id, editingId, data);
       } else {
-        await addTripFlight(trip.id, data);
+        await addTripFlight(trip.id, buildDataFrom('utreise', flightFormUtreise));
+        await addTripFlight(trip.id, buildDataFrom('hjemreise', flightFormHjemreise));
       }
       resetForms();
       setActiveModal(null);
       loadSubData();
     } catch (error) {
+      console.error('Bil transport save error:', error);
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip.id, flightForm, editingId, loadSubData]);
+  }, [trip.id, flightFormUtreise, flightFormHjemreise, activeDirection, editingId, loadSubData, flights]);
 
   // Restaurant handlers
   const handleSaveRestaurant = useCallback(async () => {
@@ -435,7 +516,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      const data = { name: sanitizeInput(actForm.name), date: actForm.date || undefined, time: actForm.time || undefined, address: actForm.address.trim() ? sanitizeInput(actForm.address) : undefined, note: actForm.note.trim() ? sanitizeInput(actForm.note) : undefined };
+      const data = { name: sanitizeInput(actForm.name), startDate: actForm.startDate || undefined, endDate: actForm.endDate || undefined, startTime: actForm.startTime || undefined, endTime: actForm.endTime || undefined, address: actForm.address.trim() ? sanitizeInput(actForm.address) : undefined, note: actForm.note.trim() ? sanitizeInput(actForm.note) : undefined };
       if (editingId) {
         await updateTripActivity(trip.id, editingId, data);
       } else {
@@ -548,15 +629,19 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   };
 
   const sortedTransportRows = useMemo(() => {
+    const typeOrder: Record<string, number> = { fly: 0, tog: 1, bil: 2 };
     const sorted = [...flights].sort((a, b) => {
+      const ta = typeOrder[a.transportType ?? 'fly'] ?? 0;
+      const tb = typeOrder[b.transportType ?? 'fly'] ?? 0;
+      if (ta !== tb) return ta - tb;
       if (a.type === 'utreise' && b.type !== 'utreise') return -1;
       if (a.type !== 'utreise' && b.type === 'utreise') return 1;
-      const dateA = a.departureDate || '';
-      const dateB = b.departureDate || '';
+      const dateA = a.departureDate || a.arrivalDate || '';
+      const dateB = b.departureDate || b.arrivalDate || '';
       if (dateA < dateB) return -1;
       if (dateA > dateB) return 1;
-      const timeA = a.departureTime || '';
-      const timeB = b.departureTime || '';
+      const timeA = a.departureTime || a.arrivalTime || '';
+      const timeB = b.departureTime || b.arrivalTime || '';
       if (timeA < timeB) return -1;
       if (timeA > timeB) return 1;
       return 0;
@@ -566,7 +651,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     while (i < sorted.length) {
       const current = sorted[i];
       if (current.type === 'utreise') {
-        const match = sorted.findIndex((s, idx) => idx > i && s.type === 'hjemreise');
+        const match = sorted.findIndex(
+          (s, idx) => idx > i && s.type === 'hjemreise' && s.transportType === current.transportType
+        );
         if (match !== -1) {
           rows.push([current, sorted[match]]);
           sorted.splice(match, 1);
@@ -680,12 +767,19 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortedTransportRows.map((row, rowIdx) => (
           <View key={rowIdx} style={styles.transportGrid}>
             {row.map((f) => (
-              <TransportTile
-                key={f.id}
-                flight={f}
-                onPress={() => openEditModal('flight', f)}
-                onLongPress={() => handleDeleteFlight(f.id)}
-              />
+              <View key={f.id} style={styles.transportTileWrapper}>
+                <TransportTile
+                  flight={f}
+                  onPress={() => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip })}
+                  onLongPress={canDelete ? () => {
+                    crossAlert('Transport', `${f.airline || f.transportType} ${f.flightNumber || ''}`, [
+                      { text: 'Avbryt', style: 'cancel' },
+                      { text: 'Rediger', onPress: () => openEditModal('flight', f) },
+                      { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFlight(f.id) },
+                    ]);
+                } : undefined}
+                />
+              </View>
             ))}
           </View>
         ))
@@ -701,9 +795,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             key={h.id}
             name={h.name}
             address={h.address}
-            detail={h.phone}
-            onPress={() => openEditModal('hotel', h)}
-            onLongPress={() => handleDeleteHotel(h.id)}
+            detail={[h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – ') || h.phone}
+            onPress={() => navigation.navigate('TripItemDetail', { item: h, tripId: trip.id, trip, itemType: 'hotel' })}
+            onLongPress={canDelete ? () => {
+              crossAlert('Hotell', h.name, [
+                { text: 'Avbryt', style: 'cancel' },
+                { text: 'Rediger', onPress: () => openEditModal('hotel', h) },
+                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteHotel(h.id) },
+              ]);
+            } : undefined}
           />
         ))
       )}
@@ -719,8 +819,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             name={r.name}
             address={r.address}
             note={r.note}
-            onPress={() => openEditModal('restaurant', r)}
-            onLongPress={() => handleDeleteRestaurant(r.id)}
+            onPress={() => navigation.navigate('TripItemDetail', { item: r, tripId: trip.id, trip, itemType: 'restaurant' })}
+            onLongPress={canDelete ? () => {
+              crossAlert('Restaurant', r.name, [
+                { text: 'Avbryt', style: 'cancel' },
+                { text: 'Rediger', onPress: () => openEditModal('restaurant', r) },
+                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteRestaurant(r.id) },
+              ]);
+            } : undefined}
           />
         ))
       )}
@@ -735,10 +841,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             key={a.id}
             name={a.name}
             address={a.address}
-            detail={(a.date || a.time) ? [a.date, a.time].filter(Boolean).join(' ') : undefined}
+            detail={[a.startDate ? formatDate(a.startDate) : '', a.endDate ? formatDate(a.endDate) : ''].filter(Boolean).join(' – ') || [a.startTime, a.endTime].filter(Boolean).join(' – ') || undefined}
             note={a.note}
-            onPress={() => openEditModal('activity', a)}
-            onLongPress={() => handleDeleteActivity(a.id)}
+            onPress={() => navigation.navigate('TripItemDetail', { item: a, tripId: trip.id, trip, itemType: 'activity' })}
+            onLongPress={canDelete ? () => {
+              crossAlert('Aktivitet', a.name, [
+                { text: 'Avbryt', style: 'cancel' },
+                { text: 'Rediger', onPress: () => openEditModal('activity', a) },
+                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteActivity(a.id) },
+              ]);
+            } : undefined}
           />
         ))
       )}
@@ -892,7 +1004,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             key={l.id}
             link={l}
             onPress={() => Linking.openURL(l.url)}
-            onLongPress={() => handleDeleteLink(l.id)}
+            onLongPress={canDelete ? () => handleDeleteLink(l.id) : undefined}
           />
         ))
       )}
@@ -923,7 +1035,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 key={d.id}
                 style={[styles.itemCard, { backgroundColor: colors.surface }]}
                 onPress={() => openEditModal('document', d)}
-                onLongPress={() => handleDeleteDocument(d.id)}
+                onLongPress={canDelete ? () => handleDeleteDocument(d.id) : undefined}
               >
                 <View style={styles.docRow}>
                   <View style={styles.docContent}>
@@ -937,9 +1049,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                         <Text style={{ color: colors.accent, fontSize: 14 }}>Åpne</Text>
                       </TouchableOpacity>
                     )}
-                    <TouchableOpacity onPress={() => handleDeleteDocument(d.id)} style={styles.docAction}>
-                      <Text style={{ color: '#E53935', fontSize: 14 }}>Slett</Text>
-                    </TouchableOpacity>
+                    {canDelete && (
+                      <TouchableOpacity onPress={() => handleDeleteDocument(d.id)} style={styles.docAction}>
+                        <Text style={{ color: '#E53935', fontSize: 14 }}>Slett</Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 </View>
               </TouchableOpacity>
@@ -1030,10 +1144,22 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         visible={activeModal === 'flight'}
         editingId={editingId}
         flightForm={flightForm}
-        onFlightFormChange={setFlightForm}
+        onFlightFormChange={handleFlightFormChange}
         onSave={handleSaveFlight}
         onCancel={() => setActiveModal(null)}
         onOpenPicker={(field) => setActivePicker(field)}
+        onDirectionChange={(dir) => {
+          setActiveDirection(dir);
+          if (dir === 'utreise') {
+            setFlightFormUtreise(f => ({ ...f, type: 'utreise' }));
+          } else {
+            setFlightFormHjemreise(f => ({ ...f, type: 'hjemreise' }));
+          }
+        }}
+        onTransportTypeChange={(tt) => {
+          setFlightFormUtreise(f => ({ ...f, transportType: tt }));
+          setFlightFormHjemreise(f => ({ ...f, transportType: tt }));
+        }}
         colors={colors}
       />
 
@@ -1075,6 +1201,60 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       placeholder="F.eks. +46 8 123 456"
                       placeholderTextColor={colors.textDisabled}
                       keyboardType="phone-pad"
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Startdato</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('hotelStartDate')}
+                    >
+                      <Text style={{ color: hotelForm.startDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {hotelForm.startDate || 'Velg startdato'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Sluttdato</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('hotelEndDate')}
+                    >
+                      <Text style={{ color: hotelForm.endDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {hotelForm.endDate || 'Velg sluttdato'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Innsjekkingstid</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('hotelCheckIn')}
+                    >
+                      <Text style={{ color: hotelForm.checkInTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {hotelForm.checkInTime || 'Velg tid'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Utsjekkingstid</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('hotelCheckOut')}
+                    >
+                      <Text style={{ color: hotelForm.checkOutTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {hotelForm.checkOutTime || 'Velg tid'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Notater</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={hotelForm.note}
+                      onChangeText={(v) => setHotelForm(f => ({ ...f, note: v }))}
+                      placeholder="F.eks. Utsikt mot havet"
+                      placeholderTextColor={colors.textDisabled}
                     />
                   </View>
                 </ScrollView>
@@ -1167,28 +1347,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     />
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Dato</Text>
-                    <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                      onPress={() => setActivePicker('actDate')}
-                    >
-                      <Text style={{ color: actForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {actForm.date || 'Velg dato'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Tid</Text>
-                    <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                      onPress={() => setActivePicker('actTime')}
-                    >
-                      <Text style={{ color: actForm.time ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {actForm.time || 'Velg tid'}
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Adresse</Text>
                     <GooglePlacesInput
                       value={actForm.address}
@@ -1196,6 +1354,50 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       placeholder="Søk etter adresse..."
                       onSelect={(v) => setActForm(f => ({ ...f, address: v }))}
                     />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Startdato</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('actStartDate')}
+                    >
+                      <Text style={{ color: actForm.startDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {actForm.startDate || 'Velg startdato'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Sluttdato</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('actEndDate')}
+                    >
+                      <Text style={{ color: actForm.endDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {actForm.endDate || 'Velg sluttdato'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Starttid</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('actStartTime')}
+                    >
+                      <Text style={{ color: actForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {actForm.startTime || 'Velg starttid'}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Sluttid</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('actEndTime')}
+                    >
+                      <Text style={{ color: actForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {actForm.endTime || 'Velg sluttid'}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Notat</Text>
@@ -1508,8 +1710,11 @@ const styles = StyleSheet.create({
   },
   transportGrid: {
     flexDirection: 'row',
-    gap: 10,
     marginBottom: 10,
+  },
+  transportTileWrapper: {
+    flex: 1,
+    marginHorizontal: 5,
   },
   weatherHeaderRow: {
     flexDirection: 'row',
