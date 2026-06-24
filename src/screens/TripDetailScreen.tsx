@@ -412,6 +412,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     }
   }, [route.params?.openItemEditId, route.params?.openItemType, hotels, restaurants, activities]);
 
+  const cleanData = (data: Record<string, any>) => Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
+
   // Hotel handlers
   const handleSaveHotel = useCallback(async () => {
     if (!hotelForm.name.trim()) {
@@ -419,7 +421,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      const data = { name: sanitizeInput(hotelForm.name), address: hotelForm.address.trim() ? sanitizeInput(hotelForm.address) : undefined, phone: hotelForm.phone.trim() ? sanitizeInput(hotelForm.phone) : undefined, startDate: hotelForm.startDate || undefined, endDate: hotelForm.endDate || undefined, checkInTime: hotelForm.checkInTime || undefined, checkOutTime: hotelForm.checkOutTime || undefined, note: hotelForm.note.trim() ? sanitizeInput(hotelForm.note) : undefined };
+      const data = cleanData({ name: sanitizeInput(hotelForm.name), address: hotelForm.address.trim() ? sanitizeInput(hotelForm.address) : undefined, phone: hotelForm.phone.trim() ? sanitizeInput(hotelForm.phone) : undefined, startDate: hotelForm.startDate || undefined, endDate: hotelForm.endDate || undefined, checkInTime: hotelForm.checkInTime || undefined, checkOutTime: hotelForm.checkOutTime || undefined, note: hotelForm.note.trim() ? sanitizeInput(hotelForm.note) : undefined });
       if (editingId) {
         await updateTripHotel(trip.id, editingId, data);
       } else {
@@ -495,7 +497,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      const data = { name: sanitizeInput(restForm.name), address: restForm.address.trim() ? sanitizeInput(restForm.address) : undefined, note: restForm.note.trim() ? sanitizeInput(restForm.note) : undefined };
+      const data = cleanData({ name: restForm.name.trim() ? sanitizeInput(restForm.name) : undefined, address: restForm.address.trim() ? sanitizeInput(restForm.address) : undefined, note: restForm.note.trim() ? sanitizeInput(restForm.note) : undefined });
       if (editingId) {
         await updateTripRestaurant(trip.id, editingId, data);
       } else {
@@ -516,7 +518,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      const data = { name: sanitizeInput(actForm.name), startDate: actForm.startDate || undefined, endDate: actForm.endDate || undefined, startTime: actForm.startTime || undefined, endTime: actForm.endTime || undefined, address: actForm.address.trim() ? sanitizeInput(actForm.address) : undefined, note: actForm.note.trim() ? sanitizeInput(actForm.note) : undefined };
+      const data = cleanData({ name: actForm.name.trim() ? sanitizeInput(actForm.name) : undefined, startDate: actForm.startDate || undefined, endDate: actForm.endDate || undefined, startTime: actForm.startTime || undefined, endTime: actForm.endTime || undefined, address: actForm.address.trim() ? sanitizeInput(actForm.address) : undefined, note: actForm.note.trim() ? sanitizeInput(actForm.note) : undefined });
       if (editingId) {
         await updateTripActivity(trip.id, editingId, data);
       } else {

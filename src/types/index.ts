@@ -96,16 +96,15 @@ export interface Trip {
 
 export interface TripRestaurant {
   id: string;
-  name: string;
+  name?: string;
   address?: string;
   note?: string;
-  rating?: number;
   createdAt: number;
 }
 
 export interface TripActivity {
   id: string;
-  name: string;
+  name?: string;
   startDate?: string;
   endDate?: string;
   startTime?: string;
@@ -133,13 +132,14 @@ export interface TripLink {
 
 export interface TripHotel {
   id: string;
-  name: string;
+  name?: string;
   address?: string;
   phone?: string;
   startDate?: string;
   endDate?: string;
   checkInTime?: string;
   checkOutTime?: string;
+  note?: string;
   createdAt: number;
 }
 
