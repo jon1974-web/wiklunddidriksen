@@ -2210,10 +2210,11 @@ const styles = StyleSheet.create({
   transportGrid: {
     flexDirection: 'row',
     marginBottom: 10,
+    gap: 8,
   },
   transportTileWrapper: {
     flex: 1,
-    marginHorizontal: 5,
+    minWidth: 0,
   },
   weatherHeaderRow: {
     flexDirection: 'row',

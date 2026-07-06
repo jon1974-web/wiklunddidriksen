@@ -60,16 +60,16 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
 });
 
 const styles = StyleSheet.create({
-  tile: { flex: 1, borderRadius: 12, borderLeftWidth: 4, overflow: 'hidden' },
-  calendarIcon: { alignItems: 'center', paddingTop: 6, paddingBottom: 4 },
-  calendarTop: { width: '100%', height: 3, borderTopLeftRadius: 8, borderTopRightRadius: 8 },
-  calendarDay: { fontSize: 22, fontWeight: 'bold', marginTop: 4, lineHeight: 26, textAlign: 'center' },
-  calendarMonth: { fontSize: 11, fontWeight: '500', textTransform: 'uppercase', textAlign: 'center' },
-  tileTransportIcon: { position: 'absolute', left: 6, top: 30 },
-  iconOnly: { width: '100%', height: 40, justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8 },
-  calendarSeparator: { height: 1, marginHorizontal: 10, marginVertical: 6 },
-  tileContent: { flex: 1, minWidth: 0, paddingHorizontal: 10, paddingBottom: 10 },
-  tileName: { fontSize: 14, fontWeight: '600', marginBottom: 2 },
-  tileDetail: { fontSize: 12, marginTop: 1 },
-  tileDivider: { height: 1, marginVertical: 6 },
+  tile: { flex: 1, borderRadius: 10, borderLeftWidth: 3, overflow: 'hidden', minWidth: 0 },
+  calendarIcon: { alignItems: 'center', paddingTop: 4, paddingBottom: 2 },
+  calendarTop: { width: '100%', height: 2, borderTopLeftRadius: 8, borderTopRightRadius: 8 },
+  calendarDay: { fontSize: 18, fontWeight: 'bold', marginTop: 2, lineHeight: 22, textAlign: 'center' },
+  calendarMonth: { fontSize: 10, fontWeight: '500', textTransform: 'uppercase', textAlign: 'center' },
+  tileTransportIcon: { position: 'absolute', left: 4, top: 24 },
+  iconOnly: { width: '100%', height: 32, justifyContent: 'center', alignItems: 'center', borderTopLeftRadius: 8, borderTopRightRadius: 8 },
+  calendarSeparator: { height: 1, marginHorizontal: 6, marginVertical: 4 },
+  tileContent: { flex: 1, minWidth: 0, paddingHorizontal: 6, paddingBottom: 6 },
+  tileName: { fontSize: 12, fontWeight: '600', marginBottom: 1 },
+  tileDetail: { fontSize: 10, marginTop: 1 },
+  tileDivider: { height: 1, marginVertical: 4 },
 });
