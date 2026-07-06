@@ -451,7 +451,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     const editId = route.params?.openItemEditId;
     const itemType = route.params?.openItemType;
     if (editId && itemType) {
-      const collections: Record<string, any[]> = { hotel: hotels, restaurant: restaurants, activity: activities };
+      const collections: Record<string, any[]> = { hotel: hotels, restaurant: restaurants, activity: activities, boat: boats, taxi: taxis, ferry: ferries };
       const items = collections[itemType] || [];
       const found = items.find((i: any) => i.id === editId);
       if (found) {
@@ -459,7 +459,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         navigation.setParams({ openItemEditId: undefined, openItemType: undefined });
       }
     }
-  }, [route.params?.openItemEditId, route.params?.openItemType, hotels, restaurants, activities]);
+  }, [route.params?.openItemEditId, route.params?.openItemType, hotels, restaurants, activities, boats, taxis, ferries]);
 
   const cleanData = (data: Record<string, any>) => Object.fromEntries(Object.entries(data).filter(([, v]) => v !== undefined));
 
@@ -1754,10 +1754,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.carRegistration} onChangeText={(v) => setBoatForm(f => ({ ...f, carRegistration: v }))} placeholder="F.eks. AB 12345" placeholderTextColor={colors.textDisabled} />
                     </View>
                   )}
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Fører</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.driver} onChangeText={(v) => setBoatForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
-                  </View>
+                  {boatForm.hasCar && (
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>Fører</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.driver} onChangeText={(v) => setBoatForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                  )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Passasjerer</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.passengers} onChangeText={(v) => setBoatForm(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
@@ -1922,10 +1924,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.carRegistration} onChangeText={(v) => setFerryForm(f => ({ ...f, carRegistration: v }))} placeholder="F.eks. AB 12345" placeholderTextColor={colors.textDisabled} />
                     </View>
                   )}
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Fører</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.driver} onChangeText={(v) => setFerryForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
-                  </View>
+                  {ferryForm.hasCar && (
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>Fører</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.driver} onChangeText={(v) => setFerryForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                  )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Passasjerer</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.passengers} onChangeText={(v) => setFerryForm(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
