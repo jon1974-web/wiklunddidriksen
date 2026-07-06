@@ -38,7 +38,7 @@ function getDeviceLanguage(): string {
 }
 
 const savedLang = typeof window !== 'undefined' ? getStoredLanguage() : 'nb';
-const initialLang = savedLang !== 'nb' ? savedLang : getDeviceLanguage();
+const initialLang = savedLang !== 'nb' ? savedLang : 'nb';
 
 i18n.use(initReactI18next).init({
   resources,
