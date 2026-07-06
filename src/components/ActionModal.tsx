@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface ActionModalProps {
   visible: boolean;
@@ -15,6 +16,7 @@ export const ActionModal: React.FC<ActionModalProps> = React.memo(({
   visible, title, subtitle, onEdit, onDelete, onCancel,
 }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -31,7 +33,7 @@ export const ActionModal: React.FC<ActionModalProps> = React.memo(({
                   style={[styles.button, { backgroundColor: colors.accent }]}
                   onPress={() => { onEdit(); onCancel(); }}
                 >
-                  <Text style={[styles.buttonText, { color: '#fff' }]}>✎ Rediger</Text>
+                  <Text style={[styles.buttonText, { color: '#fff' }]}>✎ {t('actionModal.edit')}</Text>
                 </TouchableOpacity>
               )}
 
@@ -40,7 +42,7 @@ export const ActionModal: React.FC<ActionModalProps> = React.memo(({
                   style={[styles.button, { backgroundColor: '#E53935' }]}
                   onPress={() => { onDelete(); onCancel(); }}
                 >
-                  <Text style={[styles.buttonText, { color: '#fff' }]}>🗑️ Slett</Text>
+                  <Text style={[styles.buttonText, { color: '#fff' }]}>🗑️ {t('actionModal.delete')}</Text>
                 </TouchableOpacity>
               )}
 
@@ -48,7 +50,7 @@ export const ActionModal: React.FC<ActionModalProps> = React.memo(({
                 style={[styles.button, { backgroundColor: colors.inputBackground }]}
                 onPress={onCancel}
               >
-                <Text style={[styles.buttonText, { color: colors.textSecondary }]}>Avbryt</Text>
+                <Text style={[styles.buttonText, { color: colors.textSecondary }]}>{t('actionModal.cancel')}</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>

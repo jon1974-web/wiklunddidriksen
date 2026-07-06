@@ -8,8 +8,10 @@ import { useTheme } from '../theme/ThemeContext';
 import { createOrUpdateUser, getUserProfile, joinFamilyByInviteCode } from '../services/familyService';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
+import { useTranslation } from 'react-i18next';
 
 export const AuthScreen: React.FC = () => {
+  const { t } = useTranslation();
   const setUser = useUserStore((state) => state.setUser);
   const setFamily = useUserStore((state) => state.setFamily);
   const pendingInviteCode = useUserStore((state) => state.pendingInviteCode);
@@ -38,13 +40,13 @@ export const AuthScreen: React.FC = () => {
       try { localStorage.removeItem('pendingInviteCode'); } catch {}
       try { localStorage.removeItem('pendingInviteFamilyName'); } catch {}
     } catch (joinError) {
-      crossAlert('Kunne ikke bli med', getErrorMessage(joinError) + '\n\nDu kan prøve igjen fra Profil-fanen.');
+      crossAlert(t('common.error'), getErrorMessage(joinError) + '\n\n' + t('auth.inviteJoinHint'));
     }
   };
 
   const handleAuth = async () => {
     if (!email || !password || (!isLogin && !name)) {
-      crossAlert('Error', 'Vennligst fyll inn alle feltene');
+      crossAlert(t('common.error'), 'Vennligst fyll inn alle feltene');
       return;
     }
 
@@ -104,7 +106,7 @@ export const AuthScreen: React.FC = () => {
         }
       }
     } catch (error: any) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -113,18 +115,18 @@ export const AuthScreen: React.FC = () => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <Image source={require('../../assets/icon.png')} style={{ width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }} />
-      <Text style={[styles.title, { color: '#0097A7' }]}>Familiesenter</Text>
+      <Text style={[styles.title, { color: '#0097A7' }]}>{t('auth.title')}</Text>
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-        {hasInvite ? 'Bli med i familie' : isLogin ? 'Logg inn' : 'Registrer deg'}
+        {hasInvite ? t('auth.inviteTitle') : isLogin ? t('auth.login') : t('auth.register')}
       </Text>
 
       {hasInvite && (
         <View style={[styles.inviteBanner, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
           <Text style={[styles.inviteBannerText, { color: colors.text }]}>
-            Du er invitert til <Text style={{ fontWeight: 'bold' }}>{pendingInviteFamilyName || 'en familie'}</Text>
+            {t('auth.inviteBanner')} <Text style={{ fontWeight: 'bold' }}>{pendingInviteFamilyName || 'en familie'}</Text>
           </Text>
           <Text style={[styles.inviteBannerSubtext, { color: colors.textSecondary }]}>
-            Registrer deg for å bli med.
+            {isLogin ? t('auth.inviteLoginHint') : t('auth.inviteRegisterHint')}
           </Text>
         </View>
       )}
@@ -132,7 +134,7 @@ export const AuthScreen: React.FC = () => {
       {!isLogin && (
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-          placeholder="Navn"
+          placeholder={t('auth.name')}
           placeholderTextColor={colors.textDisabled}
           value={name}
           onChangeText={setName}
@@ -142,7 +144,7 @@ export const AuthScreen: React.FC = () => {
 
       <TextInput
         style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-        placeholder="E-post"
+        placeholder={t('auth.email')}
         placeholderTextColor={colors.textDisabled}
         value={email}
         onChangeText={setEmail}
@@ -152,7 +154,7 @@ export const AuthScreen: React.FC = () => {
 
       <TextInput
         style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-        placeholder="Passord"
+        placeholder={t('auth.password')}
         placeholderTextColor={colors.textDisabled}
         value={password}
         onChangeText={setPassword}
@@ -165,21 +167,21 @@ export const AuthScreen: React.FC = () => {
         disabled={loading}
       >
         <Text style={styles.buttonText}>
-          {loading ? 'Venter...' : hasInvite ? (isLogin ? 'Logg inn og bli med' : 'Registrer og bli med') : isLogin ? 'Logg inn' : 'Registrer'}
+          {loading ? '...' : hasInvite ? (isLogin ? t('auth.inviteLoginButton') : t('auth.inviteRegisterButton')) : isLogin ? t('auth.loginButton') : t('auth.registerButton')}
         </Text>
       </TouchableOpacity>
 
       {!hasInvite && (
-      <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-        <Text style={[styles.switchText, { color: '#0097A7' }]}>
-            {isLogin ? 'Har du ikke en konto? Registrer deg' : 'Har du allerede en konto? Logg inn'}
+        <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
+          <Text style={[styles.switchText, { color: '#0097A7' }]}>
+            {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
           </Text>
         </TouchableOpacity>
       )}
 
       {!hasInvite && !isLogin && (
         <Text style={[styles.hintText, { color: colors.textDisabled }]}>
-          Registrer deg for å opprette en ny familie.
+          {t('auth.registerHint')}
         </Text>
       )}
     </SafeAreaView>

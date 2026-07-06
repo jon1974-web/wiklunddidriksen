@@ -44,6 +44,9 @@ import { uriToBlob } from '../utils/upload';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { SpondGroup, SpondMember, SpondGroupMember, UserProfile, Family } from '../types';
 import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
+import { useTranslation } from 'react-i18next';
+import { setLanguage } from '../i18n';
+import i18n from '../i18n';
 
 export const ProfileScreen: React.FC = () => {
   const user = useUserStore((state) => state.user);
@@ -805,6 +808,33 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Språk</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, paddingVertical: 8 }}>
+          {([
+            { key: 'nb', label: '🇳🇴 NO' },
+            { key: 'sv', label: '🇸🇪 SV' },
+            { key: 'da', label: '🇩🇰 DA' },
+            { key: 'en', label: '🇬🇧 EN' },
+            { key: 'fi', label: '🇫🇮 FI' },
+          ]).map((lang) => (
+            <TouchableOpacity
+              key={lang.key}
+              onPress={() => setLanguage(lang.key)}
+              style={[
+                styles.langOption,
+                { backgroundColor: colors.inputBackground, borderColor: colors.border },
+                i18n.language === lang.key && { backgroundColor: colors.accent, borderColor: colors.accent },
+              ]}
+            >
+              <Text style={[styles.langText, { color: i18n.language === lang.key ? '#fff' : colors.text }]}>
+                {lang.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Varsler</Text>
           <View style={styles.themeOptions}>
             <TouchableOpacity
@@ -1224,6 +1254,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   themeText: {
+    fontWeight: '600',
+  },
+  langOption: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  langText: {
+    fontSize: 13,
     fontWeight: '600',
   },
   familyCard: {

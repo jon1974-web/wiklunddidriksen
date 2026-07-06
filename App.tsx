@@ -6,6 +6,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { TouchableOpacity, Text, ActivityIndicator, Image, Animated } from 'react-native';
 
+import './src/i18n';
+
 import { auth } from './src/services/firebase';
 import { useUserStore } from './src/store/userStore';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';

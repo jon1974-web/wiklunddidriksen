@@ -41,7 +41,8 @@
         {
           "calendarPermission": "Familiesenter trenger tilgang til kalenderen din for a legge til arrangementer."
         }
-      ]
+      ],
+      "expo-localization"
     ]
   }
 }
