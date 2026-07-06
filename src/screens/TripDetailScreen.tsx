@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink, DestinationTips, CityTips } from '../types';
+import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink, TripBoat, TripTaxi, TripFerry, DestinationTips, CityTips } from '../types';
 import { crossAlert } from '../utils/alert';
 import {
   getTripHotels,
@@ -40,6 +40,18 @@ import {
   addTripLink,
   updateTripLink,
   deleteTripLink,
+  getTripBoats,
+  addTripBoat,
+  updateTripBoat,
+  deleteTripBoat,
+  getTripTaxis,
+  addTripTaxi,
+  updateTripTaxi,
+  deleteTripTaxi,
+  getTripFerries,
+  addTripFerry,
+  updateTripFerry,
+  deleteTripFerry,
   updateTrip,
 } from '../services/tripService';
 import { ref, deleteObject } from 'firebase/storage';
@@ -65,7 +77,7 @@ interface TripDetailScreenProps {
   route: any;
 }
 
-type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | 'tripEdit' | null;
+type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | 'boat' | 'taxi' | 'ferry' | 'tripEdit' | null;
 
 export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, route }) => {
   const { trip: initialTrip } = route.params as { trip: Trip };
@@ -81,6 +93,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [activities, setActivities] = useState<TripActivity[]>([]);
   const [documents, setDocuments] = useState<TripDocument[]>([]);
   const [links, setLinks] = useState<TripLink[]>([]);
+  const [boats, setBoats] = useState<TripBoat[]>([]);
+  const [taxis, setTaxis] = useState<TripTaxi[]>([]);
+  const [ferries, setFerries] = useState<TripFerry[]>([]);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -97,6 +112,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
   const emptyLink = { title: '', url: '' };
+  const emptyBoat = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', address: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
+  const emptyTaxi = { name: '', reference: '', departureDate: '', departureTime: '', address: '', phone: '', driver: '', passengers: '', note: '' };
+  const emptyFerry = { name: '', routeName: '', reference: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', address: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
 
   const [hotelForm, setHotelForm] = useState(emptyHotel);
   const [flightFormUtreise, setFlightFormUtreise] = useState(emptyFlight);
@@ -115,9 +133,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [actForm, setActForm] = useState(emptyAct);
   const [docForm, setDocForm] = useState(emptyDoc);
   const [linkForm, setLinkForm] = useState(emptyLink);
+  const [boatForm, setBoatForm] = useState(emptyBoat);
+  const [taxiForm, setTaxiForm] = useState(emptyTaxi);
+  const [ferryForm, setFerryForm] = useState(emptyFerry);
 
   // Unified picker state
-  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | null;
+  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDate' | 'taxiTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
   const [activePicker, setActivePicker] = useState<PickerField>(null);
 
   const handlePickerSelect = (value: string) => {
@@ -135,6 +156,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     else if (activePicker === 'hotelEndDate') setHotelForm(f => ({ ...f, endDate: value }));
     else if (activePicker === 'hotelCheckIn') setHotelForm(f => ({ ...f, checkInTime: value }));
     else if (activePicker === 'hotelCheckOut') setHotelForm(f => ({ ...f, checkOutTime: value }));
+    else if (activePicker === 'boatDepDate') setBoatForm(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'boatDepTime') setBoatForm(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'boatArrDate') setBoatForm(f => ({ ...f, arrivalDate: value }));
+    else if (activePicker === 'boatArrTime') setBoatForm(f => ({ ...f, arrivalTime: value }));
+    else if (activePicker === 'taxiDate') setTaxiForm(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'taxiTime') setTaxiForm(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'ferryDepDate') setFerryForm(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'ferryDepTime') setFerryForm(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'ferryArrDate') setFerryForm(f => ({ ...f, arrivalDate: value }));
+    else if (activePicker === 'ferryArrTime') setFerryForm(f => ({ ...f, arrivalTime: value }));
     setActivePicker(null);
   };
 
@@ -146,6 +177,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       actStartDate: 'Velg startdato', actEndDate: 'Velg sluttdato', actStartTime: 'Velg starttid', actEndTime: 'Velg sluttid',
       hotelStartDate: 'Velg startdato', hotelEndDate: 'Velg sluttdato',
       hotelCheckIn: 'Velg innsjekkingstid', hotelCheckOut: 'Velg utsjekkingstid',
+      boatDepDate: 'Velg avreisedato', boatDepTime: 'Velg avreisetid', boatArrDate: 'Velg ankomstdato', boatArrTime: 'Velg ankomsttid',
+      taxiDate: 'Velg dato', taxiTime: 'Velg tid',
+      ferryDepDate: 'Velg avreisedato', ferryDepTime: 'Velg avreisetid', ferryArrDate: 'Velg ankomstdato', ferryArrTime: 'Velg ankomsttid',
     };
     return activePicker ? titles[activePicker] : '';
   };
@@ -157,6 +191,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       flightDepTime: flightForm.departureTime, flightArrTime: flightForm.arrivalTime,
       actStartDate: actForm.startDate, actEndDate: actForm.endDate, actStartTime: actForm.startTime, actEndTime: actForm.endTime,
       hotelStartDate: hotelForm.startDate, hotelEndDate: hotelForm.endDate, hotelCheckIn: hotelForm.checkInTime, hotelCheckOut: hotelForm.checkOutTime,
+      boatDepDate: boatForm.departureDate, boatDepTime: boatForm.departureTime, boatArrDate: boatForm.arrivalDate, boatArrTime: boatForm.arrivalTime,
+      taxiDate: taxiForm.departureDate, taxiTime: taxiForm.departureTime,
+      ferryDepDate: ferryForm.departureDate, ferryDepTime: ferryForm.departureTime, ferryArrDate: ferryForm.arrivalDate, ferryArrTime: ferryForm.arrivalTime,
     };
     return activePicker ? values[activePicker] || '' : '';
   };
@@ -166,13 +203,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const loadSubData = useCallback(async () => {
     try {
-      const [h, f, r, a, d, l] = await Promise.all([
+      const [h, f, r, a, d, l, bo, ta, fe] = await Promise.all([
         getTripHotels(trip.id),
         getTripFlights(trip.id),
         getTripRestaurants(trip.id),
         getTripActivities(trip.id),
         getTripDocuments(trip.id),
         getTripLinks(trip.id),
+        getTripBoats(trip.id),
+        getTripTaxis(trip.id),
+        getTripFerries(trip.id),
       ]);
       setHotels(h);
       setFlights(f);
@@ -180,6 +220,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActivities(a);
       setDocuments(d);
       setLinks(l);
+      setBoats(bo);
+      setTaxis(ta);
+      setFerries(fe);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -383,6 +426,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setDocForm({ title: item.title || '', note: item.note || '', fileUrl: item.fileUrl || '', fileName: item.fileName || '' });
     } else if (modal === 'link') {
       setLinkForm({ title: item.title || '', url: item.url || '' });
+    } else if (modal === 'boat') {
+      setBoatForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', address: item.address || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+    } else if (modal === 'taxi') {
+      setTaxiForm({ name: item.name || '', reference: item.reference || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', address: item.address || '', phone: item.phone || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+    } else if (modal === 'ferry') {
+      setFerryForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', address: item.address || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
     }
     setActiveModal(modal);
   };
@@ -589,6 +638,30 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     }
   }, [trip.id, linkForm, editingId, loadSubData]);
 
+  const handleSaveBoat = useCallback(async () => {
+    try {
+      const data = cleanData({ name: boatForm.name.trim() ? sanitizeInput(boatForm.name) : undefined, routeName: boatForm.routeName.trim() ? sanitizeInput(boatForm.routeName) : undefined, reference: boatForm.reference.trim() ? sanitizeInput(boatForm.reference) : undefined, cabin: boatForm.cabin.trim() ? sanitizeInput(boatForm.cabin) : undefined, departureDate: boatForm.departureDate || undefined, departureTime: boatForm.departureTime || undefined, arrivalDate: boatForm.arrivalDate || undefined, arrivalTime: boatForm.arrivalTime || undefined, address: boatForm.address.trim() ? sanitizeInput(boatForm.address) : undefined, phone: boatForm.phone.trim() ? sanitizeInput(boatForm.phone) : undefined, hasCar: boatForm.hasCar || undefined, carRegistration: boatForm.hasCar && boatForm.carRegistration.trim() ? sanitizeInput(boatForm.carRegistration) : undefined, driver: boatForm.driver.trim() ? sanitizeInput(boatForm.driver) : undefined, passengers: boatForm.passengers.trim() ? sanitizeInput(boatForm.passengers) : undefined, note: boatForm.note.trim() ? sanitizeInput(boatForm.note) : undefined });
+      if (editingId) { await updateTripBoat(trip.id, editingId, data); } else { await addTripBoat(trip.id, data); }
+      resetForms(); setActiveModal(null); loadSubData();
+    } catch (error) { crossAlert('Error', getErrorMessage(error)); }
+  }, [trip.id, boatForm, editingId, loadSubData]);
+
+  const handleSaveTaxi = useCallback(async () => {
+    try {
+      const data = cleanData({ name: taxiForm.name.trim() ? sanitizeInput(taxiForm.name) : undefined, reference: taxiForm.reference.trim() ? sanitizeInput(taxiForm.reference) : undefined, departureDate: taxiForm.departureDate || undefined, departureTime: taxiForm.departureTime || undefined, address: taxiForm.address.trim() ? sanitizeInput(taxiForm.address) : undefined, phone: taxiForm.phone.trim() ? sanitizeInput(taxiForm.phone) : undefined, driver: taxiForm.driver.trim() ? sanitizeInput(taxiForm.driver) : undefined, passengers: taxiForm.passengers.trim() ? sanitizeInput(taxiForm.passengers) : undefined, note: taxiForm.note.trim() ? sanitizeInput(taxiForm.note) : undefined });
+      if (editingId) { await updateTripTaxi(trip.id, editingId, data); } else { await addTripTaxi(trip.id, data); }
+      resetForms(); setActiveModal(null); loadSubData();
+    } catch (error) { crossAlert('Error', getErrorMessage(error)); }
+  }, [trip.id, taxiForm, editingId, loadSubData]);
+
+  const handleSaveFerry = useCallback(async () => {
+    try {
+      const data = cleanData({ name: ferryForm.name.trim() ? sanitizeInput(ferryForm.name) : undefined, routeName: ferryForm.routeName.trim() ? sanitizeInput(ferryForm.routeName) : undefined, reference: ferryForm.reference.trim() ? sanitizeInput(ferryForm.reference) : undefined, departureDate: ferryForm.departureDate || undefined, departureTime: ferryForm.departureTime || undefined, arrivalDate: ferryForm.arrivalDate || undefined, arrivalTime: ferryForm.arrivalTime || undefined, address: ferryForm.address.trim() ? sanitizeInput(ferryForm.address) : undefined, phone: ferryForm.phone.trim() ? sanitizeInput(ferryForm.phone) : undefined, hasCar: ferryForm.hasCar || undefined, carRegistration: ferryForm.hasCar && ferryForm.carRegistration.trim() ? sanitizeInput(ferryForm.carRegistration) : undefined, driver: ferryForm.driver.trim() ? sanitizeInput(ferryForm.driver) : undefined, passengers: ferryForm.passengers.trim() ? sanitizeInput(ferryForm.passengers) : undefined, note: ferryForm.note.trim() ? sanitizeInput(ferryForm.note) : undefined });
+      if (editingId) { await updateTripFerry(trip.id, editingId, data); } else { await addTripFerry(trip.id, data); }
+      resetForms(); setActiveModal(null); loadSubData();
+    } catch (error) { crossAlert('Error', getErrorMessage(error)); }
+  }, [trip.id, ferryForm, editingId, loadSubData]);
+
   // Delete handlers
   const confirmDelete = (title: string, onConfirm: () => void) => {
     crossAlert(`Slett ${title}`, 'Er du sikker?', [
@@ -603,6 +676,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const handleDeleteActivity = useCallback((id: string) => confirmDelete('aktivitet', async () => { await deleteTripActivity(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteDocument = useCallback((id: string) => confirmDelete('dokument', async () => { await deleteTripDocument(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteLink = useCallback((id: string) => confirmDelete('lenke', async () => { await deleteTripLink(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteBoat = useCallback((id: string) => confirmDelete('båt', async () => { await deleteTripBoat(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteTaxi = useCallback((id: string) => confirmDelete('taxi', async () => { await deleteTripTaxi(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteFerry = useCallback((id: string) => confirmDelete('ferje', async () => { await deleteTripFerry(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
 
   const renderSectionHeader = (title: string, icon: string, onAdd: () => void) => (
     <View style={styles.sectionHeader}>
@@ -1007,6 +1083,77 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             link={l}
             onPress={() => Linking.openURL(l.url)}
             onLongPress={canDelete ? () => handleDeleteLink(l.id) : undefined}
+          />
+        ))
+      )}
+
+      {/* Boats */}
+      {renderSectionHeader('Båt/Cruise', '🚢', () => openAddModal('boat'))}
+      {boats.length === 0 ? (
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen båt/cruise lagt til</Text>
+      ) : (
+        boats.map((b) => (
+          <AddressItemCard
+            key={b.id}
+            name={b.name || 'Båt/Cruise'}
+            address={b.address}
+            detail={[b.departureDate ? formatDate(b.departureDate) : '', b.departureTime || ''].filter(Boolean).join(' ') || undefined}
+            note={b.hasCar ? '🚗 Bil med' : undefined}
+            onPress={() => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' })}
+            onLongPress={canDelete ? () => {
+              crossAlert('Båt/Cruise', b.name || 'Båt/Cruise', [
+                { text: 'Avbryt', style: 'cancel' },
+                { text: 'Rediger', onPress: () => openEditModal('boat', b) },
+                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteBoat(b.id) },
+              ]);
+            } : undefined}
+          />
+        ))
+      )}
+
+      {/* Taxis */}
+      {renderSectionHeader('Taxi', '🚕', () => openAddModal('taxi'))}
+      {taxis.length === 0 ? (
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen taxi lagt til</Text>
+      ) : (
+        taxis.map((t) => (
+          <AddressItemCard
+            key={t.id}
+            name={t.name || 'Taxi'}
+            address={t.address}
+            detail={[t.departureDate ? formatDate(t.departureDate) : '', t.departureTime || ''].filter(Boolean).join(' ') || undefined}
+            onPress={() => navigation.navigate('TripItemDetail', { item: t, tripId: trip.id, trip, itemType: 'taxi' })}
+            onLongPress={canDelete ? () => {
+              crossAlert('Taxi', t.name || 'Taxi', [
+                { text: 'Avbryt', style: 'cancel' },
+                { text: 'Rediger', onPress: () => openEditModal('taxi', t) },
+                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteTaxi(t.id) },
+              ]);
+            } : undefined}
+          />
+        ))
+      )}
+
+      {/* Ferries */}
+      {renderSectionHeader('Ferje', '⛴️', () => openAddModal('ferry'))}
+      {ferries.length === 0 ? (
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen ferje lagt til</Text>
+      ) : (
+        ferries.map((f) => (
+          <AddressItemCard
+            key={f.id}
+            name={f.name || 'Ferje'}
+            address={f.address}
+            detail={[f.departureDate ? formatDate(f.departureDate) : '', f.departureTime || ''].filter(Boolean).join(' ') || undefined}
+            note={f.hasCar ? '🚗 Bil med' : undefined}
+            onPress={() => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' })}
+            onLongPress={canDelete ? () => {
+              crossAlert('Ferje', f.name || 'Ferje', [
+                { text: 'Avbryt', style: 'cancel' },
+                { text: 'Rediger', onPress: () => openEditModal('ferry', f) },
+                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFerry(f.id) },
+              ]);
+            } : undefined}
           />
         ))
       )}
@@ -1522,6 +1669,265 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveLink}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Boat Modal */}
+      <Modal visible={activeModal === 'boat'} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger båt/cruise' : 'Legg til båt/cruise'}
+                </Text>
+                <ScrollView style={styles.modalScroll}>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Selskap/rederi</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.name} onChangeText={(v) => setBoatForm(f => ({ ...f, name: v }))} placeholder="F.eks. Color Line" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Rutenavn</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.routeName} onChangeText={(v) => setBoatForm(f => ({ ...f, routeName: v }))} placeholder="F.eks. Bergen–Tromsø" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Referanse</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.reference} onChangeText={(v) => setBoatForm(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Kabin/kupe</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.cabin} onChangeText={(v) => setBoatForm(f => ({ ...f, cabin: v }))} placeholder="F.eks. Inner 2-sengs" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Avreisedato</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('boatDepDate')}>
+                      <Text style={{ color: boatForm.departureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{boatForm.departureDate || 'Velg dato'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Avreisetid</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('boatDepTime')}>
+                      <Text style={{ color: boatForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{boatForm.departureTime || 'Velg tid'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Ankomstdato</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('boatArrDate')}>
+                      <Text style={{ color: boatForm.arrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{boatForm.arrivalDate || 'Velg dato'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Ankomsttid</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('boatArrTime')}>
+                      <Text style={{ color: boatForm.arrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{boatForm.arrivalTime || 'Velg tid'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Adresse (havn)</Text>
+                    <GooglePlacesInput value={boatForm.address} onChangeText={(v) => setBoatForm(f => ({ ...f, address: v }))} placeholder="Søk etter adresse..." onSelect={(v) => setBoatForm(f => ({ ...f, address: v }))} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.phone} onChangeText={(v) => setBoatForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                  </View>
+                  <View style={styles.field}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => setBoatForm(f => ({ ...f, hasCar: !f.hasCar }))}>
+                      <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: boatForm.hasCar ? colors.accent : colors.textDisabled, backgroundColor: boatForm.hasCar ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+                        {boatForm.hasCar && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
+                      </View>
+                      <Text style={[styles.label, { color: colors.text }]}>🚗 Bil med</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {boatForm.hasCar && (
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>Bilens reg. nr</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.carRegistration} onChangeText={(v) => setBoatForm(f => ({ ...f, carRegistration: v }))} placeholder="F.eks. AB 12345" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                  )}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Fører</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.driver} onChangeText={(v) => setBoatForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Passasjerer</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.passengers} onChangeText={(v) => setBoatForm(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Notat</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.note} onChangeText={(v) => setBoatForm(f => ({ ...f, note: v }))} placeholder="F.eks. Bestilt middag ombord" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveBoat}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Taxi Modal */}
+      <Modal visible={activeModal === 'taxi'} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger taxi' : 'Legg til taxi'}
+                </Text>
+                <ScrollView style={styles.modalScroll}>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Selskap</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.name} onChangeText={(v) => setTaxiForm(f => ({ ...f, name: v }))} placeholder="F.eks. Oslo Taxi" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Referanse</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.reference} onChangeText={(v) => setTaxiForm(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Hentedato</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiDate')}>
+                      <Text style={{ color: taxiForm.departureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{taxiForm.departureDate || 'Velg dato'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Hentetid</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiTime')}>
+                      <Text style={{ color: taxiForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{taxiForm.departureTime || 'Velg tid'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Adresse (hentested)</Text>
+                    <GooglePlacesInput value={taxiForm.address} onChangeText={(v) => setTaxiForm(f => ({ ...f, address: v }))} placeholder="Søk etter adresse..." onSelect={(v) => setTaxiForm(f => ({ ...f, address: v }))} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.phone} onChangeText={(v) => setTaxiForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Fører</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.driver} onChangeText={(v) => setTaxiForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Passasjerer</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.passengers} onChangeText={(v) => setTaxiForm(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Notat</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.note} onChangeText={(v) => setTaxiForm(f => ({ ...f, note: v }))} placeholder="F.eks. Bestilt for 4 personer" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveTaxi}>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Ferry Modal */}
+      <Modal visible={activeModal === 'ferry'} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
+                  {editingId ? 'Rediger ferje' : 'Legg til ferje'}
+                </Text>
+                <ScrollView style={styles.modalScroll}>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Selskap/rederi</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.name} onChangeText={(v) => setFerryForm(f => ({ ...f, name: v }))} placeholder="F.eks. Color Line" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Rutenavn</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.routeName} onChangeText={(v) => setFerryForm(f => ({ ...f, routeName: v }))} placeholder="F.eks. Oslo–Frederikshavn" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Referanse</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.reference} onChangeText={(v) => setFerryForm(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Avreisedato</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryDepDate')}>
+                      <Text style={{ color: ferryForm.departureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.departureDate || 'Velg dato'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Avreisetid</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryDepTime')}>
+                      <Text style={{ color: ferryForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.departureTime || 'Velg tid'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Ankomstdato</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryArrDate')}>
+                      <Text style={{ color: ferryForm.arrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.arrivalDate || 'Velg dato'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Ankomsttid</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryArrTime')}>
+                      <Text style={{ color: ferryForm.arrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.arrivalTime || 'Velg tid'}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Adresse (terminal)</Text>
+                    <GooglePlacesInput value={ferryForm.address} onChangeText={(v) => setFerryForm(f => ({ ...f, address: v }))} placeholder="Søk etter adresse..." onSelect={(v) => setFerryForm(f => ({ ...f, address: v }))} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.phone} onChangeText={(v) => setFerryForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                  </View>
+                  <View style={styles.field}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => setFerryForm(f => ({ ...f, hasCar: !f.hasCar }))}>
+                      <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: ferryForm.hasCar ? colors.accent : colors.textDisabled, backgroundColor: ferryForm.hasCar ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+                        {ferryForm.hasCar && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
+                      </View>
+                      <Text style={[styles.label, { color: colors.text }]}>🚗 Bil med</Text>
+                    </TouchableOpacity>
+                  </View>
+                  {ferryForm.hasCar && (
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>Bilens reg. nr</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.carRegistration} onChangeText={(v) => setFerryForm(f => ({ ...f, carRegistration: v }))} placeholder="F.eks. AB 12345" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                  )}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Fører</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.driver} onChangeText={(v) => setFerryForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Passasjerer</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.passengers} onChangeText={(v) => setFerryForm(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Notat</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.note} onChangeText={(v) => setFerryForm(f => ({ ...f, note: v }))} placeholder="F.eks. Billett bestilt" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                    <Text style={[styles.modalButtonText, { color: colors.text }]}>Avbryt</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveFerry}>
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
                   </TouchableOpacity>
                 </View>

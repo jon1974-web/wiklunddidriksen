@@ -164,6 +164,59 @@ export interface TripFlight {
   createdAt: number;
 }
 
+export interface TripBoat {
+  id: string;
+  name?: string;
+  routeName?: string;
+  reference?: string;
+  cabin?: string;
+  departureDate?: string;
+  departureTime?: string;
+  arrivalDate?: string;
+  arrivalTime?: string;
+  address?: string;
+  phone?: string;
+  hasCar?: boolean;
+  carRegistration?: string;
+  driver?: string;
+  passengers?: string;
+  note?: string;
+  createdAt: number;
+}
+
+export interface TripTaxi {
+  id: string;
+  name?: string;
+  reference?: string;
+  departureDate?: string;
+  departureTime?: string;
+  address?: string;
+  phone?: string;
+  driver?: string;
+  passengers?: string;
+  note?: string;
+  createdAt: number;
+}
+
+export interface TripFerry {
+  id: string;
+  name?: string;
+  routeName?: string;
+  reference?: string;
+  departureDate?: string;
+  departureTime?: string;
+  arrivalDate?: string;
+  arrivalTime?: string;
+  address?: string;
+  phone?: string;
+  hasCar?: boolean;
+  carRegistration?: string;
+  driver?: string;
+  passengers?: string;
+  note?: string;
+  createdAt: number;
+}
+
 export interface SpondEvent {
   id: string;
   heading: string;

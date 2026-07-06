@@ -12,25 +12,31 @@ import { useTheme } from '../theme/ThemeContext';
 import { crossAlert } from '../utils/alert';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { formatDate } from '../utils/dateUtils';
-import { deleteTripHotel, deleteTripRestaurant, deleteTripActivity } from '../services/tripService';
+import { deleteTripHotel, deleteTripRestaurant, deleteTripActivity, deleteTripBoat, deleteTripTaxi, deleteTripFerry } from '../services/tripService';
 
 interface TripItemDetailScreenProps {
   navigation: any;
   route: any;
 }
 
-type ItemType = 'hotel' | 'restaurant' | 'activity';
+type ItemType = 'hotel' | 'restaurant' | 'activity' | 'boat' | 'taxi' | 'ferry';
 
 const deleteHandlers: Record<ItemType, (tripId: string, itemId: string) => Promise<void>> = {
   hotel: deleteTripHotel,
   restaurant: deleteTripRestaurant,
   activity: deleteTripActivity,
+  boat: deleteTripBoat,
+  taxi: deleteTripTaxi,
+  ferry: deleteTripFerry,
 };
 
 const typeConfig: Record<ItemType, { icon: string; label: string; editParam: string }> = {
   hotel: { icon: '🛏️', label: 'Hotell', editParam: 'openHotelEditId' },
   restaurant: { icon: '🍽️', label: 'Restaurant', editParam: 'openRestaurantEditId' },
   activity: { icon: '🎯', label: 'Aktivitet', editParam: 'openActivityEditId' },
+  boat: { icon: '🚢', label: 'Båt/Cruise', editParam: 'openBoatEditId' },
+  taxi: { icon: '🚕', label: 'Taxi', editParam: 'openTaxiEditId' },
+  ferry: { icon: '⛴️', label: 'Ferje', editParam: 'openFerryEditId' },
 };
 
 export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navigation, route }) => {
@@ -147,6 +153,81 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 {item.endTime && renderRow('Sluttid', item.endTime)}
               </View>
             )}
+            {renderNotesRow('Notat', item.note)}
+          </>
+        )}
+
+        {itemType === 'boat' && (
+          <>
+            {renderRow('Rutenavn', item.routeName)}
+            {renderRow('Referanse', item.reference)}
+            {renderRow('Kabin/kupe', item.cabin)}
+            {(item.departureDate || item.departureTime) && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 Avreise</Text>
+                {item.departureDate && renderRow('Dato', formatDate(item.departureDate))}
+                {item.departureTime && renderRow('Tid', item.departureTime)}
+              </View>
+            )}
+            {(item.arrivalDate || item.arrivalTime) && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 Ankomst</Text>
+                {item.arrivalDate && renderRow('Dato', formatDate(item.arrivalDate))}
+                {item.arrivalTime && renderRow('Tid', item.arrivalTime)}
+              </View>
+            )}
+            {renderRow('Adresse', item.address)}
+            {renderRow('Telefon', item.phone)}
+            {item.hasCar && renderRow('Bil med', 'Ja')}
+            {item.hasCar && renderRow('Bilens reg. nr', item.carRegistration)}
+            {renderRow('Fører', item.driver)}
+            {renderRow('Passasjerer', item.passengers)}
+            {renderNotesRow('Notat', item.note)}
+          </>
+        )}
+
+        {itemType === 'taxi' && (
+          <>
+            {renderRow('Referanse', item.reference)}
+            {(item.departureDate || item.departureTime) && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🔑 Henting</Text>
+                {item.departureDate && renderRow('Dato', formatDate(item.departureDate))}
+                {item.departureTime && renderRow('Tid', item.departureTime)}
+              </View>
+            )}
+            {renderRow('Adresse', item.address)}
+            {renderRow('Telefon', item.phone)}
+            {renderRow('Fører', item.driver)}
+            {renderRow('Passasjerer', item.passengers)}
+            {renderNotesRow('Notat', item.note)}
+          </>
+        )}
+
+        {itemType === 'ferry' && (
+          <>
+            {renderRow('Rutenavn', item.routeName)}
+            {renderRow('Referanse', item.reference)}
+            {(item.departureDate || item.departureTime) && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 Avreise</Text>
+                {item.departureDate && renderRow('Dato', formatDate(item.departureDate))}
+                {item.departureTime && renderRow('Tid', item.departureTime)}
+              </View>
+            )}
+            {(item.arrivalDate || item.arrivalTime) && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 Ankomst</Text>
+                {item.arrivalDate && renderRow('Dato', formatDate(item.arrivalDate))}
+                {item.arrivalTime && renderRow('Tid', item.arrivalTime)}
+              </View>
+            )}
+            {renderRow('Adresse', item.address)}
+            {renderRow('Telefon', item.phone)}
+            {item.hasCar && renderRow('Bil med', 'Ja')}
+            {item.hasCar && renderRow('Bilens reg. nr', item.carRegistration)}
+            {renderRow('Fører', item.driver)}
+            {renderRow('Passasjerer', item.passengers)}
             {renderNotesRow('Notat', item.note)}
           </>
         )}
