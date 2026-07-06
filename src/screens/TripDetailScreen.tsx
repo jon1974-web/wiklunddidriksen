@@ -62,6 +62,7 @@ import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { TripDocumentUpload } from '../components/TripDocumentUpload';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { TransportTile } from '../components/TransportTile';
+import { TransportItemTile } from '../components/TransportItemTile';
 import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
@@ -746,6 +747,73 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     return rows;
   }, [flights]);
 
+  const allTransportItems = useMemo(() => {
+    const items: { id: string; icon: string; label: string; name?: string; detail?: string; departureDate?: string; departureTime?: string; arrivalTime?: string; hasCar?: boolean; onPress: () => void; onLongPress?: () => void; sortKey: string }[] = [];
+    flights.forEach(f => {
+      const icon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
+      const label = f.transportType === 'tog' ? 'Tog' : f.transportType === 'bil' ? 'Bil' : 'Fly';
+      items.push({
+        id: f.id, icon, label, name: f.airline, detail: f.flightNumber || f.reference,
+        departureDate: f.departureDate, departureTime: f.departureTime, arrivalTime: f.arrivalTime,
+        onPress: () => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip }),
+        onLongPress: canDelete ? () => {
+          crossAlert('Transport', `${f.airline || f.transportType} ${f.flightNumber || ''}`, [
+            { text: 'Avbryt', style: 'cancel' },
+            { text: 'Rediger', onPress: () => openEditModal('flight', f) },
+            { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFlight(f.id) },
+          ]);
+        } : undefined,
+        sortKey: `flight_${f.departureDate || ''}_${f.departureTime || ''}`,
+      });
+    });
+    boats.forEach(b => {
+      items.push({
+        id: b.id, icon: '⛴️', label: 'Ferje', name: b.name, detail: b.routeName,
+        departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
+        onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
+        onLongPress: canDelete ? () => {
+          crossAlert('Ferje', b.name || 'Ferje', [
+            { text: 'Avbryt', style: 'cancel' },
+            { text: 'Rediger', onPress: () => openEditModal('boat', b) },
+            { text: 'Slett', style: 'destructive', onPress: () => handleDeleteBoat(b.id) },
+          ]);
+        } : undefined,
+        sortKey: `boat_${b.departureDate || ''}_${b.departureTime || ''}`,
+      });
+    });
+    taxis.forEach(t => {
+      items.push({
+        id: t.id, icon: '🚕', label: 'Taxi', name: t.name, detail: t.reference,
+        departureDate: t.departureDate, departureTime: t.departureTime,
+        onPress: () => navigation.navigate('TripItemDetail', { item: t, tripId: trip.id, trip, itemType: 'taxi' }),
+        onLongPress: canDelete ? () => {
+          crossAlert('Taxi', t.name || 'Taxi', [
+            { text: 'Avbryt', style: 'cancel' },
+            { text: 'Rediger', onPress: () => openEditModal('taxi', t) },
+            { text: 'Slett', style: 'destructive', onPress: () => handleDeleteTaxi(t.id) },
+          ]);
+        } : undefined,
+        sortKey: `taxi_${t.departureDate || ''}_${t.departureTime || ''}`,
+      });
+    });
+    ferries.forEach(f => {
+      items.push({
+        id: f.id, icon: '🚢', label: 'Båt/Cruise', name: f.name, detail: f.routeName,
+        departureDate: f.departureDate, departureTime: f.departureTime, arrivalTime: f.arrivalTime, hasCar: f.hasCar,
+        onPress: () => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' }),
+        onLongPress: canDelete ? () => {
+          crossAlert('Båt/Cruise', f.name || 'Båt/Cruise', [
+            { text: 'Avbryt', style: 'cancel' },
+            { text: 'Rediger', onPress: () => openEditModal('ferry', f) },
+            { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFerry(f.id) },
+          ]);
+        } : undefined,
+        sortKey: `ferry_${f.departureDate || ''}_${f.departureTime || ''}`,
+      });
+    });
+    return items.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+  }, [flights, boats, taxis, ferries, canDelete, trip, navigation]);
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 8 }}>
@@ -838,27 +906,36 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       {/* Transport */}
-      {renderSectionHeader('Transport', '🚀', () => openAddModal('flight'))}
-      {flights.length === 0 ? (
+      {renderSectionHeader('Transport', '🚀', () => {
+        crossAlert('Legg til transport', 'Velg transporttype', [
+          { text: 'Avbryt', style: 'cancel' },
+          { text: '✈️ Fly', onPress: () => openAddModal('flight') },
+          { text: '🚆 Tog', onPress: () => openAddModal('flight') },
+          { text: '🚗 Bil', onPress: () => openAddModal('flight') },
+          { text: '⛴️ Ferje', onPress: () => openAddModal('boat') },
+          { text: '🚕 Taxi', onPress: () => openAddModal('taxi') },
+          { text: '🚢 Båt/Cruise', onPress: () => openAddModal('ferry') },
+        ]);
+      })}
+      {allTransportItems.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen transport lagt til</Text>
       ) : (
-        sortedTransportRows.map((row, rowIdx) => (
-          <View key={rowIdx} style={styles.transportGrid}>
-            {row.map((f) => (
-              <View key={f.id} style={styles.transportTileWrapper}>
-                <TransportTile
-                  flight={f}
-                  onPress={() => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip })}
-                  onLongPress={canDelete ? () => {
-                    crossAlert('Transport', `${f.airline || f.transportType} ${f.flightNumber || ''}`, [
-                      { text: 'Avbryt', style: 'cancel' },
-                      { text: 'Rediger', onPress: () => openEditModal('flight', f) },
-                      { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFlight(f.id) },
-                    ]);
-                } : undefined}
-                />
-              </View>
-            ))}
+        allTransportItems.map((item) => (
+          <View key={item.id} style={styles.transportGrid}>
+            <View style={styles.transportTileWrapper}>
+              <TransportItemTile
+                icon={item.icon}
+                label={item.label}
+                name={item.name}
+                detail={item.detail}
+                departureDate={item.departureDate}
+                departureTime={item.departureTime}
+                arrivalTime={item.arrivalTime}
+                hasCar={item.hasCar}
+                onPress={item.onPress}
+                onLongPress={item.onLongPress}
+              />
+            </View>
           </View>
         ))
       )}
@@ -1083,77 +1160,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             link={l}
             onPress={() => Linking.openURL(l.url)}
             onLongPress={canDelete ? () => handleDeleteLink(l.id) : undefined}
-          />
-        ))
-      )}
-
-      {/* Boats → now Ferje */}
-      {renderSectionHeader('Ferje', '⛴️', () => openAddModal('boat'))}
-      {boats.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen båt/cruise lagt til</Text>
-      ) : (
-        boats.map((b) => (
-          <AddressItemCard
-            key={b.id}
-            name={b.name || 'Båt/Cruise'}
-            address={b.address}
-            detail={[b.departureDate ? formatDate(b.departureDate) : '', b.departureTime || ''].filter(Boolean).join(' ') || undefined}
-            note={[b.hasCar ? '🚗 Bil med' : '', b.departureAddress || ''].filter(Boolean).join(' · ') || undefined}
-            onPress={() => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' })}
-            onLongPress={canDelete ? () => {
-              crossAlert('Ferje', b.name || 'Ferje', [
-                { text: 'Avbryt', style: 'cancel' },
-                { text: 'Rediger', onPress: () => openEditModal('boat', b) },
-                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteBoat(b.id) },
-              ]);
-            } : undefined}
-          />
-        ))
-      )}
-
-      {/* Taxis */}
-      {renderSectionHeader('Taxi', '🚕', () => openAddModal('taxi'))}
-      {taxis.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen taxi lagt til</Text>
-      ) : (
-        taxis.map((t) => (
-          <AddressItemCard
-            key={t.id}
-            name={t.name || 'Taxi'}
-            address={t.address}
-            detail={[t.departureDate ? formatDate(t.departureDate) : '', t.departureTime || ''].filter(Boolean).join(' ') || undefined}
-            onPress={() => navigation.navigate('TripItemDetail', { item: t, tripId: trip.id, trip, itemType: 'taxi' })}
-            onLongPress={canDelete ? () => {
-              crossAlert('Taxi', t.name || 'Taxi', [
-                { text: 'Avbryt', style: 'cancel' },
-                { text: 'Rediger', onPress: () => openEditModal('taxi', t) },
-                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteTaxi(t.id) },
-              ]);
-            } : undefined}
-          />
-        ))
-      )}
-
-      {/* Ferries → now Båt/Cruise */}
-      {renderSectionHeader('Båt/Cruise', '🚢', () => openAddModal('ferry'))}
-      {ferries.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen ferje lagt til</Text>
-      ) : (
-        ferries.map((f) => (
-          <AddressItemCard
-            key={f.id}
-            name={f.name || 'Ferje'}
-            address={f.address}
-            detail={[f.departureDate ? formatDate(f.departureDate) : '', f.departureTime || ''].filter(Boolean).join(' ') || undefined}
-            note={[f.hasCar ? '🚗 Bil med' : '', f.departureAddress || ''].filter(Boolean).join(' · ') || undefined}
-            onPress={() => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' })}
-            onLongPress={canDelete ? () => {
-              crossAlert('Båt/Cruise', f.name || 'Båt/Cruise', [
-                { text: 'Avbryt', style: 'cancel' },
-                { text: 'Rediger', onPress: () => openEditModal('ferry', f) },
-                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFerry(f.id) },
-              ]);
-            } : undefined}
           />
         ))
       )}
