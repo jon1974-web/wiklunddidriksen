@@ -60,7 +60,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
 });
 
 const styles = StyleSheet.create({
-  tile: { flex: 1, borderRadius: 12, borderLeftWidth: 4, overflow: 'hidden' },
+  tile: { borderRadius: 12, borderLeftWidth: 4, overflow: 'hidden' },
   calendarIcon: { alignItems: 'center', paddingTop: 6, paddingBottom: 4 },
   calendarTop: { width: '100%', height: 3, borderTopLeftRadius: 8, borderTopRightRadius: 8 },
   calendarDay: { fontSize: 22, fontWeight: 'bold', marginTop: 4, lineHeight: 26, textAlign: 'center' },
