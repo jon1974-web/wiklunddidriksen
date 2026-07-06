@@ -91,7 +91,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                         onPress={() => handleTransportTypeChange(tt)}
                       >
                         <Text style={[styles.flightTypeText, { color: flightForm.transportType === tt ? '#fff' : colors.text }]}>
-                          {tt === 'fly' ? '✈️ Fly' : tt === 'tog' ? '🚆 Tog' : '🚗 Bil'}
+                          {tt === 'fly' ? '✈️ Fly' : tt === 'tog' ? '🚆 Tog' : '🚗 Leiebil'}
                         </Text>
                       </TouchableOpacity>
                     ))}

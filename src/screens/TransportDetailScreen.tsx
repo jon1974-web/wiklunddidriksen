@@ -28,7 +28,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
   const f = flight;
 
   const transportIcon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
-  const typeLabel = f.transportType === 'fly' ? 'Fly' : f.transportType === 'tog' ? 'Tog' : 'Bil';
+  const typeLabel = f.transportType === 'fly' ? 'Fly' : f.transportType === 'tog' ? 'Tog' : 'Leiebil';
   const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
   const dirLabel = f.transportType === 'bil'
     ? (f.type === 'utreise' ? 'Henting' : 'Levering')

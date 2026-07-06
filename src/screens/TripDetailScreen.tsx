@@ -1964,7 +1964,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 {[
                   { icon: '✈️', label: 'Fly', type: 'flight' as ModalType },
                   { icon: '🚆', label: 'Tog', type: 'flight' as ModalType },
-                  { icon: '🚗', label: 'Bil', type: 'flight' as ModalType },
+                  { icon: '🚗', label: 'Leiebil', type: 'flight' as ModalType },
                   { icon: '🚢', label: 'Båt/Cruise', type: 'ferry' as ModalType },
                   { icon: '⛴️', label: 'Ferje', type: 'boat' as ModalType },
                   { icon: '🚕', label: 'Taxi', type: 'taxi' as ModalType },
