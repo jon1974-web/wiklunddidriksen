@@ -223,6 +223,21 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     }
   }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, event, navigation]);
 
+  const handleCopy = useCallback(() => {
+    navigation.navigate('AddEvent', {
+      prefill: {
+        title: eventData.title,
+        description: eventData.description || '',
+        date: eventData.date,
+        time: eventData.time,
+        endDate: eventData.endDate || '',
+        endTime: eventData.endTime || '',
+        reminderMinutes: eventData.reminderMinutes || 120,
+        icon: eventData.icon || '',
+      },
+    });
+  }, [eventData, navigation]);
+
   const handleDelete = useCallback(() => {
     crossAlert('Slett arrangement', 'Er du sikker på at du vil slette dette?', [
       { text: 'Avbryt', style: 'cancel' },
@@ -313,6 +328,14 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
           </TouchableOpacity>
         )}
+
+        <TouchableOpacity style={[styles.copyButton, { backgroundColor: colors.inputBackground }]} onPress={handleCopy}>
+          <Text style={[styles.copyButtonText, { color: colors.text }]}>Kopier</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.avbrytLink} onPress={() => navigation.goBack()}>
+          <Text style={[styles.avbrytLinkText, { color: colors.accent }]}>Avbryt</Text>
+        </TouchableOpacity>
 
         {Platform.OS === 'web' && (
           <View style={{ marginTop: 16 }}>
@@ -719,6 +742,24 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     fontSize: 18,
     fontWeight: '600',
+  },
+  copyButton: {
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 8,
+  },
+  copyButtonText: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  avbrytLink: {
+    alignItems: 'center',
+    marginTop: 12,
+    paddingVertical: 8,
+  },
+  avbrytLinkText: {
+    fontSize: 16,
   },
   sectionLabel: {
     fontSize: 14,
