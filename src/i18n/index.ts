@@ -1,9 +1,17 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import nb from './nb.json';
+import sv from './sv.json';
+import da from './da.json';
+import en from './en.json';
+import fi from './fi.json';
 
 const resources = {
   nb: { translation: nb },
+  sv: { translation: sv },
+  da: { translation: da },
+  en: { translation: en },
+  fi: { translation: fi },
 };
 
 function getStoredLanguage(): string {
