@@ -114,7 +114,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const emptyLink = { title: '', url: '' };
   const emptyBoat = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', address: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
   const emptyTaxi = { name: '', reference: '', departureDate: '', departureTime: '', address: '', phone: '', driver: '', passengers: '', note: '' };
-  const emptyFerry = { name: '', routeName: '', reference: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', address: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
+  const emptyFerry = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', address: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
 
   const [hotelForm, setHotelForm] = useState(emptyHotel);
   const [flightFormUtreise, setFlightFormUtreise] = useState(emptyFlight);
@@ -431,7 +431,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } else if (modal === 'taxi') {
       setTaxiForm({ name: item.name || '', reference: item.reference || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', address: item.address || '', phone: item.phone || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
     } else if (modal === 'ferry') {
-      setFerryForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', address: item.address || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+      setFerryForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', address: item.address || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
     }
     setActiveModal(modal);
   };
@@ -1087,8 +1087,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         ))
       )}
 
-      {/* Boats */}
-      {renderSectionHeader('Båt/Cruise', '🚢', () => openAddModal('boat'))}
+      {/* Boats → now Ferje */}
+      {renderSectionHeader('Ferje', '⛴️', () => openAddModal('boat'))}
       {boats.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen båt/cruise lagt til</Text>
       ) : (
@@ -1101,7 +1101,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             note={b.hasCar ? '🚗 Bil med' : undefined}
             onPress={() => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' })}
             onLongPress={canDelete ? () => {
-              crossAlert('Båt/Cruise', b.name || 'Båt/Cruise', [
+              crossAlert('Ferje', b.name || 'Ferje', [
                 { text: 'Avbryt', style: 'cancel' },
                 { text: 'Rediger', onPress: () => openEditModal('boat', b) },
                 { text: 'Slett', style: 'destructive', onPress: () => handleDeleteBoat(b.id) },
@@ -1134,8 +1134,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         ))
       )}
 
-      {/* Ferries */}
-      {renderSectionHeader('Ferje', '⛴️', () => openAddModal('ferry'))}
+      {/* Ferries → now Båt/Cruise */}
+      {renderSectionHeader('Båt/Cruise', '🚢', () => openAddModal('ferry'))}
       {ferries.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen ferje lagt til</Text>
       ) : (
@@ -1148,7 +1148,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             note={f.hasCar ? '🚗 Bil med' : undefined}
             onPress={() => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' })}
             onLongPress={canDelete ? () => {
-              crossAlert('Ferje', f.name || 'Ferje', [
+              crossAlert('Båt/Cruise', f.name || 'Båt/Cruise', [
                 { text: 'Avbryt', style: 'cancel' },
                 { text: 'Rediger', onPress: () => openEditModal('ferry', f) },
                 { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFerry(f.id) },
@@ -1678,14 +1678,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Boat Modal */}
+      {/* Boat Modal → now Ferje */}
       <Modal visible={activeModal === 'boat'} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                  {editingId ? 'Rediger båt/cruise' : 'Legg til båt/cruise'}
+                  {editingId ? 'Rediger ferje' : 'Legg til ferje'}
                 </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
@@ -1842,14 +1842,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         </TouchableWithoutFeedback>
       </Modal>
 
-      {/* Ferry Modal */}
+      {/* Ferry Modal → now Båt/Cruise */}
       <Modal visible={activeModal === 'ferry'} transparent animationType="slide">
         <TouchableWithoutFeedback onPress={() => setActiveModal(null)}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                  {editingId ? 'Rediger ferje' : 'Legg til ferje'}
+                  {editingId ? 'Rediger båt/cruise' : 'Legg til båt/cruise'}
                 </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
@@ -1859,6 +1859,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Rutenavn</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.routeName} onChangeText={(v) => setFerryForm(f => ({ ...f, routeName: v }))} placeholder="F.eks. Oslo–Frederikshavn" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Kabin/kupe</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.cabin || ''} onChangeText={(v) => setFerryForm(f => ({ ...f, cabin: v }))} placeholder="F.eks. Inner 2-sengs" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Referanse</Text>

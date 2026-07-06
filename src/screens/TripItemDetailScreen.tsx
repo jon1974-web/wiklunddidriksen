@@ -34,9 +34,9 @@ const typeConfig: Record<ItemType, { icon: string; label: string; editParam: str
   hotel: { icon: '🛏️', label: 'Hotell', editParam: 'openHotelEditId' },
   restaurant: { icon: '🍽️', label: 'Restaurant', editParam: 'openRestaurantEditId' },
   activity: { icon: '🎯', label: 'Aktivitet', editParam: 'openActivityEditId' },
-  boat: { icon: '🚢', label: 'Båt/Cruise', editParam: 'openBoatEditId' },
+  boat: { icon: '⛴️', label: 'Ferje', editParam: 'openBoatEditId' },
   taxi: { icon: '🚕', label: 'Taxi', editParam: 'openTaxiEditId' },
-  ferry: { icon: '⛴️', label: 'Ferje', editParam: 'openFerryEditId' },
+  ferry: { icon: '🚢', label: 'Båt/Cruise', editParam: 'openFerryEditId' },
 };
 
 export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navigation, route }) => {
@@ -161,7 +161,6 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           <>
             {renderRow('Rutenavn', item.routeName)}
             {renderRow('Referanse', item.reference)}
-            {renderRow('Kabin/kupe', item.cabin)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 Avreise</Text>
@@ -208,6 +207,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           <>
             {renderRow('Rutenavn', item.routeName)}
             {renderRow('Referanse', item.reference)}
+            {renderRow('Kabin/kupe', item.cabin)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 Avreise</Text>

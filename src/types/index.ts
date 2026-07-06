@@ -203,6 +203,7 @@ export interface TripFerry {
   name?: string;
   routeName?: string;
   reference?: string;
+  cabin?: string;
   departureDate?: string;
   departureTime?: string;
   arrivalDate?: string;
