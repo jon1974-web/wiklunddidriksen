@@ -112,9 +112,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
   const emptyLink = { title: '', url: '' };
-  const emptyBoat = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', address: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
+  const emptyBoat = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
   const emptyTaxi = { name: '', reference: '', departureDate: '', departureTime: '', address: '', phone: '', driver: '', passengers: '', note: '' };
-  const emptyFerry = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', address: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
+  const emptyFerry = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
 
   const [hotelForm, setHotelForm] = useState(emptyHotel);
   const [flightFormUtreise, setFlightFormUtreise] = useState(emptyFlight);
@@ -427,11 +427,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } else if (modal === 'link') {
       setLinkForm({ title: item.title || '', url: item.url || '' });
     } else if (modal === 'boat') {
-      setBoatForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', address: item.address || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+      setBoatForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
     } else if (modal === 'taxi') {
       setTaxiForm({ name: item.name || '', reference: item.reference || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', address: item.address || '', phone: item.phone || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
     } else if (modal === 'ferry') {
-      setFerryForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', address: item.address || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+      setFerryForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
     }
     setActiveModal(modal);
   };
@@ -640,7 +640,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const handleSaveBoat = useCallback(async () => {
     try {
-      const data = cleanData({ name: boatForm.name.trim() ? sanitizeInput(boatForm.name) : undefined, routeName: boatForm.routeName.trim() ? sanitizeInput(boatForm.routeName) : undefined, reference: boatForm.reference.trim() ? sanitizeInput(boatForm.reference) : undefined, cabin: boatForm.cabin.trim() ? sanitizeInput(boatForm.cabin) : undefined, departureDate: boatForm.departureDate || undefined, departureTime: boatForm.departureTime || undefined, arrivalDate: boatForm.arrivalDate || undefined, arrivalTime: boatForm.arrivalTime || undefined, address: boatForm.address.trim() ? sanitizeInput(boatForm.address) : undefined, phone: boatForm.phone.trim() ? sanitizeInput(boatForm.phone) : undefined, hasCar: boatForm.hasCar || undefined, carRegistration: boatForm.hasCar && boatForm.carRegistration.trim() ? sanitizeInput(boatForm.carRegistration) : undefined, driver: boatForm.driver.trim() ? sanitizeInput(boatForm.driver) : undefined, passengers: boatForm.passengers.trim() ? sanitizeInput(boatForm.passengers) : undefined, note: boatForm.note.trim() ? sanitizeInput(boatForm.note) : undefined });
+      const data = cleanData({ name: boatForm.name.trim() ? sanitizeInput(boatForm.name) : undefined, routeName: boatForm.routeName.trim() ? sanitizeInput(boatForm.routeName) : undefined, reference: boatForm.reference.trim() ? sanitizeInput(boatForm.reference) : undefined, cabin: boatForm.cabin.trim() ? sanitizeInput(boatForm.cabin) : undefined, departureDate: boatForm.departureDate || undefined, departureTime: boatForm.departureTime || undefined, arrivalDate: boatForm.arrivalDate || undefined, arrivalTime: boatForm.arrivalTime || undefined, departureAddress: boatForm.departureAddress.trim() ? sanitizeInput(boatForm.departureAddress) : undefined, arrivalAddress: boatForm.arrivalAddress.trim() ? sanitizeInput(boatForm.arrivalAddress) : undefined, phone: boatForm.phone.trim() ? sanitizeInput(boatForm.phone) : undefined, hasCar: boatForm.hasCar || undefined, carRegistration: boatForm.hasCar && boatForm.carRegistration.trim() ? sanitizeInput(boatForm.carRegistration) : undefined, driver: boatForm.driver.trim() ? sanitizeInput(boatForm.driver) : undefined, passengers: boatForm.passengers.trim() ? sanitizeInput(boatForm.passengers) : undefined, note: boatForm.note.trim() ? sanitizeInput(boatForm.note) : undefined });
       if (editingId) { await updateTripBoat(trip.id, editingId, data); } else { await addTripBoat(trip.id, data); }
       resetForms(); setActiveModal(null); loadSubData();
     } catch (error) { crossAlert('Error', getErrorMessage(error)); }
@@ -656,7 +656,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const handleSaveFerry = useCallback(async () => {
     try {
-      const data = cleanData({ name: ferryForm.name.trim() ? sanitizeInput(ferryForm.name) : undefined, routeName: ferryForm.routeName.trim() ? sanitizeInput(ferryForm.routeName) : undefined, reference: ferryForm.reference.trim() ? sanitizeInput(ferryForm.reference) : undefined, departureDate: ferryForm.departureDate || undefined, departureTime: ferryForm.departureTime || undefined, arrivalDate: ferryForm.arrivalDate || undefined, arrivalTime: ferryForm.arrivalTime || undefined, address: ferryForm.address.trim() ? sanitizeInput(ferryForm.address) : undefined, phone: ferryForm.phone.trim() ? sanitizeInput(ferryForm.phone) : undefined, hasCar: ferryForm.hasCar || undefined, carRegistration: ferryForm.hasCar && ferryForm.carRegistration.trim() ? sanitizeInput(ferryForm.carRegistration) : undefined, driver: ferryForm.driver.trim() ? sanitizeInput(ferryForm.driver) : undefined, passengers: ferryForm.passengers.trim() ? sanitizeInput(ferryForm.passengers) : undefined, note: ferryForm.note.trim() ? sanitizeInput(ferryForm.note) : undefined });
+      const data = cleanData({ name: ferryForm.name.trim() ? sanitizeInput(ferryForm.name) : undefined, routeName: ferryForm.routeName.trim() ? sanitizeInput(ferryForm.routeName) : undefined, reference: ferryForm.reference.trim() ? sanitizeInput(ferryForm.reference) : undefined, cabin: ferryForm.cabin?.trim() ? sanitizeInput(ferryForm.cabin) : undefined, departureDate: ferryForm.departureDate || undefined, departureTime: ferryForm.departureTime || undefined, arrivalDate: ferryForm.arrivalDate || undefined, arrivalTime: ferryForm.arrivalTime || undefined, departureAddress: ferryForm.departureAddress.trim() ? sanitizeInput(ferryForm.departureAddress) : undefined, arrivalAddress: ferryForm.arrivalAddress.trim() ? sanitizeInput(ferryForm.arrivalAddress) : undefined, phone: ferryForm.phone.trim() ? sanitizeInput(ferryForm.phone) : undefined, hasCar: ferryForm.hasCar || undefined, carRegistration: ferryForm.hasCar && ferryForm.carRegistration.trim() ? sanitizeInput(ferryForm.carRegistration) : undefined, driver: ferryForm.driver.trim() ? sanitizeInput(ferryForm.driver) : undefined, passengers: ferryForm.passengers.trim() ? sanitizeInput(ferryForm.passengers) : undefined, note: ferryForm.note.trim() ? sanitizeInput(ferryForm.note) : undefined });
       if (editingId) { await updateTripFerry(trip.id, editingId, data); } else { await addTripFerry(trip.id, data); }
       resetForms(); setActiveModal(null); loadSubData();
     } catch (error) { crossAlert('Error', getErrorMessage(error)); }
@@ -1098,7 +1098,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             name={b.name || 'Båt/Cruise'}
             address={b.address}
             detail={[b.departureDate ? formatDate(b.departureDate) : '', b.departureTime || ''].filter(Boolean).join(' ') || undefined}
-            note={b.hasCar ? '🚗 Bil med' : undefined}
+            note={[b.hasCar ? '🚗 Bil med' : '', b.departureAddress || ''].filter(Boolean).join(' · ') || undefined}
             onPress={() => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' })}
             onLongPress={canDelete ? () => {
               crossAlert('Ferje', b.name || 'Ferje', [
@@ -1145,7 +1145,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             name={f.name || 'Ferje'}
             address={f.address}
             detail={[f.departureDate ? formatDate(f.departureDate) : '', f.departureTime || ''].filter(Boolean).join(' ') || undefined}
-            note={f.hasCar ? '🚗 Bil med' : undefined}
+            note={[f.hasCar ? '🚗 Bil med' : '', f.departureAddress || ''].filter(Boolean).join(' · ') || undefined}
             onPress={() => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' })}
             onLongPress={canDelete ? () => {
               crossAlert('Båt/Cruise', f.name || 'Båt/Cruise', [
@@ -1729,8 +1729,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Adresse (havn)</Text>
-                    <GooglePlacesInput value={boatForm.address} onChangeText={(v) => setBoatForm(f => ({ ...f, address: v }))} placeholder="Søk etter adresse..." onSelect={(v) => setBoatForm(f => ({ ...f, address: v }))} />
+                    <Text style={[styles.label, { color: colors.text }]}>Avgangsterminal</Text>
+                    <GooglePlacesInput value={boatForm.departureAddress} onChangeText={(v) => setBoatForm(f => ({ ...f, departureAddress: v }))} placeholder="Avgangsterminal adresse..." onSelect={(v) => setBoatForm(f => ({ ...f, departureAddress: v }))} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Ankomstterminal</Text>
+                    <GooglePlacesInput value={boatForm.arrivalAddress} onChangeText={(v) => setBoatForm(f => ({ ...f, arrivalAddress: v }))} placeholder="Ankomstterminal adresse..." onSelect={(v) => setBoatForm(f => ({ ...f, arrivalAddress: v }))} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
@@ -1893,8 +1897,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Adresse (terminal)</Text>
-                    <GooglePlacesInput value={ferryForm.address} onChangeText={(v) => setFerryForm(f => ({ ...f, address: v }))} placeholder="Søk etter adresse..." onSelect={(v) => setFerryForm(f => ({ ...f, address: v }))} />
+                    <Text style={[styles.label, { color: colors.text }]}>Avgangsterminal</Text>
+                    <GooglePlacesInput value={ferryForm.departureAddress} onChangeText={(v) => setFerryForm(f => ({ ...f, departureAddress: v }))} placeholder="Avgangsterminal adresse..." onSelect={(v) => setFerryForm(f => ({ ...f, departureAddress: v }))} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Ankomstterminal</Text>
+                    <GooglePlacesInput value={ferryForm.arrivalAddress} onChangeText={(v) => setFerryForm(f => ({ ...f, arrivalAddress: v }))} placeholder="Ankomstterminal adresse..." onSelect={(v) => setFerryForm(f => ({ ...f, arrivalAddress: v }))} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>

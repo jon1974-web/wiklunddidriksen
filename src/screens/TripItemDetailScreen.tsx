@@ -166,6 +166,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 Avreise</Text>
                 {item.departureDate && renderRow('Dato', formatDate(item.departureDate))}
                 {item.departureTime && renderRow('Tid', item.departureTime)}
+                {item.departureAddress && renderRow('Terminal', item.departureAddress)}
               </View>
             )}
             {(item.arrivalDate || item.arrivalTime) && (
@@ -173,9 +174,9 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 Ankomst</Text>
                 {item.arrivalDate && renderRow('Dato', formatDate(item.arrivalDate))}
                 {item.arrivalTime && renderRow('Tid', item.arrivalTime)}
+                {item.arrivalAddress && renderRow('Terminal', item.arrivalAddress)}
               </View>
             )}
-            {renderRow('Adresse', item.address)}
             {renderRow('Telefon', item.phone)}
             {item.hasCar && renderRow('Bil med', 'Ja')}
             {item.hasCar && renderRow('Bilens reg. nr', item.carRegistration)}
@@ -213,6 +214,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 Avreise</Text>
                 {item.departureDate && renderRow('Dato', formatDate(item.departureDate))}
                 {item.departureTime && renderRow('Tid', item.departureTime)}
+                {item.departureAddress && renderRow('Terminal', item.departureAddress)}
               </View>
             )}
             {(item.arrivalDate || item.arrivalTime) && (
@@ -220,9 +222,9 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 Ankomst</Text>
                 {item.arrivalDate && renderRow('Dato', formatDate(item.arrivalDate))}
                 {item.arrivalTime && renderRow('Tid', item.arrivalTime)}
+                {item.arrivalAddress && renderRow('Terminal', item.arrivalAddress)}
               </View>
             )}
-            {renderRow('Adresse', item.address)}
             {renderRow('Telefon', item.phone)}
             {item.hasCar && renderRow('Bil med', 'Ja')}
             {item.hasCar && renderRow('Bilens reg. nr', item.carRegistration)}
@@ -233,23 +235,56 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
         )}
       </View>
 
-      {/* Map */}
-      {item.address && (
+      {/* Maps */}
+      {(itemType === 'boat' || itemType === 'ferry') && (item.departureAddress || item.arrivalAddress) ? (
+        <View>
+          {item.departureAddress && (
+            <TouchableOpacity
+              style={[styles.mapCard, { backgroundColor: colors.surface }]}
+              onPress={() => Linking.openURL(getGoogleMapsUrl(item.departureAddress))}
+              activeOpacity={0.8}
+            >
+              <Image source={{ uri: getStaticMapUrl(item.departureAddress, 15, '600x200') }} style={[styles.mapImage, { height: 160 }]} />
+              <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.departureAddress}</Text>
+                <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+          {item.departureAddress && item.arrivalAddress && (
+            <View style={[styles.arrowContainer, { backgroundColor: colors.surface }]}>
+              <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
+              <Text style={[styles.arrowIcon, { color: colors.accent }]}>⛵ →</Text>
+              <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
+            </View>
+          )}
+          {item.arrivalAddress && (
+            <TouchableOpacity
+              style={[styles.mapCard, { backgroundColor: colors.surface }]}
+              onPress={() => Linking.openURL(getGoogleMapsUrl(item.arrivalAddress))}
+              activeOpacity={0.8}
+            >
+              <Image source={{ uri: getStaticMapUrl(item.arrivalAddress, 15, '600x200') }} style={[styles.mapImage, { height: 160 }]} />
+              <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.arrivalAddress}</Text>
+                <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        </View>
+      ) : item.address ? (
         <TouchableOpacity
           style={[styles.mapCard, { backgroundColor: colors.surface }]}
           onPress={() => Linking.openURL(getGoogleMapsUrl(item.address))}
           activeOpacity={0.8}
         >
-          <Image
-            source={{ uri: getStaticMapUrl(item.address, 15, '600x300') }}
-            style={styles.mapImage}
-          />
+          <Image source={{ uri: getStaticMapUrl(item.address, 15, '600x300') }} style={styles.mapImage} />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
             <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.address}</Text>
             <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Google Maps →</Text>
           </View>
         </TouchableOpacity>
-      )}
+      ) : null}
 
       {/* Action buttons */}
       <View style={styles.actions}>
@@ -301,6 +336,21 @@ const styles = StyleSheet.create({
   mapOverlay: { padding: 12, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   mapOverlayText: { fontSize: 14, flex: 1 },
   mapOverlayLink: { fontSize: 14, fontWeight: '600', marginLeft: 8 },
+  arrowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+  },
+  arrowLine: {
+    flex: 1,
+    height: 2,
+  },
+  arrowIcon: {
+    fontSize: 20,
+    marginHorizontal: 12,
+    fontWeight: '600',
+  },
   actions: { flexDirection: 'row', gap: 10, marginTop: 8 },
   actionButton: { flex: 1, paddingVertical: 14, borderRadius: 12, alignItems: 'center' },
   actionButtonText: { fontSize: 16, fontWeight: '600' },

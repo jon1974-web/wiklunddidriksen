@@ -174,7 +174,8 @@ export interface TripBoat {
   departureTime?: string;
   arrivalDate?: string;
   arrivalTime?: string;
-  address?: string;
+  departureAddress?: string;
+  arrivalAddress?: string;
   phone?: string;
   hasCar?: boolean;
   carRegistration?: string;
@@ -208,7 +209,8 @@ export interface TripFerry {
   departureTime?: string;
   arrivalDate?: string;
   arrivalTime?: string;
-  address?: string;
+  departureAddress?: string;
+  arrivalAddress?: string;
   phone?: string;
   hasCar?: boolean;
   carRegistration?: string;
