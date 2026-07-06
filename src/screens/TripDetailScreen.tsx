@@ -749,11 +749,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   }, [flights]);
 
   const allTransportItems = useMemo(() => {
-    const items: { id: string; icon: string; label: string; name?: string; detail?: string; departureDate?: string; departureTime?: string; arrivalTime?: string; hasCar?: boolean; onPress: () => void; onLongPress?: () => void; sortKey: string }[] = [];
+    // Build items for each type
+    const flightItems: { id: string; icon: string; label: string; name?: string; detail?: string; departureDate?: string; departureTime?: string; arrivalTime?: string; hasCar?: boolean; onPress: () => void; onLongPress?: () => void; sortKey: string; type?: string; transportType?: string }[] = [];
+    const otherItems: { id: string; icon: string; label: string; name?: string; detail?: string; departureDate?: string; departureTime?: string; arrivalTime?: string; hasCar?: boolean; onPress: () => void; onLongPress?: () => void; sortKey: string }[] = [];
+
     flights.forEach(f => {
       const icon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
       const label = f.transportType === 'tog' ? 'Tog' : f.transportType === 'bil' ? 'Bil' : 'Fly';
-      items.push({
+      flightItems.push({
         id: f.id, icon, label, name: f.airline, detail: f.flightNumber || f.reference,
         departureDate: f.departureDate, departureTime: f.departureTime, arrivalTime: f.arrivalTime,
         onPress: () => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip }),
@@ -764,11 +767,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFlight(f.id) },
           ]);
         } : undefined,
-        sortKey: `flight_${f.departureDate || ''}_${f.departureTime || ''}`,
+        sortKey: `${f.transportType || 'fly'}_${f.type || 'utreise'}_${f.departureDate || ''}_${f.departureTime || ''}`,
+        type: f.type,
+        transportType: f.transportType,
       });
     });
+
     boats.forEach(b => {
-      items.push({
+      otherItems.push({
         id: b.id, icon: '⛴️', label: 'Ferje', name: b.name, detail: b.routeName,
         departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
         onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
@@ -782,8 +788,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortKey: `boat_${b.departureDate || ''}_${b.departureTime || ''}`,
       });
     });
+
     taxis.forEach(t => {
-      items.push({
+      otherItems.push({
         id: t.id, icon: '🚕', label: 'Taxi', name: t.name, detail: t.reference,
         departureDate: t.departureDate, departureTime: t.departureTime,
         onPress: () => navigation.navigate('TripItemDetail', { item: t, tripId: trip.id, trip, itemType: 'taxi' }),
@@ -797,8 +804,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortKey: `taxi_${t.departureDate || ''}_${t.departureTime || ''}`,
       });
     });
+
     ferries.forEach(f => {
-      items.push({
+      otherItems.push({
         id: f.id, icon: '🚢', label: 'Båt/Cruise', name: f.name, detail: f.routeName,
         departureDate: f.departureDate, departureTime: f.departureTime, arrivalTime: f.arrivalTime, hasCar: f.hasCar,
         onPress: () => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' }),
@@ -812,7 +820,34 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortKey: `ferry_${f.departureDate || ''}_${f.departureTime || ''}`,
       });
     });
-    return items.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+
+    // Pair flights: utreise + hjemreise side by side
+    flightItems.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    const rows: (typeof flightItems[0])[][] = [];
+    let i = 0;
+    while (i < flightItems.length) {
+      const current = flightItems[i];
+      if (current.type === 'utreise') {
+        const match = flightItems.findIndex(
+          (s, idx) => idx > i && s.type === 'hjemreise' && s.transportType === current.transportType
+        );
+        if (match !== -1) {
+          rows.push([current, flightItems[match]]);
+          flightItems.splice(match, 1);
+        } else {
+          rows.push([current]);
+        }
+      } else {
+        rows.push([current]);
+      }
+      i++;
+    }
+
+    // Add other items as single rows
+    otherItems.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+    otherItems.forEach(item => rows.push([item]));
+
+    return rows;
   }, [flights, boats, taxis, ferries, canDelete, trip, navigation]);
 
   return (
@@ -911,22 +946,24 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {allTransportItems.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen transport lagt til</Text>
       ) : (
-        allTransportItems.map((item) => (
-          <View key={item.id} style={styles.transportGrid}>
-            <View style={styles.transportTileWrapper}>
-              <TransportItemTile
-                icon={item.icon}
-                label={item.label}
-                name={item.name}
-                detail={item.detail}
-                departureDate={item.departureDate}
-                departureTime={item.departureTime}
-                arrivalTime={item.arrivalTime}
-                hasCar={item.hasCar}
-                onPress={item.onPress}
-                onLongPress={item.onLongPress}
-              />
-            </View>
+        allTransportItems.map((row, rowIdx) => (
+          <View key={rowIdx} style={styles.transportGrid}>
+            {row.map((item) => (
+              <View key={item.id} style={styles.transportTileWrapper}>
+                <TransportItemTile
+                  icon={item.icon}
+                  label={item.label}
+                  name={item.name}
+                  detail={item.detail}
+                  departureDate={item.departureDate}
+                  departureTime={item.departureTime}
+                  arrivalTime={item.arrivalTime}
+                  hasCar={item.hasCar}
+                  onPress={item.onPress}
+                  onLongPress={item.onLongPress}
+                />
+              </View>
+            ))}
           </View>
         ))
       )}
