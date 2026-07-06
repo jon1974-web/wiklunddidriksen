@@ -7,6 +7,7 @@ import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { Event, Trip, SpondEvent, SpondRespondent } from '../types';
 import { EventCard } from '../components/EventCard';
+import { ActionModal } from '../components/ActionModal';
 import { SpondResponseModal } from '../components/SpondResponseModal';
 import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
@@ -126,6 +127,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
   const [visibleDate, setVisibleDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
+  const [eventActionModal, setEventActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void }>({ visible: false, title: '' });
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
@@ -193,21 +195,18 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     return unsubscribe;
   }, [navigation, loadSpondEvents]);
 
-  const handleDelete = useCallback(async (eventId: string) => {
-    Alert.alert('Slett arrangement', 'Er du sikker på at du vil slette dette?', [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Slett',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteDoc(doc(db, 'events', eventId));
-          } catch (error) {
-            Alert.alert('Error', getErrorMessage(error));
-          }
-        },
+  const handleDelete = useCallback(async (eventId: string, eventTitle: string) => {
+    setEventActionModal({
+      visible: true,
+      title: eventTitle,
+      onDelete: async () => {
+        try {
+          await deleteDoc(doc(db, 'events', eventId));
+        } catch (error) {
+          Alert.alert('Error', getErrorMessage(error));
+        }
       },
-    ]);
+    });
   }, []);
 
   const today = getTodayLocal();
@@ -566,7 +565,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       <EventCard
         event={item}
         onPress={() => navigation.navigate('EventDetail', { event: item })}
-        onLongPress={() => handleDelete(item.id)}
+        onLongPress={() => handleDelete(item.id, item.title)}
         canDelete={item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin'}
       />
     );
@@ -715,6 +714,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         events={events}
         trips={trips}
         spondEvents={spondEvents}
+      />
+
+      <ActionModal
+        visible={eventActionModal.visible}
+        title={eventActionModal.title}
+        onDelete={eventActionModal.onDelete}
+        onCancel={() => setEventActionModal({ visible: false, title: '' })}
       />
     </SafeAreaView>
   );

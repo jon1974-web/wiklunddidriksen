@@ -9,6 +9,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage, sanitizeInput } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { CartIcon } from '../components/CartIcon';
+import { ActionModal } from '../components/ActionModal';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -21,6 +22,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
   const [modalVisible, setModalVisible] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
   const [copyModalVisible, setCopyModalVisible] = useState(false);
+  const [listActionModal, setListActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void }>({ visible: false, title: '' });
   const [copyListTitle, setCopyListTitle] = useState('');
   const [copyingList, setCopyingList] = useState<ShoppingList | null>(null);
   const user = useUserStore((state) => state.user);
@@ -68,21 +70,18 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
     }
   }, [newListTitle, user, familyId]);
 
-  const handleDeleteList = useCallback((listId: string) => {
-    crossAlert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Slett',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteDoc(doc(db, 'shoppingLists', listId));
-          } catch (error) {
-            crossAlert('Error', getErrorMessage(error));
-          }
-        },
+  const handleDeleteList = useCallback((listId: string, listTitle: string) => {
+    setListActionModal({
+      visible: true,
+      title: listTitle,
+      onDelete: async () => {
+        try {
+          await deleteDoc(doc(db, 'shoppingLists', listId));
+        } catch (error) {
+          crossAlert('Error', getErrorMessage(error));
+        }
       },
-    ]);
+    });
   }, []);
 
   const handleCopyList = useCallback((list: ShoppingList) => {
@@ -133,7 +132,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
             {(item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin') && (
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
-                onPress={() => handleDeleteList(item.id)}
+                onPress={() => handleDeleteList(item.id, item.title)}
               >
                 <Text style={[styles.actionButtonText, { color: colors.danger }]}>Slett</Text>
               </TouchableOpacity>
@@ -259,6 +258,13 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
           </View>
         </View>
       </Modal>
+
+      <ActionModal
+        visible={listActionModal.visible}
+        title={listActionModal.title}
+        onDelete={listActionModal.onDelete}
+        onCancel={() => setListActionModal({ visible: false, title: '' })}
+      />
     </SafeAreaView>
   );
 };

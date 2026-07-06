@@ -66,6 +66,7 @@ import { TransportItemTile } from '../components/TransportItemTile';
 import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
+import { ActionModal } from '../components/ActionModal';
 import { TRIP_ICONS } from '../constants/tripIcons';
 import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
 import { WeatherDay } from '../types';
@@ -138,6 +139,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [taxiForm, setTaxiForm] = useState(emptyTaxi);
   const [ferryForm, setFerryForm] = useState(emptyFerry);
   const [showTransportPicker, setShowTransportPicker] = useState(false);
+  const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; subtitle?: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
 
   // Unified picker state
   type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDate' | 'taxiTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
@@ -755,13 +757,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         id: b.id, icon: '⛴️', label: 'Ferje', name: b.name, detail: b.routeName,
         departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
         onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
-        onLongPress: canDelete ? () => {
-          crossAlert('Ferje', b.name || 'Ferje', [
-            { text: 'Avbryt', style: 'cancel' },
-            { text: 'Rediger', onPress: () => openEditModal('boat', b) },
-            { text: 'Slett', style: 'destructive', onPress: () => handleDeleteBoat(b.id) },
-          ]);
-        } : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: b.name || 'Ferje', onEdit: () => openEditModal('boat', b), onDelete: () => handleDeleteBoat(b.id) }) : undefined,
         sortKey: `boat_${b.departureDate || ''}_${b.departureTime || ''}`,
       });
     });
@@ -770,13 +766,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         id: t.id, icon: '🚕', label: 'Taxi', name: t.name, detail: t.reference,
         departureDate: t.departureDate, departureTime: t.departureTime,
         onPress: () => navigation.navigate('TripItemDetail', { item: t, tripId: trip.id, trip, itemType: 'taxi' }),
-        onLongPress: canDelete ? () => {
-          crossAlert('Taxi', t.name || 'Taxi', [
-            { text: 'Avbryt', style: 'cancel' },
-            { text: 'Rediger', onPress: () => openEditModal('taxi', t) },
-            { text: 'Slett', style: 'destructive', onPress: () => handleDeleteTaxi(t.id) },
-          ]);
-        } : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: t.name || 'Taxi', onEdit: () => openEditModal('taxi', t), onDelete: () => handleDeleteTaxi(t.id) }) : undefined,
         sortKey: `taxi_${t.departureDate || ''}_${t.departureTime || ''}`,
       });
     });
@@ -785,13 +775,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         id: f.id, icon: '🚢', label: 'Båt/Cruise', name: f.name, detail: f.routeName,
         departureDate: f.departureDate, departureTime: f.departureTime, arrivalTime: f.arrivalTime, hasCar: f.hasCar,
         onPress: () => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' }),
-        onLongPress: canDelete ? () => {
-          crossAlert('Båt/Cruise', f.name || 'Båt/Cruise', [
-            { text: 'Avbryt', style: 'cancel' },
-            { text: 'Rediger', onPress: () => openEditModal('ferry', f) },
-            { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFerry(f.id) },
-          ]);
-        } : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: f.name || 'Båt/Cruise', onEdit: () => openEditModal('ferry', f), onDelete: () => handleDeleteFerry(f.id) }) : undefined,
         sortKey: `ferry_${f.departureDate || ''}_${f.departureTime || ''}`,
       });
     });
@@ -902,13 +886,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TransportTile
                     flight={f}
                     onPress={() => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip })}
-                    onLongPress={canDelete ? () => {
-                      crossAlert('Transport', `${f.airline || f.transportType} ${f.flightNumber || ''}`, [
-                        { text: 'Avbryt', style: 'cancel' },
-                        { text: 'Rediger', onPress: () => openEditModal('flight', f) },
-                        { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFlight(f.id) },
-                      ]);
-                    } : undefined}
+                    onLongPress={canDelete ? () => setActionModal({ visible: true, title: `${f.airline || f.transportType} ${f.flightNumber || ''}`.trim(), subtitle: 'Transport', onEdit: () => openEditModal('flight', f), onDelete: () => handleDeleteFlight(f.id) }) : undefined}
                   />
                 </View>
               ))}
@@ -947,13 +925,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             address={h.address}
             detail={[h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – ') || h.phone}
             onPress={() => navigation.navigate('TripItemDetail', { item: h, tripId: trip.id, trip, itemType: 'hotel' })}
-            onLongPress={canDelete ? () => {
-              crossAlert('Hotell', h.name, [
-                { text: 'Avbryt', style: 'cancel' },
-                { text: 'Rediger', onPress: () => openEditModal('hotel', h) },
-                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteHotel(h.id) },
-              ]);
-            } : undefined}
+            onLongPress={canDelete ? () => setActionModal({ visible: true, title: h.name, onEdit: () => openEditModal('hotel', h), onDelete: () => handleDeleteHotel(h.id) }) : undefined}
           />
         ))
       )}
@@ -970,13 +942,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             address={r.address}
             note={r.note}
             onPress={() => navigation.navigate('TripItemDetail', { item: r, tripId: trip.id, trip, itemType: 'restaurant' })}
-            onLongPress={canDelete ? () => {
-              crossAlert('Restaurant', r.name, [
-                { text: 'Avbryt', style: 'cancel' },
-                { text: 'Rediger', onPress: () => openEditModal('restaurant', r) },
-                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteRestaurant(r.id) },
-              ]);
-            } : undefined}
+            onLongPress={canDelete ? () => setActionModal({ visible: true, title: r.name || 'Restaurant', onEdit: () => openEditModal('restaurant', r), onDelete: () => handleDeleteRestaurant(r.id) }) : undefined}
           />
         ))
       )}
@@ -994,13 +960,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             detail={[a.startDate ? formatDate(a.startDate) : '', a.endDate ? formatDate(a.endDate) : ''].filter(Boolean).join(' – ') || [a.startTime, a.endTime].filter(Boolean).join(' – ') || undefined}
             note={a.note}
             onPress={() => navigation.navigate('TripItemDetail', { item: a, tripId: trip.id, trip, itemType: 'activity' })}
-            onLongPress={canDelete ? () => {
-              crossAlert('Aktivitet', a.name, [
-                { text: 'Avbryt', style: 'cancel' },
-                { text: 'Rediger', onPress: () => openEditModal('activity', a) },
-                { text: 'Slett', style: 'destructive', onPress: () => handleDeleteActivity(a.id) },
-              ]);
-            } : undefined}
+            onLongPress={canDelete ? () => setActionModal({ visible: true, title: a.name || 'Aktivitet', onEdit: () => openEditModal('activity', a), onDelete: () => handleDeleteActivity(a.id) }) : undefined}
           />
         ))
       )}
@@ -1994,6 +1954,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         selectedValue={getPickerValue()}
         onSelect={handlePickerSelect}
         onClose={() => setActivePicker(null)}
+      />
+
+      <ActionModal
+        visible={actionModal.visible}
+        title={actionModal.title}
+        subtitle={actionModal.subtitle}
+        onEdit={actionModal.onEdit}
+        onDelete={actionModal.onDelete}
+        onCancel={() => setActionModal({ visible: false, title: '' })}
       />
     </ScrollView>
   );
