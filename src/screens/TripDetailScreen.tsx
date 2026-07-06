@@ -748,34 +748,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     return rows;
   }, [flights]);
 
-  const allTransportItems = useMemo(() => {
-    // Build items for each type
-    const flightItems: { id: string; icon: string; label: string; name?: string; detail?: string; departureDate?: string; departureTime?: string; arrivalTime?: string; hasCar?: boolean; onPress: () => void; onLongPress?: () => void; sortKey: string; type?: string; transportType?: string }[] = [];
-    const otherItems: { id: string; icon: string; label: string; name?: string; detail?: string; departureDate?: string; departureTime?: string; arrivalTime?: string; hasCar?: boolean; onPress: () => void; onLongPress?: () => void; sortKey: string }[] = [];
-
-    flights.forEach(f => {
-      const icon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
-      const label = f.transportType === 'tog' ? 'Tog' : f.transportType === 'bil' ? 'Bil' : 'Fly';
-      flightItems.push({
-        id: f.id, icon, label, name: f.airline, detail: f.flightNumber || f.reference,
-        departureDate: f.departureDate, departureTime: f.departureTime, arrivalTime: f.arrivalTime,
-        onPress: () => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip }),
-        onLongPress: canDelete ? () => {
-          crossAlert('Transport', `${f.airline || f.transportType} ${f.flightNumber || ''}`, [
-            { text: 'Avbryt', style: 'cancel' },
-            { text: 'Rediger', onPress: () => openEditModal('flight', f) },
-            { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFlight(f.id) },
-          ]);
-        } : undefined,
-        sortKey: `${f.transportType || 'fly'}_${f.type || 'utreise'}_${f.departureDate || ''}_${f.departureTime || ''}`,
-        type: f.type,
-        transportType: f.transportType,
-        flightData: f,
-      });
-    });
-
+  const otherTransportItems = useMemo(() => {
+    const items: any[] = [];
     boats.forEach(b => {
-      otherItems.push({
+      items.push({
         id: b.id, icon: '⛴️', label: 'Ferje', name: b.name, detail: b.routeName,
         departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
         onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
@@ -789,9 +765,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortKey: `boat_${b.departureDate || ''}_${b.departureTime || ''}`,
       });
     });
-
     taxis.forEach(t => {
-      otherItems.push({
+      items.push({
         id: t.id, icon: '🚕', label: 'Taxi', name: t.name, detail: t.reference,
         departureDate: t.departureDate, departureTime: t.departureTime,
         onPress: () => navigation.navigate('TripItemDetail', { item: t, tripId: trip.id, trip, itemType: 'taxi' }),
@@ -805,9 +780,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortKey: `taxi_${t.departureDate || ''}_${t.departureTime || ''}`,
       });
     });
-
     ferries.forEach(f => {
-      otherItems.push({
+      items.push({
         id: f.id, icon: '🚢', label: 'Båt/Cruise', name: f.name, detail: f.routeName,
         departureDate: f.departureDate, departureTime: f.departureTime, arrivalTime: f.arrivalTime, hasCar: f.hasCar,
         onPress: () => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' }),
@@ -821,35 +795,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortKey: `ferry_${f.departureDate || ''}_${f.departureTime || ''}`,
       });
     });
-
-    // Pair flights: utreise + hjemreise side by side
-    flightItems.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
-    const rows: (typeof flightItems[0])[][] = [];
-    let i = 0;
-    while (i < flightItems.length) {
-      const current = flightItems[i];
-      if (current.type === 'utreise') {
-        const match = flightItems.findIndex(
-          (s, idx) => idx > i && s.type === 'hjemreise' && s.transportType === current.transportType
-        );
-        if (match !== -1) {
-          rows.push([current, flightItems[match]]);
-          flightItems.splice(match, 1);
-        } else {
-          rows.push([current]);
-        }
-      } else {
-        rows.push([current]);
-      }
-      i++;
-    }
-
-    // Add other items as single rows
-    otherItems.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
-    otherItems.forEach(item => rows.push([item]));
-
-    return rows;
-  }, [flights, boats, taxis, ferries, canDelete, trip, navigation]);
+    return items.sort((a, b) => a.sortKey.localeCompare(b.sortKey));
+  }, [boats, taxis, ferries, canDelete, trip, navigation]);
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -944,37 +891,48 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Transport */}
       {renderSectionHeader('Transport', '🚀', () => setShowTransportPicker(true))}
-      {allTransportItems.length === 0 ? (
+      {sortedTransportRows.length === 0 && otherTransportItems.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen transport lagt til</Text>
       ) : (
-        allTransportItems.map((row, rowIdx) => (
-          <View key={rowIdx} style={styles.transportGrid}>
-            {row.map((item) => (
-              <View key={item.id} style={styles.transportTileWrapper}>
-                {item.flightData ? (
+        <>
+          {sortedTransportRows.map((row, rowIdx) => (
+            <View key={`flight-${rowIdx}`} style={styles.transportGrid}>
+              {row.map((f) => (
+                <View key={f.id} style={styles.transportTileWrapper}>
                   <TransportTile
-                    flight={item.flightData}
-                    onPress={item.onPress}
-                    onLongPress={item.onLongPress}
+                    flight={f}
+                    onPress={() => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip })}
+                    onLongPress={canDelete ? () => {
+                      crossAlert('Transport', `${f.airline || f.transportType} ${f.flightNumber || ''}`, [
+                        { text: 'Avbryt', style: 'cancel' },
+                        { text: 'Rediger', onPress: () => openEditModal('flight', f) },
+                        { text: 'Slett', style: 'destructive', onPress: () => handleDeleteFlight(f.id) },
+                      ]);
+                    } : undefined}
                   />
-                ) : (
-                  <TransportItemTile
-                    icon={item.icon}
-                    label={item.label}
-                    name={item.name}
-                    detail={item.detail}
-                    departureDate={item.departureDate}
-                    departureTime={item.departureTime}
-                    arrivalTime={item.arrivalTime}
-                    hasCar={item.hasCar}
-                    onPress={item.onPress}
-                    onLongPress={item.onLongPress}
-                  />
-                )}
+                </View>
+              ))}
+            </View>
+          ))}
+          {otherTransportItems.map((item) => (
+            <View key={item.id} style={styles.transportGrid}>
+              <View style={styles.transportTileWrapper}>
+                <TransportItemTile
+                  icon={item.icon}
+                  label={item.label}
+                  name={item.name}
+                  detail={item.detail}
+                  departureDate={item.departureDate}
+                  departureTime={item.departureTime}
+                  arrivalTime={item.arrivalTime}
+                  hasCar={item.hasCar}
+                  onPress={item.onPress}
+                  onLongPress={item.onLongPress}
+                />
               </View>
-            ))}
-          </View>
-        ))
+            </View>
+          ))}
+        </>
       )}
 
       {/* Hotels */}
