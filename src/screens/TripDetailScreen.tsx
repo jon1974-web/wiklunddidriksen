@@ -770,6 +770,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortKey: `${f.transportType || 'fly'}_${f.type || 'utreise'}_${f.departureDate || ''}_${f.departureTime || ''}`,
         type: f.type,
         transportType: f.transportType,
+        flightData: f,
       });
     });
 
@@ -950,18 +951,26 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <View key={rowIdx} style={styles.transportGrid}>
             {row.map((item) => (
               <View key={item.id} style={styles.transportTileWrapper}>
-                <TransportItemTile
-                  icon={item.icon}
-                  label={item.label}
-                  name={item.name}
-                  detail={item.detail}
-                  departureDate={item.departureDate}
-                  departureTime={item.departureTime}
-                  arrivalTime={item.arrivalTime}
-                  hasCar={item.hasCar}
-                  onPress={item.onPress}
-                  onLongPress={item.onLongPress}
-                />
+                {item.flightData ? (
+                  <TransportTile
+                    flight={item.flightData}
+                    onPress={item.onPress}
+                    onLongPress={item.onLongPress}
+                  />
+                ) : (
+                  <TransportItemTile
+                    icon={item.icon}
+                    label={item.label}
+                    name={item.name}
+                    detail={item.detail}
+                    departureDate={item.departureDate}
+                    departureTime={item.departureTime}
+                    arrivalTime={item.arrivalTime}
+                    hasCar={item.hasCar}
+                    onPress={item.onPress}
+                    onLongPress={item.onLongPress}
+                  />
+                )}
               </View>
             ))}
           </View>
