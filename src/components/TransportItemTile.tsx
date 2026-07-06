@@ -22,6 +22,8 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   const { colors } = useTheme();
   const calDay = departureDate ? String(new Date(departureDate + 'T12:00:00').getDate()) : '';
   const calMonth = departureDate ? new Date(departureDate + 'T12:00:00').toLocaleDateString('nb-NO', { month: 'short' }) : '';
+  const depIcon = icon === '⛴️' || icon === '🚢' ? '⚓' : icon === '🚕' ? '🔑' : '🛫';
+  const arrIcon = icon === '⛴️' || icon === '🚢' ? '🏁' : icon === '🚕' ? '📍' : '🛬';
 
   return (
     <TouchableOpacity
@@ -50,8 +52,8 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
         {hasCar && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>🚗 Bil med</Text>}
         {detail && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{detail}</Text>}
         <View style={[styles.tileDivider, { backgroundColor: colors.border }]} />
-        {departureTime && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>🛫 {departureTime}</Text>}
-        {arrivalTime && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>🛬 {arrivalTime}</Text>}
+        {departureTime && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>{depIcon} {departureTime}</Text>}
+        {arrivalTime && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>{arrIcon} {arrivalTime}</Text>}
       </View>
     </TouchableOpacity>
   );

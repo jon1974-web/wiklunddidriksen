@@ -137,6 +137,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [boatForm, setBoatForm] = useState(emptyBoat);
   const [taxiForm, setTaxiForm] = useState(emptyTaxi);
   const [ferryForm, setFerryForm] = useState(emptyFerry);
+  const [showTransportPicker, setShowTransportPicker] = useState(false);
 
   // Unified picker state
   type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDate' | 'taxiTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
@@ -906,17 +907,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       {/* Transport */}
-      {renderSectionHeader('Transport', '🚀', () => {
-        crossAlert('Legg til transport', 'Velg transporttype', [
-          { text: 'Avbryt', style: 'cancel' },
-          { text: '✈️ Fly', onPress: () => openAddModal('flight') },
-          { text: '🚆 Tog', onPress: () => openAddModal('flight') },
-          { text: '🚗 Bil', onPress: () => openAddModal('flight') },
-          { text: '⛴️ Ferje', onPress: () => openAddModal('boat') },
-          { text: '🚕 Taxi', onPress: () => openAddModal('taxi') },
-          { text: '🚢 Båt/Cruise', onPress: () => openAddModal('ferry') },
-        ]);
-      })}
+      {renderSectionHeader('Transport', '🚀', () => setShowTransportPicker(true))}
       {allTransportItems.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen transport lagt til</Text>
       ) : (
@@ -1953,6 +1944,38 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? 'Lagre' : 'Legg til'}</Text>
                   </TouchableOpacity>
                 </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Transport Type Picker */}
+      <Modal visible={showTransportPicker} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowTransportPicker(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg transporttype</Text>
+                {[
+                  { icon: '✈️', label: 'Fly', type: 'flight' as ModalType },
+                  { icon: '🚆', label: 'Tog', type: 'flight' as ModalType },
+                  { icon: '🚗', label: 'Bil', type: 'flight' as ModalType },
+                  { icon: '⛴️', label: 'Ferje', type: 'boat' as ModalType },
+                  { icon: '🚕', label: 'Taxi', type: 'taxi' as ModalType },
+                  { icon: '🚢', label: 'Båt/Cruise', type: 'ferry' as ModalType },
+                ].map((opt) => (
+                  <TouchableOpacity
+                    key={opt.label}
+                    style={[styles.modalButton, { backgroundColor: colors.inputBackground, marginBottom: 8 }]}
+                    onPress={() => { setShowTransportPicker(false); openAddModal(opt.type); }}
+                  >
+                    <Text style={[styles.modalButtonText, { color: colors.text, textAlign: 'left' }]}>{opt.icon}  {opt.label}</Text>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground, marginTop: 4 }]} onPress={() => setShowTransportPicker(false)}>
+                  <Text style={[styles.modalButtonText, { color: colors.textSecondary }]}>Avbryt</Text>
+                </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
           </View>
