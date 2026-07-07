@@ -636,7 +636,7 @@ export const ProfileScreen: React.FC = () => {
                 style={[styles.cancelButton, { backgroundColor: colors.surfaceVariant }]}
                 onPress={() => { setEditingName(false); setNewName(user?.displayName || ''); }}
               >
-                <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Avbryt</Text>
+                <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -651,14 +651,14 @@ export const ProfileScreen: React.FC = () => {
         </View>
 
         <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.textSecondary }]}>E-post</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{t('profile.email')}</Text>
           <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
             <Text style={[styles.value, { color: colors.text }]}>{user?.email}</Text>
           </View>
         </View>
 
         <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.textSecondary }]}>Telefonnummer</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{t('profile.phone')}</Text>
           {editingPhone ? (
             <View>
               <TextInput
@@ -681,7 +681,7 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.cancelButton, { borderColor: colors.border }]}
                   onPress={() => { setEditingPhone(false); setNewPhone(profile?.phoneNumber || ''); }}
                 >
-                  <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>Avbryt</Text>
+                  <Text style={[styles.cancelButtonText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -764,7 +764,7 @@ export const ProfileScreen: React.FC = () => {
               style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
               onPress={handleDisconnectCalendar}
             >
-              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Koble fra kalender</Text>
+              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.leaveFamily')}</Text>
             </TouchableOpacity>
           </View>
         ) : (
@@ -772,7 +772,7 @@ export const ProfileScreen: React.FC = () => {
             style={[styles.familyButton, { backgroundColor: colors.accent }]}
             onPress={handleConnectCalendar}
           >
-            <Text style={styles.familyButtonText}>Koble til kalender</Text>
+            <Text style={styles.familyButtonText}>{t('profile.calendar')}</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -865,7 +865,7 @@ export const ProfileScreen: React.FC = () => {
               </View>
               {familyMembers.length > 0 && (
                 <View style={[styles.memberList, { borderTopColor: colors.border }]}>
-                  <Text style={[styles.memberListTitle, { color: colors.text }]}>Medlemmer ({familyMembers.length})</Text>
+                  <Text style={[styles.memberListTitle, { color: colors.text }]}>{t('profile.members')} ({familyMembers.length})</Text>
                   {familyMembers.map((m) => (
                     <View key={m.profile.uid} style={[styles.memberRow, { borderBottomColor: colors.border }]}>
                       <View style={styles.memberInfo}>
@@ -915,18 +915,18 @@ export const ProfileScreen: React.FC = () => {
 
               {(familyRole === 'owner' || familyRole === 'admin') && (
                 <View style={{ marginTop: 12 }}>
-                  <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 8 }]}>Invitasjonskode</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 8 }]}>{t('profile.inviteCode')}</Text>
                   {inviteCode ? (
                     <View>
                       <View style={[styles.familyCard, { backgroundColor: colors.inputBackground, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
                         <Text style={[styles.familyName, { color: colors.accent, fontSize: 20, fontWeight: 'bold', letterSpacing: 2 }]}>{inviteCode}</Text>
-                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>Gyldig i 1 time</Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{t('profile.codeValidFor')}</Text>
                       </View>
                       <TouchableOpacity
                         style={[styles.familyButton, { backgroundColor: colors.accent, marginTop: 8 }]}
                         onPress={handleShareInvite}
                       >
-                        <Text style={styles.familyButtonText}>Del lenke</Text>
+                        <Text style={styles.familyButtonText}>{t('profile.shareLink')}</Text>
                       </TouchableOpacity>
                     </View>
                   ) : (
@@ -935,11 +935,11 @@ export const ProfileScreen: React.FC = () => {
                       onPress={handleGenerateInvite}
                       disabled={inviteLoading}
                     >
-                      <Text style={styles.familyButtonText}>{inviteLoading ? 'Genererer...' : 'Generer kode'}</Text>
+                      <Text style={styles.familyButtonText}>{inviteLoading ? '...' : t('profile.generateCode')}</Text>
                     </TouchableOpacity>
                   )}
                   <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 6 }}>
-                    Del koden med den som skal bli med. Engangskode, utløper etter 1 time.
+                    {t('profile.codeHint')}
                   </Text>
                 </View>
               )}
@@ -975,7 +975,7 @@ export const ProfileScreen: React.FC = () => {
 
       {(familyRole === 'owner' || familyRole === 'admin') && (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Spond konfigurasjon</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.title')} — Spond</Text>
 
           {spondConnected && spondGroups.length > 0 ? (
             <View>
@@ -984,7 +984,7 @@ export const ProfileScreen: React.FC = () => {
                 <Text style={[styles.editIcon, { color: colors.accent }]}>Koblet til</Text>
               </View>
 
-              <Text style={[styles.label, { color: colors.textSecondary, marginTop: 12 }]}>Velg grupper</Text>
+              <Text style={[styles.label, { color: colors.textSecondary, marginTop: 12 }]}>{t('profile.members')}</Text>
               {spondGroups.map((group) => (
                 <TouchableOpacity
                   key={group.id}
@@ -1092,7 +1092,7 @@ export const ProfileScreen: React.FC = () => {
               <TouchableOpacity
                 onPress={() => { setShowCreateFamily(false); setNewFamilyName(''); }}
               >
-                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Avbryt</Text>
+                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalCreateButton, { backgroundColor: colors.accent }]}
