@@ -609,7 +609,7 @@ export const ProfileScreen: React.FC = () => {
           )}
         </TouchableOpacity>
         <TouchableOpacity onPress={handleTakePhoto} disabled={uploading}>
-          <Text style={[styles.changePhotoText, { color: colors.accent }]}>Ta bilde</Text>
+          <Text style={[styles.changePhotoText, { color: colors.accent }]}>{t('profile.changePhoto')}</Text>
         </TouchableOpacity>
       </View>
 

@@ -161,6 +161,7 @@
   "profile": {
     "title": "Profile",
     "displayName": "Display name",
+    "changePhoto": "Change photo",
     "email": "Email",
     "phone": "Phone number",
     "addPhone": "Add phone number",

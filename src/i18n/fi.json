@@ -170,6 +170,7 @@
   "profile": {
     "title": "Profiili",
     "displayName": "Näyttönimi",
+    "changePhoto": "Vaihda kuva",
     "email": "Sähköposti",
     "phone": "Puhelinnumero",
     "addPhone": "Lisää puhelinnumero",

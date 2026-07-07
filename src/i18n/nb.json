@@ -161,6 +161,7 @@
   "profile": {
     "title": "Profil",
     "displayName": "Visningsnavn",
+    "changePhoto": "Ta bilde",
     "email": "E-post",
     "phone": "Telefonnummer",
     "addPhone": "Legg til telefonnummer",

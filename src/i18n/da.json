@@ -170,6 +170,7 @@
   "profile": {
     "title": "Profil",
     "displayName": "Visningsnavn",
+    "changePhoto": "Skift billede",
     "email": "E-mail",
     "phone": "Telefonnummer",
     "addPhone": "Tilføj telefonnummer",
