@@ -204,7 +204,8 @@
     "phrases": "Nyttige udtryk",
     "transportTips": "Transport",
     "scams": "Vær opmærksom på",
-    "openGoogleMaps": "Åbn i Google Maps →",
+    "openGoogleMaps": "Åbn i Google Maps →"
+  },
   "weekdays": {
     "monday": "Mandag",
     "tuesday": "Tirsdag",
@@ -214,7 +215,6 @@
     "saturday": "Lørdag",
     "sunday": "Søndag",
     "week": "Uge"
-  }
   },
   "profile": {
     "title": "Profil",
