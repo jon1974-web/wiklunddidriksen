@@ -700,7 +700,7 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Kalender</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.calendar')}</Text>
         {calendarProvider && calendarEmail ? (
           <View>
             <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
@@ -778,7 +778,7 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Tema</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.theme')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, paddingVertical: 8 }}>
           {([
             { key: 'light' as const, color: '#4CAF50', border: false },
@@ -808,7 +808,7 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Språk</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.language')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, paddingVertical: 8 }}>
           {([
             { key: 'nb', label: '🇳🇴 NO' },
@@ -835,7 +835,7 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Varsler</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.notifications')}</Text>
           <View style={styles.themeOptions}>
             <TouchableOpacity
               style={[
@@ -856,7 +856,7 @@ export const ProfileScreen: React.FC = () => {
         </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Familie</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.family')}</Text>
 
           {familyId ? (
             <View>
@@ -1073,7 +1073,7 @@ export const ProfileScreen: React.FC = () => {
       )}
 
       <TouchableOpacity style={[styles.logoutButton, { backgroundColor: colors.danger }]} onPress={handleLogout}>
-        <Text style={styles.logoutButtonText}>Logg ut</Text>
+        <Text style={styles.logoutButtonText}>{t('profile.logout')}</Text>
       </TouchableOpacity>
 
       <Modal visible={showCreateFamily} transparent animationType="fade">

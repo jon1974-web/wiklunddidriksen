@@ -16,6 +16,7 @@ import { EVENT_ICONS } from '../constants/eventIcons';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { formatDate, formatTime } from '../utils/dateUtils';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { useTranslation } from 'react-i18next';
 
 interface EventDetailScreenProps {
   navigation: any;
@@ -23,6 +24,7 @@ interface EventDetailScreenProps {
 }
 
 export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { event } = route.params as { event: Event };
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
@@ -239,7 +241,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   }, [eventData, navigation]);
 
   const handleDelete = useCallback(() => {
-    crossAlert('Slett arrangement', 'Er du sikker på at du vil slette dette?', [
+    crossAlert(t('events.deleteTitle'), t('events.deleteConfirm'), [
       { text: 'Avbryt', style: 'cancel' },
       {
         text: 'Slett',
@@ -320,21 +322,21 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         )}
 
         <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.accent }]} onPress={() => setIsEditing(true)}>
-          <Text style={styles.editButtonText}>Rediger</Text>
+          <Text style={styles.editButtonText}>{t('detail.edit')}</Text>
         </TouchableOpacity>
 
         {canDelete && (
           <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.surface, borderColor: colors.danger }]} onPress={handleDelete}>
-            <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
+            <Text style={[styles.deleteButtonText, { color: colors.danger }]}>{t('detail.delete')}</Text>
           </TouchableOpacity>
         )}
 
         <TouchableOpacity style={[styles.copyButton, { backgroundColor: colors.inputBackground }]} onPress={handleCopy}>
-          <Text style={[styles.copyButtonText, { color: colors.text }]}>Kopier</Text>
+          <Text style={[styles.copyButtonText, { color: colors.text }]}>{t('detail.copy')}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.avbrytLink} onPress={() => navigation.goBack()}>
-          <Text style={[styles.avbrytLinkText, { color: colors.accent }]}>Avbryt</Text>
+          <Text style={[styles.avbrytLinkText, { color: colors.accent }]}>{t('detail.cancel')}</Text>
         </TouchableOpacity>
 
         {Platform.OS === 'web' && (

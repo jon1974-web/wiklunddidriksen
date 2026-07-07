@@ -16,6 +16,7 @@ import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { getCarrierDomain } from '../constants/carrierDomains';
 import { getFaviconUrl } from '../utils/favicon';
 import { deleteTripFlight } from '../services/tripService';
+import { useTranslation } from 'react-i18next';
 
 interface TransportDetailScreenProps {
   navigation: any;
@@ -23,12 +24,13 @@ interface TransportDetailScreenProps {
 }
 
 export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { flight, tripId, trip } = route.params as { flight: TripFlight; tripId: string; trip: any };
   const { colors } = useTheme();
   const f = flight;
 
   const transportIcon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
-  const typeLabel = f.transportType === 'fly' ? 'Fly' : f.transportType === 'tog' ? 'Tog' : 'Leiebil';
+  const typeLabel = f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : t('transport.carRental');
   const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
   const dirLabel = f.transportType === 'bil'
     ? (f.type === 'utreise' ? 'Henting' : 'Levering')
@@ -162,7 +164,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
           style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={[styles.actionButtonText, { color: colors.text }]}>Tilbake</Text>
+          <Text style={[styles.actionButtonText, { color: colors.text }]}>{t('detail.back')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: colors.accent }]}
@@ -170,13 +172,13 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
             navigation.navigate({ name: 'TripDetail', params: { trip, openFlightEditId: f.id }, merge: true });
           }}
         >
-          <Text style={[styles.actionButtonText, { color: '#fff' }]}>Rediger</Text>
+          <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('detail.edit')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: '#E53935' }]}
           onPress={handleDelete}
         >
-          <Text style={[styles.actionButtonText, { color: '#fff' }]}>Slett</Text>
+          <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('detail.delete')}</Text>
         </TouchableOpacity>
       </View>
 

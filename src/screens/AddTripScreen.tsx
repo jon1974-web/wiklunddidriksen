@@ -9,12 +9,14 @@ import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { TRIP_ICONS } from '../constants/tripIcons';
 import { geocodeCity } from '../services/weatherService';
+import { useTranslation } from 'react-i18next';
 
 interface AddTripScreenProps {
   navigation: any;
 }
 
 export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('Norge');
@@ -60,7 +62,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.screenTitle, { color: colors.text }]}>Ny reise</Text>
+      <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.addTrip')}</Text>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
@@ -90,7 +92,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>By</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('trips.city')}</Text>
         <GooglePlacesInput
           value={city}
           onChangeText={setCity}
@@ -107,7 +109,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Land</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('trips.country')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
           value={country}
@@ -138,7 +140,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
       </View>
 
       <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleSave}>
-        <Text style={styles.buttonText}>Lagre reise</Text>
+        <Text style={styles.buttonText}>{t('common.save')}</Text>
       </TouchableOpacity>
 
       <DatePickerModal

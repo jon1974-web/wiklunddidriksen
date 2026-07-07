@@ -55,6 +55,7 @@ import {
   updateTrip,
 } from '../services/tripService';
 import { ref, deleteObject } from 'firebase/storage';
+import { useTranslation } from 'react-i18next';
 import { storage } from '../services/firebase';
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
@@ -82,6 +83,7 @@ interface TripDetailScreenProps {
 type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | 'boat' | 'taxi' | 'ferry' | 'tripEdit' | null;
 
 export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { trip: initialTrip } = route.params as { trip: Trip };
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
@@ -874,9 +876,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       {/* Transport */}
-      {renderSectionHeader('Transport', '🚀', () => setShowTransportPicker(true))}
+      {renderSectionHeader(t('transport.title'), '🚀', () => setShowTransportPicker(true))}
       {sortedTransportRows.length === 0 && otherTransportItems.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen transport lagt til</Text>
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('transport.noTransport')}</Text>
       ) : (
         <>
           {sortedTransportRows.map((row, rowIdx) => (
@@ -914,9 +916,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       {/* Hotels */}
-      {renderSectionHeader('Hotell', '🛏️', () => openAddModal('hotel'))}
+      {renderSectionHeader(t('hotels.title'), '🛏️', () => openAddModal('hotel'))}
       {hotels.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen hoteller lagt til</Text>
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('hotels.noHotels')}</Text>
       ) : (
         hotels.map((h) => (
           <AddressItemCard
@@ -931,9 +933,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       {/* Restaurants */}
-      {renderSectionHeader('Restauranter', '🍽️', () => openAddModal('restaurant'))}
+      {renderSectionHeader(t('restaurants.title'), '🍽️', () => openAddModal('restaurant'))}
       {restaurants.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen restauranter lagt til</Text>
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('restaurants.noRestaurants')}</Text>
       ) : (
         restaurants.map((r) => (
           <AddressItemCard
@@ -948,9 +950,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       {/* Activities */}
-      {renderSectionHeader('Aktiviteter', '🎯', () => openAddModal('activity'))}
+      {renderSectionHeader(t('activities.title'), '🎯', () => openAddModal('activity'))}
       {activities.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen aktiviteter lagt til</Text>
+        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('activities.noActivities')}</Text>
       ) : (
         activities.map((a) => (
           <AddressItemCard
