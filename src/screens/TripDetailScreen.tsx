@@ -388,8 +388,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     }
   }, [trip, tripTitle, tripStartDate, tripEndDate, tripIcon]);
 
-  const openAddModal = (modal: ModalType) => {
+  const openAddModal = (modal: ModalType, transportType?: 'fly' | 'tog' | 'bil') => {
     resetForms();
+    if (transportType) {
+      setFlightFormUtreise(f => ({ ...f, transportType }));
+      setFlightFormHjemreise(f => ({ ...f, transportType }));
+    }
     setActiveModal(modal);
   };
 
@@ -1924,9 +1928,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg transporttype</Text>
                 {[
-                  { icon: '✈️', label: 'Fly', type: 'flight' as ModalType },
-                  { icon: '🚆', label: 'Tog', type: 'flight' as ModalType },
-                  { icon: '🚗', label: 'Leiebil', type: 'flight' as ModalType },
+                  { icon: '✈️', label: 'Fly', type: 'flight' as ModalType, transportType: 'fly' as const },
+                  { icon: '🚆', label: 'Tog', type: 'flight' as ModalType, transportType: 'tog' as const },
+                  { icon: '🚗', label: 'Leiebil', type: 'flight' as ModalType, transportType: 'bil' as const },
                   { icon: '🚢', label: 'Båt/Cruise', type: 'ferry' as ModalType },
                   { icon: '⛴️', label: 'Ferje', type: 'boat' as ModalType },
                   { icon: '🚕', label: 'Taxi', type: 'taxi' as ModalType },
@@ -1934,7 +1938,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity
                     key={opt.label}
                     style={[styles.modalButton, { backgroundColor: colors.inputBackground, marginBottom: 8 }]}
-                    onPress={() => { setShowTransportPicker(false); openAddModal(opt.type); }}
+                    onPress={() => {
+                      setShowTransportPicker(false);
+                      openAddModal(opt.type, opt.transportType);
+                    }}
                   >
                     <Text style={[styles.modalButtonText, { color: colors.text, textAlign: 'left' }]}>{opt.icon}  {opt.label}</Text>
                   </TouchableOpacity>
