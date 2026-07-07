@@ -79,9 +79,9 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
         <View style={styles.modalOverlay}>
           <TouchableWithoutFeedback>
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
                 <Text style={{ fontSize: 28 }}>{flightForm.transportType === 'fly' ? '✈️' : flightForm.transportType === 'tog' ? '🚆' : '🚗'}</Text>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border, flex: 1 }]}>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
                   {editingId ? t('detail.edit') : t('common.add')} {t('transport.title')}
                 </Text>
               </View>
