@@ -240,7 +240,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         <View style={styles.field}>
           <Text style={[styles.label, { color: colors.text }]}>Varighet</Text>
           <View style={styles.reminderOptions}>
-            {END_DATE_OPTIONS.map((option) => (
+            {getEndDateOptions().map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endDateDays === option.value && !customEndDate && { backgroundColor: colors.accent, borderColor: colors.accent }]}
@@ -284,7 +284,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         <View style={styles.field}>
           <Text style={[styles.label, { color: colors.text }]}>Varighet</Text>
           <View style={styles.reminderOptions}>
-            {END_TIME_OPTIONS.map((option) => (
+            {getEndTimeOptions().map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endTime === String(option.value) && !customEndTime && { backgroundColor: colors.accent, borderColor: colors.accent }]}
@@ -313,7 +313,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('events.reminder')}</Text>
         <View style={styles.reminderOptions}>
-          {REMINDER_OPTIONS.map((option) => (
+          {getReminderOptions().map((option) => (
             <TouchableOpacity
               key={option.value}
               style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, reminderMinutes === option.value && { backgroundColor: colors.accent, borderColor: colors.accent }]}
