@@ -375,7 +375,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                 }}
               >
                 <Text style={styles.calendarWebButtonText}>
-                  {t('calendar.addTo')} {userCalendarProvider === 'google' ? 'Google' : 'Outlook'}
+                  {userCalendarProvider === 'google' ? t('calendar.addToGoogle') : t('calendar.addToOutlook')}
                 </Text>
               </TouchableOpacity>
             ) : (
