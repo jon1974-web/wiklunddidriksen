@@ -46,9 +46,10 @@ import { SpondGroup, SpondMember, SpondGroupMember, UserProfile, Family } from '
 import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '../i18n';
+import i18n from '../i18n';
 
 export const ProfileScreen: React.FC = () => {
-  const { t, i18n: i18nInstance } = useTranslation();
+  const { t } = useTranslation();
   const [langKey, setLangKey] = useState(0);
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
@@ -824,10 +825,10 @@ export const ProfileScreen: React.FC = () => {
               style={[
                 styles.langOption,
                 { backgroundColor: colors.inputBackground, borderColor: colors.border },
-                i18nInstance.language === lang.key && { backgroundColor: colors.accent, borderColor: colors.accent },
+                i18n.language === lang.key && { backgroundColor: colors.accent, borderColor: colors.accent },
               ]}
             >
-              <Text style={[styles.langText, { color: i18nInstance.language === lang.key ? '#fff' : colors.text }]}>
+              <Text style={[styles.langText, { color: i18n.language === lang.key ? '#fff' : colors.text }]}>
                 {lang.label}
               </Text>
             </TouchableOpacity>
