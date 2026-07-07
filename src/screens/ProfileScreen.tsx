@@ -1121,10 +1121,10 @@ export const ProfileScreen: React.FC = () => {
               window.location.reload();
             }}
           >
-            <Text style={[styles.themeText, { color: colors.text }]}>{t('app.reload')}</Text>
+            <Text style={[styles.themeText, { color: colors.text }]}>{t('profile.reload')}</Text>
           </TouchableOpacity>
           <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
-            {t('app.reloadHelp')}
+            {t('profile.reloadHelp')}
           </Text>
         </View>
       )}
