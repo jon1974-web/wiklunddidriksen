@@ -1119,10 +1119,10 @@ export const ProfileScreen: React.FC = () => {
               window.location.reload();
             }}
           >
-            <Text style={[styles.themeText, { color: colors.text }]}>Last inn på nytt</Text>
+            <Text style={[styles.themeText, { color: colors.text }]}>{t('app.reload')}</Text>
           </TouchableOpacity>
           <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
-            Henter nyeste versjon av appen.
+            {t('app.reloadHelp')}
           </Text>
         </View>
       )}

@@ -196,6 +196,8 @@
     "theme": "Tema",
     "language": "Språk",
     "app": "App",
+    "reload": "Ladda om",
+    "reloadHelp": "Hämtar senaste versionen av appen.",
     "logout": "Logga ut",
     "spondConnect": "Anslut till Spond",
     "spondDisconnect": "Koppla bort Spond",

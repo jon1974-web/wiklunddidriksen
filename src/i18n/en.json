@@ -187,6 +187,8 @@
     "theme": "Theme",
     "language": "Language",
     "app": "App",
+    "reload": "Reload",
+    "reloadHelp": "Loading latest version of the app.",
     "logout": "Log out",
     "spondConnect": "Connect to Spond",
     "spondDisconnect": "Disconnect Spond",
