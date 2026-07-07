@@ -304,7 +304,8 @@
     "title": "Prata med evenemang",
     "startRecording": "Tryck för att starta inspelning",
     "stopRecording": "Tryck för att stoppa",
-    "instruction": "Prata in i mikrofonen för att"
+    "instruction": "Prata in i mikrofonen för att",
+    "example": "T.ex. Fotbollsträning på Ekebergsletta på torsdag klockan 19 till 21 på Ekeberg konstgräs bana 2"
   },
   "languages": {
     "nb": "Norsk",

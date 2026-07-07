@@ -245,7 +245,8 @@
     "title": "Tal til arrangement",
     "startRecording": "Trykk for å starte opptak",
     "stopRecording": "Trykk for å stoppe",
-    "instruction": "Snakk i mikrofonen for å"
+    "instruction": "Snakk i mikrofonen for å",
+    "example": "F.eks. \"Fotballtrening på Ekebergsletta på torsdag klokken 19 til 21 på Ekeberg kunstgress bane 2\""
   },
   "chat": {
     "title": "Familiechat",

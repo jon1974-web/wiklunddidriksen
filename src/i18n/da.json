@@ -304,7 +304,8 @@
     "title": "Tal med begivenhed",
     "startRecording": "Tryk for at starte optagelse",
     "stopRecording": "Tryk for at stoppe",
-    "instruction": "Tal ind i mikrofonen for at"
+    "instruction": "Tal ind i mikrofonen for at",
+    "example": "F.eks. Fodboldtræning på Ekebergsletta torsdag klokken 19 til 21 på Ekeberg kunstgræs bane 2"
   },
   "languages": {
     "nb": "Norsk",

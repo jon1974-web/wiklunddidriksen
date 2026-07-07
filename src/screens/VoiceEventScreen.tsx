@@ -248,10 +248,10 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Snakk i mikrofonen for å {t('events.addEvent').toLowerCase()}
+          {t('voice.instruction')} {t('events.addEvent').toLowerCase()}
         </Text>
         <Text style={[styles.helperExample, { color: colors.textDisabled }]}>
-          F.eks. &quot;Fotballtrening på Ekebergsletta på torsdag klokken 19 til 21 på Ekeberg kunstgress bane 2&quot;
+          {t('voice.example')}
         </Text>
       </View>
 
