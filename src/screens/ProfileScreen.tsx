@@ -49,6 +49,7 @@ import { setLanguage } from '../i18n';
 
 export const ProfileScreen: React.FC = () => {
   const { t, i18n: i18nInstance } = useTranslation();
+  const [langKey, setLangKey] = useState(0);
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const familyId = useUserStore((state) => state.familyId);
@@ -819,7 +820,7 @@ export const ProfileScreen: React.FC = () => {
           ]).map((lang) => (
             <TouchableOpacity
               key={lang.key}
-              onPress={() => setLanguage(lang.key)}
+              onPress={() => { setLanguage(lang.key); setLangKey(k => k + 1); }}
               style={[
                 styles.langOption,
                 { backgroundColor: colors.inputBackground, borderColor: colors.border },
