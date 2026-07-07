@@ -13,6 +13,7 @@ import { crossAlert } from '../utils/alert';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { formatDate } from '../utils/dateUtils';
 import { deleteTripHotel, deleteTripRestaurant, deleteTripActivity, deleteTripBoat, deleteTripTaxi, deleteTripFerry } from '../services/tripService';
+import { useTranslation } from 'react-i18next';
 
 interface TripItemDetailScreenProps {
   navigation: any;
@@ -40,6 +41,7 @@ const typeConfig: Record<ItemType, { icon: string; label: string; editParam: str
 };
 
 export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { item, tripId, trip, itemType } = route.params as {
     item: any;
     tripId: string;
@@ -53,7 +55,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
     crossAlert(`Slett ${config.label.toLowerCase()}`, 'Er du sikker?', [
       { text: 'Avbryt', style: 'cancel' },
       {
-        text: 'Slett',
+        text: t('common.delete'),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -110,20 +112,20 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
       <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
         {itemType === 'hotel' && (
           <>
-            {renderRow('Adresse', item.address)}
-            {renderRow('Telefon', item.phone)}
+            {renderRow(t('common.address'), item.address)}
+            {renderRow(t('common.phone'), item.phone)}
             {(item.startDate || item.endDate) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📅 Opphold</Text>
-                {item.startDate && renderRow('Startdato', formatDate(item.startDate))}
-                {item.endDate && renderRow('Sluttdato', formatDate(item.endDate))}
+                {item.startDate && renderRow(t('common.startDate'), formatDate(item.startDate))}
+                {item.endDate && renderRow(t('common.endDate'), formatDate(item.endDate))}
               </View>
             )}
             {(item.checkInTime || item.checkOutTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🕐 Tider</Text>
-                {item.checkInTime && renderRow('Innsjekking', item.checkInTime)}
-                {item.checkOutTime && renderRow('Utsjekking', item.checkOutTime)}
+                {item.checkInTime && renderRow(t('hotels.checkIn'), item.checkInTime)}
+                {item.checkOutTime && renderRow(t('hotels.checkOut'), item.checkOutTime)}
               </View>
             )}
           </>
@@ -131,29 +133,29 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
 
         {itemType === 'restaurant' && (
           <>
-            {renderRow('Adresse', item.address)}
-            {renderNotesRow('Notat', item.note)}
+            {renderRow(t('common.address'), item.address)}
+            {renderNotesRow(t('common.note'), item.note)}
           </>
         )}
 
         {itemType === 'activity' && (
           <>
-            {renderRow('Adresse', item.address)}
+            {renderRow(t('common.address'), item.address)}
             {(item.startDate || item.endDate) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📅 Dato</Text>
-                {item.startDate && renderRow('Startdato', formatDate(item.startDate))}
-                {item.endDate && renderRow('Sluttdato', formatDate(item.endDate))}
+                {item.startDate && renderRow(t('common.startDate'), formatDate(item.startDate))}
+                {item.endDate && renderRow(t('common.endDate'), formatDate(item.endDate))}
               </View>
             )}
             {(item.startTime || item.endTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🕐 Tid</Text>
-                {item.startTime && renderRow('Starttid', item.startTime)}
-                {item.endTime && renderRow('Sluttid', item.endTime)}
+                {item.startTime && renderRow(t('pickers.startTime'), item.startTime)}
+                {item.endTime && renderRow(t('pickers.endTime'), item.endTime)}
               </View>
             )}
-            {renderNotesRow('Notat', item.note)}
+            {renderNotesRow(t('common.note'), item.note)}
           </>
         )}
 

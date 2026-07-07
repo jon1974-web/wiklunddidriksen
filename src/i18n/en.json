@@ -158,6 +158,21 @@
     "transportTips": "Transport",
     "scams": "Be aware of"
   },
+  "pickers": {
+    "startDate": "Pick start date",
+    "endDate": "Pick end date",
+    "departureDate": "Pick departure date",
+    "arrivalDate": "Pick arrival date",
+    "departureTime": "Pick departure time",
+    "arrivalTime": "Pick arrival time",
+    "startTime": "Pick start time",
+    "endTime": "Pick end time",
+    "checkInTime": "Pick check-in time",
+    "checkOutTime": "Pick check-out time",
+    "date": "Pick date",
+    "time": "Pick time",
+    "pickTime": "Pick time"
+  },
   "profile": {
     "title": "Profile",
     "displayName": "Display name",
@@ -200,6 +215,19 @@
     "notificationsOnHelp": "Reminders are sent before events.",
     "notificationsOffHelp": "Notifications are disabled."
   },
+  "calendar": {
+    "connect": "Connect calendar",
+    "disconnect": "Disconnect calendar",
+    "disconnectHelp": "Events will no longer sync with your calendar.",
+    "saveEmail": "Save calendar email in Profile to add events directly.",
+    "addToGoogle": "Add to Google Calendar",
+    "addToOutlook": "Add to Outlook Calendar"
+  },
+  "voice": {
+    "startRecording": "Tap to start recording",
+    "stopRecording": "Tap to stop",
+    "instruction": "Speak into the microphone to"
+  },
   "chat": {
     "title": "Family chat",
     "noMessages": "No messages yet",
@@ -214,7 +242,39 @@
     "edit": "Edit",
     "delete": "Delete",
     "copy": "Copy",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "back": "Back"
+  },
+  "transport": {
+    "title": "Transport",
+    "noTransport": "No transport added",
+    "addType": "Select transport type",
+    "fly": "Flight",
+    "train": "Train",
+    "carRental": "Rental car",
+    "ferry": "Ferry",
+    "taxi": "Taxi",
+    "boatCruise": "Boat/Cruise",
+    "departure": "Departure",
+    "arrival": "Arrival",
+    "pickup": "Pickup",
+    "dropoff": "Drop-off",
+    "departureTerminal": "Departure terminal",
+    "arrivalTerminal": "Arrival terminal",
+    "cabin": "Cabin",
+    "hasCar": "Car included",
+    "carRegNr": "Car reg. no.",
+    "operator": "Operator",
+    "routeName": "Route name",
+    "flightNumber": "Flight number",
+    "trainRoute": "Train route",
+    "regNr": "Reg. no.",
+    "referencePNR": "Reference (PNR)",
+    "reference": "Reference",
+    "seatNumber": "Seat number",
+    "wagon": "Wagon and seat",
+    "driver": "Driver",
+    "notLoggedIn": "Not logged in"
   },
   "languages": {
     "nb": "Norsk",

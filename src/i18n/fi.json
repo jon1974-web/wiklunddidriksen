@@ -2,6 +2,7 @@
   "common": {
     "save": "Tallenna",
     "cancel": "Peruuta",
+    "back": "Takaisin",
     "delete": "Poista",
     "edit": "Muokkaa",
     "copy": "Kopioi",
@@ -217,13 +218,74 @@
   "actionModal": {
     "edit": "Muokkaa",
     "delete": "Poista",
-    "cancel": "Peruuta"
+    "cancel": "Peruuta",
+    "back": "Takaisin"
   },
   "detail": {
     "edit": "Muokkaa",
     "delete": "Poista",
     "copy": "Kopioi",
-    "cancel": "Peruuta"
+    "cancel": "Peruuta",
+    "back": "Takaisin"
+  },
+  "transport": {
+    "title": "Kuljetus",
+    "noTransport": "Ei kuljetuksia lisätty",
+    "addType": "Valitse kuljetustyyppi",
+    "fly": "Lento",
+    "train": "Juna",
+    "carRental": "Vuokra-auto",
+    "ferry": "Lautta",
+    "taxi": "Taksi",
+    "boatCruise": "Vene/Risteily",
+    "departure": "Lähtö",
+    "arrival": "Saapuminen",
+    "pickup": "Nouto",
+    "dropoff": "Vienti",
+    "departureTerminal": "Lähtöterminaali",
+    "arrivalTerminal": "Saapumisterminaali",
+    "cabin": "Hytti",
+    "hasCar": "Auto mukana",
+    "carRegNr": "Auton rek. nro",
+    "operator": "Liikennöitsijä",
+    "routeName": "Reittinimi",
+    "flightNumber": "Lennonumero",
+    "trainRoute": "Junareitti",
+    "regNr": "Rek. nro",
+    "referencePNR": "Viite (PNR)",
+    "reference": "Viite",
+    "seatNumber": "Istumapaikka",
+    "wagon": "Vaunu ja paikka",
+    "driver": "Kuljettaja",
+    "notLoggedIn": "Ei kirjautunut sisään"
+  },
+  "pickers": {
+    "startDate": "Valitse aloituspäivä",
+    "endDate": "Valitse lopetuspäivä",
+    "departureDate": "Valitse lähtöpäivä",
+    "arrivalDate": "Valitse saapumispäivä",
+    "departureTime": "Valitse lähtöaika",
+    "arrivalTime": "Valitse saapumisaika",
+    "startTime": "Valitse aloitusaika",
+    "endTime": "Valitse lopetusaika",
+    "checkInTime": "Valitse sisäänkirjautumisaika",
+    "checkOutTime": "Valitse uloskirjautumisaika",
+    "date": "Valitse päivä",
+    "time": "Valitse aika",
+    "pickTime": "Valitse aika"
+  },
+  "calendar": {
+    "connect": "Yhdistä kalenteri",
+    "disconnect": "Irrota kalenteri",
+    "disconnectHelp": "Tapahtumat eivät enää synkronoidu kalenteriisi.",
+    "saveEmail": "Tallenna kalenteri-sähköposti Profiiliin lisätäksesi tapahtumat suoraan.",
+    "addToGoogle": "Lisää Google Calendariin",
+    "addToOutlook": "Lisää Outlook Calendariin"
+  },
+  "voice": {
+    "startRecording": "Aloita tallennusnapauttamalla",
+    "stopRecording": "Pysäytä napauttamalla",
+    "instruction": "Puhu mikrofoniin"
   },
   "languages": {
     "nb": "Norsk",

@@ -43,7 +43,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
     crossAlert('Slett transport', 'Er du sikker?', [
       { text: 'Avbryt', style: 'cancel' },
       {
-        text: 'Slett',
+        text: t('common.delete'),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -105,39 +105,39 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
 
       {/* Info card */}
       <View style={[styles.infoCard, { backgroundColor: colors.surface }]}>
-        {renderRow('Selskap', f.airline)}
-        {f.transportType === 'fly' && renderRow('Flightnummer', f.flightNumber)}
-        {f.transportType === 'tog' && renderRow('Togrute', f.flightNumber)}
-        {f.transportType === 'bil' && renderRow('Reg. nr', f.flightNumber)}
-        {f.transportType === 'fly' && renderRow('Referanse (PNR)', f.reference)}
-        {f.transportType !== 'fly' && renderRow('Referanse', f.reference)}
-        {f.transportType === 'fly' && renderRow('Setenr', f.seatNumber)}
-        {f.transportType === 'tog' && renderRow('Vogn og plass', f.wagon)}
-        {f.transportType === 'bil' && renderRow('Fører', f.driver)}
-        {f.address && renderRow('Adresse', f.address)}
+        {renderRow(t('transport.operator'), f.airline)}
+        {f.transportType === 'fly' && renderRow(t('transport.flightNumber'), f.flightNumber)}
+        {f.transportType === 'tog' && renderRow(t('transport.trainRoute'), f.flightNumber)}
+        {f.transportType === 'bil' && renderRow(t('transport.regNr'), f.flightNumber)}
+        {f.transportType === 'fly' && renderRow(t('transport.referencePNR'), f.reference)}
+        {f.transportType !== 'fly' && renderRow(t('transport.reference'), f.reference)}
+        {f.transportType === 'fly' && renderRow(t('transport.seatNumber'), f.seatNumber)}
+        {f.transportType === 'tog' && renderRow(t('transport.wagon'), f.wagon)}
+        {f.transportType === 'bil' && renderRow(t('transport.driver'), f.driver)}
+        {f.address && renderRow(t('common.address'), f.address)}
 
         {(f.departureDate || f.departureTime) && (
           <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
             <Text style={[styles.timeSectionTitle, { color: typeColor }]}>
-              {f.transportType === 'bil' ? '🔑 Henting' : '🛫 Avreise'}
+              {f.transportType === 'bil' ? '🔑 ' + t('transport.pickup') : '🛫 ' + t('transport.departure')}
             </Text>
-            {f.departureDate && renderRow('Dato', f.departureDate)}
-            {f.departureTime && renderRow('Tid', f.departureTime)}
+            {f.departureDate && renderRow(t('common.date'), f.departureDate)}
+            {f.departureTime && renderRow(t('common.time'), f.departureTime)}
           </View>
         )}
 
         {(f.arrivalDate || f.arrivalTime) && (
           <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
             <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>
-              {f.transportType === 'bil' ? '📋 Levering' : '🛬 Ankomst'}
+              {f.transportType === 'bil' ? '📋 ' + t('transport.dropoff') : '🛬 ' + t('transport.arrival')}
             </Text>
-            {f.arrivalDate && renderRow('Dato', f.arrivalDate)}
-            {f.arrivalTime && renderRow('Tid', f.arrivalTime)}
+            {f.arrivalDate && renderRow(t('common.date'), f.arrivalDate)}
+            {f.arrivalTime && renderRow(t('common.time'), f.arrivalTime)}
           </View>
         )}
 
-        {renderRow('Telefon', f.phone)}
-        {renderNotesRow('Notater', f.note)}
+        {renderRow(t('common.phone'), f.phone)}
+        {renderNotesRow(t('common.notes'), f.note)}
       </View>
 
       {/* Map for bil */}

@@ -177,15 +177,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const getPickerTitle = () => {
     const titles: Record<string, string> = {
-      tripStart: 'Velg startdato', tripEnd: 'Velg sluttdato',
-      flightDepDate: 'Velg avreisedato', flightArrDate: 'Velg ankomstdato',
-      flightDepTime: 'Velg avreisetid', flightArrTime: 'Velg ankomsttid',
-      actStartDate: 'Velg startdato', actEndDate: 'Velg sluttdato', actStartTime: 'Velg starttid', actEndTime: 'Velg sluttid',
-      hotelStartDate: 'Velg startdato', hotelEndDate: 'Velg sluttdato',
-      hotelCheckIn: 'Velg innsjekkingstid', hotelCheckOut: 'Velg utsjekkingstid',
-      boatDepDate: 'Velg avreisedato', boatDepTime: 'Velg avreisetid', boatArrDate: 'Velg ankomstdato', boatArrTime: 'Velg ankomsttid',
-      taxiDate: 'Velg dato', taxiTime: 'Velg tid',
-      ferryDepDate: 'Velg avreisedato', ferryDepTime: 'Velg avreisetid', ferryArrDate: 'Velg ankomstdato', ferryArrTime: 'Velg ankomsttid',
+      tripStart: t('pickers.startDate'), tripEnd: t('pickers.endDate'),
+      flightDepDate: t('pickers.departureDate'), flightArrDate: t('pickers.arrivalDate'),
+      flightDepTime: t('pickers.departureTime'), flightArrTime: t('pickers.arrivalTime'),
+      actStartDate: t('pickers.startDate'), actEndDate: t('pickers.endDate'), actStartTime: t('pickers.startTime'), actEndTime: t('pickers.endTime'),
+      hotelStartDate: t('pickers.startDate'), hotelEndDate: t('pickers.endDate'),
+      hotelCheckIn: t('pickers.checkInTime'), hotelCheckOut: t('pickers.checkOutTime'),
+      boatDepDate: t('pickers.departureDate'), boatDepTime: t('pickers.departureTime'), boatArrDate: t('pickers.arrivalDate'), boatArrTime: t('pickers.arrivalTime'),
+      taxiDate: t('pickers.date'), taxiTime: t('pickers.time'),
+      ferryDepDate: t('pickers.departureDate'), ferryDepTime: t('pickers.departureTime'), ferryArrDate: t('pickers.arrivalDate'), ferryArrTime: t('pickers.arrivalTime'),
     };
     return activePicker ? titles[activePicker] : '';
   };

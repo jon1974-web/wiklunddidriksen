@@ -158,6 +158,21 @@
     "transportTips": "Transport",
     "scams": "Vær oppmerksom på"
   },
+  "pickers": {
+    "startDate": "Velg startdato",
+    "endDate": "Velg sluttdato",
+    "departureDate": "Velg avreisedato",
+    "arrivalDate": "Velg ankomstdato",
+    "departureTime": "Velg avreisetid",
+    "arrivalTime": "Velg ankomsttid",
+    "startTime": "Velg starttid",
+    "endTime": "Velg sluttid",
+    "checkInTime": "Velg innsjekkingstid",
+    "checkOutTime": "Velg utsjekkingstid",
+    "date": "Velg dato",
+    "time": "Velg tid",
+    "pickTime": "Velg tidspunkt"
+  },
   "profile": {
     "title": "Profil",
     "displayName": "Visningsnavn",
@@ -200,6 +215,19 @@
     "notificationsOnHelp": "Påminnelser sendes før arrangementer.",
     "notificationsOffHelp": "Varsler er deaktivert."
   },
+  "calendar": {
+    "connect": "Koble til kalender",
+    "disconnect": "Koble fra kalender",
+    "disconnectHelp": "Arrangementer vil ikke lenger synkroniseres med kalenderen din.",
+    "saveEmail": "Lagre kalender-e-post i Profil for å legge til arrangementer direkte.",
+    "addToGoogle": "Legg til i Google Calendar",
+    "addToOutlook": "Legg til i Outlook Calendar"
+  },
+  "voice": {
+    "startRecording": "Trykk for å starte opptak",
+    "stopRecording": "Trykk for å stoppe",
+    "instruction": "Snakk i mikrofonen for å"
+  },
   "chat": {
     "title": "Familiechat",
     "noMessages": "Ingen meldinger ennå",
@@ -214,7 +242,39 @@
     "edit": "Rediger",
     "delete": "Slett",
     "copy": "Kopier",
-    "cancel": "Avbryt"
+    "cancel": "Avbryt",
+    "back": "Tilbake"
+  },
+  "transport": {
+    "title": "Transport",
+    "noTransport": "Ingen transport lagt til",
+    "addType": "Velg transporttype",
+    "fly": "Fly",
+    "train": "Tog",
+    "carRental": "Leiebil",
+    "ferry": "Ferje",
+    "taxi": "Taxi",
+    "boatCruise": "Båt/Cruise",
+    "departure": "Avreise",
+    "arrival": "Ankomst",
+    "pickup": "Henting",
+    "dropoff": "Levering",
+    "departureTerminal": "Avgangsterminal",
+    "arrivalTerminal": "Ankomstterminal",
+    "cabin": "Kabin/kupe",
+    "hasCar": "Bil med",
+    "carRegNr": "Bilens reg. nr",
+    "operator": "Selskap/rederi",
+    "routeName": "Rutenavn",
+    "flightNumber": "Flightnummer",
+    "trainRoute": "Togrute",
+    "regNr": "Reg. nr",
+    "referencePNR": "Referanse (PNR)",
+    "reference": "Referanse",
+    "seatNumber": "Setenr",
+    "wagon": "Vogn og plass",
+    "driver": "Fører",
+    "notLoggedIn": "Ikke innlogget"
   },
   "languages": {
     "nb": "Norsk",

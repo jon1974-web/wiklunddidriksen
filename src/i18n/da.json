@@ -2,6 +2,7 @@
   "common": {
     "save": "Gem",
     "cancel": "Annuller",
+    "back": "Tilbage",
     "delete": "Slet",
     "edit": "Rediger",
     "copy": "Kopier",
@@ -217,13 +218,74 @@
   "actionModal": {
     "edit": "Rediger",
     "delete": "Slet",
-    "cancel": "Annuller"
+    "cancel": "Annuller",
+    "back": "Tilbage"
   },
   "detail": {
     "edit": "Rediger",
     "delete": "Slet",
     "copy": "Kopier",
-    "cancel": "Annuller"
+    "cancel": "Annuller",
+    "back": "Tilbage"
+  },
+  "transport": {
+    "title": "Transport",
+    "noTransport": "Ingen transport tilføjet",
+    "addType": "Vælg transporttype",
+    "fly": "Fly",
+    "train": "Tog",
+    "carRental": "Lejebil",
+    "ferry": "Færge",
+    "taxi": "Taxi",
+    "boatCruise": "Båd/Cruise",
+    "departure": "Afgang",
+    "arrival": "Ankomst",
+    "pickup": "Afhentning",
+    "dropoff": "Afsætning",
+    "departureTerminal": "Afgangsterminal",
+    "arrivalTerminal": "Ankomstterminal",
+    "cabin": "Kahyt",
+    "hasCar": "Bil med",
+    "carRegNr": "Bilens reg. nr",
+    "operator": "Operatør/rederi",
+    "routeName": "Rutenavn",
+    "flightNumber": "Flynummer",
+    "trainRoute": "Toglinje",
+    "regNr": "Reg. nr",
+    "referencePNR": "Reference (PNR)",
+    "reference": "Reference",
+    "seatNumber": "Sæde",
+    "wagon": "Vogn og plads",
+    "driver": "Chauffør",
+    "notLoggedIn": "Ikke logget ind"
+  },
+  "pickers": {
+    "startDate": "Vælg startdato",
+    "endDate": "Vælg slutdato",
+    "departureDate": "Vælg afgangsdato",
+    "arrivalDate": "Vælg ankomstdato",
+    "departureTime": "Vælg afgangstid",
+    "arrivalTime": "Vælg ankomsttid",
+    "startTime": "Vælg starttid",
+    "endTime": "Vælg sluttid",
+    "checkInTime": "Vælg indtjekningstid",
+    "checkOutTime": "Vælg udtjekningstid",
+    "date": "Vælg dato",
+    "time": "Vælg tid",
+    "pickTime": "Vælg tidspunkt"
+  },
+  "calendar": {
+    "connect": "Forbind kalender",
+    "disconnect": "Afbryd kalender",
+    "disconnectHelp": "Begivenheder synkroniseres ikke længere med din kalender.",
+    "saveEmail": "Gem kalender-e-mail i Profil for at tilføje begivenheder direkte.",
+    "addToGoogle": "Føj til Google Calendar",
+    "addToOutlook": "Føj til Outlook Calendar"
+  },
+  "voice": {
+    "startRecording": "Tryk for at starte optagelse",
+    "stopRecording": "Tryk for at stoppe",
+    "instruction": "Tal ind i mikrofonen for at"
   },
   "languages": {
     "nb": "Norsk",
