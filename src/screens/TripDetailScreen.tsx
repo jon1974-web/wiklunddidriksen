@@ -1681,7 +1681,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Avreisetid</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')} {t('common.time')}</Text>
                     <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('boatDepTime')}>
                       <Text style={{ color: boatForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{boatForm.departureTime || t('common.pickTime')}</Text>
                     </TouchableOpacity>
@@ -1693,7 +1693,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Ankomsttid</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrival')} {t('common.time')}</Text>
                     <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('boatArrTime')}>
                       <Text style={{ color: boatForm.arrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{boatForm.arrivalTime || t('common.pickTime')}</Text>
                     </TouchableOpacity>
@@ -1707,7 +1707,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <GooglePlacesInput value={boatForm.arrivalAddress} onChangeText={(v) => setBoatForm(f => ({ ...f, arrivalAddress: v }))} placeholder="Ankomstterminal adresse..." onSelect={(v) => setBoatForm(f => ({ ...f, arrivalAddress: v }))} />
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.phone} onChangeText={(v) => setBoatForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
                   </View>
                   <View style={styles.field}>
@@ -1715,7 +1715,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: boatForm.hasCar ? colors.accent : colors.textDisabled, backgroundColor: boatForm.hasCar ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                         {boatForm.hasCar && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                       </View>
-                      <Text style={[styles.label, { color: colors.text }]}>🚗 Bil med</Text>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('common.carWith')}</Text>
                     </TouchableOpacity>
                   </View>
                   {boatForm.hasCar && (
@@ -1767,7 +1767,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 </View>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Selskap</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.operator')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.name} onChangeText={(v) => setTaxiForm(f => ({ ...f, name: v }))} placeholder="F.eks. Oslo Taxi" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
@@ -1775,23 +1775,23 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.reference} onChangeText={(v) => setTaxiForm(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Hentedato</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')} {t('common.date')}</Text>
                     <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiDate')}>
                       <Text style={{ color: taxiForm.departureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{taxiForm.departureDate || t('common.pickDate')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Hentetid</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')} {t('common.time')}</Text>
                     <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiTime')}>
                       <Text style={{ color: taxiForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{taxiForm.departureTime || t('common.pickTime')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Adresse (hentested)</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
                     <GooglePlacesInput value={taxiForm.address} onChangeText={(v) => setTaxiForm(f => ({ ...f, address: v }))} placeholder="Søk etter adresse..." onSelect={(v) => setTaxiForm(f => ({ ...f, address: v }))} />
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.phone} onChangeText={(v) => setTaxiForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
                   </View>
                   <View style={styles.field}>
@@ -1857,7 +1857,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Avreisetid</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')} {t('common.time')}</Text>
                     <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryDepTime')}>
                       <Text style={{ color: ferryForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.departureTime || t('common.pickTime')}</Text>
                     </TouchableOpacity>
@@ -1869,7 +1869,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Ankomsttid</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrival')} {t('common.time')}</Text>
                     <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryArrTime')}>
                       <Text style={{ color: ferryForm.arrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.arrivalTime || t('common.pickTime')}</Text>
                     </TouchableOpacity>
@@ -1883,7 +1883,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <GooglePlacesInput value={ferryForm.arrivalAddress} onChangeText={(v) => setFerryForm(f => ({ ...f, arrivalAddress: v }))} placeholder="Ankomstterminal adresse..." onSelect={(v) => setFerryForm(f => ({ ...f, arrivalAddress: v }))} />
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Telefon</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.phone} onChangeText={(v) => setFerryForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
                   </View>
                   <View style={styles.field}>
@@ -1891,7 +1891,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: ferryForm.hasCar ? colors.accent : colors.textDisabled, backgroundColor: ferryForm.hasCar ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                         {ferryForm.hasCar && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                       </View>
-                      <Text style={[styles.label, { color: colors.text }]}>🚗 Bil med</Text>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('common.carWith')}</Text>
                     </TouchableOpacity>
                   </View>
                   {ferryForm.hasCar && (
