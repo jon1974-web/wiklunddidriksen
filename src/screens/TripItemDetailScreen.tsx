@@ -116,14 +116,14 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow(t('common.phone'), item.phone)}
             {(item.startDate || item.endDate) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📅 Opphold</Text>
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📅 {t('hotels.stay')}</Text>
                 {item.startDate && renderRow(t('common.startDate'), formatDate(item.startDate))}
                 {item.endDate && renderRow(t('common.endDate'), formatDate(item.endDate))}
               </View>
             )}
             {(item.checkInTime || item.checkOutTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🕐 Tider</Text>
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🕐 {t('hotels.times')}</Text>
                 {item.checkInTime && renderRow(t('hotels.checkIn'), item.checkInTime)}
                 {item.checkOutTime && renderRow(t('hotels.checkOut'), item.checkOutTime)}
               </View>
@@ -143,14 +143,14 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow(t('common.address'), item.address)}
             {(item.startDate || item.endDate) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📅 Dato</Text>
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📅 {t('common.date')}</Text>
                 {item.startDate && renderRow(t('common.startDate'), formatDate(item.startDate))}
                 {item.endDate && renderRow(t('common.endDate'), formatDate(item.endDate))}
               </View>
             )}
             {(item.startTime || item.endTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🕐 Tid</Text>
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🕐 {t('common.time')}</Text>
                 {item.startTime && renderRow(t('pickers.startTime'), item.startTime)}
                 {item.endTime && renderRow(t('pickers.endTime'), item.endTime)}
               </View>
@@ -165,23 +165,23 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow('Referanse', item.reference)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 Avreise</Text>
-                {item.departureDate && renderRow('Dato', formatDate(item.departureDate))}
-                {item.departureTime && renderRow('Tid', item.departureTime)}
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 {t('transport.departure')}</Text>
+                {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
+                {item.departureTime && renderRow(t('common.time'), item.departureTime)}
                 {item.departureAddress && renderRow('Terminal', item.departureAddress)}
               </View>
             )}
             {(item.arrivalDate || item.arrivalTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 Ankomst</Text>
-                {item.arrivalDate && renderRow('Dato', formatDate(item.arrivalDate))}
-                {item.arrivalTime && renderRow('Tid', item.arrivalTime)}
+                <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 {t('transport.arrival')}</Text>
+                {item.arrivalDate && renderRow(t('common.date'), formatDate(item.arrivalDate))}
+                {item.arrivalTime && renderRow(t('common.time'), item.arrivalTime)}
                 {item.arrivalAddress && renderRow('Terminal', item.arrivalAddress)}
               </View>
             )}
             {renderRow('Telefon', item.phone)}
-            {item.hasCar && renderRow('Bil med', 'Ja')}
-            {item.hasCar && renderRow('Bilens reg. nr', item.carRegistration)}
+            {item.hasCar && renderRow(t('common.carWith'), 'Ja')}
+            {item.hasCar && renderRow(t('common.carRegNr'), item.carRegistration)}
             {renderRow('Fører', item.driver)}
             {renderRow('Passasjerer', item.passengers)}
             {renderNotesRow('Notat', item.note)}
@@ -193,9 +193,9 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow('Referanse', item.reference)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🔑 Henting</Text>
-                {item.departureDate && renderRow('Dato', formatDate(item.departureDate))}
-                {item.departureTime && renderRow('Tid', item.departureTime)}
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🔑 {t('transport.pickup')}</Text>
+                {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
+                {item.departureTime && renderRow(t('common.time'), item.departureTime)}
               </View>
             )}
             {renderRow('Adresse', item.address)}
@@ -213,23 +213,23 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow('Kabin/kupe', item.cabin)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 Avreise</Text>
-                {item.departureDate && renderRow('Dato', formatDate(item.departureDate))}
-                {item.departureTime && renderRow('Tid', item.departureTime)}
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 {t('transport.departure')}</Text>
+                {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
+                {item.departureTime && renderRow(t('common.time'), item.departureTime)}
                 {item.departureAddress && renderRow('Terminal', item.departureAddress)}
               </View>
             )}
             {(item.arrivalDate || item.arrivalTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 Ankomst</Text>
-                {item.arrivalDate && renderRow('Dato', formatDate(item.arrivalDate))}
-                {item.arrivalTime && renderRow('Tid', item.arrivalTime)}
+                <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 {t('transport.arrival')}</Text>
+                {item.arrivalDate && renderRow(t('common.date'), formatDate(item.arrivalDate))}
+                {item.arrivalTime && renderRow(t('common.time'), item.arrivalTime)}
                 {item.arrivalAddress && renderRow('Terminal', item.arrivalAddress)}
               </View>
             )}
             {renderRow('Telefon', item.phone)}
-            {item.hasCar && renderRow('Bil med', 'Ja')}
-            {item.hasCar && renderRow('Bilens reg. nr', item.carRegistration)}
+            {item.hasCar && renderRow(t('common.carWith'), 'Ja')}
+            {item.hasCar && renderRow(t('common.carRegNr'), item.carRegistration)}
             {renderRow('Fører', item.driver)}
             {renderRow('Passasjerer', item.passengers)}
             {renderNotesRow('Notat', item.note)}

@@ -142,7 +142,9 @@
     "title": "Hotell",
     "noHotels": "Ingen hoteller lagt til",
     "checkIn": "Innsjekkingstid",
-    "checkOut": "Utsjekkingstid"
+    "checkOut": "Utsjekkingstid",
+    "stay": "Opphold",
+    "times": "Tider"
   },
   "restaurants": {
     "title": "Restauranter",

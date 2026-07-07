@@ -142,7 +142,9 @@
     "title": "Hotels",
     "noHotels": "No hotels added",
     "checkIn": "Check-in time",
-    "checkOut": "Check-out time"
+    "checkOut": "Check-out time",
+    "stay": "Stay",
+    "times": "Times"
   },
   "restaurants": {
     "title": "Restaurants",

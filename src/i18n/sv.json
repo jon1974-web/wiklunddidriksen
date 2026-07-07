@@ -152,7 +152,9 @@
     "title": "Hotell",
     "noHotels": "Inga hotell tillagda",
     "checkIn": "Incheckningstid",
-    "checkOut": "Utcheckningstid"
+    "checkOut": "Utcheckningstid",
+    "stay": "Vistelse",
+    "times": "Tider"
   },
   "restaurants": {
     "title": "Restauranger",

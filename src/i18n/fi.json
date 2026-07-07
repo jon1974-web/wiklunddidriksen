@@ -152,7 +152,9 @@
     "title": "Hotellit",
     "noHotels": "Ei hotelleja lisätty",
     "checkIn": "Sisäänkirjautumisaika",
-    "checkOut": "Uloskirjautumisaika"
+    "checkOut": "Uloskirjautumisaika",
+    "stay": "Majoitus",
+    "times": "Ajat"
   },
   "restaurants": {
     "title": "Ravintolat",
