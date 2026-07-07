@@ -10,6 +10,7 @@ import { getUserProfile, notifyNewEvent } from '../services/familyService';
 import { syncEventToCalendar } from '../services/calendarService';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
+import { useTranslation } from 'react-i18next';
 
 interface VoiceEventScreenProps {
   navigation: any;
@@ -28,6 +29,7 @@ interface ParsedEvent {
 const CLOUD_FUNCTION_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent';
 
 export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [recording, setRecording] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [transcript, setTranscript] = useState<string | null>(null);
@@ -213,7 +215,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         notifyNewEvent(familyId, eventData.title, eventData.date, eventData.time, user.displayName || 'En i familien').catch(() => {});
       }
 
-      crossAlert('Suksess', `"${eventData.title}" er opprettet!`);
+      crossAlert(t('common.success'), `"${eventData.title}" ${t('events.addEvent')}!`);
       navigation.goBack();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -246,7 +248,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          Snakk i mikrofonen for å opprette et arrangement
+          Snakk i mikrofonen for å {t('events.addEvent').toLowerCase()}
         </Text>
         <Text style={[styles.helperExample, { color: colors.textDisabled }]}>
           F.eks. &quot;Fotballtrening på Ekebergsletta på torsdag klokken 19 til 21 på Ekeberg kunstgress bane 2&quot;

@@ -14,6 +14,7 @@ import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { getTodayLocal } from '../utils/dateUtils';
 import { EVENT_ICONS } from '../constants/eventIcons';
 import { crossAlert } from '../utils/alert';
+import { useTranslation } from 'react-i18next';
 
 interface AddEventScreenProps {
   navigation: any;
@@ -21,6 +22,7 @@ interface AddEventScreenProps {
 }
 
 export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const prefill = route?.params?.prefill;
   const [title, setTitle] = useState(prefill?.title || '');
   const [description, setDescription] = useState(prefill?.description || '');
@@ -44,7 +46,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   const [activePicker, setActivePicker] = useState<AddPickerField>(null);
 
   const getPickerTitle = () => {
-    const titles: Record<string, string> = { date: 'Velg dato', time: 'Velg tid', endDate: 'Velg sluttdato', endTime: 'Velg sluttid' };
+    const titles: Record<string, string> = { date: t('common.pickDate'), time: t('common.pickTime'), endDate: t('common.pickEndDate'), endTime: t('common.pickEndTime') };
     return activePicker ? titles[activePicker] : '';
   };
 
@@ -171,7 +173,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>Nytt arrangement</Text>
+      <Text style={[styles.title, { color: colors.text }]}>{t('events.addEvent')}</Text>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
@@ -330,11 +332,11 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         onPress={handleSave}
         disabled={saving}
       >
-        <Text style={styles.buttonText}>{saving ? 'Lagrer...' : 'Lagre'}</Text>
+        <Text style={styles.buttonText}>{saving ? '...' : t('common.save')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]} onPress={() => navigation.goBack()}>
-        <Text style={[styles.buttonText, { color: colors.text }]}>Avbryt</Text>
+        <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
       </TouchableOpacity>
 
       <DatePickerModal

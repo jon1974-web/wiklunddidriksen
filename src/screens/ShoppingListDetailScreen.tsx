@@ -8,6 +8,7 @@ import { ShoppingItem as ShoppingItemComponent } from '../components/ShoppingIte
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
+import { useTranslation } from 'react-i18next';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -17,6 +18,7 @@ interface ShoppingListDetailScreenProps {
 }
 
 export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> = ({ navigation, route }) => {
+  const { t } = useTranslation();
   const { list } = route.params as { list: ShoppingList };
   const [currentList, setCurrentList] = useState<ShoppingList>(list);
   const [newItemName, setNewItemName] = useState('');
@@ -156,7 +158,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
           <View style={styles.headerInfo}>
             <Text style={[styles.title, { color: colors.text }]}>{currentList.title}</Text>
             <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-              {currentList.items.filter((i) => i.checked).length}/{currentList.items.length} varer krysset av
+              {currentList.items.filter((i) => i.checked).length}/{currentList.items.length} {t('shopping.itemsChecked')}
             </Text>
           </View>
           <View style={styles.headerActions}>
@@ -164,14 +166,14 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
               style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
               onPress={handleCopyList}
             >
-              <Text style={[styles.headerButtonText, { color: colors.text }]}>Kopier</Text>
+              <Text style={[styles.headerButtonText, { color: colors.text }]}>{t('shopping.copy')}</Text>
             </TouchableOpacity>
             {canDelete && (
               <TouchableOpacity
                 style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
                 onPress={handleDeleteList}
               >
-                <Text style={[styles.headerButtonText, { color: colors.danger }]}>Slett</Text>
+                <Text style={[styles.headerButtonText, { color: colors.danger }]}>{t('shopping.delete')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -184,12 +186,12 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
           style={[styles.addItemInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
           value={newItemName}
           onChangeText={setNewItemName}
-          placeholder="Legg til vare..."
+          placeholder={t('shopping.addItem')}
           placeholderTextColor={colors.textDisabled}
           onSubmitEditing={handleAddItem}
         />
         <TouchableOpacity style={[styles.addItemButton, { backgroundColor: colors.accent }]} onPress={handleAddItem}>
-          <Text style={styles.addItemButtonText}>Legg til</Text>
+          <Text style={styles.addItemButtonText}>{t('shopping.addButton')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -199,7 +201,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
         ListEmptyComponent={
-          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>Ingen varer i listen. Legg til varer!</Text>
+          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('shopping.noItems')}</Text>
         }
       />
 

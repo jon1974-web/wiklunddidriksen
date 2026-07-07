@@ -17,6 +17,7 @@ import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
 import { MissedRemindersBanner } from '../components/MissedRemindersBanner';
+import { useTranslation } from 'react-i18next';
 
 interface EventsScreenProps {
   navigation: any;
@@ -116,6 +117,7 @@ type UnifiedItem =
   | (SpondEvent & { _type: 'spond' });
 
 export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [events, setEvents] = useState<Event[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
@@ -665,8 +667,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         ListEmptyComponent={
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>
             {viewMode === 'calendar'
-              ? 'Ingen arrangementer på denne dagen'
-              : 'Ingen kommende arrangementer. Legg til et nytt!'}
+              ? t('events.noEventsDay')
+              : t('events.noEvents')}
           </Text>
         }
         ListFooterComponent={
@@ -676,7 +678,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               onPress={() => setShowPastEvents(!showPastEvents)}
             >
               <Text style={[styles.showPastText, { color: colors.accent }]}>
-                {showPastEvents ? 'Skjul tidligere arrangementer' : 'Se tidligere arrangementer'}
+                {showPastEvents ? t('events.hidePast') : t('events.pastEvents')}
               </Text>
             </TouchableOpacity>
           ) : null
