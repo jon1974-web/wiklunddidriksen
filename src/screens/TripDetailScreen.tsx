@@ -1651,9 +1651,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                  {editingId ? t('detail.edit') + ' ' + t('transport.ferry').toLowerCase() : t('common.add') + ' ' + t('transport.ferry').toLowerCase()}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 28 }}>⛴️</Text>
+                  <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
+                    {editingId ? t('detail.edit') + ' ' + t('transport.ferry').toLowerCase() : t('common.add') + ' ' + t('transport.ferry').toLowerCase()}
+                  </Text>
+                </View>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.operator')}</Text>
@@ -1756,9 +1759,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                  {editingId ? t('detail.edit') + ' ' + t('transport.taxi').toLowerCase() : t('common.add') + ' ' + t('transport.taxi').toLowerCase()}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 28 }}>🚕</Text>
+                  <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
+                    {editingId ? t('detail.edit') + ' ' + t('transport.taxi').toLowerCase() : t('common.add') + ' ' + t('transport.taxi').toLowerCase()}
+                  </Text>
+                </View>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Selskap</Text>
@@ -1821,9 +1827,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                  {editingId ? t('detail.edit') + ' ' + t('transport.boatCruise').toLowerCase() : t('common.add') + ' ' + t('transport.boatCruise').toLowerCase()}
-                </Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
+                  <Text style={{ fontSize: 28 }}>🚢</Text>
+                  <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
+                    {editingId ? t('detail.edit') + ' ' + t('transport.boatCruise').toLowerCase() : t('common.add') + ' ' + t('transport.boatCruise').toLowerCase()}
+                  </Text>
+                </View>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.operator')}</Text>
