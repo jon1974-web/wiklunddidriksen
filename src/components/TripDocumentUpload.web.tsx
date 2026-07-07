@@ -4,6 +4,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../services/firebase';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
+import { useTranslation } from 'react-i18next';
 
 interface TripDocumentUploadProps {
   tripId: string;
@@ -11,6 +12,7 @@ interface TripDocumentUploadProps {
 }
 
 export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(({ tripId, onUploaded }) => {
+  const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const { colors } = useTheme();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -50,7 +52,7 @@ export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(
       {uploading ? (
         <ActivityIndicator color={colors.accent} />
       ) : (
-        <Text style={[styles.uploadText, { color: colors.textSecondary }]}>📎 Velg fil</Text>
+        <Text style={[styles.uploadText, { color: colors.textSecondary }]}>📎 {t('documents.chooseFile')}</Text>
       )}
     </TouchableOpacity>
   );

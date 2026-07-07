@@ -165,7 +165,10 @@
   "documents": {
     "title": "Resedokument",
     "noDocuments": "Inga dokument tillagda",
-    "open": "Öppna"
+    "open": "Öppna",
+    "chooseFile": "Välj fil",
+    "placeholderTitle": "T.ex. Hotellbokning",
+    "placeholderNote": "T.ex. Bekräftelsenummer"
   },
   "links": {
     "title": "Användbara länkar",

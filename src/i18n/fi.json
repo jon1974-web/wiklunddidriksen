@@ -165,7 +165,10 @@
   "documents": {
     "title": "Matkasiirrot",
     "noDocuments": "Ei asiakirjoja lisätty",
-    "open": "Avaa"
+    "open": "Avaa",
+    "chooseFile": "Valitse tiedosto",
+    "placeholderTitle": "Esim. Hotellivaraus",
+    "placeholderNote": "Esim. Vahvistusnumero"
   },
   "links": {
     "title": "Hyödylliset linkit",

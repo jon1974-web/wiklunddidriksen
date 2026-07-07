@@ -155,7 +155,10 @@
   "documents": {
     "title": "Travel documents",
     "noDocuments": "No documents added",
-    "open": "Open"
+    "open": "Open",
+    "chooseFile": "Choose file",
+    "placeholderTitle": "E.g. Hotel booking",
+    "placeholderNote": "E.g. Confirmation number"
   },
   "links": {
     "title": "Useful links",

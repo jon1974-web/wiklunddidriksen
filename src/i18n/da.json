@@ -165,7 +165,10 @@
   "documents": {
     "title": "Rejsedokumenter",
     "noDocuments": "Ingen dokumenter tilføjet",
-    "open": "Åbn"
+    "open": "Åbn",
+    "chooseFile": "Vælg fil",
+    "placeholderTitle": "F.eks. Hotel booking",
+    "placeholderNote": "F.eks. Bekræftelsesnummer"
   },
   "links": {
     "title": "Nyttige links",

@@ -1543,16 +1543,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                  {editingId ? 'Rediger dokument' : 'Legg til reisedokument'}
+                  {editingId ? t('detail.edit') + ' ' + t('documents.title').toLowerCase() : t('common.add') + ' ' + t('documents.title').toLowerCase()}
                 </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Tittel *</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.title')} *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={docForm.title}
                       onChangeText={(v) => setDocForm(f => ({ ...f, title: v }))}
-                      placeholder="F.eks. Hotell booking"
+                      placeholder={t('documents.placeholderTitle')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
@@ -1562,7 +1562,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={docForm.note}
                       onChangeText={(v) => setDocForm(f => ({ ...f, note: v }))}
-                      placeholder="F.eks. Bekreftelsesnummer"
+                      placeholder={t('documents.placeholderNote')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
