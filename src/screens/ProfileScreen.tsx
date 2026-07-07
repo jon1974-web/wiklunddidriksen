@@ -240,12 +240,12 @@ export const ProfileScreen: React.FC = () => {
   const handleLeaveFamily = () => {
     if (!user) return;
     crossAlert(
-      'Forlat familie',
-      'Er du sikker på at du vil forlate denne familien?',
+      t('profile.leaveFamily'),
+      t('profile.leaveFamily') + '?',
       [
         { text: 'Avbryt', style: 'cancel' },
         {
-          text: 'Forlat',
+          text: t('common.confirm'),
           style: 'destructive',
           onPress: async () => {
             await leaveFamily(user.uid);
@@ -260,12 +260,12 @@ export const ProfileScreen: React.FC = () => {
   const handleRemoveMember = (targetUid: string, targetName: string) => {
     if (!familyId || !user) return;
     crossAlert(
-      'Fjern medlem',
+      t('profile.remove') + ' medlem',
       `Er du sikker på at du vil fjerne ${targetName}?`,
       [
         { text: 'Avbryt', style: 'cancel' },
         {
-          text: 'Fjern',
+          text: t('profile.remove'),
           style: 'destructive',
           onPress: async () => {
             try {
@@ -286,7 +286,7 @@ export const ProfileScreen: React.FC = () => {
     const newRole = currentRole === 'admin' ? 'member' : 'admin';
     const label = newRole === 'admin' ? 'Admin' : 'Medlem';
     crossAlert(
-      'Endre rolle',
+      t('profile.admin') + ' ▾',
       `Sett ${targetName} som ${label}?`,
       [
         { text: 'Avbryt', style: 'cancel' },
@@ -691,7 +691,7 @@ export const ProfileScreen: React.FC = () => {
               onPress={() => { setNewPhone(profile?.phoneNumber || ''); setEditingPhone(true); }}
             >
               <Text style={[styles.value, { color: profile?.phoneNumber ? colors.text : colors.textDisabled }]}>
-                {profile?.phoneNumber || 'Legg til telefonnummer'}
+                {profile?.phoneNumber || t('profile.addPhone')}
               </Text>
               <Text style={[styles.editIcon, { color: colors.accent }]}>Rediger</Text>
             </TouchableOpacity>
