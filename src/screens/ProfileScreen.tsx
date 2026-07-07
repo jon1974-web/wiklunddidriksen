@@ -795,9 +795,9 @@ export const ProfileScreen: React.FC = () => {
               key={t.key}
               onPress={() => setMode(t.key)}
               style={{
-                width: 36,
-                height: 36,
-                borderRadius: 18,
+                width: 28,
+                height: 28,
+                borderRadius: 14,
                 backgroundColor: t.color,
                 borderWidth: mode === t.key ? 3 : (t.border ? 2 : 0),
                 borderColor: mode === t.key ? colors.accent : (t.border ? '#fff' : 'transparent'),
