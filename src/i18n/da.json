@@ -123,7 +123,8 @@
     "copy": "Kopier",
     "delete": "Slet",
     "copyTitle": "Kopier liste",
-    "newList": "Ny liste"
+    "newList": "Ny liste",
+    "helperText": "Her kan du tilføje forskellige lister f.eks. indkøbslister eller pakkelister."
   },
   "transport": {
     "title": "Transport",

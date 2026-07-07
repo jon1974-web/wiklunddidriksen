@@ -167,7 +167,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
           lists.length > 0 ? (
             <View style={[styles.helperCard, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
               <Text style={[styles.helperText, { color: colors.textSecondary }]}>
-                Her kan du legge til forskjellige lister f.eks. handlelister eller pakkelister.
+                {t('shopping.helperText')}
               </Text>
             </View>
           ) : null

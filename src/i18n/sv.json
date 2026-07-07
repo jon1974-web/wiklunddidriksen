@@ -123,7 +123,8 @@
     "copy": "Kopiera",
     "delete": "Ta bort",
     "copyTitle": "Kopiera lista",
-    "newList": "Ny lista"
+    "newList": "Ny lista",
+    "helperText": "Här kan du lägga till olika listor t.ex. inköpslistor eller packlistor."
   },
   "transport": {
     "title": "Transport",

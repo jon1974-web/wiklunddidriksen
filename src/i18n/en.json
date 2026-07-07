@@ -113,7 +113,8 @@
     "copy": "Copy",
     "delete": "Delete",
     "copyTitle": "Copy list",
-    "newList": "New list"
+    "newList": "New list",
+    "helperText": "Here you can add different lists e.g. shopping lists or packing lists."
   },
   "transport": {
     "title": "Transport",
