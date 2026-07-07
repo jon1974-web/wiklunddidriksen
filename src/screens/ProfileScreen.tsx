@@ -617,7 +617,7 @@ export const ProfileScreen: React.FC = () => {
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{'Profil'}</Text>
 
         <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.textSecondary }]}>Navn</Text>
+          <Text style={[styles.label, { color: colors.textSecondary }]}>{t('common.name')}</Text>
           {editingName ? (
             <View style={styles.editRow}>
               <TextInput
@@ -851,7 +851,7 @@ export const ProfileScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
           <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
-            {notificationsEnabled ? t('profile.notifications') + ': On' : t('profile.notifications') + ': Off'}
+            {notificationsEnabled ? t('profile.notificationsOff') : t('profile.notificationsOn')}
           </Text>
         </View>
 
@@ -915,7 +915,7 @@ export const ProfileScreen: React.FC = () => {
 
               {(familyRole === 'owner' || familyRole === 'admin') && (
                 <View style={{ marginTop: 12 }}>
-                  <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 8 }]}>{t('profile.inviteCode')}</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 8 }]}>{t('profile.spondConnect')}</Text>
                   {inviteCode ? (
                     <View>
                       <View style={[styles.familyCard, { backgroundColor: colors.inputBackground, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
@@ -1037,7 +1037,7 @@ export const ProfileScreen: React.FC = () => {
           ) : (
             <View>
               <Text style={[styles.noFamily, { color: colors.textSecondary }]}>
-                {t('profile.inviteCode')}
+                {t('profile.spondConnect')}
               </Text>
               <View style={styles.field}>
                 <TextInput
@@ -1065,7 +1065,7 @@ export const ProfileScreen: React.FC = () => {
                 onPress={handleConnectSpond}
                 disabled={spondLoading}
               >
-                <Text style={styles.familyButtonText}>{spondLoading ? '...' : t('profile.inviteCode')}</Text>
+                <Text style={styles.familyButtonText}>{spondLoading ? '...' : t('profile.spondConnect')}</Text>
               </TouchableOpacity>
             </View>
           )}

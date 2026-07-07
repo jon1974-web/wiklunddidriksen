@@ -185,7 +185,16 @@
     "theme": "Theme",
     "language": "Language",
     "app": "App",
-    "logout": "Log out"
+    "logout": "Log out",
+    "spondConnect": "Connect to Spond",
+    "spondDisconnect": "Disconnect Spond",
+    "spondHelp": "Connect to Spond to show team events.",
+    "calendarConnect": "Connect calendar",
+    "calendarDisconnect": "Disconnect calendar",
+    "notificationsOn": "On",
+    "notificationsOff": "Off",
+    "notificationsOnHelp": "Reminders are sent before events.",
+    "notificationsOffHelp": "Notifications are disabled."
   },
   "chat": {
     "title": "Family chat",

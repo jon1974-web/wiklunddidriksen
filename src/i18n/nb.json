@@ -185,7 +185,16 @@
     "theme": "Tema",
     "language": "Språk",
     "app": "App",
-    "logout": "Logg ut"
+    "logout": "Logg ut",
+    "spondConnect": "Koble til Spond",
+    "spondDisconnect": "Koble fra Spond",
+    "spondHelp": "Koble til Spond for å vise lagets arrangementer.",
+    "calendarConnect": "Koble til kalender",
+    "calendarDisconnect": "Koble fra kalender",
+    "notificationsOn": "På",
+    "notificationsOff": "Av",
+    "notificationsOnHelp": "Påminnelser sendes før arrangementer.",
+    "notificationsOffHelp": "Varsler er deaktivert."
   },
   "chat": {
     "title": "Familiechat",
