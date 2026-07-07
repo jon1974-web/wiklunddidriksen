@@ -164,7 +164,8 @@
   },
   "documents": {
     "title": "Resedokument",
-    "noDocuments": "Inga dokument tillagda"
+    "noDocuments": "Inga dokument tillagda",
+    "open": "Öppna"
   },
   "links": {
     "title": "Användbara länkar",

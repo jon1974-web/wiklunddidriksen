@@ -154,7 +154,8 @@
   },
   "documents": {
     "title": "Travel documents",
-    "noDocuments": "No documents added"
+    "noDocuments": "No documents added",
+    "open": "Open"
   },
   "links": {
     "title": "Useful links",

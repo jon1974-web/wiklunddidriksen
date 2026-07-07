@@ -1158,7 +1158,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.docActions}>
                     {d.fileUrl && (
                       <TouchableOpacity onPress={() => openFileUrl(d.fileUrl)} style={styles.docAction}>
-                        <Text style={{ color: colors.accent, fontSize: 14 }}>Åpne</Text>
+                        <Text style={{ color: colors.accent, fontSize: 14 }}>{t('documents.open')}</Text>
                       </TouchableOpacity>
                     )}
                     {canDelete && (

@@ -164,7 +164,8 @@
   },
   "documents": {
     "title": "Matkasiirrot",
-    "noDocuments": "Ei asiakirjoja lisätty"
+    "noDocuments": "Ei asiakirjoja lisätty",
+    "open": "Avaa"
   },
   "links": {
     "title": "Hyödylliset linkit",

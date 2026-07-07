@@ -164,7 +164,8 @@
   },
   "documents": {
     "title": "Rejsedokumenter",
-    "noDocuments": "Ingen dokumenter tilføjet"
+    "noDocuments": "Ingen dokumenter tilføjet",
+    "open": "Åbn"
   },
   "links": {
     "title": "Nyttige links",
