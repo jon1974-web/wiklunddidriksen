@@ -814,7 +814,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {trip.city && (
         <View>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>🌤️ Vær</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>🌤️ {t('weather.title')}</Text>
             {isActive && (
               <TouchableOpacity
                 onPress={() => fetchWeather(true)}
