@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { GooglePlacesInput } from './GooglePlacesInput';
+import { useTranslation } from 'react-i18next';
 
 export interface FlightForm {
   transportType: 'fly' | 'tog' | 'bil';
@@ -53,6 +54,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
   onTransportTypeChange,
   colors,
 }) => {
+  const { t } = useTranslation();
   const set = (patch: Partial<FlightForm>) => onFlightFormChange(f => ({ ...f, ...patch }));
 
   const handleDirectionToggle = (dir: 'utreise' | 'hjemreise') => {
@@ -77,9 +79,12 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
         <View style={styles.modalOverlay}>
           <TouchableWithoutFeedback>
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                {editingId ? 'Rediger transport' : 'Legg til transport'}
-              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <Text style={{ fontSize: 28 }}>{flightForm.transportType === 'fly' ? '✈️' : flightForm.transportType === 'tog' ? '🚆' : '🚗'}</Text>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border, flex: 1 }]}>
+                  {editingId ? t('detail.edit') : t('common.add')} {t('transport.title')}
+                </Text>
+              </View>
               <ScrollView style={styles.modalScroll}>
                 <View style={styles.flightTypeRow}>
                   <TouchableOpacity
