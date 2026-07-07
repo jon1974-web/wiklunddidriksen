@@ -160,7 +160,9 @@
   },
   "activities": {
     "title": "Aktiviteetit",
-    "noActivities": "Ei aktiviteetteja lisätty"
+    "noActivities": "Ei aktiviteetteja lisätty",
+    "placeholderName": "Esim. Nähtävyykset",
+    "placeholderNote": "Esim. Liput varattu"
   },
   "documents": {
     "title": "Matkasiirrot",

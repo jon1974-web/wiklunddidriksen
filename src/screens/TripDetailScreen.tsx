@@ -1304,7 +1304,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <GooglePlacesInput
                       value={hotelForm.address}
                       onChangeText={(v) => setHotelForm(f => ({ ...f, address: v }))}
-                      placeholder="Søk etter adresse..."
+                      placeholder={t('common.search') + "..."}
                       onSelect={(v) => setHotelForm(f => ({ ...f, address: v }))}
                     />
                   </View>
@@ -1413,7 +1413,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <GooglePlacesInput
                       value={restForm.address}
                       onChangeText={(v) => setRestForm(f => ({ ...f, address: v }))}
-                      placeholder="Søk etter adresse..."
+                      placeholder={t('common.search') + "..."}
                       onSelect={(v) => setRestForm(f => ({ ...f, address: v }))}
                     />
                   </View>
@@ -1453,12 +1453,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.name')} *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={actForm.name}
                       onChangeText={(v) => setActForm(f => ({ ...f, name: v }))}
-                      placeholder="F.eks. Sightseeing"
+                      placeholder={t('activities.placeholderName')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
@@ -1467,7 +1467,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <GooglePlacesInput
                       value={actForm.address}
                       onChangeText={(v) => setActForm(f => ({ ...f, address: v }))}
-                      placeholder="Søk etter adresse..."
+                      placeholder={t('common.search') + "..."}
                       onSelect={(v) => setActForm(f => ({ ...f, address: v }))}
                     />
                   </View>
@@ -1478,7 +1478,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       onPress={() => setActivePicker('actStartDate')}
                     >
                       <Text style={{ color: actForm.startDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {actForm.startDate || 'Velg startdato'}
+                        {actForm.startDate || t('pickers.startDate')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1489,7 +1489,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       onPress={() => setActivePicker('actEndDate')}
                     >
                       <Text style={{ color: actForm.endDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {actForm.endDate || 'Velg sluttdato'}
+                        {actForm.endDate || t('pickers.endDate')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1500,7 +1500,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       onPress={() => setActivePicker('actStartTime')}
                     >
                       <Text style={{ color: actForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {actForm.startTime || 'Velg starttid'}
+                        {actForm.startTime || t('pickers.startTime')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1511,7 +1511,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       onPress={() => setActivePicker('actEndTime')}
                     >
                       <Text style={{ color: actForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {actForm.endTime || 'Velg sluttid'}
+                        {actForm.endTime || t('pickers.endTime')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1521,7 +1521,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={actForm.note}
                       onChangeText={(v) => setActForm(f => ({ ...f, note: v }))}
-                      placeholder="F.eks. Billetter bestilt"
+                      placeholder={t('activities.placeholderNote')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
@@ -1788,7 +1788,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
-                    <GooglePlacesInput value={taxiForm.address} onChangeText={(v) => setTaxiForm(f => ({ ...f, address: v }))} placeholder="Søk etter adresse..." onSelect={(v) => setTaxiForm(f => ({ ...f, address: v }))} />
+                    <GooglePlacesInput value={taxiForm.address} onChangeText={(v) => setTaxiForm(f => ({ ...f, address: v }))} placeholder={t('common.search') + "..."} onSelect={(v) => setTaxiForm(f => ({ ...f, address: v }))} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>

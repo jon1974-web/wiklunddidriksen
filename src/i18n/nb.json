@@ -150,7 +150,9 @@
   },
   "activities": {
     "title": "Aktiviteter",
-    "noActivities": "Ingen aktiviteter lagt til"
+    "noActivities": "Ingen aktiviteter lagt til",
+    "placeholderName": "F.eks. Sightseeing",
+    "placeholderNote": "F.eks. Billetter bestilt"
   },
   "documents": {
     "title": "Reisedokumenter",

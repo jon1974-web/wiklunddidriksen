@@ -150,7 +150,9 @@
   },
   "activities": {
     "title": "Activities",
-    "noActivities": "No activities added"
+    "noActivities": "No activities added",
+    "placeholderName": "E.g. Sightseeing",
+    "placeholderNote": "E.g. Tickets booked"
   },
   "documents": {
     "title": "Travel documents",

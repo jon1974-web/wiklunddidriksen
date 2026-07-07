@@ -160,7 +160,9 @@
   },
   "activities": {
     "title": "Aktiviteter",
-    "noActivities": "Inga aktiviteter tillagda"
+    "noActivities": "Inga aktiviteter tillagda",
+    "placeholderName": "T.ex. Sightseeing",
+    "placeholderNote": "T.ex. Biljetter bokade"
   },
   "documents": {
     "title": "Resedokument",
