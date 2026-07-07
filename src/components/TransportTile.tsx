@@ -4,6 +4,7 @@ import { TripFlight } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getCarrierDomain } from '../constants/carrierDomains';
 import { getFaviconUrl } from '../utils/favicon';
+import { useTranslation } from 'react-i18next';
 
 interface TransportTileProps {
   flight: TripFlight;
@@ -12,6 +13,7 @@ interface TransportTileProps {
 }
 
 export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight, onPress, onLongPress }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const f = flight;
 
@@ -58,17 +60,17 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
           {f.type && (
             <Text style={{ color: typeColor, fontWeight: '600', fontSize: 12 }}>
               {f.transportType === 'bil'
-                ? (f.type === 'utreise' ? 'Henting' : 'Levering')
-                : (f.type === 'utreise' ? 'Utreise' : 'Hjemreise')}
+                ? (f.type === 'utreise' ? t('transport.pickup') : t('transport.dropoff'))
+                : (f.type === 'utreise' ? t('transport.departure') : t('transport.arrival'))}
             </Text>
           )}
         </View>
         {f.airline && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{f.airline}</Text>}
         {f.flightNumber && <Text style={[styles.tileDetail, { color: colors.accent }]} numberOfLines={1}>{f.flightNumber}</Text>}
-        {f.reference && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>Ref: {f.reference}</Text>}
-        {f.seatNumber && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>Sete: {f.seatNumber}</Text>}
+        {f.reference && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}> {t('common.reference')}: {f.reference}</Text>}
+        {f.seatNumber && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}> {t('transport.seatNumber')}: {f.seatNumber}</Text>}
         {f.wagon && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{f.wagon}</Text>}
-        {f.driver && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>Fører: {f.driver}</Text>}
+        {f.driver && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}> {t('common.driver')}: {f.driver}</Text>}
         {f.address && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{f.address}</Text>}
         <View style={[styles.tileDivider, { backgroundColor: colors.border }]} />
         {f.departureTime ? (

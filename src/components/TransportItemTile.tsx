@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { formatDate } from '../utils/dateUtils';
+import { useTranslation } from 'react-i18next';
 
 interface TransportItemTileProps {
   icon: string;
@@ -19,6 +20,7 @@ interface TransportItemTileProps {
 export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   icon, label, name, detail, departureDate, departureTime, arrivalTime, hasCar, onPress, onLongPress,
 }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
   const calDay = departureDate ? String(new Date(departureDate + 'T12:00:00').getDate()) : '';
   const calMonth = departureDate ? new Date(departureDate + 'T12:00:00').toLocaleDateString('nb-NO', { month: 'short' }) : '';
@@ -49,7 +51,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
       <View style={styles.tileContent}>
         <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 12 }}>{label}</Text>
         {name && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{name}</Text>}
-        {hasCar && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>🚗 Bil med</Text>}
+        {hasCar && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>🚗 {t('common.carWith')}</Text>}
         {detail && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{detail}</Text>}
         <View style={[styles.tileDivider, { backgroundColor: colors.border }]} />
         {departureTime && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>{depIcon} {departureTime}</Text>}
