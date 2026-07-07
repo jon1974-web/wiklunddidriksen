@@ -82,19 +82,6 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
               </Text>
               <ScrollView style={styles.modalScroll}>
                 <View style={styles.flightTypeRow}>
-                      {(['fly', 'tog', 'bil'] as const).map((tt) => (
-                        <TouchableOpacity
-                          key={tt}
-                          style={[styles.flightTypeOption, { backgroundColor: flightForm.transportType === tt ? colors.accent : colors.inputBackground }]}
-                          onPress={() => handleTransportTypeChange(tt)}
-                        >
-                          <Text style={[styles.flightTypeText, { color: flightForm.transportType === tt ? '#fff' : colors.text }]}>
-                            {tt === 'fly' ? '✈️ Fly' : tt === 'tog' ? '🚆 Tog' : '🚗 Leiebil'}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                </View>
-                <View style={styles.flightTypeRow}>
                   <TouchableOpacity
                     style={[styles.flightTypeOption, { backgroundColor: flightForm.type === 'utreise' ? colors.accent : colors.inputBackground }]}
                     onPress={() => handleDirectionToggle('utreise')}
