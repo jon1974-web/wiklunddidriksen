@@ -73,7 +73,22 @@
     "deleteConfirm": "Are you sure you want to delete this?",
     "reminder": "Reminder",
     "addEndDate": "Add end date",
-    "addEndTime": "Add end time"
+    "addEndTime": "Add end time",
+    "removeEndDate": "Remove end date",
+    "removeEndTime": "Remove end time",
+    "reminder15": "15 minutes",
+    "reminder30": "30 minutes",
+    "reminder60": "1 hour",
+    "reminder120": "2 hours",
+    "reminder1440": "1 day",
+    "endDate1": "1 day",
+    "endDate2": "2 days",
+    "endDate3": "3 days",
+    "endDate4": "4 days",
+    "endTime30": "30 min",
+    "endTime60": "1 hour",
+    "endTime90": "1.5 hours",
+    "endTime120": "2 hours"
   },
   "trips": {
     "title": "Trips",

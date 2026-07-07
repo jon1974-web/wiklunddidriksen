@@ -1,23 +1,25 @@
-export const REMINDER_OPTIONS = [
-  { label: '15 minutter', value: 15 },
-  { label: '30 minutter', value: 30 },
-  { label: '1 time', value: 60 },
-  { label: '2 timer', value: 120 },
-  { label: '1 dag', value: 1440 },
+import i18n from '../i18n';
+
+export const getReminderOptions = () => [
+  { label: i18n.t('events.reminder15'), value: 15 },
+  { label: i18n.t('events.reminder30'), value: 30 },
+  { label: i18n.t('events.reminder60'), value: 60 },
+  { label: i18n.t('events.reminder120'), value: 120 },
+  { label: i18n.t('events.reminder1440'), value: 1440 },
 ];
 
-export const END_DATE_OPTIONS = [
-  { label: '1 dag', value: 1 },
-  { label: '2 dager', value: 2 },
-  { label: '3 dager', value: 3 },
-  { label: '4 dager', value: 4 },
+export const getEndDateOptions = () => [
+  { label: i18n.t('events.endDate1'), value: 1 },
+  { label: i18n.t('events.endDate2'), value: 2 },
+  { label: i18n.t('events.endDate3'), value: 3 },
+  { label: i18n.t('events.endDate4'), value: 4 },
 ];
 
-export const END_TIME_OPTIONS = [
-  { label: '30 min', value: 30 },
-  { label: '1 time', value: 60 },
-  { label: '1.5 timer', value: 90 },
-  { label: '2 timer', value: 120 },
+export const getEndTimeOptions = () => [
+  { label: i18n.t('events.endTime30'), value: 30 },
+  { label: i18n.t('events.endTime60'), value: 60 },
+  { label: i18n.t('events.endTime90'), value: 90 },
+  { label: i18n.t('events.endTime120'), value: 120 },
 ];
 
 export const generateTimeOptions = () => {

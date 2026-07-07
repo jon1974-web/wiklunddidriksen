@@ -9,7 +9,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { scheduleEventReminder } from '../services/notificationService';
 import { getUserProfile, notifyNewEvent } from '../services/familyService';
 import { syncEventToCalendar } from '../services/calendarService';
-import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS } from '../constants/eventOptions';
+import { getReminderOptions, getEndDateOptions, getEndTimeOptions } from '../constants/eventOptions';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { getTodayLocal } from '../utils/dateUtils';
 import { EVENT_ICONS } from '../constants/eventIcons';
@@ -264,7 +264,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
             <Text style={[styles.selectedDate, { color: colors.textSecondary }]}>Valgt: {customEndDate}</Text>
           )}
           <TouchableOpacity onPress={() => { setShowEndDate(false); setEndDateDays(null); setCustomEndDate(''); }}>
-            <Text style={[styles.removeLink, { color: colors.danger }]}>Fjern sluttdato</Text>
+            <Text style={[styles.removeLink, { color: colors.danger }]}>{t('events.removeEndDate')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -305,7 +305,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { setShowEndTime(false); setEndTime(''); setCustomEndTime(''); }}>
-            <Text style={[styles.removeLink, { color: colors.danger }]}>Fjern sluttid</Text>
+            <Text style={[styles.removeLink, { color: colors.danger }]}>{t('events.removeEndTime')}</Text>
           </TouchableOpacity>
         </View>
       )}

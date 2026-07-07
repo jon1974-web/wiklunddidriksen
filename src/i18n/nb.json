@@ -73,7 +73,22 @@
     "deleteConfirm": "Er du sikker på at du vil slette dette?",
     "reminder": "Påminnelse",
     "addEndDate": "Legg til sluttdato",
-    "addEndTime": "Legg til sluttid"
+    "addEndTime": "Legg til sluttid",
+    "removeEndDate": "Fjern sluttdato",
+    "removeEndTime": "Fjern sluttid",
+    "reminder15": "15 minutter",
+    "reminder30": "30 minutter",
+    "reminder60": "1 time",
+    "reminder120": "2 timer",
+    "reminder1440": "1 dag",
+    "endDate1": "1 dag",
+    "endDate2": "2 dager",
+    "endDate3": "3 dager",
+    "endDate4": "4 dager",
+    "endTime30": "30 min",
+    "endTime60": "1 time",
+    "endTime90": "1.5 timer",
+    "endTime120": "2 timer"
   },
   "trips": {
     "title": "Reiser",
