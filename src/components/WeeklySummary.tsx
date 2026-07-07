@@ -41,7 +41,7 @@ interface DayItem {
 }
 
 export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents }) => {
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
 
   const weekData = useMemo(() => {
@@ -121,7 +121,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     }
 
     return { weekNum, days, startLabel: start.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' }) };
-  }, [events, trips, spondEvents, t]);
+  }, [events, trips, spondEvents, t, i18nInstance]);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
@@ -130,7 +130,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           <View style={styles.headerContent}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>{t('events.weeklySummary')}</Text>
             <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-              Uke {weekData.weekNum} · {weekData.startLabel} – {weekData.endLabel}
+              {t('weekdays.week')} {weekData.weekNum} · {weekData.startLabel} – {weekData.endLabel}
             </Text>
           </View>
           <TouchableOpacity onPress={onClose} style={[styles.closeButton, { backgroundColor: '#0097A7' }]}>

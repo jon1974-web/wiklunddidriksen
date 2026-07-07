@@ -203,7 +203,8 @@
     "thursday": "Thursday",
     "friday": "Friday",
     "saturday": "Saturday",
-    "sunday": "Sunday"
+    "sunday": "Sunday",
+    "week": "Week"
   },
   "pickers": {
     "startDate": "Pick start date",

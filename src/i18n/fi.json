@@ -212,7 +212,8 @@
     "thursday": "Torstai",
     "friday": "Perjantai",
     "saturday": "Lauantai",
-    "sunday": "Sunnuntai"
+    "sunday": "Sunnuntai",
+    "week": "Viikko"
   }
   },
   "profile": {

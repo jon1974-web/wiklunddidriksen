@@ -203,7 +203,8 @@
     "thursday": "Torsdag",
     "friday": "Fredag",
     "saturday": "Lørdag",
-    "sunday": "Søndag"
+    "sunday": "Søndag",
+    "week": "Uke"
   },
   "pickers": {
     "startDate": "Velg startdato",
