@@ -645,7 +645,7 @@ export const ProfileScreen: React.FC = () => {
               onPress={() => setEditingName(true)}
             >
               <Text style={[styles.value, { color: colors.text }]}>{user?.displayName}</Text>
-              <Text style={[styles.editIcon, { color: colors.accent }]}>{'detail.edit'}</Text>
+              <Text style={[styles.editIcon, { color: colors.accent }]}>{t('detail.edit')}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -693,7 +693,7 @@ export const ProfileScreen: React.FC = () => {
               <Text style={[styles.value, { color: profile?.phoneNumber ? colors.text : colors.textDisabled }]}>
                 {profile?.phoneNumber || t('profile.addPhone')}
               </Text>
-              <Text style={[styles.editIcon, { color: colors.accent }]}>{'detail.edit'}</Text>
+              <Text style={[styles.editIcon, { color: colors.accent }]}>{t('detail.edit')}</Text>
             </TouchableOpacity>
           )}
         </View>
