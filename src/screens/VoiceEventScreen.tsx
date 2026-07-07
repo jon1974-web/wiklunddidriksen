@@ -269,7 +269,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
               <Text style={styles.micIcon}>{recording ? '⏹' : '🎙️'}</Text>
             </TouchableOpacity>
             <Text style={[styles.micLabel, { color: colors.textSecondary }]}>
-              {recording ? 'Trykk for å stoppe' : 'Trykk for å starte opptak'}
+              {recording ? t('voice.stopRecording') : t('voice.startRecording')}
             </Text>
           </View>
         )}

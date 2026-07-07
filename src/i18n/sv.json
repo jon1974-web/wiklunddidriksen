@@ -301,6 +301,7 @@
     "addToOutlook": "Lägg till i Outlook Calendar"
   },
   "voice": {
+    "title": "Prata med evenemang",
     "startRecording": "Tryck för att starta inspelning",
     "stopRecording": "Tryck för att stoppa",
     "instruction": "Prata in i mikrofonen för att"

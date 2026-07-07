@@ -301,6 +301,7 @@
     "addToOutlook": "Lisää Outlook Calendariin"
   },
   "voice": {
+    "title": "Puhu tapahtumalle",
     "startRecording": "Aloita tallennusnapauttamalla",
     "stopRecording": "Pysäytä napauttamalla",
     "instruction": "Puhu mikrofoniin"

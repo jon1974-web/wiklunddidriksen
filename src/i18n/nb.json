@@ -242,6 +242,7 @@
     "addToOutlook": "Legg til i Outlook Calendar"
   },
   "voice": {
+    "title": "Tal til arrangement",
     "startRecording": "Trykk for å starte opptak",
     "stopRecording": "Trykk for å stoppe",
     "instruction": "Snakk i mikrofonen for å"

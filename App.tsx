@@ -7,6 +7,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { TouchableOpacity, Text, ActivityIndicator, Image, Animated } from 'react-native';
 
 import './src/i18n';
+import i18n from './src/i18n';
 
 import { auth } from './src/services/firebase';
 import { useUserStore } from './src/store/userStore';
@@ -90,7 +91,7 @@ const EventsStack = () => {
           name="VoiceEvent"
           component={VoiceEventScreen}
           options={{
-            title: 'Tal til arrangement',
+            title: i18n.t('voice.title'),
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
           }}

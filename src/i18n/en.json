@@ -242,6 +242,7 @@
     "addToOutlook": "Add to Outlook Calendar"
   },
   "voice": {
+    "title": "Talk to event",
     "startRecording": "Tap to start recording",
     "stopRecording": "Tap to stop",
     "instruction": "Speak into the microphone to"
