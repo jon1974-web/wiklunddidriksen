@@ -10,6 +10,7 @@ import { getErrorMessage, sanitizeInput } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { CartIcon } from '../components/CartIcon';
 import { ActionModal } from '../components/ActionModal';
+import { useTranslation } from 'react-i18next';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -18,6 +19,7 @@ interface ShoppingListsScreenProps {
 }
 
 export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [lists, setLists] = useState<ShoppingList[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
@@ -119,7 +121,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
           <View style={styles.listCardInfo}>
             <Text style={[styles.listTitle, { color: colors.text }]}>{item.title}</Text>
             <Text style={[styles.listMeta, { color: colors.textSecondary }]}>
-              {checkedCount}/{item.items.length} varer krysset av
+              {checkedCount}/{item.items.length} {t('shopping.itemsChecked')}
             </Text>
           </View>
           <View style={styles.listCardActions}>
@@ -127,14 +129,14 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
               style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
               onPress={() => handleCopyList(item)}
             >
-              <Text style={[styles.actionButtonText, { color: colors.text }]}>Kopier</Text>
+              <Text style={[styles.actionButtonText, { color: colors.text }]}>{t('shopping.copy')}</Text>
             </TouchableOpacity>
             {(item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin') && (
               <TouchableOpacity
                 style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
                 onPress={() => handleDeleteList(item.id, item.title)}
               >
-                <Text style={[styles.actionButtonText, { color: colors.danger }]}>Slett</Text>
+                <Text style={[styles.actionButtonText, { color: colors.danger }]}>{t('shopping.delete')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -149,7 +151,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
             <CartIcon size={24} color={colors.accent} />
-            <Text style={[styles.title, { color: colors.text, marginLeft: 8 }]}>Lister</Text>
+            <Text style={[styles.title, { color: colors.text, marginLeft: 8 }]}>{t('shopping.title')}</Text>
           </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
@@ -171,7 +173,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
           ) : null
         }
         ListEmptyComponent={
-          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>Ingen lister. Lag en ny!</Text>
+          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('shopping.noLists')}</Text>
         }
       />
 
@@ -190,7 +192,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Ny liste</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('shopping.newList')}</Text>
             <TextInput
               style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
               value={newListTitle}
@@ -207,13 +209,13 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
                   setModalVisible(false);
                 }}
               >
-                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Avbryt</Text>
+                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalCreateButton, { backgroundColor: colors.accent }]}
                 onPress={handleCreateList}
               >
-                <Text style={styles.modalCreateText}>Lag</Text>
+                <Text style={styles.modalCreateText}>{t('common.save')}</Text>
               </TouchableOpacity>
             </View>
           </View>

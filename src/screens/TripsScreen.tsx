@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { Trip, WeatherDay } from '../types';
 import { getTrips } from '../services/tripService';
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
@@ -15,6 +16,7 @@ interface TripsScreenProps {
 }
 
 export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
   const [weatherMap, setWeatherMap] = useState<Record<string, WeatherDay[]>>({});
@@ -153,7 +155,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={[styles.screenTitle, { color: colors.text }]}>✈️ Reiser</Text>
+          <Text style={[styles.screenTitle, { color: colors.text }]}>✈️ {t('trips.title')}</Text>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
@@ -161,14 +163,14 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
 
       {loading ? (
         <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>Laster...</Text>
+          <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('common.loading')}</Text>
         </View>
       ) : trips.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyIcon}>✈️</Text>
-          <Text style={[styles.emptyTitle, { color: colors.text }]}>Ingen reiser ennå</Text>
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>{t('trips.noTrips')}</Text>
           <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-            Trykk + for å planlegge en ny reise
+            {t('common.add')} + 
           </Text>
         </View>
       ) : (
