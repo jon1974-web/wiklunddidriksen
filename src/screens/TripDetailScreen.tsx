@@ -1613,7 +1613,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={linkForm.title}
                       onChangeText={(v) => setLinkForm(f => ({ ...f, title: v }))}
-                      placeholder="F.eks. Hotell nettside"
+                      placeholder={t('links.placeholderTitle')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>

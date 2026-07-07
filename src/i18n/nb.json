@@ -166,7 +166,8 @@
     "title": "Nyttige lenker",
     "noLinks": "Ingen lenker lagt til",
     "addLink": "Legg til lenke",
-    "url": "URL"
+    "url": "URL",
+    "placeholderTitle": "F.eks. Hotell nettside"
   },
   "weather": {
     "title": "Vær",

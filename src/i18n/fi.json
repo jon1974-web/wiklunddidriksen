@@ -176,7 +176,8 @@
     "title": "Hyödylliset linkit",
     "noLinks": "Ei linkkejä lisätty",
     "addLink": "Lisää linkki",
-    "url": "URL"
+    "url": "URL",
+    "placeholderTitle": "Esim. Hotellin verkkosivusto"
   },
   "weather": {
     "title": "Sää",

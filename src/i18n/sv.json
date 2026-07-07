@@ -176,7 +176,8 @@
     "title": "Användbara länkar",
     "noLinks": "Inga länkar tillagda",
     "addLink": "Lägg till länk",
-    "url": "URL"
+    "url": "URL",
+    "placeholderTitle": "T.ex. Hotell webbplats"
   },
   "weather": {
     "title": "Väder",

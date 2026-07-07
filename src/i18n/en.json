@@ -166,7 +166,8 @@
     "title": "Useful links",
     "noLinks": "No links added",
     "addLink": "Add link",
-    "url": "URL"
+    "url": "URL",
+    "placeholderTitle": "E.g. Hotel website"
   },
   "weather": {
     "title": "Weather",
