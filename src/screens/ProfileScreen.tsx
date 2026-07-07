@@ -614,7 +614,7 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{'Profil'}</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.title')}</Text>
 
         <View style={styles.field}>
           <Text style={[styles.label, { color: colors.textSecondary }]}>{t('common.name')}</Text>
