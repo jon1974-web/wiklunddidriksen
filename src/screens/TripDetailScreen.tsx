@@ -821,7 +821,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 disabled={refreshingWeather}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Text style={{ color: colors.accent, fontSize: 14 }}>{refreshingWeather ? '⟳ Oppdaterer...' : '↻ Oppdater'}</Text>
+                <Text style={{ color: colors.accent, fontSize: 14 }}>{refreshingWeather ? '⟳ ' + t('weather.refreshing') : '↻ ' + t('weather.refresh')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -832,11 +832,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           ) : (
             <>
               <View style={styles.weatherHeaderRow}>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 3 }]} numberOfLines={1}>Dag</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>Vær</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 2, textAlign: 'center' }]} numberOfLines={1}>Temp</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>UV</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'right' }]} numberOfLines={1}>Vann</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 3 }]} numberOfLines={1}>{t('weather.day')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>{t('weather.weather')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 2, textAlign: 'center' }]} numberOfLines={1}>{t('weather.temp')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>{t('weather.uv')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'right' }]} numberOfLines={1}>{t('weather.water')}</Text>
               </View>
               {pagedWeather.map((day, i) => {
                 const isToday = day.date === today;
@@ -862,11 +862,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               {weatherPages > 1 && (
                 <View style={styles.weatherPagination}>
                   <TouchableOpacity disabled={weatherPage === 0} onPress={() => setWeatherPage((p) => p - 1)}>
-                    <Text style={{ color: weatherPage === 0 ? colors.textDisabled : colors.accent }}>← Forrige</Text>
+                    <Text style={{ color: weatherPage === 0 ? colors.textDisabled : colors.accent }}>← {t('weather.previous')}</Text>
                   </TouchableOpacity>
                   <Text style={{ color: colors.textSecondary }}>{weatherPage + 1} / {weatherPages}</Text>
                   <TouchableOpacity disabled={weatherPage >= weatherPages - 1} onPress={() => setWeatherPage((p) => p + 1)}>
-                    <Text style={{ color: weatherPage >= weatherPages - 1 ? colors.textDisabled : colors.accent }}>Neste →</Text>
+                    <Text style={{ color: weatherPage >= weatherPages - 1 ? colors.textDisabled : colors.accent }}>{t('weather.next')} →</Text>
                   </TouchableOpacity>
                 </View>
               )}

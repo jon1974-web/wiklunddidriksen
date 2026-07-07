@@ -181,6 +181,13 @@
     "loading": "Henter vejrdata...",
     "noData": "Ingen vejrdata tilgængelige",
     "refresh": "Opdater",
+    "day": "Dag",
+    "weather": "Vejr",
+    "temp": "Temp",
+    "uv": "UV",
+    "water": "Vand",
+    "previous": "Forrige",
+    "next": "Næste",
     "refreshing": "Opdaterer..."
   },
   "tips": {

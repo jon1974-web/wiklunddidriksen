@@ -171,7 +171,14 @@
     "loading": "Loading weather data...",
     "noData": "No weather data available",
     "refresh": "Refresh",
-    "refreshing": "Refreshing..."
+    "refreshing": "Refreshing...",
+    "day": "Day",
+    "weather": "Weather",
+    "temp": "Temp",
+    "uv": "UV",
+    "water": "Water",
+    "previous": "Previous",
+    "next": "Next"
   },
   "tips": {
     "title": "Destination tips",

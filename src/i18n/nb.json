@@ -171,7 +171,14 @@
     "loading": "Henter værdata...",
     "noData": "Ingen værdata tilgjengelig",
     "refresh": "Oppdater",
-    "refreshing": "Oppdaterer..."
+    "refreshing": "Oppdaterer...",
+    "day": "Dag",
+    "weather": "Vær",
+    "temp": "Temp",
+    "uv": "UV",
+    "water": "Vann",
+    "previous": "Forrige",
+    "next": "Neste"
   },
   "tips": {
     "title": "Destinasjonstips",

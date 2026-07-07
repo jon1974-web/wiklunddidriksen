@@ -181,6 +181,13 @@
     "loading": "Hämtar väderdata...",
     "noData": "Inga väderdata tillgängliga",
     "refresh": "Uppdatera",
+    "day": "Dag",
+    "weather": "Väder",
+    "temp": "Temp",
+    "uv": "UV",
+    "water": "Vatten",
+    "previous": "Föregående",
+    "next": "Nästa",
     "refreshing": "Uppdaterar..."
   },
   "tips": {

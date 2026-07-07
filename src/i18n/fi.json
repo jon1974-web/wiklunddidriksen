@@ -181,6 +181,13 @@
     "loading": "Haetaan säädataa...",
     "noData": "Ei säädataa saatavilla",
     "refresh": "Päivitä",
+    "day": "Päivä",
+    "weather": "Sää",
+    "temp": "Lämpötila",
+    "uv": "UV",
+    "water": "Vesi",
+    "previous": "Edellinen",
+    "next": "Seuraava",
     "refreshing": "Päivitetään..."
   },
   "tips": {
