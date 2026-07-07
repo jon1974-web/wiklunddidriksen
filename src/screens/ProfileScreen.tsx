@@ -850,9 +850,6 @@ export const ProfileScreen: React.FC = () => {
               </Text>
             </TouchableOpacity>
           </View>
-          <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
-            {notificationsEnabled ? t('profile.notificationsOff') : t('profile.notificationsOn')}
-          </Text>
         </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
