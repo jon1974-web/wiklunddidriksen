@@ -1494,7 +1494,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Starttid</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('pickers.startTime')}</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
                       onPress={() => setActivePicker('actStartTime')}
@@ -1505,7 +1505,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Sluttid</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('pickers.endTime')}</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
                       onPress={() => setActivePicker('actEndTime')}
@@ -1604,11 +1604,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>
-                  {editingId ? 'Rediger lenke' : 'Legg til lenke'}
+                  {editingId ? t('detail.edit') + ' ' + t('links.title').toLowerCase() : t('common.add') + ' ' + t('links.title').toLowerCase()}
                 </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Tittel *</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.title')} *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={linkForm.title}
@@ -1618,7 +1618,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     />
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>URL *</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('links.url')} *</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={linkForm.url}
