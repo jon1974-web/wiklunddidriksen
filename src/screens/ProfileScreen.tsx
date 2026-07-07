@@ -614,7 +614,7 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Konto</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{'Profil'}</Text>
 
         <View style={styles.field}>
           <Text style={[styles.label, { color: colors.textSecondary }]}>Navn</Text>
@@ -645,7 +645,7 @@ export const ProfileScreen: React.FC = () => {
               onPress={() => setEditingName(true)}
             >
               <Text style={[styles.value, { color: colors.text }]}>{user?.displayName}</Text>
-              <Text style={[styles.editIcon, { color: colors.accent }]}>Rediger</Text>
+              <Text style={[styles.editIcon, { color: colors.accent }]}>{'detail.edit'}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -693,7 +693,7 @@ export const ProfileScreen: React.FC = () => {
               <Text style={[styles.value, { color: profile?.phoneNumber ? colors.text : colors.textDisabled }]}>
                 {profile?.phoneNumber || t('profile.addPhone')}
               </Text>
-              <Text style={[styles.editIcon, { color: colors.accent }]}>Rediger</Text>
+              <Text style={[styles.editIcon, { color: colors.accent }]}>{'detail.edit'}</Text>
             </TouchableOpacity>
           )}
         </View>
@@ -715,7 +715,7 @@ export const ProfileScreen: React.FC = () => {
               style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
               onPress={handleDisconnectCalendarEmail}
             >
-              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Koble fra</Text>
+              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.leaveFamily')}</Text>
             </TouchableOpacity>
           </View>
         ) : Platform.OS === 'web' ? (
@@ -846,12 +846,12 @@ export const ProfileScreen: React.FC = () => {
               onPress={() => handleToggleNotifications(!notificationsEnabled)}
             >
               <Text style={[styles.themeText, { color: notificationsEnabled ? '#fff' : colors.text }]}>
-                {notificationsEnabled ? 'På' : 'Av'}
+                {notificationsEnabled ? t('common.save') : t('common.cancel')}
               </Text>
             </TouchableOpacity>
           </View>
           <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
-            {notificationsEnabled ? 'Påminnelser sendes før arrangementer.' : 'Varsler er deaktivert.'}
+            {notificationsEnabled ? t('profile.notifications') + ': On' : t('profile.notifications') + ': Off'}
           </Text>
         </View>
 
@@ -876,13 +876,13 @@ export const ProfileScreen: React.FC = () => {
                         {(familyRole === 'owner' || familyRole === 'admin') && m.role !== 'owner' ? (
                           <TouchableOpacity onPress={() => handleChangeRole(m.profile.uid, m.profile.displayName, m.role)}>
                             <Text style={{ color: colors.accent, fontSize: 12, fontWeight: m.role === 'admin' ? '600' : '400' }}>
-                              {m.role === 'admin' ? 'Admin' : 'Medlem'} ▾
+                              {m.role === 'admin' ? t('profile.admin') : t('profile.member')} ▾
                             </Text>
                           </TouchableOpacity>
                         ) : m.role === 'owner' ? (
                           <Text style={{ color: colors.accent, fontSize: 12, fontWeight: '600' }}>Eier</Text>
                         ) : (
-                          <Text style={{ color: colors.accent, fontSize: 12 }}>{m.role === 'admin' ? 'Admin' : 'Medlem'}</Text>
+                          <Text style={{ color: colors.accent, fontSize: 12 }}>{m.role === 'admin' ? t('profile.admin') : t('profile.member')}</Text>
                         )}
                         {m.profile.uid === user?.uid && (
                           <Text style={[styles.memberBadge, { color: colors.accent }]}>Deg</Text>
@@ -1030,14 +1030,14 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.leaveButton, { borderColor: colors.danger }]}
                   onPress={handleDisconnectSpond}
                 >
-                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Koble fra</Text>
+                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.leaveFamily')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
           ) : (
             <View>
               <Text style={[styles.noFamily, { color: colors.textSecondary }]}>
-                Koble til Spond for å vise lagets arrangementer.
+                {t('profile.inviteCode')}
               </Text>
               <View style={styles.field}>
                 <TextInput
@@ -1065,7 +1065,7 @@ export const ProfileScreen: React.FC = () => {
                 onPress={handleConnectSpond}
                 disabled={spondLoading}
               >
-                <Text style={styles.familyButtonText}>{spondLoading ? 'Kobler til...' : 'Koble til Spond'}</Text>
+                <Text style={styles.familyButtonText}>{spondLoading ? '...' : t('profile.inviteCode')}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -1107,7 +1107,7 @@ export const ProfileScreen: React.FC = () => {
 
       {Platform.OS === 'web' && (
         <View style={[styles.section, { backgroundColor: colors.surface, marginHorizontal: 16, marginBottom: 16 }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>App</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.app')}</Text>
           <TouchableOpacity
             style={[styles.themeOption, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
             onPress={async () => {
