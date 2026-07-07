@@ -43,6 +43,13 @@ interface DayItem {
 export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
+  const [langKey, setLangKey] = useState(0);
+
+  useEffect(() => {
+    const handler = () => setLangKey(k => k + 1);
+    i18nInstance.on('languageChanged', handler);
+    return () => i18nInstance.off('languageChanged', handler);
+  }, [i18nInstance]);
 
   const weekData = useMemo(() => {
     const now = new Date();
@@ -121,7 +128,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     }
 
     return { weekNum, days, startLabel: start.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' }) };
-  }, [events, trips, spondEvents, t, i18nInstance]);
+  }, [events, trips, spondEvents, t, i18nInstance, langKey]);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
