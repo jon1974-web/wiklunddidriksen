@@ -161,14 +161,14 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
 
         {itemType === 'boat' && (
           <>
-            {renderRow('Rutenavn', item.routeName)}
+            {renderRow(t('transport.routeName'), item.routeName)}
             {renderRow(t('common.reference'), item.reference)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 {t('transport.departure')}</Text>
                 {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
                 {item.departureTime && renderRow(t('common.time'), item.departureTime)}
-                {item.departureAddress && renderRow('Terminal', item.departureAddress)}
+                {item.departureAddress && renderRow(t('transport.departureTerminal'))}
               </View>
             )}
             {(item.arrivalDate || item.arrivalTime) && (
@@ -176,15 +176,15 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 {t('transport.arrival')}</Text>
                 {item.arrivalDate && renderRow(t('common.date'), formatDate(item.arrivalDate))}
                 {item.arrivalTime && renderRow(t('common.time'), item.arrivalTime)}
-                {item.arrivalAddress && renderRow('Terminal', item.arrivalAddress)}
+                {item.arrivalAddress && renderRow(t('transport.arrivalTerminal'))}
               </View>
             )}
-            {renderRow('Telefon', item.phone)}
+            {renderRow(t('common.phone'), item.phone)}
             {item.hasCar && renderRow(t('common.carWith'), 'Ja')}
             {item.hasCar && renderRow(t('common.carRegNr'), item.carRegistration)}
-            {renderRow('Fører', item.driver)}
+            {renderRow(t('common.driver'), item.driver)}
             {renderRow(t('common.passengers'), item.passengers)}
-            {renderNotesRow('Notat', item.note)}
+            {renderNotesRow(t('common.note'), item.note)}
           </>
         )}
 
@@ -199,24 +199,24 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
               </View>
             )}
             {renderRow(t('common.address'), item.address)}
-            {renderRow('Telefon', item.phone)}
-            {renderRow('Fører', item.driver)}
+            {renderRow(t('common.phone'), item.phone)}
+            {renderRow(t('common.driver'), item.driver)}
             {renderRow(t('common.passengers'), item.passengers)}
-            {renderNotesRow('Notat', item.note)}
+            {renderNotesRow(t('common.note'), item.note)}
           </>
         )}
 
         {itemType === 'ferry' && (
           <>
-            {renderRow('Rutenavn', item.routeName)}
+            {renderRow(t('transport.routeName'), item.routeName)}
             {renderRow(t('common.reference'), item.reference)}
-            {renderRow('Kabin/kupe', item.cabin)}
+            {renderRow(t('transport.cabin'), item.cabin)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 {t('transport.departure')}</Text>
                 {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
                 {item.departureTime && renderRow(t('common.time'), item.departureTime)}
-                {item.departureAddress && renderRow('Terminal', item.departureAddress)}
+                {item.departureAddress && renderRow(t('transport.departureTerminal'))}
               </View>
             )}
             {(item.arrivalDate || item.arrivalTime) && (
@@ -224,15 +224,15 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🛬 {t('transport.arrival')}</Text>
                 {item.arrivalDate && renderRow(t('common.date'), formatDate(item.arrivalDate))}
                 {item.arrivalTime && renderRow(t('common.time'), item.arrivalTime)}
-                {item.arrivalAddress && renderRow('Terminal', item.arrivalAddress)}
+                {item.arrivalAddress && renderRow(t('transport.arrivalTerminal'))}
               </View>
             )}
-            {renderRow('Telefon', item.phone)}
+            {renderRow(t('common.phone'), item.phone)}
             {item.hasCar && renderRow(t('common.carWith'), 'Ja')}
             {item.hasCar && renderRow(t('common.carRegNr'), item.carRegistration)}
-            {renderRow('Fører', item.driver)}
+            {renderRow(t('common.driver'), item.driver)}
             {renderRow(t('common.passengers'), item.passengers)}
-            {renderNotesRow('Notat', item.note)}
+            {renderNotesRow(t('common.note'), item.note)}
           </>
         )}
       </View>
