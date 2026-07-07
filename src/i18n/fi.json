@@ -80,7 +80,10 @@
     "pastEvents": "Näytä menneet tapahtumat",
     "hidePast": "Piilota menneet tapahtumat",
     "deleteTitle": "Poista tapahtuma",
-    "deleteConfirm": "Haluatko varmasti poistaa tämän?"
+    "deleteConfirm": "Haluatko varmasti poistaa tämän?",
+    "reminder": "Muistutus",
+    "addEndDate": "Lisää lopetuspäivä",
+    "addEndTime": "Lisää lopetusaika"
   },
   "trips": {
     "title": "Matkat",

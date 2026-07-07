@@ -192,7 +192,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
           value={title}
@@ -203,7 +203,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Beskrivelse</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, styles.textArea]}
           value={description}
@@ -216,7 +216,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Adresse</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
         <GooglePlacesInput
           value={address}
           onChangeText={setAddress}
@@ -234,7 +234,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
       {!showEndDate ? (
         <TouchableOpacity onPress={() => setShowEndDate(true)}>
-          <Text style={[styles.addLink, { color: colors.accent }]}>+ Legg til sluttdato</Text>
+          <Text style={[styles.addLink, { color: colors.accent }]}>+ {t('events.addEndDate')}</Text>
         </TouchableOpacity>
       ) : (
         <View style={styles.field}>
@@ -278,7 +278,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
       {!showEndTime ? (
         <TouchableOpacity onPress={() => setShowEndTime(true)}>
-          <Text style={[styles.addLink, { color: colors.accent }]}>+ Legg til sluttid</Text>
+          <Text style={[styles.addLink, { color: colors.accent }]}>+ {t('events.addEndTime')}</Text>
         </TouchableOpacity>
       ) : (
         <View style={styles.field}>
@@ -301,7 +301,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
             onPress={() => { setActivePicker('endTime'); setEndTime(''); }}
           >
             <Text style={[styles.reminderText, { color: customEndTime && !endTime ? '#fff' : colors.textSecondary }]}>
-              {customEndTime || 'Velg tidspunkt'}
+              {customEndTime || t('pickers.pickTime')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => { setShowEndTime(false); setEndTime(''); setCustomEndTime(''); }}>
@@ -311,7 +311,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
       )}
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Påminnelse</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('events.reminder')}</Text>
         <View style={styles.reminderOptions}>
           {REMINDER_OPTIONS.map((option) => (
             <TouchableOpacity

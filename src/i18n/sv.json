@@ -80,7 +80,10 @@
     "pastEvents": "Visa tidigare evenemang",
     "hidePast": "Dölj tidigare evenemang",
     "deleteTitle": "Ta bort evenemang",
-    "deleteConfirm": "Är du säker på att du vill ta bort detta?"
+    "deleteConfirm": "Är du säker på att du vill ta bort detta?",
+    "reminder": "Påminnelse",
+    "addEndDate": "Lägg till slutdatum",
+    "addEndTime": "Lägg till sluttid"
   },
   "trips": {
     "title": "Resor",

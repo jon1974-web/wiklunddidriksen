@@ -80,7 +80,10 @@
     "pastEvents": "Se tidligere begivenheder",
     "hidePast": "Skjul tidligere begivenheder",
     "deleteTitle": "Slet begivenhed",
-    "deleteConfirm": "Er du sikker på, at du vil slette denne?"
+    "deleteConfirm": "Er du sikker på, at du vil slette denne?",
+    "reminder": "Påmindelse",
+    "addEndDate": "Tilføj slutdato",
+    "addEndTime": "Tilføj sluttid"
   },
   "trips": {
     "title": "Rejser",

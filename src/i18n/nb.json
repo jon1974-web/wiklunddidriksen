@@ -70,7 +70,10 @@
     "pastEvents": "Se tidligere arrangementer",
     "hidePast": "Skjul tidligere arrangementer",
     "deleteTitle": "Slett arrangement",
-    "deleteConfirm": "Er du sikker på at du vil slette dette?"
+    "deleteConfirm": "Er du sikker på at du vil slette dette?",
+    "reminder": "Påminnelse",
+    "addEndDate": "Legg til sluttdato",
+    "addEndTime": "Legg til sluttid"
   },
   "trips": {
     "title": "Reiser",
