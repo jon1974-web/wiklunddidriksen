@@ -9,7 +9,7 @@ import { scheduleEventReminder, cancelNotification } from '../services/notificat
 import { getUserProfile } from '../services/familyService';
 import { syncEventToCalendar, updateCalendarEvent, deleteCalendarEvent } from '../services/calendarService';
 import { useUserStore } from '../store/userStore';
-import { REMINDER_OPTIONS, END_DATE_OPTIONS, END_TIME_OPTIONS } from '../constants/eventOptions';
+import { getReminderOptions, getEndDateOptions, getEndTimeOptions } from '../constants/eventOptions';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { EVENT_ICONS } from '../constants/eventIcons';
@@ -306,7 +306,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <View style={styles.viewDetailRow}>
             <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔 Påminnelse</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>
-              {REMINDER_OPTIONS.find((o) => o.value === reminderMinutes)?.label || `${reminderMinutes} min`}
+              {getReminderOptions().find((o) => o.value === reminderMinutes)?.label || `${reminderMinutes} min`}
             </Text>
           </View>
         </View>
@@ -462,7 +462,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         <View style={styles.field}>
           <Text style={[styles.label, { color: colors.text }]}>Varighet</Text>
           <View style={styles.reminderOptions}>
-            {END_DATE_OPTIONS.map((option) => (
+            {getEndDateOptions().map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endDateDays === option.value && !customEndDate && { backgroundColor: colors.accent, borderColor: colors.accent }]}
@@ -506,7 +506,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         <View style={styles.field}>
           <Text style={[styles.label, { color: colors.text }]}>Varighet</Text>
           <View style={styles.reminderOptions}>
-            {END_TIME_OPTIONS.map((option) => (
+            {getEndTimeOptions().map((option) => (
               <TouchableOpacity
                 key={option.value}
                 style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endTime === String(option.value) && !customEndTime && { backgroundColor: colors.accent, borderColor: colors.accent }]}
@@ -535,7 +535,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Påminnelse</Text>
         <View style={styles.reminderOptions}>
-          {REMINDER_OPTIONS.map((option) => (
+          {getReminderOptions().map((option) => (
             <TouchableOpacity
               key={option.value}
               style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, reminderMinutes === option.value && { backgroundColor: colors.accent, borderColor: colors.accent }]}
