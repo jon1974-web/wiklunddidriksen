@@ -196,6 +196,8 @@
     "theme": "Teema",
     "language": "Kieli",
     "app": "Sovellus",
+    "reload": "Lataa uudelleen",
+    "reloadHelp": "Haetaan sovelluksen uusin versio.",
     "logout": "Kirjaudu ulos",
     "spondConnect": "Yhdistä Spondiin",
     "spondDisconnect": "Irrota Spondista",
