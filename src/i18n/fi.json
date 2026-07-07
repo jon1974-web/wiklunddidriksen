@@ -98,7 +98,10 @@
     "endTime60": "1 tunti",
     "endTime90": "1,5 tuntia",
     "endTime120": "2 tuntia",
-    "addEndTime": "Lisää lopetusaika"
+    "addEndTime": "Lisää lopetusaika",
+    "listView": "Lista",
+    "calendarView": "Kalenteri",
+    "weeklySummary": "Oma viikko"
   },
   "trips": {
     "title": "Matkat",

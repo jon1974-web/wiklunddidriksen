@@ -98,7 +98,10 @@
     "endTime60": "1 time",
     "endTime90": "1,5 timer",
     "endTime120": "2 timer",
-    "addEndTime": "Tilføj sluttid"
+    "addEndTime": "Tilføj sluttid",
+    "listView": "Liste",
+    "calendarView": "Kalender",
+    "weeklySummary": "Min uge"
   },
   "trips": {
     "title": "Rejser",

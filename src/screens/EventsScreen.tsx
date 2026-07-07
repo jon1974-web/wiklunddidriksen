@@ -591,7 +591,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={[styles.title, { color: colors.text }]}>📅 Arrangementer</Text>
+          <Text style={[styles.title, { color: colors.text }]}>📅 {t('events.title')}</Text>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}
@@ -600,19 +600,19 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             style={[styles.toggleButton, viewMode === 'list' && { backgroundColor: colors.accent }]}
             onPress={() => setViewMode('list')}
           >
-            <Text style={[styles.toggleText, { color: viewMode === 'list' ? '#fff' : colors.textSecondary }]}>Liste</Text>
+            <Text style={[styles.toggleText, { color: viewMode === 'list' ? '#fff' : colors.textSecondary }]}>{t('events.listView')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.toggleButton, viewMode === 'calendar' && { backgroundColor: colors.accent }]}
             onPress={() => setViewMode('calendar')}
           >
-            <Text style={[styles.toggleText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>Kalender</Text>
+            <Text style={[styles.toggleText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>{t('events.calendarView')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.toggleButton, { backgroundColor: TRIP_COLOR }]}
             onPress={() => setShowWeeklySummary(true)}
           >
-            <Text style={[styles.toggleText, { color: '#fff' }]}>Din uke</Text>
+            <Text style={[styles.toggleText, { color: '#fff' }]}>{t('events.weeklySummary')}</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
           <TouchableOpacity
