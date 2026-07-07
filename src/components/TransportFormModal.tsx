@@ -106,7 +106,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 </View>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>
-                    {t('transport.operator')}
+                    {flightForm.transportType === 'fly' ? t('transport.airline') : flightForm.transportType === 'tog' ? t('transport.trainOperator') : t('transport.rentalCompany')}
                   </Text>
                   <TextInput
                     style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
@@ -118,7 +118,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 </View>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>
-                    {t('transport.flightNumber')}
+                    {flightForm.transportType === 'fly' ? t('transport.flightNumber') : flightForm.transportType === 'tog' ? t('transport.trainRoute') : t('transport.bookingNumber')}
                   </Text>
                   <TextInput
                     style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
