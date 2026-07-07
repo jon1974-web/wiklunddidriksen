@@ -198,7 +198,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 {item.departureTime && renderRow(t('common.time'), item.departureTime)}
               </View>
             )}
-            {renderRow('Adresse', item.address)}
+            {renderRow(t('common.address'), item.address)}
             {renderRow('Telefon', item.phone)}
             {renderRow('Fører', item.driver)}
             {renderRow(t('common.passengers'), item.passengers)}
