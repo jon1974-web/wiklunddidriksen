@@ -204,7 +204,16 @@
     "phrases": "Användbara uttryck",
     "transportTips": "Transport",
     "scams": "Var uppmärksam på",
-    "openGoogleMaps": "Öppna i Google Maps →"
+    "openGoogleMaps": "Öppna i Google Maps →",
+  "weekdays": {
+    "monday": "Måndag",
+    "tuesday": "Tisdag",
+    "wednesday": "Onsdag",
+    "thursday": "Torsdag",
+    "friday": "Fredag",
+    "saturday": "Lördag",
+    "sunday": "Söndag"
+  }
   },
   "profile": {
     "title": "Profil",

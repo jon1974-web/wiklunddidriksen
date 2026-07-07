@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal } from 'rea
 import { Event, Trip, SpondEvent } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
+import { useTranslation } from 'react-i18next';
 
 interface WeeklySummaryProps {
   visible: boolean;
@@ -12,7 +13,7 @@ interface WeeklySummaryProps {
   spondEvents: SpondEvent[];
 }
 
-const DAY_NAMES = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'];
+const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
 
 const getWeekRange = (date: Date): { start: Date; end: Date } => {
   const d = new Date(date);
@@ -40,6 +41,7 @@ interface DayItem {
 }
 
 export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents }) => {
+  const { t } = useTranslation();
   const { colors } = useTheme();
 
   const weekData = useMemo(() => {
@@ -112,27 +114,27 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
       days.push({
         date: d,
-        dayName: DAY_NAMES[i],
+        dayName: t(DAY_NAMES_KEY[i]),
         dateLabel,
         items,
       });
     }
 
     return { weekNum, days, startLabel: start.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' }) };
-  }, [events, trips, spondEvents]);
+  }, [events, trips, spondEvents, t]);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <View style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
           <View style={styles.headerContent}>
-            <Text style={[styles.headerTitle, { color: colors.text }]}>Din uke</Text>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>{t('events.weeklySummary')}</Text>
             <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
               Uke {weekData.weekNum} · {weekData.startLabel} – {weekData.endLabel}
             </Text>
           </View>
           <TouchableOpacity onPress={onClose} style={[styles.closeButton, { backgroundColor: '#0097A7' }]}>
-            <Text style={styles.closeButtonText}>Lukk</Text>
+            <Text style={styles.closeButtonText}>{t('common.close')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -159,7 +161,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                     </View>
                   ))
                 ) : (
-                  <Text style={[styles.emptyDay, { color: colors.textDisabled }]}>Ingen aktiviteter</Text>
+                  <Text style={[styles.emptyDay, { color: colors.textDisabled }]}>{t('events.noEventsDay')}</Text>
                 )}
               </View>
             );

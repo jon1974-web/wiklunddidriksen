@@ -196,6 +196,15 @@
     "scams": "Vær oppmerksom på",
     "openGoogleMaps": "Åpne i Google Maps →"
   },
+  "weekdays": {
+    "monday": "Mandag",
+    "tuesday": "Tirsdag",
+    "wednesday": "Onsdag",
+    "thursday": "Torsdag",
+    "friday": "Fredag",
+    "saturday": "Lørdag",
+    "sunday": "Søndag"
+  },
   "pickers": {
     "startDate": "Velg startdato",
     "endDate": "Velg sluttdato",

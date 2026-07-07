@@ -204,7 +204,16 @@
     "phrases": "Hyödylliset fraasit",
     "transportTips": "Kuljetus",
     "scams": "Ole varuillaan",
-    "openGoogleMaps": "Avaa Google Maps →"
+    "openGoogleMaps": "Avaa Google Maps →",
+  "weekdays": {
+    "monday": "Maanantai",
+    "tuesday": "Tiistai",
+    "wednesday": "Keskiviikko",
+    "thursday": "Torstai",
+    "friday": "Perjantai",
+    "saturday": "Lauantai",
+    "sunday": "Sunnuntai"
+  }
   },
   "profile": {
     "title": "Profiili",

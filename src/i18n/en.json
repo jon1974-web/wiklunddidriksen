@@ -196,6 +196,15 @@
     "scams": "Be aware of",
     "openGoogleMaps": "Open in Google Maps →"
   },
+  "weekdays": {
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunday": "Sunday"
+  },
   "pickers": {
     "startDate": "Pick start date",
     "endDate": "Pick end date",
