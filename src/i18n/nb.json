@@ -186,6 +186,7 @@
   "tips": {
     "title": "Destinasjonstips",
     "search": "Søk etter destinasjon...",
+    "searchCity": "Søk etter by...",
     "generating": "Genererer tips...",
     "overview": "Overblikk",
     "thingsToDo": "Ting å gjøre",

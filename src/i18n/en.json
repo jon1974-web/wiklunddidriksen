@@ -186,6 +186,7 @@
   "tips": {
     "title": "Destination tips",
     "search": "Search for destination...",
+    "searchCity": "Search for city...",
     "generating": "Generating tips...",
     "overview": "Overview",
     "thingsToDo": "Things to do",

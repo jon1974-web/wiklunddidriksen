@@ -979,7 +979,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       <GooglePlacesInput
         value={tipsSearchValue}
         onChangeText={setTipsSearchValue}
-        placeholder="Søk etter by..."
+        placeholder={t('tips.searchCity')}
         onSelect={(description) => {
           const cityName = description.split(',')[0].trim();
           setStagedCity(cityName);

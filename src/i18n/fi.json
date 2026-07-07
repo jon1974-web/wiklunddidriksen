@@ -196,6 +196,7 @@
   "tips": {
     "title": "Kohdevinkit",
     "search": "Hae kohdetta...",
+    "searchCity": "Hae kaupunkia...",
     "generating": "Luodaan vinkkejä...",
     "overview": "Yleiskatsaus",
     "thingsToDo": "Asiat mitä tehdä",
