@@ -162,7 +162,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
         {itemType === 'boat' && (
           <>
             {renderRow('Rutenavn', item.routeName)}
-            {renderRow('Referanse', item.reference)}
+            {renderRow(t('common.reference'), item.reference)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 {t('transport.departure')}</Text>
@@ -183,14 +183,14 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {item.hasCar && renderRow(t('common.carWith'), 'Ja')}
             {item.hasCar && renderRow(t('common.carRegNr'), item.carRegistration)}
             {renderRow('Fører', item.driver)}
-            {renderRow('Passasjerer', item.passengers)}
+            {renderRow(t('common.passengers'), item.passengers)}
             {renderNotesRow('Notat', item.note)}
           </>
         )}
 
         {itemType === 'taxi' && (
           <>
-            {renderRow('Referanse', item.reference)}
+            {renderRow(t('common.reference'), item.reference)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🔑 {t('transport.pickup')}</Text>
@@ -201,7 +201,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow('Adresse', item.address)}
             {renderRow('Telefon', item.phone)}
             {renderRow('Fører', item.driver)}
-            {renderRow('Passasjerer', item.passengers)}
+            {renderRow(t('common.passengers'), item.passengers)}
             {renderNotesRow('Notat', item.note)}
           </>
         )}
@@ -209,7 +209,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
         {itemType === 'ferry' && (
           <>
             {renderRow('Rutenavn', item.routeName)}
-            {renderRow('Referanse', item.reference)}
+            {renderRow(t('common.reference'), item.reference)}
             {renderRow('Kabin/kupe', item.cabin)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
@@ -231,7 +231,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {item.hasCar && renderRow(t('common.carWith'), 'Ja')}
             {item.hasCar && renderRow(t('common.carRegNr'), item.carRegistration)}
             {renderRow('Fører', item.driver)}
-            {renderRow('Passasjerer', item.passengers)}
+            {renderRow(t('common.passengers'), item.passengers)}
             {renderNotesRow('Notat', item.note)}
           </>
         )}
