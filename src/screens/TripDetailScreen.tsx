@@ -969,7 +969,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Destination Tips */}
       <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 Destinasjonstips</Text>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 {t('tips.title')}</Text>
       </View>
 
       <GooglePlacesInput
@@ -1107,7 +1107,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       {/* Links */}
-      {renderSectionHeader('Nyttige lenker', '🔗', () => openAddModal('link'))}
+      {renderSectionHeader(t('links.title'), '🔗', () => openAddModal('link'))}
       {links.length === 0 ? (
         <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen lenker lagt til</Text>
       ) : (
@@ -1127,7 +1127,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         onPress={() => setDocsExpanded(!docsExpanded)}
       >
         <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
-        <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>📄 Reisedokumenter</Text>
+        <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>📄 {t('documents.title')}</Text>
         {docsExpanded && (
           <TouchableOpacity
             style={[styles.addButton, { backgroundColor: colors.accent }]}
