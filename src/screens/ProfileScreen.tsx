@@ -912,7 +912,7 @@ export const ProfileScreen: React.FC = () => {
 
               {(familyRole === 'owner' || familyRole === 'admin') && (
                 <View style={{ marginTop: 12 }}>
-                  <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 8 }]}>{t('profile.spondConnect')}</Text>
+                  <Text style={[styles.label, { color: colors.textSecondary, marginBottom: 8 }]}>{t('profile.inviteMember')}</Text>
                   {inviteCode ? (
                     <View>
                       <View style={[styles.familyCard, { backgroundColor: colors.inputBackground, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
