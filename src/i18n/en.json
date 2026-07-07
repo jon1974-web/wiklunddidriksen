@@ -193,7 +193,8 @@
     "restaurants": "Restaurants",
     "phrases": "Useful phrases",
     "transportTips": "Transport",
-    "scams": "Be aware of"
+    "scams": "Be aware of",
+    "openGoogleMaps": "Open in Google Maps →"
   },
   "pickers": {
     "startDate": "Pick start date",

@@ -203,7 +203,8 @@
     "restaurants": "Ravintolat",
     "phrases": "Hyödylliset fraasit",
     "transportTips": "Kuljetus",
-    "scams": "Ole varuillaan"
+    "scams": "Ole varuillaan",
+    "openGoogleMaps": "Avaa Google Maps →"
   },
   "profile": {
     "title": "Profiili",

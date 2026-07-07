@@ -290,21 +290,21 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           )}
           <View style={[styles.viewDivider, { backgroundColor: colors.border }]} />
           <View style={styles.viewDetailRow}>
-            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅 Dato</Text>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅 {t('common.date')}</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>{dateText}</Text>
           </View>
           <View style={styles.viewDetailRow}>
-            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐 Tid</Text>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐 {t('common.time')}</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>{timeText}</Text>
           </View>
           {eventData.address && (
             <View style={styles.viewDetailRow}>
-              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍 Adresse</Text>
+              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍 {t('common.address')}</Text>
               <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{eventData.address}</Text>
             </View>
           )}
           <View style={styles.viewDetailRow}>
-            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔 Påminnelse</Text>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔 {t('events.reminder')}</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>
               {getReminderOptions().find((o) => o.value === reminderMinutes)?.label || `${reminderMinutes} min`}
             </Text>
@@ -317,7 +317,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))}
           >
             <Image source={{ uri: mapUrl }} style={styles.viewMapImage} />
-            <Text style={[styles.viewMapLabel, { color: colors.accent }]}>Åpne i Google Maps →</Text>
+            <Text style={[styles.viewMapLabel, { color: colors.accent }]}>{t('tips.openGoogleMaps')}</Text>
           </TouchableOpacity>
         )}
 
@@ -425,7 +425,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Beskrivelse</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, styles.textArea]}
           value={description}
@@ -438,7 +438,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Adresse</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
         <GooglePlacesInput
           value={address}
           onChangeText={setAddress}
@@ -533,7 +533,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       )}
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Påminnelse</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('events.reminder')}</Text>
         <View style={styles.reminderOptions}>
           {getReminderOptions().map((option) => (
             <TouchableOpacity
