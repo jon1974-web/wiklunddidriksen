@@ -877,16 +877,16 @@ export const ProfileScreen: React.FC = () => {
                             </Text>
                           </TouchableOpacity>
                         ) : m.role === 'owner' ? (
-                          <Text style={{ color: colors.accent, fontSize: 12, fontWeight: '600' }}>Eier</Text>
+                          <Text style={{ color: colors.accent, fontSize: 12, fontWeight: '600' }}>{t('profile.owner')}</Text>
                         ) : (
                           <Text style={{ color: colors.accent, fontSize: 12 }}>{m.role === 'admin' ? t('profile.admin') : t('profile.member')}</Text>
                         )}
                         {m.profile.uid === user?.uid && (
-                          <Text style={[styles.memberBadge, { color: colors.accent }]}>Deg</Text>
+                          <Text style={[styles.memberBadge, { color: colors.accent }]}>{t('profile.you')}</Text>
                         )}
                         {(familyRole === 'owner' || familyRole === 'admin') && m.profile.uid !== user?.uid && m.role !== 'owner' && (
                           <TouchableOpacity onPress={() => handleRemoveMember(m.profile.uid, m.profile.displayName)}>
-                            <Text style={{ color: colors.danger, fontSize: 12 }}>Fjern</Text>
+                            <Text style={{ color: colors.danger, fontSize: 12 }}>{t('profile.remove')}</Text>
                           </TouchableOpacity>
                         )}
                       </View>
