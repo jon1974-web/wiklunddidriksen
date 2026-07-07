@@ -846,7 +846,7 @@ export const ProfileScreen: React.FC = () => {
               onPress={() => handleToggleNotifications(!notificationsEnabled)}
             >
               <Text style={[styles.themeText, { color: notificationsEnabled ? '#fff' : colors.text }]}>
-                {notificationsEnabled ? t('common.save') : t('common.cancel')}
+                {notificationsEnabled ? t('profile.notificationsOn') : t('profile.notificationsOff')}
               </Text>
             </TouchableOpacity>
           </View>
