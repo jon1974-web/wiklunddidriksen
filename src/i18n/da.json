@@ -218,6 +218,27 @@
     "sunday": "Søndag",
     "week": "Uge"
   },
+  "calendar": {
+    "monday": "Man",
+    "tuesday": "Tir",
+    "wednesday": "Ons",
+    "thursday": "Tor",
+    "friday": "Fre",
+    "saturday": "Lør",
+    "sunday": "Søn",
+    "january": "Januar",
+    "february": "Februar",
+    "march": "Marts",
+    "april": "April",
+    "may": "Maj",
+    "june": "Juni",
+    "july": "Juli",
+    "august": "August",
+    "september": "September",
+    "october": "Oktober",
+    "november": "November",
+    "december": "December"
+  },
   "profile": {
     "title": "Profil",
     "displayName": "Visningsnavn",

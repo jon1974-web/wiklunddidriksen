@@ -641,7 +641,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       {viewMode === 'calendar' && (
         <View style={[styles.calendarContainer, { backgroundColor: colors.surface }]}>
           <View style={styles.weekNumberContainer}>
-            <Text style={[styles.weekNumber, { color: colors.textSecondary }]}>Uke {currentWeek}</Text>
+            <Text style={[styles.weekNumber, { color: colors.textSecondary }]}>{t('weekdays.week')} {currentWeek}</Text>
           </View>
           <WebCalendar
             current={visibleDate}

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface WebCalendarProps {
   current: string;
@@ -12,10 +13,10 @@ interface WebCalendarProps {
   maxDate?: string;
 }
 
-const DAYS = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
-const MONTHS = [
-  'Januar', 'Februar', 'Mars', 'April', 'Mai', 'Juni',
-  'Juli', 'August', 'September', 'Oktober', 'November', 'Desember',
+const DAYS_KEYS = ['calendar.monday', 'calendar.tuesday', 'calendar.wednesday', 'calendar.thursday', 'calendar.friday', 'calendar.saturday', 'calendar.sunday'];
+const MONTHS_KEYS = [
+  'calendar.january', 'calendar.february', 'calendar.march', 'calendar.april', 'calendar.may', 'calendar.june',
+  'calendar.july', 'calendar.august', 'calendar.september', 'calendar.october', 'calendar.november', 'calendar.december',
 ];
 
 const getDaysInMonth = (year: number, month: number) => new Date(year, month + 1, 0).getDate();
@@ -25,6 +26,7 @@ const getFirstDayOfMonth = (year: number, month: number) => {
 };
 
 export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, markedDates, theme, onMonthChange, minDate, maxDate }) => {
+  const { t } = useTranslation();
   const currentDate = new Date(current);
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -84,14 +86,14 @@ export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, m
         <TouchableOpacity onPress={handlePrev} style={styles.arrow} disabled={!canGoPrev}>
           <Text style={[styles.arrowText, { color: canGoPrev ? accent : textDisabled }]}>{'‹'}</Text>
         </TouchableOpacity>
-        <Text style={[styles.monthTitle, { color: text }]}>{MONTHS[month]} {year}</Text>
+        <Text style={[styles.monthTitle, { color: text }]}>{t(MONTHS_KEYS[month])} {year}</Text>
         <TouchableOpacity onPress={handleNext} style={styles.arrow} disabled={!canGoNext}>
           <Text style={[styles.arrowText, { color: canGoNext ? accent : textDisabled }]}>{'›'}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.dayHeader}>
-        {DAYS.map((day) => (
-          <Text key={day} style={[styles.dayHeaderText, { color: textDisabled }]}>{day}</Text>
+        {DAYS_KEYS.map((dayKey) => (
+          <Text key={dayKey} style={[styles.dayHeaderText, { color: textDisabled }]}>{t(dayKey)}</Text>
         ))}
       </View>
       {weeks.map((week, wi) => (

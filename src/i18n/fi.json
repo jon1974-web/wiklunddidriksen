@@ -218,6 +218,27 @@
     "sunday": "Sunnuntai",
     "week": "Viikko"
   },
+  "calendar": {
+    "monday": "Ma",
+    "tuesday": "Ti",
+    "wednesday": "Ke",
+    "thursday": "To",
+    "friday": "Pe",
+    "saturday": "La",
+    "sunday": "Su",
+    "january": "Tammikuu",
+    "february": "Helmikuu",
+    "march": "Maaliskuu",
+    "april": "Huhtikuu",
+    "may": "Toukokuu",
+    "june": "Kesäkuu",
+    "july": "Heinäkuu",
+    "august": "Elokuu",
+    "september": "Syyskuu",
+    "october": "Lokakuu",
+    "november": "Marraskuu",
+    "december": "Joulukuu"
+  },
   "profile": {
     "title": "Profiili",
     "displayName": "Näyttönimi",

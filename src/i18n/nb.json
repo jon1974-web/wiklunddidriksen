@@ -208,6 +208,27 @@
     "sunday": "Søndag",
     "week": "Uke"
   },
+  "calendar": {
+    "monday": "Man",
+    "tuesday": "Tir",
+    "wednesday": "Ons",
+    "thursday": "Tor",
+    "friday": "Fre",
+    "saturday": "Lør",
+    "sunday": "Søn",
+    "january": "Januar",
+    "february": "Februar",
+    "march": "Mars",
+    "april": "April",
+    "may": "Mai",
+    "june": "Juni",
+    "july": "Juli",
+    "august": "August",
+    "september": "September",
+    "october": "Oktober",
+    "november": "November",
+    "december": "Desember"
+  },
   "pickers": {
     "startDate": "Velg startdato",
     "endDate": "Velg sluttdato",

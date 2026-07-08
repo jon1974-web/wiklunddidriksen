@@ -218,6 +218,27 @@
     "sunday": "Söndag",
     "week": "Vecka"
   },
+  "calendar": {
+    "monday": "Mån",
+    "tuesday": "Tis",
+    "wednesday": "Ons",
+    "thursday": "Tor",
+    "friday": "Fre",
+    "saturday": "Lör",
+    "sunday": "Sön",
+    "january": "Januari",
+    "february": "Februari",
+    "march": "Mars",
+    "april": "April",
+    "may": "Maj",
+    "june": "Juni",
+    "july": "Juli",
+    "august": "Augusti",
+    "september": "September",
+    "october": "Oktober",
+    "november": "November",
+    "december": "December"
+  },
   "profile": {
     "title": "Profil",
     "displayName": "Visningsnamn",
