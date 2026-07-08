@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Familiesenter — Min vecka Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f5f5f5; display: flex; justify-content: center; padding: 24px; }
+  .phone { width: 390px; background: #fff; border-radius: 24px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.15); }
+  .header { padding: 20px 20px 12px; border-bottom: 1px solid #eee; }
+  .header-row { display: flex; justify-content: space-between; align-items: center; }
+  .header-title { font-size: 22px; font-weight: bold; color: #333; display: flex; align-items: center; gap: 8px; }
+  .header-subtitle { font-size: 13px; color: #666; margin-top: 4px; }
+  .header-close { color: #E87C3E; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .section { padding: 16px 20px; }
+  .section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5; color: #E87C3E; margin-bottom: 10px; }
+  .day-card { background: #f9f9f9; border-radius: 12px; margin-bottom: 8; overflow: hidden; }
+  .day-header { padding: 10px 14px; font-weight: 600; font-size: 14px; color: #333; display: flex; align-items: center; gap: 6px; }
+  .day-header .icon { font-size: 16px; }
+  .event-item { padding: 8px 14px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #eee; }
+  .event-dot { width: 8px; height: 8px; border-radius: 4px; flex-shrink: 0; }
+  .event-text { font-size: 14px; color: #333; }
+  .event-time { font-size: 13px; color: #666; min-width: 45px; }
+  .event-empty { padding: 10px 14px; font-size: 13px; color: #999; font-style: italic; border-top: 1px solid #eee; }
+  .list-item { padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #eee; }
+  .list-icon { font-size: 16px; }
+  .list-text { font-size: 14px; color: #333; flex: 1; }
+  .list-count { font-size: 12px; color: #E87C3E; font-weight: 600; white-space: nowrap; }
+  .transport-item { padding: 10px 14px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #eee; }
+  .transport-icon { font-size: 18px; }
+  .transport-info { flex: 1; }
+  .transport-name { font-size: 14px; color: #333; font-weight: 500; }
+  .transport-date { font-size: 12px; color: #666; }
+  .transport-time { font-size: 12px; color: #E87C3E; font-weight: 600; }
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="header">
+    <div class="header-row">
+      <div class="header-title">📅 Min vecka</div>
+      <div class="header-close">Lukk</div>
+    </div>
+    <div class="header-subtitle">Uke 28 · 7. juli – 13. juli</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">📋 DAGENS PLAN</div>
+    <div class="day-card">
+      <div class="day-header"><span class="icon">📅</span> Mandag 7. juli</div>
+      <div class="event-item">
+        <div class="event-dot" style="background: #4CAF50"></div>
+        <div class="event-time">08:00</div>
+        <div class="event-text">Fotballtrening</div>
+      </div>
+      <div class="event-item">
+        <div class="event-dot" style="background: #E87C3E"></div>
+        <div class="event-time">14:00</div>
+        <div class="event-text">Barselselskap</div>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><span class="icon">📅</span> Tirsdag 8. juli</div>
+      <div class="event-empty">Ingen arrangementer</div>
+    </div>
+    <div class="day-card">
+      <div class="day-header"><span class="icon">📅</span> Onsdag 9. juli</div>
+      <div class="event-item">
+        <div class="event-dot" style="background: #0097A7"></div>
+        <div class="event-time">19:00</div>
+        <div class="event-text">Fotballkamp BSK vs Viqueens</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🛒 UAVGJORT PÅ LISTER</div>
+    <div class="day-card">
+      <div class="list-item">
+        <span class="list-icon">📋</span>
+        <span class="list-text">Handleliste — Melk, Brød, Smør</span>
+        <span class="list-count">3 igjen</span>
+      </div>
+      <div class="list-item">
+        <span class="list-icon">📋</span>
+        <span class="list-text">Pakkeliste — Pass, Ladekabel</span>
+        <span class="list-count">2 igjen</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🚀 TRANSPORT DENNE UKEN</div>
+    <div class="day-card">
+      <div class="transport-item">
+        <span class="transport-icon">⛴️</span>
+        <div class="transport-info">
+          <div class="transport-name">Ferje Oslo–Frederikshavn</div>
+          <div class="transport-date">📅 11. juli</div>
+        </div>
+        <span class="transport-time">08:00</span>
+      </div>
+      <div class="transport-item">
+        <span class="transport-icon">🚕</span>
+        <div class="transport-info">
+          <div class="transport-name">Taxi til flyplassen</div>
+          <div class="transport-date">📅 12. juli</div>
+        </div>
+        <span class="transport-time">06:00</span>
+      </div>
+      <div class="transport-item">
+        <span class="transport-icon">✈️</span>
+        <div class="transport-info">
+          <div class="transport-name">Fly hjem — Norwegian DY1234</div>
+          <div class="transport-date">📅 13. juli</div>
+        </div>
+        <span class="transport-time">14:00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🍽️ RESTAURANTER</div>
+    <div class="day-card">
+      <div class="transport-item">
+        <span class="transport-icon">🍕</span>
+        <div class="transport-info">
+          <div class="transport-name">Pizza Restaurant</div>
+          <div class="transport-date">📅 11. juli</div>
+        </div>
+        <span class="transport-time">19:00</span>
+      </div>
+      <div class="transport-item">
+        <span class="transport-icon">🍣</span>
+        <div class="transport-info">
+          <div class="transport-name">Sushi Bar</div>
+          <div class="transport-date">📅 12. juli</div>
+        </div>
+        <span class="transport-time">20:00</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">🏨 HOTELL OG AKTIVITETER</div>
+    <div class="day-card">
+      <div class="transport-item">
+        <span class="transport-icon">🛏️</span>
+        <div class="transport-info">
+          <div class="transport-name">Grand Hotel</div>
+          <div class="transport-date">📅 11. juli — Innsjekking</div>
+        </div>
+      </div>
+      <div class="transport-item">
+        <span class="transport-icon">🎯</span>
+        <div class="transport-info">
+          <div class="transport-name">Sightseeing</div>
+          <div class="transport-date">📅 12. juli</div>
+        </div>
+        <span class="transport-time">14:00</span>
+      </div>
+      <div class="transport-item">
+        <span class="transport-icon">🎯</span>
+        <div class="transport-info">
+          <div class="transport-name">Museumsbesøk</div>
+          <div class="transport-date">📅 13. juli</div>
+        </div>
+        <span class="transport-time">10:00</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="height: 40px;"></div>
+</div>
+</body>
+</html>

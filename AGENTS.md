@@ -33,6 +33,13 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - Use Firebase Auth for all user identity
 - Admin roles must be verified server-side, not just client-side
 
+### Language Support (i18n)
+- **All new UI text must use i18n translation keys** via `t()` function — never hardcode user-visible strings
+- **New translation keys must be added to all 5 language files** (`nb.json`, `en.json`, `sv.json`, `da.json`, `fi.json`)
+- Follow the existing namespace pattern: `common.*`, `events.*`, `transport.*`, `profile.*`, etc.
+- When adding new features, always add translation keys first, then use them in the code
+- For components that need language reactivity (useMemo), use `langKey` state or `i18n.on('languageChanged')` listener
+
 ### Family Role System
 - `Family.members` is a map: `{ [uid]: { role: 'owner'|'admin'|'member', displayName: string } }`
 - `UserProfile.familyRole` stores the user's role
