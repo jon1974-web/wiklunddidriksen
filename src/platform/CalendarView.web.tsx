@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +26,14 @@ const getFirstDayOfMonth = (year: number, month: number) => {
 };
 
 export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, markedDates, theme, onMonthChange, minDate, maxDate }) => {
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
+  const [langKey, setLangKey] = useState(0);
+
+  useEffect(() => {
+    const handler = () => setLangKey(k => k + 1);
+    i18nInstance.on('languageChanged', handler);
+    return () => i18nInstance.off('languageChanged', handler);
+  }, [i18nInstance]);
   const currentDate = new Date(current);
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
