@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
 import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, addDoc, collection } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -30,6 +30,14 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   const user = useUserStore((state) => state.user);
   const familyRole = useUserStore((state) => state.familyRole);
   const canDelete = currentList.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
+
+  const sortedItems = useMemo(() => {
+    return [...currentList.items].sort((a, b) => {
+      if (a.checked && !b.checked) return 1;
+      if (!a.checked && b.checked) return -1;
+      return 0;
+    });
+  }, [currentList.items]);
   const familyId = useUserStore((state) => state.familyId);
 
   useEffect(() => {
@@ -90,8 +98,9 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
     };
 
     try {
+      const updatedItems = [newItem, ...currentList.items];
       await updateDoc(doc(db, 'shoppingLists', list.id), {
-        items: arrayUnion(newItem),
+        items: updatedItems,
       });
       setNewItemName('');
     } catch (error: any) {
@@ -196,7 +205,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       </View>
 
       <FlatList
-        data={currentList.items}
+        data={sortedItems}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.listContent}
