@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 interface WebCalendarProps {
   current: string;
@@ -26,14 +26,13 @@ const getFirstDayOfMonth = (year: number, month: number) => {
 };
 
 export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, markedDates, theme, onMonthChange, minDate, maxDate }) => {
-  const { t, i18n: i18nInstance } = useTranslation();
   const [langKey, setLangKey] = useState(0);
 
   useEffect(() => {
     const handler = () => setLangKey(k => k + 1);
-    i18nInstance.on('languageChanged', handler);
-    return () => i18nInstance.off('languageChanged', handler);
-  }, [i18nInstance]);
+    i18n.on('languageChanged', handler);
+    return () => i18n.off('languageChanged', handler);
+  }, []);
   const currentDate = new Date(current);
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
@@ -93,14 +92,14 @@ export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, m
         <TouchableOpacity onPress={handlePrev} style={styles.arrow} disabled={!canGoPrev}>
           <Text style={[styles.arrowText, { color: canGoPrev ? accent : textDisabled }]}>{'‹'}</Text>
         </TouchableOpacity>
-        <Text style={[styles.monthTitle, { color: text }]}>{t(MONTHS_KEYS[month])} {year}</Text>
+        <Text style={[styles.monthTitle, { color: text }]}>{i18n.t(MONTHS_KEYS[month])} {year}</Text>
         <TouchableOpacity onPress={handleNext} style={styles.arrow} disabled={!canGoNext}>
           <Text style={[styles.arrowText, { color: canGoNext ? accent : textDisabled }]}>{'›'}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.dayHeader}>
         {DAYS_KEYS.map((dayKey) => (
-          <Text key={dayKey} style={[styles.dayHeaderText, { color: textDisabled }]}>{t(dayKey)}</Text>
+          <Text key={dayKey} style={[styles.dayHeaderText, { color: textDisabled }]}>{i18n.t(dayKey)}</Text>
         ))}
       </View>
       {weeks.map((week, wi) => (
