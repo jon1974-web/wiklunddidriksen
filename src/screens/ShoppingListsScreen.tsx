@@ -126,7 +126,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
             </Text>
           </View>
           <View style={styles.listCardDate}>
-            <Text style={[styles.dateIcon, { color: colors.textSecondary }]}>📅</Text>
+            <Text style={[styles.dateIcon, { color: colors.textSecondary }]}>📆</Text>
             <Text style={[styles.dateText, { color: colors.textSecondary }]}>{dateStr}</Text>
           </View>
         </View>
