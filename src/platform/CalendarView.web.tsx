@@ -11,6 +11,7 @@ interface WebCalendarProps {
   onMonthChange?: (year: number, month: number) => void;
   minDate?: string;
   maxDate?: string;
+  lang?: string;
 }
 
 const DAYS_KEYS = ['calendar.monday', 'calendar.tuesday', 'calendar.wednesday', 'calendar.thursday', 'calendar.friday', 'calendar.saturday', 'calendar.sunday'];

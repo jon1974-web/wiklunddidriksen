@@ -18,6 +18,7 @@ import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
 import { MissedRemindersBanner } from '../components/MissedRemindersBanner';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 interface EventsScreenProps {
   navigation: any;
@@ -652,6 +653,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             minDate={calendarMinMax.min}
             maxDate={calendarMinMax.max}
             theme={calendarTheme}
+            lang={i18n.language}
           />
         </View>
       )}
