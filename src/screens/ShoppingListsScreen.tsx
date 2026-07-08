@@ -329,6 +329,7 @@ const styles = StyleSheet.create({
   listCardActions: {
     flexDirection: 'row',
     gap: 8,
+    marginTop: 12,
   },
   actionButton: {
     paddingVertical: 8,
@@ -357,7 +358,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   dateText: {
-    fontSize: 12,
+    fontSize: 14,
+    fontWeight: '600',
   },
   listMeta: {
     fontSize: 14,
