@@ -112,34 +112,39 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
 
   const renderList = ({ item }: { item: ShoppingList }) => {
     const checkedCount = item.items.filter((i) => i.checked).length;
+    const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' }) : '';
     return (
       <TouchableOpacity
         style={[styles.listCard, { backgroundColor: colors.surface }]}
         onPress={() => navigation.navigate('ShoppingListDetail', { list: item })}
       >
-        <View style={styles.listCardBody}>
+        <View style={styles.listCardHeader}>
           <View style={styles.listCardInfo}>
             <Text style={[styles.listTitle, { color: colors.text }]}>{item.title}</Text>
             <Text style={[styles.listMeta, { color: colors.textSecondary }]}>
               {checkedCount}/{item.items.length} {t('shopping.itemsChecked')}
             </Text>
           </View>
-          <View style={styles.listCardActions}>
+          <View style={styles.listCardDate}>
+            <Text style={[styles.dateIcon, { color: colors.textSecondary }]}>📅</Text>
+            <Text style={[styles.dateText, { color: colors.textSecondary }]}>{dateStr}</Text>
+          </View>
+        </View>
+        <View style={styles.listCardActions}>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
+            onPress={() => handleCopyList(item)}
+          >
+            <Text style={[styles.actionButtonText, { color: colors.text }]}>{t('shopping.copy')}</Text>
+          </TouchableOpacity>
+          {(item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin') && (
             <TouchableOpacity
               style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
-              onPress={() => handleCopyList(item)}
+              onPress={() => handleDeleteList(item.id, item.title)}
             >
-              <Text style={[styles.actionButtonText, { color: colors.text }]}>{t('shopping.copy')}</Text>
+              <Text style={[styles.actionButtonText, { color: colors.danger }]}>{t('shopping.delete')}</Text>
             </TouchableOpacity>
-            {(item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin') && (
-              <TouchableOpacity
-                style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
-                onPress={() => handleDeleteList(item.id, item.title)}
-              >
-                <Text style={[styles.actionButtonText, { color: colors.danger }]}>{t('shopping.delete')}</Text>
-              </TouchableOpacity>
-            )}
-          </View>
+          )}
         </View>
       </TouchableOpacity>
     );
@@ -337,6 +342,22 @@ const styles = StyleSheet.create({
   listTitle: {
     fontSize: 18,
     fontWeight: '600',
+  },
+  listCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  listCardDate: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  dateIcon: {
+    fontSize: 14,
+  },
+  dateText: {
+    fontSize: 12,
   },
   listMeta: {
     fontSize: 14,
