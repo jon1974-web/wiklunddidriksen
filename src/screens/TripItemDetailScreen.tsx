@@ -52,8 +52,8 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
   const config = typeConfig[itemType];
 
   const handleDelete = useCallback(() => {
-    crossAlert(`Slett ${config.label.toLowerCase()}`, 'Er du sikker?', [
-      { text: 'Avbryt', style: 'cancel' },
+    crossAlert(`${t('detail.delete')} ${config.label.toLowerCase()}`, `${t('common.confirm')}?`, [
+      { text: t('common.cancel'), style: 'cancel' },
       {
         text: t('common.delete'),
         style: 'destructive',
@@ -294,7 +294,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           style={[styles.actionButton, { backgroundColor: colors.inputBackground }]}
           onPress={() => navigation.goBack()}
         >
-          <Text style={[styles.actionButtonText, { color: colors.text }]}>Tilbake</Text>
+          <Text style={[styles.actionButtonText, { color: colors.text }]}>{t('detail.back')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: colors.accent }]}
@@ -302,13 +302,13 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             navigation.navigate({ name: 'TripDetail', params: { trip, openItemEditId: item.id, openItemType: itemType }, merge: true });
           }}
         >
-          <Text style={[styles.actionButtonText, { color: '#fff' }]}>Rediger</Text>
+          <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('detail.edit')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, { backgroundColor: '#E53935' }]}
           onPress={handleDelete}
         >
-          <Text style={[styles.actionButtonText, { color: '#fff' }]}>Slett</Text>
+          <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('detail.delete')}</Text>
         </TouchableOpacity>
       </View>
 
