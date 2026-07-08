@@ -112,7 +112,9 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
 
   const renderList = ({ item }: { item: ShoppingList }) => {
     const checkedCount = item.items.filter((i) => i.checked).length;
-    const dateStr = item.createdAt ? new Date(item.createdAt).toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' }) : '';
+    const dateObj = item.createdAt ? new Date(item.createdAt) : null;
+    const dayNum = dateObj ? String(dateObj.getDate()) : '';
+    const monthStr = dateObj ? dateObj.toLocaleDateString('nb-NO', { month: 'long' }) : '';
     return (
       <TouchableOpacity
         style={[styles.listCard, { backgroundColor: colors.surface }]}
@@ -126,8 +128,11 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
             </Text>
           </View>
           <View style={styles.listCardDate}>
-            <Text style={[styles.dateIcon, { color: colors.textSecondary }]}>📆</Text>
-            <Text style={[styles.dateText, { color: colors.textSecondary }]}>{dateStr}</Text>
+            <View style={[styles.calIcon, { backgroundColor: colors.inputBackground }]}>
+              <Text style={[styles.calIconTop, { backgroundColor: colors.accent }]} />
+              <Text style={[styles.calIconDay, { color: colors.text }]}>{dayNum}</Text>
+            </View>
+            <Text style={[styles.dateText, { color: colors.textSecondary }]}>{monthStr}</Text>
           </View>
         </View>
         <View style={styles.listCardActions}>
@@ -353,6 +358,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
+  },
+  calIcon: {
+    width: 28,
+    height: 28,
+    borderRadius: 6,
+    overflow: 'hidden',
+    alignItems: 'center',
+  },
+  calIconTop: {
+    width: '100%',
+    height: 8,
+  },
+  calIconDay: {
+    fontSize: 14,
+    fontWeight: '700',
+    marginTop: -2,
   },
   dateIcon: {
     fontSize: 14,
