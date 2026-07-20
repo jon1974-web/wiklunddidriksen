@@ -196,15 +196,17 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     </TouchableOpacity>
                   </View>
                 )}
-                <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
-                      <GooglePlacesInput
-                        value={flightForm.address}
-                        onChangeText={(v) => set({ address: v })}
-                        placeholder="Søk etter adresse..."
-                        onSelect={(v) => set({ address: v })}
-                      />
-                    </View>
+                {flightForm.transportType === 'bil' && (
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
+                    <GooglePlacesInput
+                      value={flightForm.address}
+                      onChangeText={(v) => set({ address: v })}
+                      placeholder="Søk etter adresse..."
+                      onSelect={(v) => set({ address: v })}
+                    />
+                  </View>
+                )}
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{flightForm.transportType === 'fly' ? t('transport.departureAirport') : t('transport.departureTerminal')}</Text>
                       <GooglePlacesInput

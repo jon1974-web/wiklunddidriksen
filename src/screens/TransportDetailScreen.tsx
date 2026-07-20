@@ -114,7 +114,10 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
         {f.transportType === 'fly' && renderRow(t('transport.seatNumber'), f.seatNumber)}
         {f.transportType === 'tog' && renderRow(t('transport.wagon'), f.wagon)}
         {f.transportType === 'bil' && renderRow(t('transport.driver'), f.driver)}
-        {f.address && renderRow(t('common.address'), f.address)}
+        {f.transportType === 'fly' && f.departureAddress && renderRow(t('transport.departureAirport'), f.departureAddress)}
+        {f.transportType === 'fly' && f.arrivalAddress && renderRow(t('transport.arrivalAirport'), f.arrivalAddress)}
+        {f.transportType !== 'fly' && f.departureAddress && renderRow(t('transport.departureTerminal'), f.departureAddress)}
+        {f.transportType !== 'fly' && f.arrivalAddress && renderRow(t('transport.arrivalTerminal'), f.arrivalAddress)}
 
         {(f.departureDate || f.departureTime) && (
           <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
@@ -141,18 +144,41 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
       </View>
 
       {/* Maps */}
-      {(f.departureDate || f.departureAddress) && (
+      {f.departureAddress && (
         <TouchableOpacity
           style={[styles.mapCard, { backgroundColor: colors.surface }]}
-          onPress={() => f.address && Linking.openURL(getGoogleMapsUrl(f.address!))}
+          onPress={() => Linking.openURL(getGoogleMapsUrl(f.departureAddress!))}
           activeOpacity={0.8}
         >
           <Image
-            source={{ uri: getStaticMapUrl(f.address || '', 15, '600x200') }}
+            source={{ uri: getStaticMapUrl(f.departureAddress!, 15, '600x200') }}
             style={[styles.mapImage, { height: 160 }]}
           />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.address || t('common.address')}</Text>
+            <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.departureAddress}</Text>
+            <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
+          </View>
+        </TouchableOpacity>
+      )}
+      {f.departureAddress && f.arrivalAddress && (
+        <View style={[styles.arrowContainer, { backgroundColor: colors.surface }]}>
+          <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
+          <Text style={[styles.arrowIcon, { color: colors.accent }]}>{f.transportType === 'fly' ? '✈️' : f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '⛴️'} →</Text>
+          <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
+        </View>
+      )}
+      {f.arrivalAddress && (
+        <TouchableOpacity
+          style={[styles.mapCard, { backgroundColor: colors.surface }]}
+          onPress={() => Linking.openURL(getGoogleMapsUrl(f.arrivalAddress!))}
+          activeOpacity={0.8}
+        >
+          <Image
+            source={{ uri: getStaticMapUrl(f.arrivalAddress!, 15, '600x200') }}
+            style={[styles.mapImage, { height: 160 }]}
+          />
+          <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.arrivalAddress}</Text>
             <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
           </View>
         </TouchableOpacity>
@@ -291,6 +317,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     marginLeft: 8,
+  },
+  arrowContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+  },
+  arrowLine: {
+    flex: 1,
+    height: 2,
+  },
+  arrowIcon: {
+    fontSize: 20,
+    marginHorizontal: 12,
+    fontWeight: '600',
   },
   actions: {
     flexDirection: 'row',

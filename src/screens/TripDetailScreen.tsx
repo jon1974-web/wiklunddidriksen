@@ -733,17 +733,27 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       if (timeA > timeB) return 1;
       return 0;
     });
+    // Filter out orphan return flights (hjemreise without matching utreise)
+    const departureTypes = new Set(
+      sorted.filter(f => f.type === 'utreise' && !f.isOneWay).map(f => f.transportType)
+    );
+    const filtered = sorted.filter(f => {
+      if (f.type === 'hjemreise') {
+        return departureTypes.has(f.transportType ?? 'fly');
+      }
+      return true;
+    });
     const rows: TripFlight[][] = [];
     let i = 0;
-    while (i < sorted.length) {
-      const current = sorted[i];
+    while (i < filtered.length) {
+      const current = filtered[i];
       if (current.type === 'utreise' && !current.isOneWay) {
-        const match = sorted.findIndex(
+        const match = filtered.findIndex(
           (s, idx) => idx > i && s.type === 'hjemreise' && s.transportType === current.transportType
         );
         if (match !== -1) {
-          rows.push([current, sorted[match]]);
-          sorted.splice(match, 1);
+          rows.push([current, filtered[match]]);
+          filtered.splice(match, 1);
         } else {
           rows.push([current]);
         }
