@@ -32,6 +32,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
   const { colors } = useTheme();
   const [showFullImage, setShowFullImage] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
 
   const avatarUrl = liveAvatarUrl || message.senderAvatarUrl;
 
@@ -64,8 +65,8 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
     <>
       <View style={[styles.container, isOwnMessage ? styles.ownContainer : styles.otherContainer]}>
         <View style={styles.senderRow}>
-          {avatarUrl && avatarUrl.length > 0 ? (
-            <Image source={{ uri: avatarUrl }} style={styles.avatar} />
+          {avatarUrl && avatarUrl.length > 0 && !avatarFailed ? (
+            <Image source={{ uri: avatarUrl }} style={styles.avatar} onError={() => setAvatarFailed(true)} />
           ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder, { backgroundColor: colors.accent + '40' }]}>
               <Text style={[styles.avatarInitial, { color: colors.accent }]}>

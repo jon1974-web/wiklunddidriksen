@@ -60,6 +60,7 @@ export const AuthScreen: React.FC = () => {
           uid: result.user.uid,
           email: result.user.email || '',
           displayName,
+          avatarUrl: userProfile?.avatarUrl || undefined,
         });
 
         if (hasInvite) {
@@ -95,6 +96,7 @@ export const AuthScreen: React.FC = () => {
               uid: result.user.uid,
               email: result.user.email || '',
               displayName,
+              avatarUrl: userProfile?.avatarUrl || undefined,
             });
 
             if (hasInvite) {

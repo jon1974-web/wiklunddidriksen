@@ -366,8 +366,14 @@ export const ProfileScreen: React.FC = () => {
 
   const uploadAvatar = async (uri: string, base64Data: string | null = null) => {
     if (!user) return;
+    const currentUser = auth.currentUser;
+    if (!currentUser) {
+      Alert.alert('Feil', 'Du må være logget inn for å laste opp bilder.');
+      return;
+    }
     setUploading(true);
     try {
+      await currentUser.getIdToken(true);
       let blob: Blob;
       if (base64Data && Platform.OS === 'web') {
         const byteString = atob(base64Data);
@@ -599,9 +605,6 @@ export const ProfileScreen: React.FC = () => {
             <Image
               source={{ uri: profile.avatarUrl }}
               style={styles.avatar}
-              onError={() => {
-                setProfile((prev: UserProfile | null) => prev ? { ...prev, avatarUrl: undefined } : prev);
-              }}
             />
           ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder, { backgroundColor: colors.inputBackground }]}>

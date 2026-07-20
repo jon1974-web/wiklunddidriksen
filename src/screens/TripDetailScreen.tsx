@@ -726,9 +726,23 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     </View>
   );
 
-  const openFileUrl = (url: string) => {
+  const openFileUrl = async (url: string) => {
     if (Platform.OS === 'web') {
-      window.open(url, '_blank');
+      try {
+        const response = await fetch(url);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const blob = await response.blob();
+        const blobUrl = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = '';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+      } catch (err) {
+        window.location.href = url;
+      }
     } else {
       Linking.openURL(url);
     }
