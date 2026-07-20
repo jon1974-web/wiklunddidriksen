@@ -796,15 +796,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         sortKey: `boat_${b.departureDate || ''}_${b.departureTime || ''}`,
       });
     });
-    taxis.forEach(t => {
-      const typeLabel = t.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
+    taxis.forEach(tx => {
+      const typeLabel = tx.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: t.id, icon: '🚕', label: 'Taxi', typeLabel, name: t.name, detail: t.reference, isHjemreise: t.type === 'hjemreise',
-        departureDate: t.departureDate, departureTime: t.departureTime,
-        transportType: 'taxi', docType: t.type,
-        onPress: () => navigation.navigate('TripItemDetail', { item: t, tripId: trip.id, trip, itemType: 'taxi' }),
-        onLongPress: canDelete ? () => setActionModal({ visible: true, title: t.name || 'Taxi', onEdit: () => openEditModal('taxi', t), onDelete: () => handleDeleteTaxi(t.id) }) : undefined,
-        sortKey: `taxi_${t.departureDate || ''}_${t.departureTime || ''}`,
+        id: tx.id, icon: '🚕', label: 'Taxi', typeLabel, name: tx.name, detail: tx.reference, isHjemreise: tx.type === 'hjemreise',
+        departureDate: tx.departureDate, departureTime: tx.departureTime,
+        transportType: 'taxi', docType: tx.type,
+        onPress: () => navigation.navigate('TripItemDetail', { item: tx, tripId: trip.id, trip, itemType: 'taxi' }),
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: tx.name || 'Taxi', onEdit: () => openEditModal('taxi', tx), onDelete: () => handleDeleteTaxi(tx.id) }) : undefined,
+        sortKey: `taxi_${tx.departureDate || ''}_${tx.departureTime || ''}`,
       });
     });
     ferries.forEach(f => {
