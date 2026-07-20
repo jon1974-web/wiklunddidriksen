@@ -170,6 +170,7 @@ export interface TripBoat {
   routeName?: string;
   reference?: string;
   cabin?: string;
+  isOneWay?: boolean;
   departureDate?: string;
   departureTime?: string;
   arrivalDate?: string;
@@ -205,6 +206,7 @@ export interface TripFerry {
   routeName?: string;
   reference?: string;
   cabin?: string;
+  isOneWay?: boolean;
   departureDate?: string;
   departureTime?: string;
   arrivalDate?: string;

@@ -326,6 +326,8 @@
     "airline": "Flyselskab",
     "trainOperator": "Operatør",
     "rentalCompany": "Udlejningsselskab",
+    "oneWay": "En vej",
+    "returnTrip": "Returrejse",
     "regNr": "Reg. nr",
     "referencePNR": "Reference (PNR)",
     "reference": "Reference",

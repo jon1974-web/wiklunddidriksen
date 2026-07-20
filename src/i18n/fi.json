@@ -326,6 +326,8 @@
     "airline": "Lentoyhtiö",
     "trainOperator": "Liikennöitsijä",
     "rentalCompany": "Vuokraamo",
+    "oneWay": "Yksisuunta",
+    "returnTrip": "Paluumatka",
     "regNr": "Rek. nro",
     "referencePNR": "Viite (PNR)",
     "reference": "Viite",

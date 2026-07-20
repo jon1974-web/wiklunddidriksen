@@ -116,9 +116,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
   const emptyLink = { title: '', url: '' };
-  const emptyBoat = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
-  const emptyTaxi = { name: '', reference: '', departureDate: '', departureTime: '', address: '', phone: '', driver: '', passengers: '', note: '' };
-  const emptyFerry = { name: '', routeName: '', reference: '', cabin: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
+  const emptyBoat = { name: '', routeName: '', reference: '', cabin: '', isOneWay: false, departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
+  const emptyTaxi = { name: '', reference: '', isOneWay: false, departureDate: '', departureTime: '', address: '', phone: '', driver: '', passengers: '', note: '' };
+  const emptyFerry = { name: '', routeName: '', reference: '', cabin: '', isOneWay: false, departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
 
   const [hotelForm, setHotelForm] = useState(emptyHotel);
   const [flightFormUtreise, setFlightFormUtreise] = useState(emptyFlight);
@@ -437,7 +437,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } else if (modal === 'link') {
       setLinkForm({ title: item.title || '', url: item.url || '' });
     } else if (modal === 'boat') {
-      setBoatForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+      setBoatForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', isOneWay: item.isOneWay || false, departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
     } else if (modal === 'taxi') {
       setTaxiForm({ name: item.name || '', reference: item.reference || '', departureDate: item.departureDate || '', departureTime: item.departureTime || '', address: item.address || '', phone: item.phone || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
     } else if (modal === 'ferry') {
@@ -650,7 +650,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const handleSaveBoat = useCallback(async () => {
     try {
-      const data = cleanData({ name: boatForm.name.trim() ? sanitizeInput(boatForm.name) : undefined, routeName: boatForm.routeName.trim() ? sanitizeInput(boatForm.routeName) : undefined, reference: boatForm.reference.trim() ? sanitizeInput(boatForm.reference) : undefined, cabin: boatForm.cabin.trim() ? sanitizeInput(boatForm.cabin) : undefined, departureDate: boatForm.departureDate || undefined, departureTime: boatForm.departureTime || undefined, arrivalDate: boatForm.arrivalDate || undefined, arrivalTime: boatForm.arrivalTime || undefined, departureAddress: boatForm.departureAddress.trim() ? sanitizeInput(boatForm.departureAddress) : undefined, arrivalAddress: boatForm.arrivalAddress.trim() ? sanitizeInput(boatForm.arrivalAddress) : undefined, phone: boatForm.phone.trim() ? sanitizeInput(boatForm.phone) : undefined, hasCar: boatForm.hasCar || undefined, carRegistration: boatForm.hasCar && boatForm.carRegistration.trim() ? sanitizeInput(boatForm.carRegistration) : undefined, driver: boatForm.driver.trim() ? sanitizeInput(boatForm.driver) : undefined, passengers: boatForm.passengers.trim() ? sanitizeInput(boatForm.passengers) : undefined, note: boatForm.note.trim() ? sanitizeInput(boatForm.note) : undefined });
+      const data = cleanData({ name: boatForm.name.trim() ? sanitizeInput(boatForm.name) : undefined, routeName: boatForm.routeName.trim() ? sanitizeInput(boatForm.routeName) : undefined, reference: boatForm.reference.trim() ? sanitizeInput(boatForm.reference) : undefined, cabin: boatForm.cabin.trim() ? sanitizeInput(boatForm.cabin) : undefined, isOneWay: boatForm.isOneWay || undefined, departureDate: boatForm.departureDate || undefined, departureTime: boatForm.departureTime || undefined, arrivalDate: boatForm.arrivalDate || undefined, arrivalTime: boatForm.arrivalTime || undefined, departureAddress: boatForm.departureAddress.trim() ? sanitizeInput(boatForm.departureAddress) : undefined, arrivalAddress: boatForm.arrivalAddress.trim() ? sanitizeInput(boatForm.arrivalAddress) : undefined, phone: boatForm.phone.trim() ? sanitizeInput(boatForm.phone) : undefined, hasCar: boatForm.hasCar || undefined, carRegistration: boatForm.hasCar && boatForm.carRegistration.trim() ? sanitizeInput(boatForm.carRegistration) : undefined, driver: boatForm.driver.trim() ? sanitizeInput(boatForm.driver) : undefined, passengers: boatForm.passengers.trim() ? sanitizeInput(boatForm.passengers) : undefined, note: boatForm.note.trim() ? sanitizeInput(boatForm.note) : undefined });
       if (editingId) { await updateTripBoat(trip.id, editingId, data); } else { await addTripBoat(trip.id, data); }
       resetForms(); setActiveModal(null); loadSubData();
     } catch (error) { crossAlert('Error', getErrorMessage(error)); }
@@ -666,7 +666,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const handleSaveFerry = useCallback(async () => {
     try {
-      const data = cleanData({ name: ferryForm.name.trim() ? sanitizeInput(ferryForm.name) : undefined, routeName: ferryForm.routeName.trim() ? sanitizeInput(ferryForm.routeName) : undefined, reference: ferryForm.reference.trim() ? sanitizeInput(ferryForm.reference) : undefined, cabin: ferryForm.cabin?.trim() ? sanitizeInput(ferryForm.cabin) : undefined, departureDate: ferryForm.departureDate || undefined, departureTime: ferryForm.departureTime || undefined, arrivalDate: ferryForm.arrivalDate || undefined, arrivalTime: ferryForm.arrivalTime || undefined, departureAddress: ferryForm.departureAddress.trim() ? sanitizeInput(ferryForm.departureAddress) : undefined, arrivalAddress: ferryForm.arrivalAddress.trim() ? sanitizeInput(ferryForm.arrivalAddress) : undefined, phone: ferryForm.phone.trim() ? sanitizeInput(ferryForm.phone) : undefined, hasCar: ferryForm.hasCar || undefined, carRegistration: ferryForm.hasCar && ferryForm.carRegistration.trim() ? sanitizeInput(ferryForm.carRegistration) : undefined, driver: ferryForm.driver.trim() ? sanitizeInput(ferryForm.driver) : undefined, passengers: ferryForm.passengers.trim() ? sanitizeInput(ferryForm.passengers) : undefined, note: ferryForm.note.trim() ? sanitizeInput(ferryForm.note) : undefined });
+      const data = cleanData({ name: ferryForm.name.trim() ? sanitizeInput(ferryForm.name) : undefined, routeName: ferryForm.routeName.trim() ? sanitizeInput(ferryForm.routeName) : undefined, reference: ferryForm.reference.trim() ? sanitizeInput(ferryForm.reference) : undefined, cabin: ferryForm.cabin?.trim() ? sanitizeInput(ferryForm.cabin) : undefined, isOneWay: ferryForm.isOneWay || undefined, departureDate: ferryForm.departureDate || undefined, departureTime: ferryForm.departureTime || undefined, arrivalDate: ferryForm.arrivalDate || undefined, arrivalTime: ferryForm.arrivalTime || undefined, departureAddress: ferryForm.departureAddress.trim() ? sanitizeInput(ferryForm.departureAddress) : undefined, arrivalAddress: ferryForm.arrivalAddress.trim() ? sanitizeInput(ferryForm.arrivalAddress) : undefined, phone: ferryForm.phone.trim() ? sanitizeInput(ferryForm.phone) : undefined, hasCar: ferryForm.hasCar || undefined, carRegistration: ferryForm.hasCar && ferryForm.carRegistration.trim() ? sanitizeInput(ferryForm.carRegistration) : undefined, driver: ferryForm.driver.trim() ? sanitizeInput(ferryForm.driver) : undefined, passengers: ferryForm.passengers.trim() ? sanitizeInput(ferryForm.passengers) : undefined, note: ferryForm.note.trim() ? sanitizeInput(ferryForm.note) : undefined });
       if (editingId) { await updateTripFerry(trip.id, editingId, data); } else { await addTripFerry(trip.id, data); }
       resetForms(); setActiveModal(null); loadSubData();
     } catch (error) { crossAlert('Error', getErrorMessage(error)); }
@@ -891,24 +891,32 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               ))}
             </View>
           ))}
-          {otherTransportItems.map((item) => (
-            <View key={item.id} style={styles.transportGrid}>
-              <View style={styles.transportTileWrapper}>
-                <TransportItemTile
-                  icon={item.icon}
-                  label={item.label}
-                  name={item.name}
-                  detail={item.detail}
-                  departureDate={item.departureDate}
-                  departureTime={item.departureTime}
-                  arrivalTime={item.arrivalTime}
-                  hasCar={item.hasCar}
-                  onPress={item.onPress}
-                  onLongPress={item.onLongPress}
-                />
+          {(() => {
+            const rows: any[][] = [];
+            for (let i = 0; i < otherTransportItems.length; i += 2) {
+              rows.push(otherTransportItems.slice(i, i + 2));
+            }
+            return rows.map((row, rowIdx) => (
+              <View key={`other-${rowIdx}`} style={styles.transportGrid}>
+                {row.map((item) => (
+                  <View key={item.id} style={styles.transportTileWrapper}>
+                    <TransportItemTile
+                      icon={item.icon}
+                      label={item.label}
+                      name={item.name}
+                      detail={item.detail}
+                      departureDate={item.departureDate}
+                      departureTime={item.departureTime}
+                      arrivalTime={item.arrivalTime}
+                      hasCar={item.hasCar}
+                      onPress={item.onPress}
+                      onLongPress={item.onLongPress}
+                    />
+                  </View>
+                ))}
               </View>
-            </View>
-          ))}
+            ));
+          })()}
         </>
       )}
 
@@ -1853,6 +1861,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')} {t('common.time')}</Text>
                     <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryDepTime')}>
                       <Text style={{ color: ferryForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.departureTime || t('common.pickTime')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => setFerryForm(f => ({ ...f, isOneWay: !f.isOneWay }))}>
+                      <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: ferryForm.isOneWay ? colors.accent : colors.textDisabled, backgroundColor: ferryForm.isOneWay ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+                        {ferryForm.isOneWay && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
+                      </View>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('transport.oneWay')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>

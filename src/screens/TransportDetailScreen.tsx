@@ -140,20 +140,20 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
         {renderNotesRow(t('common.notes'), f.note)}
       </View>
 
-      {/* Map for bil */}
-      {f.transportType === 'bil' && f.address && (
+      {/* Maps */}
+      {(f.departureDate || f.departureAddress) && (
         <TouchableOpacity
           style={[styles.mapCard, { backgroundColor: colors.surface }]}
-          onPress={() => Linking.openURL(getGoogleMapsUrl(f.address!))}
+          onPress={() => f.address && Linking.openURL(getGoogleMapsUrl(f.address!))}
           activeOpacity={0.8}
         >
           <Image
-            source={{ uri: getStaticMapUrl(f.address!, 15, '600x300') }}
-            style={styles.mapImage}
+            source={{ uri: getStaticMapUrl(f.address || '', 15, '600x200') }}
+            style={[styles.mapImage, { height: 160 }]}
           />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.address}</Text>
-            <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Google Maps →</Text>
+            <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.address || t('common.address')}</Text>
+            <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
           </View>
         </TouchableOpacity>
       )}

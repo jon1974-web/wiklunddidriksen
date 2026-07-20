@@ -332,6 +332,8 @@
     "airline": "Flygbolag",
     "trainOperator": "Operatör",
     "rentalCompany": "Uthyrningsbolag",
+    "oneWay": "Enkel väg",
+    "returnTrip": "Returresa",
     "regNr": "Reg. nr",
     "referencePNR": "Referens (PNR)",
     "reference": "Referens",
