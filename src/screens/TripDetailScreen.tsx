@@ -544,7 +544,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         await updateTripFlight(trip.id, editingId, data);
       } else {
         await addTripFlight(trip.id, buildDataFrom('utreise', flightFormUtreise));
-        await addTripFlight(trip.id, buildDataFrom('hjemreise', flightFormHjemreise));
+        if (!flightFormUtreise.isOneWay) {
+          await addTripFlight(trip.id, buildDataFrom('hjemreise', flightFormHjemreise));
+        }
       }
       resetForms();
       setActiveModal(null);
@@ -717,7 +719,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const sortedTransportRows = useMemo(() => {
     const typeOrder: Record<string, number> = { fly: 0, tog: 1, bil: 2 };
-    const sorted = [...flights].sort((a, b) => {
+    // Filter out blank records (created when one-way was saved but hjemreise still generated)
+    const valid = flights.filter(f => {
+      const hasAnyData = f.airline || f.flightNumber || f.departureAddress || f.arrivalAddress || f.address || f.note || f.reference || f.wagon || f.driver || f.passengers || f.phone || f.seatNumber;
+      return !!hasAnyData;
+    });
+    const sorted = [...valid].sort((a, b) => {
       const ta = typeOrder[a.transportType ?? 'fly'] ?? 0;
       const tb = typeOrder[b.transportType ?? 'fly'] ?? 0;
       if (ta !== tb) return ta - tb;
