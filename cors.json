@@ -1,0 +1,8 @@
+[
+  {
+    "origin": ["https://familiesenter-837bb.web.app", "https://familiesenter-837bb.firebaseapp.com"],
+    "method": ["GET", "HEAD"],
+    "responseHeader": ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges"],
+    "maxAgeSeconds": 3600
+  }
+]

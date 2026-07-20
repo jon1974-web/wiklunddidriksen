@@ -701,16 +701,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     </View>
   );
 
-  const openFileUrl = async (url: string) => {
+  const openFileUrl = (url: string) => {
     if (Platform.OS === 'web') {
-      try {
-        const response = await fetch(url);
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-        window.open(blobUrl, '_blank');
-      } catch {
-        window.open(url, '_blank');
-      }
+      window.open(url, '_blank');
     } else {
       Linking.openURL(url);
     }

@@ -596,7 +596,13 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface, alignItems: 'center' }]}>
         <TouchableOpacity onPress={handlePickImage} disabled={uploading}>
           {profile?.avatarUrl ? (
-            <Image source={{ uri: profile.avatarUrl }} style={styles.avatar} />
+            <Image
+              source={{ uri: profile.avatarUrl }}
+              style={styles.avatar}
+              onError={() => {
+                setProfile((prev: UserProfile | null) => prev ? { ...prev, avatarUrl: undefined } : prev);
+              }}
+            />
           ) : (
             <View style={[styles.avatar, styles.avatarPlaceholder, { backgroundColor: colors.inputBackground }]}>
               <Text style={[styles.avatarInitial, { color: colors.textSecondary }]}>
