@@ -7,18 +7,20 @@ import { useTranslation } from 'react-i18next';
 interface TransportItemTileProps {
   icon: string;
   label: string;
+  typeLabel?: string;
   name?: string;
   detail?: string;
   departureDate?: string;
   departureTime?: string;
   arrivalTime?: string;
   hasCar?: boolean;
+  isHjemreise?: boolean;
   onPress: () => void;
   onLongPress?: () => void;
 }
 
 export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
-  icon, label, name, detail, departureDate, departureTime, arrivalTime, hasCar, onPress, onLongPress,
+  icon, label, typeLabel, name, detail, departureDate, departureTime, arrivalTime, hasCar, isHjemreise, onPress, onLongPress,
 }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
@@ -26,16 +28,17 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   const calMonth = departureDate ? new Date(departureDate + 'T12:00:00').toLocaleDateString('nb-NO', { month: 'short' }) : '';
   const depIcon = icon === '⛴️' || icon === '🚢' ? '⚓' : icon === '🚕' ? '🔑' : '🛫';
   const arrIcon = icon === '⛴️' || icon === '🚢' ? '🏁' : icon === '🚕' ? '📍' : '🛬';
+  const tileColor = isHjemreise ? '#E53935' : colors.accent;
 
   return (
     <TouchableOpacity
-      style={[styles.tile, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]}
+      style={[styles.tile, { backgroundColor: colors.surface, borderLeftColor: tileColor }]}
       onPress={onPress}
       onLongPress={onLongPress}
     >
       {departureDate ? (
         <View style={styles.calendarIcon}>
-          <View style={[styles.calendarTop, { backgroundColor: colors.accent }]} />
+          <View style={[styles.calendarTop, { backgroundColor: tileColor }]} />
           <Text style={[styles.calendarDay, { color: colors.text }]}>{calDay}</Text>
           <Text style={[styles.calendarMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
           <View style={styles.tileTransportIcon}>
@@ -43,13 +46,17 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
           </View>
         </View>
       ) : (
-        <View style={[styles.iconOnly, { backgroundColor: colors.accent }]}>
+        <View style={[styles.iconOnly, { backgroundColor: tileColor }]}>
           <Text style={{ fontSize: 24 }}>{icon}</Text>
         </View>
       )}
       <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />
       <View style={styles.tileContent}>
-        <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 12 }}>{label}</Text>
+        {typeLabel ? (
+          <Text style={{ color: tileColor, fontWeight: '600', fontSize: 12 }}>{typeLabel}</Text>
+        ) : (
+          <Text style={{ color: tileColor, fontWeight: '600', fontSize: 12 }}>{label}</Text>
+        )}
         {name && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{name}</Text>}
         {hasCar && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>🚗 {t('common.carWith')}</Text>}
         {detail && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{detail}</Text>}
