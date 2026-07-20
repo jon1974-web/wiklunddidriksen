@@ -181,7 +181,9 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                         placeholder="Navn på fører"
                         placeholderTextColor={colors.textDisabled}
                       />
-                </View>
+                    </View>
+                  </>
+                )}
                 <View style={styles.field}>
                   <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => onFlightFormChange((f: any) => ({ ...f, isOneWay: !f.isOneWay }))}>
                     <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: flightForm.isOneWay ? colors.accent : colors.textDisabled, backgroundColor: flightForm.isOneWay ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
@@ -217,8 +219,6 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                         onSelect={(v) => onFlightFormChange((f: any) => ({ ...f, arrivalAddress: v }))}
                       />
                     </View>
-                  </>
-                )}
                 {(flightForm.transportType === 'bil' ? flightForm.type === 'utreise' : true) && (
                 <View style={styles.flightTimeRow}>
                   <View style={[styles.flightTimeField, { flex: 1 }]}>
