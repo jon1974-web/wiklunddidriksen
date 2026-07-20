@@ -146,6 +146,8 @@
     "hasCar": "Auto mukana",
     "carRegNr": "Auton rek. nro",
     "operator": "Liikennöitsijä",
+    "departureAirport": "Lähtöasema",
+    "arrivalAirport": "Saapumisasema",
     "routeName": "Reittinimi"
   },
   "hotels": {
@@ -319,6 +321,8 @@
     "hasCar": "Auto mukana",
     "carRegNr": "Auton rek. nro",
     "operator": "Liikennöitsijä",
+    "departureAirport": "Lähtöasema",
+    "arrivalAirport": "Saapumisasema",
     "routeName": "Reittinimi",
     "flightNumber": "Lennonumero",
     "trainRoute": "Junareitti",

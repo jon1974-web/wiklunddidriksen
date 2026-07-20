@@ -146,6 +146,8 @@
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
     "operator": "Operatör/Rederi",
+    "departureAirport": "Avgångsflygplats",
+    "arrivalAirport": "Ankomstflygplats",
     "routeName": "Ruttnamn"
   },
   "hotels": {
@@ -325,6 +327,8 @@
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
     "operator": "Operatör/Rederi",
+    "departureAirport": "Avgångsflygplats",
+    "arrivalAirport": "Ankomstflygplats",
     "routeName": "Ruttnamn",
     "flightNumber": "Flightnummer",
     "trainRoute": "Tåglinje",

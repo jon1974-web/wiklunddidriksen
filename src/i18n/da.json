@@ -146,6 +146,8 @@
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
     "operator": "Operatør/rederi",
+    "departureAirport": "Afgangslufthavn",
+    "arrivalAirport": "Ankomstlufthavn",
     "routeName": "Rutenavn"
   },
   "hotels": {
@@ -319,6 +321,8 @@
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
     "operator": "Operatør/rederi",
+    "departureAirport": "Afgangslufthavn",
+    "arrivalAirport": "Ankomstlufthavn",
     "routeName": "Rutenavn",
     "flightNumber": "Flynummer",
     "trainRoute": "Toglinje",

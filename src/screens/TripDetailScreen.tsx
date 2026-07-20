@@ -737,7 +737,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     let i = 0;
     while (i < sorted.length) {
       const current = sorted[i];
-      if (current.type === 'utreise') {
+      if (current.type === 'utreise' && !current.isOneWay) {
         const match = sorted.findIndex(
           (s, idx) => idx > i && s.type === 'hjemreise' && s.transportType === current.transportType
         );

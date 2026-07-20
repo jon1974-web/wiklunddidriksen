@@ -136,6 +136,8 @@
     "hasCar": "Car included",
     "carRegNr": "Car reg. no.",
     "operator": "Operator",
+    "departureAirport": "Departure airport",
+    "arrivalAirport": "Arrival airport",
     "routeName": "Route name"
   },
   "hotels": {
@@ -357,6 +359,8 @@
     "hasCar": "Car included",
     "carRegNr": "Car reg. no.",
     "operator": "Operator",
+    "departureAirport": "Departure airport",
+    "arrivalAirport": "Arrival airport",
     "routeName": "Route name",
     "flightNumber": "Flight number",
     "trainRoute": "Train route",

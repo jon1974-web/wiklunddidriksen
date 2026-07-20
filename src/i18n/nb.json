@@ -136,6 +136,8 @@
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
     "operator": "Selskap/rederi",
+    "departureAirport": "Avgangsflyplass",
+    "arrivalAirport": "Ankomstflyplass",
     "routeName": "Rutenavn"
   },
   "hotels": {
@@ -357,6 +359,8 @@
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
     "operator": "Selskap/rederi",
+    "departureAirport": "Avgangsflyplass",
+    "arrivalAirport": "Ankomstflyplass",
     "routeName": "Rutenavn",
     "flightNumber": "Flightnummer",
     "trainRoute": "Togrute",
