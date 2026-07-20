@@ -733,36 +733,28 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       if (timeA > timeB) return 1;
       return 0;
     });
-    // Filter out orphan return flights and one-way return flights
-    const departureTypes = new Set(
-      sorted.filter(f => f.type === 'utreise' && !f.isOneWay).map(f => f.transportType)
-    );
-    const filtered = sorted.filter(f => {
-      if (f.type === 'hjemreise') {
-        return departureTypes.has(f.transportType ?? 'fly');
-      }
-      return true;
-    });
-    // Pair flights
+    // Pair utreise (non-one-way) with matching hjemreise, drop unpaired hjemreise
     const rows: TripFlight[][] = [];
     const used = new Set<string>();
-    for (let i = 0; i < filtered.length; i++) {
-      if (used.has(filtered[i].id)) continue;
-      const current = filtered[i];
+    for (let i = 0; i < sorted.length; i++) {
+      if (used.has(sorted[i].id)) continue;
+      const current = sorted[i];
       if (current.type === 'utreise' && !current.isOneWay) {
-        const matchIdx = filtered.findIndex(
+        const matchIdx = sorted.findIndex(
           (s, idx) => idx > i && !used.has(s.id) && s.type === 'hjemreise' && s.transportType === current.transportType
         );
         if (matchIdx !== -1) {
-          rows.push([current, filtered[matchIdx]]);
+          rows.push([current, sorted[matchIdx]]);
           used.add(current.id);
-          used.add(filtered[matchIdx].id);
+          used.add(sorted[matchIdx].id);
         } else {
           rows.push([current]);
         }
-      } else if (!used.has(current.id)) {
+      } else if (current.type === 'utreise') {
+        // One-way departure — show alone, never pair
         rows.push([current]);
       }
+      // hjemreise without matching utreise is silently dropped (orphan/one-way return)
     }
     return rows;
   }, [flights]);
