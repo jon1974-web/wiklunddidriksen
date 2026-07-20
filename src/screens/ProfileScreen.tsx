@@ -386,13 +386,23 @@ export const ProfileScreen: React.FC = () => {
       } else {
         blob = await uriToBlob(uri);
       }
-      const storageRef = ref(storage, `avatars/${user.uid}`);
-      await uploadBytes(storageRef, blob);
-      const downloadUrl = await getDownloadURL(storageRef);
+      if (blob.size === 0) {
+        throw new Error('Bildet er tomt');
+      }
+      let downloadUrl: string;
+      if (Platform.OS === 'web') {
+        const { webUploadFile } = await import('../services/webStorage');
+        downloadUrl = await webUploadFile(`avatars/${user.uid}`, blob);
+      } else {
+        const storageRef = ref(storage, `avatars/${user.uid}`);
+        await uploadBytes(storageRef, blob);
+        downloadUrl = await getDownloadURL(storageRef);
+      }
       await createOrUpdateUser(user.uid, { avatarUrl: downloadUrl });
       setProfile((prev: UserProfile | null) => prev ? { ...prev, avatarUrl: downloadUrl } : prev);
       setUser({ ...user, avatarUrl: downloadUrl });
     } catch (error) {
+      console.error('Avatar upload failed:', error);
       Alert.alert('Error', 'Kunne ikke laste opp bildet.');
     } finally {
       setUploading(false);

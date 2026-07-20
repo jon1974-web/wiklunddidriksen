@@ -729,9 +729,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const openFileUrl = async (url: string) => {
     if (Platform.OS === 'web') {
       try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const blob = await response.blob();
+        const { webFetchAsBlob } = await import('../services/webStorage');
+        const blob = await webFetchAsBlob(url);
         const blobUrl = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = blobUrl;

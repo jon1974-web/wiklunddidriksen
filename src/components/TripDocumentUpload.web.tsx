@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../services/firebase';
+import { storage, auth } from '../services/firebase';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { useTranslation } from 'react-i18next';
@@ -31,8 +31,9 @@ export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(
 
       setUploading(true);
       try {
-        await uploadBytes(storageRef, file);
-        const downloadUrl = await getDownloadURL(storageRef);
+        const { webUploadFile } = await import('../services/webStorage');
+        const path = `trips/${tripId}/documents/${fileName}`;
+        const downloadUrl = await webUploadFile(path, file);
         onUploaded(downloadUrl, fileName);
       } catch (error) {
         window.alert('Feil: ' + getErrorMessage(error));
