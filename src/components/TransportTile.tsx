@@ -17,6 +17,14 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
   const { colors } = useTheme();
   const f = flight;
 
+  const extractCode = (s?: string): string => {
+    if (!s) return '';
+    const m = s.match(/\(([^)]+)\)/);
+    return m ? m[1] : s;
+  };
+  const depCode = extractCode(f.departureAddress);
+  const arrCode = extractCode(f.arrivalAddress);
+
   const transportIcon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
   const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
   const calDate = f.departureDate || f.arrivalDate;
@@ -62,6 +70,11 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
               {f.transportType === 'bil'
                 ? (f.type === 'utreise' ? t('transport.pickup') : t('transport.dropoff'))
                 : (f.type === 'utreise' ? t('transport.departure') : t('transport.arrival'))}
+            </Text>
+          )}
+          {depCode && arrCode && (
+            <Text style={{ color: colors.textSecondary, fontSize: 11, marginTop: 2 }}>
+              {depCode} → {arrCode}
             </Text>
           )}
         </View>
