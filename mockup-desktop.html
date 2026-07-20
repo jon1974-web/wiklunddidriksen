@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Desktop Layout Mockup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #e8f0f1;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    /* Desktop layout */
+    .desktop-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+      min-height: 100vh;
+    }
+
+    .side-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 280px;
+      padding: 40px 30px;
+      text-align: center;
+    }
+
+    .side-panel .logo-icon {
+      width: 80px;
+      height: 80px;
+      margin-bottom: 16px;
+    }
+
+    .side-panel .app-name {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0097A7;
+      margin-bottom: 8px;
+    }
+
+    .side-panel .tagline {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    .app-column {
+      width: 480px;
+      min-height: 100vh;
+      background: #fff;
+      box-shadow: 0 0 40px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Status bar */
+    .status-bar {
+      height: 44px;
+      background: #0097A7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    /* Header */
+    .header {
+      padding: 16px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-back {
+      font-size: 22px;
+      color: #0097A7;
+      cursor: pointer;
+    }
+
+    .header-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .header-action {
+      font-size: 22px;
+      color: #0097A7;
+      cursor: pointer;
+    }
+
+    /* Login Page */
+    .login-page {
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: calc(100vh - 44px);
+    }
+
+    .login-logo {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 12px;
+    }
+
+    .login-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0097A7;
+      margin-bottom: 4px;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 32px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #fafafa;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field-input:focus {
+      border-color: #0097A7;
+      background: #fff;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: #0097A7;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover {
+      background: #00838F;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .login-link a {
+      color: #0097A7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    /* Divider */
+    .section-divider {
+      height: 1px;
+      background: #eee;
+      margin: 16px 20px;
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 60px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 10px;
+      color: #999;
+      cursor: pointer;
+    }
+
+    .tab-item.active {
+      color: #0097A7;
+    }
+
+    .tab-item .tab-icon {
+      font-size: 22px;
+    }
+
+    /* Event card */
+    .event-card {
+      margin: 0 20px 12px;
+      padding: 14px 16px;
+      background: #f8fafb;
+      border-radius: 12px;
+      border: 1px solid #eee;
+    }
+
+    .event-card .event-icon {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .event-card .event-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .event-card .event-date {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 2px;
+    }
+
+    .event-card .event-location {
+      font-size: 13px;
+      color: #0097A7;
+    }
+
+    .event-card .event-host {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 6px;
+    }
+
+    /* Page indicator */
+    .page-indicator {
+      text-align: center;
+      padding: 24px;
+      background: #e8f0f1;
+      color: #0097A7;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    /* Mockup label */
+    .mockup-label {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 100;
+      opacity: 0.8;
+    }
+
+    /* Nav bar inside app */
+    .nav-bar {
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .nav-action {
+      width: 36px;
+      height: 36px;
+      background: #f0f4f5;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Dark mode */
+    body.dark {
+      background: #1a1a1a;
+    }
+
+    body.dark .side-panel .app-name { color: #4dd0e1; }
+    body.dark .side-panel .tagline { color: #999; }
+
+    body.dark .app-column {
+      background: #2a2a2a;
+      box-shadow: 0 0 40px rgba(0,0,0,0.3);
+    }
+
+    body.dark .header-title { color: #eee; }
+    body.dark .nav-title { color: #eee; }
+
+    body.dark .field-input {
+      background: #333;
+      border-color: #444;
+      color: #eee;
+    }
+
+    body.dark .event-card {
+      background: #333;
+      border-color: #444;
+    }
+
+    body.dark .event-card .event-title { color: #eee; }
+    body.dark .event-card .event-date { color: #aaa; }
+
+    body.dark .tab-bar {
+      background: #2a2a2a;
+      border-color: #333;
+    }
+
+    body.dark .login-title { color: #4dd0e1; }
+    body.dark .login-subtitle { color: #999; }
+
+    body.dark .nav-action {
+      background: #333;
+    }
+
+    /* Two-page layout */
+    .pages-container {
+      display: flex;
+      gap: 60px;
+      padding: 60px 20px 40px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .page-wrapper {
+      flex-shrink: 0;
+    }
+
+    .page-label {
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    body.dark .page-label {
+      color: #888;
+    }
+
+    /* Dark mode toggle */
+    .dark-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #333;
+      color: #fff;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      cursor: pointer;
+      z-index: 100;
+      opacity: 0.7;
+    }
+
+    .dark-toggle:hover {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-label">Familiesenter — Desktop Layout Mockup</div>
+
+  <div class="pages-container">
+
+    <!-- Login Page with side panels -->
+    <div class="page-wrapper">
+      <div class="page-label">Logg inn</div>
+      <div style="display: flex; align-items: stretch;">
+        <!-- Left side panel -->
+        <div class="side-panel">
+          <svg class="logo-icon" viewBox="0 0 1024 1024">
+            <defs>
+              <linearGradient id="bg1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#0097A7"/>
+                <stop offset="100%" style="stop-color:#00838F"/>
+              </linearGradient>
+            </defs>
+            <rect width="1024" height="1024" rx="220" fill="url(#bg1)"/>
+            <path d="M512 200L200 440v384h240V580h144v244h240V440z" fill="#fff" opacity="0.9"/>
+            <circle cx="512" cy="420" r="40" fill="#E53935"/>
+            <path d="M512 390c-20-30-55-50-55-50s-10 40 10 70c0 0 15 20 45 20s45-20 45-20c20-30 10-70 10-70s-35 20-55 50z" fill="#E53935"/>
+            <rect x="300" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="420" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="540" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="660" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <ellipse cx="340" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="460" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="580" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="700" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+          </svg>
+          <div class="app-name">Familiesenter</div>
+          <div class="tagline">Familie arrangement administrasjon</div>
+        </div>
+
+        <!-- App column -->
+        <div class="app-column">
+          <div class="status-bar">9:41</div>
+          <div class="login-page">
+            <svg class="login-logo" viewBox="0 0 1024 1024">
+              <defs>
+                <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#0097A7"/>
+                  <stop offset="100%" style="stop-color:#00838F"/>
+                </linearGradient>
+              </defs>
+              <rect width="1024" height="1024" rx="220" fill="url(#bg2)"/>
+              <path d="M512 200L200 440v384h240V580h144v244h240V440z" fill="#fff" opacity="0.9"/>
+              <circle cx="512" cy="420" r="40" fill="#E53935"/>
+              <path d="M512 390c-20-30-55-50-55-50s-10 40 10 70c0 0 15 20 45 20s45-20 45-20c20-30 10-70 10-70s-35 20-55 50z" fill="#E53935"/>
+              <rect x="300" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+              <rect x="420" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+              <rect x="540" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+              <rect x="660" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+              <ellipse cx="340" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+              <ellipse cx="460" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+              <ellipse cx="580" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+              <ellipse cx="700" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            </svg>
+            <div class="login-title">Familiesenter</div>
+            <div class="login-subtitle">Familie arrangement administrasjon</div>
+
+            <div class="login-card">
+              <div class="field-group">
+                <label class="field-label">E-post</label>
+                <input class="field-input" type="email" placeholder="din@epost.no" disabled>
+              </div>
+              <div class="field-group">
+                <label class="field-label">Passord</label>
+                <input class="field-input" type="password" placeholder="••••••••" disabled>
+              </div>
+              <button class="btn-primary">Logg inn</button>
+              <div class="login-link">Har du ikke konto? <a href="#">Registrer deg</a></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right side panel -->
+        <div class="side-panel">
+          <svg class="logo-icon" viewBox="0 0 1024 1024">
+            <defs>
+              <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#0097A7"/>
+                <stop offset="100%" style="stop-color:#00838F"/>
+              </linearGradient>
+            </defs>
+            <rect width="1024" height="1024" rx="220" fill="url(#bg3)"/>
+            <path d="M512 200L200 440v384h240V580h144v244h240V440z" fill="#fff" opacity="0.9"/>
+            <circle cx="512" cy="420" r="40" fill="#E53935"/>
+            <path d="M512 390c-20-30-55-50-55-50s-10 40 10 70c0 0 15 20 45 20s45-20 45-20c20-30 10-70 10-70s-35 20-55 50z" fill="#E53935"/>
+            <rect x="300" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="420" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="540" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="660" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <ellipse cx="340" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="460" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="580" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="700" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+          </svg>
+          <div class="app-name">Familiesenter</div>
+          <div class="tagline">Familie arrangement administrasjon</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Events Page with side panels -->
+    <div class="page-wrapper">
+      <div class="page-label">Arrangementer</div>
+      <div style="display: flex; align-items: stretch;">
+        <!-- Left side panel -->
+        <div class="side-panel">
+          <svg class="logo-icon" viewBox="0 0 1024 1024">
+            <defs>
+              <linearGradient id="bg4" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#0097A7"/>
+                <stop offset="100%" style="stop-color:#00838F"/>
+              </linearGradient>
+            </defs>
+            <rect width="1024" height="1024" rx="220" fill="url(#bg4)"/>
+            <path d="M512 200L200 440v384h240V580h144v244h240V440z" fill="#fff" opacity="0.9"/>
+            <circle cx="512" cy="420" r="40" fill="#E53935"/>
+            <path d="M512 390c-20-30-55-50-55-50s-10 40 10 70c0 0 15 20 45 20s45-20 45-20c20-30 10-70 10-70s-35 20-55 50z" fill="#E53935"/>
+            <rect x="300" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="420" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="540" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="660" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <ellipse cx="340" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="460" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="580" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="700" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+          </svg>
+          <div class="app-name">Familiesenter</div>
+          <div class="tagline">Familie arrangement administrasjon</div>
+        </div>
+
+        <!-- App column -->
+        <div class="app-column">
+          <div class="status-bar">9:41</div>
+
+          <div class="nav-bar">
+            <div class="nav-title">📅 Arrangementer</div>
+            <div class="nav-action">+</div>
+          </div>
+
+          <div class="event-card">
+            <div class="event-icon">🎉</div>
+            <div class="event-title">Jons 40-årsdag</div>
+            <div class="event-date">Lørdag 15. juli — 15:00</div>
+            <div class="event-location">📍 Jons hus, Oslo</div>
+            <div class="event-host">Arrangør: Jon</div>
+          </div>
+
+          <div class="event-card">
+            <div class="event-icon">🍕</div>
+            <div class="event-title">Fredagskveld med pizza</div>
+            <div class="event-date">Fredag 14. juli — 18:00</div>
+            <div class="event-location">📍 Hjemme hos oss</div>
+            <div class="event-host">Arrangør: Marie</div>
+          </div>
+
+          <div class="event-card">
+            <div class="event-icon">⛷️</div>
+            <div class="event-title">Vintertur til Geilo</div>
+            <div class="event-date">20.–22. desember</div>
+            <div class="event-location">📍 Geilo, Hallingskarvet</div>
+            <div class="event-host">Arrangør: Jon</div>
+          </div>
+
+          <div class="event-card">
+            <div class="event-icon">🎂</div>
+            <div class="event-title">Emmas bursdag</div>
+            <div class="event-date">Søndag 6. august — 14:00</div>
+            <div class="event-location">📍 Bestemors hus, Bergen</div>
+            <div class="event-host">Arrangør: Bestemor</div>
+          </div>
+
+          <div class="tab-bar">
+            <div class="tab-item active">
+              <span class="tab-icon">📅</span>
+              <span>Arrangementer</span>
+            </div>
+            <div class="tab-item">
+              <span class="tab-icon">🛒</span>
+              <span>Lister</span>
+            </div>
+            <div class="tab-item">
+              <span class="tab-icon">💬</span>
+              <span>Chat</span>
+            </div>
+            <div class="tab-item">
+              <span class="tab-icon">✈️</span>
+              <span>Turer</span>
+            </div>
+            <div class="tab-item">
+              <span class="tab-icon">👤</span>
+              <span>Profil</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right side panel -->
+        <div class="side-panel">
+          <svg class="logo-icon" viewBox="0 0 1024 1024">
+            <defs>
+              <linearGradient id="bg5" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style="stop-color:#0097A7"/>
+                <stop offset="100%" style="stop-color:#00838F"/>
+              </linearGradient>
+            </defs>
+            <rect width="1024" height="1024" rx="220" fill="url(#bg5)"/>
+            <path d="M512 200L200 440v384h240V580h144v244h240V440z" fill="#fff" opacity="0.9"/>
+            <circle cx="512" cy="420" r="40" fill="#E53935"/>
+            <path d="M512 390c-20-30-55-50-55-50s-10 40 10 70c0 0 15 20 45 20s45-20 45-20c20-30 10-70 10-70s-35 20-55 50z" fill="#E53935"/>
+            <rect x="300" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="420" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="540" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <rect x="660" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+            <ellipse cx="340" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="460" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="580" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+            <ellipse cx="700" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+          </svg>
+          <div class="app-name">Familiesenter</div>
+          <div class="tagline">Familie arrangement administrasjon</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <button class="dark-toggle" onclick="document.body.classList.toggle('dark'); this.textContent = document.body.classList.contains('dark') ? '☀️ Light mode' : '🌙 Dark mode'">🌙 Dark mode</button>
+</body>
+</html>

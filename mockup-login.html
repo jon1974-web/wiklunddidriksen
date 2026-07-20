@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Logg inn (Desktop)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #e8f0f1;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    /* Left branding panel */
+    .brand-panel {
+      width: 300px;
+      padding: 40px 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px;
+    }
+
+    .brand-panel .logo-icon {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 16px;
+    }
+
+    .brand-panel .app-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0097A7;
+      margin-bottom: 6px;
+    }
+
+    .brand-panel .tagline {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    /* Main content area */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 560px;
+    }
+
+    .app-column {
+      flex: 1;
+      min-height: 100vh;
+      background: #fff;
+      box-shadow: 0 0 40px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status-bar {
+      height: 44px;
+      background: #0097A7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .login-page {
+      flex: 1;
+      padding: 50px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-logo {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 12px;
+    }
+
+    .login-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #0097A7;
+      margin-bottom: 4px;
+    }
+
+    .login-subtitle {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 36px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 360px;
+    }
+
+    .field-group {
+      margin-bottom: 18px;
+    }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 15px;
+      background: #fafafa;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field-input:focus {
+      border-color: #0097A7;
+      background: #fff;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: #0097A7;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .btn-primary:hover {
+      background: #00838F;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 13px;
+      color: #888;
+    }
+
+    .login-link a {
+      color: #0097A7;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .mockup-badge {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 100;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-badge">Mockup — Logg inn side</div>
+
+  <!-- Left branding panel -->
+  <div class="brand-panel">
+    <svg class="logo-icon" viewBox="0 0 1024 1024">
+      <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#0097A7"/>
+          <stop offset="100%" style="stop-color:#00838F"/>
+        </linearGradient>
+      </defs>
+      <rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+      <path d="M512 200L200 440v384h240V580h144v244h240V440z" fill="#fff" opacity="0.9"/>
+      <circle cx="512" cy="420" r="40" fill="#E53935"/>
+      <path d="M512 390c-20-30-55-50-55-50s-10 40 10 70c0 0 15 20 45 20s45-20 45-20c20-30 10-70 10-70s-35 20-55 50z" fill="#E53935"/>
+      <rect x="300" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+      <rect x="420" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+      <rect x="540" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+      <rect x="660" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+      <ellipse cx="340" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+      <ellipse cx="460" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+      <ellipse cx="580" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+      <ellipse cx="700" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+    </svg>
+    <div class="app-name">Familiesenter</div>
+    <div class="tagline">Familie arrangement administrasjon</div>
+  </div>
+
+  <!-- Main content area -->
+  <div class="main-area">
+    <div class="app-column">
+      <div class="status-bar">9:41</div>
+      <div class="login-page">
+        <svg class="login-logo" viewBox="0 0 1024 1024">
+          <defs>
+            <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#0097A7"/>
+              <stop offset="100%" style="stop-color:#00838F"/>
+            </linearGradient>
+          </defs>
+          <rect width="1024" height="1024" rx="220" fill="url(#bg2)"/>
+          <path d="M512 200L200 440v384h240V580h144v244h240V440z" fill="#fff" opacity="0.9"/>
+          <circle cx="512" cy="420" r="40" fill="#E53935"/>
+          <path d="M512 390c-20-30-55-50-55-50s-10 40 10 70c0 0 15 20 45 20s45-20 45-20c20-30 10-70 10-70s-35 20-55 50z" fill="#E53935"/>
+          <rect x="300" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+          <rect x="420" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+          <rect x="540" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+          <rect x="660" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+          <ellipse cx="340" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+          <ellipse cx="460" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+          <ellipse cx="580" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+          <ellipse cx="700" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+        </svg>
+        <div class="login-title">Familiesenter</div>
+        <div class="login-subtitle">Familie arrangement administrasjon</div>
+
+        <div class="login-card">
+          <div class="field-group">
+            <label class="field-label">E-post</label>
+            <input class="field-input" type="email" placeholder="din@epost.no" disabled>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Passord</label>
+            <input class="field-input" type="password" placeholder="••••••••" disabled>
+          </div>
+          <button class="btn-primary">Logg inn</button>
+          <div class="login-link">Har du ikke konto? <a href="#">Registrer deg</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

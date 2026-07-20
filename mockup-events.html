@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Arrangementer (Desktop)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #e8f0f1;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    /* Left branding panel */
+    .brand-panel {
+      width: 280px;
+      padding: 40px 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .brand-panel .logo-icon {
+      width: 64px;
+      height: 64px;
+      margin-bottom: 14px;
+    }
+
+    .brand-panel .app-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #0097A7;
+      margin-bottom: 4px;
+    }
+
+    .brand-panel .tagline {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.4;
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    /* Navigation links */
+    .nav-links {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-decoration: none;
+    }
+
+    .nav-link:hover {
+      background: #dce8ea;
+    }
+
+    .nav-link.active {
+      background: #0097A7;
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .nav-link .nav-emoji {
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+    }
+
+    /* Main content area */
+    .main-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 640px;
+    }
+
+    .app-column {
+      flex: 1;
+      min-height: 100vh;
+      background: #fff;
+      box-shadow: 0 0 40px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status-bar {
+      height: 44px;
+      background: #0097A7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* Header */
+    .header-bar {
+      padding: 16px 20px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .header-action {
+      width: 36px;
+      height: 36px;
+      background: #f0f4f5;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+    /* Sorting tabs */
+    .sort-tabs {
+      display: flex;
+      gap: 6px;
+      padding: 0 20px 14px;
+      flex-shrink: 0;
+    }
+
+    .sort-tab {
+      padding: 7px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #666;
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid #ddd;
+      background: #fff;
+    }
+
+    .sort-tab:hover {
+      border-color: #0097A7;
+      color: #0097A7;
+    }
+
+    .sort-tab.active {
+      background: #0097A7;
+      color: #fff;
+      border-color: #0097A7;
+    }
+
+    /* Header with view toggles and filter icons */
+    .header-row {
+      padding: 12px 20px 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #eee;
+      flex-shrink: 0;
+    }
+
+    .view-toggles {
+      display: flex;
+      gap: 6px;
+    }
+
+    .toggle-btn {
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      background: #f0f4f5;
+      border: none;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .toggle-btn:hover {
+      background: #e0e8ea;
+    }
+
+    .toggle-btn.active {
+      background: #0097A7;
+      color: #fff;
+    }
+
+    .toggle-btn.weekly {
+      background: #4CAF50;
+      color: #fff;
+    }
+
+    .filter-icons {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .filter-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 16px;
+      border: 2px solid transparent;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s;
+    }
+
+    .filter-icon:hover {
+      border-color: #ccc;
+    }
+
+    .filter-icon.active {
+      border-color: #0097A7;
+    }
+
+    .filter-icon img {
+      width: 28px;
+      height: 28px;
+      border-radius: 14px;
+    }
+
+    .filter-circle {
+      width: 22px;
+      height: 22px;
+      border-radius: 11px;
+      background: #4CAF50;
+    }
+
+    /* Content */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .event-card {
+      margin: 0 20px 10px;
+      padding: 14px 16px;
+      background: #f8fafb;
+      border-radius: 12px;
+      border: 1px solid #eee;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .event-card:hover {
+      background: #f0f4f5;
+    }
+
+    .event-card .event-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .event-card .event-icon {
+      font-size: 30px;
+      flex-shrink: 0;
+    }
+
+    .event-card .event-info { flex: 1; }
+
+    .event-card .event-title {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 3px;
+    }
+
+    .event-card .event-date {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 2px;
+    }
+
+    .event-card .event-location {
+      font-size: 13px;
+      color: #0097A7;
+    }
+
+    .event-card .event-host {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 6px;
+    }
+
+    .event-card .event-spond {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-radius: 10px;
+      font-size: 11px;
+      font-weight: 600;
+      margin-top: 6px;
+    }
+
+    /* Profile card at bottom of brand panel */
+    .profile-card {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 10px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .profile-card:hover {
+      background: rgba(255,255,255,0.9);
+    }
+
+    .profile-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      background: #0097A7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .profile-name {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .profile-email {
+      font-size: 11px;
+      color: #888;
+    }
+
+    .mockup-badge {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 100;
+      opacity: 0.7;
+    }
+
+    .bottom-tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 56px;
+      background: #fff;
+      border-top: 1px solid #eee;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-badge">Mockup — Desktop layout</div>
+
+  <!-- Left panel: branding + navigation -->
+  <div class="brand-panel">
+    <svg class="logo-icon" viewBox="0 0 1024 1024">
+      <defs>
+        <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#0097A7"/>
+          <stop offset="100%" style="stop-color:#00838F"/>
+        </linearGradient>
+      </defs>
+      <rect width="1024" height="1024" rx="220" fill="url(#bg)"/>
+      <path d="M512 200L200 440v384h240V580h144v244h240V440z" fill="#fff" opacity="0.9"/>
+      <circle cx="512" cy="420" r="40" fill="#E53935"/>
+      <path d="M512 390c-20-30-55-50-55-50s-10 40 10 70c0 0 15 20 45 20s45-20 45-20c20-30 10-70 10-70s-35 20-55 50z" fill="#E53935"/>
+      <rect x="300" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+      <rect x="420" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+      <rect x="540" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+      <rect x="660" y="620" width="80" height="120" rx="8" fill="#fff" opacity="0.6"/>
+      <ellipse cx="340" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+      <ellipse cx="460" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+      <ellipse cx="580" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+      <ellipse cx="700" cy="610" rx="28" ry="35" fill="#fff" opacity="0.7"/>
+    </svg>
+    <div class="app-name">Familiesenter</div>
+    <div class="tagline">Familie arrangement administrasjon</div>
+
+    <!-- Navigation links -->
+    <div class="nav-links">
+      <a class="nav-link active">
+        <span class="nav-emoji">📅</span>
+        Arrangementer
+      </a>
+      <a class="nav-link">
+        <span class="nav-emoji">🛒</span>
+        Handlelister
+      </a>
+      <a class="nav-link">
+        <span class="nav-emoji">💬</span>
+        Chat
+      </a>
+      <a class="nav-link">
+        <span class="nav-emoji">✈️</span>
+        Turer
+      </a>
+      <a class="nav-link">
+        <span class="nav-emoji">👤</span>
+        Profil
+      </a>
+    </div>
+
+    <!-- Profile card -->
+    <div class="profile-card">
+      <div class="profile-avatar">J</div>
+      <div>
+        <div class="profile-name">Jon</div>
+        <div class="profile-email">jon@wiklunddidriksen.com</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content area -->
+  <div class="main-area">
+    <div class="app-column">
+      <div class="status-bar">9:41</div>
+
+      <div class="header-bar">
+        <div class="header-title">📅 Arrangementer</div>
+        <div class="header-action">+</div>
+      </div>
+
+      <!-- Header with view toggles and filters -->
+      <div class="header-row">
+        <div class="view-toggles">
+          <button class="toggle-btn active">Liste</button>
+          <button class="toggle-btn">Kalender</button>
+          <button class="toggle-btn weekly">Min uke</button>
+        </div>
+        <div class="filter-icons">
+          <div class="filter-icon">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%236A1B9A'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='white' font-size='32' font-family='Arial' font-weight='bold'%3EVQ%3C/text%3E%3C/svg%3E" alt="Viqueens">
+          </div>
+          <div class="filter-icon">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%230D47A1'/%3E%3Ctext x='50' y='55' text-anchor='middle' fill='white' font-size='32' font-family='Arial' font-weight='bold'%3EBSK%3C/text%3E%3C/svg%3E" alt="BSK">
+          </div>
+          <div class="filter-icon">
+            <div class="filter-circle"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Event list -->
+      <div class="content">
+        <div class="event-card">
+          <div class="event-header">
+            <div class="event-icon">🎉</div>
+            <div class="event-info">
+              <div class="event-title">Jons 40-årsdag</div>
+              <div class="event-date">Lørdag 15. juli — 15:00</div>
+              <div class="event-location">📍 Jons hus, Oslo</div>
+              <div class="event-host">Arrangør: Jon</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-header">
+            <div class="event-icon">⚽</div>
+            <div class="event-info">
+              <div class="event-title">G14 kamp — Ready vs. Vålerenga</div>
+              <div class="event-date">Søndag 16. juli — 14:00</div>
+              <div class="event-location">📍 Marienlyst</div>
+              <div class="event-spond">Spond</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-header">
+            <div class="event-icon">🍕</div>
+            <div class="event-info">
+              <div class="event-title">Fredagskveld med pizza</div>
+              <div class="event-date">Fredag 14. juli — 18:00</div>
+              <div class="event-location">📍 Hjemme hos oss</div>
+              <div class="event-host">Arrangør: Marie</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-header">
+            <div class="event-icon">🏊</div>
+            <div class="event-info">
+              <div class="event-title">Svømming med Spond</div>
+              <div class="event-date">Lørdag 22. juli — 11:00</div>
+              <div class="event-location">📍 Sognsvann</div>
+              <div class="event-spond">Spond</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-header">
+            <div class="event-icon">⛷️</div>
+            <div class="event-info">
+              <div class="event-title">Vintertur til Geilo</div>
+              <div class="event-date">20.–22. desember</div>
+              <div class="event-location">📍 Hallingskarvet</div>
+              <div class="event-host">Arrangør: Jon</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="event-card">
+          <div class="event-header">
+            <div class="event-icon">🎄</div>
+            <div class="event-info">
+              <div class="event-title">Julefeiring hjemme</div>
+              <div class="event-date">24. desember — 14:00</div>
+              <div class="event-location">📍 Vårt hus, Oslo</div>
+              <div class="event-host">Arrangør: Jon & Marie</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
