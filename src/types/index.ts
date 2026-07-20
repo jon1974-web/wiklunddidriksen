@@ -147,6 +147,7 @@ export interface TripFlight {
   id: string;
   transportType?: 'fly' | 'tog' | 'bil';
   type?: 'utreise' | 'hjemreise';
+  isOneWay?: boolean;
   airline?: string;
   flightNumber?: string;
   reference?: string;
@@ -158,6 +159,8 @@ export interface TripFlight {
   phone?: string;
   note?: string;
   address?: string;
+  departureAddress?: string;
+  arrivalAddress?: string;
   driver?: string;
   passengers?: string;
   wagon?: string;

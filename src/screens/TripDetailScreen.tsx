@@ -111,7 +111,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   // Form state (consolidated)
   const emptyHotel = { name: '', address: '', phone: '', startDate: '', endDate: '', checkInTime: '', checkOutTime: '', note: '' };
-  const emptyFlight = { transportType: 'fly' as 'fly' | 'tog' | 'bil', type: 'utreise' as 'utreise' | 'hjemreise', airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '' };
+  const emptyFlight = { transportType: 'fly' as 'fly' | 'tog' | 'bil', type: 'utreise' as 'utreise' | 'hjemreise', isOneWay: false, airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '' };
   const emptyRest = { name: '', address: '', note: '' };
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
@@ -406,6 +406,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       const formData = {
         transportType: item.transportType || 'fly',
         type: item.type || 'utreise',
+        isOneWay: item.isOneWay || false,
         airline: item.airline || '',
         flightNumber: item.flightNumber || '',
         reference: item.reference || '',
@@ -414,6 +415,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         driver: item.driver || '',
         passengers: item.passengers || '',
         address: item.address || '',
+        departureAddress: item.departureAddress || '',
+        arrivalAddress: item.arrivalAddress || '',
         departureDate: item.departureDate || '',
         departureTime: item.departureTime || '',
         arrivalDate: item.arrivalDate || '',
@@ -501,6 +504,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         const rawData: Record<string, any> = {
           transportType: form.transportType,
           type,
+          isOneWay: form.isOneWay || undefined,
           airline: form.airline.trim() ? sanitizeInput(form.airline) : undefined,
           flightNumber: form.flightNumber.trim() ? sanitizeInput(form.flightNumber) : undefined,
           reference: form.reference.trim() ? sanitizeInput(form.reference) : undefined,
@@ -509,6 +513,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           driver: form.driver.trim() ? sanitizeInput(form.driver) : undefined,
           passengers: form.passengers.trim() ? sanitizeInput(form.passengers) : undefined,
           address: form.address.trim() ? sanitizeInput(form.address) : undefined,
+          departureAddress: form.departureAddress?.trim() ? sanitizeInput(form.departureAddress) : undefined,
+          arrivalAddress: form.arrivalAddress?.trim() ? sanitizeInput(form.arrivalAddress) : undefined,
           phone: form.phone.trim() ? sanitizeInput(form.phone) : undefined,
           note: form.note.trim() ? sanitizeInput(form.note) : undefined,
         };

@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 export interface FlightForm {
   transportType: 'fly' | 'tog' | 'bil';
   type: 'utreise' | 'hjemreise';
+  isOneWay?: boolean;
   airline: string;
   flightNumber: string;
   reference: string;
@@ -14,6 +15,8 @@ export interface FlightForm {
   driver: string;
   passengers: string;
   address: string;
+  departureAddress?: string;
+  arrivalAddress?: string;
   departureDate: string;
   departureTime: string;
   arrivalDate: string;
@@ -178,14 +181,40 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                         placeholder="Navn på fører"
                         placeholderTextColor={colors.textDisabled}
                       />
+                </View>
+                <View style={styles.field}>
+                  <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => onFlightFormChange((f: any) => ({ ...f, isOneWay: !f.isOneWay }))}>
+                    <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: flightForm.isOneWay ? colors.accent : colors.textDisabled, backgroundColor: flightForm.isOneWay ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+                      {flightForm.isOneWay && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                     </View>
-                    <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.oneWay')}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
                       <GooglePlacesInput
                         value={flightForm.address}
                         onChangeText={(v) => set({ address: v })}
                         placeholder="Søk etter adresse..."
                         onSelect={(v) => set({ address: v })}
+                      />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('transport.departureTerminal')}</Text>
+                      <GooglePlacesInput
+                        value={flightForm.departureAddress || ''}
+                        onChangeText={(v) => onFlightFormChange((f: any) => ({ ...f, departureAddress: v }))}
+                        placeholder="Avgangsterminal adresse..."
+                        onSelect={(v) => onFlightFormChange((f: any) => ({ ...f, departureAddress: v }))}
+                      />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrivalTerminal')}</Text>
+                      <GooglePlacesInput
+                        value={flightForm.arrivalAddress || ''}
+                        onChangeText={(v) => onFlightFormChange((f: any) => ({ ...f, arrivalAddress: v }))}
+                        placeholder="Ankomstterminal adresse..."
+                        onSelect={(v) => onFlightFormChange((f: any) => ({ ...f, arrivalAddress: v }))}
                       />
                     </View>
                   </>
