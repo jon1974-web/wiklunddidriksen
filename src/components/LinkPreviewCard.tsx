@@ -25,7 +25,7 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = React.memo(({ lin
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.surface }]}
+      style={[styles.card, { backgroundColor: colors.surfaceVariant }]}
       onPress={onPress}
       onLongPress={onLongPress}
     >

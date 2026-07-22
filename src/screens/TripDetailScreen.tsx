@@ -956,309 +956,332 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       )}
 
       {/* Transport */}
-      {renderSectionHeader(t('transport.title'), '🚀', () => setShowTransportPicker(true))}
-      {sortedTransportRows.length === 0 && otherTransportItems.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('transport.noTransport')}</Text>
-      ) : (
-        <>
-          {sortedTransportRows.map((row, rowIdx) => (
-            <View key={`flight-${rowIdx}`} style={styles.transportGrid}>
-              {row.map((f) => (
-                <View key={f.id} style={styles.transportTileWrapper}>
-                  <TransportTile
-                    flight={f}
-                    onPress={() => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip })}
-                    onLongPress={canDelete ? () => setActionModal({ visible: true, title: `${f.airline || f.transportType} ${f.flightNumber || ''}`.trim(), subtitle: 'Transport', onEdit: () => openEditModal('flight', f), onDelete: () => handleDeleteFlight(f.id) }) : undefined}
-                  />
-                </View>
-              ))}
-            </View>
-          ))}
-          {(() => {
-            return otherTransportItems.map((row, rowIdx) => (
-              <View key={`other-${rowIdx}`} style={styles.transportGrid}>
-                {row.map((item: any) => (
-                  <View key={item.id} style={styles.transportTileWrapper}>
-                    <TransportItemTile
-                      icon={item.icon}
-                      label={item.label}
-                      typeLabel={item.typeLabel}
-                      name={item.name}
-                      detail={item.detail}
-                      departureDate={item.departureDate}
-                      departureTime={item.departureTime}
-                      arrivalTime={item.arrivalTime}
-                      hasCar={item.hasCar}
-                      isHjemreise={item.isHjemreise}
-                      onPress={item.onPress}
-                      onLongPress={item.onLongPress}
+      <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
+        {renderSectionHeader(t('transport.title'), '🚀', () => setShowTransportPicker(true))}
+        {sortedTransportRows.length === 0 && otherTransportItems.length === 0 ? (
+          <Text style={[styles.emptySection, { color: colors.textDisabled, paddingHorizontal: 16 }]}>{t('transport.noTransport')}</Text>
+        ) : (
+          <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
+            {sortedTransportRows.map((row, rowIdx) => (
+              <View key={`flight-${rowIdx}`} style={styles.transportGrid}>
+                {row.map((f) => (
+                  <View key={f.id} style={styles.transportTileWrapper}>
+                    <TransportTile
+                      flight={f}
+                      onPress={() => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip })}
+                      onLongPress={canDelete ? () => setActionModal({ visible: true, title: `${f.airline || f.transportType} ${f.flightNumber || ''}`.trim(), subtitle: 'Transport', onEdit: () => openEditModal('flight', f), onDelete: () => handleDeleteFlight(f.id) }) : undefined}
                     />
                   </View>
                 ))}
               </View>
-            ));
-          })()}
-        </>
-      )}
-
-      {/* Hotels */}
-      {renderSectionHeader(t('hotels.title'), '🛏️', () => openAddModal('hotel'))}
-      {hotels.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('hotels.noHotels')}</Text>
-      ) : (
-        hotels.map((h) => (
-          <AddressItemCard
-            key={h.id}
-            name={h.name}
-            address={h.address}
-            detail={[h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – ') || h.phone}
-            onPress={() => navigation.navigate('TripItemDetail', { item: h, tripId: trip.id, trip, itemType: 'hotel' })}
-            onLongPress={canDelete ? () => setActionModal({ visible: true, title: h.name, onEdit: () => openEditModal('hotel', h), onDelete: () => handleDeleteHotel(h.id) }) : undefined}
-          />
-        ))
-      )}
-
-      {/* Restaurants */}
-      {renderSectionHeader(t('restaurants.title'), '🍽️', () => openAddModal('restaurant'))}
-      {restaurants.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('restaurants.noRestaurants')}</Text>
-      ) : (
-        restaurants.map((r) => (
-          <AddressItemCard
-            key={r.id}
-            name={r.name}
-            address={r.address}
-            note={r.note}
-            onPress={() => navigation.navigate('TripItemDetail', { item: r, tripId: trip.id, trip, itemType: 'restaurant' })}
-            onLongPress={canDelete ? () => setActionModal({ visible: true, title: r.name || 'Restaurant', onEdit: () => openEditModal('restaurant', r), onDelete: () => handleDeleteRestaurant(r.id) }) : undefined}
-          />
-        ))
-      )}
-
-      {/* Activities */}
-      {renderSectionHeader(t('activities.title'), '🎯', () => openAddModal('activity'))}
-      {activities.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('activities.noActivities')}</Text>
-      ) : (
-        activities.map((a) => (
-          <AddressItemCard
-            key={a.id}
-            name={a.name}
-            address={a.address}
-            detail={[a.startDate ? formatDate(a.startDate) : '', a.endDate ? formatDate(a.endDate) : ''].filter(Boolean).join(' – ') || [a.startTime, a.endTime].filter(Boolean).join(' – ') || undefined}
-            note={a.note}
-            onPress={() => navigation.navigate('TripItemDetail', { item: a, tripId: trip.id, trip, itemType: 'activity' })}
-            onLongPress={canDelete ? () => setActionModal({ visible: true, title: a.name || 'Aktivitet', onEdit: () => openEditModal('activity', a), onDelete: () => handleDeleteActivity(a.id) }) : undefined}
-          />
-        ))
-      )}
-
-      {/* Destination Tips */}
-      <View style={styles.sectionHeader}>
-        <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 {t('tips.title')}</Text>
+            ))}
+            {(() => {
+              return otherTransportItems.map((row, rowIdx) => (
+                <View key={`other-${rowIdx}`} style={styles.transportGrid}>
+                  {row.map((item: any) => (
+                    <View key={item.id} style={styles.transportTileWrapper}>
+                      <TransportItemTile
+                        icon={item.icon}
+                        label={item.label}
+                        typeLabel={item.typeLabel}
+                        name={item.name}
+                        detail={item.detail}
+                        departureDate={item.departureDate}
+                        departureTime={item.departureTime}
+                        arrivalTime={item.arrivalTime}
+                        hasCar={item.hasCar}
+                        isHjemreise={item.isHjemreise}
+                        onPress={item.onPress}
+                        onLongPress={item.onLongPress}
+                      />
+                    </View>
+                  ))}
+                </View>
+              ));
+            })()}
+          </View>
+        )}
       </View>
 
-      <GooglePlacesInput
-        value={tipsSearchValue}
-        onChangeText={setTipsSearchValue}
-        placeholder={t('tips.searchCity')}
-        onSelect={(description) => {
-          const cityName = description.split(',')[0].trim();
-          setStagedCity(cityName);
-          setTipsSearchValue('');
-        }}
-        types={['(cities)']}
-      />
-
-      {stagedCity && (
-        <View style={[styles.stagedCityRow, { borderColor: colors.accent, backgroundColor: colors.surface }]}>
-          <Text style={[styles.stagedCityName, { color: colors.text }]}>📍 {stagedCity}</Text>
-          {tipsLoading ? (
-            <View style={[styles.generateButton, { backgroundColor: colors.accent, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
-              <ActivityIndicator size="small" color="#fff" />
-              <Text style={styles.generateButtonText}>Genererer...</Text>
-            </View>
+      {/* Hotels */}
+      <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
+        {renderSectionHeader(t('hotels.title'), '🛏️', () => openAddModal('hotel'))}
+        <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
+          {hotels.length === 0 ? (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('hotels.noHotels')}</Text>
           ) : (
-            <TouchableOpacity
-              style={[styles.generateButton, { backgroundColor: colors.accent }]}
-              onPress={() => handleGenerateTips(stagedCity)}
-            >
-              <Text style={styles.generateButtonText}>Generer</Text>
-            </TouchableOpacity>
+            hotels.map((h) => (
+              <AddressItemCard
+                key={h.id}
+                name={h.name}
+                address={h.address}
+                detail={[h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – ') || h.phone}
+                onPress={() => navigation.navigate('TripItemDetail', { item: h, tripId: trip.id, trip, itemType: 'hotel' })}
+                onLongPress={canDelete ? () => setActionModal({ visible: true, title: h.name, onEdit: () => openEditModal('hotel', h), onDelete: () => handleDeleteHotel(h.id) }) : undefined}
+              />
+            ))
           )}
         </View>
-      )}
+      </View>
 
-      {tipsLoading && !stagedCity && (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Genererer tips...</Text>
-      )}
-      {tipsError && (
-        <Text style={[styles.emptySection, { color: '#E53935' }]}>{tipsError}</Text>
-      )}
+      {/* Restaurants */}
+      <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
+        {renderSectionHeader(t('restaurants.title'), '🍽️', () => openAddModal('restaurant'))}
+        <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
+          {restaurants.length === 0 ? (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('restaurants.noRestaurants')}</Text>
+          ) : (
+            restaurants.map((r) => (
+              <AddressItemCard
+                key={r.id}
+                name={r.name}
+                address={r.address}
+                note={r.note}
+                onPress={() => navigation.navigate('TripItemDetail', { item: r, tripId: trip.id, trip, itemType: 'restaurant' })}
+                onLongPress={canDelete ? () => setActionModal({ visible: true, title: r.name || 'Restaurant', onEdit: () => openEditModal('restaurant', r), onDelete: () => handleDeleteRestaurant(r.id) }) : undefined}
+              />
+            ))
+          )}
+        </View>
+      </View>
 
-      {cityTipsList.map((entry) => {
-        const isExpanded = expandedTipsCity === entry.city;
-        return (
-          <View key={entry.city} style={[styles.tipsExpandable, { borderColor: colors.border }]}>
-            <TouchableOpacity
-              style={[styles.tipsExpandHeader, { backgroundColor: colors.surface }]}
-              onPress={() => setExpandedTipsCity(isExpanded ? null : entry.city)}
-            >
-              <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{isExpanded ? '▼' : '▶'}</Text>
-              <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>{entry.city}</Text>
-              <Text style={[styles.tipsExpandDate, { color: colors.textDisabled }]}>
-                {new Date(entry.tips.generatedAt).toLocaleDateString('nb-NO')}
-              </Text>
-              <TouchableOpacity
-                onPress={() => {
-                  const idx = cityTipsList.findIndex((e) => e.city === entry.city);
-                  handleGenerateTips(entry.city, idx);
-                }}
-                disabled={tipsLoading}
-                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              >
-                <Text style={[styles.tipsRefreshBtn, { color: colors.accent }]}>
-                  {tipsLoading ? '...' : '↻'}
-                </Text>
-              </TouchableOpacity>
-            </TouchableOpacity>
+      {/* Activities */}
+      <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
+        {renderSectionHeader(t('activities.title'), '🎯', () => openAddModal('activity'))}
+        <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
+          {activities.length === 0 ? (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('activities.noActivities')}</Text>
+          ) : (
+            activities.map((a) => (
+              <AddressItemCard
+                key={a.id}
+                name={a.name}
+                address={a.address}
+                detail={[a.startDate ? formatDate(a.startDate) : '', a.endDate ? formatDate(a.endDate) : ''].filter(Boolean).join(' – ') || [a.startTime, a.endTime].filter(Boolean).join(' – ') || undefined}
+                note={a.note}
+                onPress={() => navigation.navigate('TripItemDetail', { item: a, tripId: trip.id, trip, itemType: 'activity' })}
+                onLongPress={canDelete ? () => setActionModal({ visible: true, title: a.name || 'Aktivitet', onEdit: () => openEditModal('activity', a), onDelete: () => handleDeleteActivity(a.id) }) : undefined}
+              />
+            ))
+          )}
+        </View>
+      </View>
 
-            {isExpanded && (
-              <View style={[styles.tipsExpandBody, { backgroundColor: colors.background }]}>
-                {entry.tips.overview ? (
-                  <Text style={[styles.tipsOverview, { color: colors.text }]}>{entry.tips.overview}</Text>
-                ) : null}
+      {/* Destination Tips */}
+      <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
+        <View style={styles.sectionHeader}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 {t('tips.title')}</Text>
+        </View>
+        <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
+          <GooglePlacesInput
+            value={tipsSearchValue}
+            onChangeText={setTipsSearchValue}
+            placeholder={t('tips.searchCity')}
+            onSelect={(description) => {
+              const cityName = description.split(',')[0].trim();
+              setStagedCity(cityName);
+              setTipsSearchValue('');
+            }}
+            types={['(cities)']}
+          />
 
-                {entry.tips.thingsToDo.length > 0 && (
-                  <View style={styles.tipsGroup}>
-                    <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🗓️ Ting å gjøre</Text>
-                    {entry.tips.thingsToDo.map((item, i) => (
-                      <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
-                    ))}
-                  </View>
-                )}
+          {stagedCity && (
+            <View style={[styles.stagedCityRow, { borderColor: colors.accent, backgroundColor: colors.inputBackground }]}>
+              <Text style={[styles.stagedCityName, { color: colors.text }]}>📍 {stagedCity}</Text>
+              {tipsLoading ? (
+                <View style={[styles.generateButton, { backgroundColor: colors.accent, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
+                  <ActivityIndicator size="small" color="#fff" />
+                  <Text style={styles.generateButtonText}>Genererer...</Text>
+                </View>
+              ) : (
+                <TouchableOpacity
+                  style={[styles.generateButton, { backgroundColor: colors.accent }]}
+                  onPress={() => handleGenerateTips(stagedCity)}
+                >
+                  <Text style={styles.generateButtonText}>Generer</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
 
-                {entry.tips.restaurants.length > 0 && (
-                  <View style={styles.tipsGroup}>
-                    <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🍽️ Restauranter</Text>
-                    {entry.tips.restaurants.map((item, i) => (
-                      <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
-                    ))}
-                  </View>
-                )}
+          {tipsLoading && !stagedCity && (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Genererer tips...</Text>
+          )}
+          {tipsError && (
+            <Text style={[styles.emptySection, { color: '#E53935' }]}>{tipsError}</Text>
+          )}
 
-                {entry.tips.localPhrases.length > 0 && (
-                  <View style={styles.tipsGroup}>
-                    <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>💬 Nyttige fraser</Text>
-                    {entry.tips.localPhrases.map((p, i) => (
-                      <View key={i} style={styles.phraseRow}>
-                        <Text style={[styles.phraseText, { color: colors.text }]}>{p.no}</Text>
-                        <Text style={[styles.phraseArrow, { color: colors.textSecondary }]}> → </Text>
-                        <Text style={[styles.phraseText, { color: colors.accent }]}>{p.local}</Text>
-                        {p.pronunciation ? (
-                          <Text style={[styles.phrasePron, { color: colors.textSecondary }]}> ({p.pronunciation})</Text>
-                        ) : null}
+          {cityTipsList.map((entry) => {
+            const isExpanded = expandedTipsCity === entry.city;
+            return (
+              <View key={entry.city} style={[styles.tipsExpandable, { borderColor: colors.border }]}>
+                <TouchableOpacity
+                  style={[styles.tipsExpandHeader, { backgroundColor: colors.inputBackground }]}
+                  onPress={() => setExpandedTipsCity(isExpanded ? null : entry.city)}
+                >
+                  <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{isExpanded ? '▼' : '▶'}</Text>
+                  <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>{entry.city}</Text>
+                  <Text style={[styles.tipsExpandDate, { color: colors.textDisabled }]}>
+                    {new Date(entry.tips.generatedAt).toLocaleDateString('nb-NO')}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => {
+                      const idx = cityTipsList.findIndex((e) => e.city === entry.city);
+                      handleGenerateTips(entry.city, idx);
+                    }}
+                    disabled={tipsLoading}
+                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  >
+                    <Text style={[styles.tipsRefreshBtn, { color: colors.accent }]}>
+                      {tipsLoading ? '...' : '↻'}
+                    </Text>
+                  </TouchableOpacity>
+                </TouchableOpacity>
+
+                {isExpanded && (
+                  <View style={[styles.tipsExpandBody, { backgroundColor: colors.inputBackground }]}>
+                    {entry.tips.overview ? (
+                      <Text style={[styles.tipsOverview, { color: colors.text }]}>{entry.tips.overview}</Text>
+                    ) : null}
+
+                    {entry.tips.thingsToDo.length > 0 && (
+                      <View style={styles.tipsGroup}>
+                        <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🗓️ Ting å gjøre</Text>
+                        {entry.tips.thingsToDo.map((item, i) => (
+                          <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+                        ))}
                       </View>
-                    ))}
-                  </View>
-                )}
+                    )}
 
-                {entry.tips.transportTips.length > 0 && (
-                  <View style={styles.tipsGroup}>
-                    <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🚗 Transport</Text>
-                    {entry.tips.transportTips.map((item, i) => (
-                      <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
-                    ))}
-                  </View>
-                )}
+                    {entry.tips.restaurants.length > 0 && (
+                      <View style={styles.tipsGroup}>
+                        <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🍽️ Restauranter</Text>
+                        {entry.tips.restaurants.map((item, i) => (
+                          <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+                        ))}
+                      </View>
+                    )}
 
-                {entry.tips.scamWarnings.length > 0 && (
-                  <View style={styles.tipsGroup}>
-                    <Text style={[styles.tipsGroupTitle, { color: '#E53935' }]}>⚠️ Varsler</Text>
-                    {entry.tips.scamWarnings.map((item, i) => (
-                      <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
-                    ))}
+                    {entry.tips.localPhrases.length > 0 && (
+                      <View style={styles.tipsGroup}>
+                        <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>💬 Nyttige fraser</Text>
+                        {entry.tips.localPhrases.map((p, i) => (
+                          <View key={i} style={styles.phraseRow}>
+                            <Text style={[styles.phraseText, { color: colors.text }]}>{p.no}</Text>
+                            <Text style={[styles.phraseArrow, { color: colors.textSecondary }]}> → </Text>
+                            <Text style={[styles.phraseText, { color: colors.accent }]}>{p.local}</Text>
+                            {p.pronunciation ? (
+                              <Text style={[styles.phrasePron, { color: colors.textSecondary }]}> ({p.pronunciation})</Text>
+                            ) : null}
+                          </View>
+                        ))}
+                      </View>
+                    )}
+
+                    {entry.tips.transportTips.length > 0 && (
+                      <View style={styles.tipsGroup}>
+                        <Text style={[styles.tipsGroupTitle, { color: colors.text }]}>🚗 Transport</Text>
+                        {entry.tips.transportTips.map((item, i) => (
+                          <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+                        ))}
+                      </View>
+                    )}
+
+                    {entry.tips.scamWarnings.length > 0 && (
+                      <View style={styles.tipsGroup}>
+                        <Text style={[styles.tipsGroupTitle, { color: '#E53935' }]}>⚠️ Varsler</Text>
+                        {entry.tips.scamWarnings.map((item, i) => (
+                          <Text key={i} style={[styles.tipsItem, { color: colors.text }]}>• {item}</Text>
+                        ))}
+                      </View>
+                    )}
                   </View>
                 )}
               </View>
-            )}
-          </View>
-        );
-      })}
+            );
+          })}
 
-      {cityTipsList.length === 0 && !tipsLoading && !stagedCity && (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>
-          Søk etter en by for å generere destinasjonstips
-        </Text>
-      )}
+          {cityTipsList.length === 0 && !tipsLoading && !stagedCity && (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>
+              Søk etter en by for å generere destinasjonstips
+            </Text>
+          )}
+        </View>
+      </View>
 
       {/* Links */}
-      {renderSectionHeader(t('links.title'), '🔗', () => openAddModal('link'))}
-      {links.length === 0 ? (
-        <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen lenker lagt til</Text>
-      ) : (
-        links.map((l) => (
-          <LinkPreviewCard
-            key={l.id}
-            link={l}
-            onPress={() => Linking.openURL(l.url)}
-            onLongPress={canDelete ? () => handleDeleteLink(l.id) : undefined}
-          />
-        ))
-      )}
-
-            {/* Documents - Collapsible */}
-      <TouchableOpacity
-        style={[styles.tipsExpandHeader, { backgroundColor: colors.surface, marginTop: 16, borderRadius: 8 }]}
-        onPress={() => setDocsExpanded(!docsExpanded)}
-      >
-        <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
-        <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>📄 {t('documents.title')}</Text>
-        {docsExpanded && (
-          <TouchableOpacity
-            style={[styles.addButton, { backgroundColor: colors.accent }]}
-            onPress={() => openAddModal('document')}
-          >
-            <Text style={styles.addButtonText}>+</Text>
-          </TouchableOpacity>
-        )}
-      </TouchableOpacity>
-      {docsExpanded && (
-        <>
-          {documents.length === 0 ? (
-            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen dokumenter lagt til</Text>
+      <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
+        {renderSectionHeader(t('links.title'), '🔗', () => openAddModal('link'))}
+        <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
+          {links.length === 0 ? (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen lenker lagt til</Text>
           ) : (
-            documents.map((d) => (
-              <TouchableOpacity
-                key={d.id}
-                style={[styles.itemCard, { backgroundColor: colors.surface }]}
-                onPress={() => openEditModal('document', d)}
-                onLongPress={canDelete ? () => handleDeleteDocument(d.id) : undefined}
-              >
-                <View style={styles.docRow}>
-                  <View style={styles.docContent}>
-                    <Text style={[styles.itemName, { color: colors.text }]}>{d.title}</Text>
-                    {d.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{d.note}</Text>}
-                    {d.fileName && <Text style={[styles.itemDetail, { color: colors.accent }]}>📎 {d.fileName}</Text>}
-                  </View>
-                  <View style={styles.docActions}>
-                    {d.fileUrl && (
-                      <TouchableOpacity onPress={() => openFileUrl(d.fileUrl)} style={styles.docAction}>
-                        <Text style={{ color: colors.accent, fontSize: 14 }}>{t('documents.open')}</Text>
-                      </TouchableOpacity>
-                    )}
-                    {canDelete && (
-                      <TouchableOpacity onPress={() => handleDeleteDocument(d.id)} style={styles.docAction}>
-                        <Text style={{ color: '#E53935', fontSize: 14 }}>{t('common.delete')}</Text>
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                </View>
-              </TouchableOpacity>
+            links.map((l) => (
+              <LinkPreviewCard
+                key={l.id}
+                link={l}
+                onPress={() => Linking.openURL(l.url)}
+                onLongPress={canDelete ? () => handleDeleteLink(l.id) : undefined}
+              />
             ))
           )}
-        </>
-      )}
+        </View>
+      </View>
+
+      {/* Documents */}
+      <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
+        <TouchableOpacity
+          style={[styles.tipsExpandHeader, { backgroundColor: colors.inputBackground }]}
+          onPress={() => setDocsExpanded(!docsExpanded)}
+        >
+          <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
+          <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>📄 {t('documents.title')}</Text>
+          {docsExpanded && (
+            <TouchableOpacity
+              style={[styles.addButton, { backgroundColor: colors.accent }]}
+              onPress={() => openAddModal('document')}
+            >
+              <Text style={styles.addButtonText}>+</Text>
+            </TouchableOpacity>
+          )}
+        </TouchableOpacity>
+        {docsExpanded && (
+          <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
+            {documents.length === 0 ? (
+              <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen dokumenter lagt til</Text>
+            ) : (
+              documents.map((d) => (
+                <TouchableOpacity
+                  key={d.id}
+                  style={[styles.itemCard, { backgroundColor: colors.inputBackground }]}
+                  onPress={() => openEditModal('document', d)}
+                  onLongPress={canDelete ? () => handleDeleteDocument(d.id) : undefined}
+                >
+                  <View style={styles.docRow}>
+                    <View style={styles.docContent}>
+                      <Text style={[styles.itemName, { color: colors.text }]}>{d.title}</Text>
+                      {d.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{d.note}</Text>}
+                      {d.fileName && <Text style={[styles.itemDetail, { color: colors.accent }]}>📎 {d.fileName}</Text>}
+                    </View>
+                    <View style={styles.docActions}>
+                      {d.fileUrl && (
+                        <TouchableOpacity onPress={() => openFileUrl(d.fileUrl)} style={styles.docAction}>
+                          <Text style={{ color: colors.accent, fontSize: 14 }}>{t('documents.open')}</Text>
+                        </TouchableOpacity>
+                      )}
+                      {canDelete && (
+                        <TouchableOpacity onPress={() => handleDeleteDocument(d.id)} style={styles.docAction}>
+                          <Text style={{ color: '#E53935', fontSize: 14 }}>{t('common.delete')}</Text>
+                        </TouchableOpacity>
+                      )}
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))
+            )}
+          </View>
+        )}
+      </View>
 
 
       <View style={{ height: 40 }} />
@@ -2158,6 +2181,12 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginTop: 16,
     marginBottom: 8,
+    overflow: 'hidden',
+  },
+  sectionCard: {
+    borderRadius: 12,
+    marginTop: 8,
+    marginBottom: 0,
     overflow: 'hidden',
   },
   sectionHeader: {

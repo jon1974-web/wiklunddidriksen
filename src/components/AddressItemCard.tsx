@@ -20,7 +20,7 @@ export const AddressItemCard: React.FC<AddressItemCardProps> = React.memo(({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.surface }]}
+      style={[styles.card, { backgroundColor: colors.surfaceVariant }]}
       onPress={onPress}
       onLongPress={onLongPress}
     >

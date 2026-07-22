@@ -43,7 +43,7 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
 
   return (
     <TouchableOpacity
-      style={[styles.tile, { backgroundColor: colors.surface, borderLeftColor: typeColor }]}
+      style={[styles.tile, { backgroundColor: colors.surfaceVariant, borderLeftColor: typeColor }]}
       onPress={onPress}
       onLongPress={onLongPress}
     >
