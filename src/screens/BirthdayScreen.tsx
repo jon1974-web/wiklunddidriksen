@@ -24,7 +24,6 @@ function calculateAge(birthDate: string): number {
 }
 
 export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
-  console.log('BirthdayScreen rendered');
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { user } = useUserStore();
@@ -62,7 +61,6 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   }, [familyId]);
 
   useEffect(() => {
-    console.log('BirthdayScreen useEffect running, user:', user?.uid, 'familyId:', user?.familyId);
     loadBirthdays();
   }, [loadBirthdays]);
 
