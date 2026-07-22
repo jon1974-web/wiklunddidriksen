@@ -28,6 +28,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const { colors } = useTheme();
   const { t } = useTranslation();
   const { user } = useUserStore();
+  const familyId = useUserStore((state) => state.familyId);
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -40,20 +41,16 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
-    console.log('loadBirthdays called, user:', user?.uid, 'familyId:', user?.familyId);
-    if (!user?.familyId) {
-      console.log('No familyId, stopping');
+    if (!familyId) {
       setLoading(false);
       return;
     }
     try {
-      console.log('Loading birthdays for familyId:', user.familyId);
       const q = query(
         collection(db, 'birthdays'),
-        where('familyId', '==', user.familyId)
+        where('familyId', '==', familyId)
       );
       const snapshot = await getDocs(q);
-      console.log('Found', snapshot.docs.length, 'birthdays for familyId:', user.familyId);
       const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Birthday));
       data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       setBirthdays(data);
@@ -62,7 +59,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     } finally {
       setLoading(false);
     }
-  }, [user?.familyId]);
+  }, [familyId]);
 
   useEffect(() => {
     console.log('BirthdayScreen useEffect running, user:', user?.uid, 'familyId:', user?.familyId);
@@ -84,7 +81,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       return;
     }
     try {
-      if (!user?.familyId) {
+      if (!familyId) {
         crossAlert('Error', 'Du må være med i en familie for å legge til bursdager');
         return;
       }
@@ -93,7 +90,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         date: dateStr,
         addedBy: user.uid,
         addedByName: user.displayName || 'Ukjent',
-        familyId: user.familyId,
+        familyId: familyId,
         createdAt: Date.now(),
       });
       setNewName('');
