@@ -885,7 +885,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Vær */}
       {trip.city && (
-        <View>
+        <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>🌤️ {t('weather.title')}</Text>
             {isActive && (
@@ -950,7 +950,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Currency Converter */}
       {trip.country && (
-        <View style={{ marginTop: 16, marginBottom: 8 }}>
+        <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
           <CurrencyConverter country={trip.country} language={i18n.language} />
         </View>
       )}
@@ -2153,6 +2153,13 @@ const styles = StyleSheet.create({
   },
   tripDates: {
     fontSize: 14,
+  },
+  weatherCard: {
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    overflow: 'hidden',
   },
   sectionHeader: {
     flexDirection: 'row',

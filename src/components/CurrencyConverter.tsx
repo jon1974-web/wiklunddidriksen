@@ -152,9 +152,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 12,
     padding: 16,
-    borderWidth: 1,
   },
   header: {
     flexDirection: 'row',
