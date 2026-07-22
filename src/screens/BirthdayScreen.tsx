@@ -79,9 +79,9 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       await addDoc(collection(db, 'birthdays'), {
         name: newName.trim(),
         date: dateStr,
-        addedBy: user!.uid,
-        addedByName: user!.displayName || 'Ukjent',
-        familyId: user!.familyId,
+        addedBy: user?.uid || '',
+        addedByName: user?.displayName || 'Ukjent',
+        familyId: user?.familyId || '',
         createdAt: Date.now(),
       });
       setNewName('');
