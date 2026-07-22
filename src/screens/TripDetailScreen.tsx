@@ -950,7 +950,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Currency Converter */}
       {trip.country && (
-        <View style={{ marginTop: 16, marginHorizontal: 16, marginBottom: 8 }}>
+        <View style={{ marginTop: 16, marginBottom: 8 }}>
           <CurrencyConverter country={trip.country} language={i18n.language} />
         </View>
       )}
