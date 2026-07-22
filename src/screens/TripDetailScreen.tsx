@@ -107,6 +107,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   // Trip edit form
   const [tripTitle, setTripTitle] = useState(trip.title);
+  const [tripCity, setTripCity] = useState(trip.city);
+  const [tripCountry, setTripCountry] = useState(trip.country);
   const [tripStartDate, setTripStartDate] = useState(trip.startDate);
   const [tripEndDate, setTripEndDate] = useState(trip.endDate);
   const [tripIcon, setTripIcon] = useState(trip.icon || '✈️');
@@ -381,16 +383,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     try {
       await updateTrip(trip.id, {
         title: sanitizeInput(tripTitle),
+        city: sanitizeInput(tripCity),
+        country: sanitizeInput(tripCountry),
         startDate: tripStartDate,
         endDate: tripEndDate,
         icon: tripIcon,
       });
-      setTrip({ ...trip, title: tripTitle, startDate: tripStartDate, endDate: tripEndDate, icon: tripIcon });
+      setTrip({ ...trip, title: tripTitle, city: tripCity, country: tripCountry, startDate: tripStartDate, endDate: tripEndDate, icon: tripIcon });
       setActiveModal(null);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip, tripTitle, tripStartDate, tripEndDate, tripIcon]);
+  }, [trip, tripTitle, tripCity, tripCountry, tripStartDate, tripEndDate, tripIcon]);
 
   const openAddModal = (modal: ModalType, transportType?: 'fly' | 'tog' | 'bil') => {
     resetForms();
@@ -867,6 +871,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         style={[styles.tripCard, { backgroundColor: colors.surface }]}
         onPress={() => {
           setTripTitle(trip.title);
+          setTripCity(trip.city);
+          setTripCountry(trip.country);
           setTripStartDate(trip.startDate);
           setTripEndDate(trip.endDate);
           setTripIcon(trip.icon || '✈️');
@@ -1303,6 +1309,28 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       value={tripTitle}
                       onChangeText={setTripTitle}
                       placeholder="F.eks. Sommerferie i Spania"
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>By</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={tripCity}
+                      onChangeText={setTripCity}
+                      placeholder="F.eks. Dubrovnik"
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>Land</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={tripCountry}
+                      onChangeText={setTripCountry}
+                      placeholder="F.eks. Kroatia"
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
