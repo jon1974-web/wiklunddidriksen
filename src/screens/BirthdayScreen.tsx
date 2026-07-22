@@ -34,6 +34,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [selectedBirthday, setSelectedBirthday] = useState<Birthday | null>(null);
   const [newName, setNewName] = useState('');
   const [newDate, setNewDate] = useState('');
+  const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
     if (!user?.familyId) {
@@ -179,45 +180,30 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('birthdays.date')}</Text>
                   <View style={styles.dateRow}>
-                    <TextInput
-                      style={[styles.dateInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={newDate.split('-')[0] || ''}
-                      onChangeText={(v) => {
-                        const month = newDate.split('-')[1] || '';
-                        const day = newDate.split('-')[2] || '';
-                        setNewDate(v && month && day ? `${v}-${month}-${day}` : v);
-                      }}
-                      placeholder="År"
-                      placeholderTextColor={colors.textDisabled}
-                      keyboardType="numeric"
-                      maxLength={4}
-                    />
-                    <TextInput
-                      style={[styles.dateInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={newDate.split('-')[1] || ''}
-                      onChangeText={(v) => {
-                        const year = newDate.split('-')[0] || '';
-                        const day = newDate.split('-')[2] || '';
-                        setNewDate(year && v && day ? `${year}-${v}-${day}` : v);
-                      }}
-                      placeholder="Mnd"
-                      placeholderTextColor={colors.textDisabled}
-                      keyboardType="numeric"
-                      maxLength={2}
-                    />
-                    <TextInput
-                      style={[styles.dateInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                      value={newDate.split('-')[2] || ''}
-                      onChangeText={(v) => {
-                        const year = newDate.split('-')[0] || '';
-                        const month = newDate.split('-')[1] || '';
-                        setNewDate(year && month && v ? `${year}-${month}-${v}` : v);
-                      }}
-                      placeholder="Dag"
-                      placeholderTextColor={colors.textDisabled}
-                      keyboardType="numeric"
-                      maxLength={2}
-                    />
+                    <TouchableOpacity
+                      style={[styles.dateInput, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('year')}
+                    >
+                      <Text style={{ color: newDate.split('-')[0] ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
+                        {newDate.split('-')[0] || 'År'}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.dateInput, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('month')}
+                    >
+                      <Text style={{ color: newDate.split('-')[1] ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
+                        {newDate.split('-')[1] || 'Mnd'}
+                      </Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.dateInput, { backgroundColor: colors.inputBackground }]}
+                      onPress={() => setActivePicker('day')}
+                    >
+                      <Text style={{ color: newDate.split('-')[2] ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
+                        {newDate.split('-')[2] || 'Dag'}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </View>
 
@@ -249,6 +235,82 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         onDelete={handleDelete}
         onCancel={() => { setShowDeleteModal(false); setSelectedBirthday(null); }}
       />
+
+      {/* Date picker modal */}
+      <Modal visible={!!activePicker} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setActivePicker(null)}>
+          <View style={styles.pickerOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.pickerContent, { backgroundColor: colors.surface }]}>
+                <View style={[styles.pickerHeader, { borderBottomColor: colors.border }]}>
+                  <TouchableOpacity onPress={() => setActivePicker(null)}>
+                    <Text style={{ color: colors.textSecondary, fontSize: 16 }}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <Text style={[styles.pickerTitle, { color: colors.text }]}>
+                    {activePicker === 'year' ? 'År' : activePicker === 'month' ? 'Måned' : 'Dag'}
+                  </Text>
+                  <View style={{ width: 60 }} />
+                </View>
+                <ScrollView style={{ maxHeight: 300 }} showsVerticalScrollIndicator={true}>
+                  {activePicker === 'year' && Array.from({ length: 100 }, (_, i) => {
+                    const year = new Date().getFullYear() - i;
+                    return (
+                      <TouchableOpacity
+                        key={year}
+                        style={[styles.pickerItem, { borderBottomColor: colors.border }, newDate.split('-')[0] === String(year) && { backgroundColor: colors.accent + '20' }]}
+                        onPress={() => {
+                          const month = newDate.split('-')[1] || '';
+                          const day = newDate.split('-')[2] || '';
+                          setNewDate(month && day ? `${year}-${month}-${day}` : String(year));
+                          setActivePicker(null);
+                        }}
+                      >
+                        <Text style={[styles.pickerItemText, { color: newDate.split('-')[0] === String(year) ? colors.accent : colors.text }]}>{year}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                  {activePicker === 'month' && [
+                    { label: 'Januar', value: '01' }, { label: 'Februar', value: '02' },
+                    { label: 'Mars', value: '03' }, { label: 'April', value: '04' },
+                    { label: 'Mai', value: '05' }, { label: 'Juni', value: '06' },
+                    { label: 'Juli', value: '07' }, { label: 'August', value: '08' },
+                    { label: 'September', value: '09' }, { label: 'Oktober', value: '10' },
+                    { label: 'November', value: '11' }, { label: 'Desember', value: '12' },
+                  ].map((m) => (
+                    <TouchableOpacity
+                      key={m.value}
+                      style={[styles.pickerItem, { borderBottomColor: colors.border }, newDate.split('-')[1] === m.value && { backgroundColor: colors.accent + '20' }]}
+                      onPress={() => {
+                        const year = newDate.split('-')[0] || '';
+                        const day = newDate.split('-')[2] || '';
+                        setNewDate(year && day ? `${year}-${m.value}-${day}` : m.value);
+                        setActivePicker(null);
+                      }}
+                    >
+                      <Text style={[styles.pickerItemText, { color: newDate.split('-')[1] === m.value ? colors.accent : colors.text }]}>{m.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                  {activePicker === 'day' && Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+                    <TouchableOpacity
+                      key={day}
+                      style={[styles.pickerItem, { borderBottomColor: colors.border }, newDate.split('-')[2] === String(day).padStart(2, '0') && { backgroundColor: colors.accent + '20' }]}
+                      onPress={() => {
+                        const year = newDate.split('-')[0] || '';
+                        const month = newDate.split('-')[1] || '';
+                        const dayStr = String(day).padStart(2, '0');
+                        setNewDate(year && month ? `${year}-${month}-${dayStr}` : dayStr);
+                        setActivePicker(null);
+                      }}
+                    >
+                      <Text style={[styles.pickerItemText, { color: newDate.split('-')[2] === String(day).padStart(2, '0') ? colors.accent : colors.text }]}>{day}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
     </SafeAreaView>
   );
@@ -284,7 +346,7 @@ const styles = StyleSheet.create({
   birthdayName: { fontSize: 16, fontWeight: '600' },
   birthdayDate: { fontSize: 13, marginTop: 2 },
   birthdayAddedBy: { fontSize: 11, marginTop: 2 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { borderRadius: 20, padding: 20, width: '100%', maxWidth: 340 },
   modalTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
   field: { marginBottom: 14 },
@@ -295,4 +357,10 @@ const styles = StyleSheet.create({
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
   modalBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
   modalBtnText: { fontSize: 16, fontWeight: '600' },
+  pickerOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  pickerContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, paddingBottom: 30 },
+  pickerHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 16, borderBottomWidth: 1 },
+  pickerTitle: { fontSize: 16, fontWeight: '700' },
+  pickerItem: { paddingVertical: 14, paddingHorizontal: 20, borderBottomWidth: 1 },
+  pickerItemText: { fontSize: 16, textAlign: 'center' },
 });
