@@ -39,20 +39,16 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
-    const familyKey = user?.familyId || user?.uid;
-    if (!familyKey) {
-      console.log('No familyId or uid, skipping load');
+    if (!user?.familyId) {
       setLoading(false);
       return;
     }
     try {
-      console.log('Loading birthdays for:', familyKey);
       const q = query(
         collection(db, 'birthdays'),
-        where('familyId', '==', familyKey)
+        where('familyId', '==', user.familyId)
       );
       const snapshot = await getDocs(q);
-      console.log('Found', snapshot.docs.length, 'birthdays');
       const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Birthday));
       data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       setBirthdays(data);
@@ -61,7 +57,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     } finally {
       setLoading(false);
     }
-  }, [user?.familyId, user?.uid]);
+  }, [user?.familyId]);
 
   useEffect(() => { loadBirthdays(); }, [loadBirthdays]);
 
@@ -80,7 +76,11 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       return;
     }
     try {
-      const familyKey = user?.familyId || user?.uid || '';
+      const familyKey = user?.familyId || '';
+      if (!familyKey) {
+        crossAlert('Error', 'Du må være med i en familie for å legge til bursdager');
+        return;
+      }
       await addDoc(collection(db, 'birthdays'), {
         name: newName.trim(),
         date: dateStr,
