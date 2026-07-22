@@ -1019,6 +1019,6 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZ
       sentAt: FieldValue.serverTimestamp(),
     });
   }
-
   return { sent: notificationsToSend.length };
 });
+
