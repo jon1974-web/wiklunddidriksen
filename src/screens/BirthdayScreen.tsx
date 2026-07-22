@@ -11,7 +11,6 @@ import { ActionModal } from '../components/ActionModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { MAX_BIRTHDAYS } from '../constants/limits';
-import { DatePickerModal } from '../components/DatePickerModal';
 
 function calculateAge(birthDate: string): number {
   const today = new Date();
@@ -35,10 +34,12 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [selectedBirthday, setSelectedBirthday] = useState<Birthday | null>(null);
   const [newName, setNewName] = useState('');
   const [newDate, setNewDate] = useState('');
-  const [activeDatePicker, setActiveDatePicker] = useState<'add' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
-    if (!user?.familyId) return;
+    if (!user?.familyId) {
+      setLoading(false);
+      return;
+    }
     try {
       const q = query(
         collection(db, 'birthdays'),
@@ -177,14 +178,47 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('birthdays.date')}</Text>
-                  <TouchableOpacity
-                    style={[styles.input, { backgroundColor: colors.inputBackground }]}
-                    onPress={() => setActiveDatePicker('add')}
-                  >
-                    <Text style={{ color: newDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                      {newDate ? formatDate(newDate) : t('birthdays.date')}
-                    </Text>
-                  </TouchableOpacity>
+                  <View style={styles.dateRow}>
+                    <TextInput
+                      style={[styles.dateInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={newDate.split('-')[0] || ''}
+                      onChangeText={(v) => {
+                        const month = newDate.split('-')[1] || '';
+                        const day = newDate.split('-')[2] || '';
+                        setNewDate(v && month && day ? `${v}-${month}-${day}` : v);
+                      }}
+                      placeholder="År"
+                      placeholderTextColor={colors.textDisabled}
+                      keyboardType="numeric"
+                      maxLength={4}
+                    />
+                    <TextInput
+                      style={[styles.dateInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={newDate.split('-')[1] || ''}
+                      onChangeText={(v) => {
+                        const year = newDate.split('-')[0] || '';
+                        const day = newDate.split('-')[2] || '';
+                        setNewDate(year && v && day ? `${year}-${v}-${day}` : v);
+                      }}
+                      placeholder="Mnd"
+                      placeholderTextColor={colors.textDisabled}
+                      keyboardType="numeric"
+                      maxLength={2}
+                    />
+                    <TextInput
+                      style={[styles.dateInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={newDate.split('-')[2] || ''}
+                      onChangeText={(v) => {
+                        const year = newDate.split('-')[0] || '';
+                        const month = newDate.split('-')[1] || '';
+                        setNewDate(year && month && v ? `${year}-${month}-${v}` : v);
+                      }}
+                      placeholder="Dag"
+                      placeholderTextColor={colors.textDisabled}
+                      keyboardType="numeric"
+                      maxLength={2}
+                    />
+                  </View>
                 </View>
 
                 <View style={styles.modalActions}>
@@ -216,18 +250,6 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         onCancel={() => { setShowDeleteModal(false); setSelectedBirthday(null); }}
       />
 
-      {/* Date picker */}
-      {activeDatePicker && (
-        <DatePickerModal
-          visible={true}
-          onClose={() => setActiveDatePicker(null)}
-          onConfirm={(date) => {
-            setNewDate(date);
-            setActiveDatePicker(null);
-          }}
-          title={t('birthdays.date')}
-        />
-      )}
     </SafeAreaView>
   );
 };
@@ -268,6 +290,8 @@ const styles = StyleSheet.create({
   field: { marginBottom: 14 },
   label: { fontSize: 13, fontWeight: '600', marginBottom: 4 },
   input: { padding: 12, borderRadius: 8, fontSize: 15 },
+  dateRow: { flexDirection: 'row', gap: 8 },
+  dateInput: { flex: 1, padding: 12, borderRadius: 8, fontSize: 15, textAlign: 'center' },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
   modalBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
   modalBtnText: { fontSize: 16, fontWeight: '600' },

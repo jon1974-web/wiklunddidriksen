@@ -878,15 +878,11 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>🎂 {t('birthdays.title')}</Text>
           <TouchableOpacity
-            style={[styles.themeOption, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+            style={[styles.familyButton, { backgroundColor: colors.accent }]}
             onPress={() => navigation.navigate('Birthday')}
           >
-            <Text style={[styles.themeText, { color: colors.text }]}>{t('birthdays.title')}</Text>
-            <Text style={{ color: colors.textSecondary, fontSize: 14 }}>→</Text>
+            <Text style={styles.familyButtonText}>{t('birthdays.add')}</Text>
           </TouchableOpacity>
-          <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
-            {familyId ? t('birthdays.noBirthdays') : ''}
-          </Text>
         </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
