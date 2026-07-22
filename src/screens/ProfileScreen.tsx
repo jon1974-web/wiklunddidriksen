@@ -738,7 +738,7 @@ export const ProfileScreen: React.FC = () => {
               style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
               onPress={handleDisconnectCalendarEmail}
             >
-              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.leaveFamily')}</Text>
+              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.disconnectCalendar')}</Text>
             </TouchableOpacity>
           </View>
         ) : Platform.OS === 'web' ? (
@@ -965,11 +965,11 @@ export const ProfileScreen: React.FC = () => {
                       onPress={handleGenerateInvite}
                       disabled={inviteLoading}
                     >
-                      <Text style={styles.familyButtonText}>{inviteLoading ? '...' : t('profile.generateCode')}</Text>
+                      <Text style={styles.familyButtonText}>{inviteLoading ? '...' : t('profile.generateLink')}</Text>
                     </TouchableOpacity>
                   )}
                   <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 6 }}>
-                    {t('profile.codeHint')}
+                    {t('profile.linkHint')}
                   </Text>
                 </View>
               )}
