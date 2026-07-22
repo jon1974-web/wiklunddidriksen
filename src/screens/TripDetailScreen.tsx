@@ -1231,7 +1231,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {/* Documents */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
         <TouchableOpacity
-          style={[styles.tipsExpandHeader, { backgroundColor: colors.inputBackground }]}
+          style={[styles.tipsExpandHeader, { backgroundColor: colors.surface }]}
           onPress={() => setDocsExpanded(!docsExpanded)}
         >
           <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
