@@ -39,10 +39,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
-    if (!user?.familyId) {
-      setLoading(false);
-      return;
-    }
+    if (!user?.familyId) return;
     try {
       const q = query(
         collection(db, 'birthdays'),
@@ -76,17 +73,16 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       return;
     }
     try {
-      const familyKey = user?.familyId || '';
-      if (!familyKey) {
+      if (!user?.familyId) {
         crossAlert('Error', 'Du må være med i en familie for å legge til bursdager');
         return;
       }
       await addDoc(collection(db, 'birthdays'), {
         name: newName.trim(),
         date: dateStr,
-        addedBy: user?.uid || '',
-        addedByName: user?.displayName || 'Ukjent',
-        familyId: familyKey,
+        addedBy: user.uid,
+        addedByName: user.displayName || 'Ukjent',
+        familyId: user.familyId,
         createdAt: Date.now(),
       });
       setNewName('');
