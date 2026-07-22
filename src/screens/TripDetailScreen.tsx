@@ -2193,8 +2193,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 16,
-    marginBottom: 8,
+    paddingHorizontal: 16,
+    paddingTop: 14,
+    paddingBottom: 10,
   },
   sectionTitle: {
     fontSize: 18,
@@ -2438,7 +2439,8 @@ const styles = StyleSheet.create({
   tipsExpandHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
   },
   tipsExpandIcon: {
     fontSize: 12,
