@@ -108,6 +108,18 @@ Good code is maintainable code. Quality is everyone's responsibility.
 - Never silently swallow errors — at minimum, log them
 - Use `crossAlert` utility for alerts (web-compatible)
 
+### Import Pitfalls (CRITICAL — causes blank screens)
+These import mistakes have caused blank screens multiple times. **Always verify before committing:**
+
+- **`i18n`**: Import from `'../i18n'` (local module), NOT from `'react-i18next'`
+  - ✅ `import i18n from '../i18n';`
+  - ❌ `import { i18n } from 'react-i18next';` — this is `undefined` and crashes the app
+- **React hooks**: Always import hooks you use — `useState`, `useEffect`, `useCallback`, `useMemo`, `useRef`
+  - Missing any of these causes a blank screen with no error message
+- **Named vs default exports**: Check the source file to confirm export type before importing
+  - `export default i18n` → `import i18n from '../i18n'`
+  - `export const foo` → `import { foo } from '...'`
+
 ### Naming Conventions
 - Components: PascalCase (`EventCard`, `TripDetailScreen`)
 - Functions/hooks: camelCase (`getUserProfile`, `useTheme`)
