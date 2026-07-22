@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
-import { collection, query, where, getDocs, addDoc, deleteDoc, doc, orderBy } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Birthday } from '../types';
 import { ActionModal } from '../components/ActionModal';
@@ -32,6 +32,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedBirthday, setSelectedBirthday] = useState<Birthday | null>(null);
   const [newName, setNewName] = useState('');
   const [newYear, setNewYear] = useState('');
@@ -115,6 +116,34 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     }
   };
 
+  const handleEdit = async () => {
+    if (!editingId || !newName.trim()) {
+      crossAlert('Error', t('birthdays.name') + ' er påkrevd');
+      return;
+    }
+    const dateStr = newYear && newMonth && newDay ? `${newYear}-${newMonth}-${newDay}` : '';
+    if (!dateStr) {
+      crossAlert('Error', t('birthdays.date') + ' er påkrevd');
+      return;
+    }
+    try {
+      await updateDoc(doc(db, 'birthdays', editingId), {
+        name: newName.trim(),
+        date: dateStr,
+      });
+      setNewName('');
+      setNewYear('');
+      setNewMonth('');
+      setNewDay('');
+      setEditingId(null);
+      setShowAddModal(false);
+      loadBirthdays();
+    } catch (error) {
+      console.error('Failed to edit birthday:', error);
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
     return d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -144,29 +173,44 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('birthdays.noBirthdays')}</Text>
         ) : (
           birthdays.map((b) => (
-            <TouchableOpacity
-              key={b.id}
-              style={[styles.birthdayCard, { backgroundColor: colors.surface }]}
-              onPress={() => {
-                setSelectedBirthday(b);
-                setShowDeleteModal(true);
-              }}
-            >
-              <View style={[styles.avatarCircle, { backgroundColor: colors.accent + '30' }]}>
-                <Text style={[styles.avatarInitial, { color: colors.accent }]}>
-                  {b.name.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-              <View style={styles.birthdayInfo}>
-                <Text style={[styles.birthdayName, { color: colors.text }]}>{b.name}</Text>
-                <Text style={[styles.birthdayDate, { color: colors.textSecondary }]}>
-                  {formatDate(b.date)} ({calculateAge(b.date)} {t('birthdays.years')})
-                </Text>
-                <Text style={[styles.birthdayAddedBy, { color: colors.textDisabled }]}>
-                  {t('birthdays.addedBy')}: {b.addedByName}
-                </Text>
-              </View>
-            </TouchableOpacity>
+            <View key={b.id} style={[styles.birthdayCard, { backgroundColor: colors.surface }]}>
+              <TouchableOpacity
+                style={styles.birthdayCardContent}
+                onPress={() => {
+                  setEditingId(b.id);
+                  setNewName(b.name);
+                  const parts = b.date.split('-');
+                  setNewYear(parts[0] || '');
+                  setNewMonth(parts[1] || '');
+                  setNewDay(parts[2] || '');
+                  setShowAddModal(true);
+                }}
+              >
+                <View style={[styles.avatarCircle, { backgroundColor: colors.accent + '30' }]}>
+                  <Text style={[styles.avatarInitial, { color: colors.accent }]}>
+                    {b.name.charAt(0).toUpperCase()}
+                  </Text>
+                </View>
+                <View style={styles.birthdayInfo}>
+                  <Text style={[styles.birthdayName, { color: colors.text }]}>{b.name}</Text>
+                  <Text style={[styles.birthdayDate, { color: colors.textSecondary }]}>
+                    {formatDate(b.date)} ({calculateAge(b.date)} {t('birthdays.years')})
+                  </Text>
+                  <Text style={[styles.birthdayAddedBy, { color: colors.textDisabled }]}>
+                    {t('birthdays.addedBy')}: {b.addedByName}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.deleteBtn}
+                onPress={() => {
+                  setSelectedBirthday(b);
+                  setShowDeleteModal(true);
+                }}
+              >
+                <Text style={{ color: '#E53935', fontSize: 18 }}>🗑️</Text>
+              </TouchableOpacity>
+            </View>
           ))
         )}
       </ScrollView>
@@ -177,7 +221,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('birthdays.add')}</Text>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{editingId ? t('birthdays.edit') : t('birthdays.add')}</Text>
 
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('birthdays.name')}</Text>
@@ -223,15 +267,15 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 <View style={styles.modalActions}>
                   <TouchableOpacity
                     style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]}
-                    onPress={() => setShowAddModal(false)}
+                    onPress={() => { setShowAddModal(false); setEditingId(null); setNewName(''); setNewYear(''); setNewMonth(''); setNewDay(''); }}
                   >
                     <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.modalBtn, { backgroundColor: colors.accent }]}
-                    onPress={handleAdd}
+                    onPress={editingId ? handleEdit : handleAdd}
                   >
-                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.add')}</Text>
+                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{editingId ? t('common.save') : t('common.add')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -340,6 +384,8 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 8,
   },
+  birthdayCardContent: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  deleteBtn: { padding: 8 },
   avatarCircle: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
   avatarInitial: { fontSize: 18, fontWeight: '700' },
   birthdayInfo: { flex: 1 },
