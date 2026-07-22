@@ -39,7 +39,10 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
-    if (!user?.familyId) return;
+    if (!user?.familyId) {
+      setLoading(false);
+      return;
+    }
     try {
       const q = query(
         collection(db, 'birthdays'),
