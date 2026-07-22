@@ -33,7 +33,9 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBirthday, setSelectedBirthday] = useState<Birthday | null>(null);
   const [newName, setNewName] = useState('');
-  const [newDate, setNewDate] = useState('');
+  const [newYear, setNewYear] = useState('');
+  const [newMonth, setNewMonth] = useState('');
+  const [newDay, setNewDay] = useState('');
   const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
@@ -64,7 +66,8 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       crossAlert('Error', t('birthdays.name') + ' er påkrevd');
       return;
     }
-    if (!newDate) {
+    const dateStr = newYear && newMonth && newDay ? `${newYear}-${newMonth}-${newDay}` : '';
+    if (!dateStr) {
       crossAlert('Error', t('birthdays.date') + ' er påkrevd');
       return;
     }
@@ -75,14 +78,16 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     try {
       await addDoc(collection(db, 'birthdays'), {
         name: newName.trim(),
-        date: newDate,
+        date: dateStr,
         addedBy: user!.uid,
         addedByName: user!.displayName || 'Ukjent',
         familyId: user!.familyId,
         createdAt: Date.now(),
       });
       setNewName('');
-      setNewDate('');
+      setNewYear('');
+      setNewMonth('');
+      setNewDay('');
       setShowAddModal(false);
       loadBirthdays();
     } catch (error) {
@@ -184,24 +189,24 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                       style={[styles.dateInput, { backgroundColor: colors.inputBackground }]}
                       onPress={() => setActivePicker('year')}
                     >
-                      <Text style={{ color: newDate.split('-')[0] ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
-                        {newDate.split('-')[0] || 'År'}
+                      <Text style={{ color: newYear ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
+                        {newYear || 'År'}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.dateInput, { backgroundColor: colors.inputBackground }]}
                       onPress={() => setActivePicker('month')}
                     >
-                      <Text style={{ color: newDate.split('-')[1] ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
-                        {newDate.split('-')[1] || 'Mnd'}
+                      <Text style={{ color: newMonth ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
+                        {newMonth || 'Mnd'}
                       </Text>
                     </TouchableOpacity>
                     <TouchableOpacity
                       style={[styles.dateInput, { backgroundColor: colors.inputBackground }]}
                       onPress={() => setActivePicker('day')}
                     >
-                      <Text style={{ color: newDate.split('-')[2] ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
-                        {newDate.split('-')[2] || 'Dag'}
+                      <Text style={{ color: newDay ? colors.text : colors.textDisabled, fontSize: 14, textAlign: 'center' }}>
+                        {newDay || 'Dag'}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -257,15 +262,10 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     return (
                       <TouchableOpacity
                         key={year}
-                        style={[styles.pickerItem, { borderBottomColor: colors.border }, newDate.split('-')[0] === String(year) && { backgroundColor: colors.accent + '20' }]}
-                        onPress={() => {
-                          const month = newDate.split('-')[1] || '';
-                          const day = newDate.split('-')[2] || '';
-                          setNewDate(month && day ? `${year}-${month}-${day}` : String(year));
-                          setActivePicker(null);
-                        }}
+                        style={[styles.pickerItem, { borderBottomColor: colors.border }, newYear === String(year) && { backgroundColor: colors.accent + '20' }]}
+                        onPress={() => { setNewYear(String(year)); setActivePicker(null); }}
                       >
-                        <Text style={[styles.pickerItemText, { color: newDate.split('-')[0] === String(year) ? colors.accent : colors.text }]}>{year}</Text>
+                        <Text style={[styles.pickerItemText, { color: newYear === String(year) ? colors.accent : colors.text }]}>{year}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -279,32 +279,24 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   ].map((m) => (
                     <TouchableOpacity
                       key={m.value}
-                      style={[styles.pickerItem, { borderBottomColor: colors.border }, newDate.split('-')[1] === m.value && { backgroundColor: colors.accent + '20' }]}
-                      onPress={() => {
-                        const year = newDate.split('-')[0] || '';
-                        const day = newDate.split('-')[2] || '';
-                        setNewDate(year && day ? `${year}-${m.value}-${day}` : m.value);
-                        setActivePicker(null);
-                      }}
+                      style={[styles.pickerItem, { borderBottomColor: colors.border }, newMonth === m.value && { backgroundColor: colors.accent + '20' }]}
+                      onPress={() => { setNewMonth(m.value); setActivePicker(null); }}
                     >
-                      <Text style={[styles.pickerItemText, { color: newDate.split('-')[1] === m.value ? colors.accent : colors.text }]}>{m.label}</Text>
+                      <Text style={[styles.pickerItemText, { color: newMonth === m.value ? colors.accent : colors.text }]}>{m.label}</Text>
                     </TouchableOpacity>
                   ))}
-                  {activePicker === 'day' && Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
-                    <TouchableOpacity
-                      key={day}
-                      style={[styles.pickerItem, { borderBottomColor: colors.border }, newDate.split('-')[2] === String(day).padStart(2, '0') && { backgroundColor: colors.accent + '20' }]}
-                      onPress={() => {
-                        const year = newDate.split('-')[0] || '';
-                        const month = newDate.split('-')[1] || '';
-                        const dayStr = String(day).padStart(2, '0');
-                        setNewDate(year && month ? `${year}-${month}-${dayStr}` : dayStr);
-                        setActivePicker(null);
-                      }}
-                    >
-                      <Text style={[styles.pickerItemText, { color: newDate.split('-')[2] === String(day).padStart(2, '0') ? colors.accent : colors.text }]}>{day}</Text>
-                    </TouchableOpacity>
-                  ))}
+                  {activePicker === 'day' && Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {
+                    const dayStr = String(day).padStart(2, '0');
+                    return (
+                      <TouchableOpacity
+                        key={day}
+                        style={[styles.pickerItem, { borderBottomColor: colors.border }, newDay === dayStr && { backgroundColor: colors.accent + '20' }]}
+                        onPress={() => { setNewDay(dayStr); setActivePicker(null); }}
+                      >
+                        <Text style={[styles.pickerItemText, { color: newDay === dayStr ? colors.accent : colors.text }]}>{day}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </ScrollView>
               </View>
             </TouchableWithoutFeedback>
