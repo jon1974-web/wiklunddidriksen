@@ -55,7 +55,8 @@ import {
   updateTrip,
 } from '../services/tripService';
 import { ref, deleteObject } from 'firebase/storage';
-import { useTranslation, i18n } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { storage } from '../services/firebase';
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
