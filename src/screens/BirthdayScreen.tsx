@@ -44,11 +44,13 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       return;
     }
     try {
+      console.log('Loading birthdays for familyId:', user.familyId);
       const q = query(
         collection(db, 'birthdays'),
         where('familyId', '==', user.familyId)
       );
       const snapshot = await getDocs(q);
+      console.log('Found', snapshot.docs.length, 'birthdays for familyId:', user.familyId);
       const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Birthday));
       data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       setBirthdays(data);
