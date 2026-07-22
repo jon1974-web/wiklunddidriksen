@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Theme Comparison</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #e8e8e8;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      padding: 40px 20px;
+      flex-wrap: wrap;
+    }
+
+    .theme-card {
+      width: 380px;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .theme-label {
+      text-align: center;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    /* Light theme */
+    .light .phone-frame { background: #f5f5f5; }
+    .light .status-bar { background: #0097A7; color: #fff; }
+    .light .card { background: #fff; }
+    .light .card-title { color: #333; }
+    .light .text { color: #333; }
+    .light .text-sec { color: #666; }
+    .light .item-bg { background: #f8fafb; }
+    .light .border { border-color: #eee; }
+    .light .accent { color: #4CAF50; }
+    .light .back-btn { color: #0097A7; }
+
+    /* Dark theme */
+    .dark .phone-frame { background: #121212; }
+    .dark .status-bar { background: #1e1e1e; color: #e0e0e0; }
+    .dark .card { background: #1e1e1e; }
+    .dark .card-title { color: #e0e0e0; }
+    .dark .text { color: #e0e0e0; }
+    .dark .text-sec { color: #a0a0a0; }
+    .dark .item-bg { background: #2c2c2e; }
+    .dark .border { border-color: #333; }
+    .dark .accent { color: #4CAF50; }
+    .dark .back-btn { color: #4CAF50; }
+    .dark .input { background: #2c2c2e; color: #e0e0e0; border-color: #444; }
+    .dark .tips-body { background: #2c2c2e; }
+    .dark .weather-today { background: #1a3a1e; }
+
+    /* Teal theme */
+    .teal .phone-frame { background: #f2f8f9; }
+    .teal .status-bar { background: #0097A7; color: #fff; }
+    .teal .card { background: #fff; }
+    .teal .card-title { color: #333; }
+    .teal .text { color: #333; }
+    .teal .text-sec { color: #666; }
+    .teal .item-bg { background: #e5f0f2; }
+    .teal .border { border-color: #d0e4e8; }
+    .teal .accent { color: #0097A7; }
+    .teal .back-btn { color: #0097A7; }
+
+    /* Purple theme */
+    .purple .phone-frame { background: #f7f2fa; }
+    .purple .status-bar { background: #9C27B0; color: #fff; }
+    .purple .card { background: #fff; }
+    .purple .card-title { color: #333; }
+    .purple .text { color: #333; }
+    .purple .text-sec { color: #666; }
+    .purple .item-bg { background: #f0e8f5; }
+    .purple .border { border-color: #e4d4f0; }
+    .purple .accent { color: #9C27B0; }
+    .purple .back-btn { color: #9C27B0; }
+
+    /* Orange theme */
+    .orange .phone-frame { background: #faf6f3; }
+    .orange .status-bar { background: #E87C3E; color: #fff; }
+    .orange .card { background: #fff; }
+    .orange .card-title { color: #333; }
+    .orange .text { color: #333; }
+    .orange .text-sec { color: #666; }
+    .orange .item-bg { background: #f5ede8; }
+    .orange .border { border-color: #f0e0d4; }
+    .orange .accent { color: #E87C3E; }
+    .orange .back-btn { color: #E87C3E; }
+
+    .status-bar {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .back-btn { padding: 10px 14px 2px; font-size: 18px; cursor: pointer; }
+    .card { border-radius: 10px; margin: 6px 14px; overflow: hidden; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px 8px; }
+    .card-title { font-size: 14px; font-weight: 700; }
+    .card-body { padding: 0 14px 10px; }
+    .add-btn { width: 24px; height: 24px; border-radius: 12px; background: #4CAF50; color: #fff; border: none; font-size: 16px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .trip-card { border-radius: 10px; margin: 0 14px 6px; padding: 16px; text-align: center; }
+    .trip-icon { font-size: 28px; margin-bottom: 4px; }
+    .trip-title { font-size: 18px; font-weight: 700; margin-bottom: 2px; }
+    .trip-location { font-size: 13px; margin-bottom: 1px; }
+    .trip-dates { font-size: 12px; }
+    .weather-row { display: flex; align-items: center; padding: 6px 0; border-bottom: 1px solid; font-size: 12px; }
+    .weather-header { display: flex; padding: 4px 0; border-bottom: 1px solid; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .weather-today { border-radius: 6px; padding: 6px 4px; }
+    .address-item { display: flex; gap: 10px; padding: 10px; border-radius: 8px; margin-bottom: 6px; }
+    .address-item:last-child { margin-bottom: 0; }
+    .address-name { font-size: 13px; font-weight: 600; margin-bottom: 1px; }
+    .address-detail { font-size: 11px; }
+    .transport-grid { display: flex; gap: 6px; margin-bottom: 6px; }
+    .transport-tile { flex: 1; border-radius: 8px; padding: 10px; border-left: 3px solid #4CAF50; }
+    .transport-tile.return { border-left-color: #E53935; }
+    .transport-type { font-size: 10px; font-weight: 600; color: #4CAF50; margin-bottom: 2px; }
+    .transport-tile.return .transport-type { color: #E53935; }
+    .transport-name { font-size: 12px; font-weight: 600; margin-bottom: 1px; }
+    .transport-detail { font-size: 10px; }
+    .currency-result { border-radius: 8px; padding: 10px; text-align: center; }
+    .currency-main { font-size: 14px; font-weight: 700; }
+    .currency-rate { font-size: 11px; margin-top: 2px; }
+    .tips-expand { border-radius: 8px; overflow: hidden; margin-top: 6px; }
+    .tips-header { display: flex; align-items: center; gap: 6px; padding: 8px 10px; }
+    .tips-arrow { font-size: 9px; }
+    .tips-title { font-size: 12px; font-weight: 600; flex: 1; }
+    .tips-body { padding: 10px; font-size: 12px; line-height: 1.4; }
+    .tips-section { font-size: 11px; font-weight: 700; margin: 6px 0 2px; text-transform: uppercase; }
+    .tips-section:first-child { margin-top: 0; }
+    .link-item { display: flex; gap: 8px; padding: 8px; border-radius: 8px; margin-bottom: 6px; }
+    .link-thumb { width: 60px; height: 42px; border-radius: 6px; background: #e8e8e8; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+    .link-title { font-size: 12px; font-weight: 600; }
+    .link-domain { font-size: 10px; }
+    .doc-item { display: flex; align-items: center; justify-content: space-between; padding: 10px; border-radius: 8px; margin-bottom: 6px; }
+    .doc-title { font-size: 13px; font-weight: 600; }
+    .doc-note { font-size: 11px; }
+    .doc-file { font-size: 11px; }
+    .doc-actions { display: flex; gap: 10px; }
+    .doc-action { font-size: 11px; font-weight: 600; }
+    .mockup-label {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 100;
+      opacity: 0.7;
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-label">Theme Comparison — White Cards</div>
+
+  <!-- LIGHT THEME -->
+  <div>
+    <div class="theme-card light">
+      <div class="theme-label">☀️ Light (Standard)</div>
+      <div class="phone-frame">
+        <div class="status-bar">9:41</div>
+        <div class="back-btn">←</div>
+        <div class="trip-card card">
+          <div class="trip-icon">🇭🇷</div>
+          <div class="trip-title text">Kroatia-tur</div>
+          <div class="trip-location text-sec">Dubrovnik, Kroatia</div>
+          <div class="trip-dates text-sec">15. – 22. juli 2026</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🌤️ Vær</span><span style="font-size:11px" class="accent">↻ Oppdater</span></div>
+          <div class="card-body">
+            <div class="weather-header border">
+              <span style="flex:3">Dag</span><span style="flex:1;text-align:center">Vær</span><span style="flex:2;text-align:center">Temp</span><span style="flex:1;text-align:right">Vann</span>
+            </div>
+            <div class="weather-row border weather-today">
+              <span style="flex:3;font-weight:600">Tor 24</span><span style="flex:1;text-align:center;font-size:16px">☀️</span><span style="flex:2;text-align:center">18° / 26°</span><span style="flex:1;text-align:right">22°</span>
+            </div>
+            <div class="weather-row border">
+              <span style="flex:3">Fre 25</span><span style="flex:1;text-align:center;font-size:16px">⛅</span><span style="flex:2;text-align:center">17° / 24°</span><span style="flex:1;text-align:right">21°</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">💱 Valutakurs</span></div>
+          <div class="card-body">
+            <div class="currency-result item-bg" style="border:1px solid #d0e8ea">
+              <div class="currency-main accent">100 NOK = 8,72 EUR</div>
+              <div class="currency-rate text-sec">1 NOK = 0,0872 EUR</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🚀 Transport</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="transport-grid">
+              <div class="transport-tile item-bg"><div class="transport-type">Avreise</div><div class="transport-name text">SAS SK489</div><div class="transport-detail text-sec">OSL → DBV · 15. juli</div></div>
+              <div class="transport-tile return item-bg"><div class="transport-type">Hjemreise</div><div class="transport-name text">SAS SK490</div><div class="transport-detail text-sec">DBV → OSL · 22. juli</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🛏️ Hoteller</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="address-item item-bg">
+              <div style="flex:1"><div class="address-name text">Hotel Excelsior</div><div class="address-detail text-sec">📍 Ul. sv. Đurđa 1</div><div class="address-detail text-sec">📅 15. – 22. juli</div></div>
+              <div style="width:50px;height:50px;border-radius:6px;background:#e8e8e8;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🗺️</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">💡 Reisetips</span></div>
+          <div class="card-body">
+            <div class="tips-expand border">
+              <div class="tips-header item-bg"><span class="tips-arrow">▼</span><span class="tips-title text">🇭🇷 Dubrovnik</span></div>
+              <div class="tips-body tips-section accent">Ting å gjøre</div>
+              <div class="tips-body text-sec">• Gå på muren rundt gamlebyen<br>• Besøk Lokrum Island</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔗 Nyttige lenker</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="link-item item-bg"><div class="link-thumb">🌐</div><div><div class="link-title text">Visit Dubrovnik</div><div class="link-domain accent">🔗 visitdubrovnik.com</div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📄 Reisedokumenter</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="doc-item item-bg"><div><div class="doc-title text">Flybilletter</div><div class="doc-file accent">📎 flybilletter.pdf</div></div><div class="doc-actions"><span class="doc-action accent">Åpne</span><span style="color:#E53935" class="doc-action">Slett</span></div></div>
+          </div>
+        </div>
+        <div style="height:30px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- DARK THEME -->
+  <div>
+    <div class="theme-card dark">
+      <div class="theme-label">🌙 Dark</div>
+      <div class="phone-frame">
+        <div class="status-bar">9:41</div>
+        <div class="back-btn">←</div>
+        <div class="trip-card card">
+          <div class="trip-icon">🇭🇷</div>
+          <div class="trip-title text">Kroatia-tur</div>
+          <div class="trip-location text-sec">Dubrovnik, Kroatia</div>
+          <div class="trip-dates text-sec">15. – 22. juli 2026</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🌤️ Vær</span><span style="font-size:11px" class="accent">↻ Oppdater</span></div>
+          <div class="card-body">
+            <div class="weather-header border">
+              <span style="flex:3">Dag</span><span style="flex:1;text-align:center">Vær</span><span style="flex:2;text-align:center">Temp</span><span style="flex:1;text-align:right">Vann</span>
+            </div>
+            <div class="weather-row border weather-today">
+              <span style="flex:3;font-weight:600">Tor 24</span><span style="flex:1;text-align:center;font-size:16px">☀️</span><span style="flex:2;text-align:center">18° / 26°</span><span style="flex:1;text-align:right">22°</span>
+            </div>
+            <div class="weather-row border">
+              <span style="flex:3">Fre 25</span><span style="flex:1;text-align:center;font-size:16px">⛅</span><span style="flex:2;text-align:center">17° / 24°</span><span style="flex:1;text-align:right">21°</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">💱 Valutakurs</span></div>
+          <div class="card-body">
+            <div class="currency-result item-bg" style="border:1px solid #444">
+              <div class="currency-main accent">100 NOK = 8,72 EUR</div>
+              <div class="currency-rate text-sec">1 NOK = 0,0872 EUR</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🚀 Transport</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="transport-grid">
+              <div class="transport-tile item-bg"><div class="transport-type">Avreise</div><div class="transport-name text">SAS SK489</div><div class="transport-detail text-sec">OSL → DBV · 15. juli</div></div>
+              <div class="transport-tile return item-bg"><div class="transport-type">Hjemreise</div><div class="transport-name text">SAS SK490</div><div class="transport-detail text-sec">DBV → OSL · 22. juli</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🛏️ Hoteller</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="address-item item-bg">
+              <div style="flex:1"><div class="address-name text">Hotel Excelsior</div><div class="address-detail text-sec">📍 Ul. sv. Đurđa 1</div><div class="address-detail text-sec">📅 15. – 22. juli</div></div>
+              <div style="width:50px;height:50px;border-radius:6px;background:#444;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🗺️</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">💡 Reisetips</span></div>
+          <div class="card-body">
+            <div class="tips-expand border">
+              <div class="tips-header item-bg"><span class="tips-arrow">▼</span><span class="tips-title text">🇭🇷 Dubrovnik</span></div>
+              <div class="tips-body tips-section accent">Ting å gjøre</div>
+              <div class="tips-body text-sec">• Gå på muren rundt gamlebyen<br>• Besøk Lokrum Island</div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🔗 Nyttige lenker</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="link-item item-bg"><div class="link-thumb">🌐</div><div><div class="link-title text">Visit Dubrovnik</div><div class="link-domain accent">🔗 visitdubrovnik.com</div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">📄 Reisedokumenter</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="doc-item item-bg"><div><div class="doc-title text">Flybilletter</div><div class="doc-file accent">📎 flybilletter.pdf</div></div><div class="doc-actions"><span class="doc-action accent">Åpne</span><span style="color:#ff6b6b" class="doc-action">Slett</span></div></div>
+          </div>
+        </div>
+        <div style="height:30px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAL THEME -->
+  <div>
+    <div class="theme-card teal">
+      <div class="theme-label">🩵 Teal</div>
+      <div class="phone-frame">
+        <div class="status-bar">9:41</div>
+        <div class="back-btn">←</div>
+        <div class="trip-card card">
+          <div class="trip-icon">🇭🇷</div>
+          <div class="trip-title text">Kroatia-tur</div>
+          <div class="trip-location text-sec">Dubrovnik, Kroatia</div>
+          <div class="trip-dates text-sec">15. – 22. juli 2026</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🌤️ Vær</span><span style="font-size:11px" class="accent">↻ Oppdater</span></div>
+          <div class="card-body">
+            <div class="weather-header border"><span style="flex:3">Dag</span><span style="flex:1;text-align:center">Vær</span><span style="flex:2;text-align:center">Temp</span><span style="flex:1;text-align:right">Vann</span></div>
+            <div class="weather-row border weather-today"><span style="flex:3;font-weight:600">Tor 24</span><span style="flex:1;text-align:center;font-size:16px">☀️</span><span style="flex:2;text-align:center">18° / 26°</span><span style="flex:1;text-align:right">22°</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🚀 Transport</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="transport-grid">
+              <div class="transport-tile item-bg"><div class="transport-type" style="color:#0097A7">Avreise</div><div class="transport-name text">SAS SK489</div></div>
+              <div class="transport-tile return item-bg"><div class="transport-type">Hjemreise</div><div class="transport-name text">SAS SK490</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🛏️ Hoteller</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="address-item item-bg"><div style="flex:1"><div class="address-name text">Hotel Excelsior</div><div class="address-detail text-sec">📍 Dubrovnik</div></div></div>
+          </div>
+        </div>
+        <div style="height:30px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PURPLE THEME -->
+  <div>
+    <div class="theme-card purple">
+      <div class="theme-label">💜 Purple</div>
+      <div class="phone-frame">
+        <div class="status-bar">9:41</div>
+        <div class="back-btn">←</div>
+        <div class="trip-card card">
+          <div class="trip-icon">🇭🇷</div>
+          <div class="trip-title text">Kroatia-tur</div>
+          <div class="trip-location text-sec">Dubrovnik, Kroatia</div>
+          <div class="trip-dates text-sec">15. – 22. juli 2026</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🌤️ Vær</span><span style="font-size:11px" class="accent">↻ Oppdater</span></div>
+          <div class="card-body">
+            <div class="weather-header border"><span style="flex:3">Dag</span><span style="flex:1;text-align:center">Vær</span><span style="flex:2;text-align:center">Temp</span><span style="flex:1;text-align:right">Vann</span></div>
+            <div class="weather-row border weather-today"><span style="flex:3;font-weight:600">Tor 24</span><span style="flex:1;text-align:center;font-size:16px">☀️</span><span style="flex:2;text-align:center">18° / 26°</span><span style="flex:1;text-align:right">22°</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🚀 Transport</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="transport-grid">
+              <div class="transport-tile item-bg"><div class="transport-type" style="color:#9C27B0">Avreise</div><div class="transport-name text">SAS SK489</div></div>
+              <div class="transport-tile return item-bg"><div class="transport-type">Hjemreise</div><div class="transport-name text">SAS SK490</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🛏️ Hoteller</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="address-item item-bg"><div style="flex:1"><div class="address-name text">Hotel Excelsior</div><div class="address-detail text-sec">📍 Dubrovnik</div></div></div>
+          </div>
+        </div>
+        <div style="height:30px"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORANGE THEME -->
+  <div>
+    <div class="theme-card orange">
+      <div class="theme-label">🧡 Orange</div>
+      <div class="phone-frame">
+        <div class="status-bar">9:41</div>
+        <div class="back-btn">←</div>
+        <div class="trip-card card">
+          <div class="trip-icon">🇭🇷</div>
+          <div class="trip-title text">Kroatia-tur</div>
+          <div class="trip-location text-sec">Dubrovnik, Kroatia</div>
+          <div class="trip-dates text-sec">15. – 22. juli 2026</div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🌤️ Vær</span><span style="font-size:11px" class="accent">↻ Oppdater</span></div>
+          <div class="card-body">
+            <div class="weather-header border"><span style="flex:3">Dag</span><span style="flex:1;text-align:center">Vær</span><span style="flex:2;text-align:center">Temp</span><span style="flex:1;text-align:right">Vann</span></div>
+            <div class="weather-row border weather-today"><span style="flex:3;font-weight:600">Tor 24</span><span style="flex:1;text-align:center;font-size:16px">☀️</span><span style="flex:2;text-align:center">18° / 26°</span><span style="flex:1;text-align:right">22°</span></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🚀 Transport</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="transport-grid">
+              <div class="transport-tile item-bg"><div class="transport-type" style="color:#E87C3E">Avreise</div><div class="transport-name text">SAS SK489</div></div>
+              <div class="transport-tile return item-bg"><div class="transport-type">Hjemreise</div><div class="transport-name text">SAS SK490</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">🛏️ Hoteller</span><button class="add-btn">+</button></div>
+          <div class="card-body">
+            <div class="address-item item-bg"><div style="flex:1"><div class="address-name text">Hotel Excelsior</div><div class="address-detail text-sec">📍 Dubrovnik</div></div></div>
+          </div>
+        </div>
+        <div style="height:30px"></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
