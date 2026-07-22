@@ -39,7 +39,9 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
+    console.log('loadBirthdays called, user:', user?.uid, 'familyId:', user?.familyId);
     if (!user?.familyId) {
+      console.log('No familyId, stopping');
       setLoading(false);
       return;
     }
