@@ -39,16 +39,17 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [activePicker, setActivePicker] = useState<'year' | 'month' | 'day' | null>(null);
 
   const loadBirthdays = useCallback(async () => {
-    if (!user?.familyId) {
-      console.log('No familyId, skipping load');
+    const familyKey = user?.familyId || user?.uid;
+    if (!familyKey) {
+      console.log('No familyId or uid, skipping load');
       setLoading(false);
       return;
     }
     try {
-      console.log('Loading birthdays for familyId:', user.familyId);
+      console.log('Loading birthdays for:', familyKey);
       const q = query(
         collection(db, 'birthdays'),
-        where('familyId', '==', user.familyId)
+        where('familyId', '==', familyKey)
       );
       const snapshot = await getDocs(q);
       console.log('Found', snapshot.docs.length, 'birthdays');
@@ -60,7 +61,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     } finally {
       setLoading(false);
     }
-  }, [user?.familyId]);
+  }, [user?.familyId, user?.uid]);
 
   useEffect(() => { loadBirthdays(); }, [loadBirthdays]);
 
@@ -79,12 +80,13 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       return;
     }
     try {
+      const familyKey = user?.familyId || user?.uid || '';
       await addDoc(collection(db, 'birthdays'), {
         name: newName.trim(),
         date: dateStr,
         addedBy: user?.uid || '',
         addedByName: user?.displayName || 'Ukjent',
-        familyId: user?.familyId || '',
+        familyId: familyKey,
         createdAt: Date.now(),
       });
       setNewName('');
