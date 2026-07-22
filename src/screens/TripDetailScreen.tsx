@@ -55,7 +55,7 @@ import {
   updateTrip,
 } from '../services/tripService';
 import { ref, deleteObject } from 'firebase/storage';
-import { useTranslation } from 'react-i18next';
+import { useTranslation, i18n } from 'react-i18next';
 import { storage } from '../services/firebase';
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
@@ -68,6 +68,7 @@ import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
 import { ActionModal } from '../components/ActionModal';
+import { CurrencyConverter } from '../components/CurrencyConverter';
 import { TRIP_ICONS } from '../constants/tripIcons';
 import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
 import { WeatherDay } from '../types';
@@ -943,6 +944,13 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               )}
             </>
           )}
+        </View>
+      )}
+
+      {/* Currency Converter */}
+      {trip.country && (
+        <View style={[styles.section, { backgroundColor: colors.surface, marginHorizontal: 16, marginBottom: 12 }]}>
+          <CurrencyConverter country={trip.country} language={i18n.language} />
         </View>
       )}
 

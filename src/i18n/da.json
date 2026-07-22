@@ -395,5 +395,13 @@
     "da": "Dansk",
     "en": "English",
     "fi": "Suomi"
+  },
+  "currency": {
+    "title": "Valutakurs",
+    "amount": "Beløb",
+    "from": "Fra",
+    "to": "Til",
+    "source": "Kurs",
+    "error": "Kunne ikke hente valutakurs"
   }
 }

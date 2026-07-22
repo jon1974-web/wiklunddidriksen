@@ -401,5 +401,13 @@
     "da": "Dansk",
     "en": "English",
     "fi": "Suomi"
+  },
+  "currency": {
+    "title": "Valutakurs",
+    "amount": "Belopp",
+    "from": "Från",
+    "to": "Till",
+    "source": "Kurs",
+    "error": "Kunde inte hämta växelkurs"
   }
 }

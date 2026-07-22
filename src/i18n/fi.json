@@ -395,5 +395,13 @@
     "da": "Dansk",
     "en": "English",
     "fi": "Suomi"
+  },
+  "currency": {
+    "title": "Valuuttakurssi",
+    "amount": "Summa",
+    "from": "Vastaan",
+    "to": "Asti",
+    "source": "Kurssi",
+    "error": "Valuuttakurssia ei voitu noutaa"
   }
 }
