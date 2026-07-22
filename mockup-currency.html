@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Valutakurs Mockup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #1a1a1a;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .section-icon {
+      font-size: 20px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    /* Amount input */
+    .amount-group {
+      margin-bottom: 16px;
+    }
+
+    .amount-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    .amount-input-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .amount-input {
+      flex: 1;
+      padding: 12px 14px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      background: #fafafa;
+      color: #1a1a1a;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .amount-input:focus {
+      border-color: #0097A7;
+      background: #fff;
+    }
+
+    .amount-currency {
+      font-size: 14px;
+      font-weight: 600;
+      color: #888;
+      padding: 12px 0;
+    }
+
+    /* Currency selectors */
+    .currency-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .currency-select-wrapper {
+      flex: 1;
+    }
+
+    .currency-select-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #888;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .currency-select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      background: #fafafa;
+      color: #1a1a1a;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .currency-select:focus {
+      border-color: #0097A7;
+    }
+
+    .swap-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 18px;
+      margin-top: 18px;
+      transition: all 0.15s;
+      flex-shrink: 0;
+    }
+
+    .swap-btn:hover {
+      background: #f0f4f5;
+      border-color: #0097A7;
+    }
+
+    /* Result */
+    .result-box {
+      background: #f0f9fa;
+      border: 1px solid #d0e8ea;
+      border-radius: 10px;
+      padding: 16px;
+      text-align: center;
+    }
+
+    .result-main {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0097A7;
+      margin-bottom: 4px;
+    }
+
+    .result-rate {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .result-source {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    /* Quick amounts */
+    .quick-amounts {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .quick-amount {
+      flex: 1;
+      padding: 8px;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      color: #555;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.15s;
+    }
+
+    .quick-amount:hover {
+      border-color: #0097A7;
+      color: #0097A7;
+    }
+
+    .quick-amount.active {
+      background: #0097A7;
+      color: #fff;
+      border-color: #0097A7;
+    }
+
+    /* Popular currencies */
+    .popular-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #aaa;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .popular-currencies {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .popular-chip {
+      padding: 6px 12px;
+      border: 1px solid #eee;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #555;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .popular-chip:hover {
+      border-color: #0097A7;
+      color: #0097A7;
+    }
+
+    .popular-chip.active {
+      background: #0097A7;
+      color: #fff;
+      border-color: #0097A7;
+    }
+
+    /* Mockup badge */
+    .mockup-badge {
+      position: fixed;
+      top: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: #fff;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+      z-index: 100;
+      opacity: 0.7;
+    }
+
+    /* Mock context */
+    .context-label {
+      font-size: 11px;
+      color: #aaa;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .context-trip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      background: #f8fafb;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .context-trip .trip-icon {
+      font-size: 18px;
+    }
+
+    .context-trip .trip-name {
+      font-weight: 600;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="mockup-badge">Mockup — Valutakurs</div>
+
+  <div class="container">
+    <div class="context-label">Plassering: under vær-seksjonen i turendetaljer</div>
+    <div class="context-trip">
+      <span class="trip-icon">🇭🇷</span>
+      <span class="trip-name">Kroatia-tur</span>
+      <span>•</span>
+      <span>15. juli – 22. juli 2026</span>
+    </div>
+
+    <!-- Currency Converter Section -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-icon">💱</span>
+        <span class="section-title">Valutakurs</span>
+      </div>
+
+      <!-- Quick amounts -->
+      <div class="quick-amounts">
+        <div class="quick-amount" onclick="setAmount(50)">50</div>
+        <div class="quick-amount active" onclick="setAmount(100)">100</div>
+        <div class="quick-amount" onclick="setAmount(500)">500</div>
+        <div class="quick-amount" onclick="setAmount(1000)">1 000</div>
+      </div>
+
+      <!-- Amount input -->
+      <div class="amount-group">
+        <label class="amount-label">Beløp</label>
+        <div class="amount-input-wrapper">
+          <input class="amount-input" type="number" value="100" id="amountInput" oninput="calculate()">
+          <span class="amount-currency" id="fromSymbol">NOK</span>
+        </div>
+      </div>
+
+      <!-- Currency selectors -->
+      <div class="currency-row">
+        <div class="currency-select-wrapper">
+          <label class="currency-select-label">Fra</label>
+          <select class="currency-select" id="fromCurrency" onchange="calculate()">
+            <option value="NOK" selected>🇳🇴 NOK — Norsk krone</option>
+            <option value="SEK">🇸🇪 SEK — Svensk krone</option>
+            <option value="DKK">🇩🇰 DKK — Dansk krone</option>
+            <option value="EUR">🇪🇺 EUR — Euro</option>
+            <option value="GBP">🇬🇧 GBP — Britisk pund</option>
+            <option value="USD">🇺🇸 USD — Amerikansk dollar</option>
+            <option value="HRK">🇭🇷 HRK — Kroatisk kuna</option>
+            <option value="THB">🇹🇭 THB — Thailandsk baht</option>
+            <option value="JPY">🇯🇵 JPY — Japansk yen</option>
+          </select>
+        </div>
+
+        <button class="swap-btn" onclick="swapCurrencies()">⇄</button>
+
+        <div class="currency-select-wrapper">
+          <label class="currency-select-label">Til</label>
+          <select class="currency-select" id="toCurrency" onchange="calculate()">
+            <option value="NOK">🇳🇴 NOK — Norsk krone</option>
+            <option value="SEK">🇸🇪 SEK — Svensk krone</option>
+            <option value="DKK">🇩🇰 DKK — Dansk krone</option>
+            <option value="EUR" selected>🇪🇺 EUR — Euro</option>
+            <option value="GBP">🇬🇧 GBP — Britisk pund</option>
+            <option value="USD">🇺🇸 USD — Amerikansk dollar</option>
+            <option value="HRK">🇭🇷 HRK — Kroatisk kuna</option>
+            <option value="THB">🇹🇭 THB — Thailandsk baht</option>
+            <option value="JPY">🇯🇵 JPY — Japansk yen</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div class="result-box">
+        <div class="result-main" id="resultMain">100,00 NOK = 8,72 EUR</div>
+        <div class="result-rate" id="resultRate">1 NOK = 0,0872 EUR</div>
+        <div class="result-source">Kurs: ECB (oppdatert 22. juli 2026)</div>
+      </div>
+    </div>
+
+    <!-- Context: what it looks like in the trip detail -->
+    <div class="context-label" style="margin-top: 24px;">Slik ser det ut i turendetaljer:</div>
+    <div class="section" style="opacity: 0.5; pointer-events: none;">
+      <div class="section-header">
+        <span class="section-icon">🚀</span>
+        <span class="section-title">Transport</span>
+      </div>
+      <div style="height: 60px; background: #f5f5f5; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 13px;">Transport-seksjonen vises her</div>
+    </div>
+  </div>
+
+  <script>
+    const rates = {
+      NOK: { EUR: 0.0872, USD: 0.094, GBP: 0.074, SEK: 0.92, DKK: 0.65, HRK: 0.66, THB: 3.4, JPY: 14.2 },
+      EUR: { NOK: 11.47, USD: 1.08, GBP: 0.85, SEK: 10.55, DKK: 7.46, HRK: 7.53, THB: 38.9, JPY: 162.8 },
+      USD: { NOK: 10.63, EUR: 0.93, GBP: 0.79, SEK: 9.78, DKK: 6.91, HRK: 7.0, THB: 36.1, JPY: 150.9 },
+      GBP: { NOK: 13.51, EUR: 1.18, USD: 1.27, SEK: 12.42, DKK: 8.78, HRK: 8.86, THB: 45.8, JPY: 191.3 },
+      SEK: { NOK: 1.09, EUR: 0.095, USD: 0.102, GBP: 0.081, DKK: 0.71, HRK: 0.71, THB: 3.69, JPY: 15.4 },
+      DKK: { NOK: 1.54, EUR: 0.134, USD: 0.145, GBP: 0.114, SEK: 1.41, HRK: 1.01, THB: 5.22, JPY: 21.8 },
+      HRK: { NOK: 1.52, EUR: 0.133, USD: 0.143, GBP: 0.113, SEK: 1.40, DKK: 0.99, THB: 5.16, JPY: 21.5 },
+      THB: { NOK: 0.29, EUR: 0.026, USD: 0.028, GBP: 0.022, SEK: 0.27, DKK: 0.19, HRK: 0.19, JPY: 4.19 },
+      JPY: { NOK: 0.07, EUR: 0.006, USD: 0.007, GBP: 0.005, SEK: 0.065, DKK: 0.046, HRK: 0.046, THB: 0.24 }
+    };
+
+    function calculate() {
+      const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+      const from = document.getElementById('fromCurrency').value;
+      const to = document.getElementById('toCurrency').value;
+
+      document.getElementById('fromSymbol').textContent = from;
+
+      if (from === to) {
+        document.getElementById('resultMain').textContent = `${formatNum(amount)} ${from} = ${formatNum(amount)} ${to}`;
+        document.getElementById('resultRate').textContent = `1 ${from} = 1,00 ${to}`;
+        return;
+      }
+
+      const rate = rates[from]?.[to] || 1;
+      const result = amount * rate;
+      const unitRate = rate;
+
+      document.getElementById('resultMain').textContent = `${formatNum(amount)} ${from} = ${formatNum(result)} ${to}`;
+      document.getElementById('resultRate').textContent = `1 ${from} = ${unitRate.toFixed(4)} ${to}`;
+    }
+
+    function formatNum(n) {
+      return n.toLocaleString('nb-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function swapCurrencies() {
+      const from = document.getElementById('fromCurrency');
+      const to = document.getElementById('toCurrency');
+      const temp = from.value;
+      from.value = to.value;
+      to.value = temp;
+      calculate();
+    }
+
+    function setAmount(val) {
+      document.getElementById('amountInput').value = val;
+      document.querySelectorAll('.quick-amount').forEach(el => {
+        el.classList.toggle('active', parseInt(el.textContent.replace(/\s/g, '')) === val);
+      });
+      calculate();
+    }
+
+    calculate();
+  </script>
+</body>
+</html>
