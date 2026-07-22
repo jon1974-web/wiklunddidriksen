@@ -55,6 +55,13 @@ service cloud.firestore {
       }
     }
 
+    // Birthdays: any authenticated user can read/write (family-scoped client-side)
+    match /birthdays/{birthdayId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+
     // Sent notifications: Cloud Function write, user read own
     match /sentNotifications/{eventId} {
       allow read: if request.auth != null;

@@ -929,3 +929,96 @@ exports.notifyNewEvent = onRequest({ region: "us-central1", memory: "256MB" }, a
   const sent = results.filter((r) => r.status === "fulfilled").length;
   return res.status(200).json({ sent });
 });
+
+// Birthday reminders — runs daily at 08:00
+exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZone: "Europe/Oslo" }, async (event) => {
+  const db = getFirestore();
+  const now = new Date();
+  const todayMonthDay = `${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
+  // Calculate dates for next 7 days
+  const upcomingDates = [];
+  for (let i = 0; i <= 7; i++) {
+    const d = new Date(now);
+    d.setDate(d.getDate() + i);
+    upcomingDates.push(`${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+  }
+
+  const birthdaysSnap = await db.collection("birthdays").get();
+  const sentNotifsSnap = await db.collection("sentNotifications").where("type", "==", "birthday").get();
+  const sentNotifs = new Set(sentNotifsSnap.docs.map((d) => d.id));
+
+  const notificationsToSend = [];
+
+  for (const doc of birthdaysSnap.docs) {
+    const b = doc.data();
+    const bDate = new Date(b.date);
+    const bMonthDay = `${String(bDate.getMonth() + 1).padStart(2, "0")}-${String(bDate.getDate()).padStart(2, "0")}`;
+
+    // Find matching date in next 7 days
+    let daysUntil = -1;
+    for (let i = 0; i < upcomingDates.length; i++) {
+      if (upcomingDates[i] === bMonthDay) {
+        daysUntil = i;
+        break;
+      }
+    }
+    if (daysUntil === -1) continue;
+
+    const year = now.getFullYear();
+    const notifKey = `birthday_${doc.id}_${year}`;
+    if (sentNotifs.has(notifKey)) continue;
+
+    // Get family members
+    if (!b.familyId) continue;
+    const familyDoc = await db.collection("families").doc(b.familyId).get();
+    if (!familyDoc.exists) continue;
+    const members = familyDoc.data().members || {};
+
+    const memberTokens = [];
+    for (const uid of Object.keys(members)) {
+      const userDoc = await db.collection("users").doc(uid).get();
+      if (!userDoc.exists) continue;
+      const userData = userDoc.data();
+      if (userData.notificationsEnabled === false) continue;
+      if (userData.fcmToken) {
+        memberTokens.push(userData.fcmToken);
+      }
+    }
+
+    if (memberTokens.length > 0) {
+      const age = now.getFullYear() - bDate.getFullYear();
+      const title = `🎂 ${b.name} har bursdag!`;
+      const body = daysUntil === 0
+        ? `${b.name} har bursdag i dag! Fyller ${age} år.`
+        : `${b.name} har bursdag om ${daysUntil} dager. Fyller ${age} år.`;
+
+      notificationsToSend.push({ tokens: memberTokens, title, body, notifKey });
+    }
+  }
+
+  // Send notifications
+  for (const notif of notificationsToSend) {
+    await Promise.allSettled(
+      notif.tokens.map(async (token) => {
+        await getMessaging().send({
+          token,
+          notification: { title: notif.title, body: notif.body },
+          webpush: {
+            notification: { icon: "/favicon.ico", badge: "/favicon.ico", tag: notif.notifKey },
+            fcmOptions: { link: "/" },
+          },
+          data: { url: "/", type: "birthday" },
+        });
+      })
+    );
+
+    // Record to prevent duplicates
+    await db.collection("sentNotifications").doc(notif.notifKey).set({
+      type: "birthday",
+      sentAt: FieldValue.serverTimestamp(),
+    });
+  }
+
+  return { sent: notificationsToSend.length };
+});

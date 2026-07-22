@@ -394,5 +394,23 @@
     "to": "Til",
     "source": "Kurs",
     "error": "Kunne ikke hente valutakurs"
+  },
+  "birthdays": {
+    "title": "Bursdager",
+    "add": "Legg til bursdag",
+    "edit": "Rediger bursdag",
+    "name": "Navn",
+    "date": "Fødselsdato",
+    "noBirthdays": "Ingen bursdager lagt til",
+    "noBirthdaysWeek": "Ingen bursdager denne uken",
+    "remove": "Fjern",
+    "addedBy": "Lagt til av",
+    "duplicate": "Denne personen er allerede lagt til av",
+    "duplicateNote": "Hele familien vil få varsler.",
+    "birthdayInWeek": "{name} fyller {age} år ({day})",
+    "reminderTitle": "🎂 {name} har bursdag!",
+    "reminderBody": "{name} har bursdag om {days} dager",
+    "reminderToday": "{name} har bursdag i dag!",
+    "years": "år"
   }
 }

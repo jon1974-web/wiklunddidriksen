@@ -303,6 +303,16 @@ export interface FamilyMember {
   displayName: string;
 }
 
+export interface Birthday {
+  id: string;
+  name: string;
+  date: string;
+  addedBy: string;
+  addedByName: string;
+  familyId: string;
+  createdAt: number;
+}
+
 export interface Family {
   id: string;
   name: string;

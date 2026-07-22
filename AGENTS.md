@@ -108,6 +108,13 @@ Good code is maintainable code. Quality is everyone's responsibility.
 - Never silently swallow errors — at minimum, log them
 - Use `crossAlert` utility for alerts (web-compatible)
 
+### Delete Confirmations
+- **ALWAYS** use the `ActionModal` component for delete confirmations (not `window.confirm` or `crossAlert`)
+- Shows the Familiesenter logo, person/entity name, "Er du sikker?" subtitle
+- Import: `import { ActionModal } from '../components/ActionModal';`
+- Pattern: `onLongPress` opens ActionModal with `onDelete` callback
+- This provides a consistent, branded experience across the app
+
 ### Import Pitfalls (CRITICAL — causes blank screens)
 These import mistakes have caused blank screens multiple times. **Always verify before committing:**
 

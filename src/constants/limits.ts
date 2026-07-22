@@ -10,3 +10,5 @@ export const LOCALE = 'nb-NO';
 export const SCROLL_DELAY_MS = 100;
 export const DEFAULT_DISPLAY_NAME = 'User';
 export const DATE_PICKER_RANGE_DAYS = 365;
+export const MAX_BIRTHDAYS = 50;
+export const BIRTHDAY_REMINDER_DAYS = 7;

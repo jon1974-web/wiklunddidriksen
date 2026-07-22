@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import { Event, Trip, SpondEvent } from '../types';
+import { Event, Trip, SpondEvent, Birthday } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +11,7 @@ interface WeeklySummaryProps {
   events: Event[];
   trips: Trip[];
   spondEvents: SpondEvent[];
+  birthdays?: Birthday[];
 }
 
 const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
@@ -40,7 +41,7 @@ interface DayItem {
   groupName?: string;
 }
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -146,6 +147,51 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         </View>
 
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+          {/* Birthday section */}
+          {(() => {
+            const { start, end } = getWeekRange(new Date());
+            const weekBirthdays = birthdays.filter(b => {
+              const bDate = new Date(b.date);
+              const bMonth = bDate.getMonth();
+              const bDay = bDate.getDate();
+              for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+                if (d.getMonth() === bMonth && d.getDate() === bDay) return true;
+              }
+              return false;
+            });
+            if (weekBirthdays.length === 0) {
+              return (
+                <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
+                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>🎂 {t('birthdays.title')}</Text>
+                  <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('birthdays.noBirthdaysWeek')}</Text>
+                </View>
+              );
+            }
+            return (
+              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>🎂 {t('birthdays.title')}</Text>
+                {weekBirthdays.map((b, i) => {
+                  const bDate = new Date(b.date);
+                  const today = new Date();
+                  const age = today.getFullYear() - bDate.getFullYear();
+                  const dayName = new Date(start.getTime() + [...Array(7)].findIndex((_, di) => {
+                    const d = new Date(start);
+                    d.setDate(d.getDate() + di);
+                    return d.getMonth() === bDate.getMonth() && d.getDate() === bDate.getDate();
+                  }) * 86400000).toLocaleDateString('nb-NO', { weekday: 'long' });
+                  return (
+                    <View key={i} style={[styles.birthdayItem, i < weekBirthdays.length - 1 && { borderBottomColor: colors.border }]}>
+                      <Text style={[styles.birthdayItemText, { color: colors.text }]}>
+                        {b.name} fyller {age} år ({dayName})
+                      </Text>
+                    </View>
+                  );
+                })}
+              </View>
+            );
+          })()}
+
+          {/* Day sections */}
           {weekData.days.map((day, idx) => {
             const isToday = toLocalDateStr(day.date) === toLocalDateStr(new Date());
             return (
@@ -276,5 +322,32 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     paddingHorizontal: 16,
     paddingVertical: 12,
+  },
+  birthdaySection: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    marginBottom: 12,
+  },
+  birthdaySectionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  birthdayEmpty: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    paddingHorizontal: 16,
+    paddingBottom: 12,
+  },
+  birthdayItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+  },
+  birthdayItemText: {
+    fontSize: 15,
+    fontWeight: '500',
   },
 });

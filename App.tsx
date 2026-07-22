@@ -21,6 +21,7 @@ import { EventsScreen } from './src/screens/EventsScreen';
 import { ShoppingListsScreen } from './src/screens/ShoppingListsScreen';
 import { ChatScreen } from './src/screens/ChatScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
+import { BirthdayScreen } from './src/screens/BirthdayScreen';
 import { TripsScreen } from './src/screens/TripsScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
 import { CartIcon } from './src/components/CartIcon';
@@ -59,6 +60,7 @@ type RootStackParamList = {
   TransportDetail: { flight: import('./src/types').TripFlight; tripId: string };
   TripItemDetail: { item: any; tripId: string; trip: Trip; itemType: 'hotel' | 'restaurant' | 'activity' };
   ProfileMain: undefined;
+  Birthday: undefined;
 };
 
 const EventsStack = () => {
@@ -195,6 +197,11 @@ const ProfileStack = () => {
       <Stack.Screen
         name="ProfileMain"
         component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Birthday"
+        component={BirthdayScreen}
         options={{ headerShown: false }}
       />
     </Stack.Navigator>

@@ -409,5 +409,23 @@
     "to": "Till",
     "source": "Kurs",
     "error": "Kunde inte hämta växelkurs"
+  },
+  "birthdays": {
+    "title": "Födelsedagar",
+    "add": "Lägg till födelsedag",
+    "edit": "Redigera födelsedag",
+    "name": "Namn",
+    "date": "Födelsedatum",
+    "noBirthdays": "Inga födelsedagar tillagda",
+    "noBirthdaysWeek": "Inga födelsedagar denna vecka",
+    "remove": "Ta bort",
+    "addedBy": "Tillagd av",
+    "duplicate": "Denna person redan tillagd av",
+    "duplicateNote": "Hela familjen får påminnelser.",
+    "birthdayInWeek": "{name} fyller {age} år ({day})",
+    "reminderTitle": "🎂 {name} har födelsedag!",
+    "reminderBody": "{name} har födelsedag om {days} dagar",
+    "reminderToday": "{name} har födelsedag idag!",
+    "years": "år"
   }
 }

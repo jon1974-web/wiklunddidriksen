@@ -15,6 +15,7 @@ import {
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import { signOut, updateProfile } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
@@ -50,6 +51,7 @@ import i18n from '../i18n';
 
 export const ProfileScreen: React.FC = () => {
   const { t } = useTranslation();
+  const navigation = useNavigation();
   const [langKey, setLangKey] = useState(0);
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
@@ -871,6 +873,20 @@ export const ProfileScreen: React.FC = () => {
               </Text>
             </TouchableOpacity>
           </View>
+        </View>
+
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>🎂 {t('birthdays.title')}</Text>
+          <TouchableOpacity
+            style={[styles.themeOption, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+            onPress={() => navigation.navigate('Birthday')}
+          >
+            <Text style={[styles.themeText, { color: colors.text }]}>{t('birthdays.title')}</Text>
+            <Text style={{ color: colors.textSecondary, fontSize: 14 }}>→</Text>
+          </TouchableOpacity>
+          <Text style={[styles.noFamily, { color: colors.textDisabled, marginTop: 8 }]}>
+            {familyId ? t('birthdays.noBirthdays') : ''}
+          </Text>
         </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>

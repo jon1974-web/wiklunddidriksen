@@ -2,10 +2,10 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Platform, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebCalendar } from '../platform/CalendarView';
-import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit } from 'firebase/firestore';
+import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, Birthday } from '../types';
 import { EventCard } from '../components/EventCard';
 import { ActionModal } from '../components/ActionModal';
 import { SpondResponseModal } from '../components/SpondResponseModal';
@@ -123,6 +123,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
+  const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
@@ -168,6 +169,15 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     const unsubscribe = navigation.addListener('focus', loadTrips);
     return unsubscribe;
   }, [navigation, loadTrips]);
+
+  useEffect(() => {
+    if (!familyId) return;
+    const q = query(collection(db, 'birthdays'), where('familyId', '==', familyId));
+    getDocs(q).then((snapshot) => {
+      const data = snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Birthday));
+      setBirthdays(data);
+    }).catch(() => {});
+  }, [familyId]);
 
   const loadSpondEvents = useCallback(async () => {
     if (!familyId) return;
@@ -718,6 +728,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         events={events}
         trips={trips}
         spondEvents={spondEvents}
+        birthdays={birthdays}
       />
 
       <ActionModal

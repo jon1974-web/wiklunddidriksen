@@ -403,5 +403,23 @@
     "to": "Asti",
     "source": "Kurssi",
     "error": "Valuuttakurssia ei voitu noutaa"
+  },
+  "birthdays": {
+    "title": "Syntymäpäivät",
+    "add": "Lisää syntymäpäivä",
+    "edit": "Muokkaa syntymäpäivää",
+    "name": "Nimi",
+    "date": "Syntymäaika",
+    "noBirthdays": "Ei lisättyjä syntymäpäiviä",
+    "noBirthdaysWeek": "Ei syntymäpäiviä tällä viikolla",
+    "remove": "Poista",
+    "addedBy": "Lisännyt",
+    "duplicate": "Tämä henkilö on jo lisätty",
+    "duplicateNote": "Koko perhe saa muistutuksia.",
+    "birthdayInWeek": "{name} täyttää {age} vuotta ({day})",
+    "reminderTitle": "🎂 {name}:lla on syntymäpäivä!",
+    "reminderBody": "{name}:n syntymäpäivä on {days} päivän päässä",
+    "reminderToday": "{name}:lla on syntymäpäivä tänään!",
+    "years": "vuotta"
   }
 }

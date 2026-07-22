@@ -394,5 +394,23 @@
     "to": "To",
     "source": "Rate",
     "error": "Could not fetch exchange rate"
+  },
+  "birthdays": {
+    "title": "Birthdays",
+    "add": "Add birthday",
+    "edit": "Edit birthday",
+    "name": "Name",
+    "date": "Date of birth",
+    "noBirthdays": "No birthdays added",
+    "noBirthdaysWeek": "No birthdays this week",
+    "remove": "Remove",
+    "addedBy": "Added by",
+    "duplicate": "This person is already added by",
+    "duplicateNote": "The whole family will get reminders.",
+    "birthdayInWeek": "{name} turns {age} ({day})",
+    "reminderTitle": "🎂 {name} has a birthday!",
+    "reminderBody": "{name}'s birthday is in {days} days",
+    "reminderToday": "{name} has a birthday today!",
+    "years": "years"
   }
 }
