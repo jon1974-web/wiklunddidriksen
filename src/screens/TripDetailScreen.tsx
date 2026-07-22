@@ -1315,12 +1315,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>By</Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    <GooglePlacesInput
                       value={tripCity}
                       onChangeText={setTripCity}
-                      placeholder="F.eks. Dubrovnik"
-                      placeholderTextColor={colors.textDisabled}
+                      placeholder="F.eks. Cavtat"
+                      types={['(cities)']}
+                      onSelect={(address) => {
+                        const parts = address.split(',').map((p) => p.trim());
+                        setTripCity(parts[0] || address);
+                        if (parts.length > 1) {
+                          setTripCountry(parts[parts.length - 1]);
+                        }
+                      }}
                     />
                   </View>
 
