@@ -381,15 +381,22 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      await updateTrip(trip.id, {
+      const locationQuery = tripCountry ? `${tripCity}, ${tripCountry}` : tripCity;
+      const coords = await geocodeCity(locationQuery);
+      const updateData: Record<string, any> = {
         title: sanitizeInput(tripTitle),
         city: sanitizeInput(tripCity),
         country: sanitizeInput(tripCountry),
         startDate: tripStartDate,
         endDate: tripEndDate,
         icon: tripIcon,
-      });
-      setTrip({ ...trip, title: tripTitle, city: tripCity, country: tripCountry, startDate: tripStartDate, endDate: tripEndDate, icon: tripIcon });
+      };
+      if (coords) {
+        updateData.latitude = coords.latitude;
+        updateData.longitude = coords.longitude;
+      }
+      await updateTrip(trip.id, updateData);
+      setTrip({ ...trip, ...updateData });
       setActiveModal(null);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
