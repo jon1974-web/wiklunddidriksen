@@ -46,11 +46,11 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     try {
       const q = query(
         collection(db, 'birthdays'),
-        where('familyId', '==', user.familyId),
-        orderBy('createdAt', 'desc')
+        where('familyId', '==', user.familyId)
       );
       const snapshot = await getDocs(q);
       const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() } as Birthday));
+      data.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
       setBirthdays(data);
     } catch (error) {
       console.error('Failed to load birthdays:', error);
@@ -91,6 +91,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setShowAddModal(false);
       loadBirthdays();
     } catch (error) {
+      console.error('Failed to add birthday:', error);
       crossAlert('Error', getErrorMessage(error));
     }
   };
