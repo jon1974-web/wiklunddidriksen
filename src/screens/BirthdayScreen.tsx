@@ -122,7 +122,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <Text style={[styles.headerTitle, { color: colors.text }]}>🎂 {t('birthdays.title')}</Text>
         <TouchableOpacity
           style={[styles.addBtn, { backgroundColor: colors.accent }]}
-          onPress={() => { setNewName(''); setNewDate(''); setShowAddModal(true); }}
+          onPress={() => { setNewName(''); setNewYear(''); setNewMonth(''); setNewDay(''); setShowAddModal(true); }}
         >
           <Text style={styles.addBtnText}>+</Text>
         </TouchableOpacity>
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   modalTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
   field: { marginBottom: 14 },
   label: { fontSize: 13, fontWeight: '600', marginBottom: 4 },
-  input: { padding: 12, borderRadius: 8, fontSize: 15 },
+  input: { padding: 12, borderRadius: 8, fontSize: 16 },
   dateRow: { flexDirection: 'row', gap: 8 },
   dateInput: { flex: 1, padding: 10, borderRadius: 8, fontSize: 14, textAlign: 'center', minWidth: 0 },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
