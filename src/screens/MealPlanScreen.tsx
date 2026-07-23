@@ -39,6 +39,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showAddList, setShowAddList] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
+  const [selectedRecipeForSlot, setSelectedRecipeForSlot] = useState<Recipe | null>(null);
   const [recipeForm, setRecipeForm] = useState({
     name: '', description: '', time: '', portions: '', category: 'kjoett',
     ingredients: [{ name: '', amount: '', unit: '' }],
@@ -278,6 +279,24 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     }
   };
 
+  const handleRemoveMeal = async () => {
+    if (!selectedSlot || !mealPlan || !familyId) return;
+    try {
+      const meals = mealPlan.meals || {};
+      const dayMeals = { ...meals[selectedSlot.day] };
+      delete dayMeals[selectedSlot.meal];
+      const updatedMeals = { ...meals, [selectedSlot.day]: dayMeals };
+
+      await import('firebase/firestore').then(({ updateDoc, doc }) =>
+        updateDoc(doc(db, 'mealPlans', mealPlan.id), { meals: updatedMeals })
+      );
+      setSelectedRecipeForSlot(null);
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
   const renderUkemeny = () => (
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
@@ -302,7 +321,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     style={[styles.mealTag, recipe ? { backgroundColor: colors.accentLight, borderColor: colors.accent } : { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
                     onPress={() => {
                       if (recipe) {
-                        setShowRecipeDetail(recipe);
+                        setSelectedRecipeForSlot(recipe);
+                        setSelectedSlot({ day, meal });
                       } else {
                         setSelectedSlot({ day, meal });
                       }
@@ -643,40 +663,62 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
       {/* Recipe Picker Modal for assigning meals */}
       <Modal visible={!!selectedSlot} transparent animationType="slide">
-        <TouchableWithoutFeedback onPress={() => setSelectedSlot(null)}>
+        <TouchableWithoutFeedback onPress={() => { setSelectedSlot(null); setSelectedRecipeForSlot(null); }}>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '70%' }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>
-                  Velg oppskrift for {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)} {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner')}
-                </Text>
-                <ScrollView>
-                  {recipes.length === 0 ? (
-                    <Text style={[styles.emptyText, { color: colors.textDisabled, textAlign: 'center', padding: 20 }]}>{t('mealPlanner.noRecipes')}</Text>
-                  ) : (
-                    recipes.map(recipe => (
-                      <TouchableOpacity
-                        key={recipe.id}
-                        style={[styles.recipePickerItem, { borderBottomColor: colors.border }]}
-                        onPress={() => handleAssignMeal(recipe.id)}
-                      >
-                        <Text style={{ fontSize: 20, marginRight: 10 }}>
-                          {recipe.category === 'kjoett' ? '🥩' : recipe.category === 'fisk' ? '🐟' : recipe.category === 'vegetar' ? '🥗' : recipe.category === 'pasta' ? '🍝' : recipe.category === 'sott' ? '🍰' : '🍽️'}
-                        </Text>
-                        <View style={{ flex: 1 }}>
-                          <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
-                          <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} {t('mealPlanner.minutes')} · {recipe.portions} {t('mealPlanner.servings')}</Text>
-                        </View>
-                        {recipe.isFavorite && <Text style={{ fontSize: 14 }}>❤️</Text>}
+                {selectedRecipeForSlot ? (
+                  <>
+                    <Text style={[styles.modalTitle, { color: colors.text }]}>
+                      {selectedRecipeForSlot.name}
+                    </Text>
+                    <Text style={[styles.modalSubtitle, { color: colors.textSecondary, textAlign: 'center', marginBottom: 16 }]}>
+                      {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)} · {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner')}
+                    </Text>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent, marginBottom: 8 }]} onPress={() => { setSelectedRecipeForSlot(null); }}>
+                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>📖 {t('mealPlanner.viewRecipe')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#E53935', marginBottom: 8 }]} onPress={handleRemoveMeal}>
+                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>🗑️ Fjern fra plan</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setSelectedSlot(null); setSelectedRecipeForSlot(null); }}>
+                      <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                  </>
+                ) : (
+                  <>
+                    <Text style={[styles.modalTitle, { color: colors.text }]}>
+                      Velg oppskrift for {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)} {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner')}
+                    </Text>
+                    <ScrollView>
+                      {recipes.length === 0 ? (
+                        <Text style={[styles.emptyText, { color: colors.textDisabled, textAlign: 'center', padding: 20 }]}>{t('mealPlanner.noRecipes')}</Text>
+                      ) : (
+                        recipes.map(recipe => (
+                          <TouchableOpacity
+                            key={recipe.id}
+                            style={[styles.recipePickerItem, { borderBottomColor: colors.border }]}
+                            onPress={() => handleAssignMeal(recipe.id)}
+                          >
+                            <Text style={{ fontSize: 20, marginRight: 10 }}>
+                              {recipe.category === 'kjoett' ? '🥩' : recipe.category === 'fisk' ? '🐟' : recipe.category === 'vegetar' ? '🥗' : recipe.category === 'pasta' ? '🍝' : recipe.category === 'sott' ? '🍰' : '🍽️'}
+                            </Text>
+                            <View style={{ flex: 1 }}>
+                              <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
+                              <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} {t('mealPlanner.minutes')} · {recipe.portions} {t('mealPlanner.servings')}</Text>
+                            </View>
+                            {recipe.isFavorite && <Text style={{ fontSize: 14 }}>❤️</Text>}
+                          </TouchableOpacity>
+                        ))
+                      )}
+                    </ScrollView>
+                    <View style={styles.modalActions}>
+                      <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setSelectedSlot(null); setSelectedRecipeForSlot(null); }}>
+                        <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
                       </TouchableOpacity>
-                    ))
-                  )}
-                </ScrollView>
-                <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setSelectedSlot(null)}>
-                    <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
-                  </TouchableOpacity>
-                </View>
+                    </View>
+                  </>
+                )}
               </View>
             </TouchableWithoutFeedback>
           </View>
