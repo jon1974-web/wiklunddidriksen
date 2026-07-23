@@ -703,7 +703,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 ) : (
                   <>
                     <Text style={[styles.modalTitle, { color: colors.text }]}>
-                      Velg oppskrift for {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)} {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner')}
+                      Velg oppskrift for {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch').toLowerCase() : t('mealPlanner.dinner').toLowerCase()} på {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)}
                     </Text>
                     <ScrollView>
                       {recipes.length === 0 ? (
@@ -755,9 +755,9 @@ const styles = StyleSheet.create({
   card: { borderRadius: 12, margin: 8, padding: 14 },
   cardTitle: { fontSize: 15, fontWeight: '700', marginBottom: 8 },
   cardSubtitle: { fontSize: 12, marginBottom: 8 },
-  dayRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 8, borderBottomWidth: 1 },
-  dayName: { width: 36, fontSize: 13, fontWeight: '700', paddingTop: 2 },
-  dayMeals: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  dayRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 10, paddingHorizontal: 4, borderBottomWidth: 1 },
+  dayName: { width: 80, fontSize: 13, fontWeight: '700', paddingTop: 6 },
+  dayMeals: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   mealTag: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1 },
   recipePickerItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1 },
   recipePickerName: { fontSize: 15, fontWeight: '600', marginBottom: 2 },
