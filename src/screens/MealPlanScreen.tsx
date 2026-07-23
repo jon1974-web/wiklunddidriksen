@@ -454,17 +454,18 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   const renderOppskrifter = () => (
     <View style={styles.tabContent}>
-      <View style={styles.searchBar}>
-        <TextInput
-          style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder={t('mealPlanner.searchRecipe')}
-          placeholderTextColor={colors.textDisabled}
-        />
-      </View>
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <View style={styles.searchBar}>
+          <TextInput
+            style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            placeholder={t('mealPlanner.searchRecipe')}
+            placeholderTextColor={colors.textDisabled}
+          />
+        </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
         {categories.map(cat => (
           <TouchableOpacity
             key={cat.key}
@@ -475,6 +476,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           </TouchableOpacity>
         ))}
       </ScrollView>
+      </View>
 
       {filteredRecipes.length === 0 ? (
         <View style={styles.emptyState}>
