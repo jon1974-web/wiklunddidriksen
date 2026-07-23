@@ -188,6 +188,37 @@ User types "Taco" → Search book first → Found? Show results
 }
 ```
 
+## Section 4: Min uke Integration
+
+### Placement
+Right after the Bursdager section, before events/trips/spond items.
+
+### Display Format (Compact)
+```
+🍽️ Denne uken: 5/14 måltider planlagt
+┌──────────────────────────────────────┐
+│ Man  🥗 Salat · 🍝 Bolognese       │
+│ Tir  🐟 Laks                        │
+│ Ons  🌮 Tacos · 🍛 Korma           │
+│ Tor  —                              │
+│ Fre  🍕 Pizza · 🍔 Hamburgere       │
+│ Lør  🍛 Indisk korma               │
+│ Søn  🥗 Salat · 🍕 Pizza           │
+└──────────────────────────────────────┘
+```
+
+### Interactions
+- **Tap a day** → Opens Matplan Ukemeny for that day
+- **Tap a meal** → Opens recipe detail
+- **Empty days** show "—" with "+" to add
+- **Progress indicator**: "5/14 måltider planlagt"
+
+### Why This Works
+- Stays scannable (compact emoji format)
+- Interactive (tap for detail)
+- Shows progress (planned vs total)
+- Doesn't flood with recipe details
+
 ## Files to Create/Modify
 
 | File | Action | Purpose |
@@ -195,6 +226,7 @@ User types "Taco" → Search book first → Found? Show results
 | `src/screens/MealPlanScreen.tsx` | **Create** | Main screen with sub-tabs |
 | `src/screens/RecipeDetailScreen.tsx` | **Create** | Recipe view |
 | `src/screens/RecipeFormScreen.tsx` | **Create** | Add/edit recipe |
+| `src/components/WeeklySummary.tsx` | Modify | Add compact meal section after birthdays |
 | `src/types/index.ts` | Modify | Add Recipe, MealPlan types |
 | `src/constants/limits.ts` | Modify | Add MAX_RECIPES |
 | `src/i18n/{nb,en,sv,da,fi}.json` | Modify | Add mealPlanner.* keys |
