@@ -690,7 +690,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={[styles.modalSubtitle, { color: colors.textSecondary, textAlign: 'center', marginBottom: 16 }]}>
                       {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)} · {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner')}
                     </Text>
-                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent, marginBottom: 8 }]} onPress={() => { setSelectedRecipeForSlot(null); }}>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent, marginBottom: 8 }]} onPress={() => { setShowRecipeDetail(selectedRecipeForSlot); setSelectedSlot(null); setSelectedRecipeForSlot(null); }}>
                       <Text style={[styles.modalBtnText, { color: '#fff' }]}>📖 {t('mealPlanner.viewRecipe')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#E53935', marginBottom: 8 }]} onPress={handleRemoveMeal}>
