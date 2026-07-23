@@ -521,12 +521,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             >
               <View style={[styles.recipeImg, { backgroundColor: colors.inputBackground }]}>
                 <Text style={{ fontSize: 32 }}>{item.category === 'kjoett' ? '🥩' : item.category === 'fisk' ? '🐟' : item.category === 'vegetar' ? '🥗' : item.category === 'pasta' ? '🍝' : item.category === 'sott' ? '🍰' : '🍽️'}</Text>
-                <TouchableOpacity style={styles.favBtn} onPress={() => toggleFavorite(item)}>
-                  <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
-                </TouchableOpacity>
               </View>
               <View style={styles.recipeInfo}>
-                <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
+                  <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }}>
+                    <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
+                  </TouchableOpacity>
+                </View>
                 <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>{item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}</Text>
               </View>
             </TouchableOpacity>
