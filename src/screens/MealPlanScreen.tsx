@@ -311,8 +311,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     }
   };
 
-  const handleAiSearch = async () => {
-    if (!aiQuery.trim() || !user) return;
+  const handleAiSearch = async (query?: string) => {
+    const searchQueryValue = query || aiQuery;
+    if (!searchQueryValue.trim() || !user) return;
+    setAiQuery(searchQueryValue);
     setAiLoading(true);
     setShowAiResults(true);
     try {
@@ -321,7 +323,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({
-          prompt: aiQuery,
+          prompt: searchQueryValue,
           existingRecipes: recipes.map(r => ({ name: r.name })),
         }),
       });
@@ -477,7 +479,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <Text style={{ fontSize: 40, marginBottom: 12 }}>📖</Text>
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
           {searchQuery && (
-            <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginTop: 12 }]} onPress={() => { setAiQuery(searchQuery); handleAiSearch(); }}>
+            <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginTop: 12 }]} onPress={() => handleAiSearch(searchQuery)}>
               <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
             </TouchableOpacity>
           )}
