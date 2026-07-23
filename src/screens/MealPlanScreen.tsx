@@ -36,6 +36,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showDeleteRecipe, setShowDeleteRecipe] = useState<Recipe | null>(null);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
+  const [showAddList, setShowAddList] = useState(false);
+  const [newListTitle, setNewListTitle] = useState('');
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
   const [recipeForm, setRecipeForm] = useState({
     name: '', description: '', time: '', portions: '', category: 'kjoett',
@@ -156,6 +158,84 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const toggleFavorite = async (recipe: Recipe) => {
     try {
       await updateDoc(doc(db, 'recipes', recipe.id), { isFavorite: !recipe.isFavorite });
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleCreateList = async () => {
+    if (!newListTitle.trim() || !familyId) return;
+    try {
+      await addDoc(collection(db, 'shoppingLists'), {
+        title: newListTitle.trim(),
+        items: [],
+        createdBy: user?.uid || '',
+        createdAt: Date.now(),
+        familyId,
+      });
+      setNewListTitle('');
+      setShowAddList(false);
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleDeleteList = async (listId: string) => {
+    try {
+      await deleteDoc(doc(db, 'shoppingLists', listId));
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleCopyList = async (list: ShoppingList) => {
+    if (!familyId) return;
+    try {
+      await addDoc(collection(db, 'shoppingLists'), {
+        title: list.title + ' (kopiert)',
+        items: list.items.map(item => ({ ...item, id: generateId(), checked: false })),
+        createdBy: user?.uid || '',
+        createdAt: Date.now(),
+        familyId,
+      });
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleAddToShoppingList = async (recipe: Recipe) => {
+    if (!familyId) return;
+    try {
+      const existingList = shoppingLists.find(l => l.title === recipe.name);
+      if (existingList) {
+        const newItems = recipe.ingredients.map(ing => ({
+          id: generateId(),
+          name: ing.amount ? `${ing.name} (${ing.amount} ${ing.unit})` : ing.name,
+          checked: false,
+        }));
+        await import('firebase/firestore').then(({ updateDoc, doc }) =>
+          updateDoc(doc(db, 'shoppingLists', existingList.id), {
+            items: [...newItems, ...existingList.items],
+          })
+        );
+      } else {
+        await addDoc(collection(db, 'shoppingLists'), {
+          title: recipe.name,
+          items: recipe.ingredients.map(ing => ({
+            id: generateId(),
+            name: ing.amount ? `${ing.name} (${ing.amount} ${ing.unit})` : ing.name,
+            checked: false,
+          })),
+          createdBy: user?.uid || '',
+          createdAt: Date.now(),
+          familyId,
+        });
+      }
+      crossAlert('Suksess', `${recipe.ingredients.length} ingredienser lagt til i "${recipe.name}"`);
       loadData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -291,31 +371,69 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>🛒 {t('mealPlanner.weekOverview')}</Text>
-          <Text style={[styles.autoTag, { backgroundColor: '#E3F2FD', color: '#1565C0' }]}>Auto</Text>
-        </View>
-        <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>12 varer fra denne ukens måltider</Text>
-        <View style={[styles.shoppingItem, { borderBottomColor: colors.border }]}>
-          <View style={[styles.checkbox, { backgroundColor: colors.accent, borderColor: colors.accent }]}><Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text></View>
-          <Text style={[styles.shoppingName, { color: colors.textDisabled, textDecorationLine: 'line-through' }]}>Kyllingbryst</Text>
-          <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>1 kg</Text>
-        </View>
-        <View style={[styles.shoppingItem, { borderBottomColor: colors.border }]}>
-          <View style={styles.checkbox} />
-          <Text style={[styles.shoppingName, { color: colors.text }]}>Spaghetti</Text>
-          <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>500g</Text>
-        </View>
-      </View>
-
-      <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>🛒 Egen handleliste</Text>
-        <View style={styles.addRow}>
-          <TextInput style={[styles.addInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]} placeholder="Legg til vare..." placeholderTextColor={colors.textDisabled} />
-          <TouchableOpacity style={[styles.addBtnSm, { backgroundColor: colors.accent }]}>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>🛒 Handlelister</Text>
+          <TouchableOpacity style={[styles.addBtnSm, { backgroundColor: colors.accent }]} onPress={() => setShowAddList(true)}>
             <Text style={{ color: '#fff', fontWeight: '600' }}>+</Text>
           </TouchableOpacity>
         </View>
+
+        {shoppingLists.length === 0 ? (
+          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>Ingen handlelister ennå</Text>
+        ) : (
+          shoppingLists.map((list) => (
+            <View key={list.id} style={[styles.shoppingListCard, { backgroundColor: colors.inputBackground }]}>
+              <TouchableOpacity
+                style={styles.shoppingListContent}
+                onPress={() => navigation.navigate('ShoppingListDetail', { listId: list.id, listTitle: list.title })}
+                onLongPress={() => setActionModal({ visible: true, title: list.title, onDelete: () => handleDeleteList(list.id) })}
+              >
+                <Text style={[styles.shoppingListTitle, { color: colors.text }]}>{list.title}</Text>
+                <Text style={[styles.shoppingListCount, { color: colors.textSecondary }]}>
+                  {list.items.filter(i => i.checked).length}/{list.items.length} varer
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.copyBtn}
+                onPress={() => handleCopyList(list)}
+              >
+                <Text style={{ color: colors.textSecondary, fontSize: 16 }}>📋</Text>
+              </TouchableOpacity>
+            </View>
+          ))
+        )}
       </View>
+
+      {/* Create list modal */}
+      <Modal visible={showAddList} transparent animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setShowAddList(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('mealPlanner.addRecipe')}</Text>
+                <View style={styles.field}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.recipeName')}</Text>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    value={newListTitle}
+                    onChangeText={setNewListTitle}
+                    placeholder="F.eks. Fredagsinnkjøp"
+                    placeholderTextColor={colors.textDisabled}
+                    autoFocus
+                  />
+                </View>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddList(false); setNewListTitle(''); }}>
+                    <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleCreateList}>
+                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.add')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </ScrollView>
   );
 
@@ -469,7 +587,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowRecipeDetail(null)}>
                     <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.close')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={() => { if (showRecipeDetail) { handleAddToShoppingList(showRecipeDetail); setShowRecipeDetail(null); } }}>
                     <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.addToShoppingList')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -529,6 +647,11 @@ const styles = StyleSheet.create({
   addRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
   addInput: { flex: 1, padding: 8, borderRadius: 8, borderWidth: 1, fontSize: 13 },
   addBtnSm: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8 },
+  shoppingListCard: { flexDirection: 'row', alignItems: 'center', borderRadius: 10, padding: 12, marginBottom: 8 },
+  shoppingListContent: { flex: 1 },
+  shoppingListTitle: { fontSize: 15, fontWeight: '600', marginBottom: 2 },
+  shoppingListCount: { fontSize: 12 },
+  copyBtn: { padding: 8 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { borderRadius: 20, padding: 24, width: '100%', maxWidth: 400, maxHeight: '80%' },
   modalTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
