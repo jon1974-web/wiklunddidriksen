@@ -63,10 +63,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const categories = [
     { key: 'all', label: t('mealPlanner.all') },
     { key: 'favorites', label: '❤️ ' + t('mealPlanner.favorites') },
+    { key: 'kylling', label: '🍗 ' + t('mealPlanner.kylling') },
     { key: 'kjoett', label: '🥩 ' + t('mealPlanner.kjoett') },
     { key: 'fisk', label: '🐟 ' + t('mealPlanner.fisk') },
     { key: 'vegetar', label: '🥗 ' + t('mealPlanner.vegetar') },
     { key: 'pasta', label: '🍝 ' + t('mealPlanner.pasta') },
+    { key: 'gryte', label: '🥘 ' + t('mealPlanner.gryte') },
+    { key: 'suppe', label: '🍲 ' + t('mealPlanner.suppe') },
+    { key: 'frokost', label: '🥞 ' + t('mealPlanner.frokost') },
     { key: 'sott', label: '🍰 ' + t('mealPlanner.sott') },
   ];
 
@@ -520,7 +524,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               } })}
             >
               <View style={[styles.recipeImg, { backgroundColor: colors.inputBackground }]}>
-                <Text style={{ fontSize: 32 }}>{item.category === 'kjoett' ? '🥩' : item.category === 'fisk' ? '🐟' : item.category === 'vegetar' ? '🥗' : item.category === 'pasta' ? '🍝' : item.category === 'sott' ? '🍰' : '🍽️'}</Text>
+                <Text style={{ fontSize: 32 }}>{item.category === 'kylling' ? '🍗' : item.category === 'kjoett' ? '🥩' : item.category === 'fisk' ? '🐟' : item.category === 'vegetar' ? '🥗' : item.category === 'pasta' ? '🍝' : item.category === 'gryte' ? '🥘' : item.category === 'suppe' ? '🍲' : item.category === 'frokost' ? '🥞' : item.category === 'sott' ? '🍰' : '🍽️'}</Text>
               </View>
               <View style={styles.recipeInfo}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -709,14 +713,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.category')}</Text>
                     <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                      {['kjoett', 'fisk', 'vegetar', 'pasta', 'sott'].map(cat => (
+                      {['kylling', 'kjoett', 'fisk', 'vegetar', 'pasta', 'gryte', 'suppe', 'frokost', 'sott'].map(cat => (
                         <TouchableOpacity
                           key={cat}
                           style={[styles.filterChip, { borderColor: recipeForm.category === cat ? colors.accent : colors.border }, recipeForm.category === cat && { backgroundColor: colors.accent }]}
                           onPress={() => setRecipeForm(f => ({ ...f, category: cat }))}
                         >
                           <Text style={{ fontSize: 12, fontWeight: '600', color: recipeForm.category === cat ? '#fff' : colors.textSecondary }}>
-                            {cat === 'kjoett' ? '🥩' : cat === 'fisk' ? '🐟' : cat === 'vegetar' ? '🥗' : cat === 'pasta' ? '🍝' : '🍰'} {t(`mealPlanner.${cat}`)}
+                            {cat === 'kylling' ? '🍗' : cat === 'kjoett' ? '🥩' : cat === 'fisk' ? '🐟' : cat === 'vegetar' ? '🥗' : cat === 'pasta' ? '🍝' : cat === 'gryte' ? '🥘' : cat === 'suppe' ? '🍲' : cat === 'frokost' ? '🥞' : '🍰'} {t(`mealPlanner.${cat}`)}
                           </Text>
                         </TouchableOpacity>
                       ))}
@@ -870,7 +874,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                             onPress={() => handleAssignMeal(recipe.id)}
                           >
                             <Text style={{ fontSize: 20, marginRight: 10 }}>
-                              {recipe.category === 'kjoett' ? '🥩' : recipe.category === 'fisk' ? '🐟' : recipe.category === 'vegetar' ? '🥗' : recipe.category === 'pasta' ? '🍝' : recipe.category === 'sott' ? '🍰' : '🍽️'}
+                              {recipe.category === 'kylling' ? '🍗' : recipe.category === 'kjoett' ? '🥩' : recipe.category === 'fisk' ? '🐟' : recipe.category === 'vegetar' ? '🥗' : recipe.category === 'pasta' ? '🍝' : recipe.category === 'gryte' ? '🥘' : recipe.category === 'suppe' ? '🍲' : recipe.category === 'frokost' ? '🥞' : recipe.category === 'sott' ? '🍰' : '🍽️'}
                             </Text>
                             <View style={{ flex: 1 }}>
                               <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
