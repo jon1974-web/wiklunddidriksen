@@ -167,7 +167,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const handleCreateList = async () => {
     if (!newListTitle.trim() || !familyId) return;
     try {
-      await addDoc(collection(db, 'shoppingLists'), {
+      const docRef = await addDoc(collection(db, 'shoppingLists'), {
         title: newListTitle.trim(),
         items: [],
         createdBy: user?.uid || '',
@@ -176,7 +176,17 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       });
       setNewListTitle('');
       setShowAddList(false);
-      loadData();
+      // Navigate directly with the newly created list
+      navigation.navigate('ShoppingListDetail', {
+        list: {
+          id: docRef.id,
+          title: newListTitle.trim(),
+          items: [],
+          createdBy: user?.uid || '',
+          createdAt: Date.now(),
+          familyId,
+        },
+      });
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }

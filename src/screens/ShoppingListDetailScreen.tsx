@@ -19,8 +19,17 @@ interface ShoppingListDetailScreenProps {
 
 export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
-  const { list } = route.params as { list: ShoppingList };
-  const [currentList, setCurrentList] = useState<ShoppingList>(list);
+  const routeList = route.params?.list as ShoppingList | undefined;
+
+  if (!routeList) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Ingen liste valgt</Text>
+      </View>
+    );
+  }
+
+  const [currentList, setCurrentList] = useState<ShoppingList>(routeList);
   const [newItemName, setNewItemName] = useState('');
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [renamingItem, setRenamingItem] = useState<ShoppingItem | null>(null);
@@ -41,7 +50,8 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   const familyId = useUserStore((state) => state.familyId);
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(doc(db, 'shoppingLists', list.id), (doc) => {
+    if (!routeList?.id) return;
+    const unsubscribe = onSnapshot(doc(db, 'shoppingLists', routeList.id), (doc) => {
       if (doc.exists()) {
         setCurrentList({
           id: doc.id,
@@ -50,7 +60,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       }
     });
     return () => unsubscribe();
-  }, [list.id]);
+  }, [routeList?.id]);
 
   const handleDeleteList = useCallback(() => {
     crossAlert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
@@ -60,7 +70,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
         style: 'destructive',
         onPress: async () => {
           try {
-            await deleteDoc(doc(db, 'shoppingLists', list.id));
+            await deleteDoc(doc(db, 'shoppingLists', routeList.id));
             navigation.goBack();
           } catch (error) {
             crossAlert('Error', getErrorMessage(error));
