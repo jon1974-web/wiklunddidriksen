@@ -41,6 +41,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
   const [selectedRecipeForSlot, setSelectedRecipeForSlot] = useState<Recipe | null>(null);
   const [randomRecipe, setRandomRecipe] = useState<Recipe | null>(null);
+  const [aiQuery, setAiQuery] = useState('');
+  const [aiResults, setAiResults] = useState<Recipe[]>([]);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAiResults, setShowAiResults] = useState(false);
 
   const getRandomRecipe = () => {
     if (recipes.length === 0) return;
@@ -307,6 +311,53 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     }
   };
 
+  const handleAiSearch = async () => {
+    if (!aiQuery.trim() || !user) return;
+    setAiLoading(true);
+    setShowAiResults(true);
+    try {
+      const token = await user.getIdToken();
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/aiRecipeSuggestions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({
+          prompt: aiQuery,
+          existingRecipes: recipes.map(r => ({ name: r.name })),
+        }),
+      });
+      if (!res.ok) throw new Error('Kunne ikke generere forslag');
+      const data = await res.json();
+      setAiResults(data.recipes || []);
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const handleSaveAiRecipe = async (aiRecipe: any) => {
+    if (!familyId) return;
+    try {
+      await addDoc(collection(db, 'recipes'), {
+        name: aiRecipe.name,
+        description: aiRecipe.description || '',
+        ingredients: aiRecipe.ingredients || [],
+        instructions: aiRecipe.instructions || [],
+        time: aiRecipe.time || 0,
+        portions: aiRecipe.portions || 4,
+        category: aiRecipe.category || 'kjoett',
+        isFavorite: false,
+        createdBy: user?.uid || '',
+        familyId,
+        createdAt: Date.now(),
+      });
+      crossAlert('Suksess', `"${aiRecipe.name}" lagt til i oppskriftsboken`);
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
   const renderUkemeny = () => (
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
@@ -426,7 +477,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <Text style={{ fontSize: 40, marginBottom: 12 }}>📖</Text>
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
           {searchQuery && (
-            <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginTop: 12 }]}>
+            <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginTop: 12 }]} onPress={() => { setAiQuery(searchQuery); handleAiSearch(); }}>
               <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
             </TouchableOpacity>
           )}
@@ -475,6 +526,37 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             </TouchableOpacity>
           )}
         />
+      )}
+
+      {/* AI Results */}
+      {showAiResults && (
+        <View style={[styles.card, { backgroundColor: colors.surface, margin: 8 }]}>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>🤖 {t('mealPlanner.aiSuggest')}</Text>
+          {aiLoading ? (
+            <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('common.loading')}</Text>
+          ) : aiResults.length === 0 ? (
+            <Text style={[styles.emptyText, { color: colors.textDisabled }]}>Ingen forslag funnet</Text>
+          ) : (
+            aiResults.map((recipe, i) => (
+              <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
+                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner</Text>
+                  {recipe.description ? <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }} numberOfLines={2}>{recipe.description}</Text> : null}
+                </View>
+                <TouchableOpacity
+                  style={[styles.aiSaveBtn, { backgroundColor: colors.accent }]}
+                  onPress={() => handleSaveAiRecipe(recipe)}
+                >
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>+ Lagre</Text>
+                </TouchableOpacity>
+              </View>
+            ))
+          )}
+          <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.inputBackground, marginTop: 8 }]} onPress={() => { setShowAiResults(false); setAiResults([]); }}>
+            <Text style={[styles.aiBtnText, { color: colors.text }]}>Lukk</Text>
+          </TouchableOpacity>
+        </View>
       )}
     </View>
   );
@@ -818,6 +900,8 @@ const styles = StyleSheet.create({
   recipePickerItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1 },
   recipePickerName: { fontSize: 15, fontWeight: '600', marginBottom: 2 },
   recipePickerMeta: { fontSize: 12 },
+  aiResultItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1 },
+  aiSaveBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8 },
   aiBtn: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', minWidth: 200 },
   aiBtnText: { color: '#fff', fontSize: 14, fontWeight: '600', textAlign: 'center' },
   randomResult: { borderRadius: 10, padding: 14, marginTop: 12, alignItems: 'center', borderWidth: 1 },

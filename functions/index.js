@@ -1022,3 +1022,75 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZ
   return { sent: notificationsToSend.length };
 });
 
+// AI Recipe Suggestions
+exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { prompt, existingRecipes = [] } = req.body || {};
+  if (!prompt || typeof prompt !== "string") {
+    return res.status(400).json({ error: "prompt is required" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const existingNames = existingRecipes.map((r) => r.name).join(", ");
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a helpful family meal planner for Norwegian families.
+The user will describe what they want to eat or what ingredients they have.
+Generate 3 recipe suggestions based on their request.
+
+${existingNames ? `These recipes already exist in their book: ${existingNames}. Avoid suggesting duplicates.` : ""}
+
+Respond in Norwegian. Return ONLY valid JSON array with this exact structure:
+[
+  {
+    "name": "Recipe name",
+    "description": "Short 1-2 sentence description",
+    "ingredients": [{"name": "Ingredient name", "amount": "Amount", "unit": "Unit"}],
+    "instructions": ["Step 1", "Step 2"],
+    "time": 30,
+    "portions": 4,
+    "category": "kjoett|fisk|vegetar|pasta|sott"
+  }
+]
+
+Generate exactly 3 recipes. Make them practical for everyday family cooking. Use Norwegian ingredient names where appropriate.`,
+        },
+        {
+          role: "user",
+          content: prompt,
+        },
+      ],
+      temperature: 0.7,
+      max_tokens: 2000,
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return res.status(500).json({ error: "No response from AI" });
+    }
+
+    // Parse JSON response
+    const jsonMatch = content.match(/\[[\s\S]*\]/);
+    if (!jsonMatch) {
+      return res.status(500).json({ error: "Invalid AI response format" });
+    }
+
+    const recipes = JSON.parse(jsonMatch[0]);
+    return res.status(200).json({ recipes });
+  } catch (error) {
+    console.error("AI recipe suggestion error:", error);
+    return res.status(500).json({ error: "Failed to generate suggestions" });
+  }
+});
+
