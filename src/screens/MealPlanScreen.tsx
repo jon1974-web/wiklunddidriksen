@@ -638,6 +638,18 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                       <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>{ing.amount} {ing.unit}</Text>
                     </View>
                   ))}
+
+                  {showRecipeDetail?.instructions && showRecipeDetail.instructions.length > 0 && (
+                    <>
+                      <Text style={[styles.cardTitle, { color: colors.text, marginTop: 12 }]}>{t('mealPlanner.instructionsList')}</Text>
+                      {showRecipeDetail.instructions.map((step, i) => (
+                        <View key={i} style={{ flexDirection: 'row', gap: 8, marginBottom: 8, alignItems: 'flex-start' }}>
+                          <Text style={{ color: colors.accent, fontWeight: '700', width: 20, fontSize: 13 }}>{i + 1}.</Text>
+                          <Text style={{ fontSize: 13, lineHeight: 20, color: colors.text, flex: 1 }}>{step}</Text>
+                        </View>
+                      ))}
+                    </>
+                  )}
                 </ScrollView>
                 <View style={styles.modalActions}>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowRecipeDetail(null)}>
