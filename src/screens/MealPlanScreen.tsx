@@ -628,11 +628,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail?.name}</Text>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail?.name}</Text>
                 <ScrollView>
                   {showRecipeDetail?.description ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.description}</Text> : null}
-                  <Text style={[styles.cardTitle, { color: colors.text }]}>{t('mealPlanner.ingredientsList')}</Text>
-                  {showRecipeDetail?.ingredients.map((ing, i) => (
+                  {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}</Text> : null}
+                  {showRecipeDetail?.ingredients && showRecipeDetail.ingredients.length > 0 && (
+                    <Text style={[styles.cardTitle, { color: colors.text }]}>{t('mealPlanner.ingredientsList')}</Text>
+                  )}
+                  {showRecipeDetail?.ingredients?.map((ing, i) => (
                     <View key={i} style={[styles.shoppingItem, { borderBottomColor: colors.border }]}>
                       <Text style={[styles.shoppingName, { color: colors.text }]}>{ing.name}</Text>
                       <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>{ing.amount} {ing.unit}</Text>
