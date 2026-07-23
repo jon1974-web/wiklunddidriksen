@@ -34,6 +34,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showAddRecipe, setShowAddRecipe] = useState(false);
   const [showRecipeDetail, setShowRecipeDetail] = useState<Recipe | null>(null);
   const [showDeleteRecipe, setShowDeleteRecipe] = useState<Recipe | null>(null);
+  const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+  const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
   const [recipeForm, setRecipeForm] = useState({
     name: '', description: '', time: '', portions: '', category: 'kjoett',
@@ -97,6 +99,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     return matchesSearch && matchesCategory;
   });
 
+  const resetRecipeForm = () => {
+    setRecipeForm({ name: '', description: '', time: '', portions: '', category: 'kjoett', ingredients: [{ name: '', amount: '', unit: '' }], instructions: [''] });
+  };
+
   const handleSaveRecipe = async () => {
     if (!recipeForm.name.trim()) {
       crossAlert('Error', t('mealPlanner.recipeName') + ' er påkrevd');
@@ -104,15 +110,22 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     }
     if (!familyId) return;
     try {
-      if (showAddRecipe === true) {
+      const recipeData = {
+        name: recipeForm.name.trim(),
+        description: recipeForm.description.trim(),
+        ingredients: recipeForm.ingredients.filter(i => i.name.trim()),
+        instructions: recipeForm.instructions.filter(i => i.trim()),
+        time: parseInt(recipeForm.time) || 0,
+        portions: parseInt(recipeForm.portions) || 4,
+        category: recipeForm.category,
+      };
+      if (editingRecipe) {
+        await import('firebase/firestore').then(({ updateDoc, doc }) =>
+          updateDoc(doc(db, 'recipes', editingRecipe.id), recipeData)
+        );
+      } else {
         await addDoc(collection(db, 'recipes'), {
-          name: recipeForm.name.trim(),
-          description: recipeForm.description.trim(),
-          ingredients: recipeForm.ingredients.filter(i => i.name.trim()),
-          instructions: recipeForm.instructions.filter(i => i.trim()),
-          time: parseInt(recipeForm.time) || 0,
-          portions: parseInt(recipeForm.portions) || 4,
-          category: recipeForm.category,
+          ...recipeData,
           isFavorite: false,
           createdBy: user?.uid || '',
           familyId,
@@ -120,9 +133,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         });
       }
       setShowAddRecipe(false);
-      setRecipeForm({ name: '', description: '', time: '', portions: '', category: 'kjoett', ingredients: [{ name: '', amount: '', unit: '' }], instructions: [''] });
+      setEditingRecipe(null);
+      resetRecipeForm();
       loadData();
     } catch (error) {
+      console.error('Failed to save recipe:', error);
       crossAlert('Error', getErrorMessage(error));
     }
   };
@@ -233,7 +248,23 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           keyExtractor={item => item.id}
           contentContainerStyle={styles.recipeGrid}
           renderItem={({ item }) => (
-            <TouchableOpacity style={[styles.recipeCard, { backgroundColor: colors.surface }]} onPress={() => setShowRecipeDetail(item)}>
+            <TouchableOpacity
+              style={[styles.recipeCard, { backgroundColor: colors.surface }]}
+              onPress={() => setShowRecipeDetail(item)}
+              onLongPress={() => setActionModal({ visible: true, title: item.name, onEdit: () => {
+                setEditingRecipe(item);
+                setRecipeForm({
+                  name: item.name,
+                  description: item.description || '',
+                  time: item.time ? String(item.time) : '',
+                  portions: item.portions ? String(item.portions) : '',
+                  category: item.category || 'kjoett',
+                  ingredients: item.ingredients.length > 0 ? item.ingredients : [{ name: '', amount: '', unit: '' }],
+                  instructions: item.instructions.length > 0 ? item.instructions : [''],
+                });
+                setShowAddRecipe(true);
+              }, onDelete: () => setShowDeleteRecipe(item) })}
+            >
               <View style={[styles.recipeImg, { backgroundColor: colors.inputBackground }]}>
                 <Text style={{ fontSize: 32 }}>{item.category === 'kjoett' ? '🥩' : item.category === 'fisk' ? '🐟' : item.category === 'vegetar' ? '🥗' : item.category === 'pasta' ? '🍝' : item.category === 'sott' ? '🍰' : '🍽️'}</Text>
                 <TouchableOpacity style={styles.favBtn} onPress={() => toggleFavorite(item)}>
@@ -320,7 +351,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('mealPlanner.addRecipe')}</Text>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{editingRecipe ? t('mealPlanner.editRecipe') : t('mealPlanner.addRecipe')}</Text>
                 <ScrollView>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.recipeName')}</Text>
@@ -399,11 +430,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowAddRecipe(false)}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddRecipe(false); setEditingRecipe(null); resetRecipeForm(); }}>
                     <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleSaveRecipe}>
-                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.saveRecipe')}</Text>
+                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{editingRecipe ? t('common.save') : t('mealPlanner.saveRecipe')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -442,6 +473,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
+      <ActionModal
+        visible={actionModal.visible}
+        title={actionModal.title}
+        onEdit={actionModal.onEdit}
+        onDelete={actionModal.onDelete}
+        onCancel={() => setActionModal({ visible: false, title: '' })}
+      />
     </SafeAreaView>
   );
 };
