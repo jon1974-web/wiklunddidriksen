@@ -1060,7 +1060,7 @@ Respond in Norwegian. Return ONLY valid JSON array with this exact structure:
     "instructions": ["Step 1", "Step 2"],
     "time": 30,
     "portions": 4,
-    "category": "kjoett|fisk|vegetar|pasta|sott"
+    "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott"
   }
 ]
 
