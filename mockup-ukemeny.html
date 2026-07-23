@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Ukemeny Mockup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #e8e8e8; display: flex; justify-content: center; gap: 24px; padding: 40px 20px; flex-wrap: wrap; }
+    .frame { width: 380px; background: #f5f5f5; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.15); flex-shrink: 0; }
+    .status-bar { height: 40px; background: #0097A7; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; }
+    .label { text-align: center; font-size: 14px; font-weight: 700; color: #333; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+    .header-title { font-size: 20px; font-weight: 700; }
+    .tabs { display: flex; border-bottom: 1px solid #eee; padding: 0 16px; }
+    .tab { padding: 10px 16px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab.active { color: #0097A7; border-bottom-color: #0097A7; }
+    .card { background: #fff; border-radius: 12px; margin: 8px 16px; padding: 14px 16px; }
+    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+    .randomizer { background: linear-gradient(135deg, #0097A7, #00838F); border-radius: 12px; margin: 8px 16px; padding: 16px; color: #fff; }
+    .randomizer h3 { font-size: 16px; margin-bottom: 4px; }
+    .randomizer p { font-size: 13px; opacity: 0.8; margin-bottom: 12px; }
+    .randomizer-btn { width: 100%; padding: 12px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 10px; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .randomizer-result { margin-top: 12px; padding: 12px; background: rgba(255,255,255,0.15); border-radius: 8px; text-align: center; }
+    .day-row { display: flex; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+    .day-row:last-child { border-bottom: none; }
+    .day-name { width: 36px; font-size: 13px; font-weight: 700; color: #0097A7; padding-top: 2px; }
+    .day-meals { flex: 1; display: flex; flex-wrap: wrap; gap: 4px; }
+    .meal-tag { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 14px; font-size: 12px; cursor: pointer; border: 1px solid; }
+    .meal-tag.lunch { background: #E8F5E9; border-color: #A5D6A7; color: #2E7D32; }
+    .meal-tag.dinner { background: #FFF3E0; border-color: #FFCC80; color: #E65100; }
+    .meal-tag.empty { background: #f5f5f5; border: 1px dashed #ccc; color: #aaa; }
+    .meal-tag .remove { color: #E53935; font-weight: 700; margin-left: 4px; }
+    .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 56px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-around; }
+    .tab-bar-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #999; }
+    .tab-bar-item.active { color: #0097A7; }
+    .tab-bar-item .icon { font-size: 20px; }
+    .mockup-badge { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 100; opacity: 0.7; }
+    .add-btn { width: 32px; height: 32px; border-radius: 16px; background: #4CAF50; color: #fff; border: none; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  </style>
+</head>
+<body>
+  <div class="mockup-badge">Ukemeny — Weekly Meal Planner</div>
+
+  <div>
+    <div class="label">🍽️ Ukemeny</div>
+    <div class="frame">
+      <div class="status-bar">9:41</div>
+      <div style="position: relative;">
+        <div class="header">
+          <div class="header-title">🍽️ Matplan</div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Ukemeny</div>
+          <div class="tab">Oppskrifter</div>
+          <div class="tab">Handleliste</div>
+        </div>
+
+        <div style="padding-bottom: 60px;">
+          <!-- Randomizer -->
+          <div class="randomizer">
+            <div style="font-size: 28px; margin-bottom: 6px;">🎲</div>
+            <h3>Hva skal vi ha til middag?</h3>
+            <p>La oss bestemme for deg!</p>
+            <button class="randomizer-btn">🎲 Tilfeldig rett</button>
+            <div class="randomizer-result">
+              <div style="font-size: 22px; margin-bottom: 4px;">🍝</div>
+              <div style="font-size: 16px; font-weight: 700;">Spaghetti Bolognese</div>
+              <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">30 min · 4 porsjoner</div>
+            </div>
+          </div>
+
+          <!-- Week plan -->
+          <div class="card">
+            <div class="card-title">📅 Uke 30 (21.–27. juli)</div>
+            <div class="day-row">
+              <span class="day-name">Man</span>
+              <div class="day-meals">
+                <span class="meal-tag lunch">🥗 Salat med kylling <span class="remove">×</span></span>
+                <span class="meal-tag dinner">🍝 Bolognese <span class="remove">×</span></span>
+              </div>
+            </div>
+            <div class="day-row">
+              <span class="day-name">Tir</span>
+              <div class="day-meals">
+                <span class="meal-tag empty">+ Lunsj</span>
+                <span class="meal-tag dinner">🐟 Laks <span class="remove">×</span></span>
+              </div>
+            </div>
+            <div class="day-row">
+              <span class="day-name">Ons</span>
+              <div class="day-meals">
+                <span class="meal-tag lunch">🌮 Tacos <span class="remove">×</span></span>
+                <span class="meal-tag dinner">🥘 Korma <span class="remove">×</span></span>
+              </div>
+            </div>
+            <div class="day-row">
+              <span class="day-name">Tor</span>
+              <div class="day-meals">
+                <span class="meal-tag empty">+ Lunsj</span>
+                <span class="meal-tag empty">+ Middag</span>
+              </div>
+            </div>
+            <div class="day-row">
+              <span class="day-name">Fre</span>
+              <div class="day-meals">
+                <span class="meal-tag lunch">🍕 Pizza <span class="remove">×</span></span>
+                <span class="meal-tag dinner">🍔 Hamburgere <span class="remove">×</span></span>
+              </div>
+            </div>
+            <div class="day-row">
+              <span class="day-name">Lør</span>
+              <div class="day-meals">
+                <span class="meal-tag empty">+ Lunsj</span>
+                <span class="meal-tag dinner">🍛 Indisk korma <span class="remove">×</span></span>
+              </div>
+            </div>
+            <div class="day-row">
+              <span class="day-name">Søn</span>
+              <div class="day-meals">
+                <span class="meal-tag lunch">🥗 Sommer salat <span class="remove">×</span></span>
+                <span class="meal-tag dinner">🍕 Fredagspizza <span class="remove">×</span></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick shopping -->
+          <div class="card">
+            <div class="card-title">🛒 Handleliste denne uken</div>
+            <div style="font-size: 13px; color: #666;">12 varer fra denne ukens måltider</div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-bar-item"><span class="icon">📅</span><span>Arr.</span></div>
+          <div class="tab-bar-item active"><span class="icon">🍽️</span><span>Matplan</span></div>
+          <div class="tab-bar-item"><span class="icon">💬</span><span>Chat</span></div>
+          <div class="tab-bar-item"><span class="icon">✈️</span><span>Reise</span></div>
+          <div class="tab-bar-item"><span class="icon">👤</span><span>Profil</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="label">🎲 Randomizer utvidet</div>
+    <div class="frame">
+      <div class="status-bar">9:41</div>
+      <div style="position: relative;">
+        <div class="header">
+          <div class="header-title">🍽️ Matplan</div>
+        </div>
+        <div class="tabs">
+          <div class="tab active">Ukemeny</div>
+          <div class="tab">Oppskrifter</div>
+          <div class="tab">Handleliste</div>
+        </div>
+
+        <div style="padding-bottom: 60px;">
+          <!-- Randomizer with AI -->
+          <div class="randomizer">
+            <div style="font-size: 28px; margin-bottom: 6px;">🎲</div>
+            <h3>Hva skal vi ha til middag?</h3>
+            <p>La oss bestemme for deg!</p>
+            <div style="display: flex; gap: 8px;">
+              <button class="randomizer-btn" style="flex: 1;">🎲 Tilfeldig</button>
+              <button class="randomizer-btn" style="flex: 1; background: rgba(255,255,255,0.1);">🤖 AI-forslag</button>
+            </div>
+            <div class="randomizer-result">
+              <div style="font-size: 28px; margin-bottom: 4px;">🥘</div>
+              <div style="font-size: 18px; font-weight: 700;">Kyilinggryte med ris</div>
+              <div style="font-size: 12px; opacity: 0.8; margin-top: 4px;">45 min · 6 porsjoner · ❤️ Favoritt</div>
+              <div style="display: flex; gap: 8px; margin-top: 10px;">
+                <button style="flex: 1; padding: 8px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; color: #fff; font-size: 12px; font-weight: 600;">📅 Legg til i plan</button>
+                <button style="flex: 1; padding: 8px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 8px; color: #fff; font-size: 12px; font-weight: 600;">📖 Se oppskrift</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">📅 Uke 30</div>
+            <div class="day-row">
+              <span class="day-name">Man</span>
+              <div class="day-meals">
+                <span class="meal-tag lunch">🥗 Salat <span class="remove">×</span></span>
+                <span class="meal-tag dinner">🍝 Bolognese <span class="remove">×</span></span>
+              </div>
+            </div>
+            <div class="day-row">
+              <span class="day-name">Tir</span>
+              <div class="day-meals">
+                <span class="meal-tag empty">+ Lunsj</span>
+                <span class="meal-tag dinner">🐟 Laks <span class="remove">×</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-bar-item"><span class="icon">📅</span><span>Arr.</span></div>
+          <div class="tab-bar-item active"><span class="icon">🍽️</span><span>Matplan</span></div>
+          <div class="tab-bar-item"><span class="icon">💬</span><span>Chat</span></div>
+          <div class="tab-bar-item"><span class="icon">✈️</span><span>Reise</span></div>
+          <div class="tab-bar-item"><span class="icon">👤</span><span>Profil</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

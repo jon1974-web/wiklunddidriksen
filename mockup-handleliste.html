@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Handleliste Mockup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #e8e8e8; display: flex; justify-content: center; gap: 24px; padding: 40px 20px; flex-wrap: wrap; }
+    .frame { width: 380px; background: #f5f5f5; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.15); flex-shrink: 0; }
+    .status-bar { height: 40px; background: #0097A7; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; }
+    .label { text-align: center; font-size: 14px; font-weight: 700; color: #333; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+    .header-title { font-size: 20px; font-weight: 700; }
+    .tabs { display: flex; border-bottom: 1px solid #eee; padding: 0 16px; }
+    .tab { padding: 10px 16px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab.active { color: #0097A7; border-bottom-color: #0097A7; }
+    .card { background: #fff; border-radius: 12px; margin: 8px 16px; padding: 14px 16px; }
+    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .card-subtitle { font-size: 12px; color: #888; margin-bottom: 10px; }
+    .shopping-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+    .shopping-item:last-child { border-bottom: none; }
+    .checkbox { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #ddd; flex-shrink: 0; }
+    .checkbox.checked { background: #4CAF50; border-color: #4CAF50; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; font-weight: 700; }
+    .shopping-name { font-size: 14px; flex: 1; }
+    .shopping-name.checked { text-decoration: line-through; color: #aaa; }
+    .shopping-qty { font-size: 12px; color: #888; }
+    .add-row { display: flex; gap: 8px; margin-bottom: 10px; }
+    .add-input { flex: 1; padding: 8px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 13px; }
+    .add-btn-sm { padding: 8px 14px; background: #4CAF50; color: #fff; border: none; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; }
+    .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 56px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-around; }
+    .tab-bar-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #999; }
+    .tab-bar-item.active { color: #0097A7; }
+    .tab-bar-item .icon { font-size: 20px; }
+    .mockup-badge { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 100; opacity: 0.7; }
+    .add-btn { width: 32px; height: 32px; border-radius: 16px; background: #4CAF50; color: #fff; border: none; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .auto-badge { display: inline-block; padding: 2px 8px; background: #E3F2FD; color: #1565C0; border-radius: 10px; font-size: 10px; font-weight: 600; margin-left: 8px; }
+  </style>
+</head>
+<body>
+  <div class="mockup-badge">Handleliste — Shopping List</div>
+
+  <div>
+    <div class="label">🛒 Handleliste</div>
+    <div class="frame">
+      <div class="status-bar">9:41</div>
+      <div style="position: relative;">
+        <div class="header">
+          <div class="header-title">🛒 Handlelister</div>
+          <button class="add-btn">+</button>
+        </div>
+        <div class="tabs">
+          <div class="tab">Ukemeny</div>
+          <div class="tab">Oppskrifter</div>
+          <div class="tab active">Handleliste</div>
+        </div>
+
+        <div style="padding-bottom: 60px;">
+          <!-- Auto-generated from meal plan -->
+          <div class="card">
+            <div class="card-title">🛒 Denne ukens handleliste <span class="auto-badge">Auto</span></div>
+            <div class="card-subtitle">12 varer fra denne ukens måltider</div>
+            <div class="shopping-item">
+              <div class="checkbox checked">✓</div>
+              <span class="shopping-name checked">Kyllingbryst</span>
+              <span class="shopping-qty">1 kg</span>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox checked">✓</div>
+              <span class="shopping-name checked">Spaghetti</span>
+              <span class="shopping-qty">500g</span>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox"></div>
+              <span class="shopping-name">Laks</span>
+              <span class="shopping-qty">600g</span>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox"></div>
+              <span class="shopping-name">Tacokrydder</span>
+              <span class="shopping-qty">1 pakke</span>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox"></div>
+              <span class="shopping-name">Rømme</span>
+              <span class="shopping-qty">1 boks</span>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox"></div>
+              <span class="shopping-name">Ost</span>
+              <span class="shopping-qty">200g</span>
+            </div>
+            <div style="text-align: center; padding: 8px 0; font-size: 12px; color: #aaa;">+ 6 varer til</div>
+          </div>
+
+          <!-- Manual shopping list -->
+          <div class="card">
+            <div class="card-title">🛒 Egen handleliste</div>
+            <div class="add-row">
+              <input type="text" class="add-input" placeholder="Legg til vare...">
+              <button class="add-btn-sm">+</button>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox"></div>
+              <span class="shopping-name">Melk</span>
+              <span class="shopping-qty">1 L</span>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox"></div>
+              <span class="shopping-name">Brød</span>
+              <span class="shopping-qty">1 stk</span>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox"></div>
+              <span class="shopping-name">Egg</span>
+              <span class="shopping-qty">12 stk</span>
+            </div>
+            <div class="shopping-item">
+              <div class="checkbox"></div>
+              <span class="shopping-name">Smør</span>
+              <span class="shopping-qty">1 stk</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-bar-item"><span class="icon">📅</span><span>Arr.</span></div>
+          <div class="tab-bar-item active"><span class="icon">🍽️</span><span>Matplan</span></div>
+          <div class="tab-bar-item"><span class="icon">💬</span><span>Chat</span></div>
+          <div class="tab-bar-item"><span class="icon">✈️</span><span>Reise</span></div>
+          <div class="tab-bar-item"><span class="icon">👤</span><span>Profil</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Oppskrifter Mockup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #e8e8e8; display: flex; justify-content: center; gap: 24px; padding: 40px 20px; flex-wrap: wrap; }
+    .frame { width: 380px; background: #f5f5f5; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.15); flex-shrink: 0; }
+    .status-bar { height: 40px; background: #0097A7; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; }
+    .label { text-align: center; font-size: 14px; font-weight: 700; color: #333; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; }
+    .header-title { font-size: 20px; font-weight: 700; }
+    .tabs { display: flex; border-bottom: 1px solid #eee; padding: 0 16px; }
+    .tab { padding: 10px 16px; font-size: 13px; font-weight: 600; color: #888; cursor: pointer; border-bottom: 2px solid transparent; }
+    .tab.active { color: #0097A7; border-bottom-color: #0097A7; }
+    .search-bar { padding: 8px 16px; }
+    .search-input { width: 100%; padding: 10px 14px; border: 1px solid #ddd; border-radius: 10px; font-size: 14px; background: #fff; }
+    .filters { display: flex; gap: 6px; padding: 8px 16px; overflow-x: auto; }
+    .filter-chip { padding: 6px 14px; border-radius: 16px; border: 1px solid #ddd; background: #fff; font-size: 12px; font-weight: 600; color: #666; cursor: pointer; white-space: nowrap; }
+    .filter-chip.active { background: #0097A7; color: #fff; border-color: #0097A7; }
+    .recipe-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 8px 16px; }
+    .recipe-card { background: #fff; border-radius: 10px; overflow: hidden; cursor: pointer; position: relative; }
+    .recipe-img { height: 80px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 32px; }
+    .recipe-info { padding: 8px 10px; }
+    .recipe-name { font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .recipe-meta { font-size: 11px; color: #888; }
+    .recipe-fav { position: absolute; top: 6px; right: 6px; font-size: 14px; }
+    .tab-bar { position: absolute; bottom: 0; left: 0; right: 0; height: 56px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: center; justify-content: space-around; }
+    .tab-bar-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #999; }
+    .tab-bar-item.active { color: #0097A7; }
+    .tab-bar-item .icon { font-size: 20px; }
+    .mockup-badge { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 100; opacity: 0.7; }
+    .add-btn { width: 32px; height: 32px; border-radius: 16px; background: #4CAF50; color: #fff; border: none; font-size: 18px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .empty-search { text-align: center; padding: 40px 20px; color: #888; }
+    .ai-btn { display: inline-flex; align-items: center; gap: 6px; padding: 10px 16px; background: #0097A7; color: #fff; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="mockup-badge">Oppskrifter — Recipe Book</div>
+
+  <!-- Page 1: Recipe Grid -->
+  <div>
+    <div class="label">📖 Oppskriftsbok</div>
+    <div class="frame">
+      <div class="status-bar">9:41</div>
+      <div style="position: relative;">
+        <div class="header">
+          <div class="header-title">📖 Oppskrifter</div>
+          <button class="add-btn">+</button>
+        </div>
+        <div class="tabs">
+          <div class="tab">Ukemeny</div>
+          <div class="tab active">Oppskrifter</div>
+          <div class="tab">Handleliste</div>
+        </div>
+
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="🔍 Søk oppskrifter...">
+        </div>
+
+        <div class="filters">
+          <span class="filter-chip active">Alle</span>
+          <span class="filter-chip">❤️ Favoritter</span>
+          <span class="filter-chip">🥩 Kjøtt</span>
+          <span class="filter-chip">🐟 Fisk</span>
+          <span class="filter-chip">🥗 Vegetar</span>
+          <span class="filter-chip">🍝 Pasta</span>
+          <span class="filter-chip">🍰 Søtt</span>
+        </div>
+
+        <div style="padding-bottom: 60px;">
+          <div class="recipe-grid">
+            <div class="recipe-card">
+              <div class="recipe-img" style="position:relative">🍝<span class="recipe-fav">❤️</span></div>
+              <div class="recipe-info">
+                <div class="recipe-name">Spaghetti Bolognese</div>
+                <div class="recipe-meta">30 min · 4 porsjoner</div>
+              </div>
+            </div>
+            <div class="recipe-card">
+              <div class="recipe-img">🐟</div>
+              <div class="recipe-info">
+                <div class="recipe-name">Laks med dill</div>
+                <div class="recipe-meta">25 min · 2 porsjoner</div>
+              </div>
+            </div>
+            <div class="recipe-card">
+              <div class="recipe-img" style="position:relative">🌮<span class="recipe-fav">❤️</span></div>
+              <div class="recipe-info">
+                <div class="recipe-name">Tacogryte</div>
+                <div class="recipe-meta">20 min · 4 porsjoner</div>
+              </div>
+            </div>
+            <div class="recipe-card">
+              <div class="recipe-img">🥘</div>
+              <div class="recipe-info">
+                <div class="recipe-name">Kyllinggryte</div>
+                <div class="recipe-meta">45 min · 6 porsjoner</div>
+              </div>
+            </div>
+            <div class="recipe-card">
+              <div class="recipe-img">🍕</div>
+              <div class="recipe-info">
+                <div class="recipe-name">Hjemmelaget pizza</div>
+                <div class="recipe-meta">40 min · 4 porsjoner</div>
+              </div>
+            </div>
+            <div class="recipe-card">
+              <div class="recipe-img">🥗</div>
+              <div class="recipe-info">
+                <div class="recipe-name">Sommer salat</div>
+                <div class="recipe-meta">15 min · 2 porsjoner</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-bar-item"><span class="icon">📅</span><span>Arr.</span></div>
+          <div class="tab-bar-item active"><span class="icon">🍽️</span><span>Matplan</span></div>
+          <div class="tab-bar-item"><span class="icon">💬</span><span>Chat</span></div>
+          <div class="tab-bar-item"><span class="icon">✈️</span><span>Reise</span></div>
+          <div class="tab-bar-item"><span class="icon">👤</span><span>Profil</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page 2: Search with AI fallback -->
+  <div>
+    <div class="label">🔍 Søk + AI-fallback</div>
+    <div class="frame">
+      <div class="status-bar">9:41</div>
+      <div style="position: relative;">
+        <div class="header">
+          <div class="header-title">📖 Oppskrifter</div>
+          <button class="add-btn">+</button>
+        </div>
+        <div class="tabs">
+          <div class="tab">Ukemeny</div>
+          <div class="tab active">Oppskrifter</div>
+          <div class="tab">Handleliste</div>
+        </div>
+
+        <div class="search-bar">
+          <input type="text" class="search-input" placeholder="🔍 Søk oppskrifter..." value="Pad Thai">
+        </div>
+
+        <div style="padding-bottom: 60px;">
+          <div class="empty-search">
+            <div style="font-size: 40px; margin-bottom: 12px;">🔍</div>
+            <div style="font-size: 16px; font-weight: 600; margin-bottom: 4px;">Ingen treff i oppskriftsboken</div>
+            <div style="font-size: 13px; color: #aaa; margin-bottom: 12px;">"Pad Thai" finnes ikke i boken din ennå</div>
+            <button class="ai-btn">🤖 Søk med AI</button>
+            <div style="margin-top: 12px; font-size: 12px; color: #aaa;">Eller <a href="#" style="color: #0097A7;">lim inn en URL</a></div>
+          </div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab-bar-item"><span class="icon">📅</span><span>Arr.</span></div>
+          <div class="tab-bar-item active"><span class="icon">🍽️</span><span>Matplan</span></div>
+          <div class="tab-bar-item"><span class="icon">💬</span><span>Chat</span></div>
+          <div class="tab-bar-item"><span class="icon">✈️</span><span>Reise</span></div>
+          <div class="tab-bar-item"><span class="icon">👤</span><span>Profil</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

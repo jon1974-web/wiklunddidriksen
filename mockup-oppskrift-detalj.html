@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Familiesenter — Oppskrift Detalj Mockup</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #e8e8e8; display: flex; justify-content: center; gap: 24px; padding: 40px 20px; flex-wrap: wrap; }
+    .frame { width: 380px; background: #f5f5f5; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 40px rgba(0,0,0,0.15); flex-shrink: 0; }
+    .status-bar { height: 40px; background: #0097A7; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 13px; font-weight: 600; }
+    .label { text-align: center; font-size: 14px; font-weight: 700; color: #333; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    .back-btn { padding: 10px 14px; font-size: 18px; color: #0097A7; cursor: pointer; }
+    .card { background: #fff; border-radius: 12px; margin: 0 16px 12px; padding: 14px 16px; }
+    .card-title { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+    .shopping-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; }
+    .shopping-item:last-child { border-bottom: none; }
+    .checkbox { width: 20px; height: 20px; border-radius: 4px; border: 2px solid #ddd; flex-shrink: 0; }
+    .shopping-name { font-size: 14px; flex: 1; }
+    .shopping-qty { font-size: 12px; color: #888; }
+    .step { display: flex; gap: 10px; margin-bottom: 12px; }
+    .step-num { width: 24px; height: 24px; border-radius: 12px; background: #0097A7; color: #fff; font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-text { font-size: 14px; line-height: 1.5; color: #444; flex: 1; }
+    .action-btn { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid; font-size: 13px; font-weight: 600; cursor: pointer; text-align: center; }
+    .mockup-badge { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); background: #333; color: #fff; padding: 8px 20px; border-radius: 20px; font-size: 13px; font-weight: 600; z-index: 100; opacity: 0.7; }
+  </style>
+</head>
+<body>
+  <div class="mockup-badge">Oppskrift Detalj — Recipe Detail</div>
+
+  <div>
+    <div class="label">📖 Oppskrift detaljer</div>
+    <div class="frame">
+      <div class="status-bar">9:41</div>
+      <div class="back-btn">←</div>
+
+      <div style="padding: 0 0 16px;">
+        <div style="height: 140px; background: linear-gradient(135deg, #e8f5e9, #c8e6c9); display: flex; align-items: center; justify-content: center; font-size: 56px; margin: 0 16px 12px; border-radius: 12px;">🍝</div>
+
+        <div style="padding: 0 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <h2 style="font-size: 20px; font-weight: 700;">Spaghetti Bolognese</h2>
+            <span style="font-size: 22px; cursor: pointer;">❤️</span>
+          </div>
+          <p style="font-size: 13px; color: #888; margin-bottom: 12px;">30 min · 4 porsjoner · 🥩 Kjøtt</p>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <button class="action-btn" style="border-color: #0097A7; color: #0097A7;">📝 Rediger</button>
+            <button class="action-btn" style="border-color: #4CAF50; color: #4CAF50;">🛒 Legg til handleliste</button>
+          </div>
+        </div>
+
+        <!-- Ingredients -->
+        <div class="card">
+          <div class="card-title">📋 Ingredienser</div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Spaghetti</span>
+            <span class="shopping-qty">400g</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Hakket oksekjøtt</span>
+            <span class="shopping-qty">500g</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Løk</span>
+            <span class="shopping-qty">2 stk</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Hvitløk</span>
+            <span class="shopping-qty">2 fedd</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Hermetiske tomater</span>
+            <span class="shopping-qty">1 boks</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Tomatpuré</span>
+            <span class="shopping-qty">2 ss</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Parmesan</span>
+            <span class="shopping-qty">revet</span>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="card">
+          <div class="card-title">👨‍🍳 Fremgangsmåte</div>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text">Finhakk løk og hvitløk. Varm olje i en stor stekepanne eller gryte.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text">Tilsett kjøttet og stek til det er brunt. Rør jevnlig.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text">Tilsett løk og hvitløk, stek i 2 minutter.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">4</div>
+            <div class="step-text">Tilsett hermetiske tomater, tomatpuré, salt og pepper. La det småkoke i 20 minutter.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">5</div>
+            <div class="step-text">Kok spaghetti etter anvisning på pakken. Server sausen over pastaen med revet parmesan og frisk basilikum.</div>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div class="card">
+          <div class="card-title">📝 Notater</div>
+          <p style="font-size: 13px; color: #666; line-height: 1.5;">Barna liker ekstra mye parmesan. Kan også bruke kalkun kjøtt for et lettere alternativ.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recipe with no image -->
+  <div>
+    <div class="label">📖 Oppskrift uten bilde</div>
+    <div class="frame">
+      <div class="status-bar">9:41</div>
+      <div class="back-btn">←</div>
+
+      <div style="padding: 0 0 16px;">
+        <div style="height: 80px; background: #f0f4f5; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #ccc; margin: 0 16px 12px; border-radius: 12px;">📷</div>
+
+        <div style="padding: 0 16px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <h2 style="font-size: 20px; font-weight: 700;">Tacogryte</h2>
+            <span style="font-size: 22px; cursor: pointer;">❤️</span>
+          </div>
+          <p style="font-size: 13px; color: #888; margin-bottom: 12px;">20 min · 4 porsjoner · 🥩 Kjøtt</p>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+            <button class="action-btn" style="border-color: #0097A7; color: #0097A7;">📝 Rediger</button>
+            <button class="action-btn" style="border-color: #4CAF50; color: #4CAF50;">🛒 Legg til handleliste</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">📋 Ingredienser</div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Kjøttdeig</span>
+            <span class="shopping-qty">500g</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Taco-krydder</span>
+            <span class="shopping-qty">1 pakke</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Tortillachips</span>
+            <span class="shopping-qty">1 pose</span>
+          </div>
+          <div class="shopping-item">
+            <div class="checkbox"></div>
+            <span class="shopping-name">Ost</span>
+            <span class="shopping-qty">revet</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">👨‍🍳 Fremgangsmåte</div>
+          <div class="step">
+            <div class="step-num">1</div>
+            <div class="step-text">Brun kjøttdeigen i en stekepanne.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">2</div>
+            <div class="step-text">Tilsett taco-krydder og vann. La det koke i 5 minutter.</div>
+          </div>
+          <div class="step">
+            <div class="step-num">3</div>
+            <div class="step-text">Server med chips, ost og tilbehør.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
