@@ -14,7 +14,7 @@ import { MAX_RECIPES } from '../constants/limits';
 import { generateId } from '../utils/generateId';
 
 type SubTab = 'ukemeny' | 'oppskrifter' | 'handleliste';
-const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const DAY_LABELS = ['mealPlanner.monday', 'mealPlanner.tuesday', 'mealPlanner.wednesday', 'mealPlanner.thursday', 'mealPlanner.friday', 'mealPlanner.saturday', 'mealPlanner.sunday'];
 const MEAL_SLOTS = ['lunsj', 'middag'] as const;
 

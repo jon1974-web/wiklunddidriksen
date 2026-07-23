@@ -342,6 +342,7 @@ export interface MealPlan {
   };
   familyId: string;
   createdBy: string;
+  DAYS?: string[];
 }
 
 export interface Family {
