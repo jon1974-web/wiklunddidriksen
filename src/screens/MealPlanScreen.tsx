@@ -384,7 +384,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             <View key={list.id} style={[styles.shoppingListCard, { backgroundColor: colors.inputBackground }]}>
               <TouchableOpacity
                 style={styles.shoppingListContent}
-                onPress={() => navigation.navigate('ShoppingListDetail', { listId: list.id, listTitle: list.title })}
+                onPress={() => navigation.navigate('ShoppingListDetail', { list })}
                 onLongPress={() => setActionModal({ visible: true, title: list.title, onDelete: () => handleDeleteList(list.id) })}
               >
                 <Text style={[styles.shoppingListTitle, { color: colors.text }]}>{list.title}</Text>

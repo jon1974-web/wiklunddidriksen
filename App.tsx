@@ -53,7 +53,7 @@ type RootStackParamList = {
   EventDetail_Spond: { event: SpondEvent; spondRespondents: SpondRespondent[]; spondConfig: { email: string; password: string } | null };
   VoiceEvent: undefined;
   ShoppingLists: undefined;
-  ShoppingListDetail: { listId: string; listTitle: string };
+  ShoppingListDetail: { list: import('./src/types').ShoppingList };
   MealPlan: undefined;
   RecipeDetail: { recipe: import('./src/types').Recipe };
   ChatMain: undefined;
