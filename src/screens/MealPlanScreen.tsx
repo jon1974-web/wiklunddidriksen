@@ -340,6 +340,63 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.portions} onChangeText={v => setRecipeForm(f => ({ ...f, portions: v }))} keyboardType="numeric" placeholder="4" placeholderTextColor={colors.textDisabled} />
                     </View>
                   </View>
+
+                  {/* Category */}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.category')}</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      {['kjoett', 'fisk', 'vegetar', 'pasta', 'sott'].map(cat => (
+                        <TouchableOpacity
+                          key={cat}
+                          style={[styles.filterChip, { borderColor: recipeForm.category === cat ? colors.accent : colors.border }, recipeForm.category === cat && { backgroundColor: colors.accent }]}
+                          onPress={() => setRecipeForm(f => ({ ...f, category: cat }))}
+                        >
+                          <Text style={{ fontSize: 12, fontWeight: '600', color: recipeForm.category === cat ? '#fff' : colors.textSecondary }}>
+                            {cat === 'kjoett' ? '🥩' : cat === 'fisk' ? '🐟' : cat === 'vegetar' ? '🥗' : cat === 'pasta' ? '🍝' : '🍰'} {t(`mealPlanner.${cat}`)}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+
+                  {/* Ingredients */}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.ingredients')}</Text>
+                    {recipeForm.ingredients.map((ing, i) => (
+                      <View key={i} style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
+                        <TextInput style={[styles.input, { flex: 2, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 13 }]} value={ing.name} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], name: v }; return { ...f, ingredients: ings }; })} placeholder="Ingrediens" placeholderTextColor={colors.textDisabled} />
+                        <TextInput style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 13 }]} value={ing.amount} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], amount: v }; return { ...f, ingredients: ings }; })} placeholder="Mengde" placeholderTextColor={colors.textDisabled} />
+                        <TextInput style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 13 }]} value={ing.unit} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], unit: v }; return { ...f, ingredients: ings }; })} placeholder="Enhet" placeholderTextColor={colors.textDisabled} />
+                        {recipeForm.ingredients.length > 1 && (
+                          <TouchableOpacity onPress={() => setRecipeForm(f => ({ ...f, ingredients: f.ingredients.filter((_, idx) => idx !== i) }))}>
+                            <Text style={{ color: '#E53935', fontSize: 18, padding: 8 }}>×</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ))}
+                    <TouchableOpacity onPress={() => setRecipeForm(f => ({ ...f, ingredients: [...f.ingredients, { name: '', amount: '', unit: '' }] }))}>
+                      <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '600' }}>+ {t('mealPlanner.addIngredient')}</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {/* Instructions */}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.instructions')}</Text>
+                    {recipeForm.instructions.map((step, i) => (
+                      <View key={i} style={{ flexDirection: 'row', gap: 6, marginBottom: 6, alignItems: 'center' }}>
+                        <Text style={{ color: colors.accent, fontWeight: '700', width: 20 }}>{i + 1}.</Text>
+                        <TextInput style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 13 }]} value={step} onChangeText={v => setRecipeForm(f => { const steps = [...f.instructions]; steps[i] = v; return { ...f, instructions: steps }; })} placeholder={`Steg ${i + 1}`} placeholderTextColor={colors.textDisabled} multiline />
+                        {recipeForm.instructions.length > 1 && (
+                          <TouchableOpacity onPress={() => setRecipeForm(f => ({ ...f, instructions: f.instructions.filter((_, idx) => idx !== i) }))}>
+                            <Text style={{ color: '#E53935', fontSize: 18, padding: 8 }}>×</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    ))}
+                    <TouchableOpacity onPress={() => setRecipeForm(f => ({ ...f, instructions: [...f.instructions, ''] }))}>
+                      <Text style={{ color: colors.accent, fontSize: 13, fontWeight: '600' }}>+ {t('mealPlanner.addStep')}</Text>
+                    </TouchableOpacity>
+                  </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowAddRecipe(false)}>
