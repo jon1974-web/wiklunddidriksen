@@ -859,6 +859,6 @@ const styles = StyleSheet.create({
   label: { fontSize: 13, fontWeight: '600', marginBottom: 4 },
   input: { padding: 12, borderRadius: 8, fontSize: 15 },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
-  modalBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
-  modalBtnText: { fontSize: 16, fontWeight: '600' },
+  modalBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+  modalBtnText: { fontSize: 16, fontWeight: '600', textAlign: 'center' },
 });
