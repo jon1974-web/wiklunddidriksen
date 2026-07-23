@@ -40,6 +40,16 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [newListTitle, setNewListTitle] = useState('');
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
   const [selectedRecipeForSlot, setSelectedRecipeForSlot] = useState<Recipe | null>(null);
+  const [randomRecipe, setRandomRecipe] = useState<Recipe | null>(null);
+
+  const getRandomRecipe = () => {
+    if (recipes.length === 0) return;
+    let newRecipe: Recipe;
+    do {
+      newRecipe = recipes[Math.floor(Math.random() * recipes.length)];
+    } while (newRecipe.id === randomRecipe?.id && recipes.length > 1);
+    setRandomRecipe(newRecipe);
+  };
   const [recipeForm, setRecipeForm] = useState({
     name: '', description: '', time: '', portions: '', category: 'kjoett',
     ingredients: [{ name: '', amount: '', unit: '' }],
@@ -301,9 +311,32 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <Text style={[styles.cardTitle, { color: colors.text }]}>🎲 {t('mealPlanner.whatToEat')}</Text>
-        <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]}>
+        <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]} onPress={getRandomRecipe}>
           <Text style={styles.aiBtnText}>🎲 {t('mealPlanner.randomMeal')}</Text>
         </TouchableOpacity>
+        {randomRecipe && (
+          <View style={[styles.randomResult, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+            <Text style={{ fontSize: 28, marginBottom: 4 }}>
+              {randomRecipe.category === 'kjoett' ? '🥩' : randomRecipe.category === 'fisk' ? '🐟' : randomRecipe.category === 'vegetar' ? '🥗' : randomRecipe.category === 'pasta' ? '🍝' : randomRecipe.category === 'sott' ? '🍰' : '🍽️'}
+            </Text>
+            <Text style={[styles.randomName, { color: colors.text }]}>{randomRecipe.name}</Text>
+            <Text style={[styles.randomMeta, { color: colors.textSecondary }]}>{randomRecipe.time} {t('mealPlanner.minutes')} · {randomRecipe.portions} {t('mealPlanner.servings')}</Text>
+            <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
+              <TouchableOpacity
+                style={[styles.randomActionBtn, { backgroundColor: colors.accent }]}
+                onPress={() => { setSelectedSlot({ day: DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1], meal: 'middag' }); setSelectedRecipeForSlot(randomRecipe); }}
+              >
+                <Text style={[styles.randomActionText, { color: '#fff' }]}>📅 {t('mealPlanner.addToPlan')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.randomActionBtn, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                onPress={() => { setShowRecipeDetail(randomRecipe); }}
+              >
+                <Text style={[styles.randomActionText, { color: colors.text }]}>📖 {t('mealPlanner.viewRecipe')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
@@ -764,6 +797,11 @@ const styles = StyleSheet.create({
   recipePickerMeta: { fontSize: 12 },
   aiBtn: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', minWidth: 200 },
   aiBtnText: { color: '#fff', fontSize: 14, fontWeight: '600', textAlign: 'center' },
+  randomResult: { borderRadius: 10, padding: 14, marginTop: 12, alignItems: 'center', borderWidth: 1 },
+  randomName: { fontSize: 18, fontWeight: '700', marginBottom: 2 },
+  randomMeta: { fontSize: 13, marginBottom: 8 },
+  randomActionBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center', borderWidth: 1 },
+  randomActionText: { fontSize: 13, fontWeight: '600' },
   searchBar: { padding: 8, paddingHorizontal: 16 },
   searchInput: { padding: 10, borderRadius: 10, borderWidth: 1, fontSize: 14 },
   filterRow: { paddingHorizontal: 16, marginBottom: 8, maxHeight: 40 },
