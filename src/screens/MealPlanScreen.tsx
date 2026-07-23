@@ -261,7 +261,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   instructions: item.instructions.length > 0 ? item.instructions : [''],
                 });
                 setShowAddRecipe(true);
-              }, onDelete: () => setShowDeleteRecipe(item) })}
+              }, onDelete: async () => {
+                try {
+                  await deleteDoc(doc(db, 'recipes', item.id));
+                  loadData();
+                } catch (error) {
+                  crossAlert('Error', getErrorMessage(error));
+                }
+              } })}
             >
               <View style={[styles.recipeImg, { backgroundColor: colors.inputBackground }]}>
                 <Text style={{ fontSize: 32 }}>{item.category === 'kjoett' ? '🥩' : item.category === 'fisk' ? '🐟' : item.category === 'vegetar' ? '🥗' : item.category === 'pasta' ? '🍝' : item.category === 'sott' ? '🍰' : '🍽️'}</Text>
@@ -504,7 +511,7 @@ const styles = StyleSheet.create({
   searchBar: { padding: 8, paddingHorizontal: 16 },
   searchInput: { padding: 10, borderRadius: 10, borderWidth: 1, fontSize: 14 },
   filterRow: { paddingHorizontal: 16, marginBottom: 8, maxHeight: 40 },
-  filterChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1, marginRight: 6 },
+  filterChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1, marginRight: 6, alignItems: 'center', justifyContent: 'center' },
   recipeGrid: { padding: 8, paddingBottom: 80 },
   recipeCard: { flex: 1, margin: 4, borderRadius: 10, overflow: 'hidden' },
   recipeImg: { height: 80, alignItems: 'center', justifyContent: 'center', position: 'relative' },
