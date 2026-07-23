@@ -343,7 +343,6 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                         createdBy: user?.uid || '',
                       });
                     }
-                    crossAlert('Suksess', `${randomRecipe.name} lagt til i matplanen for ${t(`mealPlanner.${day}`).toLowerCase()}`);
                     loadData();
                   } catch (error) {
                     crossAlert('Error', getErrorMessage(error));
