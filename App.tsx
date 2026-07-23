@@ -23,12 +23,13 @@ import { ChatScreen } from './src/screens/ChatScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { BirthdayScreen } from './src/screens/BirthdayScreen';
 import { TripsScreen } from './src/screens/TripsScreen';
+import { MealPlanScreen } from './src/screens/MealPlanScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
-import { CartIcon } from './src/components/CartIcon';
 
 const AddEventScreen = React.lazy(() => import('./src/screens/AddEventScreen').then(m => ({ default: m.AddEventScreen })));
 const EventDetailScreen = React.lazy(() => import('./src/screens/EventDetailScreen').then(m => ({ default: m.EventDetailScreen })));
 const ShoppingListDetailScreen = React.lazy(() => import('./src/screens/ShoppingListDetailScreen').then(m => ({ default: m.ShoppingListDetailScreen })));
+const RecipeDetailScreen = React.lazy(() => import('./src/screens/RecipeDetailScreen').then(m => ({ default: m.RecipeDetailScreen })));
 const VoiceEventScreen = React.lazy(() => import('./src/screens/VoiceEventScreen').then(m => ({ default: m.VoiceEventScreen })));
 const AddTripScreen = React.lazy(() => import('./src/screens/AddTripScreen').then(m => ({ default: m.AddTripScreen })));
 const TripDetailScreen = React.lazy(() => import('./src/screens/TripDetailScreen').then(m => ({ default: m.TripDetailScreen })));
@@ -53,6 +54,8 @@ type RootStackParamList = {
   VoiceEvent: undefined;
   ShoppingLists: undefined;
   ShoppingListDetail: { listId: string; listTitle: string };
+  MealPlan: undefined;
+  RecipeDetail: { recipe: import('./src/types').Recipe };
   ChatMain: undefined;
   TripsList: undefined;
   AddTrip: undefined;
@@ -108,15 +111,22 @@ const EventsStack = () => {
   );
 };
 
-const ShoppingStack = () => {
+const MealPlanStack = () => {
   const { colors } = useTheme();
   return (
     <Suspense fallback={<SuspenseFallback />}>
       <Stack.Navigator>
         <Stack.Screen
-          name="ShoppingLists"
-          component={ShoppingListsScreen}
+          name="MealPlan"
+          component={MealPlanScreen}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="RecipeDetail"
+          component={RecipeDetailScreen}
+          options={{
+            headerShown: false,
+          }}
         />
         <Stack.Screen
           name="ShoppingListDetail"
@@ -347,10 +357,10 @@ const AppContent = () => {
             />
             <Tab.Screen
               name="Shopping"
-              component={ShoppingStack}
+              component={MealPlanStack}
               options={{
-                tabBarLabel: 'Handleliste',
-                tabBarIcon: ({ focused }) => <CartIcon size={20} color={focused ? colors.accent : colors.textDisabled} />,
+                tabBarLabel: 'Matplan',
+                tabBarIcon: ({ focused }) => <TabIcon label="🍽️" focused={focused} />,
               }}
             />
             <Tab.Screen

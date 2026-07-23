@@ -12,3 +12,4 @@ export const DEFAULT_DISPLAY_NAME = 'User';
 export const DATE_PICKER_RANGE_DAYS = 365;
 export const MAX_BIRTHDAYS = 50;
 export const BIRTHDAY_REMINDER_DAYS = 7;
+export const MAX_RECIPES = 200;

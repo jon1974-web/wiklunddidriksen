@@ -1,0 +1,440 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, FlatList, StyleSheet, Modal, TouchableWithoutFeedback } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { useUserStore } from '../store/userStore';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { db } from '../services/firebase';
+import { Recipe, ShoppingList, ShoppingItem } from '../types';
+import { ActionModal } from '../components/ActionModal';
+import { crossAlert } from '../utils/alert';
+import { getErrorMessage } from '../utils/validation';
+import { MAX_RECIPES } from '../constants/limits';
+import { generateId } from '../utils/generateId';
+
+type SubTab = 'ukemeny' | 'oppskrifter' | 'handleliste';
+const DAYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const DAY_LABELS = ['mealPlanner.monday', 'mealPlanner.tuesday', 'mealPlanner.wednesday', 'mealPlanner.thursday', 'mealPlanner.friday', 'mealPlanner.saturday', 'mealPlanner.sunday'];
+const MEAL_SLOTS = ['lunsj', 'middag'] as const;
+
+export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
+  const { colors } = useTheme();
+  const { t } = useTranslation();
+  const familyId = useUserStore((state) => state.familyId);
+  const user = useUserStore((state) => state.user);
+
+  const [activeTab, setActiveTab] = useState<SubTab>('ukemeny');
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const [mealPlan, setMealPlan] = useState<any>(null);
+  const [shoppingLists, setShoppingLists] = useState<ShoppingList[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [showAddRecipe, setShowAddRecipe] = useState(false);
+  const [showRecipeDetail, setShowRecipeDetail] = useState<Recipe | null>(null);
+  const [showDeleteRecipe, setShowDeleteRecipe] = useState<Recipe | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
+  const [recipeForm, setRecipeForm] = useState({
+    name: '', description: '', time: '', portions: '', category: 'kjoett',
+    ingredients: [{ name: '', amount: '', unit: '' }],
+    instructions: [''],
+  });
+
+  const categories = [
+    { key: 'all', label: t('mealPlanner.all') },
+    { key: 'favorites', label: '❤️ ' + t('mealPlanner.favorites') },
+    { key: 'kjoett', label: '🥩 ' + t('mealPlanner.kjoett') },
+    { key: 'fisk', label: '🐟 ' + t('mealPlanner.fisk') },
+    { key: 'vegetar', label: '🥗 ' + t('mealPlanner.vegetar') },
+    { key: 'pasta', label: '🍝 ' + t('mealPlanner.pasta') },
+    { key: 'sott', label: '🍰 ' + t('mealPlanner.sott') },
+  ];
+
+  const getCurrentWeekStart = (): string => {
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(now);
+    monday.setDate(diff);
+    return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+  };
+
+  const weekStart = getCurrentWeekStart();
+
+  const loadData = useCallback(async () => {
+    if (!familyId) return;
+    try {
+      const recipesQ = query(collection(db, 'recipes'), where('familyId', '==', familyId));
+      const recipesSnap = await getDocs(recipesQ);
+      setRecipes(recipesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Recipe)));
+
+      const mealPlanQ = query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', weekStart));
+      const mealPlanSnap = await getDocs(mealPlanQ);
+      if (mealPlanSnap.docs.length > 0) {
+        setMealPlan({ id: mealPlanSnap.docs[0].id, ...mealPlanSnap.docs[0].data() });
+      } else {
+        setMealPlan(null);
+      }
+
+      const listsQ = query(collection(db, 'shoppingLists'), where('familyId', '==', familyId));
+      const listsSnap = await getDocs(listsQ);
+      setShoppingLists(listsSnap.docs.map(d => ({ id: d.id, ...d.data() } as ShoppingList)));
+    } catch (error) {
+      console.error('Failed to load meal planner data:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [familyId, weekStart]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const filteredRecipes = recipes.filter(r => {
+    const matchesSearch = !searchQuery || r.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = selectedCategory === 'all' ||
+      (selectedCategory === 'favorites' && r.isFavorite) ||
+      r.category === selectedCategory;
+    return matchesSearch && matchesCategory;
+  });
+
+  const handleSaveRecipe = async () => {
+    if (!recipeForm.name.trim()) {
+      crossAlert('Error', t('mealPlanner.recipeName') + ' er påkrevd');
+      return;
+    }
+    if (!familyId) return;
+    try {
+      if (showAddRecipe === true) {
+        await addDoc(collection(db, 'recipes'), {
+          name: recipeForm.name.trim(),
+          description: recipeForm.description.trim(),
+          ingredients: recipeForm.ingredients.filter(i => i.name.trim()),
+          instructions: recipeForm.instructions.filter(i => i.trim()),
+          time: parseInt(recipeForm.time) || 0,
+          portions: parseInt(recipeForm.portions) || 4,
+          category: recipeForm.category,
+          isFavorite: false,
+          createdBy: user?.uid || '',
+          familyId,
+          createdAt: Date.now(),
+        });
+      }
+      setShowAddRecipe(false);
+      setRecipeForm({ name: '', description: '', time: '', portions: '', category: 'kjoett', ingredients: [{ name: '', amount: '', unit: '' }], instructions: [''] });
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleDeleteRecipe = async () => {
+    if (!showDeleteRecipe) return;
+    try {
+      await import('firebase/firestore').then(({ deleteDoc }) =>
+        deleteDoc(doc(db, 'recipes', showDeleteRecipe.id))
+      );
+      setShowDeleteRecipe(null);
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const toggleFavorite = async (recipe: Recipe) => {
+    try {
+      await updateDoc(doc(db, 'recipes', recipe.id), { isFavorite: !recipe.isFavorite });
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const renderUkemeny = () => (
+    <ScrollView style={styles.tabContent}>
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>🎲 {t('mealPlanner.whatToEat')}</Text>
+        <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]}>
+          <Text style={styles.aiBtnText}>🎲 {t('mealPlanner.randomMeal')}</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>📅 {t('mealPlanner.weekOverview')}</Text>
+        {DAYS.map((day, i) => (
+          <TouchableOpacity key={day} style={[styles.dayRow, { borderBottomColor: colors.border }]}>
+            <Text style={[styles.dayName, { color: colors.accent }]}>{t(DAY_LABELS[i])}</Text>
+            <View style={styles.dayMeals}>
+              {MEAL_SLOTS.map(meal => {
+                const recipeId = mealPlan?.meals?.[day]?.[meal];
+                const recipe = recipes.find(r => r.id === recipeId);
+                return (
+                  <TouchableOpacity
+                    key={meal}
+                    style={[styles.mealTag, recipe ? { backgroundColor: colors.accentLight, borderColor: colors.accent } : { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                    onPress={() => {
+                      if (recipe) {
+                        setShowRecipeDetail(recipe);
+                      } else {
+                        setSelectedSlot({ day, meal });
+                      }
+                    }}
+                  >
+                    <Text style={{ fontSize: 12, color: recipe ? colors.accent : colors.textDisabled }}>
+                      {recipe ? recipe.name : `+ ${meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner')}`}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </ScrollView>
+  );
+
+  const renderOppskrifter = () => (
+    <View style={styles.tabContent}>
+      <View style={styles.searchBar}>
+        <TextInput
+          style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder={t('mealPlanner.searchRecipe')}
+          placeholderTextColor={colors.textDisabled}
+        />
+      </View>
+
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
+        {categories.map(cat => (
+          <TouchableOpacity
+            key={cat.key}
+            style={[styles.filterChip, { borderColor: selectedCategory === cat.key ? colors.accent : colors.border }, selectedCategory === cat.key && { backgroundColor: colors.accent }]}
+            onPress={() => setSelectedCategory(cat.key)}
+          >
+            <Text style={{ fontSize: 12, fontWeight: '600', color: selectedCategory === cat.key ? '#fff' : colors.textSecondary }}>{cat.label}</Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
+
+      {filteredRecipes.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={{ fontSize: 40, marginBottom: 12 }}>📖</Text>
+          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
+          {searchQuery && (
+            <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginTop: 12 }]}>
+              <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      ) : (
+        <FlatList
+          data={filteredRecipes}
+          numColumns={2}
+          keyExtractor={item => item.id}
+          contentContainerStyle={styles.recipeGrid}
+          renderItem={({ item }) => (
+            <TouchableOpacity style={[styles.recipeCard, { backgroundColor: colors.surface }]} onPress={() => setShowRecipeDetail(item)}>
+              <View style={[styles.recipeImg, { backgroundColor: colors.inputBackground }]}>
+                <Text style={{ fontSize: 32 }}>{item.category === 'kjoett' ? '🥩' : item.category === 'fisk' ? '🐟' : item.category === 'vegetar' ? '🥗' : item.category === 'pasta' ? '🍝' : item.category === 'sott' ? '🍰' : '🍽️'}</Text>
+                <TouchableOpacity style={styles.favBtn} onPress={() => toggleFavorite(item)}>
+                  <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.recipeInfo}>
+                <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
+                <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>{item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+      )}
+    </View>
+  );
+
+  const renderHandleliste = () => (
+    <ScrollView style={styles.tabContent}>
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>🛒 {t('mealPlanner.weekOverview')}</Text>
+          <Text style={[styles.autoTag, { backgroundColor: '#E3F2FD', color: '#1565C0' }]}>Auto</Text>
+        </View>
+        <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>12 varer fra denne ukens måltider</Text>
+        <View style={[styles.shoppingItem, { borderBottomColor: colors.border }]}>
+          <View style={[styles.checkbox, { backgroundColor: colors.accent, borderColor: colors.accent }]}><Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text></View>
+          <Text style={[styles.shoppingName, { color: colors.textDisabled, textDecorationLine: 'line-through' }]}>Kyllingbryst</Text>
+          <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>1 kg</Text>
+        </View>
+        <View style={[styles.shoppingItem, { borderBottomColor: colors.border }]}>
+          <View style={styles.checkbox} />
+          <Text style={[styles.shoppingName, { color: colors.text }]}>Spaghetti</Text>
+          <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>500g</Text>
+        </View>
+      </View>
+
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.cardTitle, { color: colors.text }]}>🛒 Egen handleliste</Text>
+        <View style={styles.addRow}>
+          <TextInput style={[styles.addInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]} placeholder="Legg til vare..." placeholderTextColor={colors.textDisabled} />
+          <TouchableOpacity style={[styles.addBtnSm, { backgroundColor: colors.accent }]}>
+            <Text style={{ color: '#fff', fontWeight: '600' }}>+</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </ScrollView>
+  );
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>🍽️ {t('mealPlanner.title')}</Text>
+        <TouchableOpacity style={[styles.addHeaderBtn, { backgroundColor: colors.accent }]} onPress={() => setShowAddRecipe(true)}>
+          <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>+</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
+        {(['ukemeny', 'oppskrifter', 'handleliste'] as SubTab[]).map(tab => (
+          <TouchableOpacity key={tab} style={[styles.tab, activeTab === tab && { borderBottomColor: colors.accent }]} onPress={() => setActiveTab(tab)}>
+            <Text style={[styles.tabText, { color: activeTab === tab ? colors.accent : colors.textSecondary }]}>
+              {tab === 'ukemeny' ? t('mealPlanner.weeklyPlan') : tab === 'oppskrifter' ? t('mealPlanner.recipes') : t('mealPlanner.shoppingList')}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {loading ? (
+        <View style={styles.emptyState}>
+          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('common.loading')}</Text>
+        </View>
+      ) : (
+        <>
+          {activeTab === 'ukemeny' && renderUkemeny()}
+          {activeTab === 'oppskrifter' && renderOppskrifter()}
+          {activeTab === 'handleliste' && renderHandleliste()}
+        </>
+      )}
+
+      {/* Add Recipe Modal */}
+      <Modal visible={showAddRecipe === true} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowAddRecipe(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('mealPlanner.addRecipe')}</Text>
+                <ScrollView>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.recipeName')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.name} onChangeText={v => setRecipeForm(f => ({ ...f, name: v }))} placeholder="F.eks. Spaghetti Bolognese" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.description')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.description} onChangeText={v => setRecipeForm(f => ({ ...f, description: v }))} placeholder="Kort beskrivelse" placeholderTextColor={colors.textDisabled} multiline />
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.time')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.time} onChangeText={v => setRecipeForm(f => ({ ...f, time: v }))} keyboardType="numeric" placeholder="30" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.portions')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.portions} onChangeText={v => setRecipeForm(f => ({ ...f, portions: v }))} keyboardType="numeric" placeholder="4" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                  </View>
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowAddRecipe(false)}>
+                    <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleSaveRecipe}>
+                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.saveRecipe')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Recipe Detail Modal */}
+      <Modal visible={!!showRecipeDetail} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowRecipeDetail(null)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail?.name}</Text>
+                <ScrollView>
+                  {showRecipeDetail?.description ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.description}</Text> : null}
+                  <Text style={[styles.cardTitle, { color: colors.text }]}>{t('mealPlanner.ingredientsList')}</Text>
+                  {showRecipeDetail?.ingredients.map((ing, i) => (
+                    <View key={i} style={[styles.shoppingItem, { borderBottomColor: colors.border }]}>
+                      <Text style={[styles.shoppingName, { color: colors.text }]}>{ing.name}</Text>
+                      <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>{ing.amount} {ing.unit}</Text>
+                    </View>
+                  ))}
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowRecipeDetail(null)}>
+                    <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.close')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]}>
+                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.addToShoppingList')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12 },
+  headerTitle: { fontSize: 20, fontWeight: '700' },
+  addHeaderBtn: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  tabs: { flexDirection: 'row', borderBottomWidth: 1 },
+  tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
+  tabText: { fontSize: 13, fontWeight: '600' },
+  tabContent: { flex: 1 },
+  card: { borderRadius: 12, margin: 8, padding: 14 },
+  cardTitle: { fontSize: 15, fontWeight: '700', marginBottom: 8 },
+  cardSubtitle: { fontSize: 12, marginBottom: 8 },
+  dayRow: { flexDirection: 'row', alignItems: 'flex-start', paddingVertical: 8, borderBottomWidth: 1 },
+  dayName: { width: 36, fontSize: 13, fontWeight: '700', paddingTop: 2 },
+  dayMeals: { flex: 1, flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
+  mealTag: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1 },
+  aiBtn: { paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  aiBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  searchBar: { padding: 8, paddingHorizontal: 16 },
+  searchInput: { padding: 10, borderRadius: 10, borderWidth: 1, fontSize: 14 },
+  filterRow: { paddingHorizontal: 16, marginBottom: 8 },
+  filterChip: { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 16, borderWidth: 1, marginRight: 6 },
+  recipeGrid: { padding: 8, paddingBottom: 80 },
+  recipeCard: { flex: 1, margin: 4, borderRadius: 10, overflow: 'hidden' },
+  recipeImg: { height: 80, alignItems: 'center', justifyContent: 'center', position: 'relative' },
+  favBtn: { position: 'absolute', top: 6, right: 6 },
+  recipeInfo: { padding: 8, paddingBottom: 10 },
+  recipeName: { fontSize: 13, fontWeight: '600', marginBottom: 2 },
+  recipeMeta: { fontSize: 11 },
+  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
+  emptyText: { fontSize: 14, fontStyle: 'italic' },
+  shoppingItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1 },
+  checkbox: { width: 20, height: 20, borderRadius: 4, borderWidth: 2, borderColor: '#ddd' },
+  shoppingName: { fontSize: 14, flex: 1 },
+  shoppingQty: { fontSize: 12 },
+  autoTag: { paddingVertical: 2, paddingHorizontal: 8, borderRadius: 10, fontSize: 10, fontWeight: '600' },
+  addRow: { flexDirection: 'row', gap: 8, marginBottom: 10 },
+  addInput: { flex: 1, padding: 8, borderRadius: 8, borderWidth: 1, fontSize: 13 },
+  addBtnSm: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  modalContent: { borderRadius: 20, padding: 24, width: '100%', maxWidth: 400, maxHeight: '80%' },
+  modalTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
+  field: { marginBottom: 14 },
+  label: { fontSize: 13, fontWeight: '600', marginBottom: 4 },
+  input: { padding: 12, borderRadius: 8, fontSize: 15 },
+  modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  modalBtn: { flex: 1, padding: 14, borderRadius: 12, alignItems: 'center' },
+  modalBtnText: { fontSize: 16, fontWeight: '600' },
+});

@@ -313,6 +313,37 @@ export interface Birthday {
   createdAt: number;
 }
 
+export interface RecipeIngredient {
+  name: string;
+  amount: string;
+  unit: string;
+}
+
+export interface Recipe {
+  id: string;
+  name: string;
+  description: string;
+  ingredients: RecipeIngredient[];
+  instructions: string[];
+  time: number;
+  portions: number;
+  category: string;
+  isFavorite: boolean;
+  createdBy: string;
+  familyId: string;
+  createdAt: number;
+}
+
+export interface MealPlan {
+  id: string;
+  weekStart: string;
+  meals: {
+    [day: string]: { lunsj?: string; middag?: string };
+  };
+  familyId: string;
+  createdBy: string;
+}
+
 export interface Family {
   id: string;
   name: string;
