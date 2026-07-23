@@ -78,7 +78,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
         },
       },
     ]);
-  }, [list.id, navigation]);
+  }, [routeList?.id, navigation]);
 
   const handleCopyList = useCallback(async () => {
     try {
