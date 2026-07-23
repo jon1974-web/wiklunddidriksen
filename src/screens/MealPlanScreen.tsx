@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Recipe, ShoppingList, ShoppingItem } from '../types';
 import { ActionModal } from '../components/ActionModal';
@@ -145,9 +145,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const handleDeleteRecipe = async () => {
     if (!showDeleteRecipe) return;
     try {
-      await import('firebase/firestore').then(({ deleteDoc }) =>
-        deleteDoc(doc(db, 'recipes', showDeleteRecipe.id))
-      );
+      await deleteDoc(doc(db, 'recipes', showDeleteRecipe.id));
       setShowDeleteRecipe(null);
       loadData();
     } catch (error) {
@@ -505,8 +503,8 @@ const styles = StyleSheet.create({
   aiBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
   searchBar: { padding: 8, paddingHorizontal: 16 },
   searchInput: { padding: 10, borderRadius: 10, borderWidth: 1, fontSize: 14 },
-  filterRow: { paddingHorizontal: 16, marginBottom: 8 },
-  filterChip: { paddingVertical: 6, paddingHorizontal: 14, borderRadius: 16, borderWidth: 1, marginRight: 6 },
+  filterRow: { paddingHorizontal: 16, marginBottom: 8, maxHeight: 40 },
+  filterChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1, marginRight: 6 },
   recipeGrid: { padding: 8, paddingBottom: 80 },
   recipeCard: { flex: 1, margin: 4, borderRadius: 10, overflow: 'hidden' },
   recipeImg: { height: 80, alignItems: 'center', justifyContent: 'center', position: 'relative' },
