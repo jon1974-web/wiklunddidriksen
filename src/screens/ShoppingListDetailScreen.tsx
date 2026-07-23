@@ -109,7 +109,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
 
     try {
       const updatedItems = [newItem, ...currentList.items];
-      await updateDoc(doc(db, 'shoppingLists', list.id), {
+      await updateDoc(doc(db, 'shoppingLists', currentList.id), {
         items: updatedItems,
       });
       setNewItemName('');
@@ -120,16 +120,16 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
 
   const handleToggleItem = async (item: ShoppingItem) => {
     const updatedItem = { ...item, checked: !item.checked };
-    await updateDoc(doc(db, 'shoppingLists', list.id), {
+    await updateDoc(doc(db, 'shoppingLists', currentList.id), {
       items: arrayRemove(item),
     });
-    await updateDoc(doc(db, 'shoppingLists', list.id), {
+    await updateDoc(doc(db, 'shoppingLists', currentList.id), {
       items: arrayUnion(updatedItem),
     });
   };
 
   const handleDeleteItem = async (item: ShoppingItem) => {
-    await updateDoc(doc(db, 'shoppingLists', list.id), {
+    await updateDoc(doc(db, 'shoppingLists', currentList.id), {
       items: arrayRemove(item),
     });
   };
@@ -144,10 +144,10 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
     if (!renamingItem || !renameValue.trim()) return;
     const updatedItem = { ...renamingItem, name: renameValue.trim() };
     try {
-      await updateDoc(doc(db, 'shoppingLists', list.id), {
+      await updateDoc(doc(db, 'shoppingLists', currentList.id), {
         items: arrayRemove(renamingItem),
       });
-      await updateDoc(doc(db, 'shoppingLists', list.id), {
+      await updateDoc(doc(db, 'shoppingLists', currentList.id), {
         items: arrayUnion(updatedItem),
       });
       setRenameModalVisible(false);
