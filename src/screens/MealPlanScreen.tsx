@@ -324,9 +324,33 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
               <TouchableOpacity
                 style={[styles.randomActionBtn, { backgroundColor: colors.accent }]}
-                onPress={() => { setSelectedSlot({ day: DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1], meal: 'middag' }); setSelectedRecipeForSlot(randomRecipe); }}
+                onPress={async () => {
+                  if (!familyId || !randomRecipe) return;
+                  const day = DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1];
+                  try {
+                    const meals = mealPlan?.meals || {};
+                    const dayMeals = meals[day] || {};
+                    const updatedMeals = { ...meals, [day]: { ...dayMeals, middag: randomRecipe.id } };
+                    if (mealPlan) {
+                      await import('firebase/firestore').then(({ updateDoc, doc }) =>
+                        updateDoc(doc(db, 'mealPlans', mealPlan.id), { meals: updatedMeals })
+                      );
+                    } else {
+                      await addDoc(collection(db, 'mealPlans'), {
+                        weekStart,
+                        meals: updatedMeals,
+                        familyId,
+                        createdBy: user?.uid || '',
+                      });
+                    }
+                    crossAlert('Suksess', `${randomRecipe.name} lagt til i matplanen for ${t(`mealPlanner.${day}`).toLowerCase()}`);
+                    loadData();
+                  } catch (error) {
+                    crossAlert('Error', getErrorMessage(error));
+                  }
+                }}
               >
-                <Text style={[styles.randomActionText, { color: '#fff' }]}>📅 {t('mealPlanner.addToPlan')}</Text>
+                <Text style={[styles.randomActionText, { color: '#fff' }]}>📅 {t('mealPlanner.addToPlan')} {t(`mealPlanner.${DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]}`).toLowerCase()}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.randomActionBtn, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
@@ -801,7 +825,7 @@ const styles = StyleSheet.create({
   randomName: { fontSize: 18, fontWeight: '700', marginBottom: 2 },
   randomMeta: { fontSize: 13, marginBottom: 8 },
   randomActionBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center', borderWidth: 1 },
-  randomActionText: { fontSize: 13, fontWeight: '600' },
+  randomActionText: { fontSize: 12, fontWeight: '600', textAlign: 'center', flexShrink: 1 },
   searchBar: { padding: 8, paddingHorizontal: 16 },
   searchInput: { padding: 10, borderRadius: 10, borderWidth: 1, fontSize: 14 },
   filterRow: { paddingHorizontal: 16, marginBottom: 8, maxHeight: 40 },
