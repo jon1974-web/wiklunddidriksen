@@ -548,12 +548,20 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner</Text>
                   {recipe.description ? <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }} numberOfLines={2}>{recipe.description}</Text> : null}
                 </View>
-                <TouchableOpacity
-                  style={[styles.aiSaveBtn, { backgroundColor: colors.accent }]}
-                  onPress={() => handleSaveAiRecipe(recipe)}
-                >
-                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>+ Lagre</Text>
-                </TouchableOpacity>
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  <TouchableOpacity
+                    style={[styles.aiSaveBtn, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                    onPress={() => { setShowRecipeDetail(recipe); }}
+                  >
+                    <Text style={{ color: colors.text, fontSize: 12, fontWeight: '600' }}>📖 Se</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.aiSaveBtn, { backgroundColor: colors.accent }]}
+                    onPress={() => handleSaveAiRecipe(recipe)}
+                  >
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>+ Lagre</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             ))
           )}
