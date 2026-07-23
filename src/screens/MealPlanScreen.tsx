@@ -318,7 +318,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     setAiLoading(true);
     setShowAiResults(true);
     try {
-      const token = await user.getIdToken();
+      const currentUser = (await import('firebase/auth')).getAuth().currentUser;
+      if (!currentUser) throw new Error('Ikke innlogget');
+      const token = await currentUser.getIdToken();
       const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/aiRecipeSuggestions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
