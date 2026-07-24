@@ -586,14 +586,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>🛒 Handlelister</Text>
+          <Text style={[styles.cardTitle, { color: colors.text }]}>🛒 {t('mealPlanner.shoppingLists')}</Text>
           <TouchableOpacity style={[styles.addBtnSm, { backgroundColor: colors.accent }]} onPress={() => setShowAddList(true)}>
             <Text style={{ color: '#fff', fontWeight: '600' }}>+</Text>
           </TouchableOpacity>
         </View>
 
         {shoppingLists.length === 0 ? (
-          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>Ingen handlelister ennå</Text>
+          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('mealPlanner.noShoppingLists')}</Text>
         ) : (
           shoppingLists.map((list) => (
             <View key={list.id} style={[styles.shoppingListCard, { backgroundColor: colors.inputBackground }]}>

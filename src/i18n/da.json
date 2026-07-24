@@ -494,6 +494,8 @@
     "searchInPicker": "Søg opskrifter...",
     "noSuggestions": "Ingen forslag fundet",
     "close": "Luk",
-    "saveToList": "Gem i indkøbsliste"
+    "saveToList": "Gem i indkøbsliste",
+    "shoppingLists": "Indkøbslister",
+    "noShoppingLists": "Ingen indkøbslister endnu"
   }
 }

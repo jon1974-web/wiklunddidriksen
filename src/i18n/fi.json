@@ -494,6 +494,8 @@
     "searchInPicker": "Hae reseptejä...",
     "noSuggestions": "Ei ehdotuksia",
     "close": "Sulje",
-    "saveToList": "Tallenna ostoslistalle"
+    "saveToList": "Tallenna ostoslistalle",
+    "shoppingLists": "Ostoslistat",
+    "noShoppingLists": "Ei ostoslistoja vielä"
   }
 }

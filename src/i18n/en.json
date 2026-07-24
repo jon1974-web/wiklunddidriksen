@@ -485,6 +485,8 @@
     "searchInPicker": "Search recipes...",
     "noSuggestions": "No suggestions found",
     "close": "Close",
-    "saveToList": "Save to list"
+    "saveToList": "Save to list",
+    "shoppingLists": "Shopping Lists",
+    "noShoppingLists": "No shopping lists yet"
   }
 }

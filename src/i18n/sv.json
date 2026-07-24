@@ -500,6 +500,8 @@
     "searchInPicker": "Sök recept...",
     "noSuggestions": "Inga förslag hittades",
     "close": "Stäng",
-    "saveToList": "Spara i inköpslista"
+    "saveToList": "Spara i inköpslista",
+    "shoppingLists": "Inköpslistor",
+    "noShoppingLists": "Inga inköpslistor ännu"
   }
 }

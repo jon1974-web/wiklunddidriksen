@@ -485,6 +485,8 @@
     "searchInPicker": "Søk oppskrifter...",
     "noSuggestions": "Ingen forslag funnet",
     "close": "Lukk",
-    "saveToList": "Lagre i handleliste"
+    "saveToList": "Lagre i handleliste",
+    "shoppingLists": "Handlelister",
+    "noShoppingLists": "Ingen handlelister ennå"
   }
 }
