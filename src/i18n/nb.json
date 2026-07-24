@@ -487,6 +487,7 @@
     "close": "Lukk",
     "saveToList": "Lagre i handleliste",
     "shoppingLists": "Handlelister",
-    "noShoppingLists": "Ingen handlelister ennå"
+    "noShoppingLists": "Ingen handlelister ennå",
+    "importRecipeUrl": "Lim inn URL for oppskrift"
   }
 }

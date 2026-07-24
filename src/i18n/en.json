@@ -487,6 +487,7 @@
     "close": "Close",
     "saveToList": "Save to list",
     "shoppingLists": "Shopping Lists",
-    "noShoppingLists": "No shopping lists yet"
+    "noShoppingLists": "No shopping lists yet",
+    "importRecipeUrl": "Paste URL for recipe"
   }
 }

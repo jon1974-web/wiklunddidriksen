@@ -496,6 +496,7 @@
     "close": "Luk",
     "saveToList": "Gem i indkøbsliste",
     "shoppingLists": "Indkøbslister",
-    "noShoppingLists": "Ingen indkøbslister endnu"
+    "noShoppingLists": "Ingen indkøbslister endnu",
+    "importRecipeUrl": "Indsæt URL for opskrift"
   }
 }

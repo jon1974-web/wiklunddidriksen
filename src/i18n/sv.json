@@ -502,6 +502,7 @@
     "close": "Stäng",
     "saveToList": "Spara i inköpslista",
     "shoppingLists": "Inköpslistor",
-    "noShoppingLists": "Inga inköpslistor ännu"
+    "noShoppingLists": "Inga inköpslistor ännu",
+    "importRecipeUrl": "Klistra in URL för recept"
   }
 }

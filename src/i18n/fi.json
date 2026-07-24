@@ -496,6 +496,7 @@
     "close": "Sulje",
     "saveToList": "Tallenna ostoslistalle",
     "shoppingLists": "Ostoslistat",
-    "noShoppingLists": "Ei ostoslistoja vielä"
+    "noShoppingLists": "Ei ostoslistoja vielä",
+    "importRecipeUrl": "Liitä URL reseptille"
   }
 }

@@ -129,7 +129,83 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
               lastName: g.lastName,
               profileId: g.profile?.id || g.id,
               childId: m.id,
-            });
+});
+
+// Import recipe from URL
+exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { url } = req.body || {};
+  if (!url || typeof url !== "string") {
+    return res.status(400).json({ error: "url is required" });
+  }
+
+  try {
+    // Fetch the page content
+    const response = await fetch(url);
+    if (!response.ok) {
+      return res.status(400).json({ error: "Kunne ikke hente siden" });
+    }
+    const html = await response.text();
+
+    // Use OpenAI to extract recipe data from HTML
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a recipe extraction assistant. Extract recipe data from the provided HTML content of a recipe webpage.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "name": "Recipe name",
+  "description": "Short 1-2 sentence description",
+  "ingredients": [{"name": "Ingredient name", "amount": "Amount", "unit": "Unit"}],
+  "instructions": ["Step 1", "Step 2"],
+  "time": 30,
+  "portions": 4,
+  "category": "kjoett|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott"
+}
+
+Extract the recipe name, ingredients with amounts and units, step-by-step instructions, estimated cooking time in minutes, number of servings, and categorize the dish.
+If you cannot extract a recipe from the content, return {"error": "Could not extract recipe from URL"}.`,
+        },
+        {
+          role: "user",
+          content: `Extract the recipe from this webpage content:\n\n${req.body.content || req.body.url}`,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 2000,
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return res.status(500).json({ error: "No response from AI" });
+    }
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return res.status(500).json({ error: "Invalid AI response format" });
+    }
+
+    const recipe = JSON.parse(jsonMatch[0]);
+    if (recipe.error) {
+      return res.status(400).json({ error: recipe.error });
+    }
+
+    return res.status(200).json({ recipe });
+  } catch (error) {
+    console.error("Import recipe error:", error);
+    return res.status(500).json({ error: "Failed to import recipe" });
+  }
+});
           }
         }
       }

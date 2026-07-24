@@ -47,6 +47,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [aiLoading, setAiLoading] = useState(false);
   const [showAiResults, setShowAiResults] = useState(false);
   const [pickerSearch, setPickerSearch] = useState('');
+  const [showUrlImport, setShowUrlImport] = useState(false);
+  const [importUrl, setImportUrl] = useState('');
+  const [importLoading, setImportLoading] = useState(false);
 
   const getRandomRecipe = () => {
     if (recipes.length === 0) return;
@@ -368,6 +371,48 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     }
   };
 
+  const handleUrlImport = async () => {
+    if (!importUrl.trim() || !user) return;
+    setImportLoading(true);
+    try {
+      const token = await auth.currentUser?.getIdToken();
+      if (!token) throw new Error('Ikke innlogget');
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/importRecipeFromUrl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ url: importUrl }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || 'Kunne ikke importere oppskrift');
+      }
+      const data = await res.json();
+      if (data.recipe) {
+        await addDoc(collection(db, 'recipes'), {
+          name: data.recipe.name,
+          description: data.recipe.description || '',
+          ingredients: data.recipe.ingredients || [],
+          instructions: data.recipe.instructions || [],
+          time: data.recipe.time || 0,
+          portions: data.recipe.portions || 4,
+          category: data.recipe.category || 'kjoett',
+          isFavorite: false,
+          createdBy: user.uid,
+          familyId: familyId || '',
+          createdAt: Date.now(),
+        });
+        crossAlert('Suksess', `"${data.recipe.name}" lagt til i oppskriftsboken`);
+        setShowUrlImport(false);
+        setImportUrl('');
+        loadData();
+      }
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    } finally {
+      setImportLoading(false);
+    }
+  };
+
   const renderUkemeny = () => (
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
@@ -488,11 +533,16 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <View style={styles.emptyState}>
           <Text style={{ fontSize: 40, marginBottom: 12 }}>📖</Text>
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
-          {searchQuery && (
-            <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginTop: 12 }]} onPress={() => handleAiSearch(searchQuery)}>
-              <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+            {searchQuery && (
+              <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]} onPress={() => handleAiSearch(searchQuery)}>
+                <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.inputBackground, borderColor: colors.border, borderWidth: 1 }]} onPress={() => setShowUrlImport(true)}>
+              <Text style={[styles.aiBtnText, { color: colors.text }]}>🔗 {t('mealPlanner.importURL')}</Text>
             </TouchableOpacity>
-          )}
+          </View>
         </View>
       ) : (
         <FlatList
@@ -836,6 +886,39 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         onDelete={actionModal.onDelete}
         onCancel={() => setActionModal({ visible: false, title: '' })}
       />
+
+      {/* URL Import Modal */}
+      <Modal visible={showUrlImport} transparent animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setShowUrlImport(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('mealPlanner.importURL')}</Text>
+                <View style={styles.field}>
+                  <Text style={[styles.label, { color: colors.text }]}>URL</Text>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    value={importUrl}
+                    onChangeText={setImportUrl}
+                    placeholder="https://www.matprat.no/..."
+                    placeholderTextColor={colors.textDisabled}
+                    autoCapitalize="none"
+                    keyboardType="url"
+                  />
+                </View>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowUrlImport(false); setImportUrl(''); }}>
+                    <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent, opacity: importLoading ? 0.5 : 1 }]} onPress={handleUrlImport} disabled={importLoading}>
+                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{importLoading ? t('common.loading') : t('common.add')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
       {/* Recipe Picker Modal for assigning meals */}
       <Modal visible={!!selectedSlot} transparent animationType="slide">
