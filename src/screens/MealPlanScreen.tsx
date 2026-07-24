@@ -663,7 +663,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
         </View>
 
-      <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
+      <View style={[styles.tabs, { borderBottomColor: colors.border, backgroundColor: colors.surface }]}>
         {(['ukemeny', 'oppskrifter', 'handleliste'] as SubTab[]).map(tab => (
           <TouchableOpacity key={tab} style={[styles.tab, activeTab === tab && { borderBottomColor: colors.accent }]} onPress={() => setActiveTab(tab)}>
             <Text style={[styles.tabText, { color: activeTab === tab ? colors.accent : colors.textSecondary }]}>
@@ -925,7 +925,7 @@ const styles = StyleSheet.create({
   familySubtitle: { fontSize: 14, fontStyle: 'italic', marginTop: 2, marginBottom: 8 },
   fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
   fabText: { color: '#fff', fontSize: 28, fontWeight: '700' },
-  tabs: { flexDirection: 'row', borderBottomWidth: 1, backgroundColor: colors.surface },
+  tabs: { flexDirection: 'row', borderBottomWidth: 1 },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
   tabText: { fontSize: 13, fontWeight: '600' },
   tabContent: { flex: 1 },
@@ -978,6 +978,7 @@ const styles = StyleSheet.create({
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { borderRadius: 20, padding: 24, width: '100%', maxWidth: 400, maxHeight: '80%' },
   modalTitle: { fontSize: 18, fontWeight: '700', textAlign: 'center', marginBottom: 16 },
+  modalSubtitle: { fontSize: 14, textAlign: 'center', marginBottom: 16 },
   field: { marginBottom: 14 },
   label: { fontSize: 13, fontWeight: '600', marginBottom: 4 },
   input: { padding: 12, borderRadius: 8, fontSize: 15 },
