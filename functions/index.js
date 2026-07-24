@@ -146,10 +146,16 @@ exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB"
   }
 
   try {
-    // Fetch the page content
-    const response = await fetch(url);
+    // Fetch the page content with proper headers
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Familiesenter/1.0)',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      redirect: 'follow',
+    });
     if (!response.ok) {
-      return res.status(400).json({ error: "Kunne ikke hente siden" });
+      return res.status(400).json({ error: `Kunne ikke hente siden: ${response.status}` });
     }
     const html = await response.text();
 
@@ -178,7 +184,7 @@ If you cannot extract a recipe from the content, return {"error": "Could not ext
         },
         {
           role: "user",
-          content: `Extract the recipe from this webpage content:\n\n${req.body.content || req.body.url}`,
+          content: `Extract the recipe from this webpage content:\n\n${html.substring(0, 8000)}`,
         },
       ],
       temperature: 0.3,
