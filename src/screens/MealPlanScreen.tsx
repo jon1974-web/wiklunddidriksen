@@ -534,9 +534,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <View style={styles.emptyState}>
           <Text style={{ fontSize: 40, marginBottom: 12 }}>📖</Text>
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 12, flexWrap: 'wrap', justifyContent: 'center' }}>
+          <View style={{ alignItems: 'center', marginTop: 12 }}>
             {searchQuery && (
-              <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]} onPress={() => handleAiSearch(searchQuery)}>
+              <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginBottom: 8 }]} onPress={() => handleAiSearch(searchQuery)}>
                 <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
               </TouchableOpacity>
             )}
