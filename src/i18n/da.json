@@ -485,6 +485,15 @@
     "instructionsList": "Fremgangsmåde",
     "notes": "Noter",
     "edit": "Rediger",
-    "noMealsPlanned": "Ingen måltider planlagt denne uge"
+    "noMealsPlanned": "Ingen måltider planlagt denne uge",
+    "selectRecipe": "Vælg opskrift for",
+    "on": "på",
+    "removeFromPlan": "Fjern fra plan",
+    "listName": "Indkøbslistens navn",
+    "createList": "Tilføj indkøbsliste",
+    "searchInPicker": "Søg opskrifter...",
+    "noSuggestions": "Ingen forslag fundet",
+    "close": "Luk",
+    "saveToList": "Gem i indkøbsliste"
   }
 }

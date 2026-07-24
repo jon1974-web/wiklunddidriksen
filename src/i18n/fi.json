@@ -485,6 +485,15 @@
     "instructionsList": "Ohjeet",
     "notes": "Muistiinpanot",
     "edit": "Muokkaa",
-    "noMealsPlanned": "Ei aterioita suunniteltu tällä viikolla"
+    "noMealsPlanned": "Ei aterioita suunniteltu tällä viikolla",
+    "selectRecipe": "Valitse resepti",
+    "on": "päivä",
+    "removeFromPlan": "Poista suunnitelmasta",
+    "listName": "Ostoslistan nimi",
+    "createList": "Lisää ostoslista",
+    "searchInPicker": "Hae reseptejä...",
+    "noSuggestions": "Ei ehdotuksia",
+    "close": "Sulje",
+    "saveToList": "Tallenna ostoslistalle"
   }
 }

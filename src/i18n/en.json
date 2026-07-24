@@ -476,6 +476,15 @@
     "instructionsList": "Instructions",
     "notes": "Notes",
     "edit": "Edit",
-    "noMealsPlanned": "No meals planned this week"
+    "noMealsPlanned": "No meals planned this week",
+    "selectRecipe": "Select recipe for",
+    "on": "on",
+    "removeFromPlan": "Remove from plan",
+    "listName": "Shopping list name",
+    "createList": "Add shopping list",
+    "searchInPicker": "Search recipes...",
+    "noSuggestions": "No suggestions found",
+    "close": "Close",
+    "saveToList": "Save to list"
   }
 }

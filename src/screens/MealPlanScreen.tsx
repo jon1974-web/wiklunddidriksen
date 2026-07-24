@@ -45,6 +45,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [showAiResults, setShowAiResults] = useState(false);
+  const [pickerSearch, setPickerSearch] = useState('');
 
   const getRandomRecipe = () => {
     if (recipes.length === 0) return;
@@ -547,7 +548,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           {aiLoading ? (
             <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('common.loading')}</Text>
           ) : aiResults.length === 0 ? (
-            <Text style={[styles.emptyText, { color: colors.textDisabled }]}>Ingen forslag funnet</Text>
+            <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('mealPlanner.noSuggestions')}</Text>
           ) : (
             aiResults.map((recipe, i) => (
               <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
@@ -574,7 +575,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             ))
           )}
           <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.inputBackground, marginTop: 8 }]} onPress={() => { setShowAiResults(false); setAiResults([]); }}>
-            <Text style={[styles.aiBtnText, { color: colors.text }]}>Lukk</Text>
+            <Text style={[styles.aiBtnText, { color: colors.text }]}>{t('mealPlanner.close')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -623,9 +624,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('mealPlanner.addRecipe')}</Text>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('mealPlanner.createList')}</Text>
                 <View style={styles.field}>
-                  <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.recipeName')}</Text>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.listName')}</Text>
                   <TextInput
                     style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                     value={newListTitle}
@@ -852,7 +853,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                       <Text style={[styles.modalBtnText, { color: '#fff' }]}>📖 {t('mealPlanner.viewRecipe')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.modalBtn, { backgroundColor: '#E53935', marginBottom: 8 }]} onPress={handleRemoveMeal}>
-                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>🗑️ Fjern fra plan</Text>
+                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>🗑️ {t('mealPlanner.removeFromPlan')}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setSelectedSlot(null); setSelectedRecipeForSlot(null); }}>
                       <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
@@ -861,13 +862,20 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 ) : (
                   <>
                     <Text style={[styles.modalTitle, { color: colors.text }]}>
-                      Velg oppskrift for {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch').toLowerCase() : t('mealPlanner.dinner').toLowerCase()} på {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)}
+                      {t('mealPlanner.selectRecipe')} {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch').toLowerCase() : t('mealPlanner.dinner').toLowerCase()} {t('mealPlanner.on')} {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)}
                     </Text>
-                    <ScrollView>
-                      {recipes.length === 0 ? (
-                        <Text style={[styles.emptyText, { color: colors.textDisabled, textAlign: 'center', padding: 20 }]}>{t('mealPlanner.noRecipes')}</Text>
+                    <TextInput
+                      style={[styles.modalSearchInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+                      value={pickerSearch}
+                      onChangeText={setPickerSearch}
+                      placeholder={t('mealPlanner.searchInPicker')}
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                    <ScrollView style={{ maxHeight: 300 }}>
+                      {recipes.filter(r => !pickerSearch || r.name.toLowerCase().includes(pickerSearch.toLowerCase())).length === 0 ? (
+                        <Text style={[styles.emptyText, { color: colors.textDisabled, textAlign: 'center', padding: 20 }]}>{pickerSearch ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
                       ) : (
-                        recipes.map(recipe => (
+                        recipes.filter(r => !pickerSearch || r.name.toLowerCase().includes(pickerSearch.toLowerCase())).map(recipe => (
                           <TouchableOpacity
                             key={recipe.id}
                             style={[styles.recipePickerItem, { borderBottomColor: colors.border }]}
@@ -886,7 +894,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                       )}
                     </ScrollView>
                     <View style={styles.modalActions}>
-                      <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setSelectedSlot(null); setSelectedRecipeForSlot(null); }}>
+                      <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setSelectedSlot(null); setSelectedRecipeForSlot(null); setPickerSearch(''); }}>
                         <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
                       </TouchableOpacity>
                     </View>
@@ -920,6 +928,7 @@ const styles = StyleSheet.create({
   recipePickerItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 12, borderBottomWidth: 1 },
   recipePickerName: { fontSize: 15, fontWeight: '600', marginBottom: 2 },
   recipePickerMeta: { fontSize: 12 },
+  modalSearchInput: { padding: 10, borderRadius: 8, borderWidth: 1, fontSize: 14, marginBottom: 10 },
   aiResultItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1 },
   aiSaveBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8 },
   aiBtn: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', minWidth: 200 },

@@ -491,6 +491,15 @@
     "instructionsList": "Instruktioner",
     "notes": "Anteckningar",
     "edit": "Redigera",
-    "noMealsPlanned": "Inga måltider planerade denna vecka"
+    "noMealsPlanned": "Inga måltider planerade denna vecka",
+    "selectRecipe": "Välj recept för",
+    "on": "på",
+    "removeFromPlan": "Ta bort från plan",
+    "listName": "Inköpslistans namn",
+    "createList": "Lägg till inköpslista",
+    "searchInPicker": "Sök recept...",
+    "noSuggestions": "Inga förslag hittades",
+    "close": "Stäng",
+    "saveToList": "Spara i inköpslista"
   }
 }
