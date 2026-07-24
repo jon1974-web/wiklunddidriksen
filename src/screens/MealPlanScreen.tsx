@@ -22,6 +22,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const { colors } = useTheme();
   const { t } = useTranslation();
   const familyId = useUserStore((state) => state.familyId);
+  const familyName = useUserStore((state) => state.familyName);
   const user = useUserStore((state) => state.user);
 
   const [activeTab, setActiveTab] = useState<SubTab>('ukemeny');
