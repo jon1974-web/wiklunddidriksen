@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, TextInput, FlatList, StyleSheet, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, TextInput, FlatList, StyleSheet, Modal, TouchableWithoutFeedback, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -654,12 +654,13 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>🍽️ {t('mealPlanner.title')}</Text>
-        <TouchableOpacity style={[styles.addHeaderBtn, { backgroundColor: colors.accent }]} onPress={() => setShowAddRecipe(true)}>
-          <Text style={{ color: '#fff', fontSize: 18, fontWeight: '700' }}>+</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={[styles.title, { color: colors.text }]}>🍽️ {t('mealPlanner.title')}</Text>
+            <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
+          </View>
+          {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
+        </View>
 
       <View style={[styles.tabs, { borderBottomColor: colors.border }]}>
         {(['ukemeny', 'oppskrifter', 'handleliste'] as SubTab[]).map(tab => (
@@ -905,6 +906,13 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+      {/* FAB for adding recipes */}
+      <TouchableOpacity
+        style={[styles.fab, { backgroundColor: colors.accent }]}
+        onPress={() => { resetRecipeForm(); setShowAddRecipe(true); }}
+      >
+        <Text style={styles.fabText}>+</Text>
+      </TouchableOpacity>
     </SafeAreaView>
   );
 };
@@ -912,8 +920,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12 },
-  headerTitle: { fontSize: 20, fontWeight: '700' },
-  addHeaderBtn: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  title: { fontSize: 28, fontWeight: 'bold' },
+  familySubtitle: { fontSize: 14, fontStyle: 'italic', paddingHorizontal: 16, marginTop: 2, marginBottom: 8 },
+  fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
+  fabText: { color: '#fff', fontSize: 28, fontWeight: '700' },
   tabs: { flexDirection: 'row', borderBottomWidth: 1 },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
   tabText: { fontSize: 13, fontWeight: '600' },

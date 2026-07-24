@@ -359,7 +359,7 @@ const AppContent = () => {
               name="Shopping"
               component={MealPlanStack}
               options={{
-                tabBarLabel: 'Matplan',
+                tabBarLabel: 'Matsenter',
                 tabBarIcon: ({ focused }) => <TabIcon label="🍽️" focused={focused} />,
               }}
             />
