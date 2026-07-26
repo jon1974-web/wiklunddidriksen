@@ -631,14 +631,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14 }}
                     onPress={() => setSelectedCategory(selectedCategory === cat ? 'all' : cat)}
                   >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10, flex: 1 }}>
                       <Text style={{ fontSize: 22 }}>{catEmoji}</Text>
-                      <Text style={[styles.cardTitle, { color: colors.text }]}>{catLabel}</Text>
+                      <Text style={{ color: colors.text, fontSize: 16, fontWeight: '700' }}>{catLabel}</Text>
                       <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.inputBackground }}>
                         <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>{recipes.length}</Text>
                       </View>
                     </View>
-                    <Text style={{ fontSize: 14, color: colors.textSecondary, alignSelf: 'center' }}>{isExpanded ? '▼' : '▶'}</Text>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary }}>{isExpanded ? '▼' : '▶'}</Text>
                   </TouchableOpacity>
 
                   {isExpanded && (
