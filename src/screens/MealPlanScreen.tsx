@@ -423,9 +423,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         </TouchableOpacity>
         {randomRecipe && (
           <View style={[styles.randomResult, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
-            <Text style={{ fontSize: 28, marginBottom: 4 }}>
-              {randomRecipe.category === 'kjoett' ? '🥩' : randomRecipe.category === 'fisk' ? '🐟' : randomRecipe.category === 'vegetar' ? '🥗' : randomRecipe.category === 'pasta' ? '🍝' : randomRecipe.category === 'sott' ? '🍰' : '🍽️'}
-            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <Text style={{ fontSize: 28 }}>
+                {randomRecipe.category === 'kylling' ? '🍗' : randomRecipe.category === 'kjoett' ? '🥩' : randomRecipe.category === 'fisk' ? '🐟' : randomRecipe.category === 'vegetar' ? '🥗' : randomRecipe.category === 'pasta' ? '🍝' : randomRecipe.category === 'gryte' ? '🥘' : randomRecipe.category === 'suppe' ? '🍲' : randomRecipe.category === 'frokost' ? '🥞' : randomRecipe.category === 'sott' ? '🍰' : '🍽️'}
+              </Text>
+              <TouchableOpacity onPress={() => setRandomRecipe(null)}>
+                <Text style={{ fontSize: 20, color: colors.textSecondary, fontWeight: '700' }}>✕</Text>
+              </TouchableOpacity>
+            </View>
             <Text style={[styles.randomName, { color: colors.text }]}>{randomRecipe.name}</Text>
             <Text style={[styles.randomMeta, { color: colors.textSecondary }]}>{randomRecipe.time} {t('mealPlanner.minutes')} · {randomRecipe.portions} {t('mealPlanner.servings')}</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
@@ -450,6 +455,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                         createdBy: user?.uid || '',
                       });
                     }
+                    setRandomRecipe(null);
                     loadData();
                   } catch (error) {
                     crossAlert('Error', getErrorMessage(error));
