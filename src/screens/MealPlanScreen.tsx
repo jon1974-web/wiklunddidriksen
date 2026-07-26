@@ -1084,7 +1084,7 @@ const styles = StyleSheet.create({
   aiSearchTitle: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
   aiSearchHint: { fontSize: 13, marginBottom: 10 },
   aiLangLabel: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
-  urlImportBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 14, marginTop: 12, borderWidth: 1 },
+  urlImportBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 14, marginTop: 12, borderWidth: 1, width: '100%' },
   urlImportTitle: { fontSize: 14, fontWeight: '600', marginBottom: 2 },
   urlImportHint: { fontSize: 12 },
   randomResult: { borderRadius: 10, padding: 14, marginTop: 12, alignItems: 'center', borderWidth: 1, position: 'relative' },
