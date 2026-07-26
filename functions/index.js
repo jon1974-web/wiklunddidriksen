@@ -1069,6 +1069,7 @@ Respond in ${responseLangName}. Return ONLY valid JSON array with this exact str
   {
     "name": "Real dish name (e.g. 'Kyilinggryte med chilipepper')",
     "variation": "Klassisk|Raskere|Med en vri",
+    "cuisine": "${searchLangName}",
     "description": "Short description of this variation",
     "ingredients": [{"name": "Ingredient name", "amount": "Amount", "unit": "Unit"}],
     "instructions": ["Step 1", "Step 2"],
