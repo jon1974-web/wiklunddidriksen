@@ -643,6 +643,25 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
                   </TouchableOpacity>
                 </View>
+                {item.variation && (
+                  <View style={{ flexDirection: 'row', gap: 4, marginBottom: 4 }}>
+                    <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+                      <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{item.variation}</Text>
+                    </View>
+                    {item.cuisine && (
+                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+                {!item.variation && item.cuisine && (
+                  <View style={{ flexDirection: 'row', gap: 4, marginBottom: 4 }}>
+                    <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
+                      <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
+                    </View>
+                  </View>
+                )}
                 <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>
                   {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}
                   {item.cuisine ? ` · ${item.cuisine}` : ''}
@@ -912,7 +931,19 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
-                  <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail?.name}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                    <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail?.name}</Text>
+                    {showRecipeDetail?.variation && (
+                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{showRecipeDetail.variation}</Text>
+                      </View>
+                    )}
+                    {showRecipeDetail?.cuisine && (
+                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{showRecipeDetail.cuisine}</Text>
+                      </View>
+                    )}
+                  </View>
                 <ScrollView>
                   {showRecipeDetail?.description ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.description}</Text> : null}
                   {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}</Text> : null}
