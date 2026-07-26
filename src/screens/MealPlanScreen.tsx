@@ -931,16 +931,16 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
                     <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail?.name}</Text>
                     {showRecipeDetail?.variation && (
-                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
-                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{showRecipeDetail.variation}</Text>
+                      <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9', alignSelf: 'center' }}>
+                        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.accent }}>{showRecipeDetail.variation}</Text>
                       </View>
                     )}
                     {showRecipeDetail?.cuisine && (
-                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
-                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{showRecipeDetail.cuisine}</Text>
+                      <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border, alignSelf: 'center' }}>
+                        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>{showRecipeDetail.cuisine}</Text>
                       </View>
                     )}
                   </View>
