@@ -588,13 +588,15 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           )}
 
           {/* URL Import */}
-          <TouchableOpacity style={[styles.urlImportBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowUrlImport(true)}>
-            <Text style={{ fontSize: 18, marginRight: 8 }}>🔗</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.urlImportTitle, { color: colors.text }]}>{t('mealPlanner.importURL')}</Text>
-              <Text style={[styles.urlImportHint, { color: colors.textSecondary }]}>Lim inn lenke fra en oppskriftsside</Text>
+          <TouchableOpacity style={[styles.aiSearchCard, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: 12 }]} onPress={() => setShowUrlImport(true)}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Text style={{ fontSize: 18, marginRight: 10 }}>🔗</Text>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.aiSearchTitle, { color: colors.text }]}>{t('mealPlanner.importURL')}</Text>
+                <Text style={[styles.aiSearchHint, { color: colors.textSecondary }]}>Lim inn lenke fra en oppskriftsside</Text>
+              </View>
+              <Text style={{ color: colors.textSecondary, fontSize: 16 }}>→</Text>
             </View>
-            <Text style={{ color: colors.textSecondary, fontSize: 16 }}>→</Text>
           </TouchableOpacity>
         </View>
       ) : (
@@ -1084,7 +1086,7 @@ const styles = StyleSheet.create({
   aiSearchTitle: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
   aiSearchHint: { fontSize: 13, marginBottom: 10 },
   aiLangLabel: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
-  urlImportBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 14, marginTop: 12, borderWidth: 1, width: '100%' },
+  urlImportBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 14, marginTop: 12, borderWidth: 1 },
   urlImportTitle: { fontSize: 14, fontWeight: '600', marginBottom: 2 },
   urlImportHint: { fontSize: 12 },
   randomResult: { borderRadius: 10, padding: 14, marginTop: 12, alignItems: 'center', borderWidth: 1, position: 'relative' },
