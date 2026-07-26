@@ -45,6 +45,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [aiQuery, setAiQuery] = useState('');
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
+  const [aiSearchLang, setAiSearchLang] = useState('');
   const [showAiResults, setShowAiResults] = useState(false);
   const [pickerSearch, setPickerSearch] = useState('');
   const [showUrlImport, setShowUrlImport] = useState(false);
@@ -78,6 +79,19 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     { key: 'frokost', label: '🥞 ' + t('mealPlanner.frokost') },
     { key: 'sott', label: '🍰 ' + t('mealPlanner.sott') },
   ];
+
+  const languageOptions = [
+    { value: 'norsk', label: '🇳🇴 Norsk', lang: 'nb' },
+    { value: 'svensk', label: '🇸🇪 Svensk', lang: 'sv' },
+    { value: 'engelsk', label: '🇬🇧 Engelsk', lang: 'en' },
+    { value: 'dansk', label: '🇩🇰 Dansk', lang: 'da' },
+    { value: 'finsk', label: '🇫🇮 Finsk', lang: 'fi' },
+  ];
+
+  useEffect(() => {
+    const defaultLang = languageOptions.find(o => o.lang === i18n.language);
+    if (defaultLang && !aiSearchLang) setAiSearchLang(defaultLang.value);
+  }, [i18n.language]);
 
   const getCurrentWeekStart = (): string => {
     const now = new Date();
@@ -336,6 +350,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         body: JSON.stringify({
           prompt: searchQueryValue,
           existingRecipes: recipes.map(r => ({ name: r.name })),
+          searchLanguage: aiSearchLang || 'norsk',
+          responseLanguage: i18n.language === 'nb' ? 'norsk' : i18n.language === 'sv' ? 'svensk' : i18n.language === 'da' ? 'dansk' : i18n.language === 'fi' ? 'finsk' : 'engelsk',
         }),
       });
       if (!res.ok) throw new Error('Kunne ikke generere forslag');
@@ -540,9 +556,24 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
           <View style={{ alignItems: 'center', marginTop: 12 }}>
             {searchQuery && (
-              <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginBottom: 8 }]} onPress={() => handleAiSearch(searchQuery)}>
-                <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
-              </TouchableOpacity>
+              <>
+                <View style={{ flexDirection: 'row', gap: 6, marginBottom: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+                  {languageOptions.map(opt => (
+                    <TouchableOpacity
+                      key={opt.value}
+                      style={[styles.filterChip, { borderColor: aiSearchLang === opt.value ? colors.accent : colors.border, backgroundColor: aiSearchLang === opt.value ? colors.accent : 'transparent' }]}
+                      onPress={() => setAiSearchLang(opt.value)}
+                    >
+                      <Text style={{ fontSize: 11, fontWeight: '600', color: aiSearchLang === opt.value ? '#fff' : colors.textSecondary }}>
+                        {opt.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginBottom: 8 }]} onPress={() => handleAiSearch(searchQuery)}>
+                  <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+                </TouchableOpacity>
+              </>
             )}
             <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.inputBackground, borderColor: colors.border, borderWidth: 1 }]} onPress={() => setShowUrlImport(true)}>
               <Text style={[styles.aiBtnText, { color: colors.text }]}>🔗 {t('mealPlanner.importURL')}</Text>

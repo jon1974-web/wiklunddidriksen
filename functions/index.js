@@ -1031,12 +1031,20 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
-  const { prompt, existingRecipes = [] } = req.body || {};
+  const { prompt, existingRecipes = [], searchLanguage = "norsk", responseLanguage = "norsk" } = req.body || {};
   if (!prompt || typeof prompt !== "string") {
     return res.status(400).json({ error: "prompt is required" });
   }
 
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  // Map language codes to display names
+  const languageNames = {
+    norsk: "Norwegian", svensk: "Swedish", engelsk: "English",
+    dansk: "Danish", finsk: "Finnish",
+  };
+  const searchLangName = languageNames[searchLanguage] || "Norwegian";
+  const responseLangName = languageNames[responseLanguage] || "Norwegian";
 
   try {
     const existingNames = existingRecipes.map((r) => r.name).join(", ");
@@ -1045,9 +1053,9 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
       messages: [
         {
           role: "system",
-          content: `You are a helpful family meal planner for Norwegian families.
+          content: `You are a helpful family meal planner.
 The user will describe a specific dish or recipe they want.
-Generate exactly 3 VARIATIONS of the SAME dish — not different dishes.
+Search for ${searchLangName} recipes and generate exactly 3 VARIATIONS of the SAME dish.
 
 ${existingNames ? `These recipes already exist in their book: ${existingNames}. Avoid suggesting duplicates.` : ""}
 
@@ -1056,7 +1064,7 @@ Each variation should be a different approach to the same dish:
 2. "Raskere" — a quicker/easier version (less time, fewer steps)
 3. "Med en vri" — a creative twist or variation
 
-Respond in Norwegian. Return ONLY valid JSON array with this exact structure:
+Respond in ${responseLangName}. Return ONLY valid JSON array with this exact structure:
 [
   {
     "name": "Dish name with variation tag (e.g. 'Janssons frestelse — Klassisk')",
@@ -1069,7 +1077,7 @@ Respond in Norwegian. Return ONLY valid JSON array with this exact structure:
   }
 ]
 
-Make each variation practical for everyday family cooking. Use Norwegian ingredient names where appropriate.
+Make each variation practical for everyday family cooking. Use ingredient names in ${searchLangName}.
 Focus on making the 3 versions meaningfully different from each other — different techniques, ingredients, or complexity levels.`,
         },
         {
