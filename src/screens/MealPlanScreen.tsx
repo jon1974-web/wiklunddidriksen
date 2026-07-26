@@ -603,73 +603,104 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           </TouchableOpacity>
         </View>
       ) : (
-        <FlatList
-          data={filteredRecipes}
-          numColumns={2}
-          keyExtractor={item => item.id}
-          contentContainerStyle={styles.recipeGrid}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              style={[styles.recipeCard, { backgroundColor: colors.surface }]}
-              onPress={() => setShowRecipeDetail(item)}
-              onLongPress={() => setActionModal({ visible: true, title: item.name, onEdit: () => {
-                setEditingRecipe(item);
-                setRecipeForm({
-                  name: item.name,
-                  description: item.description || '',
-                  time: item.time ? String(item.time) : '',
-                  portions: item.portions ? String(item.portions) : '',
-                  category: item.category || 'kjoett',
-                  ingredients: item.ingredients.length > 0 ? item.ingredients : [{ name: '', amount: '', unit: '' }],
-                  instructions: item.instructions.length > 0 ? item.instructions : [''],
-                });
-                setShowAddRecipe(true);
-              }, onDelete: async () => {
-                try {
-                  await deleteDoc(doc(db, 'recipes', item.id));
-                  loadData();
-                } catch (error) {
-                  crossAlert('Error', getErrorMessage(error));
-                }
-              } })}
-            >
-              <View style={[styles.recipeImg, { backgroundColor: colors.inputBackground }]}>
-                <Text style={{ fontSize: 32 }}>{item.category === 'kylling' ? '🍗' : item.category === 'kjoett' ? '🥩' : item.category === 'fisk' ? '🐟' : item.category === 'vegetar' ? '🥗' : item.category === 'pasta' ? '🍝' : item.category === 'gryte' ? '🥘' : item.category === 'suppe' ? '🍲' : item.category === 'frokost' ? '🥞' : item.category === 'sott' ? '🍰' : '🍽️'}</Text>
-              </View>
-              <View style={styles.recipeInfo}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                  <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
-                  <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }}>
-                    <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
-                  </TouchableOpacity>
-                </View>
-                {item.variation && (
-                  <View style={{ flexDirection: 'row', gap: 4, marginBottom: 4 }}>
-                    <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
-                      <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{item.variation}</Text>
-                    </View>
-                    {item.cuisine && (
-                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
-                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
+        <ScrollView style={styles.tabContent} contentContainerStyle={{ paddingBottom: 80 }}>
+          {(() => {
+            const grouped: Record<string, Recipe[]> = {};
+            filteredRecipes.forEach(r => {
+              const cat = r.category || 'kjoett';
+              if (!grouped[cat]) grouped[cat] = [];
+              grouped[cat].push(r);
+            });
+            const categoryOrder = ['kylling', 'kjoett', 'fisk', 'vegetar', 'pasta', 'gryte', 'suppe', 'frokost', 'sott'];
+            const sortedCats = Object.keys(grouped).sort((a, b) => {
+              const ai = categoryOrder.indexOf(a);
+              const bi = categoryOrder.indexOf(b);
+              return (ai === -1 ? 99 : ai) - (bi === -1 ? 99 : bi);
+            });
+            const isAllSelected = selectedCategory === 'all';
+
+            return sortedCats.map(cat => {
+              const recipes = grouped[cat];
+              const catLabel = t(`mealPlanner.${cat}`);
+              const catEmoji = cat === 'kylling' ? '🍗' : cat === 'kjoett' ? '🥩' : cat === 'fisk' ? '🐟' : cat === 'vegetar' ? '🥗' : cat === 'pasta' ? '🍝' : cat === 'gryte' ? '🥘' : cat === 'suppe' ? '🍲' : cat === 'frokost' ? '🥞' : '🍰';
+              const isExpanded = !isAllSelected || selectedCategory === cat;
+
+              return (
+                <View key={cat} style={[styles.card, { backgroundColor: colors.surface, marginBottom: 8 }]}>
+                  <TouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14 }}
+                    onPress={() => setSelectedCategory(selectedCategory === cat ? 'all' : cat)}
+                  >
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                      <Text style={{ fontSize: 20 }}>{catEmoji}</Text>
+                      <Text style={[styles.cardTitle, { color: colors.text }]}>{catLabel}</Text>
+                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground }}>
+                        <Text style={{ fontSize: 11, fontWeight: '600', color: colors.textSecondary }}>{recipes.length}</Text>
                       </View>
-                    )}
-                  </View>
-                )}
-                {!item.variation && item.cuisine && (
-                  <View style={{ flexDirection: 'row', gap: 4, marginBottom: 4 }}>
-                    <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
-                      <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
                     </View>
-                  </View>
-                )}
-                <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>
-                  {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}
-                  {item.cuisine ? ` · ${item.cuisine}` : ''}
-                </Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
+                    <Text style={{ fontSize: 14, color: colors.textSecondary }}>{isExpanded ? '▼' : '▶'}</Text>
+                  </TouchableOpacity>
+
+                  {isExpanded && (
+                    <View style={{ paddingHorizontal: 14, paddingBottom: 14 }}>
+                      {recipes.sort((a, b) => a.name.localeCompare(b.name)).map((item, i) => (
+                        <TouchableOpacity
+                          key={item.id}
+                          style={[styles.recipeCard, { backgroundColor: colors.inputBackground, marginBottom: i < recipes.length - 1 ? 8 : 0 }]}
+                          onPress={() => setShowRecipeDetail(item)}
+                          onLongPress={() => setActionModal({ visible: true, title: item.name, onEdit: () => {
+                            setEditingRecipe(item);
+                            setRecipeForm({
+                              name: item.name, description: item.description || '',
+                              time: item.time ? String(item.time) : '', portions: item.portions ? String(item.portions) : '',
+                              category: item.category || 'kjoett',
+                              ingredients: item.ingredients.length > 0 ? item.ingredients : [{ name: '', amount: '', unit: '' }],
+                              instructions: item.instructions.length > 0 ? item.instructions : [''],
+                            });
+                            setShowAddRecipe(true);
+                          }, onDelete: async () => {
+                            try { await deleteDoc(doc(db, 'recipes', item.id)); loadData(); } catch (error) { crossAlert('Error', getErrorMessage(error)); }
+                          } })}
+                        >
+                          <View style={{ flex: 1 }}>
+                            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
+                              <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }}>
+                                <Text style={{ fontSize: 14 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
+                              </TouchableOpacity>
+                            </View>
+                            {item.variation && (
+                              <View style={{ flexDirection: 'row', gap: 4, marginTop: 4 }}>
+                                <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+                                  <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{item.variation}</Text>
+                                </View>
+                                {item.cuisine && (
+                                  <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+                                    <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
+                                  </View>
+                                )}
+                              </View>
+                            )}
+                            {!item.variation && item.cuisine && (
+                              <View style={{ flexDirection: 'row', gap: 4, marginTop: 4 }}>
+                                <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+                                  <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
+                                </View>
+                              </View>
+                            )}
+                            <Text style={[styles.recipeMeta, { color: colors.textSecondary, marginTop: 4 }]}>
+                              {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              );
+            });
+          })()}
+        </ScrollView>
       )}
 
       {/* AI Results */}
