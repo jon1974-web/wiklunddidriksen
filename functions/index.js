@@ -1063,22 +1063,24 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
           role: "system",
           content: `You are a helpful family meal planner.
 The user will describe a specific dish or recipe they want.
-Search for ${searchLangName} recipes and generate exactly 3 VARIATIONS of the same dish.
+Search for ${searchLangName} recipes that match the user's description and generate exactly 3 DIFFERENT dishes — each with its own unique name and recipe.
 
 ${existingNames ? `These recipes already exist in their book: ${existingNames}. Avoid suggesting duplicates.` : ""}
 
-Each variation should be a different approach to the same dish:
-1. "${vars.classic}" — the traditional/authentic version
-2. "${vars.faster}" — a quicker/easier version (less time, fewer steps)
-3. "${vars.twist}" — a creative twist or variation
+IMPORTANT: Generate 3 DIFFERENT dishes, not 3 variations of the same dish. Each dish should have its own unique name that matches the search description. For example, searching for "spicy pasta with tomato sauce" should produce "Pasta Arrabbiata", "Penne all'Arrabbiata", and "Spaghetti al Pomodoro Piccante" — three different dishes.
+
+Assign one of these variation tags to each dish:
+- "${vars.classic}" — the traditional/authentic version
+- "${vars.faster}" — a quicker/easier version (less time, fewer steps)
+- "${vars.twist}" — a creative twist or variation
 
 CRITICAL: You MUST respond entirely in ${responseLangName}. The dish name stays in ${searchLangName} but EVERYTHING else (description, ingredient names, instruction steps) MUST be in ${responseLangName}. Return ONLY valid JSON array with this exact structure:
 [
   {
-    "name": "Real dish name (e.g. 'Kyilinggryte med chilipepper')",
-    "variation": "Klassisk|Raskere|Med en vri",
+    "name": "Unique dish name in ${searchLangName} (each dish must have a DIFFERENT name)",
+    "variation": "${vars.classic}|${vars.faster}|${vars.twist}",
     "cuisine": "${searchLangName}",
-    "description": "Short description of this variation",
+    "description": "Short description in ${responseLangName}",
     "ingredients": [{"name": "Ingredient name MUST be in ${responseLangName}", "amount": "Amount", "unit": "Unit"}],
     "instructions": ["Step MUST be in ${responseLangName}", "Step MUST be in ${responseLangName}"],
     "time": 30,
@@ -1087,10 +1089,8 @@ CRITICAL: You MUST respond entirely in ${responseLangName}. The dish name stays 
   }
 ]
 
-IMPORTANT: The "name" field should be the REAL dish name, NOT the search query. For example, if the user searches for "Kyllingretter med sterke krydder", the results should be real dishes like "Thai Kyllinggryte", "Karrykylling med ris", "Kylling i kokosmelk" — NOT "Kyllingretter med sterke krydder — Klassisk".
-
-Make each variation practical for everyday family cooking. Use ingredient names in ${searchLangName}.
-Focus on making the 3 versions meaningfully different from each other.`,
+Make each dish practical for everyday family cooking. Each dish must have a unique, authentic name from ${searchLangName} cuisine.
+Focus on making the 3 dishes meaningfully different from each other — different ingredients, techniques, or complexity levels.`,
         },
         {
           role: "user",
