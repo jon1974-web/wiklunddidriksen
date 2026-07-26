@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, FlatList, StyleShe
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { useUserStore } from '../store/userStore';
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
