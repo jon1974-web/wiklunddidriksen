@@ -631,16 +631,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 14 }}
                     onPress={() => setSelectedCategory(selectedCategory === cat ? 'all' : cat)}
                   >
-                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, height: 28 }}>
-                      <View style={{ width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{ fontSize: 22 }}>{catEmoji}</Text>
-                      </View>
-                      <Text style={[styles.cardTitle, { color: colors.text, fontSize: 16, height: 22, lineHeight: 22 }]}>{catLabel}</Text>
-                      <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.inputBackground, height: 22, justifyContent: 'center' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                      <Text style={{ fontSize: 22 }}>{catEmoji}</Text>
+                      <Text style={[styles.cardTitle, { color: colors.text }]}>{catLabel}</Text>
+                      <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.inputBackground }}>
                         <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>{recipes.length}</Text>
                       </View>
                     </View>
-                    <Text style={{ fontSize: 14, color: colors.textSecondary }}>{isExpanded ? '▼' : '▶'}</Text>
+                    <Text style={{ fontSize: 14, color: colors.textSecondary, alignSelf: 'center' }}>{isExpanded ? '▼' : '▶'}</Text>
                   </TouchableOpacity>
 
                   {isExpanded && (
