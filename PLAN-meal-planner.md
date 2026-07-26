@@ -242,3 +242,26 @@ Must use theme tokens (colors.surface, colors.accent, etc.) — works with all 8
 
 ## Mockups
 1. `mockup-meal-planner.html` — Ukemeny, Oppskrifter, Handleliste, Recipe Detail
+
+## Recipe Detail Enhancements (Planned)
+
+### Add to Weekday from Recipe Detail
+When viewing a recipe, add a "📅 Legg til i ukeplan" button that lets you assign the recipe to a specific day and meal directly.
+
+**Flow:**
+```
+Open recipe → Tap "📅 Legg til i ukeplan"
+→ Pick day (Man-Søn) + meal (Lunsj/Middag)
+→ Recipe assigned to that slot
+```
+
+**UI:**
+- Button on recipe detail modal: "📅 Legg til i ukeplan"
+- Opens a picker with day + meal selection
+- Saves directly to mealPlan document
+- Shows confirmation after assignment
+
+**Benefits:**
+- Faster workflow — no need to go back to Ukemeny to assign
+- Works from both recipe detail modal AND recipe book
+- Complements existing flow (assigning from day slots)
