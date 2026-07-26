@@ -500,6 +500,11 @@
     "importRecipeUrl": "Indsæt URL for opskrift",
     "searchInLanguage": "Søg i køkken",
     "urlImportHint": "Indsæt link fra en opskriftsside",
-    "saveRecipe": "Gem"
+    "saveRecipe": "Gem",
+    "langNorsk": "Norsk",
+    "langSvensk": "Svensk",
+    "langEngelsk": "Engelsk",
+    "langDansk": "Dansk",
+    "langFinsk": "Finsk"
   }
 }

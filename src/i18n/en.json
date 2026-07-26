@@ -491,6 +491,11 @@
     "importRecipeUrl": "Paste URL for recipe",
     "searchInLanguage": "Search in cuisine",
     "urlImportHint": "Paste link from a recipe page",
-    "saveRecipe": "Save"
+    "saveRecipe": "Save",
+    "langNorsk": "Norwegian",
+    "langSvensk": "Swedish",
+    "langEngelsk": "English",
+    "langDansk": "Danish",
+    "langFinsk": "Finnish"
   }
 }

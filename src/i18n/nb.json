@@ -491,6 +491,11 @@
     "importRecipeUrl": "Lim inn URL for oppskrift",
     "searchInLanguage": "Søk i cuisine",
     "urlImportHint": "Lim inn lenke fra en oppskriftsside",
-    "saveRecipe": "Lagre"
+    "saveRecipe": "Lagre",
+    "langNorsk": "Norsk",
+    "langSvensk": "Svensk",
+    "langEngelsk": "Engelsk",
+    "langDansk": "Dansk",
+    "langFinsk": "Finsk"
   }
 }

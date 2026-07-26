@@ -500,6 +500,11 @@
     "importRecipeUrl": "Liitä URL reseptille",
     "searchInLanguage": "Hae keittiössä",
     "urlImportHint": "Liitä linkki reseptisivulta",
-    "saveRecipe": "Tallenna"
+    "saveRecipe": "Tallenna",
+    "langNorsk": "Norja",
+    "langSvensk": "Ruotsi",
+    "langEngelsk": "Englanti",
+    "langDansk": "Tanska",
+    "langFinsk": "Suomi"
   }
 }
