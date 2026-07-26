@@ -65,6 +65,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     name: '', description: '', time: '', portions: '', category: 'kjoett',
     ingredients: [{ name: '', amount: '', unit: '' }],
     instructions: [''],
+    variation: '', cuisine: '',
   });
 
   const categories = [
@@ -141,7 +142,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   });
 
   const resetRecipeForm = () => {
-    setRecipeForm({ name: '', description: '', time: '', portions: '', category: 'kjoett', ingredients: [{ name: '', amount: '', unit: '' }], instructions: [''] });
+    setRecipeForm({ name: '', description: '', time: '', portions: '', category: 'kjoett', ingredients: [{ name: '', amount: '', unit: '' }], instructions: [''], variation: '', cuisine: '' });
   };
 
   const handleSaveRecipe = async () => {
@@ -159,6 +160,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         time: parseInt(recipeForm.time) || 0,
         portions: parseInt(recipeForm.portions) || 4,
         category: recipeForm.category,
+        variation: recipeForm.variation || '',
+        cuisine: recipeForm.cuisine || '',
       };
       if (editingRecipe) {
         await import('firebase/firestore').then(({ updateDoc, doc }) =>
@@ -656,6 +659,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                               category: item.category || 'kjoett',
                               ingredients: item.ingredients.length > 0 ? item.ingredients : [{ name: '', amount: '', unit: '' }],
                               instructions: item.instructions.length > 0 ? item.instructions : [''],
+                              variation: item.variation || '', cuisine: item.cuisine || '',
                             });
                             setShowAddRecipe(true);
                           }, onDelete: async () => {
@@ -901,6 +905,28 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                         </TouchableOpacity>
                       ))}
                     </View>
+                  </View>
+
+                  {/* Variation */}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.variation')}</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                      {['Klassisk', 'Raskere', 'Med en vri'].map(v => (
+                        <TouchableOpacity
+                          key={v}
+                          style={[styles.filterChip, { borderColor: recipeForm.variation === v ? colors.accent : colors.border }, recipeForm.variation === v && { backgroundColor: colors.accent }]}
+                          onPress={() => setRecipeForm(f => ({ ...f, variation: f.variation === v ? '' : v }))}
+                        >
+                          <Text style={{ fontSize: 12, fontWeight: '600', color: recipeForm.variation === v ? '#fff' : colors.textSecondary }}>{v}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+
+                  {/* Cuisine */}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.cuisine')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.cuisine} onChangeText={v => setRecipeForm(f => ({ ...f, cuisine: v }))} placeholder={t('mealPlanner.cuisinePlaceholder')} placeholderTextColor={colors.textDisabled} />
                   </View>
 
                   {/* Ingredients */}
