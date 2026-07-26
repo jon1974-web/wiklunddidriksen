@@ -1055,7 +1055,7 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
           role: "system",
           content: `You are a helpful family meal planner.
 The user will describe a specific dish or recipe they want.
-Search for ${searchLangName} recipes and generate exactly 3 VARIATIONS of the SAME dish.
+Search for ${searchLangName} recipes and generate exactly 3 VARIATIONS of the same dish.
 
 ${existingNames ? `These recipes already exist in their book: ${existingNames}. Avoid suggesting duplicates.` : ""}
 
@@ -1067,7 +1067,8 @@ Each variation should be a different approach to the same dish:
 Respond in ${responseLangName}. Return ONLY valid JSON array with this exact structure:
 [
   {
-    "name": "Dish name with variation tag (e.g. 'Janssons frestelse — Klassisk')",
+    "name": "Real dish name (e.g. 'Kyilinggryte med chilipepper')",
+    "variation": "Klassisk|Raskere|Med en vri",
     "description": "Short description of this variation",
     "ingredients": [{"name": "Ingredient name", "amount": "Amount", "unit": "Unit"}],
     "instructions": ["Step 1", "Step 2"],
@@ -1077,8 +1078,10 @@ Respond in ${responseLangName}. Return ONLY valid JSON array with this exact str
   }
 ]
 
+IMPORTANT: The "name" field should be the REAL dish name, NOT the search query. For example, if the user searches for "Kyllingretter med sterke krydder", the results should be real dishes like "Thai Kyllinggryte", "Karrykylling med ris", "Kylling i kokosmelk" — NOT "Kyllingretter med sterke krydder — Klassisk".
+
 Make each variation practical for everyday family cooking. Use ingredient names in ${searchLangName}.
-Focus on making the 3 versions meaningfully different from each other — different techniques, ingredients, or complexity levels.`,
+Focus on making the 3 versions meaningfully different from each other.`,
         },
         {
           role: "user",

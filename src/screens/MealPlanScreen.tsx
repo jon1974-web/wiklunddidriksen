@@ -376,6 +376,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         time: aiRecipe.time || 0,
         portions: aiRecipe.portions || 4,
         category: aiRecipe.category || 'kjoett',
+        variation: aiRecipe.variation || '',
         isFavorite: false,
         createdBy: user?.uid || '',
         familyId,
@@ -414,6 +415,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           time: data.recipe.time || 0,
           portions: data.recipe.portions || 4,
           category: data.recipe.category || 'kjoett',
+          variation: data.recipe.variation || '',
           isFavorite: false,
           createdBy: user.uid,
           familyId: familyId || '',
@@ -659,8 +661,15 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             aiResults.map((recipe, i) => (
               <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
                 <View style={{ flex: 1 }}>
-                  <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
-                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                    <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
+                    {recipe.variation && (
+                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{recipe.variation}</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner · {recipe.category || ''}</Text>
                   {recipe.description ? <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }} numberOfLines={2}>{recipe.description}</Text> : null}
                 </View>
                 <View style={{ flexDirection: 'row', gap: 6 }}>

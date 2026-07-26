@@ -90,9 +90,16 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.recipeTitle, { color: colors.text }]}>{recipe.name}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <Text style={[styles.recipeTitle, { color: colors.text }]}>{recipe.name}</Text>
+          {recipe.variation && (
+            <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: colors.accent }}>{recipe.variation}</Text>
+            </View>
+          )}
+        </View>
         <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>
-          {getCategoryEmoji(recipe.category)} {recipe.time} {t('mealPlanner.minutes')} · {recipe.portions} {t('mealPlanner.servings')}
+          {getCategoryEmoji(recipe.category)} {recipe.time} {t('mealPlanner.minutes')} · {recipe.portions} {t('mealPlanner.servings')} · {recipe.category ? t(`mealPlanner.${recipe.category}`) : ''}
         </Text>
 
         {recipe.description ? (
