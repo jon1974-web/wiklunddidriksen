@@ -632,9 +632,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     onPress={() => setSelectedCategory(selectedCategory === cat ? 'all' : cat)}
                   >
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                      <Text style={{ fontSize: 22, lineHeight: 24 }}>{catEmoji}</Text>
-                      <Text style={[styles.cardTitle, { color: colors.text, lineHeight: 24 }]}>{catLabel}</Text>
-                      <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.inputBackground, alignSelf: 'center' }}>
+                      <Text style={{ fontSize: 22 }}>{catEmoji}</Text>
+                      <Text style={[styles.cardTitle, { color: colors.text }]}>{catLabel}</Text>
+                      <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: colors.inputBackground }}>
                         <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>{recipes.length}</Text>
                       </View>
                     </View>
