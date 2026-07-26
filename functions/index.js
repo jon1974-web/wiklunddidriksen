@@ -1043,8 +1043,16 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
     norsk: "Norwegian", svensk: "Swedish", engelsk: "English",
     dansk: "Danish", finsk: "Finnish",
   };
+  const variationLabels = {
+    norsk: { classic: "Klassisk", faster: "Raskere", twist: "Med en vri" },
+    svensk: { classic: "Klassiskt", faster: "Snabbare", twist: "Med en vri" },
+    engelsk: { classic: "Classic", faster: "Faster", twist: "With a twist" },
+    dansk: { classic: "Klassisk", faster: "Hurtigere", twist: "Med et twist" },
+    finsk: { classic: "Klassinen", faster: "Nopeammin", twist: "Vähän erilainen" },
+  };
   const searchLangName = languageNames[searchLanguage] || "Norwegian";
   const responseLangName = languageNames[responseLanguage] || "Norwegian";
+  const vars = variationLabels[responseLanguage] || variationLabels.norsk;
 
   try {
     const existingNames = existingRecipes.map((r) => r.name).join(", ");
@@ -1060,9 +1068,9 @@ Search for ${searchLangName} recipes and generate exactly 3 VARIATIONS of the sa
 ${existingNames ? `These recipes already exist in their book: ${existingNames}. Avoid suggesting duplicates.` : ""}
 
 Each variation should be a different approach to the same dish:
-1. "Klassisk" — the traditional/authentic version
-2. "Raskere" — a quicker/easier version (less time, fewer steps)
-3. "Med en vri" — a creative twist or variation
+1. "${vars.classic}" — the traditional/authentic version
+2. "${vars.faster}" — a quicker/easier version (less time, fewer steps)
+3. "${vars.twist}" — a creative twist or variation
 
 CRITICAL: You MUST respond entirely in ${responseLangName}. The dish name stays in ${searchLangName} but EVERYTHING else (description, ingredient names, instruction steps) MUST be in ${responseLangName}. Return ONLY valid JSON array with this exact structure:
 [
@@ -1071,8 +1079,8 @@ CRITICAL: You MUST respond entirely in ${responseLangName}. The dish name stays 
     "variation": "Klassisk|Raskere|Med en vri",
     "cuisine": "${searchLangName}",
     "description": "Short description of this variation",
-    "ingredients": [{"name": "Ingredient name", "amount": "Amount", "unit": "Unit"}],
-    "instructions": ["Step 1", "Step 2"],
+    "ingredients": [{"name": "Ingredient name MUST be in ${responseLangName}", "amount": "Amount", "unit": "Unit"}],
+    "instructions": ["Step MUST be in ${responseLangName}", "Step MUST be in ${responseLangName}"],
     "time": 30,
     "portions": 4,
     "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott"
@@ -1151,8 +1159,8 @@ Return ONLY valid JSON with this exact structure:
 {
   "name": "Recipe name",
   "description": "Short 1-2 sentence description",
-  "ingredients": [{"name": "Ingredient name", "amount": "Amount", "unit": "Unit"}],
-  "instructions": ["Step 1", "Step 2"],
+  "ingredients": [{"name": "Ingredient name MUST be in ${responseLangName}", "amount": "Amount", "unit": "Unit"}],
+  "instructions": ["Step MUST be in ${responseLangName}", "Step MUST be in ${responseLangName}"],
   "time": 30,
   "portions": 4,
   "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott"

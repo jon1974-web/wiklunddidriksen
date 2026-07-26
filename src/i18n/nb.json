@@ -501,6 +501,9 @@
     "countrySverige": "Sverige",
     "countryEngland": "England",
     "countryDanmark": "Danmark",
-    "countryFinland": "Finland"
+    "countryFinland": "Finland",
+    "varClassic": "Klassisk",
+    "varFaster": "Raskere",
+    "varTwist": "Med en vri"
   }
 }
