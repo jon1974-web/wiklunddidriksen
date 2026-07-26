@@ -423,14 +423,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         </TouchableOpacity>
         {randomRecipe && (
           <View style={[styles.randomResult, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-              <Text style={{ fontSize: 28 }}>
-                {randomRecipe.category === 'kylling' ? '🍗' : randomRecipe.category === 'kjoett' ? '🥩' : randomRecipe.category === 'fisk' ? '🐟' : randomRecipe.category === 'vegetar' ? '🥗' : randomRecipe.category === 'pasta' ? '🍝' : randomRecipe.category === 'gryte' ? '🥘' : randomRecipe.category === 'suppe' ? '🍲' : randomRecipe.category === 'frokost' ? '🥞' : randomRecipe.category === 'sott' ? '🍰' : '🍽️'}
-              </Text>
-              <TouchableOpacity onPress={() => setRandomRecipe(null)}>
-                <Text style={{ fontSize: 20, color: colors.textSecondary, fontWeight: '700' }}>✕</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableOpacity style={{ position: 'absolute', top: 12, right: 12 }} onPress={() => setRandomRecipe(null)}>
+              <Text style={{ fontSize: 18, color: colors.textSecondary, fontWeight: '700' }}>✕</Text>
+            </TouchableOpacity>
+            <Text style={{ fontSize: 28, marginBottom: 4 }}>
+              {randomRecipe.category === 'kylling' ? '🍗' : randomRecipe.category === 'kjoett' ? '🥩' : randomRecipe.category === 'fisk' ? '🐟' : randomRecipe.category === 'vegetar' ? '🥗' : randomRecipe.category === 'pasta' ? '🍝' : randomRecipe.category === 'gryte' ? '🥘' : randomRecipe.category === 'suppe' ? '🍲' : randomRecipe.category === 'frokost' ? '🥞' : randomRecipe.category === 'sott' ? '🍰' : '🍽️'}
+            </Text>
             <Text style={[styles.randomName, { color: colors.text }]}>{randomRecipe.name}</Text>
             <Text style={[styles.randomMeta, { color: colors.textSecondary }]}>{randomRecipe.time} {t('mealPlanner.minutes')} · {randomRecipe.portions} {t('mealPlanner.servings')}</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
@@ -1034,7 +1032,7 @@ const styles = StyleSheet.create({
   aiSaveBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8 },
   aiBtn: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', minWidth: 200 },
   aiBtnText: { color: '#fff', fontSize: 14, fontWeight: '600', textAlign: 'center' },
-  randomResult: { borderRadius: 10, padding: 14, marginTop: 12, alignItems: 'center', borderWidth: 1 },
+  randomResult: { borderRadius: 10, padding: 14, marginTop: 12, alignItems: 'center', borderWidth: 1, position: 'relative' },
   randomName: { fontSize: 18, fontWeight: '700', marginBottom: 2 },
   randomMeta: { fontSize: 13, marginBottom: 8 },
   randomActionBtn: { flex: 1, paddingVertical: 10, borderRadius: 8, alignItems: 'center', borderWidth: 1 },
