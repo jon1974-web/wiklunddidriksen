@@ -555,31 +555,47 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <View style={styles.emptyState}>
           <Text style={{ fontSize: 40, marginBottom: 12 }}>📖</Text>
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
-          <View style={{ alignItems: 'center', marginTop: 12 }}>
-            {searchQuery && (
-              <>
-                <View style={{ flexDirection: 'row', gap: 6, marginBottom: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-                  {languageOptions.map(opt => (
-                    <TouchableOpacity
-                      key={opt.value}
-                      style={[styles.filterChip, { borderColor: aiSearchLang === opt.value ? colors.accent : colors.border, backgroundColor: aiSearchLang === opt.value ? colors.accent : 'transparent' }]}
-                      onPress={() => setAiSearchLang(opt.value)}
-                    >
-                      <Text style={{ fontSize: 11, fontWeight: '600', color: aiSearchLang === opt.value ? '#fff' : colors.textSecondary }}>
-                        {opt.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginBottom: 8 }]} onPress={() => handleAiSearch(searchQuery)}>
-                  <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
-                </TouchableOpacity>
-              </>
-            )}
-            <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.inputBackground, borderColor: colors.border, borderWidth: 1 }]} onPress={() => setShowUrlImport(true)}>
-              <Text style={[styles.aiBtnText, { color: colors.text }]}>🔗 {t('mealPlanner.importURL')}</Text>
-            </TouchableOpacity>
-          </View>
+
+          {/* AI Search Section */}
+          {searchQuery && (
+            <View style={[styles.aiSearchCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+              <Text style={[styles.aiSearchTitle, { color: colors.text }]}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+              <Text style={[styles.aiSearchHint, { color: colors.textSecondary }]}>
+                {t('mealPlanner.searchWithAI')} "{searchQuery}"
+              </Text>
+
+              <Text style={[styles.aiLangLabel, { color: colors.textSecondary }]}>
+                {t('mealPlanner.searchInLanguage')}:
+              </Text>
+              <View style={{ flexDirection: 'row', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+                {languageOptions.map(opt => (
+                  <TouchableOpacity
+                    key={opt.value}
+                    style={[styles.filterChip, { borderColor: aiSearchLang === opt.value ? colors.accent : colors.border, backgroundColor: aiSearchLang === opt.value ? colors.accent : 'transparent' }]}
+                    onPress={() => setAiSearchLang(opt.value)}
+                  >
+                    <Text style={{ fontSize: 11, fontWeight: '600', color: aiSearchLang === opt.value ? '#fff' : colors.textSecondary }}>
+                      {opt.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]} onPress={() => handleAiSearch(searchQuery)}>
+                <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* URL Import */}
+          <TouchableOpacity style={[styles.urlImportBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowUrlImport(true)}>
+            <Text style={{ fontSize: 18, marginRight: 8 }}>🔗</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={[styles.urlImportTitle, { color: colors.text }]}>{t('mealPlanner.importURL')}</Text>
+              <Text style={[styles.urlImportHint, { color: colors.textSecondary }]}>Lim inn lenke fra en oppskriftsside</Text>
+            </View>
+            <Text style={{ color: colors.textSecondary, fontSize: 16 }}>→</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -1064,6 +1080,13 @@ const styles = StyleSheet.create({
   aiSaveBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 8 },
   aiBtn: { paddingVertical: 12, paddingHorizontal: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', minWidth: 200 },
   aiBtnText: { color: '#fff', fontSize: 14, fontWeight: '600', textAlign: 'center' },
+  aiSearchCard: { borderRadius: 12, padding: 16, marginTop: 12, borderWidth: 1 },
+  aiSearchTitle: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
+  aiSearchHint: { fontSize: 13, marginBottom: 10 },
+  aiLangLabel: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
+  urlImportBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 14, marginTop: 12, borderWidth: 1 },
+  urlImportTitle: { fontSize: 14, fontWeight: '600', marginBottom: 2 },
+  urlImportHint: { fontSize: 12 },
   randomResult: { borderRadius: 10, padding: 14, marginTop: 12, alignItems: 'center', borderWidth: 1, position: 'relative' },
   randomName: { fontSize: 18, fontWeight: '700', marginBottom: 2 },
   randomMeta: { fontSize: 13, marginBottom: 8 },

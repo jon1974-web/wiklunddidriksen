@@ -497,6 +497,7 @@
     "saveToList": "Tallenna ostoslistalle",
     "shoppingLists": "Ostoslistat",
     "noShoppingLists": "Ei ostoslistoja vielä",
-    "importRecipeUrl": "Liitä URL reseptille"
+    "importRecipeUrl": "Liitä URL reseptille",
+    "searchInLanguage": "Hae keittiössä"
   }
 }

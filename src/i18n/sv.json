@@ -503,6 +503,7 @@
     "saveToList": "Spara i inköpslista",
     "shoppingLists": "Inköpslistor",
     "noShoppingLists": "Inga inköpslistor ännu",
-    "importRecipeUrl": "Klistra in URL för recept"
+    "importRecipeUrl": "Klistra in URL för recept",
+    "searchInLanguage": "Sök i cuisine"
   }
 }
