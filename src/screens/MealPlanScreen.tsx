@@ -1105,7 +1105,7 @@ const styles = StyleSheet.create({
   recipeInfo: { padding: 8, paddingBottom: 10 },
   recipeName: { fontSize: 13, fontWeight: '600', marginBottom: 2 },
   recipeMeta: { fontSize: 11 },
-  emptyState: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 40 },
+  emptyState: { flex: 1, justifyContent: 'center', padding: 40 },
   emptyText: { fontSize: 14, fontStyle: 'italic' },
   shoppingItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1 },
   checkbox: { width: 20, height: 20, borderRadius: 4, borderWidth: 2, borderColor: '#ddd' },
