@@ -489,6 +489,8 @@
     "shoppingLists": "Shopping Lists",
     "noShoppingLists": "No shopping lists yet",
     "importRecipeUrl": "Paste URL for recipe",
-    "searchInLanguage": "Search in cuisine"
+    "searchInLanguage": "Search in cuisine",
+    "urlImportHint": "Paste link from a recipe page",
+    "saveRecipe": "Save"
   }
 }

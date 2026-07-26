@@ -489,6 +489,8 @@
     "shoppingLists": "Handlelister",
     "noShoppingLists": "Ingen handlelister ennå",
     "importRecipeUrl": "Lim inn URL for oppskrift",
-    "searchInLanguage": "Søk i cuisine"
+    "searchInLanguage": "Søk i cuisine",
+    "urlImportHint": "Lim inn lenke fra en oppskriftsside",
+    "saveRecipe": "Lagre"
   }
 }

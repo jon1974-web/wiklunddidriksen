@@ -593,7 +593,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               <Text style={{ fontSize: 18, marginRight: 10 }}>🔗</Text>
               <View style={{ flex: 1 }}>
                 <Text style={[styles.aiSearchTitle, { color: colors.text }]}>{t('mealPlanner.importURL')}</Text>
-                <Text style={[styles.aiSearchHint, { color: colors.textSecondary }]}>Lim inn lenke fra en oppskriftsside</Text>
+                <Text style={[styles.aiSearchHint, { color: colors.textSecondary }]}>{t('mealPlanner.urlImportHint')}</Text>
               </View>
               <Text style={{ color: colors.textSecondary, fontSize: 16 }}>→</Text>
             </View>
@@ -674,7 +674,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     style={[styles.aiSaveBtn, { backgroundColor: colors.accent }]}
                     onPress={() => handleSaveAiRecipe(recipe)}
                   >
-                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>+ Lagre</Text>
+                    <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>+ {t('mealPlanner.saveRecipe')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>

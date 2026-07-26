@@ -498,6 +498,8 @@
     "shoppingLists": "Indkøbslister",
     "noShoppingLists": "Ingen indkøbslister endnu",
     "importRecipeUrl": "Indsæt URL for opskrift",
-    "searchInLanguage": "Søg i køkken"
+    "searchInLanguage": "Søg i køkken",
+    "urlImportHint": "Indsæt link fra en opskriftsside",
+    "saveRecipe": "Gem"
   }
 }
