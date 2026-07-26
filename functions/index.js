@@ -1064,7 +1064,7 @@ Each variation should be a different approach to the same dish:
 2. "Raskere" — a quicker/easier version (less time, fewer steps)
 3. "Med en vri" — a creative twist or variation
 
-Respond in ${responseLangName}. Return ONLY valid JSON array with this exact structure:
+CRITICAL: You MUST respond entirely in ${responseLangName}. The dish name stays in ${searchLangName} but EVERYTHING else (description, ingredient names, instruction steps) MUST be in ${responseLangName}. Return ONLY valid JSON array with this exact structure:
 [
   {
     "name": "Real dish name (e.g. 'Kyilinggryte med chilipepper')",
@@ -1086,7 +1086,7 @@ Focus on making the 3 versions meaningfully different from each other.`,
         },
         {
           role: "user",
-          content: prompt,
+          content: `Search for ${searchLangName} recipes for: "${prompt}"\n\nIMPORTANT: Respond in ${responseLangName}. The dish name can stay in ${searchLangName}, but all descriptions, ingredient names, and instructions MUST be in ${responseLangName}.`,
         },
       ],
       temperature: 0.7,
