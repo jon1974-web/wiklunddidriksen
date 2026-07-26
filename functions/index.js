@@ -1046,16 +1046,21 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
         {
           role: "system",
           content: `You are a helpful family meal planner for Norwegian families.
-The user will describe what they want to eat or what ingredients they have.
-Generate 3 recipe suggestions based on their request.
+The user will describe a specific dish or recipe they want.
+Generate exactly 3 VARIATIONS of the SAME dish — not different dishes.
 
 ${existingNames ? `These recipes already exist in their book: ${existingNames}. Avoid suggesting duplicates.` : ""}
+
+Each variation should be a different approach to the same dish:
+1. "Klassisk" — the traditional/authentic version
+2. "Raskere" — a quicker/easier version (less time, fewer steps)
+3. "Med en vri" — a creative twist or variation
 
 Respond in Norwegian. Return ONLY valid JSON array with this exact structure:
 [
   {
-    "name": "Recipe name",
-    "description": "Short 1-2 sentence description",
+    "name": "Dish name with variation tag (e.g. 'Janssons frestelse — Klassisk')",
+    "description": "Short description of this variation",
     "ingredients": [{"name": "Ingredient name", "amount": "Amount", "unit": "Unit"}],
     "instructions": ["Step 1", "Step 2"],
     "time": 30,
@@ -1064,7 +1069,8 @@ Respond in Norwegian. Return ONLY valid JSON array with this exact structure:
   }
 ]
 
-Generate exactly 3 recipes. Make them practical for everyday family cooking. Use Norwegian ingredient names where appropriate.`,
+Make each variation practical for everyday family cooking. Use Norwegian ingredient names where appropriate.
+Focus on making the 3 versions meaningfully different from each other — different techniques, ingredients, or complexity levels.`,
         },
         {
           role: "user",
