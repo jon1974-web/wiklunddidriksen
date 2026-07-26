@@ -329,6 +329,7 @@ export interface Recipe {
   portions: number;
   category: string;
   variation?: string;
+  cuisine?: string;
   isFavorite: boolean;
   createdBy: string;
   familyId: string;

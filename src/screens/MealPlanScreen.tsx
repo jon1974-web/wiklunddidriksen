@@ -377,6 +377,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         portions: aiRecipe.portions || 4,
         category: aiRecipe.category || 'kjoett',
         variation: aiRecipe.variation || '',
+        cuisine: aiRecipe.cuisine || '',
         isFavorite: false,
         createdBy: user?.uid || '',
         familyId,
@@ -642,7 +643,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
                   </TouchableOpacity>
                 </View>
-                <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>{item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}</Text>
+                <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>
+                  {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}
+                  {item.cuisine ? ` · ${item.cuisine}` : ''}
+                </Text>
               </View>
             </TouchableOpacity>
           )}
@@ -661,15 +665,20 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             aiResults.map((recipe, i) => (
               <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
                 <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
                     <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
                     {recipe.variation && (
                       <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
                         <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{recipe.variation}</Text>
                       </View>
                     )}
+                    {recipe.cuisine && (
+                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{recipe.cuisine}</Text>
+                      </View>
+                    )}
                   </View>
-                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner · {recipe.category || ''}</Text>
+                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner · {t(`mealPlanner.${recipe.category || 'kjoett'}`)}</Text>
                   {recipe.description ? <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }} numberOfLines={2}>{recipe.description}</Text> : null}
                 </View>
                 <View style={{ flexDirection: 'row', gap: 6 }}>
