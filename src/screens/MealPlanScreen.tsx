@@ -47,6 +47,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSearchLang, setAiSearchLang] = useState('');
+  const [cuisineSearch, setCuisineSearch] = useState('');
+  const [showCuisineDropdown, setShowCuisineDropdown] = useState(false);
   const [showAiResults, setShowAiResults] = useState(false);
   const [pickerSearch, setPickerSearch] = useState('');
   const [showUrlImport, setShowUrlImport] = useState(false);
@@ -80,6 +82,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     { key: 'suppe', label: '🍲 ' + t('mealPlanner.suppe') },
     { key: 'frokost', label: '🥞 ' + t('mealPlanner.frokost') },
     { key: 'sott', label: '🍰 ' + t('mealPlanner.sott') },
+  ];
+
+  const cuisineCountries = [
+    { name: 'Norge', flag: '🇳🇴' },
+    { name: 'Sverige', flag: '🇸🇪' },
+    { name: 'England', flag: '🇬🇧' },
+    { name: 'Danmark', flag: '🇩🇰' },
+    { name: 'Finland', flag: '🇫🇮' },
   ];
 
   const languageOptions = [
@@ -926,7 +936,45 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   {/* Cuisine */}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.cuisine')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.cuisine} onChangeText={v => setRecipeForm(f => ({ ...f, cuisine: v }))} placeholder={t('mealPlanner.cuisinePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                    {recipeForm.cuisine ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                        <TouchableOpacity
+                          style={[styles.input, { backgroundColor: colors.inputBackground, flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }]}
+                          onPress={() => { setRecipeForm(f => ({ ...f, cuisine: '' })); setCuisineSearch(''); setShowCuisineDropdown(true); }}
+                        >
+                          <Text style={{ fontSize: 16 }}>{cuisineCountries.find(c => c.name === recipeForm.cuisine)?.flag}</Text>
+                          <Text style={{ color: colors.text, fontSize: 14 }}>{recipeForm.cuisine}</Text>
+                          <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>×</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <View>
+                        <TextInput
+                          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                          value={cuisineSearch}
+                          onChangeText={v => { setCuisineSearch(v); setShowCuisineDropdown(true); }}
+                          onFocus={() => setShowCuisineDropdown(true)}
+                          placeholder={t('mealPlanner.cuisinePlaceholder')}
+                          placeholderTextColor={colors.textDisabled}
+                        />
+                        {showCuisineDropdown && (
+                          <View style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: 4, padding: 0, overflow: 'hidden' }]}>
+                            {cuisineCountries
+                              .filter(c => c.name.toLowerCase().includes(cuisineSearch.toLowerCase()))
+                              .map(c => (
+                                <TouchableOpacity
+                                  key={c.name}
+                                  style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}
+                                  onPress={() => { setRecipeForm(f => ({ ...f, cuisine: c.name })); setCuisineSearch(''); setShowCuisineDropdown(false); }}
+                                >
+                                  <Text style={{ fontSize: 16 }}>{c.flag}</Text>
+                                  <Text style={{ color: colors.text, fontSize: 14 }}>{c.name}</Text>
+                                </TouchableOpacity>
+                              ))}
+                          </View>
+                        )}
+                      </View>
+                    )}
                   </View>
 
                   {/* Ingredients */}
