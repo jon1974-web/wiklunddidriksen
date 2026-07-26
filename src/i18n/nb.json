@@ -496,6 +496,11 @@
     "langSvensk": "Svensk",
     "langEngelsk": "Engelsk",
     "langDansk": "Dansk",
-    "langFinsk": "Finsk"
+    "langFinsk": "Finsk",
+    "countryNorge": "Norge",
+    "countrySverige": "Sverige",
+    "countryEngland": "England",
+    "countryDanmark": "Danmark",
+    "countryFinland": "Finland"
   }
 }

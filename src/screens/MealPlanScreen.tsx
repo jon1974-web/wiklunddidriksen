@@ -82,11 +82,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   ];
 
   const languageOptions = [
-    { value: 'norsk', label: `🇳🇴 ${t('mealPlanner.langNorsk')}`, lang: 'nb' },
-    { value: 'svensk', label: `🇸🇪 ${t('mealPlanner.langSvensk')}`, lang: 'sv' },
-    { value: 'engelsk', label: `🇬🇧 ${t('mealPlanner.langEngelsk')}`, lang: 'en' },
-    { value: 'dansk', label: `🇩🇰 ${t('mealPlanner.langDansk')}`, lang: 'da' },
-    { value: 'finsk', label: `🇫🇮 ${t('mealPlanner.langFinsk')}`, lang: 'fi' },
+    { value: 'norsk', label: `🇳🇴 ${t('mealPlanner.countryNorge')}`, lang: 'nb' },
+    { value: 'svensk', label: `🇸🇪 ${t('mealPlanner.countrySverige')}`, lang: 'sv' },
+    { value: 'engelsk', label: `🇬🇧 ${t('mealPlanner.countryEngland')}`, lang: 'en' },
+    { value: 'dansk', label: `🇩🇰 ${t('mealPlanner.countryDanmark')}`, lang: 'da' },
+    { value: 'finsk', label: `🇫🇮 ${t('mealPlanner.countryFinland')}`, lang: 'fi' },
   ];
 
   useEffect(() => {
