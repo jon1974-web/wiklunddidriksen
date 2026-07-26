@@ -553,8 +553,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
       {filteredRecipes.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={{ fontSize: 40, marginBottom: 12 }}>📖</Text>
-          <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
+          <Text style={{ fontSize: 40, marginBottom: 12, textAlign: 'center' }}>📖</Text>
+          <Text style={[styles.emptyText, { color: colors.textDisabled, textAlign: 'center' }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
 
           {/* AI Search Section */}
           {searchQuery && (
