@@ -1257,83 +1257,51 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
     const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
 
     for (const [aiName, config] of missingLangs) {
+      const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
+      const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
+
+      const systemMsg = `Translate from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}.
+Output ONLY a JSON object. Every text value MUST be fully in ${config.english}. Do NOT use any ${languageConfig[sourceLanguage]?.english || "Norwegian"} words.`;
+
+      const userMsg = `Translate this to ${config.english}:
+
+name: ${name}
+description: ${description || ""}
+ingredients: ${ingredientText || "None"}
+instructions: ${instructionText || "None"}
+
+Return JSON exactly like this (all values translated to ${config.english}):
+{"name":"translated name","description":"translated description","ingredients":[{"name":"translated ingredient","amount":"amount","unit":"unit"}],"instructions":["translated step"]}`;
+
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
-          {
-            role: "system",
-            content: `Translate recipes from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}. Output ONLY valid JSON. Every text field MUST be 100% in ${config.english} - zero words from ${languageConfig[sourceLanguage]?.english || "Norwegian"} allowed.`,
-          },
-          {
-            role: "user",
-            content: `Translate this recipe name and description to ${config.english}. Output JSON with "name" and "description" keys.
-
-Name: ${name}
-Description: ${description || ""}`,
-          },
+          { role: "system", content: systemMsg },
+          { role: "user", content: userMsg },
         ],
         temperature: 0.3,
-        max_tokens: 500,
+        max_tokens: 2000,
       });
 
       const content = completion.choices[0]?.message?.content;
-      let nameTranslation = name;
-      let descriptionTranslation = description || "";
+      console.log(`translateRecipe: raw response for ${config.code}: ${content?.substring(0, 200)}`);
       if (content) {
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           try {
             const parsed = JSON.parse(jsonMatch[0]);
-            nameTranslation = parsed.name || name;
-            descriptionTranslation = parsed.description || description || "";
-          } catch {}
+            newTranslations[config.code] = {
+              name: parsed.name || name,
+              description: parsed.description || description || "",
+              ingredients: parsed.ingredients || ingredients || [],
+              instructions: parsed.instructions || instructions || [],
+            };
+            console.log(`translateRecipe: OK ${config.code} name="${newTranslations[config.code].name}" desc="${newTranslations[config.code].description?.substring(0, 50)}..."`);
+          } catch (e) {
+            console.log(`translateRecipe: JSON parse error for ${config.code}: ${e.message}`);
+          }
         }
       }
-
-      // Then translate ingredients and instructions separately
-      const completion2 = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `Translate recipes from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}. Output ONLY valid JSON. Every text field MUST be 100% in ${config.english} - zero words from ${languageConfig[sourceLanguage]?.english || "Norwegian"} allowed. Keep amounts and units as-is.`,
-          },
-          {
-            role: "user",
-            content: `Translate these ingredients and instructions to ${config.english}. Output JSON with "ingredients" and "instructions" keys.
-
-Ingredients:
-${ingredientText || "None"}
-
-Instructions:
-${instructionText || "None"}`,
-          },
-        ],
-        temperature: 0.3,
-        max_tokens: 1500,
-      });
-
-      const content2 = completion2.choices[0]?.message?.content;
-      let ingredientsTranslation = ingredients || [];
-      let instructionsTranslation = instructions || [];
-      if (content2) {
-        const jsonMatch2 = content2.match(/\{[\s\S]*\}/);
-        if (jsonMatch2) {
-          try {
-            const parsed2 = JSON.parse(jsonMatch2[0]);
-            ingredientsTranslation = parsed2.ingredients || ingredients || [];
-            instructionsTranslation = parsed2.instructions || instructions || [];
-          } catch {}
-        }
-      }
-
-      newTranslations[config.code] = {
-        name: nameTranslation,
-        description: descriptionTranslation,
-        ingredients: ingredientsTranslation,
-        instructions: instructionsTranslation,
-      };
-      console.log(`translateRecipe: translated to ${config.english} (${config.code})`);
     }
 
     if (Object.keys(newTranslations).length > 0) {
