@@ -165,9 +165,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         cuisine: recipeForm.cuisine || '',
       };
       if (editingRecipe) {
-        await import('firebase/firestore').then(({ updateDoc, doc }) =>
-          updateDoc(doc(db, 'recipes', editingRecipe.id), { ...recipeData, translations: {} })
-        );
+        const { updateDoc, doc } = await import('firebase/firestore');
+        await updateDoc(doc(db, 'recipes', editingRecipe.id), { ...recipeData, translations: {} });
+        await new Promise(resolve => setTimeout(resolve, 500));
         triggerRecipeTranslation(editingRecipe.id, recipeData.name, recipeData.description, recipeData.ingredients, recipeData.instructions, undefined, true);
       } else {
         const docRef = await addDoc(collection(db, 'recipes'), {

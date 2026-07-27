@@ -1238,15 +1238,17 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
     const db = getFirestore();
     const recipeDoc = await db.collection("recipes").doc(recipeId).get();
     const existingTranslations = recipeDoc.exists ? (recipeDoc.data().translations || {}) : {};
+    console.log(`translateRecipe: recipeId=${recipeId}, force=${force}, existingKeys=${Object.keys(existingTranslations).join(',')}, sourceLang=${sourceLanguage}`);
 
     const newTranslations = force ? {} : { ...existingTranslations };
 
     // Always store source language as copy of original
     newTranslations[sourceLangCode] = { name, description: description || "", ingredients: ingredients || [], instructions: instructions || [] };
 
-    const missingLangs = targetLangs.filter(([_, config]) => !newTranslations[config.code]);
+    const langsToTranslate = targetLangs;
+    console.log(`translateRecipe: translating ${langsToTranslate.map(([k,c]) => c.code).join(',')}, force=${force}`);
 
-    if (missingLangs.length === 0) {
+    if (langsToTranslate.length === 0) {
       await db.collection("recipes").doc(recipeId).update({ translations: newTranslations });
       return res.status(200).json({ translations: newTranslations, message: "All 5 translations present" });
     }
@@ -1256,7 +1258,7 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
     const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
     const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
 
-    for (const [aiName, config] of missingLangs) {
+    for (const [aiName, config] of langsToTranslate) {
       const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
       const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
 
