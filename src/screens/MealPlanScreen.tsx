@@ -200,12 +200,16 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       if (!currentUser) return;
       const token = await currentUser.getIdToken();
       const sourceLanguage = getAiNameForCode(i18n.language);
-      fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/translateRecipe', {
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/translateRecipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ recipeId, name, description, ingredients, instructions, sourceLanguage }),
       });
-    } catch {}
+      const data = await res.json();
+      console.log('Translation result:', data);
+    } catch (error) {
+      console.error('Translation failed:', error);
+    }
   };
 
   const handleDeleteRecipe = async () => {

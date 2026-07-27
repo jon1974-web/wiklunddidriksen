@@ -853,31 +853,6 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>🤖 Oversett oppskrifter</Text>
-        <TouchableOpacity
-          style={[styles.familyButton, { backgroundColor: colors.accent }]}
-          onPress={async () => {
-            try {
-              const { getAuth } = await import('firebase/auth');
-              const token = await getAuth().currentUser?.getIdToken();
-              if (!token) return;
-              crossAlert('Starter', 'Oversetter oppskrifter... Dette kan ta et minutt.');
-              const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/migrateRecipeTranslations', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-              });
-              const data = await res.json();
-              crossAlert('Ferdig', `Oversatt: ${data.translated} oppskrifter, ${data.failed} feilet.`);
-            } catch (error) {
-              crossAlert('Feil', 'Kunne ikke oversette oppskrifter.');
-            }
-          }}
-        >
-          <Text style={styles.familyButtonText}>Oversett alle oppskrifter</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.notifications')}</Text>
           <View style={styles.themeOptions}>
             <TouchableOpacity
