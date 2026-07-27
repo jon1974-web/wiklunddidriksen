@@ -39,6 +39,7 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - Follow the existing namespace pattern: `common.*`, `events.*`, `transport.*`, `profile.*`, etc.
 - When adding new features, always add translation keys first, then use them in the code
 - For components that need language reactivity (useMemo), use `langKey` state or `i18n.on('languageChanged')` listener
+- **This applies to ALL user-facing text**: buttons, links, labels, text inputs, placeholder text, helper texts, error messages, alert titles/messages, section headers, empty states, tooltips, badge labels, and any other visible text
 
 ### Family Role System
 - `Family.members` is a map: `{ [uid]: { role: 'owner'|'admin'|'member', displayName: string } }`
