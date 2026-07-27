@@ -1318,9 +1318,11 @@ exports.migrateRecipeTranslations = onRequest({ region: "us-central1", memory: "
 
   try {
     const recipesSnap = await db.collection("recipes").limit(500).get();
+    const targetLangCodes = Object.values(languageConfig).map(c => c.code).filter(c => c !== "nb");
     const toTranslate = recipesSnap.docs.filter(d => {
       const data = d.data();
-      return !data.translations || Object.keys(data.translations).length === 0;
+      if (!data.translations) return true;
+      return targetLangCodes.some(code => !data.translations[code]);
     });
 
     if (toTranslate.length === 0) {
@@ -1333,13 +1335,15 @@ exports.migrateRecipeTranslations = onRequest({ region: "us-central1", memory: "
 
     for (const recipeDoc of toTranslate) {
       const recipe = recipeDoc.data();
+      const existingTranslations = recipe.translations || {};
       const sourceLanguage = "norsk";
       const ingredientText = (recipe.ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
       const instructionText = (recipe.instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
 
-      const translations = {};
+      const newTranslations = { ...existingTranslations };
 
       for (const [aiName, config] of Object.entries(languageConfig).filter(([k]) => k !== sourceLanguage)) {
+        if (newTranslations[config.code]) continue;
         try {
           const completion = await openai.chat.completions.create({
             model: "gpt-4o-mini",
@@ -1381,15 +1385,15 @@ ${instructionText || "None"}`,
             const jsonMatch = content.match(/\{[\s\S]*\}/);
             if (jsonMatch) {
               try {
-                translations[config.code] = JSON.parse(jsonMatch[0]);
+                newTranslations[config.code] = JSON.parse(jsonMatch[0]);
               } catch {}
             }
           }
         } catch {}
       }
 
-      if (Object.keys(translations).length > 0) {
-        await db.collection("recipes").doc(recipeDoc.id).update({ translations });
+      if (Object.keys(newTranslations).length > 0) {
+        await db.collection("recipes").doc(recipeDoc.id).update({ translations: newTranslations });
         translated++;
       } else {
         failed++;
