@@ -8,6 +8,7 @@ import { useUserStore } from '../store/userStore';
 import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Recipe, ShoppingList, ShoppingItem } from '../types';
+import { LANGUAGES, getAiNameForCode } from '../constants/languages';
 import { ActionModal } from '../components/ActionModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
@@ -84,21 +85,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     { key: 'sott', label: '🍰 ' + t('mealPlanner.sott') },
   ];
 
-  const cuisineCountries = [
-    { name: 'Norge', flag: '🇳🇴' },
-    { name: 'Sverige', flag: '🇸🇪' },
-    { name: 'England', flag: '🇬🇧' },
-    { name: 'Danmark', flag: '🇩🇰' },
-    { name: 'Finland', flag: '🇫🇮' },
-  ];
+  const cuisineCountries = LANGUAGES.map(l => ({ name: l.code === 'nb' ? 'Norge' : l.code === 'sv' ? 'Sverige' : l.code === 'da' ? 'Danmark' : l.code === 'en' ? 'England' : 'Finland', flag: l.flag }));
 
-  const languageOptions = [
-    { value: 'norsk', label: `🇳🇴 ${t('mealPlanner.countryNorge')}`, lang: 'nb' },
-    { value: 'svensk', label: `🇸🇪 ${t('mealPlanner.countrySverige')}`, lang: 'sv' },
-    { value: 'engelsk', label: `🇬🇧 ${t('mealPlanner.countryEngland')}`, lang: 'en' },
-    { value: 'dansk', label: `🇩🇰 ${t('mealPlanner.countryDanmark')}`, lang: 'da' },
-    { value: 'finsk', label: `🇫🇮 ${t('mealPlanner.countryFinland')}`, lang: 'fi' },
-  ];
+  const languageOptions = LANGUAGES.map(l => ({ value: l.aiName, label: `${l.flag} ${t('mealPlanner.country' + (l.code === 'nb' ? 'Norge' : l.code === 'sv' ? 'Sverige' : l.code === 'da' ? 'Danmark' : l.code === 'en' ? 'England' : 'Finland'))}`, lang: l.code }));
 
   useEffect(() => {
     const defaultLang = languageOptions.find(o => o.lang === i18n.language);
@@ -177,14 +166,16 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         await import('firebase/firestore').then(({ updateDoc, doc }) =>
           updateDoc(doc(db, 'recipes', editingRecipe.id), recipeData)
         );
+        triggerRecipeTranslation(editingRecipe.id, recipeData.name, recipeData.description, recipeData.ingredients, recipeData.instructions);
       } else {
-        await addDoc(collection(db, 'recipes'), {
+        const docRef = await addDoc(collection(db, 'recipes'), {
           ...recipeData,
           isFavorite: false,
           createdBy: user?.uid || '',
           familyId,
           createdAt: Date.now(),
         });
+        triggerRecipeTranslation(docRef.id, recipeData.name, recipeData.description, recipeData.ingredients, recipeData.instructions);
       }
       setShowAddRecipe(false);
       setEditingRecipe(null);
@@ -194,6 +185,27 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       console.error('Failed to save recipe:', error);
       crossAlert('Error', getErrorMessage(error));
     }
+  };
+
+  const getRecipeText = (recipe: Recipe, field: 'name' | 'description' | 'ingredients' | 'instructions') => {
+    if (recipe.translations?.[i18n.language]?.[field]) {
+      return recipe.translations[i18n.language][field];
+    }
+    return recipe[field];
+  };
+
+  const triggerRecipeTranslation = async (recipeId: string, name: string, description: string, ingredients: any[], instructions: string[]) => {
+    try {
+      const currentUser = (await import('firebase/auth')).getAuth().currentUser;
+      if (!currentUser) return;
+      const token = await currentUser.getIdToken();
+      const sourceLanguage = getAiNameForCode(i18n.language);
+      fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/translateRecipe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ recipeId, name, description, ingredients, instructions, sourceLanguage }),
+      });
+    } catch {}
   };
 
   const handleDeleteRecipe = async () => {
@@ -365,7 +377,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           prompt: searchQueryValue,
           existingRecipes: recipes.map(r => ({ name: r.name })),
           searchLanguage: aiSearchLang || 'norsk',
-          responseLanguage: i18n.language === 'nb' ? 'norsk' : i18n.language === 'sv' ? 'svensk' : i18n.language === 'da' ? 'dansk' : i18n.language === 'fi' ? 'finsk' : 'engelsk',
+            responseLanguage: getAiNameForCode(i18n.language),
         }),
       });
       if (!res.ok) throw new Error('Kunne ikke generere forslag');
@@ -381,7 +393,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const handleSaveAiRecipe = async (aiRecipe: any) => {
     if (!familyId) return;
     try {
-      await addDoc(collection(db, 'recipes'), {
+      const docRef = await addDoc(collection(db, 'recipes'), {
         name: aiRecipe.name,
         description: aiRecipe.description || '',
         ingredients: aiRecipe.ingredients || [],
@@ -396,6 +408,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         familyId,
         createdAt: Date.now(),
       });
+      triggerRecipeTranslation(docRef.id, aiRecipe.name, aiRecipe.description || '', aiRecipe.ingredients || [], aiRecipe.instructions || []);
       crossAlert('Suksess', `"${aiRecipe.name}" lagt til i oppskriftsboken`);
       loadData();
     } catch (error) {
@@ -413,7 +426,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/importRecipeFromUrl', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ url: importUrl, language: i18n.language === 'nb' ? 'norsk' : i18n.language === 'sv' ? 'svensk' : i18n.language === 'en' ? 'engelsk' : i18n.language === 'da' ? 'dansk' : 'finsk' }),
+        body: JSON.stringify({ url: importUrl, language: getAiNameForCode(i18n.language) }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -421,7 +434,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       }
       const data = await res.json();
       if (data.recipe) {
-        await addDoc(collection(db, 'recipes'), {
+        const docRef = await addDoc(collection(db, 'recipes'), {
           name: data.recipe.name,
           description: data.recipe.description || '',
           ingredients: data.recipe.ingredients || [],
@@ -436,6 +449,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           familyId: familyId || '',
           createdAt: Date.now(),
         });
+        triggerRecipeTranslation(docRef.id, data.recipe.name, data.recipe.description || '', data.recipe.ingredients || [], data.recipe.instructions || []);
         crossAlert('Suksess', `"${data.recipe.name}" lagt til i oppskriftsboken`);
         setShowUrlImport(false);
         setImportUrl('');
@@ -679,7 +693,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                         >
                           <View style={{ flex: 1 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{item.name}</Text>
+                              <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{getRecipeText(item, 'name')}</Text>
                               <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }}>
                                 <Text style={{ fontSize: 14 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
                               </TouchableOpacity>
@@ -1038,7 +1052,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
                   <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail?.name}</Text>
+                    <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail ? getRecipeText(showRecipeDetail, 'name') : ''}</Text>
                     {showRecipeDetail?.variation && (
                       <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9', alignSelf: 'center' }}>
                         <Text style={{ fontSize: 12, fontWeight: '600', color: colors.accent }}>{showRecipeDetail.variation}</Text>
@@ -1051,12 +1065,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     )}
                   </View>
                 <ScrollView>
-                  {showRecipeDetail?.description ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.description}</Text> : null}
+                  {showRecipeDetail?.description ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{getRecipeText(showRecipeDetail, 'description')}</Text> : null}
                   {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}</Text> : null}
                   {showRecipeDetail?.ingredients && showRecipeDetail.ingredients.length > 0 && (
                     <Text style={[styles.cardTitle, { color: colors.text }]}>{t('mealPlanner.ingredientsList')}</Text>
                   )}
-                  {showRecipeDetail?.ingredients?.map((ing, i) => (
+                  {(showRecipeDetail ? getRecipeText(showRecipeDetail, 'ingredients') : [])?.map((ing: any, i: number) => (
                     <View key={i} style={[styles.shoppingItem, { borderBottomColor: colors.border }]}>
                       <Text style={[styles.shoppingName, { color: colors.text }]}>{ing.name}</Text>
                       <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>{ing.amount} {ing.unit}</Text>
@@ -1066,7 +1080,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   {showRecipeDetail?.instructions && showRecipeDetail.instructions.length > 0 && (
                     <>
                       <Text style={[styles.cardTitle, { color: colors.text, marginTop: 12 }]}>{t('mealPlanner.instructionsList')}</Text>
-                      {showRecipeDetail.instructions.map((step, i) => (
+                      {(showRecipeDetail ? getRecipeText(showRecipeDetail, 'instructions') : [])?.map((step: string, i: number) => (
                         <View key={i} style={{ flexDirection: 'row', gap: 8, marginBottom: 8, alignItems: 'flex-start' }}>
                           <Text style={{ color: colors.accent, fontWeight: '700', width: 20, fontSize: 13 }}>{i + 1}.</Text>
                           <Text style={{ fontSize: 13, lineHeight: 20, color: colors.text, flex: 1 }}>{step}</Text>

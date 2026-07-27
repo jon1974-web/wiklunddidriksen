@@ -47,6 +47,7 @@ import { SpondGroup, SpondMember, SpondGroupMember, UserProfile, Family } from '
 import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '../i18n';
+import { LANGUAGES } from '../constants/languages';
 import i18n from '../i18n';
 
 export const ProfileScreen: React.FC = () => {
@@ -833,24 +834,18 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.language')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, paddingVertical: 8 }}>
-          {([
-            { key: 'nb', label: '🇳🇴 NO' },
-            { key: 'sv', label: '🇸🇪 SV' },
-            { key: 'da', label: '🇩🇰 DA' },
-            { key: 'en', label: '🇬🇧 EN' },
-            { key: 'fi', label: '🇫🇮 FI' },
-          ]).map((lang) => (
+          {LANGUAGES.map((lang) => (
             <TouchableOpacity
-              key={lang.key}
-              onPress={() => { setLanguage(lang.key); setLangKey(k => k + 1); }}
+              key={lang.code}
+              onPress={() => { setLanguage(lang.code); setLangKey(k => k + 1); }}
               style={[
                 styles.langOption,
                 { backgroundColor: colors.inputBackground, borderColor: colors.border },
-                i18n.language === lang.key && { backgroundColor: colors.accent, borderColor: colors.accent },
+                i18n.language === lang.code && { backgroundColor: colors.accent, borderColor: colors.accent },
               ]}
             >
-              <Text style={[styles.langText, { color: i18n.language === lang.key ? '#fff' : colors.text }]}>
-                {lang.label}
+              <Text style={[styles.langText, { color: i18n.language === lang.code ? '#fff' : colors.text }]}>
+                {lang.flag} {lang.label}
               </Text>
             </TouchableOpacity>
           ))}

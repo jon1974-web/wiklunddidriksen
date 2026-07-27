@@ -1,3 +1,5 @@
+import { getDefaultCurrency } from './languages';
+
 export interface CurrencyInfo {
   code: string;
   name: string;
@@ -119,14 +121,7 @@ export function getCurrencyForCountry(countryName: string): CountryCurrency | nu
 }
 
 export function getCurrencyForLanguage(lang: string): CurrencyInfo {
-  const map: Record<string, string> = {
-    nb: 'NOK',
-    sv: 'SEK',
-    da: 'DKK',
-    en: 'GBP',
-    fi: 'EUR',
-  };
-  const code = map[lang] || 'NOK';
+  const code = getDefaultCurrency(lang);
   return COUNTRIES[code] || COUNTRIES.NOK;
 }
 

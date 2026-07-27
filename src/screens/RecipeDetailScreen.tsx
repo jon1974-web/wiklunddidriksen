@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { useUserStore } from '../store/userStore';
 import { doc, updateDoc, deleteDoc, collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -23,6 +24,13 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const user = useUserStore((state) => state.user);
   const recipe = route.params.recipe;
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const getRecipeText = (field: 'name' | 'description' | 'ingredients' | 'instructions') => {
+    if (recipe.translations?.[i18n.language]?.[field]) {
+      return recipe.translations[i18n.language][field];
+    }
+    return recipe[field];
+  };
 
   const toggleFavorite = async () => {
     try {
@@ -51,7 +59,7 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       if (listsSnap.docs.length > 0) {
         const listDoc = listsSnap.docs[0];
         const existingItems = listDoc.data().items || [];
-        const newItems = recipe.ingredients.map(ing => ({
+        const newItems = (getRecipeText('ingredients') || recipe.ingredients).map((ing: any) => ({
           id: generateId(),
           name: ing.amount ? `${ing.name} (${ing.amount} ${ing.unit})` : ing.name,
           checked: false,
@@ -91,7 +99,7 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
 
       <ScrollView contentContainerStyle={styles.content}>
         <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-          <Text style={[styles.recipeTitle, { color: colors.text }]}>{recipe.name}</Text>
+          <Text style={[styles.recipeTitle, { color: colors.text }]}>{getRecipeText('name')}</Text>
           {recipe.variation && (
             <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9', alignSelf: 'center' }}>
               <Text style={{ fontSize: 12, fontWeight: '600', color: colors.accent }}>{recipe.variation}</Text>
@@ -108,7 +116,7 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         </Text>
 
         {recipe.description ? (
-          <Text style={[styles.recipeDesc, { color: colors.textSecondary }]}>{recipe.description}</Text>
+          <Text style={[styles.recipeDesc, { color: colors.textSecondary }]}>{getRecipeText('description')}</Text>
         ) : null}
 
         <View style={styles.actionRow}>
@@ -119,18 +127,21 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
 
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>📋 {t('mealPlanner.ingredientsList')}</Text>
-          {recipe.ingredients.map((ing, i) => (
-            <View key={i} style={[styles.ingredientRow, { borderBottomColor: colors.border }]}>
-              <View style={styles.ingredientCheck} />
-              <Text style={[styles.ingredientName, { color: colors.text }]}>{ing.name}</Text>
-              <Text style={[styles.ingredientQty, { color: colors.textSecondary }]}>{ing.amount} {ing.unit}</Text>
-            </View>
-          ))}
+          {recipe.ingredients.map((ing, i) => {
+            const translatedIng = getRecipeText('ingredients')?.[i] || ing;
+            return (
+              <View key={i} style={[styles.ingredientRow, { borderBottomColor: colors.border }]}>
+                <View style={styles.ingredientCheck} />
+                <Text style={[styles.ingredientName, { color: colors.text }]}>{translatedIng.name}</Text>
+                <Text style={[styles.ingredientQty, { color: colors.textSecondary }]}>{translatedIng.amount} {translatedIng.unit}</Text>
+              </View>
+            );
+          })}
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>👨‍🍳 {t('mealPlanner.instructionsList')}</Text>
-          {recipe.instructions.map((step, i) => (
+          {(getRecipeText('instructions') || recipe.instructions).map((step, i) => (
             <View key={i} style={styles.stepRow}>
               <View style={[styles.stepNum, { backgroundColor: colors.accent }]}>
                 <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>{i + 1}</Text>

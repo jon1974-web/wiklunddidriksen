@@ -1208,3 +1208,93 @@ If you cannot extract a recipe from the content, return {"error": "Could not ext
   }
 });
 
+// Translate recipe to all supported languages
+exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { recipeId, name, description, ingredients, instructions, sourceLanguage } = req.body || {};
+  if (!recipeId || !name) {
+    return res.status(400).json({ error: "recipeId and name are required" });
+  }
+
+  const languageConfig = {
+    norsk: { code: "nb", english: "Norwegian" },
+    svensk: { code: "sv", english: "Swedish" },
+    dansk: { code: "da", english: "Danish" },
+    engelsk: { code: "en", english: "English" },
+    finsk: { code: "fi", english: "Finnish" },
+  };
+
+  const targetLangs = Object.entries(languageConfig).filter(([key]) => key !== sourceLanguage);
+
+  try {
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+    const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
+    const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
+
+    const translations = {};
+
+    for (const [aiName, config] of targetLangs) {
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `You are a professional translator for a family meal planner app. Translate the following recipe from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}.
+
+Translate ALL text fields accurately. Ingredient names and instruction steps must be properly translated. Keep amounts and units as-is if they are numeric.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "name": "Translated recipe name",
+  "description": "Translated description",
+  "ingredients": [{"name": "Translated ingredient name", "amount": "Amount", "unit": "Unit"}],
+  "instructions": ["Translated step 1", "Translated step 2"]
+}`,
+          },
+          {
+            role: "user",
+            content: `Translate this recipe to ${config.english}:
+
+Name: ${name}
+Description: ${description || ""}
+
+Ingredients:
+${ingredientText || "None"}
+
+Instructions:
+${instructionText || "None"}`,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 2000,
+      });
+
+      const content = completion.choices[0]?.message?.content;
+      if (content) {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            translations[config.code] = JSON.parse(jsonMatch[0]);
+          } catch {}
+        }
+      }
+    }
+
+    if (Object.keys(translations).length > 0) {
+      await getFirestore().collection("recipes").doc(recipeId).update({ translations });
+    }
+
+    return res.status(200).json({ translations });
+  } catch (error) {
+    console.error("Translate recipe error:", error);
+    return res.status(500).json({ error: "Failed to translate recipe" });
+  }
+});
+

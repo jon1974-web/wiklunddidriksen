@@ -1,12 +1,13 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { LANGUAGE_CODES, detectLanguage } from '../constants/languages';
 import nb from './nb.json';
 import sv from './sv.json';
 import da from './da.json';
 import en from './en.json';
 import fi from './fi.json';
 
-const resources = {
+const resources: Record<string, { translation: any }> = {
   nb: { translation: nb },
   sv: { translation: sv },
   da: { translation: da },
@@ -17,7 +18,7 @@ const resources = {
 function getStoredLanguage(): string {
   try {
     const stored = localStorage.getItem('language');
-    if (stored && ['nb', 'sv', 'da', 'en', 'fi'].includes(stored)) {
+    if (stored && LANGUAGE_CODES.includes(stored)) {
       return stored;
     }
   } catch {}
@@ -27,11 +28,7 @@ function getStoredLanguage(): string {
 function getDeviceLanguage(): string {
   try {
     const lang = navigator?.language || navigator?.languages?.[0] || 'nb';
-    if (lang.startsWith('sv')) return 'sv';
-    if (lang.startsWith('da')) return 'da';
-    if (lang.startsWith('en')) return 'en';
-    if (lang.startsWith('fi')) return 'fi';
-    return 'nb';
+    return detectLanguage(lang);
   } catch {
     return 'nb';
   }

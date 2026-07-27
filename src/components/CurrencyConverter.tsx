@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+import { getLocale } from '../constants/languages';
 import { ALL_CURRENCIES, CURRENCY_INFO, getCurrencyForCountry, getCurrencyForLanguage } from '../constants/currencies';
 import { convertAmount, ExchangeRateResult } from '../services/currencyService';
 
@@ -76,7 +78,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
             onPress={() => setAmount(String(q))}
           >
             <Text style={[styles.quickBtnText, { color: amount === String(q) ? '#fff' : colors.textSecondary }]}>
-              {q.toLocaleString('nb-NO')}
+              {q.toLocaleString(getLocale(i18n.language))}
             </Text>
           </TouchableOpacity>
         ))}
@@ -135,8 +137,8 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
       ) : result ? (
         <View style={[styles.resultBox, { backgroundColor: colors.accentLight || '#f0f9fa', borderColor: colors.accent + '30' }]}>
           <Text style={[styles.resultMain, { color: colors.accent }]}>
-            {result.amount?.toLocaleString('nb-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.from} = {' '}
-            {result.result?.toLocaleString('nb-NO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.to}
+            {result.amount?.toLocaleString(getLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.from} = {' '}
+            {result.result?.toLocaleString(getLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.to}
           </Text>
           <Text style={[styles.resultRate, { color: colors.textSecondary }]}>
             1 {result.from} = {result.rate.toFixed(4)} {result.to}

@@ -1,3 +1,6 @@
+import { getLocale } from '../constants/languages';
+import i18n from '../i18n';
+
 export const getTodayLocal = (): string => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -5,7 +8,7 @@ export const getTodayLocal = (): string => {
 
 export const formatDate = (dateStr: string): string => {
   const date = new Date(dateStr);
-  return date.toLocaleDateString('nb-NO', {
+  return date.toLocaleDateString(getLocale(i18n.language), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',

@@ -4,6 +4,8 @@ import { Event, Trip, SpondEvent, Birthday } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+import { getLocale } from '../constants/languages';
 
 interface WeeklySummaryProps {
   visible: boolean;
@@ -64,7 +66,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       const dateStr = toLocalDateStr(d);
-      const dateLabel = d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'short' });
+      const dateLabel = d.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'short' });
       const items: DayItem[] = [];
 
       events.forEach((e) => {
@@ -128,7 +130,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       });
     }
 
-    return { weekNum, days, startLabel: start.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' }) };
+    return { weekNum, days, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
   }, [events, trips, spondEvents, t, i18nInstance, langKey]);
 
   return (
@@ -178,7 +180,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                     const d = new Date(start);
                     d.setDate(d.getDate() + di);
                     return d.getMonth() === bDate.getMonth() && d.getDate() === bDate.getDate();
-                  }) * 86400000).toLocaleDateString('nb-NO', { weekday: 'long' });
+                  }) * 86400000).toLocaleDateString(getLocale(i18n.language), { weekday: 'long' });
                   return (
                     <View key={i} style={[styles.birthdayItem, i < weekBirthdays.length - 1 && { borderBottomColor: colors.border }]}>
                       <Text style={[styles.birthdayItemText, { color: colors.text }]}>

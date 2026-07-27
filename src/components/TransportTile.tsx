@@ -5,6 +5,8 @@ import { useTheme } from '../theme/ThemeContext';
 import { getCarrierDomain } from '../constants/carrierDomains';
 import { getFaviconUrl } from '../utils/favicon';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+import { getLocale } from '../constants/languages';
 
 interface TransportTileProps {
   flight: TripFlight;
@@ -33,7 +35,7 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
   if (calDate) {
     const d = new Date(calDate + 'T12:00:00');
     calDay = String(d.getDate());
-    calMonth = d.toLocaleDateString('nb-NO', { month: 'short' });
+    calMonth = d.toLocaleDateString(getLocale(i18n.language), { month: 'short' });
   }
   const depLabel = f.transportType === 'bil' ? '🔑' : '🛫';
   const arrLabel = f.transportType === 'bil' ? '📋' : '🛬';

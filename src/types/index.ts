@@ -319,6 +319,13 @@ export interface RecipeIngredient {
   unit: string;
 }
 
+export interface RecipeTranslation {
+  name: string;
+  description: string;
+  ingredients: RecipeIngredient[];
+  instructions: string[];
+}
+
 export interface Recipe {
   id: string;
   name: string;
@@ -334,6 +341,9 @@ export interface Recipe {
   createdBy: string;
   familyId: string;
   createdAt: number;
+  translations?: {
+    [lang: string]: RecipeTranslation;
+  };
 }
 
 export interface MealPlan {

@@ -11,6 +11,8 @@ import { crossAlert } from '../utils/alert';
 import { CartIcon } from '../components/CartIcon';
 import { ActionModal } from '../components/ActionModal';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+import { getLocale } from '../constants/languages';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -114,7 +116,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
     const checkedCount = item.items.filter((i) => i.checked).length;
     const dateObj = item.createdAt ? new Date(item.createdAt) : null;
     const dayNum = dateObj ? String(dateObj.getDate()) : '';
-    const monthStr = dateObj ? dateObj.toLocaleDateString('nb-NO', { month: 'long' }) : '';
+    const monthStr = dateObj ? dateObj.toLocaleDateString(getLocale(i18n.language), { month: 'long' }) : '';
     return (
       <TouchableOpacity
         style={[styles.listCard, { backgroundColor: colors.surface }]}

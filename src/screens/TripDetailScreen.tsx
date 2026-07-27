@@ -57,6 +57,7 @@ import {
 import { ref, deleteObject } from 'firebase/storage';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import { getLocale } from '../constants/languages';
 import { storage } from '../services/firebase';
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
@@ -291,7 +292,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const formatShortDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return `${d.toLocaleDateString('nb-NO', { weekday: 'short' })} ${d.getDate()}.${d.getMonth() + 1}`;
+    return `${d.toLocaleDateString(getLocale(i18n.language), { weekday: 'short' })} ${d.getDate()}.${d.getMonth() + 1}`;
   };
 
   const [cityTipsList, setCityTipsList] = useState<CityTips[]>(
@@ -1135,7 +1136,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{isExpanded ? '▼' : '▶'}</Text>
                   <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>{entry.city}</Text>
                   <Text style={[styles.tipsExpandDate, { color: colors.textDisabled }]}>
-                    {new Date(entry.tips.generatedAt).toLocaleDateString('nb-NO')}
+                    {new Date(entry.tips.generatedAt).toLocaleDateString(getLocale(i18n.language))}
                   </Text>
                   <TouchableOpacity
                     onPress={() => {

@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import i18n from '../i18n';
+import { getLocale } from '../constants/languages';
 
 interface Option {
   label: string;
@@ -24,7 +26,7 @@ function generateDateOptions(count: number, offset: number): Option[] {
     const d = new Date();
     d.setDate(d.getDate() + offset + i);
     const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    const label = d.toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    const label = d.toLocaleDateString(getLocale(i18n.language), { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
     return { label, value: dateStr };
   });
 }

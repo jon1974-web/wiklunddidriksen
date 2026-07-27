@@ -3,6 +3,8 @@ import { View, Text, ScrollView, TouchableOpacity, TextInput, Modal, TouchableWi
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+import { getLocale } from '../constants/languages';
 import { useUserStore } from '../store/userStore';
 import { collection, query, where, getDocs, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -146,7 +148,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   const formatDate = (dateStr: string) => {
     const d = new Date(dateStr);
-    return d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+    return d.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' });
   };
 
   return (

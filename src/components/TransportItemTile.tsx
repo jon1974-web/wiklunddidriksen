@@ -3,6 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { formatDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
+import { getLocale } from '../constants/languages';
 
 interface TransportItemTileProps {
   icon: string;
@@ -25,7 +27,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   const { t } = useTranslation();
   const { colors } = useTheme();
   const calDay = departureDate ? String(new Date(departureDate + 'T12:00:00').getDate()) : '';
-  const calMonth = departureDate ? new Date(departureDate + 'T12:00:00').toLocaleDateString('nb-NO', { month: 'short' }) : '';
+  const calMonth = departureDate ? new Date(departureDate + 'T12:00:00').toLocaleDateString(getLocale(i18n.language), { month: 'short' }) : '';
   const depIcon = icon === '⛴️' || icon === '🚢' ? '⚓' : icon === '🚕' ? '🔑' : '🛫';
   const arrIcon = icon === '⛴️' || icon === '🚢' ? '🏁' : icon === '🚕' ? '📍' : '🛬';
   const tileColor = isHjemreise ? '#E53935' : colors.accent;
