@@ -1230,6 +1230,8 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
     finsk: { code: "fi", english: "Finnish" },
   };
 
+  const allLangCodes = Object.values(languageConfig).map(c => c.code);
+  const sourceLangCode = languageConfig[sourceLanguage]?.code || "nb";
   const targetLangs = Object.entries(languageConfig).filter(([key]) => key !== sourceLanguage);
 
   try {
@@ -1237,18 +1239,24 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
     const recipeDoc = await db.collection("recipes").doc(recipeId).get();
     const existingTranslations = recipeDoc.exists ? (recipeDoc.data().translations || {}) : {};
 
-    const missingLangs = targetLangs.filter(([_, config]) => !existingTranslations[config.code]);
+    const newTranslations = { ...existingTranslations };
+
+    // Always store source language as copy of original
+    if (!newTranslations[sourceLangCode]) {
+      newTranslations[sourceLangCode] = { name, description: description || "", ingredients: ingredients || [], instructions: instructions || [] };
+    }
+
+    const missingLangs = targetLangs.filter(([_, config]) => !newTranslations[config.code]);
 
     if (missingLangs.length === 0) {
-      return res.status(200).json({ translations: existingTranslations, message: "All translations already exist" });
+      await db.collection("recipes").doc(recipeId).update({ translations: newTranslations });
+      return res.status(200).json({ translations: newTranslations, message: "All 5 translations present" });
     }
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
     const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
     const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
-
-    const newTranslations = { ...existingTranslations };
 
     for (const [aiName, config] of missingLangs) {
       const completion = await openai.chat.completions.create({
