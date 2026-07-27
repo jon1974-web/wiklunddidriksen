@@ -1262,35 +1262,45 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
         messages: [
           {
             role: "system",
-            content: `You are a professional translator. Your ONLY job is to translate text. You must NEVER output text in the source language. Every single word must be in the target language.
-
-Source language: ${languageConfig[sourceLanguage]?.english || "Norwegian"}
-Target language: ${config.english}
-
-Rules:
-- Translate EVERY word to ${config.english}. NO exceptions.
-- The recipe name MUST be translated to ${config.english}
-- The description MUST be fully in ${config.english}
-- Ingredient names MUST be in ${config.english}
-- Instruction steps MUST be fully in ${config.english}
-- Keep amounts and units as-is
-- NEVER mix languages in a field
-- If a word has no direct translation, use the closest equivalent in ${config.english}
-
-Return ONLY valid JSON:
-{
-  "name": "Fully translated name in ${config.english}",
-  "description": "Fully translated description in ${config.english}",
-  "ingredients": [{"name": "Ingredient in ${config.english}", "amount": "Amount", "unit": "Unit"}],
-  "instructions": ["Fully translated step in ${config.english}"]
-}`,
+            content: `Translate recipes from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}. Output ONLY valid JSON. Every text field MUST be 100% in ${config.english} - zero words from ${languageConfig[sourceLanguage]?.english || "Norwegian"} allowed.`,
           },
           {
             role: "user",
-            content: `Translate this recipe to ${config.english}:
+            content: `Translate this recipe name and description to ${config.english}. Output JSON with "name" and "description" keys.
 
 Name: ${name}
-Description: ${description || ""}
+Description: ${description || ""}`,
+          },
+        ],
+        temperature: 0.3,
+        max_tokens: 500,
+      });
+
+      const content = completion.choices[0]?.message?.content;
+      let nameTranslation = name;
+      let descriptionTranslation = description || "";
+      if (content) {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          try {
+            const parsed = JSON.parse(jsonMatch[0]);
+            nameTranslation = parsed.name || name;
+            descriptionTranslation = parsed.description || description || "";
+          } catch {}
+        }
+      }
+
+      // Then translate ingredients and instructions separately
+      const completion2 = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          {
+            role: "system",
+            content: `Translate recipes from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}. Output ONLY valid JSON. Every text field MUST be 100% in ${config.english} - zero words from ${languageConfig[sourceLanguage]?.english || "Norwegian"} allowed. Keep amounts and units as-is.`,
+          },
+          {
+            role: "user",
+            content: `Translate these ingredients and instructions to ${config.english}. Output JSON with "ingredients" and "instructions" keys.
 
 Ingredients:
 ${ingredientText || "None"}
@@ -1300,19 +1310,30 @@ ${instructionText || "None"}`,
           },
         ],
         temperature: 0.3,
-        max_tokens: 2000,
+        max_tokens: 1500,
       });
 
-      const content = completion.choices[0]?.message?.content;
-      if (content) {
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
+      const content2 = completion2.choices[0]?.message?.content;
+      let ingredientsTranslation = ingredients || [];
+      let instructionsTranslation = instructions || [];
+      if (content2) {
+        const jsonMatch2 = content2.match(/\{[\s\S]*\}/);
+        if (jsonMatch2) {
           try {
-            newTranslations[config.code] = JSON.parse(jsonMatch[0]);
-            console.log(`translateRecipe: translated to ${config.english} (${config.code})`);
+            const parsed2 = JSON.parse(jsonMatch2[0]);
+            ingredientsTranslation = parsed2.ingredients || ingredients || [];
+            instructionsTranslation = parsed2.instructions || instructions || [];
           } catch {}
         }
       }
+
+      newTranslations[config.code] = {
+        name: nameTranslation,
+        description: descriptionTranslation,
+        ingredients: ingredientsTranslation,
+        instructions: instructionsTranslation,
+      };
+      console.log(`translateRecipe: translated to ${config.english} (${config.code})`);
     }
 
     if (Object.keys(newTranslations).length > 0) {
