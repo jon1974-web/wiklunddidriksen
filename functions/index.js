@@ -1129,10 +1129,16 @@ exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB"
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
-  const { url } = req.body || {};
+  const { url, language } = req.body || {};
   if (!url || typeof url !== "string") {
     return res.status(400).json({ error: "url is required" });
   }
+
+  const languageNames = {
+    norsk: "Norwegian", svensk: "Swedish", engelsk: "English",
+    dansk: "Danish", finsk: "Finnish",
+  };
+  const responseLangName = languageNames[language] || "Norwegian";
 
   try {
     const response = await fetch(url, {
@@ -1163,7 +1169,9 @@ Return ONLY valid JSON with this exact structure:
   "instructions": ["Step MUST be in ${responseLangName}", "Step MUST be in ${responseLangName}"],
   "time": 30,
   "portions": 4,
-  "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott"
+  "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott",
+  "variation": "",
+  "cuisine": ""
 }
 
 Extract the recipe name, ingredients with amounts and units, step-by-step instructions, estimated cooking time in minutes, number of servings, and categorize the dish.

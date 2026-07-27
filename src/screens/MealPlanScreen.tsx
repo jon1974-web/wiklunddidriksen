@@ -413,7 +413,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/importRecipeFromUrl', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ url: importUrl }),
+        body: JSON.stringify({ url: importUrl, language: i18n.language === 'nb' ? 'norsk' : i18n.language === 'sv' ? 'svensk' : i18n.language === 'en' ? 'engelsk' : i18n.language === 'da' ? 'dansk' : 'finsk' }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -430,6 +430,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           portions: data.recipe.portions || 4,
           category: data.recipe.category || 'kjoett',
           variation: data.recipe.variation || '',
+          cuisine: data.recipe.cuisine || '',
           isFavorite: false,
           createdBy: user.uid,
           familyId: familyId || '',
