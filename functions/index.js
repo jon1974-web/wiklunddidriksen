@@ -1298,3 +1298,108 @@ ${instructionText || "None"}`,
   }
 });
 
+// One-time migration: translate all existing recipes that don't have translations
+exports.migrateRecipeTranslations = onRequest({ region: "us-central1", memory: "512MB", timeoutSeconds: 540 }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const db = getFirestore();
+  const languageConfig = {
+    norsk: { code: "nb", english: "Norwegian" },
+    svensk: { code: "sv", english: "Swedish" },
+    dansk: { code: "da", english: "Danish" },
+    engelsk: { code: "en", english: "English" },
+    finsk: { code: "fi", english: "Finnish" },
+  };
+
+  try {
+    const recipesSnap = await db.collection("recipes").limit(500).get();
+    const toTranslate = recipesSnap.docs.filter(d => {
+      const data = d.data();
+      return !data.translations || Object.keys(data.translations).length === 0;
+    });
+
+    if (toTranslate.length === 0) {
+      return res.status(200).json({ message: "All recipes already translated", translated: 0 });
+    }
+
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+    let translated = 0;
+    let failed = 0;
+
+    for (const recipeDoc of toTranslate) {
+      const recipe = recipeDoc.data();
+      const sourceLanguage = "norsk";
+      const ingredientText = (recipe.ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
+      const instructionText = (recipe.instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
+
+      const translations = {};
+
+      for (const [aiName, config] of Object.entries(languageConfig).filter(([k]) => k !== sourceLanguage)) {
+        try {
+          const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [
+              {
+                role: "system",
+                content: `You are a professional translator for a family meal planner app. Translate the following recipe from Norwegian to ${config.english}.
+
+Translate ALL text fields accurately. Ingredient names and instruction steps must be properly translated. Keep amounts and units as-is if they are numeric.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "name": "Translated recipe name",
+  "description": "Translated description",
+  "ingredients": [{"name": "Translated ingredient name", "amount": "Amount", "unit": "Unit"}],
+  "instructions": ["Translated step 1", "Translated step 2"]
+}`,
+              },
+              {
+                role: "user",
+                content: `Translate this recipe to ${config.english}:
+
+Name: ${recipe.name}
+Description: ${recipe.description || ""}
+
+Ingredients:
+${ingredientText || "None"}
+
+Instructions:
+${instructionText || "None"}`,
+              },
+            ],
+            temperature: 0.3,
+            max_tokens: 2000,
+          });
+
+          const content = completion.choices[0]?.message?.content;
+          if (content) {
+            const jsonMatch = content.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+              try {
+                translations[config.code] = JSON.parse(jsonMatch[0]);
+              } catch {}
+            }
+          }
+        } catch {}
+      }
+
+      if (Object.keys(translations).length > 0) {
+        await db.collection("recipes").doc(recipeDoc.id).update({ translations });
+        translated++;
+      } else {
+        failed++;
+      }
+    }
+
+    return res.status(200).json({ translated, failed, total: toTranslate.length });
+  } catch (error) {
+    console.error("Migration error:", error);
+    return res.status(500).json({ error: "Migration failed" });
+  }
+});
+
