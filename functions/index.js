@@ -1262,16 +1262,27 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
         messages: [
           {
             role: "system",
-            content: `You are a professional translator for a family meal planner app. Translate the following recipe from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}.
+            content: `You are a professional translator. Your ONLY job is to translate text. You must NEVER output text in the source language. Every single word must be in the target language.
 
-Translate ALL text fields accurately. Ingredient names and instruction steps must be properly translated. Keep amounts and units as-is if they are numeric.
+Source language: ${languageConfig[sourceLanguage]?.english || "Norwegian"}
+Target language: ${config.english}
 
-Return ONLY valid JSON with this exact structure:
+Rules:
+- Translate EVERY word to ${config.english}. NO exceptions.
+- The recipe name MUST be translated to ${config.english}
+- The description MUST be fully in ${config.english}
+- Ingredient names MUST be in ${config.english}
+- Instruction steps MUST be fully in ${config.english}
+- Keep amounts and units as-is
+- NEVER mix languages in a field
+- If a word has no direct translation, use the closest equivalent in ${config.english}
+
+Return ONLY valid JSON:
 {
-  "name": "Translated recipe name",
-  "description": "Translated description",
-  "ingredients": [{"name": "Translated ingredient name", "amount": "Amount", "unit": "Unit"}],
-  "instructions": ["Translated step 1", "Translated step 2"]
+  "name": "Fully translated name in ${config.english}",
+  "description": "Fully translated description in ${config.english}",
+  "ingredients": [{"name": "Ingredient in ${config.english}", "amount": "Amount", "unit": "Unit"}],
+  "instructions": ["Fully translated step in ${config.english}"]
 }`,
           },
           {
@@ -1298,12 +1309,14 @@ ${instructionText || "None"}`,
         if (jsonMatch) {
           try {
             newTranslations[config.code] = JSON.parse(jsonMatch[0]);
+            console.log(`translateRecipe: translated to ${config.english} (${config.code})`);
           } catch {}
         }
       }
     }
 
     if (Object.keys(newTranslations).length > 0) {
+      console.log(`translateRecipe: ${recipeId} - translating ${missingLangs.length} languages, total keys: ${Object.keys(newTranslations).length}`);
       await db.collection("recipes").doc(recipeId).update({ translations: newTranslations });
     }
 
