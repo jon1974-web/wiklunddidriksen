@@ -166,7 +166,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       };
       if (editingRecipe) {
         await import('firebase/firestore').then(({ updateDoc, doc }) =>
-          updateDoc(doc(db, 'recipes', editingRecipe.id), recipeData)
+          updateDoc(doc(db, 'recipes', editingRecipe.id), { ...recipeData, translations: {} })
         );
         triggerRecipeTranslation(editingRecipe.id, recipeData.name, recipeData.description, recipeData.ingredients, recipeData.instructions);
       } else {
