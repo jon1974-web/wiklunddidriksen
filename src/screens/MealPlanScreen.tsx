@@ -10,6 +10,7 @@ import { db } from '../services/firebase';
 import { Recipe, ShoppingList, ShoppingItem } from '../types';
 import { LANGUAGES, getAiNameForCode } from '../constants/languages';
 import { ActionModal } from '../components/ActionModal';
+import { InfoModal } from '../components/InfoModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { MAX_RECIPES } from '../constants/limits';
@@ -39,6 +40,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showDeleteRecipe, setShowDeleteRecipe] = useState<Recipe | null>(null);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
   const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
+  const [infoModal, setInfoModal] = useState<{ visible: boolean; title: string; message?: string }>({ visible: false, title: '' });
   const [showAddList, setShowAddList] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
@@ -313,7 +315,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           familyId,
         });
       }
-      crossAlert('Suksess', `${recipe.ingredients.length} ingredienser lagt til i "${recipe.name}"`);
+      setInfoModal({ visible: true, title: t('common.success'), message: `${recipe.ingredients.length} ingredienser lagt til i "${recipe.name}"` });
       loadData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -413,7 +415,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         createdAt: Date.now(),
       });
       triggerRecipeTranslation(docRef.id, aiRecipe.name, aiRecipe.description || '', aiRecipe.ingredients || [], aiRecipe.instructions || []);
-      crossAlert('Suksess', `"${aiRecipe.name}" lagt til i oppskriftsboken`);
+      setInfoModal({ visible: true, title: t('common.success'), message: `"${aiRecipe.name}" lagt til i oppskriftsboken` });
       loadData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -454,7 +456,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           createdAt: Date.now(),
         });
         triggerRecipeTranslation(docRef.id, data.recipe.name, data.recipe.description || '', data.recipe.ingredients || [], data.recipe.instructions || []);
-        crossAlert('Suksess', `"${data.recipe.name}" lagt til i oppskriftsboken`);
+        setInfoModal({ visible: true, title: t('common.success'), message: `"${data.recipe.name}" lagt til i oppskriftsboken` });
         setShowUrlImport(false);
         setImportUrl('');
         loadData();
@@ -1113,6 +1115,13 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         onEdit={actionModal.onEdit}
         onDelete={actionModal.onDelete}
         onCancel={() => setActionModal({ visible: false, title: '' })}
+      />
+
+      <InfoModal
+        visible={infoModal.visible}
+        title={infoModal.title}
+        message={infoModal.message}
+        onConfirm={() => setInfoModal({ visible: false, title: '' })}
       />
 
       {/* URL Import Modal */}

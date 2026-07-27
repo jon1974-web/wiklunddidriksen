@@ -9,6 +9,7 @@ import { doc, updateDoc, deleteDoc, collection, addDoc, query, where, getDocs } 
 import { db } from '../services/firebase';
 import { Recipe } from '../types';
 import { ActionModal } from '../components/ActionModal';
+import { InfoModal } from '../components/InfoModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 
@@ -24,6 +25,7 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const user = useUserStore((state) => state.user);
   const recipe = route.params.recipe;
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [infoModal, setInfoModal] = useState<{ visible: boolean; title: string; message?: string }>({ visible: false, title: '' });
 
   const getRecipeText = (field: 'name' | 'description' | 'ingredients' | 'instructions') => {
     if (recipe.translations?.[i18n.language]?.[field]) {
@@ -67,9 +69,9 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         await import('firebase/firestore').then(({ updateDoc }) =>
           updateDoc(doc(db, 'shoppingLists', listDoc.id), { items: [...newItems, ...existingItems] })
         );
-        crossAlert('Suksess', `${recipe.ingredients.length} ingredienser lagt til i handlelisten`);
+        setInfoModal({ visible: true, title: t('common.success'), message: `${recipe.ingredients.length} ingredienser lagt til i handlelisten` });
       } else {
-        crossAlert('Info', 'Opprett en handleliste først');
+        setInfoModal({ visible: true, title: t('common.info'), message: 'Opprett en handleliste først' });
       }
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -158,6 +160,13 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         subtitle={t('mealPlanner.deleteRecipeConfirm')}
         onDelete={handleDelete}
         onCancel={() => setShowDeleteModal(false)}
+      />
+
+      <InfoModal
+        visible={infoModal.visible}
+        title={infoModal.title}
+        message={infoModal.message}
+        onConfirm={() => setInfoModal({ visible: false, title: '' })}
       />
     </SafeAreaView>
   );
