@@ -455,7 +455,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           familyId: familyId || '',
           createdAt: Date.now(),
         });
-        triggerRecipeTranslation(docRef.id, data.recipe.name, data.recipe.description || '', data.recipe.ingredients || [], data.recipe.instructions || [], 'norsk');
+        const detectedLang = importUrl.includes('.no') ? 'norsk' : importUrl.includes('.se') ? 'svensk' : importUrl.includes('.dk') ? 'dansk' : importUrl.includes('.fi') ? 'finsk' : 'engelsk';
+        triggerRecipeTranslation(docRef.id, data.recipe.name, data.recipe.description || '', data.recipe.ingredients || [], data.recipe.instructions || [], detectedLang);
         setInfoModal({ visible: true, title: t('common.success'), message: `"${data.recipe.name}" lagt til i oppskriftsboken` });
         setShowUrlImport(false);
         setImportUrl('');
