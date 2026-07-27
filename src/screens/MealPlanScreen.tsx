@@ -196,12 +196,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     return recipe[field];
   };
 
-  const triggerRecipeTranslation = async (recipeId: string, name: string, description: string, ingredients: any[], instructions: string[]) => {
+  const triggerRecipeTranslation = async (recipeId: string, name: string, description: string, ingredients: any[], instructions: string[], sourceLanguageOverride?: string) => {
     try {
       const currentUser = (await import('firebase/auth')).getAuth().currentUser;
       if (!currentUser) return;
       const token = await currentUser.getIdToken();
-      const sourceLanguage = getAiNameForCode(i18n.language);
+      const sourceLanguage = sourceLanguageOverride || getAiNameForCode(i18n.language);
       const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/translateRecipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
@@ -455,7 +455,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           familyId: familyId || '',
           createdAt: Date.now(),
         });
-        triggerRecipeTranslation(docRef.id, data.recipe.name, data.recipe.description || '', data.recipe.ingredients || [], data.recipe.instructions || []);
+        triggerRecipeTranslation(docRef.id, data.recipe.name, data.recipe.description || '', data.recipe.ingredients || [], data.recipe.instructions || [], 'norsk');
         setInfoModal({ visible: true, title: t('common.success'), message: `"${data.recipe.name}" lagt til i oppskriftsboken` });
         setShowUrlImport(false);
         setImportUrl('');
