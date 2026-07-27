@@ -1258,79 +1258,64 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
     const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
     const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
 
-    for (const [aiName, config] of langsToTranslate) {
-      const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
-      const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
+    const norwegianWords = ['og', 'eller', 'er', 'med', 'på', 'i', 'av', 'til', 'for', 'som', 'en', 'et', 'den', 'det', 'har', 'ikke', 'blir', 'kan', 'skal', 'bli'];
 
-      const norwegianWords = ['og', 'eller', 'er', 'med', 'på', 'i', 'av', 'til', 'for', 'som', 'en', 'et', 'den', 'det', 'har', 'ikke', 'blir', 'kan', 'skal', 'bli', 'vaer'];
+    const translateOne = async ([aiName, config]) => {
+      const systemMsg = `Translate from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}. Output ONLY a JSON object. Every text value MUST be 100% in ${config.english}. Zero words from ${languageConfig[sourceLanguage]?.english || "Norwegian"} allowed.`;
 
-      const doTranslation = async (attempt) => {
-        const systemMsg = attempt === 1
-          ? `Translate from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}. Output ONLY a JSON object. Every text value MUST be fully in ${config.english}. Do NOT use any ${languageConfig[sourceLanguage]?.english || "Norwegian"} words.`
-          : `CRITICAL: You MUST translate ALL text to ${config.english}. The previous attempt failed because some text was left in ${languageConfig[sourceLanguage]?.english || "Norwegian"}. Translate EVERY word. Example: "Amerikanske pannekaker" -> "American pancakes". "Lønnesirup" -> "Maple syrup". Output ONLY JSON.`;
-
-        const userMsg = `Translate this to ${config.english}:
+      const userMsg = `Translate to ${config.english}. Return ONLY JSON:
 
 name: ${name}
 description: ${description || ""}
 ingredients: ${ingredientText || "None"}
-instructions: ${instructionText || "None"}
+instructions: ${instructionText || "None"}`;
 
-Return JSON exactly like this (all values translated to ${config.english}):
-{"name":"translated name","description":"translated description","ingredients":[{"name":"translated ingredient","amount":"amount","unit":"unit"}],"instructions":["translated step"]}`;
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: systemMsg },
+          { role: "user", content: userMsg },
+        ],
+        temperature: 0.3,
+        max_tokens: 2000,
+      });
 
-        const completion = await openai.chat.completions.create({
-          model: "gpt-4o",
-          messages: [
-            { role: "system", content: systemMsg },
-            { role: "user", content: userMsg },
-          ],
-          temperature: 0.3,
-          max_tokens: 2000,
-        });
+      const content = completion.choices[0]?.message?.content;
+      if (!content) return null;
 
-        return completion.choices[0]?.message?.content;
-      };
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) return null;
 
-      let content = await doTranslation(1);
-      let parsed = null;
-      if (content) {
-        const jsonMatch = content.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          try { parsed = JSON.parse(jsonMatch[0]); } catch {}
-        }
-      }
-
-      // Check if name/description still contain Norwegian words
-      if (parsed) {
-        const nameLower = (parsed.name || '').toLowerCase();
-        const descLower = (parsed.description || '').toLowerCase();
-        const hasNorwegian = norwegianWords.some(w => nameLower.includes(` ${w} `) || nameLower.startsWith(`${w} `) || nameLower.endsWith(` ${w}`) || descLower.includes(` ${w} `));
-        if (hasNorwegian) {
-          console.log(`translateRecipe: ${config.code} has Norwegian words, retrying...`);
-          content = await doTranslation(2);
-          if (content) {
-            const jsonMatch = content.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-              try { parsed = JSON.parse(jsonMatch[0]); } catch {}
-            }
-          }
-        }
-      }
-
-      if (parsed) {
-        newTranslations[config.code] = {
+      try {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          code: config.code,
           name: parsed.name || name,
           description: parsed.description || description || "",
           ingredients: parsed.ingredients || ingredients || [],
           instructions: parsed.instructions || instructions || [],
         };
-        console.log(`translateRecipe: OK ${config.code} name="${newTranslations[config.code].name}" desc="${newTranslations[config.code].description?.substring(0, 50)}..."`);
+      } catch { return null; }
+    };
+
+    const results = await Promise.allSettled(langsToTranslate.map(translateOne));
+
+    for (const result of results) {
+      if (result.status === 'fulfilled' && result.value) {
+        const t = result.value;
+        const nameLower = (t.name || '').toLowerCase();
+        const descLower = (t.description || '').toLowerCase();
+        const hasNorwegian = norwegianWords.some(w => nameLower.includes(` ${w} `) || nameLower.startsWith(`${w} `) || nameLower.endsWith(` ${w}`) || descLower.includes(` ${w} `));
+        if (hasNorwegian) {
+          console.log(`translateRecipe: ${t.code} has Norwegian words in result, keeping anyway`);
+        }
+        newTranslations[t.code] = { name: t.name, description: t.description, ingredients: t.ingredients, instructions: t.instructions };
+        console.log(`translateRecipe: OK ${t.code} name="${t.name}"`);
       }
     }
 
     if (Object.keys(newTranslations).length > 0) {
-      console.log(`translateRecipe: ${recipeId} - translating ${missingLangs.length} languages, total keys: ${Object.keys(newTranslations).length}`);
+      console.log(`translateRecipe: ${recipeId} - saved ${Object.keys(newTranslations).length} translations`);
       await db.collection("recipes").doc(recipeId).update({ translations: newTranslations });
     }
 
