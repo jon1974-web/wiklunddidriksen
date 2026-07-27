@@ -168,7 +168,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         await import('firebase/firestore').then(({ updateDoc, doc }) =>
           updateDoc(doc(db, 'recipes', editingRecipe.id), { ...recipeData, translations: {} })
         );
-        triggerRecipeTranslation(editingRecipe.id, recipeData.name, recipeData.description, recipeData.ingredients, recipeData.instructions);
+        triggerRecipeTranslation(editingRecipe.id, recipeData.name, recipeData.description, recipeData.ingredients, recipeData.instructions, undefined, true);
       } else {
         const docRef = await addDoc(collection(db, 'recipes'), {
           ...recipeData,
@@ -196,7 +196,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     return recipe[field];
   };
 
-  const triggerRecipeTranslation = async (recipeId: string, name: string, description: string, ingredients: any[], instructions: string[], sourceLanguageOverride?: string) => {
+  const triggerRecipeTranslation = async (recipeId: string, name: string, description: string, ingredients: any[], instructions: string[], sourceLanguageOverride?: string, force?: boolean) => {
     try {
       const currentUser = (await import('firebase/auth')).getAuth().currentUser;
       if (!currentUser) return;
@@ -205,7 +205,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/translateRecipe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-        body: JSON.stringify({ recipeId, name, description, ingredients, instructions, sourceLanguage }),
+        body: JSON.stringify({ recipeId, name, description, ingredients, instructions, sourceLanguage, force }),
       });
       const data = await res.json();
       console.log('Translation result:', data);

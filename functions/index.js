@@ -1217,7 +1217,7 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
-  const { recipeId, name, description, ingredients, instructions, sourceLanguage } = req.body || {};
+  const { recipeId, name, description, ingredients, instructions, sourceLanguage, force } = req.body || {};
   if (!recipeId || !name) {
     return res.status(400).json({ error: "recipeId and name are required" });
   }
@@ -1239,12 +1239,10 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
     const recipeDoc = await db.collection("recipes").doc(recipeId).get();
     const existingTranslations = recipeDoc.exists ? (recipeDoc.data().translations || {}) : {};
 
-    const newTranslations = { ...existingTranslations };
+    const newTranslations = force ? {} : { ...existingTranslations };
 
     // Always store source language as copy of original
-    if (!newTranslations[sourceLangCode]) {
-      newTranslations[sourceLangCode] = { name, description: description || "", ingredients: ingredients || [], instructions: instructions || [] };
-    }
+    newTranslations[sourceLangCode] = { name, description: description || "", ingredients: ingredients || [], instructions: instructions || [] };
 
     const missingLangs = targetLangs.filter(([_, config]) => !newTranslations[config.code]);
 
