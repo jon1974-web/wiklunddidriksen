@@ -1233,14 +1233,24 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
   const targetLangs = Object.entries(languageConfig).filter(([key]) => key !== sourceLanguage);
 
   try {
+    const db = getFirestore();
+    const recipeDoc = await db.collection("recipes").doc(recipeId).get();
+    const existingTranslations = recipeDoc.exists ? (recipeDoc.data().translations || {}) : {};
+
+    const missingLangs = targetLangs.filter(([_, config]) => !existingTranslations[config.code]);
+
+    if (missingLangs.length === 0) {
+      return res.status(200).json({ translations: existingTranslations, message: "All translations already exist" });
+    }
+
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
     const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
     const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
 
-    const translations = {};
+    const newTranslations = { ...existingTranslations };
 
-    for (const [aiName, config] of targetLangs) {
+    for (const [aiName, config] of missingLangs) {
       const completion = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
@@ -1281,17 +1291,17 @@ ${instructionText || "None"}`,
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           try {
-            translations[config.code] = JSON.parse(jsonMatch[0]);
+            newTranslations[config.code] = JSON.parse(jsonMatch[0]);
           } catch {}
         }
       }
     }
 
-    if (Object.keys(translations).length > 0) {
-      await getFirestore().collection("recipes").doc(recipeId).update({ translations });
+    if (Object.keys(newTranslations).length > 0) {
+      await db.collection("recipes").doc(recipeId).update({ translations: newTranslations });
     }
 
-    return res.status(200).json({ translations });
+    return res.status(200).json({ translations: newTranslations });
   } catch (error) {
     console.error("Translate recipe error:", error);
     return res.status(500).json({ error: "Failed to translate recipe" });
