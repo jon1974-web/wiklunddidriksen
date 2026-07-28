@@ -458,7 +458,7 @@
     "addToShoppingList": "Lisää ostoslistalle",
     "addToPlan": "Lisää suunnitelmaan",
     "weekOverview": "Tämä viikko",
-    "mealsPlanned": "{planned}/{total} ateriaa suunniteltu",
+    "mealsPlanned": "{{planned}}/{{total}} ateriaa suunniteltu",
     "monday": "Maanantai",
     "tuesday": "Tiistai",
     "wednesday": "Keskiviikko",

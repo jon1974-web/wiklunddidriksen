@@ -449,7 +449,7 @@
     "addToShoppingList": "Add to shopping list",
     "addToPlan": "Add to plan",
     "weekOverview": "This week",
-    "mealsPlanned": "{planned}/{total} meals planned",
+    "mealsPlanned": "{{planned}}/{{total}} meals planned",
     "monday": "Monday",
     "tuesday": "Tuesday",
     "wednesday": "Wednesday",

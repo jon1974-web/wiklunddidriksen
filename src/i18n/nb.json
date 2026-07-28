@@ -449,7 +449,7 @@
     "addToShoppingList": "Legg til handleliste",
     "addToPlan": "Legg til i plan",
     "weekOverview": "Denne uken",
-    "mealsPlanned": "{planned}/{total} måltider planlagt",
+    "mealsPlanned": "{{planned}}/{{total}} måltider planlagt",
     "monday": "Mandag",
     "tuesday": "Tirsdag",
     "wednesday": "Onsdag",
