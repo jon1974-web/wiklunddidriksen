@@ -844,7 +844,6 @@ export const ProfileScreen: React.FC = () => {
               />
             );
           })}
-          ))}
         </View>
       </View>
 
