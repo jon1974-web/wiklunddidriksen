@@ -816,34 +816,31 @@ export const ProfileScreen: React.FC = () => {
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.theme')}</Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, paddingVertical: 8 }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, paddingVertical: 8, alignItems: 'center' }}>
           {([
-            { key: 'light' as const, color: '#4CAF50', border: false },
-            { key: 'dark' as const, color: '#333', border: true },
-            { key: 'orange' as const, color: '#E87C3E', border: false },
-            { key: 'deepblue' as const, color: '#1A3A5C', border: false },
-            { key: 'silver' as const, color: '#8E8E93', border: false },
-            { key: 'purple' as const, color: '#9C27B0', border: false },
-            { key: 'pink' as const, color: '#F48FB1', border: false },
-            { key: 'teal' as const, color: '#0097A7', border: false },
-            { key: 'system' as const, color: '#999', border: false },
-          ]).map((t) => {
-            const isActive = mode === t.key;
-            return (
-              <TouchableOpacity
-                key={t.key}
-                onPress={() => setMode(t.key)}
-                style={{
-                  width: isActive ? 32 : 26,
-                  height: isActive ? 32 : 26,
-                  borderRadius: isActive ? 16 : 13,
-                  backgroundColor: t.color,
-                  borderWidth: isActive ? 2 : (t.border ? 2 : 0),
-                  borderColor: isActive ? colors.accent : (t.border ? '#fff' : 'transparent'),
-                }}
-              />
-            );
-          })}
+            { key: 'light' as const, color: '#4CAF50' },
+            { key: 'dark' as const, color: '#333' },
+            { key: 'orange' as const, color: '#E87C3E' },
+            { key: 'deepblue' as const, color: '#1A3A5C' },
+            { key: 'silver' as const, color: '#8E8E93' },
+            { key: 'purple' as const, color: '#9C27B0' },
+            { key: 'pink' as const, color: '#F48FB1' },
+            { key: 'teal' as const, color: '#0097A7' },
+            { key: 'system' as const, color: '#999' },
+          ]).map((t) => (
+            <TouchableOpacity
+              key={t.key}
+              onPress={() => setMode(t.key)}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: t.color,
+                borderWidth: mode === t.key ? 3 : 0,
+                borderColor: mode === t.key ? colors.accent : 'transparent',
+              }}
+            />
+          ))}
         </View>
       </View>
 
