@@ -50,6 +50,11 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - Cloud Functions verify auth + role server-side before any mutation
 - Client reads direct Firestore; client writes call Cloud Functions via `callFunction()` helper
 
+## PWA / iOS (CRITICAL)
+
+- **All `TextInput` components MUST use `fontSize: 16` or higher** — iOS Safari auto-zooms on inputs with font-size below 16px when focused. This breaks the PWA experience.
+- Never use `fontSize: 13` or `fontSize: 14` on text inputs.
+
 ## Performance (HIGH PRIORITY)
 
 Performance directly impacts user experience. Treat it as a feature, not an afterthought.
