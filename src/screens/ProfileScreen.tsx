@@ -837,7 +837,7 @@ export const ProfileScreen: React.FC = () => {
                 borderRadius: 16,
                 backgroundColor: t.color,
                 borderWidth: mode === t.key ? 3 : 0,
-                borderColor: mode === t.key ? '#fff' : 'transparent',
+                borderColor: mode === t.key ? colors.accent : 'transparent',
               }}
             />
           ))}
