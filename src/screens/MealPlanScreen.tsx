@@ -699,30 +699,23 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                         >
                           <View style={styles.recipeInfo}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                              <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{getRecipeText(item, 'name')}</Text>
-                              <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }} style={{ padding: 4 }}>
-                                <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
-                              </TouchableOpacity>
-                            </View>
-                            {item.variation && (
-                              <View style={{ flexDirection: 'row', gap: 4, marginTop: 4 }}>
-                                <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
-                                  <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{item.variation}</Text>
-                                </View>
-                                {item.cuisine && (
-                                  <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
-                                    <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
+                              <Text style={[styles.recipeName, { color: colors.text, flex: 1 }]} numberOfLines={1}>{getRecipeText(item, 'name')}</Text>
+                              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                                {item.variation && (
+                                  <View style={{ paddingHorizontal: 5, paddingVertical: 2, borderRadius: 6, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+                                    <Text style={{ fontSize: 9, fontWeight: '600', color: colors.accent }}>{item.variation}</Text>
                                   </View>
                                 )}
+                                {item.cuisine && (
+                                  <View style={{ paddingHorizontal: 5, paddingVertical: 2, borderRadius: 6, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+                                    <Text style={{ fontSize: 9, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
+                                  </View>
+                                )}
+                                <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }} style={{ padding: 4 }}>
+                                  <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
+                                </TouchableOpacity>
                               </View>
-                            )}
-                            {!item.variation && item.cuisine && (
-                              <View style={{ flexDirection: 'row', gap: 4, marginTop: 4 }}>
-                                <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
-                                  <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
-                                </View>
-                              </View>
-                            )}
+                            </View>
                             <Text style={[styles.recipeMeta, { color: colors.textSecondary, marginTop: 4 }]}>
                               {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}
                             </Text>
