@@ -255,10 +255,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                       )}
                       <View style={styles.itemContent}>
                         <Text style={[styles.itemTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
-                        <Text style={[styles.itemTime, { color: colors.textSecondary }]}>{item.timeRange}</Text>
-                        {item.groupName && (
-                          <Text style={[styles.itemGroup, { color: '#0097A7' }]}>{item.groupName}</Text>
-                        )}
+                        <Text style={[styles.itemTime, { color: colors.textSecondary, fontWeight: '600' }]}>{item.timeRange}</Text>
                       </View>
                     </View>
                   ))
