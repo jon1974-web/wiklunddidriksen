@@ -832,14 +832,18 @@ export const ProfileScreen: React.FC = () => {
               key={t.key}
               onPress={() => setMode(t.key)}
               style={{
-                width: 28,
-                height: 28,
-                borderRadius: 14,
+                width: 32,
+                height: 32,
+                borderRadius: 16,
                 backgroundColor: t.color,
                 borderWidth: mode === t.key ? 3 : (t.border ? 2 : 0),
                 borderColor: mode === t.key ? colors.accent : (t.border ? '#fff' : 'transparent'),
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-            />
+            >
+              {mode === t.key && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
+            </TouchableOpacity>
           ))}
         </View>
       </View>
