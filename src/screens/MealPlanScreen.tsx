@@ -700,8 +700,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                           <View style={{ flex: 1 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{getRecipeText(item, 'name')}</Text>
-                              <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }}>
-                                <Text style={{ fontSize: 14 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
+                              <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }} style={{ padding: 4 }}>
+                                <Text style={{ fontSize: 16 }}>{item.isFavorite ? '❤️' : '🤍'}</Text>
                               </TouchableOpacity>
                             </View>
                             {item.variation && (
@@ -1281,12 +1281,12 @@ const styles = StyleSheet.create({
   filterRow: { paddingHorizontal: 16, marginBottom: 8, maxHeight: 40 },
   filterChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, borderWidth: 1, marginRight: 6, alignItems: 'center', justifyContent: 'center' },
   recipeGrid: { padding: 8, paddingBottom: 80 },
-  recipeCard: { flex: 1, margin: 4, borderRadius: 10, overflow: 'hidden' },
+  recipeCard: { flex: 1, margin: 6, borderRadius: 12, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
   recipeImg: { height: 80, alignItems: 'center', justifyContent: 'center', position: 'relative' },
-  favBtn: { position: 'absolute', top: 6, right: 6 },
-  recipeInfo: { padding: 8, paddingBottom: 10 },
-  recipeName: { fontSize: 13, fontWeight: '600', marginBottom: 2 },
-  recipeMeta: { fontSize: 11 },
+  favBtn: { position: 'absolute', top: 8, right: 8 },
+  recipeInfo: { padding: 12, paddingBottom: 14 },
+  recipeName: { fontSize: 14, fontWeight: '600', marginBottom: 4 },
+  recipeMeta: { fontSize: 12 },
   emptyState: { flex: 1, justifyContent: 'center', padding: 40 },
   emptyText: { fontSize: 14, fontStyle: 'italic' },
   shoppingItem: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, borderBottomWidth: 1 },
