@@ -140,18 +140,21 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
       const ids = groupIds || (groupId ? [groupId] : []);
       const allEvents = [];
       for (const gid of ids) {
-        const response = await fetch(
-          `${SPOND_API_BASE}/sponds/?groupId=${gid}&max=${max || 100}`,
-          { headers: authHeaders }
-        );
-        if (response.ok) {
-          const events = await response.json();
-          (events || []).forEach((e) => {
-            allEvents.push({ ...e, _groupId: gid });
-          });
-        } else {
-          const err = await response.json().catch(() => ({}));
-          return res.status(response.status).json(err);
+        try {
+          const response = await fetch(
+            `${SPOND_API_BASE}/sponds/?groupId=${gid}&max=${max || 100}`,
+            { headers: authHeaders }
+          );
+          if (response.ok) {
+            const events = await response.json();
+            (events || []).forEach((e) => {
+              allEvents.push({ ...e, _groupId: gid });
+            });
+          } else {
+            console.warn(`spondProxy: group ${gid} returned ${response.status}`);
+          }
+        } catch (e) {
+          console.warn(`spondProxy: group ${gid} failed:`, e.message);
         }
       }
       return res.status(200).json(allEvents);
