@@ -1217,109 +1217,84 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
-  const { recipeId, name, description, ingredients, instructions, sourceLanguage, force } = req.body || {};
+  const { recipeId, name, description, ingredients, instructions } = req.body || {};
   if (!recipeId || !name) {
     return res.status(400).json({ error: "recipeId and name are required" });
   }
 
-  const languageConfig = {
-    norsk: { code: "nb", english: "Norwegian" },
-    svensk: { code: "sv", english: "Swedish" },
-    dansk: { code: "da", english: "Danish" },
-    engelsk: { code: "en", english: "English" },
-    finsk: { code: "fi", english: "Finnish" },
-  };
-
-  const allLangCodes = Object.values(languageConfig).map(c => c.code);
-  const sourceLangCode = languageConfig[sourceLanguage]?.code || "nb";
-  const targetLangs = Object.entries(languageConfig).filter(([key]) => key !== sourceLanguage);
+  const langMap = { nb: "Norwegian", sv: "Swedish", da: "Danish", en: "English", fi: "Finnish" };
+  const allCodes = ["nb", "sv", "da", "en", "fi"];
 
   try {
-    const db = getFirestore();
-    const recipeDoc = await db.collection("recipes").doc(recipeId).get();
-    const existingTranslations = recipeDoc.exists ? (recipeDoc.data().translations || {}) : {};
-    console.log(`translateRecipe: recipeId=${recipeId}, force=${force}, existingKeys=${Object.keys(existingTranslations).join(',')}, sourceLang=${sourceLanguage}`);
-
-    const newTranslations = force ? {} : { ...existingTranslations };
-
-    // Always store source language as copy of original
-    newTranslations[sourceLangCode] = { name, description: description || "", ingredients: ingredients || [], instructions: instructions || [] };
-
-    const langsToTranslate = targetLangs;
-    console.log(`translateRecipe: translating ${langsToTranslate.map(([k,c]) => c.code).join(',')}, force=${force}`);
-
-    if (langsToTranslate.length === 0) {
-      await db.collection("recipes").doc(recipeId).update({ translations: newTranslations });
-      return res.status(200).json({ translations: newTranslations, message: "All 5 translations present" });
-    }
-
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
     const ingredientText = (ingredients || []).map(i => `${i.amount} ${i.unit} ${i.name}`).join('\n');
     const instructionText = (instructions || []).map((s, i) => `${i + 1}. ${s}`).join('\n');
 
-    const norwegianWords = ['og', 'eller', 'er', 'med', 'på', 'i', 'av', 'til', 'for', 'som', 'en', 'et', 'den', 'det', 'har', 'ikke', 'blir', 'kan', 'skal', 'bli'];
+    const langList = allCodes.map(c => `${c}=${langMap[c]}`).join(', ');
 
-    const translateOne = async ([aiName, config]) => {
-      const systemMsg = `Translate from ${languageConfig[sourceLanguage]?.english || "Norwegian"} to ${config.english}. Output ONLY a JSON object. Every text value MUST be 100% in ${config.english}. Zero words from ${languageConfig[sourceLanguage]?.english || "Norwegian"} allowed.`;
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: `You are a professional recipe translator. Translate the recipe below into ALL 5 languages: ${langList}.
 
-      const userMsg = `Translate to ${config.english}. Return ONLY JSON:
+CRITICAL RULES:
+- Every field (name, description, ingredients, instructions) MUST be fully in the target language
+- The recipe name MUST be translated — it is NOT a proper noun
+- "Amerikanske pannekaker" in Norwegian = "American pancakes" in English = "Amerikanska pannkakor" in Swedish
+- NEVER leave text in the wrong language
+- NEVER mix languages in a field
+- Keep amounts and units unchanged`,
+        },
+        {
+          role: "user",
+          content: `Translate this recipe to ALL 5 languages (${langList}):
 
 name: ${name}
-description: ${description || ""}
-ingredients: ${ingredientText || "None"}
-instructions: ${instructionText || "None"}`;
+description: ${description || "(none)"}
+ingredients: ${ingredientText || "(none)"}
+instructions: ${instructionText || "(none)"}
 
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [
-          { role: "system", content: systemMsg },
-          { role: "user", content: userMsg },
-        ],
-        temperature: 0.3,
-        max_tokens: 2000,
-      });
+Return ONLY a JSON object with this exact structure:
+{"nb":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]},"sv":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]},"da":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]},"en":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]},"fi":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]}}`,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 4000,
+    });
 
-      const content = completion.choices[0]?.message?.content;
-      if (!content) return null;
+    const content = completion.choices[0]?.message?.content;
+    if (!content) return res.status(500).json({ error: "No response from AI" });
 
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      if (!jsonMatch) return null;
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) return res.status(500).json({ error: "Invalid AI response" });
 
-      try {
-        const parsed = JSON.parse(jsonMatch[0]);
-        return {
-          code: config.code,
-          name: parsed.name || name,
-          description: parsed.description || description || "",
-          ingredients: parsed.ingredients || ingredients || [],
-          instructions: parsed.instructions || instructions || [],
-        };
-      } catch { return null; }
-    };
+    const translations = JSON.parse(jsonMatch[0]);
 
-    const results = await Promise.allSettled(langsToTranslate.map(translateOne));
+    // Validate all 5 languages are present
+    const missing = allCodes.filter(c => !translations[c]);
+    if (missing.length > 0) {
+      console.log(`translateRecipe: missing languages: ${missing.join(',')}`);
+    }
 
-    for (const result of results) {
-      if (result.status === 'fulfilled' && result.value) {
-        const t = result.value;
-        const nameLower = (t.name || '').toLowerCase();
-        const descLower = (t.description || '').toLowerCase();
-        const hasNorwegian = norwegianWords.some(w => nameLower.includes(` ${w} `) || nameLower.startsWith(`${w} `) || nameLower.endsWith(` ${w}`) || descLower.includes(` ${w} `));
-        if (hasNorwegian) {
-          console.log(`translateRecipe: ${t.code} has Norwegian words in result, keeping anyway`);
-        }
-        newTranslations[t.code] = { name: t.name, description: t.description, ingredients: t.ingredients, instructions: t.instructions };
-        console.log(`translateRecipe: OK ${t.code} name="${t.name}"`);
+    // Ensure every translation has all fields
+    for (const code of allCodes) {
+      if (!translations[code]) {
+        translations[code] = { name, description: description || "", ingredients: ingredients || [], instructions: instructions || [] };
+      } else {
+        translations[code].name = translations[code].name || name;
+        translations[code].description = translations[code].description || description || "";
+        translations[code].ingredients = translations[code].ingredients || ingredients || [];
+        translations[code].instructions = translations[code].instructions || instructions || [];
       }
     }
 
-    if (Object.keys(newTranslations).length > 0) {
-      console.log(`translateRecipe: ${recipeId} - saved ${Object.keys(newTranslations).length} translations`);
-      await db.collection("recipes").doc(recipeId).update({ translations: newTranslations });
-    }
+    await getFirestore().collection("recipes").doc(recipeId).update({ translations });
+    console.log(`translateRecipe: ${recipeId} saved 5 translations. nb="${translations.nb?.name}", en="${translations.en?.name}", sv="${translations.sv?.name}"`);
 
-    return res.status(200).json({ translations: newTranslations });
+    return res.status(200).json({ translations });
   } catch (error) {
     console.error("Translate recipe error:", error);
     return res.status(500).json({ error: "Failed to translate recipe" });
