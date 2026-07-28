@@ -203,16 +203,20 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   }, [familyId, user?.uid]);
 
   const loadSpondEvents = useCallback(async () => {
-    if (!familyId) return;
+    if (!familyId) { console.log('Spond: no familyId'); return; }
     try {
       const config = await getSpondConfig(familyId);
+      console.log('Spond config:', config ? `${config.groups.length} groups, email: ${!!config.email}, pass: ${!!config.password}` : 'null');
       if (config && config.email && config.password && config.groups.length > 0) {
         setSpondConfig({ email: config.email, password: config.password });
         const groupIds = config.groups.map((g) => g.id);
+        console.log('Spond groupIds:', groupIds);
         const logos: Record<string, string> = {};
         config.groups.forEach(g => { if (g.logoUrl) logos[g.name] = g.logoUrl; });
         setSpondGroupLogos(logos);
+        console.log('Spond logos:', Object.keys(logos));
         const events = await getSpondEvents(config.email, config.password, groupIds);
+        console.log('Spond events:', events.length);
         const withGroupNames = events.map((e) => {
           const group = config.groups.find((g) => g.id === e.groupId);
           return { ...e, groupName: group?.name };
@@ -223,8 +227,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           setSpondRespondents(config.respondents);
         }
       }
-    } catch {
-      // Silently fail for Spond
+    } catch (e) {
+      console.error('Spond load error:', e);
     }
   }, [familyId]);
 

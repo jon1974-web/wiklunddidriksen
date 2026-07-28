@@ -128,6 +128,7 @@ export const ProfileScreen: React.FC = () => {
           const spondConfig = await getSpondConfig(userProfile.familyId);
           if (spondConfig) {
             setSpondEmail(spondConfig.email);
+            setSpondPassword(spondConfig.password);
             setSpondConnected(true);
             setSpondGroups(spondConfig.groups);
             setSpondSelectedGroups(spondConfig.groups.map((g) => g.id));
@@ -1117,10 +1118,10 @@ export const ProfileScreen: React.FC = () => {
                   <Text style={styles.familyButtonText}>Lagre</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.leaveButton, { borderColor: colors.danger }]}
+                  style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 8 }]}
                   onPress={handleDisconnectSpond}
                 >
-                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.leaveFamily')}</Text>
+                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Koble fra Spond</Text>
                 </TouchableOpacity>
               </View>
             </View>
