@@ -646,7 +646,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.toggleButton, { backgroundColor: TRIP_COLOR }]}
-            onPress={() => setShowWeeklySummary(true)}
+            onPress={() => {
+              if (user) {
+                getUserProfile(user.uid).then(profile => {
+                  if (profile?.minUkeSections) setMinUkeSections(profile.minUkeSections);
+                }).catch(() => {});
+              }
+              setShowWeeklySummary(true);
+            }}
           >
             <Text style={[styles.toggleText, { color: '#fff' }]}>{t('events.weeklySummary')}</Text>
           </TouchableOpacity>
