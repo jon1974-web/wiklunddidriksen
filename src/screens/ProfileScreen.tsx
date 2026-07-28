@@ -827,19 +827,23 @@ export const ProfileScreen: React.FC = () => {
             { key: 'pink' as const, color: '#F48FB1', border: false },
             { key: 'teal' as const, color: '#0097A7', border: false },
             { key: 'system' as const, color: '#999', border: false },
-          ]).map((t) => (
-            <TouchableOpacity
-              key={t.key}
-              onPress={() => setMode(t.key)}
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: 16,
-                backgroundColor: t.color,
-                borderWidth: mode === t.key ? 3 : (t.border ? 2 : 0),
-                borderColor: mode === t.key ? colors.accent : (t.border ? '#fff' : 'transparent'),
-              }}
-            />
+          ]).map((t) => {
+            const isActive = mode === t.key;
+            return (
+              <TouchableOpacity
+                key={t.key}
+                onPress={() => setMode(t.key)}
+                style={{
+                  width: isActive ? 32 : 26,
+                  height: isActive ? 32 : 26,
+                  borderRadius: isActive ? 16 : 13,
+                  backgroundColor: t.color,
+                  borderWidth: isActive ? 2 : (t.border ? 2 : 0),
+                  borderColor: isActive ? colors.accent : (t.border ? '#fff' : 'transparent'),
+                }}
+              />
+            );
+          })}
           ))}
         </View>
       </View>
