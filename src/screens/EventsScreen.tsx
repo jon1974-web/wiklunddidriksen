@@ -438,9 +438,27 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       }
     });
 
+    // Today highlight
+    const todayStr = getTodayLocal();
+    marks[todayStr] = { ...marks[todayStr], today: true };
+
+    // Birthday dots
+    const BIRTHDAY_COLOR = '#FF69B4';
+    birthdays.forEach((b) => {
+      const bDate = new Date(b.date);
+      const bMonthDay = `${String(bDate.getMonth() + 1).padStart(2, '0')}-${String(bDate.getDate()).padStart(2, '0')}`;
+      const currentYear = new Date().getFullYear();
+      const bThisYear = `${currentYear}-${bMonthDay}`;
+      if (!marks[bThisYear]) {
+        marks[bThisYear] = { marked: true, dotColor: BIRTHDAY_COLOR };
+      } else {
+        marks[bThisYear] = { ...marks[bThisYear], marked: true, dotColor: BIRTHDAY_COLOR };
+      }
+    });
+
     marks[selectedDate] = { ...marks[selectedDate], selected: true, selectedColor: colors.accent };
     return marks;
-  }, [events, trips, spondEvents, selectedDate, colors.accent]);
+  }, [events, trips, spondEvents, birthdays, selectedDate, colors.accent]);
 
   const currentWeek = useMemo(() => getWeekNumber(new Date(selectedDate)), [selectedDate]);
 

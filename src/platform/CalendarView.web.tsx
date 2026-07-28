@@ -112,6 +112,7 @@ export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, m
             const marks = markedDates[dateStr];
             const isSelected = marks?.selected;
             const hasEvent = marks?.marked;
+            const isToday = marks?.today;
 
             return (
               <TouchableOpacity
@@ -121,6 +122,7 @@ export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, m
                   styles.dayButton,
                   isSelected && { backgroundColor: selectedBg, borderRadius: 20 },
                   hasEvent && !isSelected && marks?.color && { backgroundColor: marks.color + '30' },
+                  isToday && !isSelected && { borderWidth: 2, borderColor: accent, borderRadius: 20 },
                 ]}
                 onPress={() => onDayPress({
                   dateString: dateStr,
@@ -132,6 +134,7 @@ export const WebCalendar: React.FC<WebCalendarProps> = ({ current, onDayPress, m
                 <Text style={[
                   styles.dayText,
                   { color: isSelected ? '#fff' : text },
+                  isToday && !isSelected && { fontWeight: 'bold', color: accent },
                 ]}>
                   {day}
                 </Text>
