@@ -84,12 +84,12 @@ export const getSpondGroups = async (email: string, password: string): Promise<S
   const token = await getToken(email, password);
   try {
     const groups = await proxyCall({ action: 'groups', token });
-    return (groups || []).map((g: any) => ({ id: g.id, name: g.name }));
+    return (groups || []).map((g: any) => ({ id: g.id, name: g.name, logoUrl: g.logoUrl || g.imageUrl || g.image || undefined }));
   } catch {
     clearPersistedToken();
     const newToken = await loginSpond(email, password);
     const groups = await proxyCall({ action: 'groups', token: newToken });
-    return (groups || []).map((g: any) => ({ id: g.id, name: g.name }));
+    return (groups || []).map((g: any) => ({ id: g.id, name: g.name, logoUrl: g.logoUrl || g.imageUrl || g.image || undefined }));
   }
 };
 

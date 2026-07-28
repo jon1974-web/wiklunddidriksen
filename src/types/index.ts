@@ -244,6 +244,7 @@ export interface SpondEvent {
 export interface SpondGroup {
   id: string;
   name: string;
+  logoUrl?: string;
 }
 
 export interface SpondConfig {

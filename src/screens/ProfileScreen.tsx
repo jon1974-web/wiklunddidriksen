@@ -1038,16 +1038,46 @@ export const ProfileScreen: React.FC = () => {
 
               <Text style={[styles.label, { color: colors.textSecondary, marginTop: 12 }]}>{t('profile.members')}</Text>
               {spondGroups.map((group) => (
-                <TouchableOpacity
-                  key={group.id}
-                  style={[styles.valueRow, { backgroundColor: colors.inputBackground, marginBottom: 6 }]}
-                  onPress={() => handleToggleSpondGroup(group.id)}
-                >
-                  <Text style={[styles.value, { color: colors.text }]}>{group.name}</Text>
-                  <Text style={[styles.editIcon, { color: spondSelectedGroups.includes(group.id) ? colors.accent : colors.textDisabled }]}>
-                    {spondSelectedGroups.includes(group.id) ? '✅' : '⬜'}
-                  </Text>
-                </TouchableOpacity>
+                <View key={group.id} style={{ marginBottom: 8 }}>
+                  <TouchableOpacity
+                    style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}
+                    onPress={() => handleToggleSpondGroup(group.id)}
+                  >
+                    {group.logoUrl ? (
+                      <Image source={{ uri: group.logoUrl }} style={{ width: 32, height: 32, borderRadius: 6, marginRight: 10 }} />
+                    ) : (
+                      <View style={{ width: 32, height: 32, borderRadius: 6, backgroundColor: colors.inputBackground, borderColor: colors.border, borderWidth: 1, marginRight: 10, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontSize: 16 }}>🏟️</Text>
+                      </View>
+                    )}
+                    <Text style={[styles.value, { color: colors.text, flex: 1 }]}>{group.name}</Text>
+                    <Text style={[styles.editIcon, { color: spondSelectedGroups.includes(group.id) ? colors.accent : colors.textDisabled }]}>
+                      {spondSelectedGroups.includes(group.id) ? '✅' : '⬜'}
+                    </Text>
+                  </TouchableOpacity>
+                  {spondSelectedGroups.includes(group.id) && (
+                    <TouchableOpacity
+                      style={{ alignSelf: 'flex-end', marginTop: 4, paddingHorizontal: 8, paddingVertical: 4 }}
+                      onPress={async () => {
+                        const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.5, base64: true });
+                        if (!result.canceled && result.assets[0]) {
+                          try {
+                            const blob = await uriToBlob(result.assets[0].uri);
+                            const storageRef = ref(storage, `spond-logos/${familyId}/${group.id}`);
+                            await uploadBytes(storageRef, blob);
+                            const url = await getDownloadURL(storageRef);
+                            const updated = spondGroups.map(g => g.id === group.id ? { ...g, logoUrl: url } : g);
+                            setSpondGroups(updated);
+                            const selected = updated.filter(g => spondSelectedGroups.includes(g.id));
+                            await saveSpondConfig(familyId, { email: spondEmail, password: spondPassword, groups: selected, respondents: spondAllMembers.filter(m => spondRespondents.includes(m.id)).map(m => ({ uid: '', spondId: m.id, profileId: m.profileId || m.id, firstName: m.firstName, lastName: m.lastName, groupId: m.groupId, groupName: m.groupName })) });
+                          } catch (e) { console.error('Logo upload failed:', e); }
+                        }
+                      }}
+                    >
+                      <Text style={{ color: colors.accent, fontSize: 12 }}>📷 Last opp logo</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
               ))}
 
               {spondAllMembers.length > 0 && (

@@ -5,17 +5,18 @@ import { SpondResponseModal } from '../components/SpondResponseModal';
 import { changeSpondResponse } from '../services/spondService';
 import { useTheme } from '../theme/ThemeContext';
 import { formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
-import { getEventRespondents, getModalRespondents, getSpondStampStatus, SPOND_GROUP_LOGOS } from './EventsScreen';
+import { getEventRespondents, getModalRespondents, getSpondStampStatus } from './EventsScreen';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 interface SpondEventDetailParams {
   event: SpondEvent;
   spondRespondents: SpondRespondent[];
   spondConfig: { email: string; password: string } | null;
+  groupLogos?: Record<string, string>;
 }
 
 export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
-  const { event, spondRespondents, spondConfig } = route.params as SpondEventDetailParams;
+  const { event, spondRespondents, spondConfig, groupLogos = {} } = route.params as SpondEventDetailParams;
   const { colors } = useTheme();
   const [responseModal, setResponseModal] = useState<{ type: 'accept' | 'decline' } | null>(null);
 
@@ -36,7 +37,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
 
   const mapUrl = useMemo(() => event.address ? getStaticMapUrl(event.address, 15, '600x300') : null, [event.address]);
 
-  const groupLogo = useMemo(() => event.groupName ? SPOND_GROUP_LOGOS[event.groupName] : undefined, [event.groupName]);
+  const groupLogo = useMemo(() => event.groupName ? groupLogos[event.groupName] : undefined, [event.groupName, groupLogos]);
 
   const handleSendResponse = useCallback(async (memberIds: string[]) => {
     if (!responseModal || !spondConfig) return;
@@ -70,7 +71,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <View style={styles.titleRow}>
           {groupLogo ? (
-            <Image source={groupLogo} style={styles.groupLogo} />
+            <Image source={{ uri: groupLogo }} style={styles.groupLogo} />
           ) : (
             <Text style={styles.groupIcon}>🏟️</Text>
           )}

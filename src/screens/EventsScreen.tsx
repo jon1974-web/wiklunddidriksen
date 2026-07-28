@@ -29,10 +29,7 @@ const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#0
 const TRIP_COLOR = '#0097A7';
 const SPOND_COLOR = '#E53935';
 
-export const SPOND_GROUP_LOGOS: Record<string, any> = {
-  'BSK Fotball J2010/2011': require('../../assets/Bekkelaget logo.png'),
-  'Surprise 25/26': require('../../assets/Viqueens logo.png'),
-};
+export const SPOND_GROUP_LOGOS: Record<string, any> = {};
 
 export interface StampDetail {
   name: string;
@@ -126,6 +123,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
+  const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [filterSource, setFilterSource] = useState<string | null>(null);
@@ -211,6 +209,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       if (config && config.email && config.password && config.groups.length > 0) {
         setSpondConfig({ email: config.email, password: config.password });
         const groupIds = config.groups.map((g) => g.id);
+        const logos: Record<string, string> = {};
+        config.groups.forEach(g => { if (g.logoUrl) logos[g.name] = g.logoUrl; });
+        setSpondGroupLogos(logos);
         const events = await getSpondEvents(config.email, config.password, groupIds);
         const withGroupNames = events.map((e) => {
           const group = config.groups.find((g) => g.id === e.groupId);
@@ -306,8 +307,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         return selectedDate >= start && selectedDate <= end;
       }).map((e) => ({ ...e, _type: 'spond' as const }));
       let dayItems = [...dayEvents, ...dayTrips, ...daySpond];
-      if (filterSource === 'viqueens') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === 'Surprise 25/26');
-      else if (filterSource === 'bekkelaget') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === 'BSK Fotball J2010/2011');
+      if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
       dayItems.sort(sortByDate);
       return dayItems;
@@ -317,10 +317,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       ...trips.map((t) => ({ ...t, _type: 'trip' as const })),
       ...spondEvents.map((e) => ({ ...e, _type: 'spond' as const })),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
-    const filtered = filterSource === 'viqueens'
-      ? allItems.filter((i) => i._type === 'spond' && i.groupName === 'Surprise 25/26')
-      : filterSource === 'bekkelaget'
-      ? allItems.filter((i) => i._type === 'spond' && i.groupName === 'BSK Fotball J2010/2011')
+    const filtered = filterSource && filterSource !== 'app'
+      ? allItems.filter((i) => i._type === 'spond' && i.groupName === filterSource)
       : filterSource === 'app'
       ? allItems.filter((i) => i._type === 'event' || i._type === 'trip')
       : allItems;
@@ -516,11 +514,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               event: item,
               spondRespondents,
               spondConfig,
+              groupLogos: spondGroupLogos,
             })}
           >
             <View style={styles.spondCardTitleRow}>
-              {item.groupName && SPOND_GROUP_LOGOS[item.groupName] ? (
-                <Image source={SPOND_GROUP_LOGOS[item.groupName]} style={styles.spondCardLogo} />
+              {item.groupName && spondGroupLogos[item.groupName] ? (
+                <Image source={{ uri: spondGroupLogos[item.groupName] }} style={styles.spondCardLogo} />
               ) : (
                 <Text style={styles.spondCardIcon}>🏟️</Text>
               )}
@@ -658,18 +657,15 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             <Text style={[styles.toggleText, { color: '#fff' }]}>{t('events.weeklySummary')}</Text>
           </TouchableOpacity>
           <View style={{ flex: 1 }} />
-          <TouchableOpacity
-            style={[styles.filterIcon, filterSource === 'viqueens' && { borderColor: colors.accent }]}
-            onPress={() => setFilterSource(filterSource === 'viqueens' ? null : 'viqueens')}
-          >
-            <Image source={SPOND_GROUP_LOGOS['Surprise 25/26']} style={[styles.filterIconImg, filterSource === 'viqueens' && styles.filterIconImgActive]} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.filterIcon, filterSource === 'bekkelaget' && { borderColor: colors.accent }]}
-            onPress={() => setFilterSource(filterSource === 'bekkelaget' ? null : 'bekkelaget')}
-          >
-            <Image source={SPOND_GROUP_LOGOS['BSK Fotball J2010/2011']} style={[styles.filterIconImg, filterSource === 'bekkelaget' && styles.filterIconImgActive]} />
-          </TouchableOpacity>
+          {spondGroupLogos && Object.entries(spondGroupLogos).map(([groupName, logoUrl]) => (
+            <TouchableOpacity
+              key={groupName}
+              style={[styles.filterIcon, filterSource === groupName && { borderColor: colors.accent }]}
+              onPress={() => setFilterSource(filterSource === groupName ? null : groupName)}
+            >
+              <Image source={{ uri: logoUrl }} style={[styles.filterIconImg, filterSource === groupName && styles.filterIconImgActive]} />
+            </TouchableOpacity>
+          ))}
           <TouchableOpacity
             style={[styles.filterIcon, filterSource === 'app' && { borderColor: colors.accent }]}
             onPress={() => setFilterSource(filterSource === 'app' ? null : 'app')}
@@ -764,6 +760,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         mealPlan={mealPlan}
         recipes={recipes}
         sectionSettings={minUkeSections}
+        groupLogos={spondGroupLogos}
       />
 
       <ActionModal

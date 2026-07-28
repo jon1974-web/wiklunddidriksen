@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
 import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
@@ -17,6 +17,7 @@ interface WeeklySummaryProps {
   mealPlan?: MealPlan | null;
   recipes?: Recipe[];
   sectionSettings?: Record<string, boolean>;
+  groupLogos?: Record<string, string>;
 }
 
 const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
@@ -45,9 +46,10 @@ interface DayItem {
   timeRange: string;
   icon: string;
   groupName?: string;
+  logoUrl?: string;
 }
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {} }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {} }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -120,6 +122,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             timeRange,
             icon: '🏟️',
             groupName: e.groupName,
+            logoUrl: e.groupName ? groupLogos[e.groupName] : undefined,
           });
         }
       });
@@ -245,7 +248,11 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                 {day.items.length > 0 ? (
                   day.items.map((item, i) => (
                     <View key={i} style={[styles.itemRow, i < day.items.length - 1 && { borderBottomColor: colors.border }]}>
-                      <Text style={styles.itemIcon}>{item.icon}</Text>
+                      {item.logoUrl ? (
+                        <Image source={{ uri: item.logoUrl }} style={{ width: 28, height: 28, borderRadius: 6 }} />
+                      ) : (
+                        <Text style={styles.itemIcon}>{item.icon}</Text>
+                      )}
                       <View style={styles.itemContent}>
                         <Text style={[styles.itemTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
                         <Text style={[styles.itemTime, { color: colors.textSecondary }]}>{item.timeRange}</Text>
