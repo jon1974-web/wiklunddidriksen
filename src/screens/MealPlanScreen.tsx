@@ -1284,7 +1284,7 @@ const styles = StyleSheet.create({
   recipeCard: { flex: 1, margin: 6, borderRadius: 12, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
   recipeImg: { height: 80, alignItems: 'center', justifyContent: 'center', position: 'relative' },
   favBtn: { position: 'absolute', top: 8, right: 8 },
-  recipeInfo: { padding: 12, paddingBottom: 14 },
+  recipeInfo: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: 14 },
   recipeName: { fontSize: 14, fontWeight: '600', marginBottom: 4 },
   recipeMeta: { fontSize: 12 },
   emptyState: { flex: 1, justifyContent: 'center', padding: 40 },
