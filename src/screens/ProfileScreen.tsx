@@ -836,10 +836,12 @@ export const ProfileScreen: React.FC = () => {
                 height: 32,
                 borderRadius: 16,
                 backgroundColor: t.color,
-                borderWidth: mode === t.key ? 3 : 0,
-                borderColor: mode === t.key ? colors.accent : 'transparent',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
-            />
+            >
+              {mode === t.key && <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>✓</Text>}
+            </TouchableOpacity>
           ))}
         </View>
       </View>
