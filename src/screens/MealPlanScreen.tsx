@@ -697,7 +697,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                             try { await deleteDoc(doc(db, 'recipes', item.id)); loadData(); } catch (error) { crossAlert('Error', getErrorMessage(error)); }
                           } })}
                         >
-                          <View style={{ flex: 1 }}>
+                          <View style={styles.recipeInfo}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                               <Text style={[styles.recipeName, { color: colors.text }]} numberOfLines={1}>{getRecipeText(item, 'name')}</Text>
                               <TouchableOpacity onPress={(e) => { e.stopPropagation?.(); toggleFavorite(item); }} style={{ padding: 4 }}>
