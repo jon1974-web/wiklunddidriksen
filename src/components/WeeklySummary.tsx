@@ -124,21 +124,6 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         }
       });
 
-      if (mealPlan?.meals) {
-        const dayKey = DAY_KEYS[i];
-        const dayMeals = mealPlan.meals[dayKey];
-        if (dayMeals) {
-          if (dayMeals.lunsj) {
-            const recipe = recipes.find(r => r.id === dayMeals.lunsj);
-            items.push({ type: 'meal', title: recipe ? recipe.name : t('mealPlanner.lunch'), timeRange: t('mealPlanner.lunch'), icon: '🥪' });
-          }
-          if (dayMeals.middag) {
-            const recipe = recipes.find(r => r.id === dayMeals.middag);
-            items.push({ type: 'meal', title: recipe ? recipe.name : t('mealPlanner.dinner'), timeRange: t('mealPlanner.dinner'), icon: '🍽️' });
-          }
-        }
-      }
-
       items.sort((a, b) => a.timeRange.localeCompare(b.timeRange));
 
       days.push({
@@ -208,6 +193,42 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                     </View>
                   );
                 })}
+              </View>
+            );
+          })()}
+
+          {/* Meal plan compact section */}
+          {sectionSettings.meals !== false && mealPlan?.meals && (() => {
+            const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+            const DAY_LABELS_SHORT = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
+            let plannedCount = 0;
+            const totalSlots = 14;
+            const dayRows = DAY_KEYS.map((key, i) => {
+              const dayMeals = mealPlan.meals[key] || {};
+              const lunsjRecipe = dayMeals.lunsj ? recipes.find(r => r.id === dayMeals.lunsj) : null;
+              const middagRecipe = dayMeals.middag ? recipes.find(r => r.id === dayMeals.middag) : null;
+              if (lunsjRecipe) plannedCount++;
+              if (middagRecipe) plannedCount++;
+              const mealParts = [];
+              if (lunsjRecipe) mealParts.push(`🥪 ${lunsjRecipe.name}`);
+              if (middagRecipe) mealParts.push(`🍽️ ${middagRecipe.name}`);
+              return { day: DAY_LABELS_SHORT[i], meals: mealParts, hasMeals: mealParts.length > 0 };
+            });
+
+            return (
+              <View style={[styles.mealSection, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.mealSectionTitle, { color: colors.text }]}>🍽️ {t('mealPlanner.weeklyPlan')}</Text>
+                <Text style={[styles.mealProgress, { color: colors.textSecondary }]}>
+                  {t('mealPlanner.mealsPlanned', { planned: plannedCount, total: totalSlots })}
+                </Text>
+                {dayRows.map((row, i) => (
+                  <View key={i} style={[styles.mealDayRow, i < 6 && { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.mealDayLabel, { color: colors.text }]}>{row.day}</Text>
+                    <Text style={[styles.mealDayContent, { color: row.hasMeals ? colors.text : colors.textDisabled }]}>
+                      {row.hasMeals ? row.meals.join(' · ') : '—'}
+                    </Text>
+                  </View>
+                ))}
               </View>
             );
           })()}
@@ -370,5 +391,42 @@ const styles = StyleSheet.create({
   birthdayItemText: {
     fontSize: 15,
     fontWeight: '500',
+  },
+  mealSection: {
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  mealSectionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 4,
+  },
+  mealProgress: {
+    fontSize: 13,
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+  },
+  mealDayRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+  },
+  mealDayLabel: {
+    fontSize: 14,
+    fontWeight: '700',
+    width: 36,
+  },
+  mealDayContent: {
+    fontSize: 14,
+    flex: 1,
   },
 });
