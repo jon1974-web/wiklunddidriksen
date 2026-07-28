@@ -129,6 +129,7 @@ export const ProfileScreen: React.FC = () => {
           if (spondConfig) {
             setSpondEmail(spondConfig.email);
             setSpondConnected(true);
+            setSpondGroups(spondConfig.groups);
             setSpondSelectedGroups(spondConfig.groups.map((g) => g.id));
             if (spondConfig.respondents) {
               setSpondRespondents(spondConfig.respondents.map((r) => r.spondId));
@@ -499,7 +500,14 @@ export const ProfileScreen: React.FC = () => {
     setSpondLoading(true);
     try {
       const groups = await getSpondGroups(spondEmail.trim(), spondPassword);
-      setSpondGroups(groups);
+      // Merge with saved logoUrls from existing config
+      const savedConfig = familyId ? await getSpondConfig(familyId) : null;
+      const savedLogos: Record<string, string> = {};
+      if (savedConfig?.groups) {
+        savedConfig.groups.forEach(g => { if (g.logoUrl) savedLogos[g.id] = g.logoUrl; });
+      }
+      const merged = groups.map(g => savedLogos[g.id] ? { ...g, logoUrl: savedLogos[g.id] } : g);
+      setSpondGroups(merged);
       setSpondConnected(true);
 
       const allMembers: SpondGroupMember[] = [];
