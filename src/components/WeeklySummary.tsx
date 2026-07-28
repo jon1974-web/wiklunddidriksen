@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal } from 'react-native';
-import { Event, Trip, SpondEvent, Birthday } from '../types';
+import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +14,13 @@ interface WeeklySummaryProps {
   trips: Trip[];
   spondEvents: SpondEvent[];
   birthdays?: Birthday[];
+  mealPlan?: MealPlan | null;
+  recipes?: Recipe[];
+  sectionSettings?: Record<string, boolean>;
 }
 
 const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
+const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
 const getWeekRange = (date: Date): { start: Date; end: Date } => {
   const d = new Date(date);
@@ -36,14 +40,14 @@ const toLocalDateStr = (date: Date): string => {
 };
 
 interface DayItem {
-  type: 'event' | 'trip' | 'spond';
+  type: 'event' | 'trip' | 'spond' | 'meal';
   title: string;
   timeRange: string;
   icon: string;
   groupName?: string;
 }
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {} }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -120,6 +124,21 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         }
       });
 
+      if (mealPlan?.meals) {
+        const dayKey = DAY_KEYS[i];
+        const dayMeals = mealPlan.meals[dayKey];
+        if (dayMeals) {
+          if (dayMeals.lunsj) {
+            const recipe = recipes.find(r => r.id === dayMeals.lunsj);
+            items.push({ type: 'meal', title: recipe ? recipe.name : t('mealPlanner.lunch'), timeRange: t('mealPlanner.lunch'), icon: '🥪' });
+          }
+          if (dayMeals.middag) {
+            const recipe = recipes.find(r => r.id === dayMeals.middag);
+            items.push({ type: 'meal', title: recipe ? recipe.name : t('mealPlanner.dinner'), timeRange: t('mealPlanner.dinner'), icon: '🍽️' });
+          }
+        }
+      }
+
       items.sort((a, b) => a.timeRange.localeCompare(b.timeRange));
 
       days.push({
@@ -131,7 +150,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     }
 
     return { weekNum, days, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
-  }, [events, trips, spondEvents, t, i18nInstance, langKey]);
+  }, [events, trips, spondEvents, mealPlan, recipes, t, i18nInstance, langKey]);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
@@ -150,7 +169,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
           {/* Birthday section */}
-          {(() => {
+          {sectionSettings.birthdays !== false && (() => {
             const { start, end } = getWeekRange(new Date());
             const weekBirthdays = birthdays.filter(b => {
               const bDate = new Date(b.date);

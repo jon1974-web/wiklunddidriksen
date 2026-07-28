@@ -295,6 +295,7 @@ export interface UserProfile {
   calendarProvider: 'google' | 'outlook' | null;
   avatarUrl: string | null;
   notificationsEnabled: boolean;
+  minUkeSections?: { [key: string]: boolean };
   createdAt: number;
 }
 

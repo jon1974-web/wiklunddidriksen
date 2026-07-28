@@ -14,6 +14,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services/spondService';
+import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
 import { MissedRemindersBanner } from '../components/MissedRemindersBanner';
@@ -133,6 +134,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [showPastEvents, setShowPastEvents] = useState(false);
   const [eventActionModal, setEventActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void }>({ visible: false, title: '' });
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
+  const [mealPlan, setMealPlan] = useState<any>(null);
+  const [recipes, setRecipes] = useState<any[]>([]);
+  const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ birthdays: true, meals: true });
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
@@ -178,6 +182,27 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       setBirthdays(data);
     }).catch(() => {});
   }, [familyId]);
+
+  useEffect(() => {
+    if (!familyId || !user) return;
+    const now = new Date();
+    const day = now.getDay();
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const monday = new Date(now);
+    monday.setDate(diff);
+    const weekStart = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+    const q = query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', weekStart));
+    getDocs(q).then(snap => {
+      if (snap.docs.length > 0) setMealPlan({ id: snap.docs[0].id, ...snap.docs[0].data() });
+    }).catch(() => {});
+    const recipesQ = query(collection(db, 'recipes'), where('familyId', '==', familyId));
+    getDocs(recipesQ).then(snap => {
+      setRecipes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    }).catch(() => {});
+    getUserProfile(user.uid).then(profile => {
+      if (profile?.minUkeSections) setMinUkeSections(profile.minUkeSections);
+    }).catch(() => {});
+  }, [familyId, user?.uid]);
 
   const loadSpondEvents = useCallback(async () => {
     if (!familyId) return;
@@ -729,6 +754,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         trips={trips}
         spondEvents={spondEvents}
         birthdays={birthdays}
+        mealPlan={mealPlan}
+        recipes={recipes}
+        sectionSettings={minUkeSections}
       />
 
       <ActionModal

@@ -79,6 +79,7 @@ export const ProfileScreen: React.FC = () => {
   const [calendarEmail, setCalendarEmail] = useState('');
   const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ birthdays: true, meals: true });
   const [uploading, setUploading] = useState(false);
   const [spondEmail, setSpondEmail] = useState('');
   const [spondPassword, setSpondPassword] = useState('');
@@ -118,6 +119,9 @@ export const ProfileScreen: React.FC = () => {
       }
       if (userProfile?.notificationsEnabled !== undefined) {
         setNotificationsEnabled(userProfile.notificationsEnabled);
+      }
+      if (userProfile?.minUkeSections) {
+        setMinUkeSections(userProfile.minUkeSections);
       }
       if (userProfile?.familyId) {
         try {
@@ -869,6 +873,29 @@ export const ProfileScreen: React.FC = () => {
             </TouchableOpacity>
           </View>
         </View>
+
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>📋 {t('profile.minUke')}</Text>
+        {[
+          { key: 'birthdays', icon: '🎂', label: t('birthdays.title') },
+          { key: 'meals', icon: '🍽️', label: t('mealPlanner.weeklyPlan') },
+        ].map(section => (
+          <TouchableOpacity
+            key={section.key}
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10 }}
+            onPress={() => {
+              const updated = { ...minUkeSections, [section.key]: !minUkeSections[section.key] };
+              setMinUkeSections(updated);
+              if (user) createOrUpdateUser(user.uid, { minUkeSections: updated });
+            }}
+          >
+            <Text style={{ color: colors.text, fontSize: 15 }}>{section.icon} {section.label}</Text>
+            <View style={{ width: 50, height: 28, borderRadius: 14, backgroundColor: minUkeSections[section.key] !== false ? colors.accent : colors.inputBackground, justifyContent: 'center', padding: 2 }}>
+              <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', alignSelf: minUkeSections[section.key] !== false ? 'flex-end' : 'flex-start' }} />
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>🎂 {t('birthdays.title')}</Text>
