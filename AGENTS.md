@@ -41,6 +41,56 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - For components that need language reactivity (useMemo), use `langKey` state or `i18n.on('languageChanged')` listener
 - **This applies to ALL user-facing text**: buttons, links, labels, text inputs, placeholder text, helper texts, error messages, alert titles/messages, section headers, empty states, tooltips, badge labels, and any other visible text
 
+### Help Center (Info Modal)
+When adding help to a feature, follow this pattern:
+
+1. **Add the Info icon** to the right of the section header text:
+```tsx
+import { HelpCenter } from '../components/HelpCenter';
+
+const [showHelp, setShowHelp] = useState(false);
+
+// In JSX:
+<View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+  <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>📅 Section Title</Text>
+  <TouchableOpacity
+    style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+    onPress={() => setShowHelp(true)}
+  >
+    <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+      </View>
+    </View>
+  </TouchableOpacity>
+</View>
+```
+
+2. **Add the HelpCenter modal** with sections in this order:
+```tsx
+<HelpCenter
+  visible={showHelp}
+  onClose={() => setShowHelp(false)}
+  title={t('mealPlanner.helpTitle')}
+  sections={[
+    { icon: '📋', title: t('mealPlanner.helpWhat'), text: t('mealPlanner.helpWhatText') },
+    { icon: '👉', title: t('mealPlanner.helpHow'), text: t('mealPlanner.helpHowText'), tip: t('mealPlanner.helpTip') },
+    { icon: '⚙️', title: t('mealPlanner.helpSettings'), text: t('mealPlanner.helpSettingsText') },
+  ]}
+/>
+```
+
+3. **Section order**: What is it → How to use it (with tip) → Settings (if applicable)
+
+4. **Add translations** in all 5 languages (`nb.json`, `en.json`, `sv.json`, `da.json`, `fi.json`):
+   - `helpTitle` — feature name
+   - `helpWhat` / `helpWhatText` — what the feature does
+   - `helpHow` / `helpHowText` — how to use it
+   - `helpTip` — helpful tip
+   - `helpSettings` / `helpSettingsText` — profile settings reference (if applicable)
+
+5. **Icon design**: Always teal (#0097A7) — bullseye pattern (teal → white → teal → white "i"). Does NOT follow theme.
+
 ### Family Role System
 - `Family.members` is a map: `{ [uid]: { role: 'owner'|'admin'|'member', displayName: string } }`
 - `UserProfile.familyRole` stores the user's role
