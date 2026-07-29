@@ -569,7 +569,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             onPress={() => setShowHelp(true)}
           >
             <View style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#fff', fontSize: 10, fontWeight: '800' }}>i</Text>
               </View>
             </View>
