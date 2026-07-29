@@ -82,6 +82,8 @@ const [showHelp, setShowHelp] = useState(false);
 
 3. **Section order**: What is it → How to use it (with tip) → Settings (if applicable)
 
+4. **Update help text when features change**: Whenever new functionality is added to a feature that has a Help Center modal, the help text MUST be updated to reflect the changes. This includes new buttons, new settings, changed workflows, etc. The help modal should always accurately describe the current state of the feature.
+
 4. **Add translations** in all 5 languages (`nb.json`, `en.json`, `sv.json`, `da.json`, `fi.json`):
    - `helpTitle` — feature name
    - `helpWhat` / `helpWhatText` — what the feature does
