@@ -909,6 +909,30 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>🍽️ {t('profile.matsenter')}</Text>
+        {[
+          { key: 'mealFrokost', icon: '🥞', label: t('mealPlanner.frokost') },
+          { key: 'mealLunsj', icon: '🥪', label: t('mealPlanner.lunch') },
+          { key: 'mealMiddag', icon: '🍽️', label: t('mealPlanner.dinner') },
+        ].map(section => (
+          <TouchableOpacity
+            key={section.key}
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 10 }}
+            onPress={() => {
+              const updated = { ...minUkeSections, [section.key]: minUkeSections[section.key] === false ? true : false };
+              setMinUkeSections(updated);
+              if (user) createOrUpdateUser(user.uid, { minUkeSections: updated });
+            }}
+          >
+            <Text style={{ color: colors.text, fontSize: 15 }}>{section.icon} {section.label}</Text>
+            <View style={{ width: 50, height: 28, borderRadius: 14, backgroundColor: minUkeSections[section.key] !== false ? colors.accent : colors.inputBackground, justifyContent: 'center', padding: 2 }}>
+              <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', alignSelf: minUkeSections[section.key] !== false ? 'flex-end' : 'flex-start' }} />
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>🎂 {t('birthdays.title')}</Text>
           <TouchableOpacity
             style={[styles.familyButton, { backgroundColor: colors.accent }]}
