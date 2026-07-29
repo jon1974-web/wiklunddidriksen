@@ -289,9 +289,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const handleAddToShoppingList = async (recipe: Recipe) => {
     if (!familyId) return;
     try {
+      const ingredients = getRecipeText(recipe, 'ingredients') || recipe.ingredients;
       const existingList = shoppingLists.find(l => l.title === recipe.name);
       if (existingList) {
-        const newItems = recipe.ingredients.map(ing => ({
+        const newItems = ingredients.map(ing => ({
           id: generateId(),
           name: ing.amount ? `${ing.name} (${ing.amount} ${ing.unit})` : ing.name,
           checked: false,
@@ -304,7 +305,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       } else {
         await addDoc(collection(db, 'shoppingLists'), {
           title: recipe.name,
-          items: recipe.ingredients.map(ing => ({
+          items: ingredients.map(ing => ({
             id: generateId(),
             name: ing.amount ? `${ing.name} (${ing.amount} ${ing.unit})` : ing.name,
             checked: false,
@@ -314,7 +315,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           familyId,
         });
       }
-      setInfoModal({ visible: true, title: t('common.success'), message: `${recipe.ingredients.length} ingredienser lagt til i "${recipe.name}"` });
+      setInfoModal({ visible: true, title: t('common.success'), message: `${ingredients.length} ingredienser lagt til i "${recipe.name}"` });
       loadData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
