@@ -148,6 +148,23 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      if (user) {
+        getUserProfile(user.uid).then(profile => {
+          if (profile?.minUkeSections) {
+            setMealToggles({
+              mealFrokost: profile.minUkeSections.mealFrokost !== false,
+              mealLunsj: profile.minUkeSections.mealLunsj !== false,
+              mealMiddag: profile.minUkeSections.mealMiddag !== false,
+            });
+          }
+        }).catch(() => {});
+      }
+    });
+    return unsubscribe;
+  }, [navigation, user]);
+
   const filteredRecipes = recipes.filter(r => {
     const matchesSearch = !searchQuery || r.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' ||
