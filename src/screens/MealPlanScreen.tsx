@@ -1216,7 +1216,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 ) : (
                   <>
                     <Text style={[styles.modalTitle, { color: colors.text }]}>
-                      {t('mealPlanner.selectRecipe')} {selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch').toLowerCase() : t('mealPlanner.dinner').toLowerCase()} {t('mealPlanner.on')} {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)}
+                      {t('mealPlanner.selectRecipe')} {selectedSlot?.meal === 'frokost' ? t('mealPlanner.frokost').toLowerCase() : selectedSlot?.meal === 'lunsj' ? t('mealPlanner.lunch').toLowerCase() : t('mealPlanner.dinner').toLowerCase()} {t('mealPlanner.on')} {selectedSlot?.day && t(`mealPlanner.${selectedSlot.day}`)}
                     </Text>
                     <TextInput
                       style={[styles.modalSearchInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
