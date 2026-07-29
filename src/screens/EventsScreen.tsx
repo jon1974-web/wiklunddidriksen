@@ -668,6 +668,23 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <TouchableOpacity
             style={[styles.toggleButton, { backgroundColor: TRIP_COLOR }]}
             onPress={() => {
+              // Re-fetch mealPlan and recipes
+              if (familyId) {
+                const now = new Date();
+                const day = now.getDay();
+                const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+                const monday = new Date(now);
+                monday.setDate(diff);
+                const ws = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+                const q = query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', ws));
+                getDocs(q).then(snap => {
+                  if (snap.docs.length > 0) setMealPlan({ id: snap.docs[0].id, ...snap.docs[0].data() });
+                }).catch(() => {});
+                const recipesQ = query(collection(db, 'recipes'), where('familyId', '==', familyId));
+                getDocs(recipesQ).then(snap => {
+                  setRecipes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+                }).catch(() => {});
+              }
               if (user) {
                 getUserProfile(user.uid).then(profile => {
                   if (profile?.minUkeSections) setMinUkeSections(profile.minUkeSections);
