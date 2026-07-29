@@ -51,6 +51,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [mealToggles, setMealToggles] = useState<Record<string, boolean>>({ mealFrokost: true, mealLunsj: true, mealMiddag: true });
   const [showHelp, setShowHelp] = useState(false);
   const [showHelpRandom, setShowHelpRandom] = useState(false);
+  const [showHelpSearch, setShowHelpSearch] = useState(false);
   const [aiQuery, setAiQuery] = useState('');
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -631,14 +632,26 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const renderOppskrifter = () => (
     <View style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <View style={styles.searchBar}>
-          <TextInput
-            style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholder={t('mealPlanner.searchRecipe')}
-            placeholderTextColor={colors.textDisabled}
-          />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View style={[styles.searchBar, { flex: 1 }]}>
+            <TextInput
+              style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholder={t('mealPlanner.searchRecipe')}
+              placeholderTextColor={colors.textDisabled}
+            />
+          </View>
+          <TouchableOpacity
+            style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => setShowHelpSearch(true)}
+          >
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterRow}>
@@ -1202,6 +1215,17 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           { icon: '🎲', title: t('mealPlanner.helpRandomWhat'), text: t('mealPlanner.helpRandomWhatText') },
           { icon: '👉', title: t('mealPlanner.helpRandomHow'), text: t('mealPlanner.helpRandomHowText'), tip: t('mealPlanner.helpRandomTip') },
           { icon: '⚙️', title: t('mealPlanner.helpRandomSettings'), text: t('mealPlanner.helpRandomSettingsText') },
+        ]}
+      />
+
+      <HelpCenter
+        visible={showHelpSearch}
+        onClose={() => setShowHelpSearch(false)}
+        title={t('mealPlanner.helpSearchTitle')}
+        sections={[
+          { icon: '🔍', title: t('mealPlanner.helpSearchWhat'), text: t('mealPlanner.helpSearchWhatText') },
+          { icon: '👉', title: t('mealPlanner.helpSearchHow'), text: t('mealPlanner.helpSearchHowText'), tip: t('mealPlanner.helpSearchTip') },
+          { icon: '⚙️', title: t('mealPlanner.helpSearchSettings'), text: t('mealPlanner.helpSearchSettingsText') },
         ]}
       />
 
