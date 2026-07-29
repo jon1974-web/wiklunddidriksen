@@ -568,7 +568,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
             onPress={() => setShowHelp(true)}
           >
-            <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>i</Text>
+            <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: '#0097A7', fontSize: 11, fontWeight: '700', lineHeight: 13 }}>i</Text>
+            </View>
           </TouchableOpacity>
         </View>
         {DAYS.map((day, i) => (

@@ -99,7 +99,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   body: {
-    maxHeight: 350,
+    maxHeight: 420,
   },
   bodyContent: {
     padding: 20,
