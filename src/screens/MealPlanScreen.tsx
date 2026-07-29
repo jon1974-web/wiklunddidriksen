@@ -563,7 +563,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>📅 {t('mealPlanner.weekOverview')}</Text>
+          <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>📅 {t('mealPlanner.weekOverview')}</Text>
           <TouchableOpacity
             style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
             onPress={() => setShowHelp(true)}
