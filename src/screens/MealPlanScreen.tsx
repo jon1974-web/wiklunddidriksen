@@ -484,7 +484,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             <Text style={{ fontSize: 28, marginBottom: 4 }}>
               {randomRecipe.category === 'kylling' ? '🍗' : randomRecipe.category === 'kjoett' ? '🥩' : randomRecipe.category === 'fisk' ? '🐟' : randomRecipe.category === 'vegetar' ? '🥗' : randomRecipe.category === 'pasta' ? '🍝' : randomRecipe.category === 'gryte' ? '🥘' : randomRecipe.category === 'suppe' ? '🍲' : randomRecipe.category === 'frokost' ? '🥞' : randomRecipe.category === 'sott' ? '🍰' : '🍽️'}
             </Text>
-            <Text style={[styles.randomName, { color: colors.text }]}>{randomRecipe.name}</Text>
+            <Text style={[styles.randomName, { color: colors.text }]}>{getRecipeText(randomRecipe, 'name')}</Text>
             <Text style={[styles.randomMeta, { color: colors.textSecondary }]}>{randomRecipe.time} {t('mealPlanner.minutes')} · {randomRecipe.portions} {t('mealPlanner.servings')}</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
               <TouchableOpacity
