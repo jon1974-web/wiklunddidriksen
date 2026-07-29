@@ -565,12 +565,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>📅 {t('mealPlanner.weekOverview')}</Text>
           <TouchableOpacity
-            style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 24, height: 24, borderRadius: 12, borderWidth: 2, borderColor: '#fff', backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
             onPress={() => setShowHelp(true)}
           >
-            <View style={{ width: 16, height: 16, borderRadius: 8, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: '#0097A7', fontSize: 11, fontWeight: '700', lineHeight: 13 }}>i</Text>
-            </View>
+            <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>i</Text>
           </TouchableOpacity>
         </View>
         {DAYS.map((day, i) => (
