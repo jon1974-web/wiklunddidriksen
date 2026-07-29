@@ -1017,7 +1017,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.cuisine')}</Text>
                     {recipeForm.cuisine ? (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                         <TouchableOpacity
                           style={[styles.input, { backgroundColor: colors.inputBackground, flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }]}
                           onPress={() => { setRecipeForm(f => ({ ...f, cuisine: '' })); setCuisineSearch(''); setShowCuisineDropdown(true); }}
