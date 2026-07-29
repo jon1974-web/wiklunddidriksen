@@ -13,13 +13,14 @@ import { ActionModal } from '../components/ActionModal';
 import { InfoModal } from '../components/InfoModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
+import { getUserProfile } from '../services/familyService';
 import { MAX_RECIPES } from '../constants/limits';
 import { generateId } from '../utils/generateId';
 
 type SubTab = 'ukemeny' | 'oppskrifter' | 'handleliste';
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const DAY_LABELS = ['mealPlanner.monday', 'mealPlanner.tuesday', 'mealPlanner.wednesday', 'mealPlanner.thursday', 'mealPlanner.friday', 'mealPlanner.saturday', 'mealPlanner.sunday'];
-const MEAL_SLOTS = ['lunsj', 'middag'] as const;
+const MEAL_SLOTS = ['frokost', 'lunsj', 'middag'] as const;
 
 export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const { colors } = useTheme();
@@ -46,6 +47,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
   const [selectedRecipeForSlot, setSelectedRecipeForSlot] = useState<Recipe | null>(null);
   const [randomRecipe, setRandomRecipe] = useState<Recipe | null>(null);
+  const [mealToggles, setMealToggles] = useState<Record<string, boolean>>({ mealFrokost: true, mealLunsj: true, mealMiddag: true });
   const [aiQuery, setAiQuery] = useState('');
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -125,6 +127,18 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       const listsQ = query(collection(db, 'shoppingLists'), where('familyId', '==', familyId));
       const listsSnap = await getDocs(listsQ);
       setShoppingLists(listsSnap.docs.map(d => ({ id: d.id, ...d.data() } as ShoppingList)));
+
+      if (user) {
+        getUserProfile(user.uid).then(profile => {
+          if (profile?.minUkeSections) {
+            setMealToggles({
+              mealFrokost: profile.minUkeSections.mealFrokost !== false,
+              mealLunsj: profile.minUkeSections.mealLunsj !== false,
+              mealMiddag: profile.minUkeSections.mealMiddag !== false,
+            });
+          }
+        }).catch(() => {});
+      }
     } catch (error) {
       console.error('Failed to load meal planner data:', error);
     } finally {
@@ -534,9 +548,16 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <TouchableOpacity key={day} style={[styles.dayRow, { borderBottomColor: colors.border }]}>
             <Text style={[styles.dayName, { color: colors.accent }]}>{t(DAY_LABELS[i])}</Text>
             <View style={styles.dayMeals}>
-              {MEAL_SLOTS.map(meal => {
+              {MEAL_SLOTS.filter(meal => {
+                if (meal === 'frokost') return mealToggles.mealFrokost !== false;
+                if (meal === 'lunsj') return mealToggles.mealLunsj !== false;
+                if (meal === 'middag') return mealToggles.mealMiddag !== false;
+                return true;
+              }).map(meal => {
                 const recipeId = mealPlan?.meals?.[day]?.[meal];
                 const recipe = recipes.find(r => r.id === recipeId);
+                const mealEmoji = meal === 'frokost' ? '🥞' : meal === 'lunsj' ? '🥪' : '🍽️';
+                const mealLabel = meal === 'frokost' ? t('mealPlanner.frokost') : meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner');
                 return (
                   <TouchableOpacity
                     key={meal}
@@ -551,7 +572,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     }}
                   >
                     <Text style={{ fontSize: 12, color: recipe ? colors.accent : colors.textDisabled }}>
-                      {recipe ? recipe.name : `+ ${meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner')}`}
+                      {recipe ? recipe.name : `+ ${mealLabel}`}
                     </Text>
                   </TouchableOpacity>
                 );

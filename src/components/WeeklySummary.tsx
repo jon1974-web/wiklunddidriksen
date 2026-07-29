@@ -204,15 +204,22 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           {sectionSettings.meals !== false && mealPlan?.meals && (() => {
             const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
             const DAY_LABELS_SHORT = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
+            const showFrokost = sectionSettings.mealFrokost !== false;
+            const showLunsj = sectionSettings.mealLunsj !== false;
+            const showMiddag = sectionSettings.mealMiddag !== false;
+            const enabledSlots = (showFrokost ? 1 : 0) + (showLunsj ? 1 : 0) + (showMiddag ? 1 : 0);
+            const totalSlots = 7 * enabledSlots;
             let plannedCount = 0;
-            const totalSlots = 14;
             const dayRows = DAY_KEYS.map((key, i) => {
               const dayMeals = mealPlan.meals[key] || {};
-              const lunsjRecipe = dayMeals.lunsj ? recipes.find(r => r.id === dayMeals.lunsj) : null;
-              const middagRecipe = dayMeals.middag ? recipes.find(r => r.id === dayMeals.middag) : null;
+              const frokostRecipe = showFrokost && dayMeals.frokost ? recipes.find(r => r.id === dayMeals.frokost) : null;
+              const lunsjRecipe = showLunsj && dayMeals.lunsj ? recipes.find(r => r.id === dayMeals.lunsj) : null;
+              const middagRecipe = showMiddag && dayMeals.middag ? recipes.find(r => r.id === dayMeals.middag) : null;
+              if (frokostRecipe) plannedCount++;
               if (lunsjRecipe) plannedCount++;
               if (middagRecipe) plannedCount++;
               const mealParts = [];
+              if (frokostRecipe) mealParts.push(`🥞 ${frokostRecipe.name}`);
               if (lunsjRecipe) mealParts.push(`🥪 ${lunsjRecipe.name}`);
               if (middagRecipe) mealParts.push(`🍽️ ${middagRecipe.name}`);
               return { day: DAY_LABELS_SHORT[i], meals: mealParts, hasMeals: mealParts.length > 0 };

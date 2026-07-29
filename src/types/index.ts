@@ -352,7 +352,7 @@ export interface MealPlan {
   id: string;
   weekStart: string;
   meals: {
-    [day: string]: { lunsj?: string; middag?: string };
+    [day: string]: { frokost?: string; lunsj?: string; middag?: string };
   };
   familyId: string;
   createdBy: string;
