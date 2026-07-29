@@ -680,7 +680,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           </TouchableOpacity>
         </View>
         {spondGroupLogos && Object.keys(spondGroupLogos).length > 0 && (
-          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, paddingTop: 8, paddingBottom: 4 }}>
+          <View style={{ flexDirection: 'row', gap: 10, paddingTop: 8, paddingBottom: 4, paddingHorizontal: 16 }}>
             <TouchableOpacity
               style={[styles.filterIcon, filterSource === 'app' && { borderColor: colors.accent }]}
               onPress={() => setFilterSource(filterSource === 'app' ? null : 'app')}
