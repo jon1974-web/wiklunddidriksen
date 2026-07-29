@@ -91,7 +91,7 @@ const [showHelp, setShowHelp] = useState(false);
    - `helpTip` — helpful tip
    - `helpSettings` / `helpSettingsText` — profile settings reference (if applicable)
 
-5. **Icon design**: Always teal (#0097A7) — bullseye pattern (teal → white → teal → white "i"). Does NOT follow theme.
+5. **Icon design**: Use the SVG from `assets/help-icon.svg`. Always teal (#0097A7) — bullseye pattern. Does NOT follow theme.
 
 ### Family Role System
 - `Family.members` is a map: `{ [uid]: { role: 'owner'|'admin'|'member', displayName: string } }`

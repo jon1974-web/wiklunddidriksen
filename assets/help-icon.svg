@@ -1,0 +1,11 @@
+<svg viewBox="0 0 48 48" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer teal circle (26px equivalent) -->
+  <circle cx="24" cy="24" r="24" fill="#0097A7"/>
+  <!-- White circle (18px equivalent) -->
+  <circle cx="24" cy="24" r="18" fill="#fff"/>
+  <!-- Inner teal circle (12px equivalent) -->
+  <circle cx="24" cy="24" r="12" fill="#0097A7"/>
+  <!-- White i letter -->
+  <circle cx="24" cy="18" r="2.5" fill="#fff"/>
+  <rect x="22.5" y="22" width="3" height="10" rx="1.5" fill="#fff"/>
+</svg>
