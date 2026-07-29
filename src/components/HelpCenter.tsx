@@ -29,28 +29,27 @@ export const HelpCenter: React.FC<HelpCenterProps> = React.memo(({ visible, onCl
           <TouchableWithoutFeedback>
             <View style={[styles.container, { backgroundColor: colors.surface }]}>
               <View style={styles.header}>
-                <View style={styles.logo}>
-                  <Image source={require('../../assets/icon.png')} style={styles.logoImg} />
-                </View>
+                <Image source={require('../../assets/icon.png')} style={styles.logo} />
                 <Text style={styles.headerTitle}>Hjelpesenter</Text>
                 <Text style={styles.headerSubtitle}>{title}</Text>
-                {subtitle && <Text style={styles.headerDesc}>{subtitle}</Text>}
               </View>
 
-              <ScrollView style={styles.body} contentContainerStyle={styles.bodyContent}>
-                {sections.map((section, i) => (
-                  <View key={i} style={styles.section}>
-                    <Text style={[styles.sectionTitle, { color: '#0097A7' }]}>
-                      {section.icon} {section.title}
-                    </Text>
-                    <Text style={[styles.sectionText, { color: colors.text }]}>{section.text}</Text>
-                    {section.tip && (
-                      <View style={styles.tip}>
-                        <Text style={styles.tipText}>💡 <Text style={{ fontWeight: '600' }}>Tips:</Text> {section.tip}</Text>
-                      </View>
-                    )}
-                  </View>
-                ))}
+              <ScrollView style={styles.body}>
+                <View style={styles.bodyContent}>
+                  {sections.map((section, i) => (
+                    <View key={i} style={[styles.section, i < sections.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border, paddingBottom: 16 }]}>
+                      <Text style={[styles.sectionTitle, { color: '#0097A7' }]}>
+                        {section.icon} {section.title}
+                      </Text>
+                      <Text style={[styles.sectionText, { color: colors.text }]}>{section.text}</Text>
+                      {section.tip && (
+                        <View style={[styles.tip, { backgroundColor: '#E0F7FA', borderLeftColor: '#0097A7' }]}>
+                          <Text style={[styles.tipText, { color: '#006064' }]}>💡 <Text style={{ fontWeight: '600' }}>Tips:</Text> {section.tip}</Text>
+                        </View>
+                      )}
+                    </View>
+                  ))}
+                </View>
               </ScrollView>
 
               <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
@@ -74,13 +73,11 @@ const styles = StyleSheet.create({
   },
   container: {
     borderRadius: 20,
-    width: '100%',
-    maxWidth: 360,
+    width: 340,
     maxHeight: '80%',
     overflow: 'hidden',
   },
   header: {
-    background: 'linear-gradient(135deg, #0097A7, #00ACC1)',
     backgroundColor: '#0097A7',
     padding: 24,
     alignItems: 'center',
@@ -89,20 +86,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 14,
-    backgroundColor: '#fff',
     marginBottom: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  logoImg: {
-    width: 56,
-    height: 56,
-    borderRadius: 14,
   },
   headerTitle: {
     color: '#fff',
@@ -114,34 +98,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 4,
   },
-  headerDesc: {
-    color: 'rgba(255,255,255,0.7)',
-    fontSize: 12,
-    marginTop: 2,
-    textAlign: 'center',
-  },
   body: {
-    maxHeight: 400,
+    maxHeight: 350,
   },
   bodyContent: {
     padding: 20,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   sectionTitle: {
     fontSize: 15,
     fontWeight: '700',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   sectionText: {
     fontSize: 14,
-    lineHeight: 1.5,
+    lineHeight: 20,
   },
   tip: {
-    backgroundColor: '#E0F7FA',
     borderLeftWidth: 3,
-    borderLeftColor: '#0097A7',
     padding: 10,
     paddingTop: 8,
     paddingBottom: 8,
@@ -150,8 +126,7 @@ const styles = StyleSheet.create({
   },
   tipText: {
     fontSize: 13,
-    color: '#006064',
-    lineHeight: 1.4,
+    lineHeight: 18,
   },
   closeBtn: {
     width: '100%',
