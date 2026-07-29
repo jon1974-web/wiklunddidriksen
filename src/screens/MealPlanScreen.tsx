@@ -52,6 +52,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showHelp, setShowHelp] = useState(false);
   const [showHelpRandom, setShowHelpRandom] = useState(false);
   const [showHelpSearch, setShowHelpSearch] = useState(false);
+  const [showHelpHandleliste, setShowHelpHandleliste] = useState(false);
   const [aiQuery, setAiQuery] = useState('');
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -866,8 +867,18 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const renderHandleliste = () => (
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>🛒 {t('mealPlanner.shoppingLists')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10 }}>
+          <Text style={[styles.cardTitle, { color: colors.text, flex: 1, marginBottom: 0 }]}>🛒 {t('mealPlanner.shoppingLists')}</Text>
+          <TouchableOpacity
+            style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center', marginRight: 8 }}
+            onPress={() => setShowHelpHandleliste(true)}
+          >
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
           <TouchableOpacity style={[styles.addBtnSm, { backgroundColor: colors.accent }]} onPress={() => setShowAddList(true)}>
             <Text style={{ color: '#fff', fontWeight: '600' }}>+</Text>
           </TouchableOpacity>
@@ -1226,6 +1237,17 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           { icon: '🔍', title: t('mealPlanner.helpSearchWhat'), text: t('mealPlanner.helpSearchWhatText') },
           { icon: '👉', title: t('mealPlanner.helpSearchHow'), text: t('mealPlanner.helpSearchHowText'), tip: t('mealPlanner.helpSearchTip') },
           { icon: '⚙️', title: t('mealPlanner.helpSearchSettings'), text: t('mealPlanner.helpSearchSettingsText') },
+        ]}
+      />
+
+      <HelpCenter
+        visible={showHelpHandleliste}
+        onClose={() => setShowHelpHandleliste(false)}
+        title={t('mealPlanner.helpHandlelisteTitle')}
+        sections={[
+          { icon: '🛒', title: t('mealPlanner.helpHandlelisteWhat'), text: t('mealPlanner.helpHandlelisteWhatText') },
+          { icon: '👉', title: t('mealPlanner.helpHandlelisteHow'), text: t('mealPlanner.helpHandlelisteHowText') },
+          { icon: '📎', title: t('mealPlanner.helpHandlelisteRecipe'), text: t('mealPlanner.helpHandlelisteRecipeText'), tip: t('mealPlanner.helpHandlelisteRecipeTip') },
         ]}
       />
 
