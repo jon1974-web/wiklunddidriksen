@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Help Center Mockup - Familiesenter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f5f5f5; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .phone-frame { width: 375px; background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+        .header { background: #0097A7; padding: 16px; display: flex; align-items: center; gap: 12px; }
+        .header-icon { width: 36px; height: 36px; border-radius: 9px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .header-title { color: #fff; font-size: 18px; font-weight: 600; }
+        .content { padding: 16px; }
+        
+        /* Helper icon button */
+        .help-icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 10px; background: #E0E0E0; color: #666; font-size: 11px; font-weight: 700; cursor: pointer; margin-left: 6px; }
+        .help-icon-btn:hover { background: #BDBDBD; }
+        
+        /* Helper icon in context */
+        .section-header { display: flex; align-items: center; gap: 6px; margin-bottom: 12px; }
+        .section-title { font-size: 16px; font-weight: 600; color: #333; }
+        
+        /* Modal overlay */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 100; padding: 20px; }
+        .modal-container { background: #fff; border-radius: 20px; width: 100%; max-width: 360px; overflow: hidden; }
+        
+        /* Help Center specific styles */
+        .help-header { background: linear-gradient(135deg, #0097A7, #00ACC1); padding: 24px; text-align: center; }
+        .help-logo { width: 56px; height: 56px; border-radius: 14px; background: #fff; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .help-title { color: #fff; font-size: 20px; font-weight: 700; }
+        .help-subtitle { color: rgba(255,255,255,0.8); font-size: 13px; margin-top: 4px; }
+        
+        .help-body { padding: 20px; }
+        .help-section { margin-bottom: 20px; }
+        .help-section-title { font-size: 15px; font-weight: 700; color: #0097A7; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .help-section-icon { font-size: 16px; }
+        .help-text { font-size: 14px; color: #444; line-height: 1.5; }
+        .help-tip { background: #E0F7FA; border-left: 3px solid #0097A7; padding: 10px 12px; border-radius: 0 8px 8px 0; margin-top: 8px; }
+        .help-tip-text { font-size: 13px; color: #006064; line-height: 1.4; }
+        
+        .help-close { width: 100%; padding: 14px; background: #0097A7; color: #fff; border: none; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .help-close:hover { background: #00838F; }
+    </style>
+</head>
+<body>
+    <!-- Context: Helper icon next to a section title -->
+    <div class="phone-frame">
+        <div class="header">
+            <div class="header-icon">🍽️</div>
+            <div class="header-title">Matsenter</div>
+        </div>
+        <div class="content">
+            <div class="section-header">
+                <span style="font-size: 16px; font-weight: 700;">📅 Ukemeny</span>
+                <span class="help-icon-btn" onclick="document.getElementById('helpModal').style.display='flex'">?</span>
+            </div>
+            <div style="background: #f0f0f0; border-radius: 12px; padding: 16px; color: #666; text-align: center;">
+                [Meal plan grid goes here]
+            </div>
+        </div>
+    </div>
+
+    <!-- Help Center Modal -->
+    <div class="modal-overlay" id="helpModal" style="display: flex;">
+        <div class="modal-container">
+            <div class="help-header">
+                <div class="help-logo">🍽️</div>
+                <div class="help-title">Hjelpesenter</div>
+                <div class="help-subtitle">Ukemeny</div>
+            </div>
+            <div class="help-body">
+                <div class="help-section">
+                    <div class="help-section-title">
+                        <span class="help-section-icon">📋</span> Hva er Ukemeny?
+                    </div>
+                    <div class="help-text">
+                        Ukemenyen lar deg planlegge måltider for hele uken. Du kan legge til frokost, lunsj og middag for hver dag.
+                    </div>
+                </div>
+                
+                <div class="help-section">
+                    <div class="help-section-title">
+                        <span class="help-section-icon">👉</span> Slik gjør du
+                    </div>
+                    <div class="help-text">
+                        Trykk på en dag for å velge oppskrift fra boken. Du kan også bruke "Tilfeldig rett" for å få et forslag.
+                    </div>
+                    <div class="help-tip">
+                        <div class="help-tip-text">
+                            💡 <strong>Tips:</strong> Du kan endre måltidet senere ved å trykke på det igjen.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="help-section">
+                    <div class="help-section-title">
+                        <span class="help-section-icon">⚙️</span> Innstillinger
+                    </div>
+                    <div class="help-text">
+                        I profilen under <strong>Matsenter</strong> kan du velge hvilke måltidstyper som skal vises: Frokost, Lunsj og Middag.
+                    </div>
+                </div>
+            </div>
+            <button class="help-close" onclick="document.getElementById('helpModal').style.display='none'">Forstått</button>
+        </div>
+    </div>
+</body>
+</html>
