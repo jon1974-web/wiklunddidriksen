@@ -50,6 +50,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [randomRecipe, setRandomRecipe] = useState<Recipe | null>(null);
   const [mealToggles, setMealToggles] = useState<Record<string, boolean>>({ mealFrokost: true, mealLunsj: true, mealMiddag: true });
   const [showHelp, setShowHelp] = useState(false);
+  const [showHelpRandom, setShowHelpRandom] = useState(false);
   const [aiQuery, setAiQuery] = useState('');
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -505,7 +506,19 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const renderUkemeny = () => (
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>🎲 {t('mealPlanner.whatToEat')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>🎲 {t('mealPlanner.whatToEat')}</Text>
+          <TouchableOpacity
+            style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => setShowHelpRandom(true)}
+          >
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
         <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]} onPress={getRandomRecipe}>
           <Text style={styles.aiBtnText}>🎲 {t('mealPlanner.randomMeal')}</Text>
         </TouchableOpacity>
@@ -1178,6 +1191,17 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           { icon: '📋', title: t('mealPlanner.helpWhat'), text: t('mealPlanner.helpWhatText') },
           { icon: '👉', title: t('mealPlanner.helpHow'), text: t('mealPlanner.helpHowText'), tip: t('mealPlanner.helpTip') },
           { icon: '⚙️', title: t('mealPlanner.helpSettings'), text: t('mealPlanner.helpSettingsText') },
+        ]}
+      />
+
+      <HelpCenter
+        visible={showHelpRandom}
+        onClose={() => setShowHelpRandom(false)}
+        title={t('mealPlanner.helpRandomTitle')}
+        sections={[
+          { icon: '🎲', title: t('mealPlanner.helpRandomWhat'), text: t('mealPlanner.helpRandomWhatText') },
+          { icon: '👉', title: t('mealPlanner.helpRandomHow'), text: t('mealPlanner.helpRandomHowText'), tip: t('mealPlanner.helpRandomTip') },
+          { icon: '⚙️', title: t('mealPlanner.helpRandomSettings'), text: t('mealPlanner.helpRandomSettingsText') },
         ]}
       />
 
