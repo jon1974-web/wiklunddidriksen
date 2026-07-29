@@ -678,23 +678,26 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           >
             <Text style={[styles.toggleText, { color: '#fff' }]}>{t('events.weeklySummary')}</Text>
           </TouchableOpacity>
-          <View style={{ flex: 1 }} />
-          {spondGroupLogos && Object.entries(spondGroupLogos).map(([groupName, logoUrl]) => (
-            <TouchableOpacity
-              key={groupName}
-              style={[styles.filterIcon, filterSource === groupName && { borderColor: colors.accent }]}
-              onPress={() => setFilterSource(filterSource === groupName ? null : groupName)}
-            >
-              <Image source={{ uri: logoUrl }} style={[styles.filterIconImg, filterSource === groupName && styles.filterIconImgActive]} />
-            </TouchableOpacity>
-          ))}
-          <TouchableOpacity
-            style={[styles.filterIcon, filterSource === 'app' && { borderColor: colors.accent }]}
-            onPress={() => setFilterSource(filterSource === 'app' ? null : 'app')}
-          >
-            <View style={[styles.filterIconCircle, { backgroundColor: colors.accent }, filterSource === 'app' && styles.filterIconCircleActive]} />
-          </TouchableOpacity>
         </View>
+        {spondGroupLogos && Object.keys(spondGroupLogos).length > 0 && (
+          <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, paddingTop: 8, paddingBottom: 4 }}>
+            <TouchableOpacity
+              style={[styles.filterIcon, filterSource === 'app' && { borderColor: colors.accent }]}
+              onPress={() => setFilterSource(filterSource === 'app' ? null : 'app')}
+            >
+              <View style={[styles.filterIconCircle, { backgroundColor: colors.accent }, filterSource === 'app' && styles.filterIconCircleActive]} />
+            </TouchableOpacity>
+            {Object.entries(spondGroupLogos).map(([groupName, logoUrl]) => (
+              <TouchableOpacity
+                key={groupName}
+                style={[styles.filterIcon, filterSource === groupName && { borderColor: colors.accent }]}
+                onPress={() => setFilterSource(filterSource === groupName ? null : groupName)}
+              >
+                <Image source={{ uri: logoUrl }} style={[styles.filterIconImg, filterSource === groupName && styles.filterIconImgActive]} />
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
       </View>
 
       <MissedRemindersBanner navigation={navigation} />
