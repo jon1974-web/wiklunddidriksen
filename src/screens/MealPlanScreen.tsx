@@ -11,6 +11,7 @@ import { Recipe, ShoppingList, ShoppingItem } from '../types';
 import { LANGUAGES, getAiNameForCode } from '../constants/languages';
 import { ActionModal } from '../components/ActionModal';
 import { InfoModal } from '../components/InfoModal';
+import { HelpCenter } from '../components/HelpCenter';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getUserProfile } from '../services/familyService';
@@ -48,6 +49,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [selectedRecipeForSlot, setSelectedRecipeForSlot] = useState<Recipe | null>(null);
   const [randomRecipe, setRandomRecipe] = useState<Recipe | null>(null);
   const [mealToggles, setMealToggles] = useState<Record<string, boolean>>({ mealFrokost: true, mealLunsj: true, mealMiddag: true });
+  const [showHelp, setShowHelp] = useState(false);
   const [aiQuery, setAiQuery] = useState('');
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -560,7 +562,15 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.cardTitle, { color: colors.text }]}>📅 {t('mealPlanner.weekOverview')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <Text style={[styles.cardTitle, { color: colors.text, flex: 1 }]}>📅 {t('mealPlanner.weekOverview')}</Text>
+          <TouchableOpacity
+            style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => setShowHelp(true)}
+          >
+            <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>i</Text>
+          </TouchableOpacity>
+        </View>
         {DAYS.map((day, i) => (
           <TouchableOpacity key={day} style={[styles.dayRow, { borderBottomColor: colors.border }]}>
             <Text style={[styles.dayName, { color: colors.accent }]}>{t(DAY_LABELS[i])}</Text>
@@ -1154,6 +1164,17 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         title={infoModal.title}
         message={infoModal.message}
         onConfirm={() => setInfoModal({ visible: false, title: '' })}
+      />
+
+      <HelpCenter
+        visible={showHelp}
+        onClose={() => setShowHelp(false)}
+        title={t('mealPlanner.helpTitle')}
+        sections={[
+          { icon: '📋', title: t('mealPlanner.helpWhat'), text: t('mealPlanner.helpWhatText') },
+          { icon: '👉', title: t('mealPlanner.helpHow'), text: t('mealPlanner.helpHowText'), tip: t('mealPlanner.helpTip') },
+          { icon: '⚙️', title: t('mealPlanner.helpSettings'), text: t('mealPlanner.helpSettingsText') },
+        ]}
       />
 
       {/* URL Import Modal */}
