@@ -500,7 +500,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
   const selectedCount = events.filter(e => e.checked).length;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>

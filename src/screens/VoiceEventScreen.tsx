@@ -244,7 +244,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
 
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
