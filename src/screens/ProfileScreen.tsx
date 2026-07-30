@@ -89,6 +89,7 @@ export const ProfileScreen: React.FC = () => {
   const [spondLoading, setSpondLoading] = useState(false);
   const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
   const [spondRespondents, setSpondRespondents] = useState<string[]>([]);
+  const [showRespondents, setShowRespondents] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -1127,8 +1128,15 @@ export const ProfileScreen: React.FC = () => {
 
               {spondAllMembers.length > 0 && (
                 <>
-                  <Text style={[styles.label, { color: colors.textSecondary, marginTop: 16 }]}>Velg respondenter (hvem kan svare)</Text>
-                  {spondAllMembers.map((member) => (
+                  <TouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16, gap: 8 }}
+                    onPress={() => setShowRespondents(!showRespondents)}
+                  >
+                    <Text style={[styles.label, { color: colors.textSecondary, marginTop: 0, marginBottom: 0 }]}>Velg respondenter (hvem kan svare)</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{spondRespondents.length} valgt</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{showRespondents ? '▲' : '▼'}</Text>
+                  </TouchableOpacity>
+                  {showRespondents && spondAllMembers.map((member) => (
                     <TouchableOpacity
                       key={`${member.groupId}-${member.id}`}
                       style={[styles.valueRow, { backgroundColor: colors.inputBackground, marginBottom: 6 }]}
