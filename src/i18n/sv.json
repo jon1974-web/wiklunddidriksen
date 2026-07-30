@@ -400,6 +400,26 @@
     "instruction": "Prata in i mikrofonen för att",
     "example": "T.ex. Fotbollsträning på Ekebergsletta på torsdag klockan 19 till 21 på Ekeberg konstgräs bana 2"
   },
+  "photoEvent": {
+    "title": "Foto till evenemang",
+    "instruction": "Ta eller välj ett foto för att",
+    "pickImage": "Välj foto",
+    "takePhoto": "Ta foto",
+    "processing": "Behandlar foto...",
+    "noEvents": "Inga evenemang hittades i bilden",
+    "eventsFound": "evenemang hittades",
+    "singleEvent": "evenemang hittades",
+    "selectEvents": "Välj evenemang att skapa",
+    "selectAll": "Välj alla",
+    "deselectAll": "Avmarkera alla",
+    "createSelected": "Skapa valda",
+    "creating": "Skapar...",
+    "createEvent": "Skapa evenemang",
+    "editManually": "Redigera manuellt",
+    "tryAgain": "Försök igen",
+    "retry": "Ladda om",
+    "error": "Kunde inte läsa evenemang från bilden"
+  },
   "languages": {
     "nb": "Norsk",
     "sv": "Svenska",

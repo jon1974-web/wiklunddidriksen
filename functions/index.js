@@ -349,6 +349,125 @@ Always extract a meaningful title from the speech.`,
   }
 });
 
+exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const { imageBase64, type } = req.body;
+
+    if (!imageBase64) {
+      return res.status(400).json({ error: "No image data received" });
+    }
+
+    if (type !== "event") {
+      return res.status(400).json({ error: "Invalid type. Only 'event' is supported." });
+    }
+
+    const today = new Date().toISOString().split("T")[0];
+
+    const systemPrompt = `You are an event parser. Extract ALL events visible in this image and return structured data.
+
+Today's date is ${today}.
+
+For each event found, extract:
+- title: A meaningful event title
+- description: Description or empty string if not visible
+- date: Start date as YYYY-MM-DD (resolve relative dates like "i dag", "i morgen", "neste mandag" relative to today)
+- endDate: End date as YYYY-MM-DD or null if single-day
+- time: Start time as HH:MM (default "09:00" if not visible)
+- endTime: End time as HH:MM or null
+- reminderMinutes: Default 30
+
+Norwegian days: mandag=Monday, tirsdag=Tuesday, onsdag=Wednesday, torsdag=Thursday, fredag=Friday, lørdag=Saturday, søndag=Sunday.
+Norwegian months: januar=January, februar=February, mars=March, april=April, mai=May, juni=June, juli=July, august=August, september=September, oktober=October, november=November, desember=December.
+
+If only one event is found, return an array with one element.
+If multiple events are found (e.g. a weekly schedule), return ALL of them.
+If no events can be identified, return an empty array.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "events": [
+    {
+      "title": "event title",
+      "description": "description or empty string",
+      "date": "YYYY-MM-DD",
+      "endDate": "YYYY-MM-DD or null",
+      "time": "HH:MM",
+      "endTime": "HH:MM or null",
+      "reminderMinutes": 30
+    }
+  ]
+}`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
+        },
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${imageBase64}`,
+                detail: "high",
+              },
+            },
+            {
+              type: "text",
+              text: "Extract all events visible in this image.",
+            },
+          ],
+        },
+      ],
+      response_format: { type: "json_object" },
+      max_tokens: 4096,
+    });
+
+    const result = JSON.parse(completion.choices[0].message.content);
+
+    const events = Array.isArray(result.events) ? result.events : [];
+
+    const normalized = events.map((e) => ({
+      title: e.title || "",
+      description: e.description || "",
+      date: e.date || today,
+      endDate: e.endDate || null,
+      time: e.time || "09:00",
+      endTime: e.endTime || null,
+      reminderMinutes: e.reminderMinutes || 30,
+    }));
+
+    return res.status(200).json({ events: normalized });
+  } catch (error) {
+    console.error("Photo to data error:", error.message, error.stack);
+    return res.status(500).json({ error: error.message || "Internal server error" });
+  }
+});
+
 // Scheduled function: check reminders every minute and send FCM push notifications
 // Notifies ALL family members, not just the event creator
 exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-central1" }, async (event) => {

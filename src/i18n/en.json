@@ -327,6 +327,26 @@
     "instruction": "Speak into the microphone to",
     "example": "E.g. \"Football practice at Ekeberg on Thursday from 7 to 9 PM at Ekeberg artificial pitch field 2\""
   },
+  "photoEvent": {
+    "title": "Photo to event",
+    "instruction": "Take or choose a photo to",
+    "pickImage": "Choose photo",
+    "takePhoto": "Take photo",
+    "processing": "Processing photo...",
+    "noEvents": "No events found in the image",
+    "eventsFound": "events found",
+    "singleEvent": "event found",
+    "selectEvents": "Select events to create",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "createSelected": "Create selected",
+    "creating": "Creating...",
+    "createEvent": "Create event",
+    "editManually": "Edit manually",
+    "tryAgain": "Try again",
+    "retry": "Reload",
+    "error": "Could not read events from the image"
+  },
   "chat": {
     "title": "Family chat",
     "noMessages": "No messages yet",

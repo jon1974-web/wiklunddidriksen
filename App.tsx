@@ -31,6 +31,7 @@ const EventDetailScreen = React.lazy(() => import('./src/screens/EventDetailScre
 const ShoppingListDetailScreen = React.lazy(() => import('./src/screens/ShoppingListDetailScreen').then(m => ({ default: m.ShoppingListDetailScreen })));
 const RecipeDetailScreen = React.lazy(() => import('./src/screens/RecipeDetailScreen').then(m => ({ default: m.RecipeDetailScreen })));
 const VoiceEventScreen = React.lazy(() => import('./src/screens/VoiceEventScreen').then(m => ({ default: m.VoiceEventScreen })));
+const PhotoEventScreen = React.lazy(() => import('./src/screens/PhotoEventScreen').then(m => ({ default: m.PhotoEventScreen })));
 const AddTripScreen = React.lazy(() => import('./src/screens/AddTripScreen').then(m => ({ default: m.AddTripScreen })));
 const TripDetailScreen = React.lazy(() => import('./src/screens/TripDetailScreen').then(m => ({ default: m.TripDetailScreen })));
 const TransportDetailScreen = React.lazy(() => import('./src/screens/TransportDetailScreen').then(m => ({ default: m.TransportDetailScreen })));
@@ -52,6 +53,7 @@ type RootStackParamList = {
   EventDetail: { event: Event };
   EventDetail_Spond: { event: SpondEvent; spondRespondents: SpondRespondent[]; spondConfig: { email: string; password: string } | null };
   VoiceEvent: undefined;
+  PhotoEvent: undefined;
   ShoppingLists: undefined;
   ShoppingListDetail: { list: import('./src/types').ShoppingList };
   MealPlan: undefined;
@@ -97,6 +99,15 @@ const EventsStack = () => {
           component={VoiceEventScreen}
           options={{
             title: i18n.t('voice.title'),
+            headerStyle: { backgroundColor: colors.surface },
+            headerTintColor: colors.text,
+          }}
+        />
+        <Stack.Screen
+          name="PhotoEvent"
+          component={PhotoEventScreen}
+          options={{
+            title: i18n.t('photoEvent.title'),
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
           }}

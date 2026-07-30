@@ -394,6 +394,26 @@
     "instruction": "Tal ind i mikrofonen for at",
     "example": "F.eks. Fodboldtræning på Ekebergsletta torsdag klokken 19 til 21 på Ekeberg kunstgræs bane 2"
   },
+  "photoEvent": {
+    "title": "Foto til begivenhed",
+    "instruction": "Tag eller vælg et billede for at",
+    "pickImage": "Vælg billede",
+    "takePhoto": "Tag billede",
+    "processing": "Behandler billede...",
+    "noEvents": "Ingen begivenheder fundet i billedet",
+    "eventsFound": "begivenheder fundet",
+    "singleEvent": "begivenhed fundet",
+    "selectEvents": "Vælg begivenheder at oprette",
+    "selectAll": "Vælg alle",
+    "deselectAll": "Fravælg alle",
+    "createSelected": "Opret valgte",
+    "creating": "Opretter...",
+    "createEvent": "Opret begivenhed",
+    "editManually": "Rediger manuelt",
+    "tryAgain": "Prøv igen",
+    "retry": "Indlæs igen",
+    "error": "Kunne ikke læse begivenheder fra billedet"
+  },
   "languages": {
     "nb": "Norsk",
     "sv": "Svenska",

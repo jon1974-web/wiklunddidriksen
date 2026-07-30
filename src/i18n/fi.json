@@ -394,6 +394,26 @@
     "instruction": "Puhu mikrofoniin",
     "example": "Esim. Jalkapallotreenni Ekebergslettalla torstaina klo 19-21 Ekebergin tekojääkenttä 2"
   },
+  "photoEvent": {
+    "title": "Valokuva tapahtumaksi",
+    "instruction": "Ota tai valitse kuva",
+    "pickImage": "Valitse kuva",
+    "takePhoto": "Ota kuva",
+    "processing": "Käsitellään kuvaa...",
+    "noEvents": "Ei tapahtumia löytynyt kuvasta",
+    "eventsFound": "tapahtumaa löytynyt",
+    "singleEvent": "tapahtuma löytynyt",
+    "selectEvents": "Valitse luotavat tapahtumat",
+    "selectAll": "Valitse kaikki",
+    "deselectAll": "Poista valinnat",
+    "createSelected": "Luo valitut",
+    "creating": "Luodaan...",
+    "createEvent": "Luo tapahtuma",
+    "editManually": "Muokkaa manuaalisesti",
+    "tryAgain": "Yritä uudelleen",
+    "retry": "Lataa uudelleen",
+    "error": "Ei voitu lukea tapahtumia kuvasta"
+  },
   "languages": {
     "nb": "Norsk",
     "sv": "Svenska",

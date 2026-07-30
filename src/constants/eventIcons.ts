@@ -19,4 +19,6 @@ export const EVENT_ICONS = [
   { emoji: '🚴', label: 'Sykling' },
   { emoji: '🏔️', label: 'Fjelltur' },
   { emoji: '🎣', label: 'Fiske' },
+  { emoji: '🩺', label: 'Lege' },
+  { emoji: '🧠', label: 'Psykolog' },
 ];

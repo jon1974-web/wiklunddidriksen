@@ -775,6 +775,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       </TouchableOpacity>
 
       <TouchableOpacity
+        style={[styles.fabCamera, { backgroundColor: colors.accent }]}
+        onPress={() => navigation.navigate('PhotoEvent')}
+      >
+        <Text style={styles.fabMicText}>📷</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.accent }]}
         onPress={() => navigation.navigate('AddEvent')}
       >
@@ -1153,5 +1160,20 @@ const styles = StyleSheet.create({
   },
   fabMicText: {
     fontSize: 24,
+  },
+  fabCamera: {
+    position: 'absolute',
+    right: 20,
+    bottom: 156,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });

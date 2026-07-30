@@ -327,6 +327,26 @@
     "instruction": "Snakk i mikrofonen for å",
     "example": "F.eks. \"Fotballtrening på Ekebergsletta på torsdag klokken 19 til 21 på Ekeberg kunstgress bane 2\""
   },
+  "photoEvent": {
+    "title": "Foto til arrangement",
+    "instruction": "Ta eller velg et bilde for å",
+    "pickImage": "Velg bilde",
+    "takePhoto": "Ta bilde",
+    "processing": "Behandler bilde...",
+    "noEvents": "Ingen arrangementer funnet i bildet",
+    "eventsFound": "arrangementer funnet",
+    "singleEvent": "arrangement funnet",
+    "selectEvents": "Velg arrangementer å opprette",
+    "selectAll": "Velg alle",
+    "deselectAll": "Fjern alle",
+    "createSelected": "Opprett valgte",
+    "creating": "Oppretter...",
+    "createEvent": "Opprett arrangement",
+    "editManually": "Rediger manuelt",
+    "tryAgain": "Prøv igjen",
+    "retry": "Last inn på nytt",
+    "error": "Kunne ikke lese arrangement fra bildet"
+  },
   "chat": {
     "title": "Familiechat",
     "noMessages": "Ingen meldinger ennå",

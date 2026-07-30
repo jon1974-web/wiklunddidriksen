@@ -129,10 +129,6 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         setMealPlan(null);
       }
 
-      const listsQ = query(collection(db, 'shoppingLists'), where('familyId', '==', familyId));
-      const listsSnap = await getDocs(listsQ);
-      setShoppingLists(listsSnap.docs.map(d => ({ id: d.id, ...d.data() } as ShoppingList)));
-
       if (user) {
         getUserProfile(user.uid).then(profile => {
           if (profile?.minUkeSections) {
@@ -152,6 +148,15 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   }, [familyId, weekStart]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  useEffect(() => {
+    if (!familyId) return;
+    const q = query(collection(db, 'shoppingLists'), where('familyId', '==', familyId));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setShoppingLists(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as ShoppingList)));
+    });
+    return () => unsubscribe();
+  }, [familyId]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
