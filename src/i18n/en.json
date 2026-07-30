@@ -324,12 +324,12 @@
     "title": "Talk to event",
     "startRecording": "Tap to start recording",
     "stopRecording": "Tap to stop",
-    "instruction": "Speak into the microphone to",
+    "instruction": "Speak into the microphone to create a new event",
     "example": "E.g. \"Football practice at Ekeberg on Thursday from 7 to 9 PM at Ekeberg artificial pitch field 2\""
   },
   "photoEvent": {
     "title": "Photo to event",
-    "instruction": "Take or choose a photo to",
+    "instruction": "Take or choose a photo to create a new event",
     "pickImage": "Choose photo",
     "takePhoto": "Take photo",
     "processing": "Processing photo...",

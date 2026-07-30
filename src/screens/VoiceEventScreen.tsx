@@ -248,7 +248,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          {t('voice.instruction')} {t('events.addEvent').toLowerCase()}
+          {t('voice.instruction')}
         </Text>
         <Text style={[styles.helperExample, { color: colors.textDisabled }]}>
           {t('voice.example')}

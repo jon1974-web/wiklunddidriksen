@@ -397,12 +397,12 @@
     "title": "Prata med evenemang",
     "startRecording": "Tryck för att starta inspelning",
     "stopRecording": "Tryck för att stoppa",
-    "instruction": "Prata in i mikrofonen för att",
+    "instruction": "Prata in i mikrofonen för att skapa ett nytt evenemang",
     "example": "T.ex. Fotbollsträning på Ekebergsletta på torsdag klockan 19 till 21 på Ekeberg konstgräs bana 2"
   },
   "photoEvent": {
     "title": "Foto till evenemang",
-    "instruction": "Ta eller välj ett foto för att",
+    "instruction": "Ta eller välj ett foto för att skapa ett nytt evenemang",
     "pickImage": "Välj foto",
     "takePhoto": "Ta foto",
     "processing": "Behandlar foto...",

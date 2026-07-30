@@ -504,7 +504,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
 
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          {t('photoEvent.instruction')} {t('events.addEvent').toLowerCase()}
+          {t('photoEvent.instruction')}
         </Text>
       </View>
 

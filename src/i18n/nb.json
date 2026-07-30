@@ -324,12 +324,12 @@
     "title": "Tal til arrangement",
     "startRecording": "Trykk for å starte opptak",
     "stopRecording": "Trykk for å stoppe",
-    "instruction": "Snakk i mikrofonen for å",
+    "instruction": "Snakk i mikrofonen for å opprette et nytt arrangement",
     "example": "F.eks. \"Fotballtrening på Ekebergsletta på torsdag klokken 19 til 21 på Ekeberg kunstgress bane 2\""
   },
   "photoEvent": {
     "title": "Foto til arrangement",
-    "instruction": "Ta eller velg et bilde for å",
+    "instruction": "Ta eller velg et bilde for å opprette et nytt arrangement",
     "pickImage": "Velg bilde",
     "takePhoto": "Ta bilde",
     "processing": "Behandler bilde...",

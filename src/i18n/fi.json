@@ -391,12 +391,12 @@
     "title": "Puhu tapahtumalle",
     "startRecording": "Aloita tallennusnapauttamalla",
     "stopRecording": "Pysäytä napauttamalla",
-    "instruction": "Puhu mikrofoniin",
+    "instruction": "Puhu mikrofoniin luodaksesi uuden tapahtuman",
     "example": "Esim. Jalkapallotreenni Ekebergslettalla torstaina klo 19-21 Ekebergin tekojääkenttä 2"
   },
   "photoEvent": {
     "title": "Valokuva tapahtumaksi",
-    "instruction": "Ota tai valitse kuva",
+    "instruction": "Ota tai valitse kuva luodaksesi uuden tapahtuman",
     "pickImage": "Valitse kuva",
     "takePhoto": "Ota kuva",
     "processing": "Käsitellään kuvaa...",
