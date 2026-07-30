@@ -13,7 +13,7 @@ import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatS
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { getTrips } from '../services/tripService';
-import { getSpondConfig, getSpondEvents, changeSpondResponse } from '../services/spondService';
+import { getSpondConfig, getSpondEvents, changeSpondResponse, clearSpondToken } from '../services/spondService';
 import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
@@ -215,7 +215,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         config.groups.forEach(g => { if (g.logoUrl) logos[g.name] = g.logoUrl; });
         setSpondGroupLogos(logos);
         console.log('Spond logos:', Object.keys(logos));
-        const events = await getSpondEvents(config.email, config.password, groupIds);
+        let events;
+        try {
+          events = await getSpondEvents(config.email, config.password, groupIds);
+        } catch {
+          clearSpondToken();
+          events = await getSpondEvents(config.email, config.password, groupIds);
+        }
         console.log('Spond events:', events.length);
         const withGroupNames = events.map((e) => {
           const group = config.groups.find((g) => g.id === e.groupId);

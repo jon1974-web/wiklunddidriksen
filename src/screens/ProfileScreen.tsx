@@ -135,6 +135,16 @@ export const ProfileScreen: React.FC = () => {
             if (spondConfig.respondents) {
               setSpondRespondents(spondConfig.respondents.map((r) => r.spondId));
             }
+            setSpondLoading(true);
+            const allMembers: any[] = [];
+            for (const group of spondConfig.groups) {
+              try {
+                const members = await getSpondMembers(spondConfig.email, spondConfig.password, group.id);
+                members.forEach((m: any) => allMembers.push({ ...m, groupId: group.id, groupName: group.name }));
+              } catch {}
+            }
+            setSpondAllMembers(allMembers);
+            setSpondLoading(false);
           }
         } catch (e) {
           console.log('Error loading Spond config:', e);
