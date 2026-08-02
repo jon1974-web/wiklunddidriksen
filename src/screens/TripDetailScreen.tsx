@@ -118,7 +118,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   // Form state (consolidated)
   const emptyHotel = { name: '', address: '', phone: '', startDate: '', endDate: '', checkInTime: '', checkOutTime: '', note: '' };
   const emptyFlight = { transportType: 'fly' as 'fly' | 'tog' | 'bil', type: 'utreise' as 'utreise' | 'hjemreise', isOneWay: false, airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '' };
-  const emptyRest = { name: '', address: '', note: '' };
+  const emptyRest = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
   const emptyLink = { title: '', url: '' };
@@ -156,7 +156,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [showHelpDocuments, setShowHelpDocuments] = useState(false);
 
   // Unified picker state
-  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDate' | 'taxiTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
+  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDate' | 'taxiTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
   const [activePicker, setActivePicker] = useState<PickerField>(null);
 
   const handlePickerSelect = (value: string) => {
@@ -170,6 +170,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     else if (activePicker === 'actEndDate') setActForm(f => ({ ...f, endDate: value }));
     else if (activePicker === 'actStartTime') setActForm(f => ({ ...f, startTime: value }));
     else if (activePicker === 'actEndTime') setActForm(f => ({ ...f, endTime: value }));
+    else if (activePicker === 'restStartDate') setRestForm(f => ({ ...f, startDate: value }));
+    else if (activePicker === 'restEndDate') setRestForm(f => ({ ...f, endDate: value }));
+    else if (activePicker === 'restStartTime') setRestForm(f => ({ ...f, startTime: value }));
+    else if (activePicker === 'restEndTime') setRestForm(f => ({ ...f, endTime: value }));
     else if (activePicker === 'hotelStartDate') setHotelForm(f => ({ ...f, startDate: value }));
     else if (activePicker === 'hotelEndDate') setHotelForm(f => ({ ...f, endDate: value }));
     else if (activePicker === 'hotelCheckIn') setHotelForm(f => ({ ...f, checkInTime: value }));
@@ -195,6 +199,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       flightDepDate: t('pickers.departureDate'), flightArrDate: t('pickers.arrivalDate'),
       flightDepTime: t('pickers.departureTime'), flightArrTime: t('pickers.arrivalTime'),
       actStartDate: t('pickers.startDate'), actEndDate: t('pickers.endDate'), actStartTime: t('pickers.startTime'), actEndTime: t('pickers.endTime'),
+      restStartDate: t('pickers.startDate'), restEndDate: t('pickers.endDate'), restStartTime: t('pickers.startTime'), restEndTime: t('pickers.endTime'),
       hotelStartDate: t('pickers.startDate'), hotelEndDate: t('pickers.endDate'),
       hotelCheckIn: t('pickers.checkInTime'), hotelCheckOut: t('pickers.checkOutTime'),
       boatDepDate: t('pickers.departureDate'), boatDepTime: t('pickers.departureTime'), boatArrDate: t('pickers.arrivalDate'), boatArrTime: t('pickers.arrivalTime'),
@@ -210,6 +215,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       flightDepDate: flightForm.departureDate, flightArrDate: flightForm.arrivalDate,
       flightDepTime: flightForm.departureTime, flightArrTime: flightForm.arrivalTime,
       actStartDate: actForm.startDate, actEndDate: actForm.endDate, actStartTime: actForm.startTime, actEndTime: actForm.endTime,
+      restStartDate: restForm.startDate, restEndDate: restForm.endDate, restStartTime: restForm.startTime, restEndTime: restForm.endTime,
       hotelStartDate: hotelForm.startDate, hotelEndDate: hotelForm.endDate, hotelCheckIn: hotelForm.checkInTime, hotelCheckOut: hotelForm.checkOutTime,
       boatDepDate: boatForm.departureDate, boatDepTime: boatForm.departureTime, boatArrDate: boatForm.arrivalDate, boatArrTime: boatForm.arrivalTime,
       taxiDate: taxiForm.departureDate, taxiTime: taxiForm.departureTime,
@@ -455,7 +461,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         setFlightFormUtreise(formData);
       }
     } else if (modal === 'restaurant') {
-      setRestForm({ name: item.name || '', address: item.address || '', note: item.note || '' });
+      setRestForm({ name: item.name || '', startDate: item.startDate || '', endDate: item.endDate || '', startTime: item.startTime || '', endTime: item.endTime || '', address: item.address || '', note: item.note || '' });
     } else if (modal === 'activity') {
       setActForm({ name: item.name || '', startDate: item.startDate || item.date || '', endDate: item.endDate || '', startTime: item.startTime || item.time || '', endTime: item.endTime || '', address: item.address || '', note: item.note || '' });
     } else if (modal === 'document') {
@@ -587,7 +593,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      const data = cleanData({ name: restForm.name.trim() ? sanitizeInput(restForm.name) : undefined, address: restForm.address.trim() ? sanitizeInput(restForm.address) : undefined, note: restForm.note.trim() ? sanitizeInput(restForm.note) : undefined });
+      const data = cleanData({ name: restForm.name.trim() ? sanitizeInput(restForm.name) : undefined, startDate: restForm.startDate || undefined, endDate: restForm.endDate || undefined, startTime: restForm.startTime || undefined, endTime: restForm.endTime || undefined, address: restForm.address.trim() ? sanitizeInput(restForm.address) : undefined, note: restForm.note.trim() ? sanitizeInput(restForm.note) : undefined });
       if (editingId) {
         await updateTripRestaurant(trip.id, editingId, data);
       } else {
@@ -1068,6 +1074,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 key={r.id}
                 name={r.name}
                 address={r.address}
+                detail={[
+                  r.startDate ? formatDate(r.startDate) : '',
+                  r.endDate ? formatDate(r.endDate) : '',
+                ].filter(Boolean).join(' – ') ||
+                  [r.startTime, r.endTime].filter(Boolean).join(' – ') ||
+                  undefined}
                 note={r.note}
                 onPress={() => navigation.navigate('TripItemDetail', { item: r, tripId: trip.id, trip, itemType: 'restaurant' })}
                 onLongPress={canDelete ? () => setActionModal({ visible: true, title: r.name || 'Restaurant', onEdit: () => openEditModal('restaurant', r), onDelete: () => handleDeleteRestaurant(r.id) }) : undefined}
@@ -1597,6 +1609,30 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       placeholder={t('common.search') + "..."}
                       onSelect={(v) => setRestForm(f => ({ ...f, address: v }))}
                     />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('pickers.startDate')}</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('restStartDate')}>
+                      <Text style={{ color: restForm.startDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{restForm.startDate || t('pickers.startDate')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('pickers.endDate')}</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('restEndDate')}>
+                      <Text style={{ color: restForm.endDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{restForm.endDate || t('pickers.endDate')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('pickers.startTime')}</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('restStartTime')}>
+                      <Text style={{ color: restForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{restForm.startTime || t('pickers.startTime')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('pickers.endTime')}</Text>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('restEndTime')}>
+                      <Text style={{ color: restForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{restForm.endTime || t('pickers.endTime')}</Text>
+                    </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>

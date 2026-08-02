@@ -97,6 +97,10 @@ export interface Trip {
 export interface TripRestaurant {
   id: string;
   name?: string;
+  startDate?: string;
+  endDate?: string;
+  startTime?: string;
+  endTime?: string;
   address?: string;
   note?: string;
   createdAt: number;
