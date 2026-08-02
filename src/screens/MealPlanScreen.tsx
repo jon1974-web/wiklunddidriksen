@@ -705,13 +705,13 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 {t('mealPlanner.searchInLanguage')}:
               </Text>
               <TouchableOpacity
-                style={[styles.filterChip, { borderColor: colors.border, backgroundColor: colors.inputBackground, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8 }]}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 4 }}
                 onPress={() => setShowLangDropdown(!showLangDropdown)}
               >
-                <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text, flex: 1 }}>
                   {languageOptions.find(o => o.value === aiSearchLang)?.label || t('mealPlanner.searchInLanguage')}
                 </Text>
-                <Text style={{ color: colors.textSecondary, fontSize: 10, marginLeft: 6 }}>{showLangDropdown ? '▲' : '▼'}</Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{showLangDropdown ? '▲' : '▼'}</Text>
               </TouchableOpacity>
               {showLangDropdown && (
                 <View style={[styles.langDropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
