@@ -260,8 +260,8 @@ const ProfileStack = () => {
   );
 };
 
-const TabIcon = ({ icon, focused }: { icon: string; focused: boolean }) => {
-  const color = focused ? '#0097A7' : '#999';
+const TabIcon = ({ icon, focused, accentColor }: { icon: string; focused: boolean; accentColor: string }) => {
+  const color = focused ? accentColor : '#999';
   const size = 24;
 
   if (icon === 'calendar') return (
@@ -436,7 +436,7 @@ const AppContent = () => {
               component={EventsStack}
               options={{
                 tabBarLabel: 'Arrangementer',
-                tabBarIcon: ({ focused }) => <TabIcon icon="calendar" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="calendar" focused={focused} accentColor={colors.accent} />,
               }}
             />
             <Tab.Screen
@@ -444,7 +444,7 @@ const AppContent = () => {
               component={MealPlanStack}
               options={{
                 tabBarLabel: 'Matsenter',
-                tabBarIcon: ({ focused }) => <TabIcon icon="utensils" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="utensils" focused={focused} accentColor={colors.accent} />,
               }}
             />
             <Tab.Screen
@@ -452,7 +452,7 @@ const AppContent = () => {
               component={ChatStack}
               options={{
                 tabBarLabel: 'Chat',
-                tabBarIcon: ({ focused }) => <TabIcon icon="chat" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="chat" focused={focused} accentColor={colors.accent} />,
               }}
             />
             <Tab.Screen
@@ -460,7 +460,7 @@ const AppContent = () => {
               component={TripsStack}
               options={{
                 tabBarLabel: 'Reise',
-                tabBarIcon: ({ focused }) => <TabIcon icon="compass" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="compass" focused={focused} accentColor={colors.accent} />,
               }}
               listeners={({ navigation }) => ({
                 tabPress: (e) => {
@@ -474,7 +474,7 @@ const AppContent = () => {
               component={ProfileStack}
               options={{
                 tabBarLabel: 'Profil',
-                tabBarIcon: ({ focused }) => <TabIcon icon="person" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="person" focused={focused} accentColor={colors.accent} />,
               }}
             />
           </Tab.Navigator>
