@@ -66,6 +66,7 @@ import { TripDocumentUpload } from '../components/TripDocumentUpload';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { TransportTile } from '../components/TransportTile';
 import { TransportItemTile } from '../components/TransportItemTile';
+import { HelpCenter } from '../components/HelpCenter';
 import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
@@ -147,6 +148,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [ferryForm, setFerryForm] = useState(emptyFerry);
   const [showTransportPicker, setShowTransportPicker] = useState(false);
   const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; subtitle?: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
+  const [showHelpTransport, setShowHelpTransport] = useState(false);
+  const [showHelpHotels, setShowHelpHotels] = useState(false);
+  const [showHelpRestaurants, setShowHelpRestaurants] = useState(false);
+  const [showHelpActivities, setShowHelpActivities] = useState(false);
+  const [showHelpTips, setShowHelpTips] = useState(false);
+  const [showHelpDocuments, setShowHelpDocuments] = useState(false);
 
   // Unified picker state
   type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDate' | 'taxiTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
@@ -729,11 +736,22 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const handleDeleteTaxi = useCallback((id: string) => confirmDelete('taxi', async () => { await deleteTripTaxi(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteFerry = useCallback((id: string) => confirmDelete('ferje', async () => { await deleteTripFerry(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
 
-  const renderSectionHeader = (title: string, icon: string, onAdd: () => void) => (
+  const renderSectionHeader = (title: string, icon: string, onAdd: () => void, onHelp?: () => void) => (
     <View style={styles.sectionHeader}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>
-        {icon} {title}
-      </Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+        <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          {icon} {title}
+        </Text>
+        {onHelp && (
+          <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={onHelp}>
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        )}
+      </View>
       <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.accent }]} onPress={onAdd}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
@@ -971,7 +989,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Transport */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('transport.title'), '🚀', () => setShowTransportPicker(true))}
+        {renderSectionHeader(t('transport.title'), '🚀', () => setShowTransportPicker(true), () => setShowHelpTransport(true))}
         {sortedTransportRows.length === 0 && otherTransportItems.length === 0 ? (
           <Text style={[styles.emptySection, { color: colors.textDisabled, paddingHorizontal: 16 }]}>{t('transport.noTransport')}</Text>
         ) : (
@@ -1019,7 +1037,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Hotels */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('hotels.title'), '🛏️', () => openAddModal('hotel'))}
+        {renderSectionHeader(t('hotels.title'), '🛏️', () => openAddModal('hotel'), () => setShowHelpHotels(true))}
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           {hotels.length === 0 ? (
             <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('hotels.noHotels')}</Text>
@@ -1040,7 +1058,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Restaurants */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('restaurants.title'), '🍽️', () => openAddModal('restaurant'))}
+        {renderSectionHeader(t('restaurants.title'), '🍽️', () => openAddModal('restaurant'), () => setShowHelpRestaurants(true))}
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           {restaurants.length === 0 ? (
             <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('restaurants.noRestaurants')}</Text>
@@ -1061,7 +1079,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Activities */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('activities.title'), '🎯', () => openAddModal('activity'))}
+        {renderSectionHeader(t('activities.title'), '🎯', () => openAddModal('activity'), () => setShowHelpActivities(true))}
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           {activities.length === 0 ? (
             <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('activities.noActivities')}</Text>
@@ -1084,7 +1102,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {/* Destination Tips */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
         <View style={styles.sectionHeader}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 {t('tips.title')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 {t('tips.title')}</Text>
+            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpTips(true)}>
+              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           <GooglePlacesInput
@@ -1250,6 +1277,13 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         >
           <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
           <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>📄 {t('documents.title')}</Text>
+          <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpDocuments(true)}>
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
           {docsExpanded && (
             <TouchableOpacity
               style={[styles.addButton, { backgroundColor: colors.accent }]}
@@ -2183,6 +2217,31 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         onDelete={actionModal.onDelete}
         onCancel={() => setActionModal({ visible: false, title: '' })}
       />
+
+      <HelpCenter visible={showHelpTransport} onClose={() => setShowHelpTransport(false)} title={t('detail.helpTransportTitle')} sections={[
+        { icon: '🚀', title: t('detail.helpTransportWhat'), text: t('detail.helpTransportWhatText') },
+        { icon: '👉', title: t('detail.helpTransportHow'), text: t('detail.helpTransportHowText'), tip: t('detail.helpTransportTip') },
+      ]} />
+      <HelpCenter visible={showHelpHotels} onClose={() => setShowHelpHotels(false)} title={t('detail.helpHotelsTitle')} sections={[
+        { icon: '🛏️', title: t('detail.helpHotelsWhat'), text: t('detail.helpHotelsWhatText') },
+        { icon: '👉', title: t('detail.helpHotelsHow'), text: t('detail.helpHotelsHowText'), tip: t('detail.helpHotelsTip') },
+      ]} />
+      <HelpCenter visible={showHelpRestaurants} onClose={() => setShowHelpRestaurants(false)} title={t('detail.helpRestaurantsTitle')} sections={[
+        { icon: '🍽️', title: t('detail.helpRestaurantsWhat'), text: t('detail.helpRestaurantsWhatText') },
+        { icon: '👉', title: t('detail.helpRestaurantsHow'), text: t('detail.helpRestaurantsHowText'), tip: t('detail.helpRestaurantsTip') },
+      ]} />
+      <HelpCenter visible={showHelpActivities} onClose={() => setShowHelpActivities(false)} title={t('detail.helpActivitiesTitle')} sections={[
+        { icon: '🎯', title: t('detail.helpActivitiesWhat'), text: t('detail.helpActivitiesWhatText') },
+        { icon: '👉', title: t('detail.helpActivitiesHow'), text: t('detail.helpActivitiesHowText'), tip: t('detail.helpActivitiesTip') },
+      ]} />
+      <HelpCenter visible={showHelpTips} onClose={() => setShowHelpTips(false)} title={t('detail.helpTipsTitle')} sections={[
+        { icon: '💡', title: t('detail.helpTipsWhat'), text: t('detail.helpTipsWhatText') },
+        { icon: '👉', title: t('detail.helpTipsHow'), text: t('detail.helpTipsHowText') },
+      ]} />
+      <HelpCenter visible={showHelpDocuments} onClose={() => setShowHelpDocuments(false)} title={t('detail.helpDocumentsTitle')} sections={[
+        { icon: '📄', title: t('detail.helpDocumentsWhat'), text: t('detail.helpDocumentsWhatText') },
+        { icon: '👉', title: t('detail.helpDocumentsHow'), text: t('detail.helpDocumentsHowText'), tip: t('detail.helpDocumentsTip') },
+      ]} />
     </ScrollView>
   );
 };
