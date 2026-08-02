@@ -53,6 +53,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showHelpRandom, setShowHelpRandom] = useState(false);
   const [showHelpSearch, setShowHelpSearch] = useState(false);
   const [showHelpHandleliste, setShowHelpHandleliste] = useState(false);
+  const [showHelpAiSearch, setShowHelpAiSearch] = useState(false);
   const [aiQuery, setAiQuery] = useState('');
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -681,7 +682,19 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           {/* AI Search Section */}
           {searchQuery && (
             <View style={[styles.aiSearchCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <Text style={[styles.aiSearchTitle, { color: colors.text }]}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                <Text style={[styles.aiSearchTitle, { color: colors.text, marginBottom: 0 }]}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+                <TouchableOpacity
+                  style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+                  onPress={() => setShowHelpAiSearch(true)}
+                >
+                  <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              </View>
               <Text style={[styles.aiSearchHint, { color: colors.textSecondary }]}>
                 {t('mealPlanner.searchWithAI')} "{searchQuery}"
               </Text>
@@ -1231,6 +1244,16 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           { icon: '🔍', title: t('mealPlanner.helpSearchWhat'), text: t('mealPlanner.helpSearchWhatText') },
           { icon: '👉', title: t('mealPlanner.helpSearchHow'), text: t('mealPlanner.helpSearchHowText'), tip: t('mealPlanner.helpSearchTip') },
           { icon: '⚙️', title: t('mealPlanner.helpSearchSettings'), text: t('mealPlanner.helpSearchSettingsText') },
+        ]}
+      />
+
+      <HelpCenter
+        visible={showHelpAiSearch}
+        onClose={() => setShowHelpAiSearch(false)}
+        title={t('mealPlanner.helpAiSearchTitle')}
+        sections={[
+          { icon: '🤖', title: t('mealPlanner.helpAiSearchWhat'), text: t('mealPlanner.helpAiSearchWhatText') },
+          { icon: '👉', title: t('mealPlanner.helpAiSearchHow'), text: t('mealPlanner.helpAiSearchHowText'), tip: t('mealPlanner.helpAiSearchTip') },
         ]}
       />
 
