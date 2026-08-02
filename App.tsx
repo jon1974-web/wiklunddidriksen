@@ -5,6 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { TouchableOpacity, Text, ActivityIndicator, Image, Animated } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 
 import './src/i18n';
 import i18n from './src/i18n';
@@ -70,6 +71,19 @@ type RootStackParamList = {
   Birthday: undefined;
 };
 
+const BackButton = ({ tintColor }: { tintColor?: string }) => {
+  const navigation = useNavigation();
+  return (
+    <TouchableOpacity
+      onPress={() => navigation.goBack()}
+      style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: tintColor || '#333', justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}
+      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+    >
+      <Text style={{ color: tintColor || '#333', fontSize: 16, lineHeight: 18 }}>←</Text>
+    </TouchableOpacity>
+  );
+};
+
 const EventsStack = () => {
   const { colors } = useTheme();
   return (
@@ -87,6 +101,7 @@ const EventsStack = () => {
             title: 'Nytt arrangement',
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
+            headerLeft: (props) => <BackButton tintColor={props.tintColor} />,
           }}
         />
         <Stack.Screen
@@ -103,6 +118,7 @@ const EventsStack = () => {
             title: i18n.t('voice.title'),
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
+            headerLeft: (props) => <BackButton tintColor={props.tintColor} />,
           }}
         />
         <Stack.Screen
@@ -112,6 +128,7 @@ const EventsStack = () => {
             title: i18n.t('photoEvent.title'),
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
+            headerLeft: (props) => <BackButton tintColor={props.tintColor} />,
           }}
         />
         <Stack.Screen
@@ -155,6 +172,7 @@ const MealPlanStack = () => {
             title: i18n.t('photoRecipe.title'),
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
+            headerLeft: (props) => <BackButton tintColor={props.tintColor} />,
           }}
         />
       </Stack.Navigator>
