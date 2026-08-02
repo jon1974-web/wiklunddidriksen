@@ -58,6 +58,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSearchLang, setAiSearchLang] = useState('');
+  const [showLangDropdown, setShowLangDropdown] = useState(false);
+  const [langSearchQuery, setLangSearchQuery] = useState('');
   const [cuisineSearch, setCuisineSearch] = useState('');
   const [showCuisineDropdown, setShowCuisineDropdown] = useState(false);
   const [showAiResults, setShowAiResults] = useState(false);
@@ -97,7 +99,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   const cuisineCountries = LANGUAGES.map(l => ({ name: l.code === 'nb' ? 'Norge' : l.code === 'sv' ? 'Sverige' : l.code === 'da' ? 'Danmark' : l.code === 'en' ? 'England' : 'Finland', flag: l.flag }));
 
-  const languageOptions = LANGUAGES.map(l => ({ value: l.aiName, label: `${l.flag} ${t('mealPlanner.country' + (l.code === 'nb' ? 'Norge' : l.code === 'sv' ? 'Sverige' : l.code === 'da' ? 'Danmark' : l.code === 'en' ? 'England' : 'Finland'))}`, lang: l.code }));
+  const languageOptions = LANGUAGES.map(l => ({ value: l.aiName, label: `${l.flag} ${t('mealPlanner.country' + l.countryKey)}`, lang: l.code }));
 
   useEffect(() => {
     const defaultLang = languageOptions.find(o => o.lang === i18n.language);
@@ -702,19 +704,42 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               <Text style={[styles.aiLangLabel, { color: colors.textSecondary }]}>
                 {t('mealPlanner.searchInLanguage')}:
               </Text>
-              <View style={{ flexDirection: 'row', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
-                {languageOptions.map(opt => (
-                  <TouchableOpacity
-                    key={opt.value}
-                    style={[styles.filterChip, { borderColor: aiSearchLang === opt.value ? colors.accent : colors.border, backgroundColor: aiSearchLang === opt.value ? colors.accent : 'transparent' }]}
-                    onPress={() => setAiSearchLang(opt.value)}
-                  >
-                    <Text style={{ fontSize: 11, fontWeight: '600', color: aiSearchLang === opt.value ? '#fff' : colors.textSecondary }}>
-                      {opt.label}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+              <TouchableOpacity
+                style={[styles.filterChip, { borderColor: colors.border, backgroundColor: colors.inputBackground, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 8 }]}
+                onPress={() => setShowLangDropdown(!showLangDropdown)}
+              >
+                <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>
+                  {languageOptions.find(o => o.value === aiSearchLang)?.label || t('mealPlanner.searchInLanguage')}
+                </Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 10, marginLeft: 6 }}>{showLangDropdown ? '▲' : '▼'}</Text>
+              </TouchableOpacity>
+              {showLangDropdown && (
+                <View style={[styles.langDropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                  <TextInput
+                    style={[styles.langSearchInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    placeholder="Søk etter land..."
+                    placeholderTextColor={colors.textDisabled}
+                    value={langSearchQuery}
+                    onChangeText={setLangSearchQuery}
+                    autoFocus
+                  />
+                  <ScrollView style={{ maxHeight: 200 }} nestedScrollEnabled>
+                    {languageOptions
+                      .filter(o => !langSearchQuery || o.label.toLowerCase().includes(langSearchQuery.toLowerCase()))
+                      .map(opt => (
+                        <TouchableOpacity
+                          key={opt.value}
+                          style={[styles.langOption, { borderBottomColor: colors.border }, aiSearchLang === opt.value && { backgroundColor: colors.accent + '20' }]}
+                          onPress={() => { setAiSearchLang(opt.value); setShowLangDropdown(false); setLangSearchQuery(''); }}
+                        >
+                          <Text style={{ fontSize: 13, color: aiSearchLang === opt.value ? colors.accent : colors.text, fontWeight: aiSearchLang === opt.value ? '700' : '400' }}>
+                            {opt.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                  </ScrollView>
+                </View>
+              )}
 
               <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]} onPress={() => handleAiSearch(searchQuery)}>
                 <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
@@ -1426,6 +1451,9 @@ const styles = StyleSheet.create({
   aiSearchTitle: { fontSize: 15, fontWeight: '700', marginBottom: 4 },
   aiSearchHint: { fontSize: 13, marginBottom: 10 },
   aiLangLabel: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
+  langDropdown: { borderRadius: 8, borderWidth: 1, marginBottom: 12, overflow: 'hidden' },
+  langSearchInput: { padding: 10, fontSize: 14, borderBottomWidth: 1, borderBottomColor: 'transparent' },
+  langOption: { paddingVertical: 10, paddingHorizontal: 12, borderBottomWidth: 0.5 },
   urlImportBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 14, marginTop: 12, borderWidth: 1 },
   urlImportTitle: { fontSize: 14, fontWeight: '600', marginBottom: 2 },
   urlImportHint: { fontSize: 12 },

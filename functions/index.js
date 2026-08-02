@@ -1225,7 +1225,13 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
   // Map language codes to display names
   const languageNames = {
     norsk: "Norwegian", svensk: "Swedish", engelsk: "English",
-    dansk: "Danish", finsk: "Finnish",
+    dansk: "Danish", finsk: "Finnish", italiensk: "Italian",
+    spansk: "Spanish", fransk: "French", tysk: "German",
+    gresk: "Greek", tyrkisk: "Turkish", indisk: "Indian",
+    japansk: "Japanese", thailandsk: "Thai", mexicansk: "Mexican",
+    kinesisk: "Chinese", koreansk: "Korean", kroatisk: "Croatian",
+    portugisisk: "Portuguese", amerikansk: "American",
+    argentinsk: "Argentinian", brasiliansk: "Brazilian",
   };
   const variationLabels = {
     norsk: { classic: "Klassisk", faster: "Raskere", twist: "Med en vri" },
@@ -1233,6 +1239,23 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
     engelsk: { classic: "Classic", faster: "Faster", twist: "With a twist" },
     dansk: { classic: "Klassisk", faster: "Hurtigere", twist: "Med et twist" },
     finsk: { classic: "Klassinen", faster: "Nopeammin", twist: "Vähän erilainen" },
+    italiensk: { classic: "Classico", faster: "Veloce", twist: "Con un tocco" },
+    spansk: { classic: "Clásico", faster: "Rápido", twist: "Con un toque" },
+    fransk: { classic: "Classique", faster: "Rapide", twist: "Avec une touche" },
+    tysk: { classic: "Klassisch", faster: "Schnell", twist: "Mit einer Twist" },
+    gresk: { classic: "Κλασικό", faster: "Γρήγορο", twist: "Με στραβωμό" },
+    tyrkisk: { classic: "Klasik", faster: "Hızlı", twist: "Farklı bir dokunuşla" },
+    indisk: { classic: "Classic", faster: "Quick", twist: "With a twist" },
+    japansk: { classic: "クラシック", faster: "簡単", twist: "アレンジ" },
+    thailandsk: { classic: "ดั้งเดิม", faster: "ง่าย", twist: "สไตล์ใหม่" },
+    mexicansk: { classic: "Clásico", faster: "Rápido", twist: "Con un toque" },
+    kinesisk: { classic: "经典", faster: "快手", twist: "创意版" },
+    koreansk: { classic: "클래식", faster: "간편", twist: "활용" },
+    kroatisk: { classic: "Klasično", faster: "Brzo", twist: s"Sa začinom" },
+    portugisisk: { classic: "Clássico", faster: "Rápido", twist: "Com um toque" },
+    amerikansk: { classic: "Classic", faster: "Quick", twist: "With a twist" },
+    argentinsk: { classic: "Clásico", faster: "Rápido", twist: "Con un toque" },
+    brasiliansk: { classic: "Clássico", faster: "Rápido", twist: "Com um toque" },
   };
   const searchLangName = languageNames[searchLanguage] || "Norwegian";
   const responseLangName = languageNames[responseLanguage] || "Norwegian";
