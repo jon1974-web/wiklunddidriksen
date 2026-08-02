@@ -1251,7 +1251,7 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
     mexicansk: { classic: "Clásico", faster: "Rápido", twist: "Con un toque" },
     kinesisk: { classic: "经典", faster: "快手", twist: "创意版" },
     koreansk: { classic: "클래식", faster: "간편", twist: "활용" },
-    kroatisk: { classic: "Klasično", faster: "Brzo", twist: s"Sa začinom" },
+    kroatisk: { classic: "Klasično", faster: "Brzo", twist: "Sa začinom" },
     portugisisk: { classic: "Clássico", faster: "Rápido", twist: "Com um toque" },
     amerikansk: { classic: "Classic", faster: "Quick", twist: "With a twist" },
     argentinsk: { classic: "Clásico", faster: "Rápido", twist: "Con un toque" },
