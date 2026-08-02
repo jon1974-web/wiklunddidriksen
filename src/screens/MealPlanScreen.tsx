@@ -705,7 +705,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 {t('mealPlanner.searchInLanguage')}:
               </Text>
               <TouchableOpacity
-                style={[styles.filterChip, { borderColor: colors.border, backgroundColor: colors.inputBackground, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 8 }]}
+                style={[styles.filterChip, { borderColor: colors.border, backgroundColor: colors.inputBackground, paddingHorizontal: 12, paddingVertical: 8, marginBottom: 8 }]}
                 onPress={() => setShowLangDropdown(!showLangDropdown)}
               >
                 <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>
@@ -741,7 +741,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 </View>
               )}
 
-              <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent }]} onPress={() => handleAiSearch(searchQuery)}>
+              <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.accent, marginTop: 8 }]} onPress={() => handleAiSearch(searchQuery)}>
                 <Text style={styles.aiBtnText}>🤖 {t('mealPlanner.searchWithAI')}</Text>
               </TouchableOpacity>
             </View>
