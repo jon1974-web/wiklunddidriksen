@@ -414,6 +414,25 @@
     "retry": "Lataa uudelleen",
     "error": "Ei voitu lukea tapahtumia kuvasta"
   },
+  "photoRecipe": {
+    "title": "Valokuva reseptiksi",
+    "instruction": "Ota tai valitse kuva luodaksesi uuden reseptin",
+    "pickImage": "Valitse kuva",
+    "takePhoto": "Ota kuva",
+    "processing": "Käsitellään kuvaa...",
+    "noRecipes": "Ei reseptejä löytynyt kuvasta",
+    "recipesFound": "reseptiä löytynyt",
+    "singleRecipe": "resepti löytynyt",
+    "selectRecipes": "Valitse tallennettavat reseptit",
+    "selectAll": "Valitse kaikki",
+    "deselectAll": "Poista valinnat",
+    "createSelected": "Tallenna valitut",
+    "creating": "Tallennetaan...",
+    "saveRecipe": "Tallenna resepti",
+    "editManually": "Muokkaa manuaalisesti",
+    "tryAgain": "Yritä uudelleen",
+    "error": "Ei voitu lukea reseptejä kuvasta"
+  },
   "languages": {
     "nb": "Norsk",
     "sv": "Svenska",

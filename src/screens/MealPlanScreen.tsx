@@ -1362,6 +1362,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       </Modal>
       {/* FAB for adding recipes */}
       <TouchableOpacity
+        style={[styles.fabCamera, { backgroundColor: colors.accent }]}
+        onPress={() => navigation.navigate('PhotoRecipe')}
+      >
+        <Text style={styles.fabText}>📷</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         style={[styles.fab, { backgroundColor: colors.accent }]}
         onPress={() => { resetRecipeForm(); setShowAddRecipe(true); }}
       >
@@ -1377,6 +1383,7 @@ const styles = StyleSheet.create({
   title: { fontSize: 28, fontWeight: 'bold' },
   familySubtitle: { fontSize: 14, fontStyle: 'italic', marginTop: 2, marginBottom: 8 },
   fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
+  fabCamera: { position: 'absolute', bottom: 92, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
   fabText: { color: '#fff', fontSize: 28, fontWeight: '700' },
   tabs: { flexDirection: 'row', borderBottomWidth: 1 },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },

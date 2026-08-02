@@ -378,13 +378,17 @@ exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       return res.status(400).json({ error: "No image data received" });
     }
 
-    if (type !== "event") {
-      return res.status(400).json({ error: "Invalid type. Only 'event' is supported." });
+    if (type !== "event" && type !== "recipe") {
+      return res.status(400).json({ error: "Invalid type. Only 'event' and 'recipe' are supported." });
     }
 
     const today = new Date().toISOString().split("T")[0];
 
-    const systemPrompt = `You are an event parser. Extract ALL events visible in this image and return structured data.
+    let systemPrompt;
+    let userText;
+
+    if (type === "event") {
+      systemPrompt = `You are an event parser. Extract ALL events visible in this image and return structured data.
 
 Today's date is ${today}.
 
@@ -418,6 +422,45 @@ Return ONLY valid JSON with this exact structure:
     }
   ]
 }`;
+      userText = "Extract all events visible in this image.";
+    } else {
+      systemPrompt = `You are a recipe parser. Extract ALL recipes visible in this image and return structured data.
+
+For each recipe found, extract:
+- name: Recipe title/name
+- description: Short description or empty string if not visible
+- ingredients: Array of { name, amount, unit } objects. amount is always a string. unit can be "g", "kg", "ml", "dl", "l", "ts", "ss", "stk", "bunt", "pk", "pellets", "fedd", "skiver", "ss", "dl", "klype", "etter behag", or empty string
+- instructions: Array of step-by-step instruction strings
+- time: Cooking/prep time in minutes as a number (default 30)
+- portions: Number of servings as a number (default 4)
+- category: One of "kylling", "kjoett", "fisk", "vegetar", "pasta", "gryte", "suppe", "frokost", "sott" (guess from the recipe content)
+- variation: "Klassisk", "Raskere", "Med en vri", or empty string
+- cuisine: Country/cuisine name or empty string
+
+If only one recipe is found, return an array with one element.
+If multiple recipes are found (e.g. a cookbook page), return ALL of them.
+If no recipes can be identified, return an empty array.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "recipes": [
+    {
+      "name": "recipe name",
+      "description": "description or empty string",
+      "ingredients": [
+        { "name": "ingredient name", "amount": "quantity", "unit": "unit" }
+      ],
+      "instructions": ["step 1", "step 2"],
+      "time": 30,
+      "portions": 4,
+      "category": "category key",
+      "variation": "",
+      "cuisine": ""
+    }
+  ]
+}`;
+      userText = "Extract all recipes visible in this image.";
+    }
 
     const completion = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -438,7 +481,7 @@ Return ONLY valid JSON with this exact structure:
             },
             {
               type: "text",
-              text: "Extract all events visible in this image.",
+              text: userText,
             },
           ],
         },
@@ -449,19 +492,38 @@ Return ONLY valid JSON with this exact structure:
 
     const result = JSON.parse(completion.choices[0].message.content);
 
-    const events = Array.isArray(result.events) ? result.events : [];
-
-    const normalized = events.map((e) => ({
-      title: e.title || "",
-      description: e.description || "",
-      date: e.date || today,
-      endDate: e.endDate || null,
-      time: e.time || "09:00",
-      endTime: e.endTime || null,
-      reminderMinutes: e.reminderMinutes || 30,
-    }));
-
-    return res.status(200).json({ events: normalized });
+    if (type === "event") {
+      const events = Array.isArray(result.events) ? result.events : [];
+      const normalized = events.map((e) => ({
+        title: e.title || "",
+        description: e.description || "",
+        date: e.date || today,
+        endDate: e.endDate || null,
+        time: e.time || "09:00",
+        endTime: e.endTime || null,
+        reminderMinutes: e.reminderMinutes || 30,
+      }));
+      return res.status(200).json({ events: normalized });
+    } else {
+      const recipes = Array.isArray(result.recipes) ? result.recipes : [];
+      const validCategories = ["kylling", "kjoett", "fisk", "vegetar", "pasta", "gryte", "suppe", "frokost", "sott"];
+      const normalized = recipes.map((r) => ({
+        name: r.name || "",
+        description: r.description || "",
+        ingredients: Array.isArray(r.ingredients) ? r.ingredients.map((i) => ({
+          name: i.name || "",
+          amount: String(i.amount || ""),
+          unit: i.unit || "",
+        })) : [],
+        instructions: Array.isArray(r.instructions) ? r.instructions.filter((s) => s && s.trim()) : [],
+        time: typeof r.time === "number" ? r.time : 30,
+        portions: typeof r.portions === "number" ? r.portions : 4,
+        category: validCategories.includes(r.category) ? r.category : "kjoett",
+        variation: r.variation || "",
+        cuisine: r.cuisine || "",
+      }));
+      return res.status(200).json({ recipes: normalized });
+    }
   } catch (error) {
     console.error("Photo to data error:", error.message, error.stack);
     return res.status(500).json({ error: error.message || "Internal server error" });

@@ -414,6 +414,25 @@
     "retry": "Indlæs igen",
     "error": "Kunne ikke læse begivenheder fra billedet"
   },
+  "photoRecipe": {
+    "title": "Foto til opskrift",
+    "instruction": "Tag eller vælg et billede for at oprette en ny opskrift",
+    "pickImage": "Vælg billede",
+    "takePhoto": "Tag billede",
+    "processing": "Behandler billede...",
+    "noRecipes": "Ingen opskrifter fundet i billedet",
+    "recipesFound": "opskrifter fundet",
+    "singleRecipe": "opskrift fundet",
+    "selectRecipes": "Vælg opskrifter at gemme",
+    "selectAll": "Vælg alle",
+    "deselectAll": "Fravælg alle",
+    "createSelected": "Gem valgte",
+    "creating": "Gemmer...",
+    "saveRecipe": "Gem opskrift",
+    "editManually": "Rediger manuelt",
+    "tryAgain": "Prøv igen",
+    "error": "Kunne ikke læse opskrifter fra billedet"
+  },
   "languages": {
     "nb": "Norsk",
     "sv": "Svenska",

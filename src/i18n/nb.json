@@ -347,6 +347,25 @@
     "retry": "Last inn på nytt",
     "error": "Kunne ikke lese arrangement fra bildet"
   },
+  "photoRecipe": {
+    "title": "Foto til oppskrift",
+    "instruction": "Ta eller velg et bilde for å opprette en ny oppskrift",
+    "pickImage": "Velg bilde",
+    "takePhoto": "Ta bilde",
+    "processing": "Behandler bilde...",
+    "noRecipes": "Ingen oppskrifter funnet i bildet",
+    "recipesFound": "oppskrifter funnet",
+    "singleRecipe": "oppskrift funnet",
+    "selectRecipes": "Velg oppskrifter å lagre",
+    "selectAll": "Velg alle",
+    "deselectAll": "Fjern alle",
+    "createSelected": "Lagre valgte",
+    "creating": "Lagrer...",
+    "saveRecipe": "Lagre oppskrift",
+    "editManually": "Rediger manuelt",
+    "tryAgain": "Prøv igjen",
+    "error": "Kunne ikke lese oppskrift fra bildet"
+  },
   "chat": {
     "title": "Familiechat",
     "noMessages": "Ingen meldinger ennå",

@@ -347,6 +347,25 @@
     "retry": "Reload",
     "error": "Could not read events from the image"
   },
+  "photoRecipe": {
+    "title": "Photo to recipe",
+    "instruction": "Take or choose a photo to create a new recipe",
+    "pickImage": "Choose photo",
+    "takePhoto": "Take photo",
+    "processing": "Processing photo...",
+    "noRecipes": "No recipes found in the image",
+    "recipesFound": "recipes found",
+    "singleRecipe": "recipe found",
+    "selectRecipes": "Select recipes to save",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "createSelected": "Save selected",
+    "creating": "Saving...",
+    "saveRecipe": "Save recipe",
+    "editManually": "Edit manually",
+    "tryAgain": "Try again",
+    "error": "Could not read recipes from the image"
+  },
   "chat": {
     "title": "Family chat",
     "noMessages": "No messages yet",

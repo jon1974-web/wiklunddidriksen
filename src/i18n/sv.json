@@ -420,6 +420,25 @@
     "retry": "Ladda om",
     "error": "Kunde inte läsa evenemang från bilden"
   },
+  "photoRecipe": {
+    "title": "Foto till recept",
+    "instruction": "Ta eller välj ett foto för att skapa ett nytt recept",
+    "pickImage": "Välj foto",
+    "takePhoto": "Ta foto",
+    "processing": "Behandlar foto...",
+    "noRecipes": "Inga recept hittades i bilden",
+    "recipesFound": "recept hittades",
+    "singleRecipe": "recept hittades",
+    "selectRecipes": "Välj recept att spara",
+    "selectAll": "Välj alla",
+    "deselectAll": "Avmarkera alla",
+    "createSelected": "Spara valda",
+    "creating": "Sparar...",
+    "saveRecipe": "Spara recept",
+    "editManually": "Redigera manuellt",
+    "tryAgain": "Försök igen",
+    "error": "Kunde inte läsa recept från bilden"
+  },
   "languages": {
     "nb": "Norsk",
     "sv": "Svenska",
