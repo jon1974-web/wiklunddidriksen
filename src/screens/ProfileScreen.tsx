@@ -860,7 +860,7 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.language')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 8, paddingVertical: 8 }}>
-          {LANGUAGES.map((lang) => (
+          {LANGUAGES.filter(l => l.hasTranslation).map((lang) => (
             <TouchableOpacity
               key={lang.code}
               onPress={() => { setLanguage(lang.code); setLangKey(k => k + 1); }}
