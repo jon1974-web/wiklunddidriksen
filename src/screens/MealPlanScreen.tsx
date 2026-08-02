@@ -97,7 +97,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     { key: 'sott', label: '🍰 ' + t('mealPlanner.sott') },
   ];
 
-  const cuisineCountries = LANGUAGES.map(l => ({ name: l.code === 'nb' ? 'Norge' : l.code === 'sv' ? 'Sverige' : l.code === 'da' ? 'Danmark' : l.code === 'en' ? 'England' : 'Finland', flag: l.flag }));
+  const cuisineCountries = LANGUAGES.map(l => ({ name: l.countryKey, flag: l.flag }));
 
   const languageOptions = LANGUAGES.map(l => ({ value: l.aiName, label: `${l.flag} ${t('mealPlanner.country' + l.countryKey)}`, lang: l.code }));
 
@@ -163,6 +163,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
+      loadData();
       if (user) {
         getUserProfile(user.uid).then(profile => {
           if (profile?.minUkeSections) {
