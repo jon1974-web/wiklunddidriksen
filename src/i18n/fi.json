@@ -527,7 +527,7 @@
     "helpAiSearchWhat": "Mikä on AI-haku?",
     "helpAiSearchWhatText": "AI-haku käyttää keinotekoälyä reseptien luomiseen sen perusteella, mitä kirjoitat. Jos et löydä reseptiä kirjastasi, AI voi auttaa sinua luomaan uuden kuvaustesi perusteella.",
     "helpAiSearchHow": "Näin teet sen",
-    "helpAiSearchHowText": "Kirjoita hakusana hakukenttään. Jos tuloksia ei näy, napsauta 'Hae AI:lla'-painiketta. Valitse haluttu kieli reseptille. AI-haku luo kolme ehdotusta ainesosilla ja ohjeilla.",
+    "helpAiSearchHowText": "Kirjoita hakusana hakukenttään. Jos tuloksia ei näy, napsauta 'Hae AI:lla'-painiketta. Valitse maa, josta haluat etsiä reseptejä. AI-haku luo kolme ehdotusta ainesosilla ja ohjeilla.",
     "helpAiSearchTip": "Voit muokata reseptiä sen luomisen jälkeen, jotta se sopii mielipiteisiisi.",
     "helpHandlelisteTitle": "Ostoslistat",
     "helpHandlelisteWhat": "Mikä on ostoslistat?",

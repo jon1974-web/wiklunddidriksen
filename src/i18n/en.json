@@ -518,7 +518,7 @@
     "helpAiSearchWhat": "What is AI Search?",
     "helpAiSearchWhatText": "AI Search uses artificial intelligence to generate recipes based on what you type. If you can't find a recipe in your book, AI can help you create a new one based on your description.",
     "helpAiSearchHow": "How to use it",
-    "helpAiSearchHowText": "Type a search word in the search field. If no results appear, click the 'Search with AI' button. Select your desired language for the recipe. AI search generates three suggestions with ingredients and instructions.",
+    "helpAiSearchHowText": "Type a search word in the search field. If no results appear, click the 'Search with AI' button. Select which country you want to search recipes from. AI search generates three suggestions with ingredients and instructions.",
     "helpAiSearchTip": "You can edit the recipe after it has been generated to match your preferences.",
     "helpHandlelisteTitle": "Shopping lists",
     "helpHandlelisteWhat": "What are Shopping lists?",

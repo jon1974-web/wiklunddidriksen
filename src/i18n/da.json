@@ -527,7 +527,7 @@
     "helpAiSearchWhat": "Hvad er AI-søg?",
     "helpAiSearchWhatText": "AI-søget bruger kunstig intelligens til at generere opskrifter baseret på det du skriver. Hvis du ikke finder en opskrift i din bog, kan AI hjælpe dig med at lave en ny baseret på din beskrivelse.",
     "helpAiSearchHow": "Sådan gør du",
-    "helpAiSearchHowText": "Skriv et søgeord i søgefeltet. Hvis der ikke vises resultater, klikker du på 'Søg med AI'-knappen. Vælg det ønskede sprog for opskriften. AI-søget genererer tre forslag med ingredienser og fremgangsmåde.",
+    "helpAiSearchHowText": "Skriv et søgeord i søgefeltet. Hvis der ikke vises resultater, klikker du på 'Søg med AI'-knappen. Vælg hvilket land du vil søge opskrifter fra. AI-søget genererer tre forslag med ingredienser og fremgangsmåde.",
     "helpAiSearchTip": "Du kan redigere opskriften efter den er genereret, så den passer dine præferencer.",
     "helpHandlelisteTitle": "Indkøbslister",
     "helpHandlelisteWhat": "Hvad er Indkøbslister?",
