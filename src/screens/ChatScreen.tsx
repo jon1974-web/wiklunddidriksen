@@ -13,6 +13,7 @@ import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_MAX_DIMENSION, IMAGE_QUAL
 import { getErrorMessage } from '../utils/validation';
 import { uriToBlob } from '../utils/upload';
 import { getUserProfile } from '../services/familyService';
+import { AppIcon } from '../components/AppIcon';
 
 export const ChatScreen: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -212,7 +213,10 @@ export const ChatScreen: React.FC = () => {
       >
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={[styles.title, { color: colors.text }]}>💬 Familiechat</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <AppIcon name="chat" size={28} color={colors.accent} />
+            <Text style={[styles.title, { color: colors.text }]}>{t('chat.title')}</Text>
+          </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}

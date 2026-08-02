@@ -50,6 +50,7 @@ import { setLanguage } from '../i18n';
 import { LANGUAGES } from '../constants/languages';
 import i18n from '../i18n';
 import { HelpCenter } from '../components/HelpCenter';
+import { AppIcon } from '../components/AppIcon';
 
 export const ProfileScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -638,7 +639,10 @@ export const ProfileScreen: React.FC = () => {
       <ScrollView style={{ flex: 1, backgroundColor: colors.background }}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={[styles.title, { color: colors.text }]}>👤 {t('profile.title')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <AppIcon name="person" size={28} color={colors.accent} />
+            <Text style={[styles.title, { color: colors.text }]}>{t('profile.title')}</Text>
+          </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}

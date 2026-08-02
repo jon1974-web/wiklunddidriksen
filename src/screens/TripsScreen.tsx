@@ -10,6 +10,7 @@ import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { useUserStore } from '../store/userStore';
 import { getForecast, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
+import { AppIcon } from '../components/AppIcon';
 
 interface TripsScreenProps {
   navigation: any;
@@ -155,7 +156,10 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={[styles.screenTitle, { color: colors.text }]}>✈️ {t('trips.title')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <AppIcon name="compass" size={28} color={colors.accent} />
+            <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.title')}</Text>
+          </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}

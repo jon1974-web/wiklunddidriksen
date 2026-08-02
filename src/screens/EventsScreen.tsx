@@ -7,6 +7,7 @@ import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { Event, Trip, SpondEvent, SpondRespondent, Birthday } from '../types';
 import { EventCard } from '../components/EventCard';
+import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
 import { SpondResponseModal } from '../components/SpondResponseModal';
 import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
@@ -654,7 +655,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Text style={[styles.title, { color: colors.text }]}>📅 {t('events.title')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <AppIcon name="calendar" size={28} color={colors.accent} />
+            <Text style={[styles.title, { color: colors.text }]}>{t('events.title')}</Text>
+          </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}

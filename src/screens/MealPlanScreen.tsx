@@ -12,6 +12,7 @@ import { LANGUAGES, getAiNameForCode } from '../constants/languages';
 import { ActionModal } from '../components/ActionModal';
 import { InfoModal } from '../components/InfoModal';
 import { HelpCenter } from '../components/HelpCenter';
+import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getUserProfile } from '../services/familyService';
@@ -981,7 +982,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={[styles.title, { color: colors.text }]}>🍽️ {t('mealPlanner.title')}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <AppIcon name="utensils" size={28} color={colors.accent} />
+              <Text style={[styles.title, { color: colors.text }]}>{t('mealPlanner.title')}</Text>
+            </View>
             <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
           </View>
           {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}

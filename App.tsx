@@ -4,7 +4,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
-import { TouchableOpacity, Text, ActivityIndicator, Image, Animated } from 'react-native';
+import { View, TouchableOpacity, Text, ActivityIndicator, Image, Animated } from 'react-native';
+import Svg, { Rect, Line, Path, Circle, Polygon } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 
 import './src/i18n';
@@ -259,9 +260,51 @@ const ProfileStack = () => {
   );
 };
 
-const TabIcon = ({ label, focused }: { label: string; focused: boolean }) => (
-  <Text style={[{ fontSize: 20 }, focused && { transform: [{ scale: 1.1 }] }]}>{label}</Text>
-);
+const TabIcon = ({ icon, focused }: { icon: string; focused: boolean }) => {
+  const color = focused ? '#0097A7' : '#999';
+  const size = 24;
+
+  if (icon === 'calendar') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+      <Line x1="16" y1="2" x2="16" y2="6"/>
+      <Line x1="8" y1="2" x2="8" y2="6"/>
+      <Line x1="3" y1="10" x2="21" y2="10"/>
+      <Rect x="7" y="13" width="4" height="4" rx="1" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (icon === 'utensils') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round">
+      <Path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/>
+      <Line x1="7" y1="2" x2="7" y2="22"/>
+      <Path d="M17 2c0 0 0 5 0 7 0 1.1-.9 2-2 2h-1v11"/>
+      <Line x1="14" y1="2" x2="14" y2="22"/>
+    </Svg>
+  );
+
+  if (icon === 'chat') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+    </Svg>
+  );
+
+  if (icon === 'compass') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="12" r="10"/>
+      <Polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (icon === 'person') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+      <Circle cx="12" cy="7" r="4"/>
+    </Svg>
+  );
+
+  return null;
+};
 
 const AppContent = () => {
   const [loading, setLoading] = useState(true);
@@ -393,7 +436,7 @@ const AppContent = () => {
               component={EventsStack}
               options={{
                 tabBarLabel: 'Arrangementer',
-                tabBarIcon: ({ focused }) => <TabIcon label="📅" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="calendar" focused={focused} />,
               }}
             />
             <Tab.Screen
@@ -401,7 +444,7 @@ const AppContent = () => {
               component={MealPlanStack}
               options={{
                 tabBarLabel: 'Matsenter',
-                tabBarIcon: ({ focused }) => <TabIcon label="🍽️" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="utensils" focused={focused} />,
               }}
             />
             <Tab.Screen
@@ -409,7 +452,7 @@ const AppContent = () => {
               component={ChatStack}
               options={{
                 tabBarLabel: 'Chat',
-                tabBarIcon: ({ focused }) => <TabIcon label="💬" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="chat" focused={focused} />,
               }}
             />
             <Tab.Screen
@@ -417,7 +460,7 @@ const AppContent = () => {
               component={TripsStack}
               options={{
                 tabBarLabel: 'Reise',
-                tabBarIcon: ({ focused }) => <TabIcon label="✈️" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="compass" focused={focused} />,
               }}
               listeners={({ navigation }) => ({
                 tabPress: (e) => {
@@ -431,7 +474,7 @@ const AppContent = () => {
               component={ProfileStack}
               options={{
                 tabBarLabel: 'Profil',
-                tabBarIcon: ({ focused }) => <TabIcon label="👤" focused={focused} />,
+                tabBarIcon: ({ focused }) => <TabIcon icon="person" focused={focused} />,
               }}
             />
           </Tab.Navigator>
