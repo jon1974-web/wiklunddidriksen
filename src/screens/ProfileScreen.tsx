@@ -49,6 +49,7 @@ import { useTranslation } from 'react-i18next';
 import { setLanguage } from '../i18n';
 import { LANGUAGES } from '../constants/languages';
 import i18n from '../i18n';
+import { HelpCenter } from '../components/HelpCenter';
 
 export const ProfileScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -90,6 +91,13 @@ export const ProfileScreen: React.FC = () => {
   const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
   const [spondRespondents, setSpondRespondents] = useState<string[]>([]);
   const [showRespondents, setShowRespondents] = useState(false);
+  const [showHelpCalendar, setShowHelpCalendar] = useState(false);
+  const [showHelpNotifications, setShowHelpNotifications] = useState(false);
+  const [showHelpMinUke, setShowHelpMinUke] = useState(false);
+  const [showHelpMatsenter, setShowHelpMatsenter] = useState(false);
+  const [showHelpBirthdays, setShowHelpBirthdays] = useState(false);
+  const [showHelpFamily, setShowHelpFamily] = useState(false);
+  const [showHelpSpond, setShowHelpSpond] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -748,7 +756,16 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.calendar')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.calendar')}</Text>
+          <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpCalendar(true)}>
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
         {calendarProvider && calendarEmail ? (
           <View>
             <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
@@ -879,7 +896,16 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.notifications')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.notifications')}</Text>
+            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpNotifications(true)}>
+              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
           <View style={styles.themeOptions}>
             <TouchableOpacity
               style={[
@@ -897,7 +923,16 @@ export const ProfileScreen: React.FC = () => {
         </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>📋 {t('profile.minUke')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>📋 {t('profile.minUke')}</Text>
+          <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpMinUke(true)}>
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
         {[
           { key: 'birthdays', icon: '🎂', label: t('birthdays.title') },
           { key: 'meals', icon: '🍽️', label: t('mealPlanner.weeklyPlan') },
@@ -920,7 +955,16 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>🍽️ {t('profile.matsenter')}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>🍽️ {t('profile.matsenter')}</Text>
+          <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpMatsenter(true)}>
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
         {[
           { key: 'mealFrokost', icon: '🥞', label: t('mealPlanner.frokost') },
           { key: 'mealLunsj', icon: '🥪', label: t('mealPlanner.lunch') },
@@ -944,7 +988,16 @@ export const ProfileScreen: React.FC = () => {
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>🎂 {t('birthdays.title')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>🎂 {t('birthdays.title')}</Text>
+            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpBirthdays(true)}>
+              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             style={[styles.familyButton, { backgroundColor: colors.accent }]}
             onPress={() => navigation.navigate('Birthday')}
@@ -954,7 +1007,16 @@ export const ProfileScreen: React.FC = () => {
         </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.family')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.family')}</Text>
+            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpFamily(true)}>
+              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
 
           {familyId ? (
             <View>
@@ -1073,7 +1135,16 @@ export const ProfileScreen: React.FC = () => {
 
       {(familyRole === 'owner' || familyRole === 'admin') && (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.title')} — Spond</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.title')} — Spond</Text>
+            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpSpond(true)}>
+              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
 
           {spondConnected && spondGroups.length > 0 ? (
             <View>
@@ -1265,6 +1336,36 @@ export const ProfileScreen: React.FC = () => {
         </View>
       )}
       </ScrollView>
+
+      <HelpCenter visible={showHelpCalendar} onClose={() => setShowHelpCalendar(false)} title={t('profile.helpCalendarTitle')} sections={[
+        { icon: '📅', title: t('profile.helpCalendarWhat'), text: t('profile.helpCalendarWhatText') },
+        { icon: '👉', title: t('profile.helpCalendarHow'), text: t('profile.helpCalendarHowText'), tip: t('profile.helpCalendarTip') },
+      ]} />
+      <HelpCenter visible={showHelpNotifications} onClose={() => setShowHelpNotifications(false)} title={t('profile.helpNotificationsTitle')} sections={[
+        { icon: '🔔', title: t('profile.helpNotificationsWhat'), text: t('profile.helpNotificationsWhatText') },
+        { icon: '👉', title: t('profile.helpNotificationsHow'), text: t('profile.helpNotificationsHowText') },
+      ]} />
+      <HelpCenter visible={showHelpMinUke} onClose={() => setShowHelpMinUke(false)} title={t('profile.helpMinUkeTitle')} sections={[
+        { icon: '📋', title: t('profile.helpMinUkeWhat'), text: t('profile.helpMinUkeWhatText') },
+        { icon: '👉', title: t('profile.helpMinUkeHow'), text: t('profile.helpMinUkeHowText'), tip: t('profile.helpMinUkeTip') },
+      ]} />
+      <HelpCenter visible={showHelpMatsenter} onClose={() => setShowHelpMatsenter(false)} title={t('profile.helpMatsenterTitle')} sections={[
+        { icon: '🍽️', title: t('profile.helpMatsenterWhat'), text: t('profile.helpMatsenterWhatText') },
+        { icon: '👉', title: t('profile.helpMatsenterHow'), text: t('profile.helpMatsenterHowText'), tip: t('profile.helpMatsenterTip') },
+      ]} />
+      <HelpCenter visible={showHelpBirthdays} onClose={() => setShowHelpBirthdays(false)} title={t('profile.helpBirthdaysTitle')} sections={[
+        { icon: '🎂', title: t('profile.helpBirthdaysWhat'), text: t('profile.helpBirthdaysWhatText') },
+        { icon: '👉', title: t('profile.helpBirthdaysHow'), text: t('profile.helpBirthdaysHowText'), tip: t('profile.helpBirthdaysTip') },
+      ]} />
+      <HelpCenter visible={showHelpFamily} onClose={() => setShowHelpFamily(false)} title={t('profile.helpFamilyTitle')} sections={[
+        { icon: '👨‍👩‍👧‍👦', title: t('profile.helpFamilyWhat'), text: t('profile.helpFamilyWhatText') },
+        { icon: '👉', title: t('profile.helpFamilyHow'), text: t('profile.helpFamilyHowText'), tip: t('profile.helpFamilyTip') },
+      ]} />
+      <HelpCenter visible={showHelpSpond} onClose={() => setShowHelpSpond(false)} title={t('profile.helpSpondTitle')} sections={[
+        { icon: '⚽', title: t('profile.helpSpondWhat'), text: t('profile.helpSpondWhatText') },
+        { icon: '👉', title: t('profile.helpSpondHow'), text: t('profile.helpSpondHowText'), tip: t('profile.helpSpondTip') },
+      ]} />
+
     </SafeAreaView>
   );
 };
