@@ -71,11 +71,10 @@ type RootStackParamList = {
   Birthday: undefined;
 };
 
-const EventsStack = () => {
-  const { colors } = useTheme();
+const BackButton = () => {
   const navigation = useNavigation();
-
-  const BackButton = () => (
+  const { colors } = useTheme();
+  return (
     <TouchableOpacity
       onPress={() => navigation.goBack()}
       style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.text, justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}
@@ -84,6 +83,10 @@ const EventsStack = () => {
       <Text style={{ color: colors.text, fontSize: 16, lineHeight: 18 }}>←</Text>
     </TouchableOpacity>
   );
+};
+
+const EventsStack = () => {
+  const { colors } = useTheme();
   return (
     <Suspense fallback={<SuspenseFallback />}>
       <Stack.Navigator>
@@ -141,17 +144,6 @@ const EventsStack = () => {
 
 const MealPlanStack = () => {
   const { colors } = useTheme();
-  const navigation = useNavigation();
-
-  const BackButton = () => (
-    <TouchableOpacity
-      onPress={() => navigation.goBack()}
-      style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.text, justifyContent: 'center', alignItems: 'center', marginLeft: 8 }}
-      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-    >
-      <Text style={{ color: colors.text, fontSize: 16, lineHeight: 18 }}>←</Text>
-    </TouchableOpacity>
-  );
   return (
     <Suspense fallback={<SuspenseFallback />}>
       <Stack.Navigator>
