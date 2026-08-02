@@ -708,18 +708,6 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               </TouchableOpacity>
             </View>
           )}
-
-          {/* URL Import */}
-          <TouchableOpacity style={[styles.aiSearchCard, { backgroundColor: colors.surface, borderColor: colors.border, marginTop: 12 }]} onPress={() => setShowUrlImport(true)}>
-            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Text style={{ fontSize: 18, marginRight: 10 }}>🔗</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={[styles.aiSearchTitle, { color: colors.text }]}>{t('mealPlanner.importURL')}</Text>
-                <Text style={[styles.aiSearchHint, { color: colors.textSecondary }]}>{t('mealPlanner.urlImportHint')}</Text>
-              </View>
-              <Text style={{ color: colors.textSecondary, fontSize: 16 }}>→</Text>
-            </View>
-          </TouchableOpacity>
         </View>
       ) : (
         <ScrollView style={styles.tabContent} contentContainerStyle={{ paddingBottom: 80 }}>
@@ -1362,6 +1350,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       </Modal>
       {/* FAB for adding recipes */}
       <TouchableOpacity
+        style={[styles.fabUrl, { backgroundColor: colors.accent }]}
+        onPress={() => setShowUrlImport(true)}
+      >
+        <Text style={styles.fabText}>🔗</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
         style={[styles.fabCamera, { backgroundColor: colors.accent }]}
         onPress={() => navigation.navigate('PhotoRecipe')}
       >
@@ -1384,6 +1378,7 @@ const styles = StyleSheet.create({
   familySubtitle: { fontSize: 14, fontStyle: 'italic', marginTop: 2, marginBottom: 8 },
   fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
   fabCamera: { position: 'absolute', bottom: 92, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
+  fabUrl: { position: 'absolute', bottom: 160, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
   fabText: { color: '#fff', fontSize: 28, fontWeight: '700' },
   tabs: { flexDirection: 'row', borderBottomWidth: 1 },
   tab: { flex: 1, paddingVertical: 12, alignItems: 'center', borderBottomWidth: 2, borderBottomColor: 'transparent' },
