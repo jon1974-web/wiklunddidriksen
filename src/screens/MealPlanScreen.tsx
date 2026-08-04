@@ -55,6 +55,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showHelpSearch, setShowHelpSearch] = useState(false);
   const [showHelpHandleliste, setShowHelpHandleliste] = useState(false);
   const [showHelpAiSearch, setShowHelpAiSearch] = useState(false);
+  const [weekOffset, setWeekOffset] = useState(0);
+  const [mealPlansMap, setMealPlansMap] = useState<Map<string, any>>(new Map());
+  const [showAddToPlan, setShowAddToPlan] = useState<Recipe | null>(null);
+  const [planDay, setPlanDay] = useState('');
+  const [planMeal, setPlanMeal] = useState('');
   const [aiQuery, setAiQuery] = useState('');
   const [aiResults, setAiResults] = useState<Recipe[]>([]);
   const [aiLoading, setAiLoading] = useState(false);
@@ -107,16 +112,32 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     if (defaultLang && !aiSearchLang) setAiSearchLang(defaultLang.value);
   }, [i18n.language]);
 
-  const getCurrentWeekStart = (): string => {
+  const getWeekStart = (offset: number = 0): string => {
     const now = new Date();
     const day = now.getDay();
-    const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+    const diff = now.getDate() - day + (day === 0 ? -6 : 1) + (offset * 7);
     const monday = new Date(now);
     monday.setDate(diff);
     return `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
   };
 
-  const weekStart = getCurrentWeekStart();
+  const getWeekLabel = (offset: number = 0): string => {
+    const start = new Date(getWeekStart(offset));
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    const opts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'short' };
+    return `${start.toLocaleDateString('nb-NO', opts)} – ${end.toLocaleDateString('nb-NO', opts)}`;
+  };
+
+  const getWeekNumber = (offset: number = 0): number => {
+    const d = new Date(getWeekStart(offset));
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 3 - ((d.getDay() + 6) % 7));
+    const week1 = new Date(d.getFullYear(), 0, 4);
+    return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + ((week1.getDay() + 6) % 7)) / 7);
+  };
+
+  const weekStart = getWeekStart(weekOffset);
 
   const loadData = useCallback(async () => {
     if (!familyId) return;
@@ -152,6 +173,25 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   }, [familyId, weekStart]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  useEffect(() => {
+    if (!familyId) return;
+    const loadWeekPlans = async () => {
+      const newMap = new Map<string, any>();
+      const promises: Promise<void>[] = [];
+      for (let i = -6; i <= 6; i++) {
+        const ws = getWeekStart(i);
+        promises.push(
+          getDocs(query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', ws)))
+            .then(snap => { if (snap.docs.length > 0) newMap.set(ws, { id: snap.docs[0].id, ...snap.docs[0].data() }); })
+            .catch(() => {})
+        );
+      }
+      await Promise.all(promises);
+      setMealPlansMap(newMap);
+    };
+    loadWeekPlans();
+  }, [familyId]);
 
   useEffect(() => {
     if (!familyId) return;
@@ -587,19 +627,28 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>📅 {t('mealPlanner.weekOverview')}</Text>
-          <TouchableOpacity
-            style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
-            onPress={() => setShowHelp(true)}
-          >
-            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
-              </View>
-            </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <TouchableOpacity onPress={() => setWeekOffset(o => o - 1)} style={{ padding: 8 }}>
+            <Text style={{ color: colors.accent, fontSize: 18 }}>◀</Text>
+          </TouchableOpacity>
+          <View style={{ alignItems: 'center' }}>
+            <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 2 }]}>
+              📅 {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
+            </Text>
+            <Text style={{ fontSize: 12, color: colors.textSecondary }}>{getWeekLabel(weekOffset)}</Text>
+          </View>
+          <TouchableOpacity onPress={() => setWeekOffset(o => o + 1)} style={{ padding: 8 }}>
+            <Text style={{ color: colors.accent, fontSize: 18 }}>▶</Text>
           </TouchableOpacity>
         </View>
+        {weekOffset !== 0 && (
+          <TouchableOpacity
+            style={{ alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, backgroundColor: colors.inputBackground, marginBottom: 8 }}
+            onPress={() => setWeekOffset(0)}
+          >
+            <Text style={{ fontSize: 12, color: colors.accent, fontWeight: '600' }}>{t('mealPlanner.backToCurrentWeek')}</Text>
+          </TouchableOpacity>
+        )}
         {DAYS.map((day, i) => (
           <TouchableOpacity key={day} style={[styles.dayRow, { borderBottomColor: colors.border }]}>
             <Text style={[styles.dayName, { color: colors.accent }]}>{t(DAY_LABELS[i])}</Text>
@@ -636,6 +685,30 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             </View>
           </TouchableOpacity>
         ))}
+        {!mealPlan?.meals || Object.keys(mealPlan.meals).length === 0 ? (
+          <TouchableOpacity
+            style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, paddingVertical: 12, marginTop: 4, borderRadius: 8, backgroundColor: colors.inputBackground }}
+            onPress={async () => {
+              const prevWs = getWeekStart(weekOffset - 1);
+              const prevPlan = mealPlansMap.get(prevWs);
+              if (!prevPlan?.meals || !familyId) return;
+              try {
+                if (mealPlan) {
+                  const { updateDoc, doc: docFn } = await import('firebase/firestore');
+                  await updateDoc(docFn(db, 'mealPlans', mealPlan.id), { meals: prevPlan.meals });
+                } else {
+                  await addDoc(collection(db, 'mealPlans'), { weekStart, meals: prevPlan.meals, familyId, createdBy: user?.uid || '' });
+                }
+                loadData();
+              } catch (error) {
+                crossAlert('Error', getErrorMessage(error));
+              }
+            }}
+          >
+            <Text style={{ fontSize: 16 }}>📋</Text>
+            <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 14 }}>{t('mealPlanner.copyFromPreviousWeek')}</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
     </ScrollView>
   );
@@ -1219,6 +1292,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowRecipeDetail(null)}>
                     <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.close')}</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, borderColor: colors.accent, borderWidth: 1 }]} onPress={() => { if (showRecipeDetail) { setShowAddToPlan(showRecipeDetail); setShowRecipeDetail(null); } }}>
+                    <Text style={[styles.modalBtnText, { color: colors.accent }]}>📅 {t('mealPlanner.addToPlan')}</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={() => { if (showRecipeDetail) { handleAddToShoppingList(showRecipeDetail); setShowRecipeDetail(null); } }}>
                     <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.addToShoppingList')}</Text>
                   </TouchableOpacity>
@@ -1236,6 +1312,75 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         onDelete={actionModal.onDelete}
         onCancel={() => setActionModal({ visible: false, title: '' })}
       />
+
+      <Modal visible={!!showAddToPlan} transparent animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setShowAddToPlan(null)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('mealPlanner.addToPlan')}</Text>
+                <Text style={{ color: colors.textSecondary, marginBottom: 12, fontSize: 14 }}>{showAddToPlan?.name}</Text>
+                <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.selectDay')}</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                  {DAYS.map((day, i) => (
+                    <TouchableOpacity key={day} style={[styles.filterChip, { borderColor: planDay === day ? colors.accent : colors.border, backgroundColor: planDay === day ? colors.accent : 'transparent' }]} onPress={() => setPlanDay(day)}>
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: planDay === day ? '#fff' : colors.textSecondary }}>{t(DAY_LABELS[i]).slice(0, 3)}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.selectMeal')}</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+                  {MEAL_SLOTS.filter(meal => {
+                    if (meal === 'frokost') return mealToggles.mealFrokost !== false;
+                    if (meal === 'lunsj') return mealToggles.mealLunsj !== false;
+                    if (meal === 'middag') return mealToggles.mealMiddag !== false;
+                    return true;
+                  }).map(meal => {
+                    const mealLabel = meal === 'frokost' ? t('mealPlanner.frokost') : meal === 'lunsj' ? t('mealPlanner.lunch') : t('mealPlanner.dinner');
+                    const mealEmoji = meal === 'frokost' ? '🥞' : meal === 'lunsj' ? '🥪' : '🍽️';
+                    return (
+                      <TouchableOpacity key={meal} style={[styles.filterChip, { borderColor: planMeal === meal ? colors.accent : colors.border, backgroundColor: planMeal === meal ? colors.accent : 'transparent' }]} onPress={() => setPlanMeal(meal)}>
+                        <Text style={{ fontSize: 12, fontWeight: '600', color: planMeal === meal ? '#fff' : colors.textSecondary }}>{mealEmoji} {mealLabel}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddToPlan(null); setPlanDay(''); setPlanMeal(''); }}>
+                    <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.modalBtn, { backgroundColor: (!planDay || !planMeal) ? colors.textDisabled : colors.accent, opacity: (!planDay || !planMeal) ? 0.5 : 1 }]}
+                    disabled={!planDay || !planMeal}
+                    onPress={async () => {
+                      if (!showAddToPlan || !planDay || !planMeal || !familyId) return;
+                      try {
+                        const meals = mealPlan?.meals || {};
+                        const dayMeals = meals[planDay] || {};
+                        const updatedMeals = { ...meals, [planDay]: { ...dayMeals, [planMeal]: showAddToPlan.id } };
+                        if (mealPlan) {
+                          const { updateDoc, doc: docFn } = await import('firebase/firestore');
+                          await updateDoc(docFn(db, 'mealPlans', mealPlan.id), { meals: updatedMeals });
+                        } else {
+                          await addDoc(collection(db, 'mealPlans'), { weekStart, meals: updatedMeals, familyId, createdBy: user?.uid || '' });
+                        }
+                        setShowAddToPlan(null);
+                        setPlanDay('');
+                        setPlanMeal('');
+                        loadData();
+                      } catch (error) {
+                        crossAlert('Error', getErrorMessage(error));
+                      }
+                    }}
+                  >
+                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.addToPlan')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
 
       <InfoModal
         visible={infoModal.visible}
