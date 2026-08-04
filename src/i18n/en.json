@@ -95,7 +95,7 @@
   },
   "trips": {
     "title": "Trips",
-    "noTripsWeek": "No trips this week"
+    "noTripsWeek": "No trips this week",
     "addTrip": "New trip",
     "noTrips": "No trips added",
     "city": "City",

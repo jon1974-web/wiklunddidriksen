@@ -105,7 +105,7 @@
   },
   "trips": {
     "title": "Matkat",
-    "noTripsWeek": "Ei matkoja tällä viikolla"
+    "noTripsWeek": "Ei matkoja tällä viikolla",
     "addTrip": "Uusi matka",
     "noTrips": "Ei matkoja lisätty",
     "city": "Kaupunki",
