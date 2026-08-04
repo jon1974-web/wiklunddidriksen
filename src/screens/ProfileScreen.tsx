@@ -997,7 +997,7 @@ export const ProfileScreen: React.FC = () => {
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>🎂 {t('birthdays.title')}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('birthdays.title')}</Text>
             <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpBirthdays(true)}>
               <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
                 <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
