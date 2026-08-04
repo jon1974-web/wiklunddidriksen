@@ -46,7 +46,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
           <Text style={[styles.calendarDay, { color: colors.text }]}>{calDay}</Text>
           <Text style={[styles.calendarMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
           <View style={styles.tileTransportIcon}>
-            <AppIcon name={iconName as any} size={18} color={colors.accent} />
+            <AppIcon name={iconName as any} size={22} color={colors.accent} />
           </View>
         </View>
       ) : (
@@ -56,11 +56,15 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
       )}
       <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />
       <View style={styles.tileContent}>
-        {typeLabel ? (
-          <Text style={{ color: tileColor, fontWeight: '600', fontSize: 12 }}>{typeLabel}</Text>
-        ) : (
-          <Text style={{ color: tileColor, fontWeight: '600', fontSize: 12 }}>{label}</Text>
-        )}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+          <AppIcon name={iconName as any} size={14} color={colors.accent} />
+          <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 12 }}>
+            {iconName === 'fly' ? t('transport.fly') : iconName === 'train' ? t('transport.train') : iconName === 'car' ? t('transport.carRental') : iconName === 'ferry' ? t('transport.ferry') : t('transport.taxi')}
+          </Text>
+          {typeLabel && (
+            <Text style={{ color: tileColor, fontWeight: '600', fontSize: 12 }}>· {typeLabel}</Text>
+          )}
+        </View>
         {name && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{name}</Text>}
         {hasCar && <Text style={[styles.tileDetail, { color: colors.textSecondary }]}>🚗 {t('common.carWith')}</Text>}
         {detail && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{detail}</Text>}
