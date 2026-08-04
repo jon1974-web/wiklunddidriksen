@@ -267,6 +267,13 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     loadSubData();
   }, [loadSubData]);
 
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('focus', () => {
+      loadSubData();
+    });
+    return unsubscribe;
+  }, [navigation, loadSubData]);
+
   const [weather, setWeather] = useState<WeatherDay[]>([]);
   const [weatherPage, setWeatherPage] = useState(0);
   const [weatherLoading, setWeatherLoading] = useState(true);
