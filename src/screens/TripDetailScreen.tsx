@@ -1400,7 +1400,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 key={pl.id}
                 style={[styles.itemCard, { backgroundColor: colors.inputBackground }]}
                 onPress={() => navigation.navigate('PackingListDetail', { list: pl, tripId: trip.id })}
-                onLongPress={canDelete ? () => confirmDelete(pl.title || 'pakkeliste', async () => { await deleteTripPackingList(trip.id, pl.id); loadSubData(); }) : undefined}
+                onLongPress={() => setActionModal({ visible: true, title: pl.title || 'pakkeliste', onEdit: () => navigation.navigate('PackingListDetail', { list: pl, tripId: trip.id }), onDelete: () => { deleteTripPackingList(trip.id, pl.id).then(() => loadSubData()); } })}
               >
                 <View style={styles.docRow}>
                   <View style={styles.docContent}>

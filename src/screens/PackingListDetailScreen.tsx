@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
-import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc } from 'firebase/firestore';
+import { doc, onSnapshot, updateDoc, arrayUnion, arrayRemove, deleteDoc, addDoc, collection } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { PackingList, PackingItem } from '../types';
@@ -9,6 +9,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
+import { ActionModal } from '../components/ActionModal';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -59,23 +60,36 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
     return () => unsubscribe();
   }, [routeList?.id, tripId]);
 
+  const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void }>({ visible: false, title: '' });
+
   const handleDeleteList = useCallback(() => {
-    crossAlert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Slett',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteDoc(doc(db, 'trips', tripId, 'packingLists', routeList.id));
-            navigation.goBack();
-          } catch (error) {
-            crossAlert('Error', getErrorMessage(error));
-          }
-        },
+    setActionModal({
+      visible: true,
+      title: currentList.title || 'pakkeliste',
+      onDelete: async () => {
+        try {
+          await deleteDoc(doc(db, 'trips', tripId, 'packingLists', routeList.id));
+          navigation.goBack();
+        } catch (error) {
+          crossAlert('Error', getErrorMessage(error));
+        }
       },
-    ]);
-  }, [routeList?.id, tripId, navigation]);
+    });
+  }, [currentList, routeList?.id, tripId, navigation]);
+
+  const handleCopyList = useCallback(async () => {
+    try {
+      await addDoc(collection(db, 'trips', tripId, 'packingLists'), {
+        title: `${currentList.title} (kopiert)`,
+        items: currentList.items.map((item) => ({ ...item, id: generateId(), checked: false })),
+        createdBy: user?.uid,
+        createdAt: Date.now(),
+      });
+      navigation.goBack();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  }, [currentList, user, tripId, navigation]);
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) {
@@ -162,14 +176,22 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
               {currentList.items.filter((i) => i.checked).length}/{currentList.items.length} {t('shopping.itemsChecked')}
             </Text>
           </View>
-          {canDelete && (
+          <View style={styles.headerActions}>
             <TouchableOpacity
               style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
-              onPress={handleDeleteList}
+              onPress={handleCopyList}
             >
-              <Text style={[styles.headerButtonText, { color: colors.danger }]}>{t('shopping.delete')}</Text>
+              <Text style={[styles.headerButtonText, { color: colors.text }]}>{t('shopping.copy')}</Text>
             </TouchableOpacity>
-          )}
+            {canDelete && (
+              <TouchableOpacity
+                style={[styles.headerButton, { backgroundColor: colors.inputBackground }]}
+                onPress={handleDeleteList}
+              >
+                <Text style={[styles.headerButtonText, { color: colors.danger }]}>{t('shopping.delete')}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
       </View>
 
@@ -236,6 +258,13 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
           </View>
         </View>
       </Modal>
+
+      <ActionModal
+        visible={actionModal.visible}
+        title={actionModal.title}
+        onDelete={actionModal.onDelete}
+        onCancel={() => setActionModal({ visible: false, title: '' })}
+      />
     </View>
   );
 };
@@ -245,6 +274,7 @@ const styles = StyleSheet.create({
   header: { alignItems: 'flex-start', padding: 16, borderBottomWidth: 1 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', width: '100%' },
   headerInfo: { flex: 1 },
+  headerActions: { flexDirection: 'row', gap: 8 },
   headerButton: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 8 },
   headerButtonText: { fontSize: 14, fontWeight: '600' },
   title: { fontSize: 24, fontWeight: 'bold' },
