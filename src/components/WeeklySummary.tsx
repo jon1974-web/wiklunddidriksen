@@ -174,6 +174,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
               return (
                 <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                   <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="birthday" size={18} color={colors.accent} /> {t('birthdays.title')}</Text>
+                  <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('birthdays.noBirthdaysWeek')}</Text>
                 </View>
               );
             }
@@ -261,7 +262,17 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
               return start <= sunday && end >= monday;
             });
 
-            if (weekTrips.length === 0) return null;
+            if (weekTrips.length === 0) {
+              return (
+                <View style={[styles.mealSection, { backgroundColor: colors.surface }]}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <AppIcon name="compass" size={18} color={colors.accent} />
+                    <Text style={[styles.mealSectionTitle, { color: colors.text }]}>{t('trips.title')}</Text>
+                  </View>
+                  <Text style={{ color: colors.textDisabled, fontSize: 13, fontStyle: 'italic' }}>{t('trips.noTripsWeek')}</Text>
+                </View>
+              );
+            }
 
             return (
               <View style={[styles.mealSection, { backgroundColor: colors.surface }]}>

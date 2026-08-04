@@ -105,6 +105,7 @@
   },
   "trips": {
     "title": "Resor",
+    "noTripsWeek": "Inga resor denne veckan"
     "addTrip": "Ny resa",
     "noTrips": "Inga resor tillagda",
     "city": "Stad",
