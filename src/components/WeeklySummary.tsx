@@ -331,35 +331,33 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             );
           })()}
 
-          {/* Day sections */}
-          {weekData.days.map((day, idx) => {
-            const isToday = toLocalDateStr(day.date) === toLocalDateStr(new Date());
-            return (
-              <View key={idx} style={[styles.daySection, { backgroundColor: colors.surface }]}>
-                <View style={[styles.dayHeader, isToday && { backgroundColor: '#0097A7' + '20', borderLeftColor: '#0097A7' }]}>
-                  <Text style={[styles.dayName, { color: isToday ? '#0097A7' : colors.text }]}>{day.dayName}</Text>
-                  <Text style={[styles.dayDate, { color: isToday ? '#0097A7' : colors.textSecondary }]}>{day.dateLabel}</Text>
-                </View>
-                {day.items.length > 0 ? (
-                  day.items.map((item, i) => (
-                    <View key={i} style={[styles.itemRow, i < day.items.length - 1 && { borderBottomColor: colors.border }]}>
-                      {item.logoUrl ? (
-                        <Image source={{ uri: item.logoUrl }} style={{ width: 28, height: 28, borderRadius: 6 }} />
-                      ) : (
-                        <AppIcon name={item.icon as any} size={18} color={colors.accent} />
-                      )}
-                      <View style={styles.itemContent}>
-                        <Text style={[styles.itemTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
-                        <Text style={[styles.itemTime, { color: colors.textSecondary, fontWeight: '600' }]}>{item.timeRange}</Text>
+          {/* Arrangementer section */}
+          <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="calendar" size={18} color={colors.accent} /> {t('events.title')}</Text>
+            {weekData.days.map((day, idx) => {
+              const isToday = toLocalDateStr(day.date) === toLocalDateStr(new Date());
+              return (
+                <View key={idx} style={[{ paddingVertical: 10, paddingHorizontal: 16, borderBottomWidth: 2, borderBottomColor: colors.accent + '40' }, isToday && { backgroundColor: colors.accent + '20', borderLeftWidth: 3, borderLeftColor: colors.accent, marginLeft: -16, paddingLeft: 28, paddingRight: 16, borderBottomRightRadius: 6 }]}>
+                  <Text style={[{ fontSize: 13, fontWeight: '700', marginBottom: 4 }, { color: isToday ? colors.accent : colors.text }]}>{day.dayName} {day.dateLabel}</Text>
+                  {day.items.length > 0 ? (
+                    day.items.map((item, i) => (
+                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+                        {item.logoUrl ? (
+                          <Image source={{ uri: item.logoUrl }} style={{ width: 18, height: 18, borderRadius: 4 }} />
+                        ) : (
+                          <AppIcon name={item.icon as any} size={16} color={colors.accent} />
+                        )}
+                        <Text style={{ color: colors.text, fontSize: 13, flex: 1 }} numberOfLines={1}>{item.title}</Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{item.timeRange}</Text>
                       </View>
-                    </View>
-                  ))
-                ) : (
-                  <Text style={[styles.emptyDay, { color: colors.textDisabled }]}>{t('events.noEventsDay')}</Text>
-                )}
-              </View>
-            );
-          })}
+                    ))
+                  ) : (
+                    <Text style={{ color: colors.textDisabled, fontSize: 13, fontStyle: 'italic' }}>{t('events.noEventsDay')}</Text>
+                  )}
+                </View>
+              );
+            })}
+          </View>
         </ScrollView>
       </View>
     </Modal>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arrangementer Section Mockup — Din uke</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; padding: 24px; display: flex; justify-content: center; }
+    .phone-frame { width: 375px; background: #fff; border-radius: 20px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); overflow: hidden; }
+    .header { background: #fff; padding: 16px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+    .header-title { font-size: 18px; font-weight: 700; color: #333; }
+    .header-subtitle { font-size: 12px; color: #666; margin-top: 2px; }
+    .close-btn { background: #0097A7; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .scroll-content { padding: 16px; }
+    .section-card { background: #fff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 12px; overflow: hidden; }
+    .section-title { font-size: 16px; font-weight: 700; padding: 12px 16px 8px; display: flex; align-items: center; gap: 8px; }
+    .section-title svg { width: 18px; height: 18px; }
+    .day-row { padding: 10px 16px; border-bottom: 2px solid #0097A740; }
+    .day-row:last-child { border-bottom: none; }
+    .day-header { font-size: 13px; font-weight: 700; color: #0097A7; margin-bottom: 4px; }
+    .day-header.today { background: #0097A720; border-left: 3px solid #0097A7; padding-left: 12px; border-radius: 0 6px 6px 0; margin-left: -16px; padding-right: 16px; margin-right: -16px; }
+    .event-item { display: flex; align-items: center; gap: 8px; padding: 4px 0; }
+    .event-icon { width: 16px; height: 16px; color: #0097A7; flex-shrink: 0; }
+    .event-name { font-size: 13px; color: #333; flex: 1; }
+    .event-time { font-size: 12px; color: #666; flex-shrink: 0; }
+    .no-events { font-size: 13px; color: #999; font-style: italic; padding: 4px 0; }
+  </style>
+</head>
+<body>
+
+<div class="phone-frame">
+  <div class="header">
+    <div>
+      <div class="header-title">Din uke</div>
+      <div class="header-subtitle">Uke 32 · 4. aug – 10. aug</div>
+    </div>
+    <button class="close-btn">Lukk</button>
+  </div>
+
+  <div class="scroll-content">
+    <!-- Arrangementer Section -->
+    <div class="section-card">
+      <div class="section-title">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="18" height="18">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <rect x="7" y="13" width="4" height="4" rx="1" fill="#0097A7" stroke="none"/>
+        </svg>
+        Arrangementer
+      </div>
+
+      <!-- Mandag -->
+      <div class="day-row">
+        <div class="day-header today">Mandag 4. aug</div>
+        <div class="event-item">
+          <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="event-name">Fotballtrening</span>
+          <span class="event-time">18:00 – 19:30</span>
+        </div>
+        <div class="event-item">
+          <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="event-name">Middag med venner</span>
+          <span class="event-time">19:00</span>
+        </div>
+      </div>
+
+      <!-- Tirsdag -->
+      <div class="day-row">
+        <div class="day-header">Tirsdag 5. aug</div>
+        <div class="event-item">
+          <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="event-name">Zumba time</span>
+          <span class="event-time">17:00 – 18:00</span>
+        </div>
+      </div>
+
+      <!-- Onsdag -->
+      <div class="day-row">
+        <div class="day-header">Onsdag 6. aug</div>
+        <div class="no-events">Ingen arrangementer</div>
+      </div>
+
+      <!-- Torsdag -->
+      <div class="day-row">
+        <div class="day-header">Torsdag 7. aug</div>
+        <div class="event-item">
+          <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="event-name">Foreldremøte skole</span>
+          <span class="event-time">18:00</span>
+        </div>
+      </div>
+
+      <!-- Fredag -->
+      <div class="day-row">
+        <div class="day-header">Fredag 8. aug</div>
+        <div class="no-events">Ingen arrangementer</div>
+      </div>
+
+      <!-- Lørdag -->
+      <div class="day-row">
+        <div class="day-header">Lørdag 9. aug</div>
+        <div class="event-item">
+          <svg class="event-icon" viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          <span class="event-name">Bursdagsfeiring</span>
+          <span class="event-time">14:00 – 17:00</span>
+        </div>
+      </div>
+
+      <!-- Søndag -->
+      <div class="day-row">
+        <div class="day-header">Søndag 10. aug</div>
+        <div class="no-events">Ingen arrangementer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
