@@ -36,6 +36,8 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [renamingItem, setRenamingItem] = useState<PackingItem | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [copyModalVisible, setCopyModalVisible] = useState(false);
+  const [copyTitle, setCopyTitle] = useState('');
   const newItemInputRef = useRef<TextInput>(null);
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
@@ -77,19 +79,27 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
     });
   }, [currentList, routeList?.id, tripId, navigation]);
 
-  const handleCopyList = useCallback(async () => {
+  const handleCopyList = useCallback(() => {
+    setCopyTitle(`${currentList.title} (kopiert)`);
+    setCopyModalVisible(true);
+  }, [currentList]);
+
+  const handleConfirmCopy = useCallback(async () => {
+    if (!copyTitle.trim()) return;
     try {
       await addDoc(collection(db, 'trips', tripId, 'packingLists'), {
-        title: `${currentList.title} (kopiert)`,
+        title: copyTitle.trim(),
         items: currentList.items.map((item) => ({ ...item, id: generateId(), checked: false })),
         createdBy: user?.uid,
         createdAt: Date.now(),
       });
+      setCopyModalVisible(false);
+      setCopyTitle('');
       navigation.goBack();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [currentList, user, tripId, navigation]);
+  }, [currentList, copyTitle, user, tripId, navigation]);
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) {
@@ -253,6 +263,31 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
                 onPress={handleConfirmRename}
               >
                 <Text style={styles.modalCreateText}>{t('common.save')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Copy List Modal */}
+      <Modal visible={copyModalVisible} transparent animationType="fade" onRequestClose={() => setCopyModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('shopping.copyTitle')}</Text>
+            <TextInput
+              style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+              value={copyTitle}
+              onChangeText={setCopyTitle}
+              placeholder="Liste_navn"
+              placeholderTextColor={colors.textDisabled}
+              autoFocus
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity style={styles.modalCancelButton} onPress={() => { setCopyModalVisible(false); setCopyTitle(''); }}>
+                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalCreateButton, { backgroundColor: colors.accent }]} onPress={handleConfirmCopy}>
+                <Text style={styles.modalCreateText}>{t('common.add')}</Text>
               </TouchableOpacity>
             </View>
           </View>
