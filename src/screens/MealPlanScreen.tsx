@@ -613,7 +613,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   }
                 }}
               >
-                <Text style={[styles.randomActionText, { color: '#fff' }]}>📅 {t('mealPlanner.addToPlan')} {t(`mealPlanner.${DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]}`).toLowerCase()}</Text>
+                <Text style={[styles.randomActionText, { color: '#fff' }]}><AppIcon name="calendar" size={16} color="#fff" /> {t('mealPlanner.addToPlan')} {t(`mealPlanner.${DAYS[new Date().getDay() === 0 ? 6 : new Date().getDay() - 1]}`).toLowerCase()}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.randomActionBtn, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
@@ -633,7 +633,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           </TouchableOpacity>
           <View style={{ alignItems: 'center' }}>
             <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 2 }]}>
-              📅 {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
+              <AppIcon name="calendar" size={18} color={colors.accent} /> {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
             </Text>
             <Text style={{ fontSize: 12, color: colors.textSecondary }}>{getWeekLabel(weekOffset)}</Text>
           </View>
@@ -1293,7 +1293,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.close')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, borderColor: colors.accent, borderWidth: 1 }]} onPress={() => { if (showRecipeDetail) { setShowAddToPlan(showRecipeDetail); setShowRecipeDetail(null); } }}>
-                    <Text style={[styles.modalBtnText, { color: colors.accent }]}>📅 {t('mealPlanner.addToPlan')}</Text>
+                    <Text style={[styles.modalBtnText, { color: colors.accent }]}><AppIcon name="calendar" size={14} color={colors.accent} /> {t('mealPlanner.addToPlan')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={() => { if (showRecipeDetail) { handleAddToShoppingList(showRecipeDetail); setShowRecipeDetail(null); } }}>
                     <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.addToShoppingList')}</Text>
