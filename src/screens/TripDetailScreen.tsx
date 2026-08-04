@@ -746,7 +746,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const renderSectionHeader = (title: string, iconName: string, onAdd: () => void, onHelp?: () => void) => (
     <View style={styles.sectionHeader}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-        <AppIcon name={iconName as any} size={18} color={colors.accent} />
+        <AppIcon name={iconName as any} size={22} color={colors.accent} />
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           {title}
         </Text>
@@ -927,7 +927,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {trip.city && (
         <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}><AppIcon name="weather" size={18} color={colors.accent} /> {t('weather.title')}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}><AppIcon name="weather" size={22} color={colors.accent} /> {t('weather.title')}</Text>
             {isActive && (
               <TouchableOpacity
                 onPress={() => fetchWeather(true)}
@@ -1117,7 +1117,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
         <View style={styles.sectionHeader}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}><AppIcon name="destination" size={18} color={colors.accent} /> {t('tips.title')}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}><AppIcon name="destination" size={22} color={colors.accent} /> {t('tips.title')}</Text>
             <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpTips(true)}>
               <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
                 <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
@@ -1290,7 +1290,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           onPress={() => setDocsExpanded(!docsExpanded)}
         >
           <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
-          <Text style={[styles.tipsExpandTitle, { color: colors.text }]}><AppIcon name="documents" size={18} color={colors.accent} /> {t('documents.title')}</Text>
+          <Text style={[styles.tipsExpandTitle, { color: colors.text }]}><AppIcon name="documents" size={22} color={colors.accent} /> {t('documents.title')}</Text>
           <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpDocuments(true)}>
             <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>

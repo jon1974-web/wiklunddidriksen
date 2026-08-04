@@ -62,7 +62,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
   return (
     <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.header}>
-        <AppIcon name="currency" size={18} color="#0097A7" />
+        <AppIcon name="currency" size={22} color={colors.accent} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>{t('currency.title')}</Text>
       </View>
 
