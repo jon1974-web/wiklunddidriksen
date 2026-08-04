@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { GooglePlacesInput } from './GooglePlacesInput';
 import { useTranslation } from 'react-i18next';
+import { AppIcon } from './AppIcon';
 
 export interface FlightForm {
   transportType: 'fly' | 'tog' | 'bil';
@@ -83,7 +84,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
           <TouchableWithoutFeedback>
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
-                <Text style={{ fontSize: 28 }}>{flightForm.transportType === 'fly' ? '✈️' : flightForm.transportType === 'tog' ? '🚆' : flightForm.transportType === 'bil' ? '🚗' : '⛴️'}</Text>
+                <AppIcon name={flightForm.transportType === 'fly' ? 'fly' : flightForm.transportType === 'tog' ? 'train' : 'car'} size={28} color="#0097A7" />
                 <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
                   {editingId ? t('detail.edit') : t('common.add')} {t('transport.title')}
                 </Text>

@@ -7,6 +7,7 @@ import { getFaviconUrl } from '../utils/favicon';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
+import { AppIcon } from './AppIcon';
 
 interface TransportTileProps {
   flight: TripFlight;
@@ -27,7 +28,7 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
   const depCode = extractCode(f.departureAddress);
   const arrCode = extractCode(f.arrivalAddress);
 
-  const transportIcon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
+  const transportIconName = f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : 'fly';
   const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
   const calDate = f.departureDate || f.arrivalDate;
   let calDay = '';
@@ -55,7 +56,7 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
           <Text style={[styles.calendarDay, { color: colors.text, textAlign: 'center' }]}>{calDay}</Text>
           <Text style={[styles.calendarMonth, { color: colors.textSecondary, textAlign: 'center' }]}>{calMonth}</Text>
           <View style={styles.tileTransportIcon}>
-            <Text style={{ fontSize: 20 }}>{transportIcon}</Text>
+            <AppIcon name={transportIconName as any} size={20} color={colors.accent} />
           </View>
           {logoUrl && (
             <View style={styles.tileCompanyLogo}>
@@ -67,6 +68,10 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
       <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />
       <View style={styles.tileContent}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+          <AppIcon name={transportIconName as any} size={14} color={colors.accent} />
+          <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 12 }}>
+            {f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : t('transport.carRental')}
+          </Text>
           {f.type && (
             <Text style={{ color: typeColor, fontWeight: '600', fontSize: 12 }}>
               {f.transportType === 'bil'

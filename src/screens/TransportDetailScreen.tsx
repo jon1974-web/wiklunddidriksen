@@ -17,6 +17,7 @@ import { getCarrierDomain } from '../constants/carrierDomains';
 import { getFaviconUrl } from '../utils/favicon';
 import { deleteTripFlight } from '../services/tripService';
 import { useTranslation } from 'react-i18next';
+import { AppIcon } from '../components/AppIcon';
 
 interface TransportDetailScreenProps {
   navigation: any;
@@ -29,7 +30,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
   const { colors } = useTheme();
   const f = flight;
 
-  const transportIcon = f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '✈️';
+  const transportIconName = f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : 'fly';
   const typeLabel = f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : t('transport.carRental');
   const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
   const dirLabel = f.transportType === 'bil'
@@ -86,7 +87,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
       {/* Header card */}
       <View style={[styles.headerCard, { backgroundColor: colors.surface, borderLeftColor: typeColor }]}>
         <View style={styles.headerRow}>
-          <Text style={styles.headerIcon}>{transportIcon}</Text>
+          <AppIcon name={transportIconName as any} size={28} color={colors.accent} />
           <View style={styles.headerText}>
             <Text style={[styles.headerDir, { color: typeColor }]}>{dirLabel}</Text>
             <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={2}>

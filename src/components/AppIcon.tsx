@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi';
   size?: number;
   color?: string;
 }
@@ -138,6 +138,68 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
       <Circle cx="12" cy="12" r="10" fill={color} fillOpacity="0.15"/>
       <Line x1="12" y1="6" x2="12" y2="18"/>
       <Path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/>
+    </Svg>
+  );
+
+  // Style A: Bold stroke with filled accent background
+  if (name === 'fly') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M22 2L11 13"/>
+      <Path d="M22 2l-7 20-4-9-9-4z" fill={color} fillOpacity="0.15"/>
+    </Svg>
+  );
+
+  if (name === 'train') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="4" y="3" width="16" height="16" rx="2" fill={color} fillOpacity="0.15"/>
+      <Line x1="4" y1="11" x2="20" y2="11"/>
+      <Line x1="12" y1="3" x2="12" y2="11"/>
+      <Circle cx="8" cy="15" r="1" fill={color} stroke="none"/>
+      <Circle cx="16" cy="15" r="1" fill={color} stroke="none"/>
+      <Line x1="8" y1="19" x2="6" y2="22"/>
+      <Line x1="16" y1="19" x2="18" y2="22"/>
+    </Svg>
+  );
+
+  if (name === 'boat') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M2 20c2-1 4-1 6 0s4 1 6 0 4-1 6 0"/>
+      <Path d="M4 16l2-8h12l2 8" fill={color} fillOpacity="0.15"/>
+      <Line x1="12" y1="4" x2="12" y2="8"/>
+      <Path d="M10 4h4l1 4h-6l1-4z"/>
+    </Svg>
+  );
+
+  if (name === 'ferry') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M2 20c2-1 4-1 6 0s4 1 6 0 4-1 6 0"/>
+      <Rect x="4" y="10" width="16" height="6" rx="1" fill={color} fillOpacity="0.15"/>
+      <Line x1="4" y1="16" x2="4" y2="13"/>
+      <Line x1="20" y1="16" x2="20" y2="13"/>
+      <Circle cx="8" cy="13" r="1" fill={color} stroke="none"/>
+      <Circle cx="16" cy="13" r="1" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  // Style C: Bold stroke, fully filled main shape
+  if (name === 'car') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M5 14l1.5-5.5a2 2 0 011.9-1.4h7.1a2 2 0 011.9 1.4L19 14" fill={color}/>
+      <Rect x="3" y="14" width="18" height="4" rx="1" fill={color}/>
+      <Circle cx="7" cy="18" r="2" fill="#fff" stroke={color} strokeWidth="2"/>
+      <Circle cx="17" cy="18" r="2" fill="#fff" stroke={color} strokeWidth="2"/>
+      <Line x1="7" y1="12" x2="17" y2="12" stroke="#fff" strokeWidth="2"/>
+    </Svg>
+  );
+
+  if (name === 'taxi') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M5 14l1.5-5.5a2 2 0 011.9-1.4h7.1a2 2 0 011.9 1.4L19 14" fill={color}/>
+      <Rect x="3" y="14" width="18" height="4" rx="1" fill={color}/>
+      <Circle cx="7" cy="18" r="2" fill="#fff" stroke={color} strokeWidth="2"/>
+      <Circle cx="17" cy="18" r="2" fill="#fff" stroke={color} strokeWidth="2"/>
+      <Line x1="7" y1="12" x2="17" y2="12" stroke="#fff" strokeWidth="2"/>
+      <Rect x="10" y="7" width="4" height="3" rx="1" fill="#fff" stroke="none"/>
     </Svg>
   );
 
