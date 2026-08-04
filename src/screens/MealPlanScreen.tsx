@@ -1573,7 +1573,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 16, paddingVertical: 12 },
   title: { fontSize: 28, fontWeight: 'bold' },
-  familySubtitle: { fontSize: 14, fontStyle: 'italic', marginTop: 2, marginBottom: 8 },
+  familySubtitle: { fontSize: 14, fontStyle: 'italic', paddingHorizontal: 16, marginTop: 2, marginBottom: 8 },
   fab: { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
   fabCamera: { position: 'absolute', bottom: 92, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
   fabUrl: { position: 'absolute', bottom: 160, right: 24, width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.25, shadowRadius: 4, elevation: 5 },
