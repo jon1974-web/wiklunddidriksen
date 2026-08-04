@@ -938,9 +938,9 @@ export const ProfileScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
         {[
-          { key: 'birthdays', icon: '🎂', label: t('birthdays.title') },
-          { key: 'meals', icon: '🍽️', label: t('mealPlanner.weeklyPlan') },
-          { key: 'reiser', icon: '✈️', label: t('trips.title') },
+          { key: 'birthdays', icon: 'birthday', label: t('birthdays.title') },
+          { key: 'meals', icon: 'utensils', label: t('mealPlanner.weeklyPlan') },
+          { key: 'reiser', icon: 'compass', label: t('trips.title') },
         ].map(section => (
           <TouchableOpacity
             key={section.key}
@@ -951,7 +951,10 @@ export const ProfileScreen: React.FC = () => {
               if (user) createOrUpdateUser(user.uid, { minUkeSections: updated });
             }}
           >
-            <Text style={{ color: colors.text, fontSize: 15 }}>{section.icon} {section.label}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <AppIcon name={section.icon as any} size={18} color={colors.accent} />
+              <Text style={{ color: colors.text, fontSize: 15 }}>{section.label}</Text>
+            </View>
             <View style={{ width: 50, height: 28, borderRadius: 14, backgroundColor: minUkeSections[section.key] !== false ? colors.accent : colors.inputBackground, justifyContent: 'center', padding: 2 }}>
               <View style={{ width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', alignSelf: minUkeSections[section.key] !== false ? 'flex-end' : 'flex-start' }} />
             </View>
@@ -961,7 +964,7 @@ export const ProfileScreen: React.FC = () => {
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}><AppIcon name="utensils" size={18} color={colors.accent} /> {t('profile.matsenter')}</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.matsenter')}</Text>
           <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpMatsenter(true)}>
             <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
