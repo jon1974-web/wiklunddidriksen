@@ -973,6 +973,7 @@ export const ProfileScreen: React.FC = () => {
           { key: 'mealFrokost', icon: '🥞', label: t('mealPlanner.frokost') },
           { key: 'mealLunsj', icon: '🥪', label: t('mealPlanner.lunch') },
           { key: 'mealMiddag', icon: '🍽️', label: t('mealPlanner.dinner') },
+          { key: 'reiser', icon: '✈️', label: t('trips.title') },
         ].map(section => (
           <TouchableOpacity
             key={section.key}

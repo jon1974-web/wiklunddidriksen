@@ -13,7 +13,7 @@ import { SpondResponseModal } from '../components/SpondResponseModal';
 import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
-import { getTrips } from '../services/tripService';
+import { getTrips, getTripFlights, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse, clearSpondToken } from '../services/spondService';
 import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -135,7 +135,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const [mealPlan, setMealPlan] = useState<any>(null);
   const [recipes, setRecipes] = useState<any[]>([]);
-  const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ birthdays: true, meals: true });
+  const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ birthdays: true, meals: true, reiser: true });
+  const [tripSubcollections, setTripSubcollections] = useState<Record<string, any>>({});
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
@@ -244,6 +245,44 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     const unsubscribe = navigation.addListener('focus', loadSpondEvents);
     return unsubscribe;
   }, [navigation, loadSpondEvents]);
+
+  useEffect(() => {
+    if (!showWeeklySummary || trips.length === 0) return;
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const monday = new Date(today);
+    monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+    monday.setHours(0, 0, 0, 0);
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    sunday.setHours(23, 59, 59, 999);
+
+    const weekTrips = trips.filter(t => {
+      const start = new Date(t.startDate + 'T00:00:00');
+      const end = new Date(t.endDate + 'T23:59:59');
+      return start <= sunday && end >= monday;
+    });
+
+    if (weekTrips.length === 0) return;
+
+    const loadAll = async () => {
+      const newMap: Record<string, any> = {};
+      await Promise.all(weekTrips.map(async (trip) => {
+        try {
+          const [flights, hotels, restaurants, activities, packingLists] = await Promise.all([
+            getTripFlights(trip.id),
+            getTripHotels(trip.id),
+            getTripRestaurants(trip.id),
+            getTripActivities(trip.id),
+            getTripPackingLists(trip.id),
+          ]);
+          newMap[trip.id] = { flights, hotels, restaurants, activities, packingLists };
+        } catch {}
+      }));
+      setTripSubcollections(newMap);
+    };
+    loadAll();
+  }, [showWeeklySummary, trips]);
 
   const handleDelete = useCallback(async (eventId: string, eventTitle: string) => {
     setEventActionModal({
@@ -820,6 +859,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         recipes={recipes}
         sectionSettings={minUkeSections}
         groupLogos={spondGroupLogos}
+        tripSubcollections={tripSubcollections}
       />
 
       <ActionModal

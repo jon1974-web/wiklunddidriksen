@@ -387,3 +387,11 @@ export interface Family {
   inviteExpiresAt?: number;
   createdAt: number;
 }
+
+export interface TripSubcollections {
+  flights: TripFlight[];
+  hotels: TripHotel[];
+  restaurants: TripRestaurant[];
+  activities: TripActivity[];
+  packingLists: any[];
+}

@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
 import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe } from '../types';
 import { useTheme } from '../theme/ThemeContext';
-import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
+import { getWeekNumber, formatTime, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
@@ -19,6 +19,7 @@ interface WeeklySummaryProps {
   recipes?: Recipe[];
   sectionSettings?: Record<string, boolean>;
   groupLogos?: Record<string, string>;
+  tripSubcollections?: Record<string, any>;
 }
 
 const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
@@ -50,7 +51,7 @@ interface DayItem {
   logoUrl?: string;
 }
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {} }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {}, tripSubcollections = {} }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -239,6 +240,88 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                     </Text>
                   </View>
                 ))}
+              </View>
+            );
+          })()}
+
+          {/* Reiser (Trips) section */}
+          {sectionSettings.reiser !== false && (() => {
+            const today = new Date();
+            const dayOfWeek = today.getDay();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
+            monday.setHours(0, 0, 0, 0);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+
+            const weekTrips = trips.filter(tr => {
+              const start = new Date(tr.startDate + 'T00:00:00');
+              const end = new Date(tr.endDate + 'T23:59:59');
+              return start <= sunday && end >= monday;
+            });
+
+            if (weekTrips.length === 0) return null;
+
+            return (
+              <View style={[styles.mealSection, { backgroundColor: colors.surface }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                  <AppIcon name="compass" size={18} color={colors.accent} />
+                  <Text style={[styles.mealSectionTitle, { color: colors.text }]}>{t('trips.title')}</Text>
+                </View>
+                {weekTrips.map((trip) => {
+                  const sub = tripSubcollections[trip.id];
+                  const startDate = new Date(trip.startDate + 'T00:00:00');
+                  const endDate = new Date(trip.endDate + 'T23:59:59');
+                  const startLabel = startDate.toLocaleDateString(getLocale(i18nInstance.language), { day: 'numeric', month: 'short' });
+                  const endLabel = endDate.toLocaleDateString(getLocale(i18nInstance.language), { day: 'numeric', month: 'short' });
+
+                  return (
+                    <View key={trip.id} style={{ marginBottom: 12, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 6 }}>
+                        <AppIcon name="compass" size={16} color={colors.accent} />
+                        <Text style={{ color: colors.text, fontWeight: '700', fontSize: 15 }}>{trip.title}</Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({startLabel} – {endLabel})</Text>
+                      </View>
+                      {sub && (() => {
+                        const items: { icon: string; name: string; detail: string }[] = [];
+
+                        sub.flights?.forEach((f: any) => {
+                          items.push({ icon: f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : 'fly', name: f.airline || t('transport.fly'), detail: [f.departureDate ? formatDate(f.departureDate) : '', f.departureTime, f.arrivalTime].filter(Boolean).join(' · ') });
+                        });
+                        sub.boats?.forEach((b: any) => {
+                          items.push({ icon: 'boat', name: b.name || t('transport.boatCruise'), detail: [b.departureDate ? formatDate(b.departureDate) : '', b.departureTime, b.arrivalTime].filter(Boolean).join(' · ') });
+                        });
+                        sub.hotels?.forEach((h: any) => {
+                          items.push({ icon: 'hotel', name: h.name || t('hotels.title'), detail: [h.startDate, h.endDate].filter(Boolean).join(' – ') });
+                        });
+                        sub.restaurants?.forEach((r: any) => {
+                          items.push({ icon: 'utensils', name: r.name || t('restaurants.title'), detail: [r.startDate, r.startTime].filter(Boolean).join(' · ') });
+                        });
+                        sub.activities?.forEach((a: any) => {
+                          items.push({ icon: 'activities', name: a.name || t('activities.title'), detail: [a.startDate, a.startTime].filter(Boolean).join(' · ') });
+                        });
+                        sub.packingLists?.filter((pl: any) => pl.items && pl.items.some((i: any) => !i.checked)).forEach((pl: any) => {
+                          const total = pl.items?.length || 0;
+                          const checked = pl.items?.filter((i: any) => i.checked).length || 0;
+                          items.push({ icon: 'packing', name: pl.title || t('packing.title'), detail: `${checked}/${total} ${t('shopping.itemsChecked')}` });
+                        });
+
+                        if (items.length === 0) {
+                          return <Text style={{ color: colors.textDisabled, fontSize: 13, fontStyle: 'italic' }}>{t('detail.noTransport')}</Text>;
+                        }
+
+                        return items.map((item, i) => (
+                          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+                            <AppIcon name={item.icon as any} size={16} color={colors.accent} />
+                            <Text style={{ color: colors.text, fontSize: 13, flex: 1 }} numberOfLines={1}>{item.name}</Text>
+                            <Text style={{ color: colors.textSecondary, fontSize: 12 }} numberOfLines={1}>{item.detail}</Text>
+                          </View>
+                        ));
+                      })()}
+                    </View>
+                  );
+                })}
               </View>
             );
           })()}
