@@ -6,6 +6,7 @@ import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
+import { AppIcon } from './AppIcon';
 
 interface WeeklySummaryProps {
   visible: boolean;
@@ -227,7 +228,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
             return (
               <View style={[styles.mealSection, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.mealSectionTitle, { color: colors.text }]}>🍽️ {t('mealPlanner.weeklyPlan')}</Text>
+                <Text style={[styles.mealSectionTitle, { color: colors.text }]}><AppIcon name="utensils" size={18} color={colors.accent} /> {t('mealPlanner.weeklyPlan')}</Text>
                 <Text style={[styles.mealProgress, { color: colors.textSecondary }]}>
                   {t('mealPlanner.mealsPlanned', { planned: plannedCount, total: totalSlots })}
                 </Text>
