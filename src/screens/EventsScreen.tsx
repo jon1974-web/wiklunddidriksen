@@ -887,6 +887,7 @@ const styles = StyleSheet.create({
   familySubtitle: {
     fontSize: 14,
     fontStyle: 'italic',
+    marginLeft: 36,
     marginTop: -8,
     marginBottom: 12,
   },
