@@ -494,9 +494,6 @@ const styles = StyleSheet.create({
   birthdaySectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 8,
     lineHeight: 20,
   },
   birthdayEmpty: {
