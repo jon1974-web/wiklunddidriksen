@@ -35,7 +35,7 @@ export const updateTrip = async (id: string, data: Partial<Trip>): Promise<void>
 };
 
 export const deleteTrip = async (id: string): Promise<void> => {
-  const subcollections = ['restaurants', 'activities', 'documents', 'links', 'hotels', 'flights', 'boats', 'taxis', 'ferries'];
+  const subcollections = ['restaurants', 'activities', 'documents', 'links', 'hotels', 'flights', 'boats', 'taxis', 'ferries', 'packingLists'];
   for (const sub of subcollections) {
     const snap = await getDocs(collection(db, TRIPS_COLLECTION, id, sub));
     for (const d of snap.docs) {
@@ -251,4 +251,27 @@ export const updateTripFerry = async (tripId: string, ferryId: string, data: Par
 
 export const deleteTripFerry = async (tripId: string, ferryId: string): Promise<void> => {
   await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'ferries', ferryId));
+};
+
+// Packing Lists
+export const getTripPackingLists = async (tripId: string): Promise<any[]> => {
+  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'packingLists'), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+};
+
+export const addTripPackingList = async (tripId: string, data: { title: string; items: any[]; createdBy: string }): Promise<string> => {
+  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'packingLists'), {
+    ...data,
+    createdAt: Date.now(),
+  });
+  return docRef.id;
+};
+
+export const updateTripPackingList = async (tripId: string, listId: string, data: any): Promise<void> => {
+  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'packingLists', listId), data);
+};
+
+export const deleteTripPackingList = async (tripId: string, listId: string): Promise<void> => {
+  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'packingLists', listId));
 };

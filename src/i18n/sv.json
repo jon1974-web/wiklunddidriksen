@@ -176,6 +176,12 @@
     "placeholderTitle": "T.ex. Hotellbokning",
     "placeholderNote": "T.ex. Bekräftelsenummer"
   },
+  "packing": {
+    "title": "Packlistor",
+    "noLists": "Inga packlistor tillagda",
+    "addList": "Ny packlista",
+    "listNamePlaceholder": "T.ex. Packlista för familj"
+  },
   "links": {
     "title": "Användbara länkar",
     "noLinks": "Inga länkar tillagda",

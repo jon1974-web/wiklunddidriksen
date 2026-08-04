@@ -52,6 +52,9 @@ import {
   addTripFerry,
   updateTripFerry,
   deleteTripFerry,
+  getTripPackingLists,
+  addTripPackingList,
+  deleteTripPackingList,
   updateTrip,
 } from '../services/tripService';
 import { ref, deleteObject } from 'firebase/storage';
@@ -105,6 +108,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [boats, setBoats] = useState<TripBoat[]>([]);
   const [taxis, setTaxis] = useState<TripTaxi[]>([]);
   const [ferries, setFerries] = useState<TripFerry[]>([]);
+  const [packingLists, setPackingLists] = useState<any[]>([]);
+  const [showAddPackingList, setShowAddPackingList] = useState(false);
+  const [newPackingListTitle, setNewPackingListTitle] = useState('');
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -230,7 +236,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const loadSubData = useCallback(async () => {
     try {
-      const [h, f, r, a, d, l, bo, ta, fe] = await Promise.all([
+      const [h, f, r, a, d, l, bo, ta, fe, pl] = await Promise.all([
         getTripHotels(trip.id),
         getTripFlights(trip.id),
         getTripRestaurants(trip.id),
@@ -240,6 +246,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         getTripBoats(trip.id),
         getTripTaxis(trip.id),
         getTripFerries(trip.id),
+        getTripPackingLists(trip.id),
       ]);
       setHotels(h);
       setFlights(f);
@@ -250,6 +257,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setBoats(bo);
       setTaxis(ta);
       setFerries(fe);
+      setPackingLists(pl);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -742,6 +750,25 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const handleDeleteBoat = useCallback((id: string) => confirmDelete('båt', async () => { await deleteTripBoat(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteTaxi = useCallback((id: string) => confirmDelete('taxi', async () => { await deleteTripTaxi(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteFerry = useCallback((id: string) => confirmDelete('ferje', async () => { await deleteTripFerry(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+
+  const handleCreatePackingList = useCallback(async () => {
+    if (!newPackingListTitle.trim()) {
+      crossAlert('Error', 'Vennligst skriv et navn');
+      return;
+    }
+    try {
+      await addTripPackingList(trip.id, {
+        title: newPackingListTitle.trim(),
+        items: [],
+        createdBy: user?.uid || '',
+      });
+      setNewPackingListTitle('');
+      setShowAddPackingList(false);
+      loadSubData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  }, [trip.id, newPackingListTitle, user, loadSubData]);
 
   const renderSectionHeader = (title: string, iconName: string, onAdd: () => void, onHelp?: () => void) => (
     <View style={styles.sectionHeader}>
@@ -1352,6 +1379,34 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             )}
           </View>
         )}
+      </View>
+
+      {/* Packing Lists */}
+      <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
+        {renderSectionHeader(t('packing.title'), 'packing', () => setShowAddPackingList(true))}
+        <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
+          {packingLists.length === 0 ? (
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('packing.noLists')}</Text>
+          ) : (
+            packingLists.map((pl) => (
+              <TouchableOpacity
+                key={pl.id}
+                style={[styles.itemCard, { backgroundColor: colors.inputBackground }]}
+                onPress={() => navigation.navigate('PackingListDetail', { list: pl, tripId: trip.id })}
+                onLongPress={canDelete ? () => confirmDelete(pl.title || 'pakkeliste', async () => { await deleteTripPackingList(trip.id, pl.id); loadSubData(); }) : undefined}
+              >
+                <View style={styles.docRow}>
+                  <View style={styles.docContent}>
+                    <Text style={[styles.itemName, { color: colors.text }]}>{pl.title}</Text>
+                    <Text style={[styles.itemDetail, { color: colors.textSecondary }]}>
+                      {pl.items?.filter((i: any) => i.checked).length || 0}/{pl.items?.length || 0} {t('shopping.itemsChecked')}
+                    </Text>
+                  </View>
+                </View>
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
       </View>
 
 
@@ -2289,6 +2344,36 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         { icon: '📄', title: t('detail.helpDocumentsWhat'), text: t('detail.helpDocumentsWhatText') },
         { icon: '👉', title: t('detail.helpDocumentsHow'), text: t('detail.helpDocumentsHowText'), tip: t('detail.helpDocumentsTip') },
       ]} />
+
+      {/* Create Packing List Modal */}
+      <Modal visible={showAddPackingList} transparent animationType="fade">
+        <TouchableWithoutFeedback onPress={() => setShowAddPackingList(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('packing.addList')}</Text>
+                <TextInput
+                  style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                  value={newPackingListTitle}
+                  onChangeText={setNewPackingListTitle}
+                  placeholder={t('packing.listNamePlaceholder')}
+                  placeholderTextColor={colors.textDisabled}
+                  autoFocus
+                />
+                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 12 }}>
+                  <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20 }} onPress={() => { setShowAddPackingList(false); setNewPackingListTitle(''); }}>
+                    <Text style={{ color: colors.textSecondary, fontSize: 16 }}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, backgroundColor: colors.accent }} onPress={handleCreatePackingList}>
+                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>{t('common.add')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
     </ScrollView>
   );
 };

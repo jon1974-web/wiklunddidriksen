@@ -166,6 +166,12 @@
     "placeholderTitle": "E.g. Hotel booking",
     "placeholderNote": "E.g. Confirmation number"
   },
+  "packing": {
+    "title": "Packing lists",
+    "noLists": "No packing lists added",
+    "addList": "New packing list",
+    "listNamePlaceholder": "E.g. Packing list for family trip"
+  },
   "links": {
     "title": "Useful links",
     "noLinks": "No links added",

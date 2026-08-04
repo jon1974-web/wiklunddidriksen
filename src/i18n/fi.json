@@ -176,6 +176,12 @@
     "placeholderTitle": "Esim. Hotellivaraus",
     "placeholderNote": "Esim. Vahvistusnumero"
   },
+  "packing": {
+    "title": "Pakkauslistat",
+    "noLists": "Ei pakkauslistoja lisätty",
+    "addList": "Uusi pakkauslista",
+    "listNamePlaceholder": "Esim. Perheen pakkauslista"
+  },
   "links": {
     "title": "Hyödylliset linkit",
     "noLinks": "Ei linkkejä lisätty",

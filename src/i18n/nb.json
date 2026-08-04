@@ -166,6 +166,12 @@
     "placeholderTitle": "F.eks. Hotell booking",
     "placeholderNote": "F.eks. Bekreftelsesnummer"
   },
+  "packing": {
+    "title": "Pakkelister",
+    "noLists": "Ingen pakkelister lagt til",
+    "addList": "Ny pakkeliste",
+    "listNamePlaceholder": "F.eks. Pakkeliste for barnefamilie"
+  },
   "links": {
     "title": "Nyttige lenker",
     "noLinks": "Ingen lenker lagt til",

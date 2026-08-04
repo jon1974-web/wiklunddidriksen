@@ -40,6 +40,7 @@ const TripDetailScreen = React.lazy(() => import('./src/screens/TripDetailScreen
 const TransportDetailScreen = React.lazy(() => import('./src/screens/TransportDetailScreen').then(m => ({ default: m.TransportDetailScreen })));
 const SpondEventDetailScreen = React.lazy(() => import('./src/screens/SpondEventDetailScreen').then(m => ({ default: m.SpondEventDetailScreen })));
 const TripItemDetailScreen = React.lazy(() => import('./src/screens/TripItemDetailScreen').then(m => ({ default: m.TripItemDetailScreen })));
+const PackingListDetailScreen = React.lazy(() => import('./src/screens/PackingListDetailScreen').then(m => ({ default: m.PackingListDetailScreen })));
 
 const SuspenseFallback = () => (
   <ActivityIndicator size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />
@@ -68,6 +69,7 @@ type RootStackParamList = {
   TripDetail: { trip: Trip };
   TransportDetail: { flight: import('./src/types').TripFlight; tripId: string };
   TripItemDetail: { item: any; tripId: string; trip: Trip; itemType: 'hotel' | 'restaurant' | 'activity' };
+  PackingListDetail: { list: any; tripId: string };
   ProfileMain: undefined;
   Birthday: undefined;
 };
@@ -233,6 +235,13 @@ const TripsStack = () => {
         <Stack.Screen
           name="TripItemDetail"
           component={TripItemDetailScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="PackingListDetail"
+          component={PackingListDetailScreen}
           options={{
             headerShown: false,
           }}

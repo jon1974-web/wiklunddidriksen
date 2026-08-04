@@ -38,6 +38,20 @@ export interface ShoppingList {
   createdAt: number;
 }
 
+export interface PackingItem {
+  id: string;
+  name: string;
+  checked: boolean;
+}
+
+export interface PackingList {
+  id: string;
+  title: string;
+  items: PackingItem[];
+  createdBy: string;
+  createdAt: number;
+}
+
 export interface MessageReaction {
   userId: string;
   type: 'like' | 'smile' | 'heart';
