@@ -592,6 +592,7 @@
     "selectDay": "Välj dag",
     "selectMeal": "Välj måltid",
     "mealsPlanned": "{{planned}}/{{total}} måltider planerade",
+    "noMealsPlanned": "Inga måltider planerade",
     "helpTitle": "Veckomeny",
     "helpWhat": "Vad är Veckomeny?",
     "helpWhatText": "Veckomenyn låter dig planera måltider för hela veckan. Du kan lägga till frukost, lunch och middag för varje dag.",

@@ -577,6 +577,7 @@
     "selectDay": "Select day",
     "selectMeal": "Select meal",
     "mealsPlanned": "{{planned}}/{{total}} meals planned",
+    "noMealsPlanned": "No meals planned",
     "helpTitle": "Weekly Plan",
     "helpWhat": "What is the Weekly Plan?",
     "helpWhatText": "The weekly plan lets you plan meals for the whole week. You can add breakfast, lunch and dinner for each day.",

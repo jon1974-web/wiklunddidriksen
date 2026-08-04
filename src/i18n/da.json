@@ -586,6 +586,7 @@
     "selectDay": "Vælg dag",
     "selectMeal": "Vælg måltid",
     "mealsPlanned": "{{planned}}/{{total}} måltider planlagt",
+    "noMealsPlanned": "Ingen måltider planlagt",
     "helpTitle": "Ugeplan",
     "helpWhat": "Hvad er Ugeplan?",
     "helpWhatText": "Ugeplanen lader dig planlægge måltider for hele ugen. Du kan tilføje morgenmad, frokost og middag for hver dag.",

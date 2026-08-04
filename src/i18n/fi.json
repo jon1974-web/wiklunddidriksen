@@ -586,6 +586,7 @@
     "selectDay": "Valitse päivä",
     "selectMeal": "Valitse ateria",
     "mealsPlanned": "{{planned}}/{{total}} ateriaa suunniteltu",
+    "noMealsPlanned": "Ei aterioita suunniteltu",
     "helpTitle": "Viikkoasuunnitelma",
     "helpWhat": "Mikä on viikkoasuunnitelma?",
     "helpWhatText": "Viikkoasuunnitelman avulla voit suunnitella ateriat koko viikolle. Voit lisätä aamiaisen, lounaan ja päivällisen jokaiselle päivälle.",

@@ -228,19 +228,25 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             });
 
             return (
-              <View style={[styles.mealSection, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.mealSectionTitle, { color: colors.text }]}><AppIcon name="utensils" size={18} color={colors.accent} /> {t('mealPlanner.weeklyPlan')}</Text>
-                <Text style={[styles.mealProgress, { color: colors.textSecondary }]}>
-                  {t('mealPlanner.mealsPlanned', { planned: plannedCount, total: totalSlots })}
-                </Text>
-                {dayRows.map((row, i) => (
-                  <View key={i} style={[styles.mealDayRow, i < 6 && { borderBottomColor: colors.border }]}>
-                    <Text style={[styles.mealDayLabel, { color: colors.text }]}>{row.day}</Text>
-                    <Text style={[styles.mealDayContent, { color: row.hasMeals ? colors.text : colors.textDisabled }]}>
-                      {row.hasMeals ? row.meals.join(' · ') : '—'}
+              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="utensils" size={18} color={colors.accent} /> {t('mealPlanner.weeklyPlan')}</Text>
+                {plannedCount === 0 ? (
+                  <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('mealPlanner.noMealsPlanned')}</Text>
+                ) : (
+                  <>
+                    <Text style={[styles.mealProgress, { color: colors.textSecondary, paddingHorizontal: 16 }]}>
+                      {t('mealPlanner.mealsPlanned', { planned: plannedCount, total: totalSlots })}
                     </Text>
-                  </View>
-                ))}
+                    {dayRows.map((row, i) => (
+                      <View key={i} style={[styles.mealDayRow, i < 6 && { borderBottomColor: colors.border }]}>
+                        <Text style={[styles.mealDayLabel, { color: colors.text }]}>{row.day}</Text>
+                        <Text style={[styles.mealDayContent, { color: row.hasMeals ? colors.text : colors.textDisabled }]}>
+                          {row.hasMeals ? row.meals.join(' · ') : '—'}
+                        </Text>
+                      </View>
+                    ))}
+                  </>
+                )}
               </View>
             );
           })()}

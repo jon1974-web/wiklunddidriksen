@@ -577,6 +577,7 @@
     "selectDay": "Velg dag",
     "selectMeal": "Velg måltid",
     "mealsPlanned": "{{planned}}/{{total}} måltider planlagt",
+    "noMealsPlanned": "Ingen måltider planlagt",
     "helpTitle": "Ukemeny",
     "helpWhat": "Hva er Ukemeny?",
     "helpWhatText": "Ukemenyen lar deg planlegge måltider for hele uken. Du kan legge til frokost, lunsj og middag for hver dag.",
