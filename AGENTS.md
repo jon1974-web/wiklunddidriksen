@@ -127,6 +127,13 @@ Performance directly impacts user experience. Treat it as a feature, not an afte
 - Use `FlatList` with `getItemLayout` for fixed-height lists
 - Avoid re-creating functions on every render
 
+### Navigation Focus Listeners
+- **ALWAYS** add `navigation.addListener('focus', ...)` when a screen loads data on mount that can be modified on child screens
+- When navigating back from a detail/edit screen, the parent screen must refresh its data to reflect changes
+- Pattern: `useEffect(() => { const unsubscribe = navigation.addListener('focus', () => { loadData(); }); return unsubscribe; }, [navigation, loadData]);`
+- Without this, counters, lists, and summaries will show stale data until the app is fully refreshed
+- Example: TripDetailScreen needs focus listener because PackingListDetailScreen modifies packing list items
+
 ### Rendering
 - Memoize computed values (sorted lists, filtered data, stamp calculations)
 - Avoid IIFEs in JSX — extract to `useMemo` or component functions
