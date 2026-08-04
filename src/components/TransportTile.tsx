@@ -55,8 +55,11 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
           <View style={[styles.calendarTop, { backgroundColor: typeColor }]} />
           <Text style={[styles.calendarDay, { color: colors.text, textAlign: 'center' }]}>{calDay}</Text>
           <Text style={[styles.calendarMonth, { color: colors.textSecondary, textAlign: 'center' }]}>{calMonth}</Text>
-          <View style={styles.tileTransportIcon}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, position: 'absolute', left: 6, top: 24 }}>
             <AppIcon name={transportIconName as any} size={20} color={colors.accent} />
+            <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 11 }}>
+              {f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : t('transport.carRental')}
+            </Text>
           </View>
           {logoUrl && (
             <View style={styles.tileCompanyLogo}>
@@ -67,24 +70,18 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
       )}
       <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />
       <View style={styles.tileContent}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-          <AppIcon name={transportIconName as any} size={14} color={colors.accent} />
-          <Text style={{ color: colors.accent, fontWeight: '600', fontSize: 12 }}>
-            {f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : t('transport.carRental')}
+        {f.type && (
+          <Text style={{ color: typeColor, fontWeight: '600', fontSize: 12 }}>
+            {f.transportType === 'bil'
+              ? (f.type === 'utreise' ? t('transport.pickup') : t('transport.dropoff'))
+              : (f.type === 'utreise' ? t('transport.departure') : t('transport.arrival'))}
           </Text>
-          {f.type && (
-            <Text style={{ color: typeColor, fontWeight: '600', fontSize: 12 }}>
-              {f.transportType === 'bil'
-                ? (f.type === 'utreise' ? t('transport.pickup') : t('transport.dropoff'))
-                : (f.type === 'utreise' ? t('transport.departure') : t('transport.arrival'))}
-            </Text>
-          )}
-          {depCode && arrCode && (
-            <Text style={{ color: colors.textSecondary, fontSize: 11, marginTop: 2 }}>
-              {depCode} → {arrCode}
-            </Text>
-          )}
-        </View>
+        )}
+        {depCode && arrCode && (
+          <Text style={{ color: colors.textSecondary, fontSize: 11, marginTop: 2 }}>
+            {depCode} → {arrCode}
+          </Text>
+        )}
         {f.airline && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{f.airline}</Text>}
         {f.flightNumber && <Text style={[styles.tileDetail, { color: colors.accent }]} numberOfLines={1}>{f.flightNumber}</Text>}
         {f.reference && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}> {t('common.reference')}: {f.reference}</Text>}
