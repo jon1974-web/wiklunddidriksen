@@ -974,7 +974,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     <ScrollView style={styles.tabContent}>
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
-          <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>🛒 {t('mealPlanner.shoppingLists')}</Text>
+          <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}><AppIcon name="shopping" size={18} color={colors.accent} /> {t('mealPlanner.shoppingLists')}</Text>
           <TouchableOpacity
             style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
             onPress={() => setShowHelpHandleliste(true)}

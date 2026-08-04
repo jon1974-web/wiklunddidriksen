@@ -1,8 +1,8 @@
 import React from 'react';
-import Svg, { Rect, Line, Path, Circle, Polygon } from 'react-native-svg';
+import Svg, { Rect, Line, Path, Circle, Polygon, Polyline } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency';
   size?: number;
   color?: string;
 }
@@ -44,6 +44,100 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
       <Circle cx="12" cy="7" r="4"/>
+    </Svg>
+  );
+
+  if (name === 'birthday') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+      <Circle cx="12" cy="7" r="4" fill={color}/>
+      <Rect x="10" y="0" width="4" height="4" rx="2" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'shopping') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z" fill={color} fillOpacity="0.15"/>
+      <Line x1="3" y1="6" x2="21" y2="6"/>
+      <Path d="M16 10a4 4 0 01-8 0"/>
+    </Svg>
+  );
+
+  if (name === 'transport') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="12" r="10" fill={color} fillOpacity="0.15"/>
+      <Polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'hotel') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3 21h18"/>
+      <Path d="M5 21V7l8-4v18" fill={color} fillOpacity="0.15"/>
+      <Path d="M19 21V11l-6-4"/>
+      <Rect x="8" y="8" width="4" height="4" rx="1" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'activities') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="12" r="10" fill={color} fillOpacity="0.15"/>
+      <Circle cx="12" cy="12" r="6" fill="none"/>
+      <Circle cx="12" cy="12" r="2" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'destination') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 2a7 7 0 017 7c0 5-7 13-7 13S5 14 5 9a7 7 0 017-7z" fill={color} fillOpacity="0.15"/>
+      <Circle cx="12" cy="9" r="2.5" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'packing') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="2" y="7" width="20" height="14" rx="2" fill={color} fillOpacity="0.15"/>
+      <Path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/>
+      <Line x1="6" y1="12" x2="10" y2="12"/>
+      <Line x1="6" y1="16" x2="10" y2="16"/>
+    </Svg>
+  );
+
+  if (name === 'links') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" fill="none"/>
+      <Path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" fill={color} fillOpacity="0.15"/>
+    </Svg>
+  );
+
+  if (name === 'documents') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" fill={color} fillOpacity="0.15"/>
+      <Polyline points="14 2 14 8 20 8"/>
+      <Line x1="16" y1="13" x2="8" y2="13"/>
+      <Line x1="16" y1="17" x2="8" y2="17"/>
+    </Svg>
+  );
+
+  if (name === 'weather') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="12" r="4" fill={color}/>
+      <Line x1="12" y1="2" x2="12" y2="4"/>
+      <Line x1="12" y1="20" x2="12" y2="22"/>
+      <Line x1="4.93" y1="4.93" x2="6.34" y2="6.34"/>
+      <Line x1="17.66" y1="17.66" x2="19.07" y2="19.07"/>
+      <Line x1="2" y1="12" x2="4" y2="12"/>
+      <Line x1="20" y1="12" x2="22" y2="12"/>
+      <Line x1="4.93" y1="19.07" x2="6.34" y2="17.66"/>
+      <Line x1="17.66" y1="6.34" x2="19.07" y2="4.93"/>
+    </Svg>
+  );
+
+  if (name === 'currency') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="12" r="10" fill={color} fillOpacity="0.15"/>
+      <Line x1="12" y1="6" x2="12" y2="18"/>
+      <Path d="M15 9.5c0-1.38-1.34-2.5-3-2.5s-3 1.12-3 2.5 1.34 2.5 3 2.5 3 1.12 3 2.5-1.34 2.5-3 2.5"/>
     </Svg>
   );
 

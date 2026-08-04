@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator 
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import { AppIcon } from './AppIcon';
 import { getLocale } from '../constants/languages';
 import { ALL_CURRENCIES, CURRENCY_INFO, getCurrencyForCountry, getCurrencyForLanguage } from '../constants/currencies';
 import { convertAmount, ExchangeRateResult } from '../services/currencyService';
@@ -61,7 +62,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
   return (
     <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.header}>
-        <Text style={styles.headerIcon}>💱</Text>
+        <AppIcon name="currency" size={18} color="#0097A7" />
         <Text style={[styles.headerTitle, { color: colors.text }]}>{t('currency.title')}</Text>
       </View>
 

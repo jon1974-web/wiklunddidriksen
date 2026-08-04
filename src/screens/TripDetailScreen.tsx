@@ -67,6 +67,7 @@ import { DatePickerModal } from '../components/DatePickerModal';
 import { TransportTile } from '../components/TransportTile';
 import { TransportItemTile } from '../components/TransportItemTile';
 import { HelpCenter } from '../components/HelpCenter';
+import { AppIcon } from '../components/AppIcon';
 import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
@@ -742,11 +743,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const handleDeleteTaxi = useCallback((id: string) => confirmDelete('taxi', async () => { await deleteTripTaxi(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteFerry = useCallback((id: string) => confirmDelete('ferje', async () => { await deleteTripFerry(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
 
-  const renderSectionHeader = (title: string, icon: string, onAdd: () => void, onHelp?: () => void) => (
+  const renderSectionHeader = (title: string, iconName: string, onAdd: () => void, onHelp?: () => void) => (
     <View style={styles.sectionHeader}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
+        <AppIcon name={iconName as any} size={18} color={colors.accent} />
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
-          {icon} {title}
+          {title}
         </Text>
         {onHelp && (
           <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={onHelp}>
@@ -925,7 +927,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       {trip.city && (
         <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>🌤️ {t('weather.title')}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}><AppIcon name="weather" size={18} color={colors.accent} /> {t('weather.title')}</Text>
             {isActive && (
               <TouchableOpacity
                 onPress={() => fetchWeather(true)}
@@ -995,7 +997,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Transport */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('transport.title'), '🚀', () => setShowTransportPicker(true), () => setShowHelpTransport(true))}
+        {renderSectionHeader(t('transport.title'), 'transport', () => setShowTransportPicker(true), () => setShowHelpTransport(true))}
         {sortedTransportRows.length === 0 && otherTransportItems.length === 0 ? (
           <Text style={[styles.emptySection, { color: colors.textDisabled, paddingHorizontal: 16 }]}>{t('transport.noTransport')}</Text>
         ) : (
@@ -1043,7 +1045,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Hotels */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('hotels.title'), '🛏️', () => openAddModal('hotel'), () => setShowHelpHotels(true))}
+        {renderSectionHeader(t('hotels.title'), 'hotel', () => openAddModal('hotel'), () => setShowHelpHotels(true))}
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           {hotels.length === 0 ? (
             <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('hotels.noHotels')}</Text>
@@ -1064,7 +1066,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Restaurants */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('restaurants.title'), '🍽️', () => openAddModal('restaurant'), () => setShowHelpRestaurants(true))}
+        {renderSectionHeader(t('restaurants.title'), 'utensils', () => openAddModal('restaurant'), () => setShowHelpRestaurants(true))}
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           {restaurants.length === 0 ? (
             <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('restaurants.noRestaurants')}</Text>
@@ -1091,7 +1093,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Activities */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('activities.title'), '🎯', () => openAddModal('activity'), () => setShowHelpActivities(true))}
+        {renderSectionHeader(t('activities.title'), 'activities', () => openAddModal('activity'), () => setShowHelpActivities(true))}
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           {activities.length === 0 ? (
             <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('activities.noActivities')}</Text>
@@ -1115,7 +1117,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
         <View style={styles.sectionHeader}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>💡 {t('tips.title')}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}><AppIcon name="destination" size={18} color={colors.accent} /> {t('tips.title')}</Text>
             <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpTips(true)}>
               <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
                 <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
@@ -1264,7 +1266,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
       {/* Links */}
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
-        {renderSectionHeader(t('links.title'), '🔗', () => openAddModal('link'))}
+        {renderSectionHeader(t('links.title'), 'links', () => openAddModal('link'))}
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           {links.length === 0 ? (
             <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen lenker lagt til</Text>
@@ -1288,7 +1290,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           onPress={() => setDocsExpanded(!docsExpanded)}
         >
           <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
-          <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>📄 {t('documents.title')}</Text>
+          <Text style={[styles.tipsExpandTitle, { color: colors.text }]}><AppIcon name="documents" size={18} color={colors.accent} /> {t('documents.title')}</Text>
           <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpDocuments(true)}>
             <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>

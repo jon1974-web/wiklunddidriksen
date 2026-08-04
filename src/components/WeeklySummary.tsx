@@ -172,14 +172,13 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             if (weekBirthdays.length === 0) {
               return (
                 <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>🎂 {t('birthdays.title')}</Text>
-                  <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('birthdays.noBirthdaysWeek')}</Text>
+                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="birthday" size={18} color={colors.accent} /> {t('birthdays.title')}</Text>
                 </View>
               );
             }
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>🎂 {t('birthdays.title')}</Text>
+                <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="birthday" size={18} color={colors.accent} /> {t('birthdays.title')}</Text>
                 {weekBirthdays.map((b, i) => {
                   const bDate = new Date(b.date);
                   const today = new Date();
