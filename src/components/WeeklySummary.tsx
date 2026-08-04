@@ -173,14 +173,20 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             if (weekBirthdays.length === 0) {
               return (
                 <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="birthday" size={18} color={colors.accent} /> {t('birthdays.title')}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <AppIcon name="birthday" size={18} color={colors.accent} />
+                    <Text style={[styles.birthdaySectionTitle, { color: colors.text, paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }]}>{t('birthdays.title')}</Text>
+                  </View>
                   <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('birthdays.noBirthdaysWeek')}</Text>
                 </View>
               );
             }
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="birthday" size={18} color={colors.accent} /> {t('birthdays.title')}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <AppIcon name="birthday" size={18} color={colors.accent} />
+                  <Text style={[styles.birthdaySectionTitle, { color: colors.text, paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }]}>{t('birthdays.title')}</Text>
+                </View>
                 {weekBirthdays.map((b, i) => {
                   const bDate = new Date(b.date);
                   const today = new Date();
@@ -229,7 +235,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="utensils" size={18} color={colors.accent} /> {t('mealPlanner.weeklyPlan')}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <AppIcon name="utensils" size={18} color={colors.accent} />
+                  <Text style={[styles.birthdaySectionTitle, { color: colors.text, paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }]}>{t('mealPlanner.weeklyPlan')}</Text>
+                </View>
                 {plannedCount === 0 ? (
                   <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('mealPlanner.noMealsPlanned')}</Text>
                 ) : (
@@ -271,7 +280,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             if (weekTrips.length === 0) {
               return (
                 <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="compass" size={18} color={colors.accent} /> {t('trips.title')}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <AppIcon name="compass" size={18} color={colors.accent} />
+                    <Text style={[styles.birthdaySectionTitle, { color: colors.text, paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }]}>{t('trips.title')}</Text>
+                  </View>
                   <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('trips.noTripsWeek')}</Text>
                 </View>
               );
@@ -279,7 +291,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="compass" size={18} color={colors.accent} /> {t('trips.title')}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                  <AppIcon name="compass" size={18} color={colors.accent} />
+                  <Text style={[styles.birthdaySectionTitle, { color: colors.text, paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }]}>{t('trips.title')}</Text>
+                </View>
                 {weekTrips.map((trip) => {
                   const sub = tripSubcollections[trip.id];
                   const startDate = new Date(trip.startDate + 'T00:00:00');
@@ -338,8 +353,11 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           })()}
 
           {/* Arrangementer section */}
-          <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}><AppIcon name="calendar" size={18} color={colors.accent} /> {t('events.title')}</Text>
+            <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <AppIcon name="calendar" size={18} color={colors.accent} />
+                <Text style={[styles.birthdaySectionTitle, { color: colors.text, paddingHorizontal: 0, paddingTop: 0, paddingBottom: 0 }]}>{t('events.title')}</Text>
+              </View>
             {weekData.days.map((day, idx) => {
               const isToday = toLocalDateStr(day.date) === toLocalDateStr(new Date());
               return (
@@ -479,6 +497,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingTop: 12,
     paddingBottom: 8,
+    lineHeight: 20,
   },
   birthdayEmpty: {
     fontSize: 14,
