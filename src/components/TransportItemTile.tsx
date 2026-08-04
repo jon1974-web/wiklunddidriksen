@@ -47,7 +47,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
           <Text style={[styles.calendarMonth, { color: colors.textSecondary, textAlign: 'center' }]}>{calMonth}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, position: 'absolute', left: 6, top: 24 }}>
             <AppIcon name={iconName as any} size={20} color={colors.accent} />
-            <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 12 }}>
+            <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>
               {iconName === 'fly' ? t('transport.fly') : iconName === 'train' ? t('transport.train') : iconName === 'car' ? t('transport.carRental') : iconName === 'ferry' ? t('transport.ferry') : t('transport.taxi')}
             </Text>
           </View>
