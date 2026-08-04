@@ -875,7 +875,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     boats.forEach(b => {
       const typeLabel = b.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: b.id, icon: '⛴️', label: 'Ferje', typeLabel, name: b.name, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
+        id: b.id, icon: 'ferry', label: 'Ferje', typeLabel, name: b.name, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
         departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
         transportType: 'ferry', docType: b.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
@@ -886,7 +886,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     taxis.forEach(tx => {
       const typeLabel = tx.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: tx.id, icon: '🚕', label: 'Taxi', typeLabel, name: tx.name, detail: tx.reference, isHjemreise: tx.type === 'hjemreise',
+        id: tx.id, icon: 'taxi', label: 'Taxi', typeLabel, name: tx.name, detail: tx.reference, isHjemreise: tx.type === 'hjemreise',
         departureDate: tx.departureDate, departureTime: tx.departureTime,
         transportType: 'taxi', docType: tx.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: tx, tripId: trip.id, trip, itemType: 'taxi' }),
@@ -897,7 +897,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     ferries.forEach(f => {
       const typeLabel = f.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: f.id, icon: '🚢', label: 'Båt/Cruise', typeLabel, name: f.name, detail: f.routeName, isHjemreise: f.type === 'hjemreise',
+        id: f.id, icon: 'boat', label: 'Båt/Cruise', typeLabel, name: f.name, detail: f.routeName, isHjemreise: f.type === 'hjemreise',
         departureDate: f.departureDate, departureTime: f.departureTime, arrivalTime: f.arrivalTime, hasCar: f.hasCar,
         transportType: 'ferry', docType: f.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: f, tripId: trip.id, trip, itemType: 'ferry' }),
@@ -1942,7 +1942,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
-                  <Text style={{ fontSize: 28 }}>⛴️</Text>
+                  <AppIcon name="ferry" size={28} color={colors.accent} />
                   <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
                     {editingId ? t('detail.edit') + ' ' + t('transport.ferry').toLowerCase() : t('common.add') + ' ' + t('transport.ferry').toLowerCase()}
                   </Text>
@@ -2062,7 +2062,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
-                  <Text style={{ fontSize: 28 }}>🚕</Text>
+                  <AppIcon name="taxi" size={28} color={colors.accent} />
                   <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
                     {editingId ? t('detail.edit') + ' ' + t('transport.taxi').toLowerCase() : t('common.add') + ' ' + t('transport.taxi').toLowerCase()}
                   </Text>
@@ -2160,7 +2160,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
-                  <Text style={{ fontSize: 28 }}>🚢</Text>
+                  <AppIcon name="boat" size={28} color={colors.accent} />
                   <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
                     {editingId ? t('detail.edit') + ' ' + t('transport.boatCruise').toLowerCase() : t('common.add') + ' ' + t('transport.boatCruise').toLowerCase()}
                   </Text>

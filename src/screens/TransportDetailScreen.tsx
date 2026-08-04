@@ -164,7 +164,10 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
       {f.departureAddress && f.arrivalAddress && (
         <View style={[styles.arrowContainer, { backgroundColor: colors.surface }]}>
           <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
-          <Text style={[styles.arrowIcon, { color: colors.accent }]}>{f.transportType === 'fly' ? '✈️' : f.transportType === 'tog' ? '🚆' : f.transportType === 'bil' ? '🚗' : '⛴️'} →</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+            <AppIcon name={transportIconName as any} size={20} color={colors.accent} />
+            <Text style={[styles.arrowIcon, { color: colors.accent }]}>→</Text>
+          </View>
           <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
         </View>
       )}

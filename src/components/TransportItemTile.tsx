@@ -5,6 +5,7 @@ import { formatDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
+import { AppIcon } from './AppIcon';
 
 interface TransportItemTileProps {
   icon: string;
@@ -28,8 +29,9 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   const { colors } = useTheme();
   const calDay = departureDate ? String(new Date(departureDate + 'T12:00:00').getDate()) : '';
   const calMonth = departureDate ? new Date(departureDate + 'T12:00:00').toLocaleDateString(getLocale(i18n.language), { month: 'short' }) : '';
-  const depIcon = icon === '⛴️' || icon === '🚢' ? '⚓' : icon === '🚕' ? '🔑' : '🛫';
-  const arrIcon = icon === '⛴️' || icon === '🚢' ? '🏁' : icon === '🚕' ? '📍' : '🛬';
+  const iconName = icon === 'ferry' || icon === 'boat' ? 'ferry' as const : icon === 'taxi' ? 'taxi' as const : icon === 'train' ? 'train' as const : icon === 'car' ? 'car' as const : 'fly' as const;
+  const depIcon = iconName === 'ferry' ? '⚓' : iconName === 'taxi' ? '🔑' : '🛫';
+  const arrIcon = iconName === 'ferry' ? '🏁' : iconName === 'taxi' ? '📍' : '🛬';
   const tileColor = isHjemreise ? '#E53935' : colors.accent;
 
   return (
@@ -44,12 +46,12 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
           <Text style={[styles.calendarDay, { color: colors.text }]}>{calDay}</Text>
           <Text style={[styles.calendarMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
           <View style={styles.tileTransportIcon}>
-            <Text style={{ fontSize: 20 }}>{icon}</Text>
+            <AppIcon name={iconName as any} size={18} color={colors.accent} />
           </View>
         </View>
       ) : (
         <View style={[styles.iconOnly, { backgroundColor: tileColor }]}>
-          <Text style={{ fontSize: 24 }}>{icon}</Text>
+          <AppIcon name={iconName as any} size={22} color="#fff" />
         </View>
       )}
       <View style={[styles.calendarSeparator, { backgroundColor: colors.border }]} />

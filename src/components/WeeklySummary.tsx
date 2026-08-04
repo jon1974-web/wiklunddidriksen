@@ -105,7 +105,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             type: 'trip',
             title: t.title,
             timeRange,
-            icon: '✈️',
+            icon: 'compass',
           });
         }
       });
@@ -258,7 +258,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                       {item.logoUrl ? (
                         <Image source={{ uri: item.logoUrl }} style={{ width: 28, height: 28, borderRadius: 6 }} />
                       ) : (
-                        <Text style={styles.itemIcon}>{item.icon}</Text>
+                        <AppIcon name={item.icon as any} size={18} color={colors.accent} />
                       )}
                       <View style={styles.itemContent}>
                         <Text style={[styles.itemTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
