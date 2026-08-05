@@ -338,7 +338,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                         }
 
                         return items.map((item, i) => (
-                          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4, paddingLeft: 24 }}>
+                          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4, paddingLeft: 40 }}>
                             <AppIcon name={item.icon as any} size={16} color={colors.accent} />
                             <Text style={{ color: colors.text, fontSize: 13, flex: 1 }} numberOfLines={1}>{item.name}</Text>
                             <Text style={{ color: colors.textSecondary, fontSize: 12 }} numberOfLines={1}>{item.detail}</Text>
