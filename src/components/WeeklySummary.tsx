@@ -310,32 +310,34 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                         <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({startLabel} – {endLabel})</Text>
                       </View>
                       {sub && (() => {
-                        const items: { icon: string; name: string; detail: string }[] = [];
+                        const items: { icon: string; name: string; detail: string; sortDate: string }[] = [];
 
                         sub.flights?.forEach((f: any) => {
-                          items.push({ icon: f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : 'fly', name: f.airline || t('transport.fly'), detail: [f.departureDate ? formatDate(f.departureDate) : '', f.departureTime, f.arrivalTime].filter(Boolean).join(' · ') });
+                          items.push({ icon: f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : 'fly', name: f.airline || t('transport.fly'), detail: [f.departureDate ? formatDate(f.departureDate) : '', f.departureTime, f.arrivalTime].filter(Boolean).join(' · '), sortDate: f.departureDate || 'zzz' });
                         });
                         sub.boats?.forEach((b: any) => {
-                          items.push({ icon: 'boat', name: b.name || t('transport.boatCruise'), detail: [b.departureDate ? formatDate(b.departureDate) : '', b.departureTime, b.arrivalTime].filter(Boolean).join(' · ') });
+                          items.push({ icon: 'boat', name: b.name || t('transport.boatCruise'), detail: [b.departureDate ? formatDate(b.departureDate) : '', b.departureTime, b.arrivalTime].filter(Boolean).join(' · '), sortDate: b.departureDate || 'zzz' });
                         });
                         sub.hotels?.forEach((h: any) => {
-                          items.push({ icon: 'hotel', name: h.name || t('hotels.title'), detail: [h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – ') });
+                          items.push({ icon: 'hotel', name: h.name || t('hotels.title'), detail: [h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – '), sortDate: h.startDate || 'zzz' });
                         });
                         sub.restaurants?.forEach((r: any) => {
-                          items.push({ icon: 'utensils', name: r.name || t('restaurants.title'), detail: [r.startDate ? formatDate(r.startDate) : '', r.startTime].filter(Boolean).join(' · ') });
+                          items.push({ icon: 'utensils', name: r.name || t('restaurants.title'), detail: [r.startDate ? formatDate(r.startDate) : '', r.startTime].filter(Boolean).join(' · '), sortDate: r.startDate || 'zzz' });
                         });
                         sub.activities?.forEach((a: any) => {
-                          items.push({ icon: 'activities', name: a.name || t('activities.title'), detail: [a.startDate ? formatDate(a.startDate) : '', a.startTime].filter(Boolean).join(' · ') });
+                          items.push({ icon: 'activities', name: a.name || t('activities.title'), detail: [a.startDate ? formatDate(a.startDate) : '', a.startTime].filter(Boolean).join(' · '), sortDate: a.startDate || 'zzz' });
                         });
                         sub.packingLists?.filter((pl: any) => pl.items && pl.items.some((i: any) => !i.checked)).forEach((pl: any) => {
                           const total = pl.items?.length || 0;
                           const checked = pl.items?.filter((i: any) => i.checked).length || 0;
-                          items.push({ icon: 'packing', name: pl.title || t('packing.title'), detail: `${checked}/${total} ${t('shopping.itemsChecked')}` });
+                          items.push({ icon: 'packing', name: pl.title || t('packing.title'), detail: `${checked}/${total} ${t('shopping.itemsChecked')}`, sortDate: 'zzz' });
                         });
 
                         if (items.length === 0) {
                           return <Text style={{ color: colors.textDisabled, fontSize: 13, fontStyle: 'italic' }}>{t('detail.noTransport')}</Text>;
                         }
+
+                        items.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
 
                         return items.map((item, i) => (
                           <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4, paddingLeft: 40 }}>
