@@ -304,7 +304,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
                   return (
                     <View key={trip.id} style={{ marginBottom: 12, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8, marginTop: 4 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8, marginTop: 4, paddingLeft: 24 }}>
                         <AppIcon name="compass" size={16} color={colors.accent} />
                         <Text style={{ color: colors.text, fontWeight: '700', fontSize: 15 }}>{trip.title}</Text>
                         <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({startLabel} – {endLabel})</Text>
