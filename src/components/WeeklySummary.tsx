@@ -319,13 +319,13 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                           items.push({ icon: 'boat', name: b.name || t('transport.boatCruise'), detail: [b.departureDate ? formatDate(b.departureDate) : '', b.departureTime, b.arrivalTime].filter(Boolean).join(' · ') });
                         });
                         sub.hotels?.forEach((h: any) => {
-                          items.push({ icon: 'hotel', name: h.name || t('hotels.title'), detail: [h.startDate, h.endDate].filter(Boolean).join(' – ') });
+                          items.push({ icon: 'hotel', name: h.name || t('hotels.title'), detail: [h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – ') });
                         });
                         sub.restaurants?.forEach((r: any) => {
-                          items.push({ icon: 'utensils', name: r.name || t('restaurants.title'), detail: [r.startDate, r.startTime].filter(Boolean).join(' · ') });
+                          items.push({ icon: 'utensils', name: r.name || t('restaurants.title'), detail: [r.startDate ? formatDate(r.startDate) : '', r.startTime].filter(Boolean).join(' · ') });
                         });
                         sub.activities?.forEach((a: any) => {
-                          items.push({ icon: 'activities', name: a.name || t('activities.title'), detail: [a.startDate, a.startTime].filter(Boolean).join(' · ') });
+                          items.push({ icon: 'activities', name: a.name || t('activities.title'), detail: [a.startDate ? formatDate(a.startDate) : '', a.startTime].filter(Boolean).join(' · ') });
                         });
                         sub.packingLists?.filter((pl: any) => pl.items && pl.items.some((i: any) => !i.checked)).forEach((pl: any) => {
                           const total = pl.items?.length || 0;
