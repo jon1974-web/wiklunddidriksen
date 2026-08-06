@@ -161,7 +161,7 @@ export interface TripHotel {
   createdAt: number;
 }
 
-export interface TripFlight {
+export interface TripTransport {
   id: string;
   transportType?: 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry';
   type?: 'utreise' | 'hjemreise';

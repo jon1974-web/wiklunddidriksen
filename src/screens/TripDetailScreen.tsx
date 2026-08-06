@@ -13,17 +13,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip, TripHotel, TripFlight, TripRestaurant, TripActivity, TripDocument, TripLink, TripBoat, TripTaxi, TripFerry, DestinationTips, CityTips } from '../types';
+import { Trip, TripHotel, TripTransport, TripRestaurant, TripActivity, TripDocument, TripLink, TripBoat, TripTaxi, TripFerry, DestinationTips, CityTips } from '../types';
 import { crossAlert } from '../utils/alert';
 import {
   getTripHotels,
   addTripHotel,
   updateTripHotel,
   deleteTripHotel,
-  getTripFlights,
-  addTripFlight,
-  updateTripFlight,
-  deleteTripFlight,
+  getTripTransport,
+  addTripTransport,
+  updateTripTransport,
+  deleteTripTransport,
   getTripRestaurants,
   addTripRestaurant,
   updateTripRestaurant,
@@ -88,7 +88,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [trip, setTrip] = useState<Trip>(initialTrip);
   const canDelete = trip.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
   const [hotels, setHotels] = useState<TripHotel[]>([]);
-  const [flights, setFlights] = useState<TripFlight[]>([]);
+  const [flights, setFlights] = useState<TripTransport[]>([]);
   const [restaurants, setRestaurants] = useState<TripRestaurant[]>([]);
   const [activities, setActivities] = useState<TripActivity[]>([]);
   const [documents, setDocuments] = useState<TripDocument[]>([]);
@@ -112,7 +112,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   // Form state (consolidated)
   const emptyHotel = { name: '', address: '', phone: '', startDate: '', endDate: '', checkInTime: '', checkOutTime: '', note: '' };
-  const emptyFlight = { transportType: 'fly' as 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry', type: 'utreise' as 'utreise' | 'hjemreise', isOneWay: false, airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '', routeName: '', cabin: '', hasCar: false, carRegistration: '', departureAddress: '', arrivalAddress: '' };
+  const emptyTransport = { transportType: 'fly' as 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry', type: 'utreise' as 'utreise' | 'hjemreise', isOneWay: false, airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '', routeName: '', cabin: '', hasCar: false, carRegistration: '', departureAddress: '', arrivalAddress: '' };
   const emptyRest = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
@@ -122,12 +122,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const emptyFerry = { name: '', routeName: '', reference: '', cabin: '', isOneWay: false, type: 'utreise' as 'utreise' | 'hjemreise', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
 
   const [hotelForm, setHotelForm] = useState(emptyHotel);
-  const [flightFormUtreise, setFlightFormUtreise] = useState(emptyFlight);
-  const [flightFormHjemreise, setFlightFormHjemreise] = useState(emptyFlight);
+  const [transportFormUtreise, setFlightFormUtreise] = useState(emptyTransport);
+  const [transportFormHjemreise, setFlightFormHjemreise] = useState(emptyTransport);
   const [activeDirection, setActiveDirection] = useState<'utreise' | 'hjemreise'>('utreise');
-  const flightForm = activeDirection === 'utreise' ? flightFormUtreise : flightFormHjemreise;
+  const transportForm = activeDirection === 'utreise' ? transportFormUtreise : transportFormHjemreise;
 
-  const handleFlightFormChange = useCallback((updater: React.SetStateAction<typeof emptyFlight>) => {
+  const handleTransportFormChange = useCallback((updater: React.SetStateAction<typeof emptyTransport>) => {
     if (activeDirection === 'utreise') {
       setFlightFormUtreise(updater);
     } else {
@@ -175,10 +175,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const handlePickerSelect = (value: string) => {
     if (activePicker === 'tripStart') setTripStartDate(value);
     else if (activePicker === 'tripEnd') setTripEndDate(value);
-    else if (activePicker === 'flightDepDate') handleFlightFormChange(f => ({ ...f, departureDate: value }));
-    else if (activePicker === 'flightArrDate') handleFlightFormChange(f => ({ ...f, arrivalDate: value }));
-    else if (activePicker === 'flightDepTime') handleFlightFormChange(f => ({ ...f, departureTime: value }));
-    else if (activePicker === 'flightArrTime') handleFlightFormChange(f => ({ ...f, arrivalTime: value }));
+    else if (activePicker === 'flightDepDate') handleTransportFormChange(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'flightArrDate') handleTransportFormChange(f => ({ ...f, arrivalDate: value }));
+    else if (activePicker === 'flightDepTime') handleTransportFormChange(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'flightArrTime') handleTransportFormChange(f => ({ ...f, arrivalTime: value }));
     else if (activePicker === 'actStartDate') setActForm(f => ({ ...f, startDate: value }));
     else if (activePicker === 'actEndDate') setActForm(f => ({ ...f, endDate: value }));
     else if (activePicker === 'actStartTime') setActForm(f => ({ ...f, startTime: value }));
@@ -225,8 +225,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const getPickerValue = () => {
     const values: Record<string, string> = {
       tripStart: tripStartDate, tripEnd: tripEndDate,
-      flightDepDate: flightForm.departureDate, flightArrDate: flightForm.arrivalDate,
-      flightDepTime: flightForm.departureTime, flightArrTime: flightForm.arrivalTime,
+      flightDepDate: transportForm.departureDate, flightArrDate: transportForm.arrivalDate,
+      flightDepTime: transportForm.departureTime, flightArrTime: transportForm.arrivalTime,
       actStartDate: actForm.startDate, actEndDate: actForm.endDate, actStartTime: actForm.startTime, actEndTime: actForm.endTime,
       restStartDate: restForm.startDate, restEndDate: restForm.endDate, restStartTime: restForm.startTime, restEndTime: restForm.endTime,
       hotelStartDate: hotelForm.startDate, hotelEndDate: hotelForm.endDate, hotelCheckIn: hotelForm.checkInTime, hotelCheckOut: hotelForm.checkOutTime,
@@ -244,7 +244,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     try {
       const [h, f, r, a, d, l, pl] = await Promise.all([
         getTripHotels(trip.id),
-        getTripFlights(trip.id),
+        getTripTransport(trip.id),
         getTripRestaurants(trip.id),
         getTripActivities(trip.id),
         getTripDocuments(trip.id),
@@ -391,8 +391,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const resetForms = () => {
     setHotelForm(emptyHotel);
-    setFlightFormUtreise(emptyFlight);
-    setFlightFormHjemreise(emptyFlight);
+    setFlightFormUtreise(emptyTransport);
+    setFlightFormHjemreise(emptyTransport);
     setActiveDirection('utreise');
     setRestForm(emptyRest);
     setActForm(emptyAct);
@@ -561,9 +561,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   }, [trip.id, hotelForm, editingId, loadSubData]);
 
   // Flight handlers
-  const handleSaveFlight = useCallback(async () => {
+  const handleSaveTransport = useCallback(async () => {
     try {
-      const buildDataFrom = (type: 'utreise' | 'hjemreise', form: typeof emptyFlight) => {
+      const buildDataFrom = (type: 'utreise' | 'hjemreise', form: typeof emptyTransport) => {
         const rawData: Record<string, any> = {
           transportType: form.transportType,
           type,
@@ -599,16 +599,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       };
 
       if (editingId) {
-        const editingType = (editingFlight?: TripFlight) => editingFlight?.type || activeDirection;
+        const editingType = (editingFlight?: TripTransport) => editingFlight?.type || activeDirection;
         const originalFlight = flights.find(f => f.id === editingId);
         const resolvedType = editingType(originalFlight);
-        const form = resolvedType === 'utreise' ? flightFormUtreise : flightFormHjemreise;
+        const form = resolvedType === 'utreise' ? transportFormUtreise : transportFormHjemreise;
         const data = buildDataFrom(resolvedType, form);
-        await updateTripFlight(trip.id, editingId, data);
+        await updateTripTransport(trip.id, editingId, data);
       } else {
-        await addTripFlight(trip.id, buildDataFrom('utreise', flightFormUtreise));
-        if (!flightFormUtreise.isOneWay) {
-          await addTripFlight(trip.id, buildDataFrom('hjemreise', flightFormHjemreise));
+        await addTripTransport(trip.id, buildDataFrom('utreise', transportFormUtreise));
+        if (!transportFormUtreise.isOneWay) {
+          await addTripTransport(trip.id, buildDataFrom('hjemreise', transportFormHjemreise));
         }
       }
       resetForms();
@@ -618,7 +618,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       console.error('Bil transport save error:', error);
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip.id, flightFormUtreise, flightFormHjemreise, activeDirection, editingId, loadSubData, flights]);
+  }, [trip.id, transportFormUtreise, transportFormHjemreise, activeDirection, editingId, loadSubData, flights]);
 
   // Restaurant handlers
   const handleSaveRestaurant = useCallback(async () => {
@@ -778,7 +778,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   };
 
   const handleDeleteHotel = useCallback((id: string) => confirmDelete('hotell', async () => { await deleteTripHotel(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
-  const handleDeleteFlight = useCallback((id: string) => confirmDelete('fly', async () => { await deleteTripFlight(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
+  const handleDeleteFlight = useCallback((id: string) => confirmDelete('fly', async () => { await deleteTripTransport(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteRestaurant = useCallback((id: string) => confirmDelete('restaurant', async () => { await deleteTripRestaurant(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteActivity = useCallback((id: string) => confirmDelete('aktivitet', async () => { await deleteTripActivity(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteDocument = useCallback((id: string) => confirmDelete('dokument', async () => { await deleteTripDocument(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
@@ -874,7 +874,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return 0;
     });
     // Pair utreise (non-one-way) with matching hjemreise, drop unpaired hjemreise
-    const rows: TripFlight[][] = [];
+    const rows: TripTransport[][] = [];
     const used = new Set<string>();
     for (let i = 0; i < sorted.length; i++) {
       if (used.has(sorted[i].id)) continue;
@@ -1554,9 +1554,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       <TransportFormModal
         visible={activeModal === 'flight'}
         editingId={editingId}
-        flightForm={flightForm}
-        onFlightFormChange={handleFlightFormChange}
-        onSave={handleSaveFlight}
+        transportForm={transportForm}
+        onFlightFormChange={handleTransportFormChange}
+        onSave={handleSaveTransport}
         onCancel={() => setActiveModal(null)}
         onOpenPicker={(field) => setActivePicker(field)}
         onDirectionChange={(dir) => {

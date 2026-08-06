@@ -186,6 +186,15 @@ Good code is maintainable code. Quality is everyone's responsibility.
 - Never silently swallow errors — at minimum, log them
 - Use `crossAlert` utility for alerts (web-compatible)
 
+### Naming Conventions for Readability
+- **Use descriptive names that reflect purpose, not implementation**: `handleSaveTransport` not `handleSaveFlight`
+- **Avoid legacy names**: When refactoring, rename old types/functions to match the new architecture (e.g. `TripFlight` → `TripTransport`)
+- **Type names should be self-documenting**: `TripTransport` tells you it's a transport item; `TripFlight` only tells you about flights
+- **Function names should describe the action**: `getTripTransport`, `addTripTransport`, `updateTripTransport`, `deleteTripTransport`
+- **Form state names should match their purpose**: `transportFormUtreise` not `flightFormUtreise`
+- **Interface names should match their content**: `TransportForm` not `FlightForm`
+- This applies to all new features — readability is a priority for future development
+
 ### Delete Confirmations
 - **ALWAYS** use the `ActionModal` component for delete confirmations (not `window.confirm` or `crossAlert`)
 - Shows the Familiesenter logo, person/entity name, "Er du sikker?" subtitle

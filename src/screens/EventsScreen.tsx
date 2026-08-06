@@ -13,7 +13,7 @@ import { SpondResponseModal } from '../components/SpondResponseModal';
 import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
-import { getTrips, getTripFlights, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
+import { getTrips, getTripTransport, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse, clearSpondToken } from '../services/spondService';
 import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -270,7 +270,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       await Promise.all(weekTrips.map(async (trip) => {
         try {
           const [flights, hotels, restaurants, activities, packingLists] = await Promise.all([
-            getTripFlights(trip.id),
+            getTripTransport(trip.id),
             getTripHotels(trip.id),
             getTripRestaurants(trip.id),
             getTripActivities(trip.id),

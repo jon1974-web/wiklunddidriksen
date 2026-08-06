@@ -10,12 +10,12 @@ import {
   Platform,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { TripFlight } from '../types';
+import { TripTransport } from '../types';
 import { crossAlert } from '../utils/alert';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { getCarrierDomain } from '../constants/carrierDomains';
 import { getFaviconUrl } from '../utils/favicon';
-import { deleteTripFlight } from '../services/tripService';
+import { deleteTripTransport } from '../services/tripService';
 import { useTranslation } from 'react-i18next';
 import { AppIcon } from '../components/AppIcon';
 
@@ -26,7 +26,7 @@ interface TransportDetailScreenProps {
 
 export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
-  const { flight, tripId, trip } = route.params as { flight: TripFlight; tripId: string; trip: any };
+  const { flight, tripId, trip } = route.params as { flight: TripTransport; tripId: string; trip: any };
   const { colors } = useTheme();
   const f = flight;
 
@@ -48,7 +48,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
         style: 'destructive',
         onPress: async () => {
           try {
-            await deleteTripFlight(tripId, f.id);
+            await deleteTripTransport(tripId, f.id);
             navigation.goBack();
           } catch {
             crossAlert('Error', 'Kunne ikke slette transport');
