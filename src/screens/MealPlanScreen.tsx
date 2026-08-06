@@ -52,7 +52,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [mealToggles, setMealToggles] = useState<Record<string, boolean>>({ mealFrokost: true, mealLunsj: true, mealMiddag: true });
   const [showHelp, setShowHelp] = useState(false);
   const [showHelpRandom, setShowHelpRandom] = useState(false);
-  const [showHelpWeekOverview, setShowHelpWeekOverview] = useState(false);
+  const [showHelpWeekMenu, setShowHelpWeekMenu] = useState(false);
   const [showHelpSearch, setShowHelpSearch] = useState(false);
   const [showHelpHandleliste, setShowHelpHandleliste] = useState(false);
   const [showHelpAiSearch, setShowHelpAiSearch] = useState(false);
@@ -628,34 +628,45 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
-            <AppIcon name="calendar" size={18} color={colors.accent} />
-            <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>
-              {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
-            </Text>
-            <TouchableOpacity
-              style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
-              onPress={() => setShowHelpWeekOverview(true)}
-            >
-              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
-                </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+          <TouchableOpacity onPress={() => setWeekOffset(o => o - 1)} style={{ padding: 8 }}>
+            <Text style={{ color: colors.accent, fontSize: 18 }}>◀</Text>
+          </TouchableOpacity>
+          <View style={{ alignItems: 'center', flex: 1 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+              <AppIcon name="calendar" size={18} color={colors.accent} />
+              <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>
+                {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
+              </Text>
+            </View>
+            <Text style={{ fontSize: 12, color: colors.textSecondary }}>{getWeekLabel(weekOffset)}</Text>
+          </View>
+          <TouchableOpacity onPress={() => setWeekOffset(o => o + 1)} style={{ padding: 8 }}>
+            <Text style={{ color: colors.accent, fontSize: 18 }}>▶</Text>
+          </TouchableOpacity>
+        </View>
+        {weekOffset !== 0 && (
+          <TouchableOpacity
+            style={{ alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, backgroundColor: colors.inputBackground, marginBottom: 8 }}
+            onPress={() => setWeekOffset(0)}
+          >
+            <Text style={{ fontSize: 12, color: colors.accent, fontWeight: '600' }}>{t('mealPlanner.backToCurrentWeek')}</Text>
+          </TouchableOpacity>
+        )}
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <AppIcon name="utensils" size={18} color={colors.accent} />
+          <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>{t('mealPlanner.weekMenu')}</Text>
+          <TouchableOpacity
+            style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            onPress={() => setShowHelpWeekMenu(true)}
+          >
+            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
               </View>
-            </TouchableOpacity>
-          </View>
-          <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 8, textAlign: 'center' }}>{getWeekLabel(weekOffset)}</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-            <TouchableOpacity onPress={() => setWeekOffset(o => o - 1)} style={{ padding: 8 }}>
-              <Text style={{ color: colors.accent, fontSize: 18 }}>◀</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setWeekOffset(0)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, backgroundColor: colors.inputBackground }}>
-              <Text style={{ fontSize: 12, color: colors.accent, fontWeight: '600' }}>{t('mealPlanner.backToCurrentWeek')}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setWeekOffset(o => o + 1)} style={{ padding: 8 }}>
-              <Text style={{ color: colors.accent, fontSize: 18 }}>▶</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableOpacity>
+        </View>
         {DAYS.map((day, i) => (
           <TouchableOpacity key={day} style={[styles.dayRow, { borderBottomColor: colors.border }]}>
             <Text style={[styles.dayName, { color: colors.accent }]}>{t(DAY_LABELS[i])}</Text>
@@ -1451,12 +1462,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       />
 
       <HelpCenter
-        visible={showHelpWeekOverview}
-        onClose={() => setShowHelpWeekOverview(false)}
-        title={t('mealPlanner.helpWeekOverviewTitle')}
+        visible={showHelpWeekMenu}
+        onClose={() => setShowHelpWeekMenu(false)}
+        title={t('mealPlanner.helpWeekMenuTitle')}
         sections={[
-          { icon: '📋', title: t('mealPlanner.helpWeekOverviewWhat'), text: t('mealPlanner.helpWeekOverviewWhatText') },
-          { icon: '👉', title: t('mealPlanner.helpWeekOverviewHow'), text: t('mealPlanner.helpWeekOverviewHowText'), tip: t('mealPlanner.helpWeekOverviewTip') },
+          { icon: '📋', title: t('mealPlanner.helpWeekMenuWhat'), text: t('mealPlanner.helpWeekMenuWhatText') },
+          { icon: '👉', title: t('mealPlanner.helpWeekMenuHow'), text: t('mealPlanner.helpWeekMenuHowText'), tip: t('mealPlanner.helpWeekMenuTip') },
         ]}
       />
 
