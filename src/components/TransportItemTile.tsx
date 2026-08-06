@@ -29,9 +29,9 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   const { colors } = useTheme();
   const calDay = departureDate ? String(new Date(departureDate + 'T12:00:00').getDate()) : '';
   const calMonth = departureDate ? new Date(departureDate + 'T12:00:00').toLocaleDateString(getLocale(i18n.language), { month: 'short' }) : '';
-  const iconName = icon === 'ferry' || icon === 'boat' ? 'ferry' as const : icon === 'taxi' ? 'taxi' as const : icon === 'train' ? 'train' as const : icon === 'car' ? 'car' as const : 'fly' as const;
-  const depIcon = iconName === 'ferry' ? '⚓' : iconName === 'taxi' ? '🔑' : '🛫';
-  const arrIcon = iconName === 'ferry' ? '🏁' : iconName === 'taxi' ? '📍' : '🛬';
+  const iconName = icon === 'ferry' ? 'ferry' as const : icon === 'boat' ? 'boat' as const : icon === 'taxi' ? 'taxi' as const : icon === 'train' ? 'train' as const : icon === 'car' ? 'car' as const : 'fly' as const;
+  const depIcon = iconName === 'ferry' || iconName === 'boat' ? '⚓' : iconName === 'taxi' ? '🔑' : '🛫';
+  const arrIcon = iconName === 'ferry' || iconName === 'boat' ? '🏁' : iconName === 'taxi' ? '📍' : '🛬';
   const tileColor = isHjemreise ? '#E53935' : colors.accent;
 
   return (
@@ -48,7 +48,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, position: 'absolute', left: 6, top: 24 }}>
             <AppIcon name={iconName as any} size={20} color={colors.accent} />
             <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>
-              {iconName === 'fly' ? t('transport.fly') : iconName === 'train' ? t('transport.train') : iconName === 'car' ? t('transport.carRental') : iconName === 'ferry' ? t('transport.ferry') : t('transport.taxi')}
+              {iconName === 'fly' ? t('transport.fly') : iconName === 'train' ? t('transport.train') : iconName === 'car' ? t('transport.carRental') : iconName === 'boat' ? t('transport.boatCruise') : iconName === 'ferry' ? t('transport.ferry') : t('transport.taxi')}
             </Text>
           </View>
         </View>

@@ -2320,8 +2320,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   { iconName: 'fly' as const, label: 'Fly', type: 'flight' as ModalType, transportType: 'fly' as const },
                   { iconName: 'train' as const, label: 'Tog', type: 'flight' as ModalType, transportType: 'tog' as const },
                   { iconName: 'car' as const, label: 'Leiebil', type: 'flight' as ModalType, transportType: 'bil' as const },
-                  { iconName: 'boat' as const, label: 'Båt/Cruise', type: 'ferry' as ModalType },
-                  { iconName: 'ferry' as const, label: 'Ferje', type: 'boat' as ModalType },
+                  { iconName: 'boat' as const, label: 'Båt/Cruise', type: 'boat' as ModalType },
+                  { iconName: 'ferry' as const, label: 'Ferje', type: 'ferry' as ModalType },
                   { iconName: 'taxi' as const, label: 'Taxi', type: 'taxi' as ModalType },
                 ].map((opt) => (
                   <TouchableOpacity
