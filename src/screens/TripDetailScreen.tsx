@@ -746,9 +746,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       if (editingId) {
         await updateTripBoat(trip.id, editingId, boatDirection === 'hjemreise' ? hjemreiseData : utreiseData);
         if (!boatFormUtreise.isOneWay) {
-          const otherData = boatDirection === 'hjemreise' ? utreiseData : hjemreiseData;
-          const otherExists = boats.some(b => b.id !== editingId && b.type === (boatDirection === 'hjemreise' ? 'utreise' : 'hjemreise'));
+          const currentBoats = await getTripBoats(trip.id);
+          const otherType = boatDirection === 'hjemreise' ? 'utreise' : 'hjemreise';
+          const otherExists = currentBoats.some(b => b.id !== editingId && b.type === otherType);
           if (!otherExists) {
+            const otherData = boatDirection === 'hjemreise' ? utreiseData : hjemreiseData;
             await addTripBoat(trip.id, otherData);
           }
         }
@@ -769,9 +771,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       if (editingId) {
         await updateTripTaxi(trip.id, editingId, taxiDirection === 'hjemreise' ? hjemreiseData : utreiseData);
         if (!taxiFormUtreise.isOneWay) {
-          const otherData = taxiDirection === 'hjemreise' ? utreiseData : hjemreiseData;
-          const otherExists = taxis.some(t => t.id !== editingId && t.type === (taxiDirection === 'hjemreise' ? 'utreise' : 'hjemreise'));
+          const currentTaxis = await getTripTaxis(trip.id);
+          const otherType = taxiDirection === 'hjemreise' ? 'utreise' : 'hjemreise';
+          const otherExists = currentTaxis.some(t => t.id !== editingId && t.type === otherType);
           if (!otherExists) {
+            const otherData = taxiDirection === 'hjemreise' ? utreiseData : hjemreiseData;
             await addTripTaxi(trip.id, otherData);
           }
         }
@@ -792,9 +796,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       if (editingId) {
         await updateTripFerry(trip.id, editingId, ferryDirection === 'hjemreise' ? hjemreiseData : utreiseData);
         if (!ferryFormUtreise.isOneWay) {
-          const otherData = ferryDirection === 'hjemreise' ? utreiseData : hjemreiseData;
-          const otherExists = ferries.some(f => f.id !== editingId && f.type === (ferryDirection === 'hjemreise' ? 'utreise' : 'hjemreise'));
+          const currentFerries = await getTripFerries(trip.id);
+          const otherType = ferryDirection === 'hjemreise' ? 'utreise' : 'hjemreise';
+          const otherExists = currentFerries.some(f => f.id !== editingId && f.type === otherType);
           if (!otherExists) {
+            const otherData = ferryDirection === 'hjemreise' ? utreiseData : hjemreiseData;
             await addTripFerry(trip.id, otherData);
           }
         }
