@@ -230,7 +230,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 <View style={styles.flightTimeRow}>
                   <View style={[styles.flightTimeField, { flex: 1 }]}>
                     <Text style={[styles.label, { color: colors.text }]}>
-                      {flightForm.transportType === 'bil' ? 'Hentedato' : t('transport.departure')}
+                      {flightForm.transportType === 'bil' ? 'Hentedato' : t('transport.departureDateLabel')}
                     </Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
@@ -243,7 +243,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                   </View>
                   <View style={[styles.flightTimeField, { flex: 1 }]}>
                     <Text style={[styles.label, { color: colors.text }]}>
-                      {flightForm.transportType === 'bil' ? 'Hentetid' : t('transport.departure')}
+                      {flightForm.transportType === 'bil' ? 'Hentetid' : t('transport.departureTimeLabel')}
                     </Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
@@ -260,7 +260,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 <View style={styles.flightTimeRow}>
                   <View style={[styles.flightTimeField, { flex: 1 }]}>
                     <Text style={[styles.label, { color: colors.text }]}>
-                      {flightForm.transportType === 'bil' ? t('transport.dropoff') : t('transport.arrival')}
+                      {flightForm.transportType === 'bil' ? t('transport.dropoff') : t('transport.arrivalDateLabel')}
                     </Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
@@ -273,7 +273,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                   </View>
                   <View style={[styles.flightTimeField, { flex: 1 }]}>
                     <Text style={[styles.label, { color: colors.text }]}>
-                      {flightForm.transportType === 'bil' ? t('transport.dropoff') : t('transport.arrival')}
+                      {flightForm.transportType === 'bil' ? t('transport.dropoff') : t('transport.arrivalTimeLabel')}
                     </Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: colors.inputBackground }]}
