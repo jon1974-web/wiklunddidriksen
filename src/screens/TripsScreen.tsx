@@ -4,11 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { Trip, WeatherDay } from '../types';
-import { getTrips } from '../services/tripService';
+import { getTrips, deleteTrip } from '../services/tripService';
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { useUserStore } from '../store/userStore';
+import { crossAlert } from '../utils/alert';
+import { ActionModal } from '../components/ActionModal';
 import { getForecast, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
 import { AppIcon } from '../components/AppIcon';
 
@@ -25,7 +27,10 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const fetchedRef = useRef<Set<string>>(new Set());
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
+  const user = useUserStore((state) => state.user);
+  const familyRole = useUserStore((state) => state.familyRole);
   const { colors } = useTheme();
+  const [tripActionModal, setTripActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void }>({ visible: false, title: '' });
 
   const today = getTodayLocal();
 
@@ -104,6 +109,25 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       <TouchableOpacity
         style={[styles.card, { backgroundColor: colors.surface }]}
         onPress={() => navigation.navigate('TripDetail', { trip: item })}
+        delayLongPress={500}
+        onLongPress={() => {
+          const canDeleteTrip = item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
+          if (canDeleteTrip) {
+            setTripActionModal({
+              visible: true,
+              title: item.title,
+              onDelete: async () => {
+                try {
+                  await deleteTrip(item.id);
+                  setTripActionModal({ visible: false, title: '' });
+                  loadTrips();
+                } catch (error) {
+                  crossAlert('Error', getErrorMessage(error));
+                }
+              },
+            });
+          }
+        }}
       >
         <View style={styles.cardRow}>
           <View style={styles.cardContent}>
@@ -192,6 +216,12 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       >
         <Text style={styles.fabText}>+</Text>
       </TouchableOpacity>
+      <ActionModal
+        visible={tripActionModal.visible}
+        title={tripActionModal.title}
+        onDelete={tripActionModal.onDelete}
+        onCancel={() => setTripActionModal({ visible: false, title: '' })}
+      />
     </SafeAreaView>
   );
 };

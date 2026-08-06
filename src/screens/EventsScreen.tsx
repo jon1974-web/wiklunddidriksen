@@ -13,8 +13,7 @@ import { SpondResponseModal } from '../components/SpondResponseModal';
 import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
-import { crossAlert } from '../utils/alert';
-import { getTrips, getTripTransport, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists, deleteTrip } from '../services/tripService';
+import { getTrips, getTripTransport, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse, clearSpondToken } from '../services/spondService';
 import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -133,7 +132,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [visibleDate, setVisibleDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
   const [eventActionModal, setEventActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void }>({ visible: false, title: '' });
-  const [tripActionModal, setTripActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void }>({ visible: false, title: '' });
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const [mealPlan, setMealPlan] = useState<any>(null);
   const [recipes, setRecipes] = useState<any[]>([]);
@@ -536,19 +534,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         <TouchableOpacity
           style={[styles.tripCard, { backgroundColor: colors.surface }]}
           onPress={() => navigation.navigate('Trips', { screen: 'TripDetail', params: { trip: item } })}
-          onLongPress={(item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin') ? () => setTripActionModal({
-            visible: true,
-            title: item.title,
-            onDelete: async () => {
-              try {
-                await deleteTrip(item.id);
-                setTripActionModal({ visible: false, title: '' });
-                loadTrips();
-              } catch (error) {
-                crossAlert('Error', getErrorMessage(error));
-              }
-            },
-          }) : undefined}
         >
           <View style={styles.tripCardRow}>
             <View style={styles.tripCardContent}>
@@ -882,12 +867,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         title={eventActionModal.title}
         onDelete={eventActionModal.onDelete}
         onCancel={() => setEventActionModal({ visible: false, title: '' })}
-      />
-      <ActionModal
-        visible={tripActionModal.visible}
-        title={tripActionModal.title}
-        onDelete={tripActionModal.onDelete}
-        onCancel={() => setTripActionModal({ visible: false, title: '' })}
       />
     </SafeAreaView>
   );
