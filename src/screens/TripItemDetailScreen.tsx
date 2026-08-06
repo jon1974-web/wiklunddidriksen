@@ -246,7 +246,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
       </View>
 
       {/* Maps */}
-      {(itemType === 'boat' || itemType === 'ferry') && (item.departureAddress || item.arrivalAddress) ? (
+      {(itemType === 'boat' || itemType === 'ferry' || itemType === 'taxi') && (item.departureAddress || item.arrivalAddress) ? (
         <View>
           {item.departureAddress && (
             <TouchableOpacity
