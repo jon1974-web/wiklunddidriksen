@@ -28,7 +28,7 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
   const depCode = extractCode(f.departureAddress);
   const arrCode = extractCode(f.arrivalAddress);
 
-  const transportIconName = f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : 'fly';
+  const transportIconName = f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : f.transportType === 'boat' ? 'boat' : f.transportType === 'ferry' ? 'ferry' : f.transportType === 'taxi' ? 'taxi' : 'fly';
   const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
   const calDate = f.departureDate || f.arrivalDate;
   let calDay = '';
@@ -38,8 +38,8 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
     calDay = String(d.getDate());
     calMonth = d.toLocaleDateString(getLocale(i18n.language), { month: 'short' });
   }
-  const depLabel = f.transportType === 'bil' ? '🔑' : '🛫';
-  const arrLabel = f.transportType === 'bil' ? '📋' : '🛬';
+  const depLabel = f.transportType === 'bil' ? '🔑' : f.transportType === 'boat' || f.transportType === 'ferry' ? '⚓' : f.transportType === 'taxi' ? '📍' : '🛫';
+  const arrLabel = f.transportType === 'bil' ? '📋' : f.transportType === 'boat' || f.transportType === 'ferry' ? '🏁' : f.transportType === 'taxi' ? '📍' : '🛬';
 
   const carrierDomain = f.airline ? getCarrierDomain(f.airline) : null;
   const logoUrl = carrierDomain ? getFaviconUrl(carrierDomain) : null;
@@ -58,7 +58,7 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, position: 'absolute', left: 6, top: 24 }}>
             <AppIcon name={transportIconName as any} size={20} color={colors.accent} />
             <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>
-              {f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : t('transport.carRental')}
+              {f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : f.transportType === 'bil' ? t('transport.carRental') : f.transportType === 'boat' ? t('transport.boatCruise') : f.transportType === 'ferry' ? t('transport.ferry') : t('transport.taxi')}
             </Text>
           </View>
           {logoUrl && (

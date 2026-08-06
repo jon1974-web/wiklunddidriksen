@@ -1,11 +1,13 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { formatDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
 import { AppIcon } from './AppIcon';
+import { getCarrierDomain } from '../constants/carrierDomains';
+import { getFaviconUrl } from '../utils/favicon';
 
 interface TransportItemTileProps {
   icon: string;
@@ -33,6 +35,8 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   const depIcon = iconName === 'ferry' || iconName === 'boat' ? '⚓' : iconName === 'taxi' ? '📍' : '🛫';
   const arrIcon = iconName === 'ferry' || iconName === 'boat' ? '🏁' : iconName === 'taxi' ? '📍' : '🛬';
   const tileColor = isHjemreise ? '#E53935' : colors.accent;
+  const carrierDomain = name ? getCarrierDomain(name) : null;
+  const logoUrl = carrierDomain ? getFaviconUrl(carrierDomain) : null;
 
   return (
     <TouchableOpacity
@@ -51,6 +55,11 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
               {iconName === 'fly' ? t('transport.fly') : iconName === 'train' ? t('transport.train') : iconName === 'car' ? t('transport.carRental') : iconName === 'boat' ? t('transport.boatCruise') : iconName === 'ferry' ? t('transport.ferry') : t('transport.taxi')}
             </Text>
           </View>
+          {logoUrl ? (
+            <View style={{ position: 'absolute', right: 6, top: 24 }}>
+              <Image source={{ uri: logoUrl }} style={{ width: 20, height: 20, borderRadius: 4 }} resizeMode="contain" />
+            </View>
+          ) : null}
         </View>
       ) : (
         <View style={[styles.iconOnly, { backgroundColor: tileColor }]}>

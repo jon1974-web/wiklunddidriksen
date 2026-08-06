@@ -1617,3 +1617,151 @@ ${instructionText || "None"}`,
   }
 });
 
+exports.migrateTransportData = onRequest({ region: "us-central1" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const ADMIN_EMAILS = ["jon@wiklunddidriksen.com"];
+  const userEmail = (await getAuth().getUser(uid)).email;
+  if (!ADMIN_EMAILS.includes(userEmail)) {
+    return res.status(403).json({ error: "Only admin can run migration" });
+  }
+
+  const db = getFirestore();
+  const familyId = "AVCUsb8X6GdRM3f0EBf0";
+
+  try {
+    const tripsSnap = await db.collection("trips").where("familyId", "==", familyId).get();
+    let migrated = 0;
+    let skipped = 0;
+    let errors = 0;
+
+    for (const tripDoc of tripsSnap.docs) {
+      const tripId = tripDoc.id;
+
+      // Migrate from flights subcollection
+      try {
+        const flightsSnap = await db.collection("trips").doc(tripId).collection("flights").get();
+        for (const doc of flightsSnap.docs) {
+          const data = doc.data();
+          if (!data.transportType) {
+            data.transportType = "fly";
+          }
+          await db.collection("trips").doc(tripId).collection("transport").doc(doc.id).set(data);
+          await doc.ref.delete();
+          migrated++;
+        }
+      } catch (e) { errors++; }
+
+      // Migrate from boats subcollection
+      try {
+        const boatsSnap = await db.collection("trips").doc(tripId).collection("boats").get();
+        for (const doc of boatsSnap.docs) {
+          const data = doc.data();
+          const mapped = {
+            transportType: "boat",
+            airline: data.name || "",
+            routeName: data.routeName || "",
+            reference: data.reference || "",
+            cabin: data.cabin || "",
+            isOneWay: data.isOneWay || false,
+            type: data.type || "utreise",
+            departureDate: data.departureDate || "",
+            departureTime: data.departureTime || "",
+            arrivalDate: data.arrivalDate || "",
+            arrivalTime: data.arrivalTime || "",
+            departureAddress: data.departureAddress || "",
+            arrivalAddress: data.arrivalAddress || "",
+            phone: data.phone || "",
+            hasCar: data.hasCar || false,
+            carRegistration: data.carRegistration || "",
+            driver: data.driver || "",
+            passengers: data.passengers || "",
+            note: data.note || "",
+            createdAt: data.createdAt || Date.now(),
+          };
+          await db.collection("trips").doc(tripId).collection("transport").doc(doc.id).set(mapped);
+          await doc.ref.delete();
+          migrated++;
+        }
+      } catch (e) { errors++; }
+
+      // Migrate from taxis subcollection
+      try {
+        const taxisSnap = await db.collection("trips").doc(tripId).collection("taxis").get();
+        for (const doc of taxisSnap.docs) {
+          const data = doc.data();
+          const mapped = {
+            transportType: "taxi",
+            airline: data.name || "",
+            reference: data.reference || "",
+            isOneWay: data.isOneWay || false,
+            type: data.type || "utreise",
+            departureDate: data.departureDate || "",
+            departureTime: data.departureTime || "",
+            arrivalDate: data.arrivalDate || "",
+            arrivalTime: data.arrivalTime || "",
+            departureAddress: data.departureAddress || "",
+            arrivalAddress: data.arrivalAddress || "",
+            phone: data.phone || "",
+            driver: data.driver || "",
+            passengers: data.passengers || "",
+            note: data.note || "",
+            createdAt: data.createdAt || Date.now(),
+          };
+          await db.collection("trips").doc(tripId).collection("transport").doc(doc.id).set(mapped);
+          await doc.ref.delete();
+          migrated++;
+        }
+      } catch (e) { errors++; }
+
+      // Migrate from ferries subcollection
+      try {
+        const ferriesSnap = await db.collection("trips").doc(tripId).collection("ferries").get();
+        for (const doc of ferriesSnap.docs) {
+          const data = doc.data();
+          const mapped = {
+            transportType: "ferry",
+            airline: data.name || "",
+            routeName: data.routeName || "",
+            reference: data.reference || "",
+            cabin: data.cabin || "",
+            isOneWay: data.isOneWay || false,
+            type: data.type || "utreise",
+            departureDate: data.departureDate || "",
+            departureTime: data.departureTime || "",
+            arrivalDate: data.arrivalDate || "",
+            arrivalTime: data.arrivalTime || "",
+            departureAddress: data.departureAddress || "",
+            arrivalAddress: data.arrivalAddress || "",
+            phone: data.phone || "",
+            hasCar: data.hasCar || false,
+            carRegistration: data.carRegistration || "",
+            driver: data.driver || "",
+            passengers: data.passengers || "",
+            note: data.note || "",
+            createdAt: data.createdAt || Date.now(),
+          };
+          await db.collection("trips").doc(tripId).collection("transport").doc(doc.id).set(mapped);
+          await doc.ref.delete();
+          migrated++;
+        }
+      } catch (e) { errors++; }
+    }
+
+    return res.status(200).json({
+      message: "Migration complete",
+      tripsProcessed: tripsSnap.docs.length,
+      documentsMigrated: migrated,
+      errors,
+    });
+  } catch (error) {
+    console.error("Migration error:", error);
+    return res.status(500).json({ error: "Migration failed" });
+  }
+});
+

@@ -360,7 +360,15 @@
     "helpSpondWhatText": "Yhdistä Spond näyttääksesi joukkueen tapahtumat ja aktiviteetit suoraan sovelluksessa. Katso osallistujat ja vastaajat.",
     "helpSpondHow": "Näin teet sen",
     "helpSpondHowText": "Kirjoita Spond-sähköposti ja salasana, napauta 'Yhdistä'. Valitse mitä ryhmiä haluat näyttää. Spond-tapahtumat näkyvät automaattisesti tapahtumasivulla.",
-    "helpSpondTip": "Spond-salasana tallennetaan turvallisesti. Voit irrottaa milloin tahansa."
+    "helpSpondTip": "Spond-salasana tallennetaan turvallisesti. Voit irrottaa milloin tahansa.",
+    "migrating": "Migroidaan...",
+    "migrateRole": "Suorita migraatio (admin)",
+    "migrateRoleDesc": "Muunna perhetiedot uuteen roolijärjestelmään. Suorita kerran.",
+    "migrateTransport": "Migroida kuljetukset (admin)",
+    "migrateTransportDesc": "Siirrä kuljetustiedot vanhoista alioksista yhtenäiseen kuljetuskokoelmaan. Suorita kerran.",
+    "migrateTransportDone": "Kuljetusmigraatio valmis!",
+    "migrateTransportError": "Kuljetusmigraatio epäonnistui",
+    "success": "Onnistui"
   },
   "chat": {
     "title": "Perhekeskustelu",

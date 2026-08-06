@@ -366,7 +366,15 @@
     "helpSpondWhatText": "Connect to Spond to show your team's events and activities directly in the app. See who's attending and respondents.",
     "helpSpondHow": "How to use it",
     "helpSpondHowText": "Enter your Spond email and password, tap 'Connect'. Choose which groups to show. Spond events appear automatically on the events page.",
-    "helpSpondTip": "Your Spond password is stored securely. You can disconnect at any time."
+    "helpSpondTip": "Your Spond password is stored securely. You can disconnect at any time.",
+    "migrating": "Migrating...",
+    "migrateRole": "Run migration (admin)",
+    "migrateRoleDesc": "Convert family data to new role system. Run once.",
+    "migrateTransport": "Migrate transport (admin)",
+    "migrateTransportDesc": "Move transport data from old subcollections to unified transport collection. Run once.",
+    "migrateTransportDone": "Transport migration complete!",
+    "migrateTransportError": "Transport migration failed",
+    "success": "Success"
   },
   "voice": {
     "title": "Talk to event",

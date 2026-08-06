@@ -76,6 +76,7 @@ export const ProfileScreen: React.FC = () => {
   const [inviteFamilyName, setInviteFamilyName] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
   const [migrating, setMigrating] = useState(false);
+  const [migratingTransport, setMigratingTransport] = useState(false);
   const [familyListener, setFamilyListener] = useState<(() => void) | null>(null);
   const [calendarName, setCalendarName] = useState<string | null>(null);
   const [calendarEmail, setCalendarEmail] = useState('');
@@ -362,6 +363,28 @@ export const ProfileScreen: React.FC = () => {
       setMigrating(false);
     }
   }, [user, familyId]);
+
+  const handleMigrateTransport = useCallback(async () => {
+    if (!user) return;
+    setMigratingTransport(true);
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/migrateTransportData', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || t('profile.migrateTransportError'));
+      crossAlert(t('profile.success'), t('profile.migrateTransportDone'));
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    } finally {
+      setMigratingTransport(false);
+    }
+  }, [user]);
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -1066,17 +1089,28 @@ export const ProfileScreen: React.FC = () => {
                 </View>
               )}
 
-              {familyId && !familyRole && user?.email === 'jon@wiklunddidriksen.com' && (
+              {familyId && (familyRole === 'owner' || familyRole === 'admin' || (!familyRole && user?.email === 'jon@wiklunddidriksen.com')) && (
                 <View style={{ marginTop: 12 }}>
                   <TouchableOpacity
                     style={[styles.familyButton, { backgroundColor: colors.danger, opacity: migrating ? 0.6 : 1 }]}
                     onPress={handleMigrate}
                     disabled={migrating}
                   >
-                    <Text style={styles.familyButtonText}>{migrating ? 'Migrerer...' : 'Kjør migrering (admin)'}</Text>
+                    <Text style={styles.familyButtonText}>{migrating ? t('profile.migrating') : t('profile.migrateRole')}</Text>
                   </TouchableOpacity>
                   <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 4 }}>
-                    Konverter familiedata til nytt rollesystem. Kjøres én gang.
+                    {t('profile.migrateRoleDesc')}
+                  </Text>
+
+                  <TouchableOpacity
+                    style={[styles.familyButton, { backgroundColor: colors.warning || '#FF9800', opacity: migratingTransport ? 0.6 : 1, marginTop: 8 }]}
+                    onPress={handleMigrateTransport}
+                    disabled={migratingTransport}
+                  >
+                    <Text style={styles.familyButtonText}>{migratingTransport ? t('profile.migrating') : t('profile.migrateTransport')}</Text>
+                  </TouchableOpacity>
+                  <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 4 }}>
+                    {t('profile.migrateTransportDesc')}
                   </Text>
                 </View>
               )}

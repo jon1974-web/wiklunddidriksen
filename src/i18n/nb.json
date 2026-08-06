@@ -366,7 +366,15 @@
     "helpSpondWhatText": "Koble til Spond for å vise lagets arrangementer og hendelser direkte i appen. Se hvem som deltar og respondenter.",
     "helpSpondHow": "Slik gjør du",
     "helpSpondHowText": "Skriv inn Spond-e-post og passord, trykk «Koble til». Velg hvilke grupper du vil vise. Spond-arrangementer vises automatisk på arrangement-siden.",
-    "helpSpondTip": "Spond-passordet lagres sikkert. Du kan koble fra når som helst."
+    "helpSpondTip": "Spond-passordet lagres sikkert. Du kan koble fra når som helst.",
+    "migrating": "Migrerer...",
+    "migrateRole": "Kjør migrering (admin)",
+    "migrateRoleDesc": "Konverter familiedata til nytt rollesystem. Kjøres én gang.",
+    "migrateTransport": "Migrer transport (admin)",
+    "migrateTransportDesc": "Flytt transportdata fra gamle subcollections til enhetlig transport-samling. Kjøres én gang.",
+    "migrateTransportDone": "Transportmigrering fullført!",
+    "migrateTransportError": "Transportmigrering feilet",
+    "success": "Suksess"
   },
   "voice": {
     "title": "Tal til arrangement",

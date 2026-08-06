@@ -36,6 +36,33 @@ const CARRIER_DOMAINS: Record<string, string> = {
   'dollar': 'dollar.com',
   'thrifty': 'thrifty.com',
   'free2rent': 'free2rent.si',
+  'color line': 'colorline.com',
+  'colorline': 'colorline.com',
+  'fjord line': 'fjordline.com',
+  'fjordline': 'fjordline.com',
+  'stena line': 'stenaline.com',
+  'stenaline': 'stenaline.com',
+  'hurtigruten': 'hurtigruten.com',
+  'havyard': 'havyard.no',
+  'torghatten': 'torghatten.no',
+  'boreal': 'boreal.no',
+  'tide': 'tideselskapet.no',
+  'norled': 'norled.no',
+  'lf ferjer': 'ffferjer.no',
+  'ferjeforbindelsen': 'ffferjer.no',
+  'nettbuss': 'nettbuss.no',
+  'taxi': 'taxi.no',
+  'oslo taxi': 'oslotaxi.no',
+  'bergen taxi': 'bergentaxi.no',
+  'trondheim taxi': 'trondheimtaxi.no',
+  'norges taxi': 'norgestaxi.no',
+  '0 taxi': '0taxi.no',
+  'nordic taxi': 'nordictaxi.no',
+  'uber': 'uber.com',
+  'bolt': 'bolt.eu',
+  'yango': 'yango.com',
+  'tvind': 'tvind.no',
+  'tvind taxi': 'tvind.no',
 };
 
 export function getCarrierDomain(name: string): string | null {
@@ -44,5 +71,17 @@ export function getCarrierDomain(name: string): string | null {
   for (const [key, domain] of Object.entries(CARRIER_DOMAINS)) {
     if (lower.includes(key) || key.includes(lower)) return domain;
   }
+  // Domain guessing: try to construct a domain from the company name
+  const cleaned = lower.replace(/[^a-z0-9\s]/g, '').replace(/\s+/g, '');
+  if (cleaned.length >= 3) {
+    const tlds = ['.com', '.no', '.eu', '.org'];
+    for (const tld of tlds) {
+      const guessed = cleaned + tld;
+      if (guessableDomains[guessed]) return guessed;
+    }
+    return cleaned + '.com';
+  }
   return null;
 }
+
+const guessableDomains: Record<string, boolean> = {};

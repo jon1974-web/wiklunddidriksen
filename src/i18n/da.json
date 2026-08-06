@@ -360,7 +360,15 @@
     "helpSpondWhatText": "Forbind til Spond for at vise holdets begivenheder og aktiviteter direkte i appen. Se hvem der deltager og respondenter.",
     "helpSpondHow": "Sådan gør du",
     "helpSpondHowText": "Indtast din Spond-e-mail og adgangskode, tryk 'Forbind'. Vælg hvilke grupper du vil vise. Spond-begivenheder vises automatisk på begivenhedssiden.",
-    "helpSpondTip": "Din Spond-adgangskode gemmes sikkert. Du kan afbryde når som helst."
+    "helpSpondTip": "Din Spond-adgangskode gemmes sikkert. Du kan afbryde når som helst.",
+    "migrating": "Migrerer...",
+    "migrateRole": "Kør migration (admin)",
+    "migrateRoleDesc": "Konverter familiedata til nyt rollesystem. Kør én gang.",
+    "migrateTransport": "Migrer transport (admin)",
+    "migrateTransportDesc": "Flyt transportdata fra gamle subcollections til ensartet transportsamling. Kør én gang.",
+    "migrateTransportDone": "Transportmigrering fuldført!",
+    "migrateTransportError": "Transportmigrering fejlede",
+    "success": "Succes"
   },
   "chat": {
     "title": "Familiechat",
