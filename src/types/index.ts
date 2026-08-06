@@ -163,7 +163,7 @@ export interface TripHotel {
 
 export interface TripFlight {
   id: string;
-  transportType?: 'fly' | 'tog' | 'bil';
+  transportType?: 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry';
   type?: 'utreise' | 'hjemreise';
   isOneWay?: boolean;
   airline?: string;
@@ -182,71 +182,10 @@ export interface TripFlight {
   driver?: string;
   passengers?: string;
   wagon?: string;
-  createdAt: number;
-}
-
-export interface TripBoat {
-  id: string;
-  name?: string;
   routeName?: string;
-  reference?: string;
   cabin?: string;
-  type?: 'utreise' | 'hjemreise';
-  isOneWay?: boolean;
-  departureDate?: string;
-  departureTime?: string;
-  arrivalDate?: string;
-  arrivalTime?: string;
-  departureAddress?: string;
-  arrivalAddress?: string;
-  phone?: string;
   hasCar?: boolean;
   carRegistration?: string;
-  driver?: string;
-  passengers?: string;
-  note?: string;
-  createdAt: number;
-}
-
-export interface TripTaxi {
-  id: string;
-  name?: string;
-  reference?: string;
-  type?: 'utreise' | 'hjemreise';
-  isOneWay?: boolean;
-  departureDate?: string;
-  departureTime?: string;
-  arrivalDate?: string;
-  arrivalTime?: string;
-  departureAddress?: string;
-  arrivalAddress?: string;
-  phone?: string;
-  driver?: string;
-  passengers?: string;
-  note?: string;
-  createdAt: number;
-}
-
-export interface TripFerry {
-  id: string;
-  name?: string;
-  routeName?: string;
-  reference?: string;
-  cabin?: string;
-  type?: 'utreise' | 'hjemreise';
-  isOneWay?: boolean;
-  departureDate?: string;
-  departureTime?: string;
-  arrivalDate?: string;
-  arrivalTime?: string;
-  departureAddress?: string;
-  arrivalAddress?: string;
-  phone?: string;
-  hasCar?: boolean;
-  carRegistration?: string;
-  driver?: string;
-  passengers?: string;
-  note?: string;
   createdAt: number;
 }
 

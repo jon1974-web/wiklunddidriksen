@@ -11,7 +11,7 @@ import {
   limit,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink, TripHotel, TripFlight, TripBoat, TripTaxi, TripFerry } from '../types';
+import { Trip, TripRestaurant, TripActivity, TripDocument, TripLink, TripHotel, TripFlight } from '../types';
 
 const TRIPS_COLLECTION = 'trips';
 
@@ -35,7 +35,7 @@ export const updateTrip = async (id: string, data: Partial<Trip>): Promise<void>
 };
 
 export const deleteTrip = async (id: string): Promise<void> => {
-  const subcollections = ['restaurants', 'activities', 'documents', 'links', 'hotels', 'flights', 'boats', 'taxis', 'ferries', 'packingLists'];
+  const subcollections = ['restaurants', 'activities', 'documents', 'links', 'hotels', 'transport', 'packingLists'];
   for (const sub of subcollections) {
     const snap = await getDocs(collection(db, TRIPS_COLLECTION, id, sub));
     for (const d of snap.docs) {
@@ -161,15 +161,15 @@ export const updateTripLink = async (tripId: string, linkId: string, data: Parti
   await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'links', linkId), data);
 };
 
-// Flights
+// Transport (unified for all types: fly, tog, bil, boat, ferry, taxi)
 export const getTripFlights = async (tripId: string): Promise<TripFlight[]> => {
-  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'flights'), orderBy('createdAt', 'desc'));
+  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'transport'), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as TripFlight));
 };
 
 export const addTripFlight = async (tripId: string, data: Omit<TripFlight, 'id' | 'createdAt'>): Promise<string> => {
-  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'flights'), {
+  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'transport'), {
     ...data,
     createdAt: Date.now(),
   });
@@ -177,80 +177,11 @@ export const addTripFlight = async (tripId: string, data: Omit<TripFlight, 'id' 
 };
 
 export const updateTripFlight = async (tripId: string, flightId: string, data: Partial<TripFlight>): Promise<void> => {
-  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'flights', flightId), data);
+  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'transport', flightId), data);
 };
 
 export const deleteTripFlight = async (tripId: string, flightId: string): Promise<void> => {
-  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'flights', flightId));
-};
-
-// Boats
-export const getTripBoats = async (tripId: string): Promise<TripBoat[]> => {
-  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'boats'), orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as TripBoat));
-};
-
-export const addTripBoat = async (tripId: string, data: Omit<TripBoat, 'id' | 'createdAt'>): Promise<string> => {
-  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'boats'), {
-    ...data,
-    createdAt: Date.now(),
-  });
-  return docRef.id;
-};
-
-export const updateTripBoat = async (tripId: string, boatId: string, data: Partial<TripBoat>): Promise<void> => {
-  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'boats', boatId), data);
-};
-
-export const deleteTripBoat = async (tripId: string, boatId: string): Promise<void> => {
-  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'boats', boatId));
-};
-
-// Taxis
-export const getTripTaxis = async (tripId: string): Promise<TripTaxi[]> => {
-  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'taxis'), orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as TripTaxi));
-};
-
-export const addTripTaxi = async (tripId: string, data: Omit<TripTaxi, 'id' | 'createdAt'>): Promise<string> => {
-  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'taxis'), {
-    ...data,
-    createdAt: Date.now(),
-  });
-  return docRef.id;
-};
-
-export const updateTripTaxi = async (tripId: string, taxiId: string, data: Partial<TripTaxi>): Promise<void> => {
-  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'taxis', taxiId), data);
-};
-
-export const deleteTripTaxi = async (tripId: string, taxiId: string): Promise<void> => {
-  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'taxis', taxiId));
-};
-
-// Ferries
-export const getTripFerries = async (tripId: string): Promise<TripFerry[]> => {
-  const q = query(collection(db, TRIPS_COLLECTION, tripId, 'ferries'), orderBy('createdAt', 'desc'));
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as TripFerry));
-};
-
-export const addTripFerry = async (tripId: string, data: Omit<TripFerry, 'id' | 'createdAt'>): Promise<string> => {
-  const docRef = await addDoc(collection(db, TRIPS_COLLECTION, tripId, 'ferries'), {
-    ...data,
-    createdAt: Date.now(),
-  });
-  return docRef.id;
-};
-
-export const updateTripFerry = async (tripId: string, ferryId: string, data: Partial<TripFerry>): Promise<void> => {
-  await updateDoc(doc(db, TRIPS_COLLECTION, tripId, 'ferries', ferryId), data);
-};
-
-export const deleteTripFerry = async (tripId: string, ferryId: string): Promise<void> => {
-  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'ferries', ferryId));
+  await deleteDoc(doc(db, TRIPS_COLLECTION, tripId, 'transport', flightId));
 };
 
 // Packing Lists

@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { AppIcon } from './AppIcon';
 
 export interface FlightForm {
-  transportType: 'fly' | 'tog' | 'bil';
+  transportType: 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry';
   type: 'utreise' | 'hjemreise';
   isOneWay?: boolean;
   airline: string;
@@ -24,6 +24,10 @@ export interface FlightForm {
   arrivalTime: string;
   phone: string;
   note: string;
+  routeName?: string;
+  cabin?: string;
+  hasCar?: boolean;
+  carRegistration?: string;
 }
 
 interface TransportFormModalProps {
@@ -35,7 +39,7 @@ interface TransportFormModalProps {
   onCancel: () => void;
   onOpenPicker: (field: 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime') => void;
   onDirectionChange?: (direction: 'utreise' | 'hjemreise') => void;
-  onTransportTypeChange?: (type: 'fly' | 'tog' | 'bil') => void;
+  onTransportTypeChange?: (type: 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry') => void;
   colors: {
     surface: string;
     text: string;
@@ -69,7 +73,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
     }
   };
 
-  const handleTransportTypeChange = (tt: 'fly' | 'tog' | 'bil') => {
+  const handleTransportTypeChange = (tt: 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry') => {
     if (onTransportTypeChange) {
       onTransportTypeChange(tt);
     } else {
@@ -84,7 +88,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
           <TouchableWithoutFeedback>
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
-                <AppIcon name={flightForm.transportType === 'fly' ? 'fly' : flightForm.transportType === 'tog' ? 'train' : 'car'} size={28} color="#0097A7" />
+                <AppIcon name={flightForm.transportType === 'fly' ? 'fly' : flightForm.transportType === 'tog' ? 'train' : flightForm.transportType === 'boat' ? 'boat' : flightForm.transportType === 'ferry' ? 'ferry' : flightForm.transportType === 'taxi' ? 'taxi' : 'car'} size={28} color="#0097A7" />
                 <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
                   {editingId ? t('detail.edit') : t('common.add')} {t('transport.title')}
                 </Text>
@@ -96,7 +100,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     onPress={() => handleDirectionToggle('utreise')}
                   >
                     <Text style={[styles.flightTypeText, { color: flightForm.type === 'utreise' ? '#fff' : colors.text }]}>
-                      {flightForm.transportType === 'bil' ? t('transport.pickup') : t('transport.departure')}
+                      {flightForm.transportType === 'bil' || flightForm.transportType === 'taxi' ? t('transport.pickup') : flightForm.transportType === 'boat' || flightForm.transportType === 'ferry' ? t('transport.departure') : t('transport.departure')}
                     </Text>
                   </TouchableOpacity>
                   {!flightForm.isOneWay && (
@@ -105,7 +109,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                       onPress={() => handleDirectionToggle('hjemreise')}
                     >
                       <Text style={[styles.flightTypeText, { color: flightForm.type === 'hjemreise' ? '#fff' : colors.text }]}>
-                        {flightForm.transportType === 'bil' ? t('transport.dropoff') : t('transport.arrival')}
+                        {flightForm.transportType === 'bil' || flightForm.transportType === 'taxi' ? t('transport.dropoff') : flightForm.transportType === 'boat' || flightForm.transportType === 'ferry' ? t('transport.arrival') : t('transport.arrival')}
                       </Text>
                     </TouchableOpacity>
                   )}
@@ -208,10 +212,10 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     />
                   </View>
                 )}
-                {flightForm.transportType !== 'bil' && (
+                {flightForm.transportType !== 'bil' && flightForm.transportType !== 'taxi' && (
                   <>
                     <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{flightForm.transportType === 'fly' ? t('transport.departureAirport') : t('transport.departureTerminal')}</Text>
+                      <Text style={[styles.label, { color: colors.text }]}>{flightForm.transportType === 'fly' ? t('transport.departureAirport') : flightForm.transportType === 'boat' || flightForm.transportType === 'ferry' ? t('transport.departureTerminal') : t('transport.departureTerminal')}</Text>
                       <GooglePlacesInput
                         value={flightForm.departureAddress || ''}
                         onChangeText={(v) => onFlightFormChange((f: any) => ({ ...f, departureAddress: v }))}
@@ -220,7 +224,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                       />
                     </View>
                     <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{flightForm.transportType === 'fly' ? t('transport.arrivalAirport') : t('transport.arrivalTerminal')}</Text>
+                      <Text style={[styles.label, { color: colors.text }]}>{flightForm.transportType === 'fly' ? t('transport.arrivalAirport') : flightForm.transportType === 'boat' || flightForm.transportType === 'ferry' ? t('transport.arrivalTerminal') : t('transport.arrivalTerminal')}</Text>
                       <GooglePlacesInput
                         value={flightForm.arrivalAddress || ''}
                         onChangeText={(v) => onFlightFormChange((f: any) => ({ ...f, arrivalAddress: v }))}
@@ -228,6 +232,30 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                         onSelect={(v) => onFlightFormChange((f: any) => ({ ...f, arrivalAddress: v }))}
                       />
                     </View>
+                  </>
+                )}
+                {flightForm.transportType === 'taxi' && (
+                  <>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('transport.pickupAddress')}</Text>
+                      <GooglePlacesInput
+                        value={flightForm.departureAddress || ''}
+                        onChangeText={(v) => onFlightFormChange((f: any) => ({ ...f, departureAddress: v }))}
+                        placeholder="Henteadresse..."
+                        onSelect={(v) => onFlightFormChange((f: any) => ({ ...f, departureAddress: v }))}
+                      />
+                    </View>
+                    {!flightForm.isOneWay && (
+                      <View style={styles.field}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrivalAddress')}</Text>
+                        <GooglePlacesInput
+                          value={flightForm.arrivalAddress || ''}
+                          onChangeText={(v) => onFlightFormChange((f: any) => ({ ...f, arrivalAddress: v }))}
+                          placeholder="Leveringsadresse..."
+                          onSelect={(v) => onFlightFormChange((f: any) => ({ ...f, arrivalAddress: v }))}
+                        />
+                      </View>
+                    )}
                   </>
                 )}
                 {(flightForm.transportType === 'bil' ? flightForm.type === 'utreise' : true) && (
