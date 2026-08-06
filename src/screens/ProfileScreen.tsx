@@ -75,8 +75,6 @@ export const ProfileScreen: React.FC = () => {
   const [inviteCode, setInviteCode] = useState('');
   const [inviteFamilyName, setInviteFamilyName] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
-  const [migrating, setMigrating] = useState(false);
-  const [migratingTransport, setMigratingTransport] = useState(false);
   const [familyListener, setFamilyListener] = useState<(() => void) | null>(null);
   const [calendarName, setCalendarName] = useState<string | null>(null);
   const [calendarEmail, setCalendarEmail] = useState('');
@@ -337,54 +335,6 @@ export const ProfileScreen: React.FC = () => {
       ]
     );
   };
-
-  const handleMigrate = useCallback(async () => {
-    if (!user) return;
-    setMigrating(true);
-    try {
-      const idToken = await auth.currentUser?.getIdToken();
-      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/migrateFamilyMembers', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Migrering feilet');
-      Alert.alert('Suksess', 'Migrering fullført! Familien bruker nå det nye rollesystemet.');
-      if (familyId) {
-        const updated = await getFamilyMembersWithRoles(familyId);
-        setFamilyMembers(updated);
-      }
-    } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
-    } finally {
-      setMigrating(false);
-    }
-  }, [user, familyId]);
-
-  const handleMigrateTransport = useCallback(async () => {
-    if (!user) return;
-    setMigratingTransport(true);
-    try {
-      const idToken = await auth.currentUser?.getIdToken();
-      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/migrateTransportData', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || t('profile.migrateTransportError'));
-      crossAlert(t('profile.success'), t('profile.migrateTransportDone'));
-    } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
-    } finally {
-      setMigratingTransport(false);
-    }
-  }, [user]);
 
   const handlePickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -785,10 +735,10 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.calendar')}</Text>
-          <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpCalendar(true)}>
-            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpCalendar(true)}>
+            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -925,10 +875,10 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.notifications')}</Text>
-            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpNotifications(true)}>
-              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+            <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpNotifications(true)}>
+              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -952,10 +902,10 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.minUke')}</Text>
-          <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpMinUke(true)}>
-            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpMinUke(true)}>
+            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -988,10 +938,10 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.matsenter')}</Text>
-          <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpMatsenter(true)}>
-            <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpMatsenter(true)}>
+            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
               </View>
             </View>
           </TouchableOpacity>
@@ -1021,10 +971,10 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('birthdays.title')}</Text>
-            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpBirthdays(true)}>
-              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+            <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpBirthdays(true)}>
+              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -1040,10 +990,10 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.family')}</Text>
-            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpFamily(true)}>
-              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+            <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpFamily(true)}>
+              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
                 </View>
               </View>
             </TouchableOpacity>
@@ -1086,32 +1036,6 @@ export const ProfileScreen: React.FC = () => {
                       </View>
                     </View>
                   ))}
-                </View>
-              )}
-
-              {familyId && (familyRole === 'owner' || familyRole === 'admin' || (!familyRole && user?.email === 'jon@wiklunddidriksen.com')) && (
-                <View style={{ marginTop: 12 }}>
-                  <TouchableOpacity
-                    style={[styles.familyButton, { backgroundColor: colors.danger, opacity: migrating ? 0.6 : 1 }]}
-                    onPress={handleMigrate}
-                    disabled={migrating}
-                  >
-                    <Text style={styles.familyButtonText}>{migrating ? t('profile.migrating') : t('profile.migrateRole')}</Text>
-                  </TouchableOpacity>
-                  <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 4 }}>
-                    {t('profile.migrateRoleDesc')}
-                  </Text>
-
-                  <TouchableOpacity
-                    style={[styles.familyButton, { backgroundColor: colors.warning || '#FF9800', opacity: migratingTransport ? 0.6 : 1, marginTop: 8 }]}
-                    onPress={handleMigrateTransport}
-                    disabled={migratingTransport}
-                  >
-                    <Text style={styles.familyButtonText}>{migratingTransport ? t('profile.migrating') : t('profile.migrateTransport')}</Text>
-                  </TouchableOpacity>
-                  <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 4 }}>
-                    {t('profile.migrateTransportDesc')}
-                  </Text>
                 </View>
               )}
 
@@ -1179,10 +1103,10 @@ export const ProfileScreen: React.FC = () => {
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.title')} — Spond</Text>
-            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpSpond(true)}>
-              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+            <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpSpond(true)}>
+              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
                 </View>
               </View>
             </TouchableOpacity>
