@@ -208,6 +208,8 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     />
                   </View>
                 )}
+                {flightForm.transportType !== 'bil' && (
+                  <>
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{flightForm.transportType === 'fly' ? t('transport.departureAirport') : t('transport.departureTerminal')}</Text>
                       <GooglePlacesInput
@@ -226,6 +228,8 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                         onSelect={(v) => onFlightFormChange((f: any) => ({ ...f, arrivalAddress: v }))}
                       />
                     </View>
+                  </>
+                )}
                 {(flightForm.transportType === 'bil' ? flightForm.type === 'utreise' : true) && (
                 <View style={styles.flightTimeRow}>
                   <View style={[styles.flightTimeField, { flex: 1 }]}>
