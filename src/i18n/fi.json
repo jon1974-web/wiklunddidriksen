@@ -7,6 +7,7 @@
     "edit": "Muokkaa",
     "copy": "Kopioi",
     "close": "Sulje",
+    "back": "Takaisin",
     "add": "Lisää",
     "error": "Virhe",
     "success": "Onnistui",
@@ -382,6 +383,7 @@
     "helpBirthdaysWhat": "Mikä on Syntymäpäivät?",
     "helpBirthdaysWhatText": "Hallitse perheen syntymäpäiviä ja saa muistutuksia. Syntymäpäivät näkyvät tapahtumasivulla.",
     "helpBirthdaysHow": "Näin teet sen",
+    "helpBirthdaysHowText": "Napauta 'Lisää syntymäpäivä' lisätäksesi uuden. Kirjoita nimi ja valitse päivämäärä. Syntymäpäivä lisätään vuosittaisena tapahtumana.",
     "helpBrightnessHowText": "Napauta 'Lisää syntymäpäivä' lisätäksesi uuden. Kirjoita nimi ja valitse päivämäärä. Syntymäpäivä lisätään vuosittaisena tapahtumana.",
     "helpBirthdaysTip": "Voit lisätä enintään 50 syntymäpäivää.",
     "helpFamilyTitle": "Perhe",
@@ -711,6 +713,9 @@
     "countryPortugal": "Portugali",
     "countryUSA": "USA",
     "countryArgentina": "Argentiina",
-    "countryBrasil": "Brasilia"
+    "countryBrasil": "Brasilia",
+    "varClassic": "Klassinen",
+    "varFaster": "Nopea",
+    "varTwist": "Twist"
   }
 }

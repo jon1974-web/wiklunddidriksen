@@ -96,7 +96,16 @@
     "inviteRegisterButton": "Sign up and join",
     "inviteLoginButton": "Log in and join",
     "registerHint": "Sign up to create a new family.",
-    "inviteJoinHint": "Or use an invite link to join an existing family."
+    "inviteJoinHint": "Or use an invite link to join an existing family.",
+    "spondConnect": "Connect to Spond",
+    "spondDisconnect": "Disconnect Spond",
+    "spondHelp": "Connect to Spond to show your team's events.",
+    "calendarConnect": "Connect calendar",
+    "calendarDisconnect": "Disconnect calendar",
+    "notificationsOn": "On",
+    "notificationsOff": "Off",
+    "notificationsOnHelp": "Reminders are sent before events.",
+    "notificationsOffHelp": "Notifications are disabled."
   },
   "events": {
     "title": "Events",
@@ -390,6 +399,7 @@
     "helpBirthdaysWhatText": "Manage family birthdays and get reminders. Birthdays appear on the events page.",
     "helpBirthdaysHow": "How to use it",
     "helpBirthdaysHowText": "Tap 'Add birthday' to add a new one. Enter the name and select a date. The birthday is added as an annual event.",
+    "helpBrightnessHowText": "Tap 'Add birthday' to add a new one. Enter the name and select a date. The birthday is added as an annual event.",
     "helpBirthdaysTip": "You can add up to 50 birthdays.",
     "helpFamilyTitle": "Family",
     "helpFamilyWhat": "What is Family?",
@@ -466,7 +476,8 @@
   "actionModal": {
     "edit": "Edit",
     "delete": "Delete",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "back": "Back"
   },
   "detail": {
     "edit": "Edit",

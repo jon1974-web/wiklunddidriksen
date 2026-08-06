@@ -97,7 +97,16 @@
     "inviteRegisterButton": "Registrer og bli med",
     "inviteLoginButton": "Logg inn og bli med",
     "registerHint": "Registrer deg for å opprette en ny familie.",
-    "inviteJoinHint": "Eller bruk en invitasjonslenke for å bli med i en eksisterende familie."
+    "inviteJoinHint": "Eller bruk en invitasjonslenke for å bli med i en eksisterende familie.",
+    "spondConnect": "Koble til Spond",
+    "spondDisconnect": "Koble fra Spond",
+    "spondHelp": "Koble til Spond for å vise lagets arrangementer.",
+    "calendarConnect": "Koble til kalender",
+    "calendarDisconnect": "Koble fra kalender",
+    "notificationsOn": "På",
+    "notificationsOff": "Av",
+    "notificationsOnHelp": "Påminnelser sendes før arrangementer.",
+    "notificationsOffHelp": "Varsler er deaktivert."
   },
   "events": {
     "title": "Arrangementer",
@@ -391,6 +400,7 @@
     "helpBirthdaysWhatText": "Administrer familienes bursdager og få påminnelser. Bursdager vises på arrangement-siden.",
     "helpBirthdaysHow": "Slik gjør du",
     "helpBirthdaysHowText": "Trykk på «Legg til bursdag» for å legge til en ny bursdag. Skriv inn navn og velg dato. Bursdagen legges til som et årlig arrangement.",
+    "helpBrightnessHowText": "Trykk på «Legg til bursdag» for å legge til en ny bursdag. Skriv inn navn og velg dato. Bursdagen legges til som et årlig arrangement.",
     "helpBirthdaysTip": "Du kan legge til opptil 50 bursdager.",
     "helpFamilyTitle": "Familie",
     "helpFamilyWhat": "Hva er Familie?",
@@ -467,7 +477,8 @@
   "actionModal": {
     "edit": "Rediger",
     "delete": "Slett",
-    "cancel": "Avbryt"
+    "cancel": "Avbryt",
+    "back": "Tilbake"
   },
   "detail": {
     "edit": "Rediger",
