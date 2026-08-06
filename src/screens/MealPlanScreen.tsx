@@ -627,20 +627,23 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-          <TouchableOpacity onPress={() => setWeekOffset(o => o - 1)} style={{ padding: 8 }}>
-            <Text style={{ color: colors.accent, fontSize: 18 }}>◀</Text>
-          </TouchableOpacity>
-          <View style={{ alignItems: 'center' }}>
-            <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 2 }]}>
-              <AppIcon name="calendar" size={18} color={colors.accent} /> {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
-            </Text>
-            <Text style={{ fontSize: 12, color: colors.textSecondary }}>{getWeekLabel(weekOffset)}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <TouchableOpacity onPress={() => setWeekOffset(o => o - 1)} style={{ padding: 8 }}>
+              <Text style={{ color: colors.accent, fontSize: 18 }}>◀</Text>
+            </TouchableOpacity>
+            <View style={{ alignItems: 'center', flex: 1 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                <Text style={{ fontSize: 16 }}>📅</Text>
+                <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>
+                  {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
+                </Text>
+              </View>
+              <Text style={{ fontSize: 12, color: colors.textSecondary }}>{getWeekLabel(weekOffset)}</Text>
+            </View>
+            <TouchableOpacity onPress={() => setWeekOffset(o => o + 1)} style={{ padding: 8 }}>
+              <Text style={{ color: colors.accent, fontSize: 18 }}>▶</Text>
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity onPress={() => setWeekOffset(o => o + 1)} style={{ padding: 8 }}>
-            <Text style={{ color: colors.accent, fontSize: 18 }}>▶</Text>
-          </TouchableOpacity>
-        </View>
         {weekOffset !== 0 && (
           <TouchableOpacity
             style={{ alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, backgroundColor: colors.inputBackground, marginBottom: 8 }}
@@ -1547,24 +1550,28 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         </TouchableWithoutFeedback>
       </Modal>
       {/* FAB for adding recipes */}
-      <TouchableOpacity
-        style={[styles.fabUrl, { backgroundColor: colors.accent }]}
-        onPress={() => setShowUrlImport(true)}
-      >
-        <Text style={styles.fabText}>🔗</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.fabCamera, { backgroundColor: colors.accent }]}
-        onPress={() => navigation.navigate('PhotoRecipe')}
-      >
-        <Text style={styles.fabText}>📷</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.accent }]}
-        onPress={() => { resetRecipeForm(); setShowAddRecipe(true); }}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
+      {activeTab === 'oppskrifter' && (
+        <>
+          <TouchableOpacity
+            style={[styles.fabUrl, { backgroundColor: colors.accent }]}
+            onPress={() => setShowUrlImport(true)}
+          >
+            <Text style={styles.fabText}>🔗</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.fabCamera, { backgroundColor: colors.accent }]}
+            onPress={() => navigation.navigate('PhotoRecipe')}
+          >
+            <Text style={styles.fabText}>📷</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.fab, { backgroundColor: colors.accent }]}
+            onPress={() => { resetRecipeForm(); setShowAddRecipe(true); }}
+          >
+            <Text style={styles.fabText}>+</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </SafeAreaView>
   );
 };
