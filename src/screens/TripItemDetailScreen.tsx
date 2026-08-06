@@ -193,12 +193,20 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow(t('common.reference'), item.reference)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🔑 {t('transport.pickup')}</Text>
+                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📍 {t('transport.pickup')}</Text>
                 {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
                 {item.departureTime && renderRow(t('common.time'), item.departureTime)}
+                {item.departureAddress && renderRow(t('transport.pickupAddress'))}
               </View>
             )}
-            {renderRow(t('common.address'), item.address)}
+            {(item.arrivalDate || item.arrivalTime) && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>📍 {t('transport.dropoff')}</Text>
+                {item.arrivalDate && renderRow(t('common.date'), formatDate(item.arrivalDate))}
+                {item.arrivalTime && renderRow(t('common.time'), item.arrivalTime)}
+                {item.arrivalAddress && renderRow(t('transport.arrivalAddress'))}
+              </View>
+            )}
             {renderRow(t('common.phone'), item.phone)}
             {renderRow(t('common.driver'), item.driver)}
             {renderRow(t('common.passengers'), item.passengers)}

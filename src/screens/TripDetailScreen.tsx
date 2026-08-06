@@ -2152,12 +2152,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.departureTerminal')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('transport.pickupAddress')}</Text>
                     <GooglePlacesInput value={taxiForm.departureAddress} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, departureAddress: v }))} placeholder="Henteadresse..." onSelect={(v) => handleTaxiFormChange(f => ({ ...f, departureAddress: v }))} />
                   </View>
                   {!taxiForm.isOneWay && (
                     <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrivalTerminal')}</Text>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrivalAddress')}</Text>
                       <GooglePlacesInput value={taxiForm.arrivalAddress} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, arrivalAddress: v }))} placeholder="Leveringsadresse..." onSelect={(v) => handleTaxiFormChange(f => ({ ...f, arrivalAddress: v }))} />
                     </View>
                   )}

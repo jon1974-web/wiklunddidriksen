@@ -167,7 +167,9 @@
     "departureDateLabel": "Lähtöpäivä",
     "departureTimeLabel": "Lähtöaika",
     "arrivalDateLabel": "Saapumispäivä",
-    "arrivalTimeLabel": "Saapumisaika"
+    "arrivalTimeLabel": "Saapumisaika",
+    "pickupAddress": "Nouto-osoite",
+    "arrivalAddress": "Saapumisosoite"
   },
   "hotels": {
     "title": "Hotellit",

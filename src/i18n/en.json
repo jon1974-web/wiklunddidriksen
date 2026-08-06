@@ -158,7 +158,9 @@
     "departureDateLabel": "Departure date",
     "departureTimeLabel": "Departure time",
     "arrivalDateLabel": "Arrival date",
-    "arrivalTimeLabel": "Arrival time"
+    "arrivalTimeLabel": "Arrival time",
+    "pickupAddress": "Pickup address",
+    "arrivalAddress": "Arrival address"
   },
   "hotels": {
     "title": "Hotels",

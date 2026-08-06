@@ -30,7 +30,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   const calDay = departureDate ? String(new Date(departureDate + 'T12:00:00').getDate()) : '';
   const calMonth = departureDate ? new Date(departureDate + 'T12:00:00').toLocaleDateString(getLocale(i18n.language), { month: 'short' }) : '';
   const iconName = icon === 'ferry' ? 'ferry' as const : icon === 'boat' ? 'boat' as const : icon === 'taxi' ? 'taxi' as const : icon === 'train' ? 'train' as const : icon === 'car' ? 'car' as const : 'fly' as const;
-  const depIcon = iconName === 'ferry' || iconName === 'boat' ? '⚓' : iconName === 'taxi' ? '🔑' : '🛫';
+  const depIcon = iconName === 'ferry' || iconName === 'boat' ? '⚓' : iconName === 'taxi' ? '📍' : '🛫';
   const arrIcon = iconName === 'ferry' || iconName === 'boat' ? '🏁' : iconName === 'taxi' ? '📍' : '🛬';
   const tileColor = isHjemreise ? '#E53935' : colors.accent;
 

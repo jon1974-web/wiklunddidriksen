@@ -167,7 +167,9 @@
     "departureDateLabel": "Avgångsdatum",
     "departureTimeLabel": "Avgångstid",
     "arrivalDateLabel": "Ankomstdatum",
-    "arrivalTimeLabel": "Ankomsttid"
+    "arrivalTimeLabel": "Ankomsttid",
+    "pickupAddress": "Hämtningsadress",
+    "arrivalAddress": "Leveransadress"
   },
   "hotels": {
     "title": "Hotell",
