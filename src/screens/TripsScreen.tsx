@@ -168,7 +168,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
               style={styles.mapContainer}
               onPress={() => Linking.openURL(getGoogleMapsUrl(locationQuery))}
             >
-              <Image source={{ uri: tripMapUrl }} style={styles.mapImage} />
+              <Image source={{ uri: tripMapUrl }} style={styles.mapImage} resizeMode="cover" />
             </TouchableOpacity>
           )}
         </View>
