@@ -52,6 +52,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [mealToggles, setMealToggles] = useState<Record<string, boolean>>({ mealFrokost: true, mealLunsj: true, mealMiddag: true });
   const [showHelp, setShowHelp] = useState(false);
   const [showHelpRandom, setShowHelpRandom] = useState(false);
+  const [showHelpWeekOverview, setShowHelpWeekOverview] = useState(false);
   const [showHelpSearch, setShowHelpSearch] = useState(false);
   const [showHelpHandleliste, setShowHelpHandleliste] = useState(false);
   const [showHelpAiSearch, setShowHelpAiSearch] = useState(false);
@@ -627,31 +628,34 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       </View>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 12 }}>
+            <AppIcon name="calendar" size={18} color={colors.accent} />
+            <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>
+              {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
+            </Text>
+            <TouchableOpacity
+              style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+              onPress={() => setShowHelpWeekOverview(true)}
+            >
+              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 8, textAlign: 'center' }}>{getWeekLabel(weekOffset)}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
             <TouchableOpacity onPress={() => setWeekOffset(o => o - 1)} style={{ padding: 8 }}>
               <Text style={{ color: colors.accent, fontSize: 18 }}>◀</Text>
             </TouchableOpacity>
-            <View style={{ alignItems: 'center', flex: 1 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
-                <Text style={{ fontSize: 16 }}>📅</Text>
-                <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>
-                  {t('mealPlanner.weekOverview')} {getWeekNumber(weekOffset)}
-                </Text>
-              </View>
-              <Text style={{ fontSize: 12, color: colors.textSecondary }}>{getWeekLabel(weekOffset)}</Text>
-            </View>
+            <TouchableOpacity onPress={() => setWeekOffset(0)} style={{ paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, backgroundColor: colors.inputBackground }}>
+              <Text style={{ fontSize: 12, color: colors.accent, fontWeight: '600' }}>{t('mealPlanner.backToCurrentWeek')}</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => setWeekOffset(o => o + 1)} style={{ padding: 8 }}>
               <Text style={{ color: colors.accent, fontSize: 18 }}>▶</Text>
             </TouchableOpacity>
           </View>
-        {weekOffset !== 0 && (
-          <TouchableOpacity
-            style={{ alignSelf: 'center', paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16, backgroundColor: colors.inputBackground, marginBottom: 8 }}
-            onPress={() => setWeekOffset(0)}
-          >
-            <Text style={{ fontSize: 12, color: colors.accent, fontWeight: '600' }}>{t('mealPlanner.backToCurrentWeek')}</Text>
-          </TouchableOpacity>
-        )}
         {DAYS.map((day, i) => (
           <TouchableOpacity key={day} style={[styles.dayRow, { borderBottomColor: colors.border }]}>
             <Text style={[styles.dayName, { color: colors.accent }]}>{t(DAY_LABELS[i])}</Text>
@@ -1443,6 +1447,16 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           { icon: '🛒', title: t('mealPlanner.helpHandlelisteWhat'), text: t('mealPlanner.helpHandlelisteWhatText') },
           { icon: '👉', title: t('mealPlanner.helpHandlelisteHow'), text: t('mealPlanner.helpHandlelisteHowText') },
           { icon: '📎', title: t('mealPlanner.helpHandlelisteRecipe'), text: t('mealPlanner.helpHandlelisteRecipeText'), tip: t('mealPlanner.helpHandlelisteRecipeTip') },
+        ]}
+      />
+
+      <HelpCenter
+        visible={showHelpWeekOverview}
+        onClose={() => setShowHelpWeekOverview(false)}
+        title={t('mealPlanner.helpWeekOverviewTitle')}
+        sections={[
+          { icon: '📋', title: t('mealPlanner.helpWeekOverviewWhat'), text: t('mealPlanner.helpWeekOverviewWhatText') },
+          { icon: '👉', title: t('mealPlanner.helpWeekOverviewHow'), text: t('mealPlanner.helpWeekOverviewHowText'), tip: t('mealPlanner.helpWeekOverviewTip') },
         ]}
       />
 
