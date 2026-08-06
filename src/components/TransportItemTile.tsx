@@ -56,7 +56,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
             </Text>
           </View>
           {logoUrl ? (
-            <View style={{ position: 'absolute', right: 6, top: 24, height: 20, justifyContent: 'center' }}>
+            <View style={{ position: 'absolute', right: 6, top: 24, flexDirection: 'row', alignItems: 'center' }}>
               <Image source={{ uri: logoUrl }} style={{ width: 20, height: 20, borderRadius: 4 }} resizeMode="contain" />
             </View>
           ) : null}

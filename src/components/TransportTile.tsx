@@ -143,7 +143,9 @@ const styles = StyleSheet.create({
   tileCompanyLogo: {
     position: 'absolute',
     right: 6,
-    top: 30,
+    top: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   companyLogo: {
     width: 20,
