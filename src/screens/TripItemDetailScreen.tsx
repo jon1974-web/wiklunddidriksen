@@ -31,15 +31,6 @@ const deleteHandlers: Record<ItemType, (tripId: string, itemId: string) => Promi
   ferry: deleteTripFerry,
 };
 
-const typeConfig: Record<ItemType, { icon: string; label: string; editParam: string }> = {
-  hotel: { icon: '🛏️', label: 'Hotell', editParam: 'openHotelEditId' },
-  restaurant: { icon: '🍽️', label: 'Restaurant', editParam: 'openRestaurantEditId' },
-  activity: { icon: '🎯', label: 'Aktivitet', editParam: 'openActivityEditId' },
-  boat: { icon: '⛵', label: 'Båt/Cruise', editParam: 'openBoatEditId' },
-  taxi: { icon: '🚕', label: 'Taxi', editParam: 'openTaxiEditId' },
-  ferry: { icon: '⛴️', label: 'Ferje', editParam: 'openFerryEditId' },
-};
-
 export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { item, tripId, trip, itemType } = route.params as {
@@ -49,6 +40,14 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
     itemType: ItemType;
   };
   const { colors } = useTheme();
+  const typeConfig: Record<ItemType, { icon: string; label: string; editParam: string }> = {
+    hotel: { icon: '🛏️', label: t('hotels.title'), editParam: 'openHotelEditId' },
+    restaurant: { icon: '🍽️', label: t('restaurants.title'), editParam: 'openRestaurantEditId' },
+    activity: { icon: '🎯', label: t('activities.title'), editParam: 'openActivityEditId' },
+    boat: { icon: '⛵', label: t('transport.boatCruise'), editParam: 'openBoatEditId' },
+    taxi: { icon: '🚕', label: t('transport.taxi'), editParam: 'openTaxiEditId' },
+    ferry: { icon: '⛴️', label: t('transport.ferry'), editParam: 'openFerryEditId' },
+  };
   const config = typeConfig[itemType];
 
   const handleDelete = useCallback(() => {
@@ -62,7 +61,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             await deleteHandlers[itemType](tripId, item.id);
             navigation.goBack();
           } catch {
-            crossAlert('Error', `Kunne ikke slette ${config.label.toLowerCase()}`);
+            crossAlert('Error', t('common.deleteFailed'));
           }
         },
       },
@@ -180,7 +179,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
               </View>
             )}
             {renderRow(t('common.phone'), item.phone)}
-            {item.hasCar && renderRow(t('common.carWith'), 'Ja')}
+            {item.hasCar && renderRow(t('common.carWith'), t('common.yes'))}
             {item.hasCar && renderRow(t('common.carRegNr'), item.carRegistration)}
             {renderRow(t('common.driver'), item.driver)}
             {renderRow(t('common.passengers'), item.passengers)}
@@ -236,7 +235,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
               </View>
             )}
             {renderRow(t('common.phone'), item.phone)}
-            {item.hasCar && renderRow(t('common.carWith'), 'Ja')}
+            {item.hasCar && renderRow(t('common.carWith'), t('common.yes'))}
             {item.hasCar && renderRow(t('common.carRegNr'), item.carRegistration)}
             {renderRow(t('common.driver'), item.driver)}
             {renderRow(t('common.passengers'), item.passengers)}

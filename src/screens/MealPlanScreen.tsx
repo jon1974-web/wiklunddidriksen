@@ -654,7 +654,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           </TouchableOpacity>
         )}
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-          <AppIcon name="utensils" size={18} color={colors.accent} />
+          <AppIcon name="menu" size={18} color={colors.accent} />
           <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>{t('mealPlanner.weekMenu')}</Text>
           <TouchableOpacity
             style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}

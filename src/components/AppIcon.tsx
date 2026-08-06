@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu';
   size?: number;
   color?: string;
 }
@@ -200,6 +200,16 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
       <Circle cx="17" cy="18" r="2" fill="#fff" stroke={color} strokeWidth="2"/>
       <Line x1="7" y1="12" x2="17" y2="12" stroke="#fff" strokeWidth="2"/>
       <Rect x="10" y="7" width="4" height="3" rx="1" fill="#fff" stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'menu') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Line x1="4" y1="6" x2="20" y2="6"/>
+      <Line x1="4" y1="12" x2="16" y2="12"/>
+      <Line x1="4" y1="18" x2="12" y2="18"/>
+      <Circle cx="18" cy="12" r="1.5" fill={color}/>
+      <Circle cx="14" cy="18" r="1.5" fill={color}/>
     </Svg>
   );
 

@@ -34,11 +34,12 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - Admin roles must be verified server-side, not just client-side
 
 ### Language Support (i18n)
-- **All new UI text must use i18n translation keys** via `t()` function — never hardcode user-visible strings
+- **All UI text must use i18n translation keys** via `t()` function — never hardcode user-visible strings (including labels, placeholders, error messages, button text, alert titles/messages, fallback values)
 - **New translation keys must be added to all 5 language files** (`nb.json`, `en.json`, `sv.json`, `da.json`, `fi.json`)
 - Follow the existing namespace pattern: `common.*`, `events.*`, `transport.*`, `profile.*`, etc.
 - When adding new features, always add translation keys first, then use them in the code
 - For components that need language reactivity (useMemo), use `langKey` state or `i18n.on('languageChanged')` listener
+- **This applies to ALL user-facing text**: buttons, links, labels, text inputs, placeholder text, helper texts, error messages, alert titles/messages, section headers, empty states, tooltips, badge labels, and any other visible text
 - **This applies to ALL user-facing text**: buttons, links, labels, text inputs, placeholder text, helper texts, error messages, alert titles/messages, section headers, empty states, tooltips, badge labels, and any other visible text
 
 ### Help Center (Info Modal)

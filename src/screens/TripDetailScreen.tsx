@@ -412,11 +412,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const handleSaveTripEdit = useCallback(async () => {
     if (!tripTitle.trim()) {
-      crossAlert('Error', 'Vennligst skriv en tittel');
+      crossAlert('Error', t('common.enterTitle'));
       return;
     }
     if (tripEndDate < tripStartDate) {
-      crossAlert('Error', 'Sluttdato kan ikke være før startdato');
+      crossAlert('Error', t('common.endDateBeforeStart'));
       return;
     }
     try {
@@ -542,7 +542,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   // Hotel handlers
   const handleSaveHotel = useCallback(async () => {
     if (!hotelForm.name.trim()) {
-      crossAlert('Error', 'Vennligst skriv et navn');
+      crossAlert('Error', t('common.enterName'));
       return;
     }
     try {
@@ -623,7 +623,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   // Restaurant handlers
   const handleSaveRestaurant = useCallback(async () => {
     if (!restForm.name.trim()) {
-      crossAlert('Error', 'Vennligst skriv et navn');
+      crossAlert('Error', t('common.enterName'));
       return;
     }
     try {
@@ -644,7 +644,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   // Activity handlers
   const handleSaveActivity = useCallback(async () => {
     if (!actForm.name.trim()) {
-      crossAlert('Error', 'Vennligst skriv et navn');
+      crossAlert('Error', t('common.enterName'));
       return;
     }
     try {
@@ -665,7 +665,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   // Document handlers
   const handleSaveDocument = useCallback(async () => {
     if (!docForm.title.trim()) {
-      crossAlert('Error', 'Vennligst skriv en tittel');
+      crossAlert('Error', t('common.enterTitle'));
       return;
     }
     try {
@@ -697,11 +697,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   // Link handlers
   const handleSaveLink = useCallback(async () => {
     if (!linkForm.title.trim()) {
-      crossAlert('Error', 'Vennligst skriv en tittel');
+      crossAlert('Error', t('common.enterTitle'));
       return;
     }
     if (!linkForm.url.trim()) {
-      crossAlert('Error', 'Vennligst skriv en URL');
+      crossAlert('Error', t('common.enterUrl'));
       return;
     }
     try {
@@ -771,9 +771,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   // Delete handlers
   const confirmDelete = (title: string, onConfirm: () => void) => {
-    crossAlert(`Slett ${title}`, 'Er du sikker?', [
-      { text: 'Avbryt', style: 'cancel' },
-      { text: 'Slett', style: 'destructive', onPress: onConfirm },
+    crossAlert(`${t('common.delete')} ${title}`, t('common.deleteConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      { text: t('common.delete'), style: 'destructive', onPress: onConfirm },
     ]);
   };
 
@@ -789,7 +789,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const handleCreatePackingList = useCallback(async () => {
     if (!newPackingListTitle.trim()) {
-      crossAlert('Error', 'Vennligst skriv et navn');
+      crossAlert('Error', t('common.enterName'));
       return;
     }
     try {
@@ -905,33 +905,33 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     flights.filter(f => f.transportType === 'boat').forEach(b => {
       const typeLabel = b.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: b.id, icon: 'boat', label: 'Båt/Cruise', typeLabel, name: b.airline || b.name, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
+        id: b.id, icon: 'boat', label: t('transport.boatCruise'), typeLabel, name: b.airline || b.name, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
         departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
         transportType: 'boat', docType: b.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
-        onLongPress: canDelete ? () => setActionModal({ visible: true, title: b.airline || b.name || 'Båt/Cruise', onEdit: () => openEditModal('flight', b), onDelete: () => handleDeleteFlight(b.id) }) : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: b.airline || b.name || t('transport.boatCruise'), onEdit: () => openEditModal('flight', b), onDelete: () => handleDeleteFlight(b.id) }) : undefined,
         sortKey: `boat_${b.departureDate || ''}_${b.departureTime || ''}`,
       });
     });
     flights.filter(f => f.transportType === 'taxi').forEach(tx => {
       const typeLabel = tx.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: tx.id, icon: 'taxi', label: 'Taxi', typeLabel, name: tx.airline || tx.name, detail: tx.reference, isHjemreise: tx.type === 'hjemreise',
+        id: tx.id, icon: 'taxi', label: t('transport.taxi'), typeLabel, name: tx.airline || tx.name, detail: tx.reference, isHjemreise: tx.type === 'hjemreise',
         departureDate: tx.departureDate, departureTime: tx.departureTime,
         transportType: 'taxi', docType: tx.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: tx, tripId: trip.id, trip, itemType: 'taxi' }),
-        onLongPress: canDelete ? () => setActionModal({ visible: true, title: tx.airline || tx.name || 'Taxi', onEdit: () => openEditModal('flight', tx), onDelete: () => handleDeleteFlight(tx.id) }) : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: tx.airline || tx.name || t('transport.taxi'), onEdit: () => openEditModal('flight', tx), onDelete: () => handleDeleteFlight(tx.id) }) : undefined,
         sortKey: `taxi_${tx.departureDate || ''}_${tx.departureTime || ''}`,
       });
     });
     flights.filter(f => f.transportType === 'ferry').forEach(fer => {
       const typeLabel = fer.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: fer.id, icon: 'ferry', label: 'Ferje', typeLabel, name: fer.airline || fer.name, detail: fer.routeName, isHjemreise: fer.type === 'hjemreise',
+        id: fer.id, icon: 'ferry', label: t('transport.ferry'), typeLabel, name: fer.airline || fer.name, detail: fer.routeName, isHjemreise: fer.type === 'hjemreise',
         departureDate: fer.departureDate, departureTime: fer.departureTime, arrivalTime: fer.arrivalTime, hasCar: fer.hasCar,
         transportType: 'ferry', docType: fer.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: fer, tripId: trip.id, trip, itemType: 'ferry' }),
-        onLongPress: canDelete ? () => setActionModal({ visible: true, title: fer.airline || fer.name || 'Ferje', onEdit: () => openEditModal('flight', fer), onDelete: () => handleDeleteFlight(fer.id) }) : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: fer.airline || fer.name || t('transport.ferry'), onEdit: () => openEditModal('flight', fer), onDelete: () => handleDeleteFlight(fer.id) }) : undefined,
         sortKey: `ferry_${fer.departureDate || ''}_${fer.departureTime || ''}`,
       });
     });
@@ -1076,7 +1076,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <TransportTile
                       flight={f}
                       onPress={() => navigation.navigate('TransportDetail', { flight: f, tripId: trip.id, trip })}
-                      onLongPress={canDelete ? () => setActionModal({ visible: true, title: `${f.airline || f.transportType} ${f.flightNumber || ''}`.trim(), subtitle: 'Transport', onEdit: () => openEditModal('flight', f), onDelete: () => handleDeleteFlight(f.id) }) : undefined}
+                      onLongPress={canDelete ? () => setActionModal({ visible: true, title: `${f.airline || f.transportType} ${f.flightNumber || ''}`.trim(), subtitle: t('transport.title'), onEdit: () => openEditModal('flight', f), onDelete: () => handleDeleteFlight(f.id) }) : undefined}
                     />
                   </View>
                 ))}
@@ -1151,7 +1151,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   undefined}
                 note={r.note}
                 onPress={() => navigation.navigate('TripItemDetail', { item: r, tripId: trip.id, trip, itemType: 'restaurant' })}
-                onLongPress={canDelete ? () => setActionModal({ visible: true, title: r.name || 'Restaurant', onEdit: () => openEditModal('restaurant', r), onDelete: () => handleDeleteRestaurant(r.id) }) : undefined}
+                onLongPress={canDelete ? () => setActionModal({ visible: true, title: r.name || t('restaurants.title'), onEdit: () => openEditModal('restaurant', r), onDelete: () => handleDeleteRestaurant(r.id) }) : undefined}
               />
             ))
           )}
@@ -1173,7 +1173,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 detail={[a.startDate ? formatDate(a.startDate) : '', a.endDate ? formatDate(a.endDate) : ''].filter(Boolean).join(' – ') || [a.startTime, a.endTime].filter(Boolean).join(' – ') || undefined}
                 note={a.note}
                 onPress={() => navigation.navigate('TripItemDetail', { item: a, tripId: trip.id, trip, itemType: 'activity' })}
-                onLongPress={canDelete ? () => setActionModal({ visible: true, title: a.name || 'Aktivitet', onEdit: () => openEditModal('activity', a), onDelete: () => handleDeleteActivity(a.id) }) : undefined}
+                onLongPress={canDelete ? () => setActionModal({ visible: true, title: a.name || t('activities.title'), onEdit: () => openEditModal('activity', a), onDelete: () => handleDeleteActivity(a.id) }) : undefined}
               />
             ))
           )}
@@ -1328,7 +1328,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
           {cityTipsList.length === 0 && !tipsLoading && !stagedCity && (
             <Text style={[styles.emptySection, { color: colors.textDisabled }]}>
-              Søk etter en by for å generere destinasjonstips
+              {t('common.destTipHint')}
             </Text>
           )}
         </View>
@@ -1430,7 +1430,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 key={pl.id}
                 style={[styles.itemCard, { backgroundColor: colors.inputBackground }]}
                 onPress={() => navigation.navigate('PackingListDetail', { list: pl, tripId: trip.id })}
-                onLongPress={() => setActionModal({ visible: true, title: pl.title || 'pakkeliste', onEdit: () => navigation.navigate('PackingListDetail', { list: pl, tripId: trip.id }), onDelete: () => { deleteTripPackingList(trip.id, pl.id).then(() => loadSubData()); } })}
+                onLongPress={() => setActionModal({ visible: true, title: pl.title || t('packing.title'), onEdit: () => navigation.navigate('PackingListDetail', { list: pl, tripId: trip.id }), onDelete: () => { deleteTripPackingList(trip.id, pl.id).then(() => loadSubData()); } })}
               >
                 <View style={styles.docRow}>
                   <View style={styles.docContent}>
@@ -1460,22 +1460,22 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={tripTitle}
                       onChangeText={setTripTitle}
-                      placeholder="F.eks. Sommerferie i Spania"
+                      placeholder={t('common.placeholderTripTitle')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
 
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>By</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.city')}</Text>
                     <GooglePlacesInput
                       value={tripCity}
                       onChangeText={setTripCity}
-                      placeholder="F.eks. Cavtat"
+                      placeholder={t('common.placeholderCity')}
                       types={['(cities)']}
                       onSelect={(address) => {
                         const parts = address.split(',').map((p) => p.trim());
@@ -1488,12 +1488,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
 
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Land</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.country')}</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={tripCountry}
                       onChangeText={setTripCountry}
-                      placeholder="F.eks. Kroatia"
+                      placeholder={t('common.placeholderCountry')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
@@ -1520,7 +1520,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       onPress={() => setActivePicker('tripStart')}
                     >
                       <Text style={{ color: tripStartDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {tripStartDate || 'Velg startdato'}
+                        {tripStartDate || t('common.selectStartDate')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1532,7 +1532,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       onPress={() => setActivePicker('tripEnd')}
                     >
                       <Text style={{ color: tripEndDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {tripEndDate || 'Velg sluttdato'}
+                        {tripEndDate || t('common.selectEndDate')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1591,7 +1591,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={hotelForm.name}
                       onChangeText={(v) => setHotelForm(f => ({ ...f, name: v }))}
-                      placeholder="F.eks. Grand Hotel"
+                      placeholder={t('common.placeholderHotelName')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
@@ -1610,7 +1610,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={hotelForm.phone}
                       onChangeText={(v) => setHotelForm(f => ({ ...f, phone: v }))}
-                      placeholder="F.eks. +46 8 123 456"
+                      placeholder={t('common.placeholderPhone')}
                       placeholderTextColor={colors.textDisabled}
                       keyboardType="phone-pad"
                     />
@@ -1622,7 +1622,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       onPress={() => setActivePicker('hotelStartDate')}
                     >
                       <Text style={{ color: hotelForm.startDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {hotelForm.startDate || 'Velg startdato'}
+                        {hotelForm.startDate || t('common.selectStartDate')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1633,7 +1633,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       onPress={() => setActivePicker('hotelEndDate')}
                     >
                       <Text style={{ color: hotelForm.endDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
-                        {hotelForm.endDate || 'Velg sluttdato'}
+                        {hotelForm.endDate || t('common.selectEndDate')}
                       </Text>
                     </TouchableOpacity>
                   </View>
@@ -1665,7 +1665,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={hotelForm.note}
                       onChangeText={(v) => setHotelForm(f => ({ ...f, note: v }))}
-                      placeholder="F.eks. Utsikt mot havet"
+                      placeholder={t('common.placeholderHotelNote')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
@@ -1700,7 +1700,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={restForm.name}
                       onChangeText={(v) => setRestForm(f => ({ ...f, name: v }))}
-                      placeholder="F.eks. pizza stedet"
+                      placeholder={t('common.placeholderRestaurantName')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
@@ -1743,7 +1743,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={restForm.note}
                       onChangeText={(v) => setRestForm(f => ({ ...f, note: v }))}
-                      placeholder="F.eks. Reservasjon kl. 19"
+                      placeholder={t('common.placeholderRestaurantNote')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
@@ -1973,14 +1973,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>Velg transporttype</Text>
+                <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: colors.border }]}>{t('transport.addType')}</Text>
                 {[
-                  { iconName: 'fly' as const, label: 'Fly', type: 'flight' as ModalType, transportType: 'fly' as const },
-                  { iconName: 'train' as const, label: 'Tog', type: 'flight' as ModalType, transportType: 'tog' as const },
-                  { iconName: 'car' as const, label: 'Leiebil', type: 'flight' as ModalType, transportType: 'bil' as const },
-                  { iconName: 'boat' as const, label: 'Båt/Cruise', type: 'flight' as ModalType, transportType: 'boat' as const },
-                  { iconName: 'ferry' as const, label: 'Ferje', type: 'flight' as ModalType, transportType: 'ferry' as const },
-                  { iconName: 'taxi' as const, label: 'Taxi', type: 'flight' as ModalType, transportType: 'taxi' as const },
+                  { iconName: 'fly' as const, label: t('transport.fly'), type: 'flight' as ModalType, transportType: 'fly' as const },
+                  { iconName: 'train' as const, label: t('transport.train'), type: 'flight' as ModalType, transportType: 'tog' as const },
+                  { iconName: 'car' as const, label: t('transport.carRental'), type: 'flight' as ModalType, transportType: 'bil' as const },
+                  { iconName: 'boat' as const, label: t('transport.boatCruise'), type: 'flight' as ModalType, transportType: 'boat' as const },
+                  { iconName: 'ferry' as const, label: t('transport.ferry'), type: 'flight' as ModalType, transportType: 'ferry' as const },
+                  { iconName: 'taxi' as const, label: t('transport.taxi'), type: 'flight' as ModalType, transportType: 'taxi' as const },
                 ].map((opt) => (
                   <TouchableOpacity
                     key={opt.label}
