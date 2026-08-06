@@ -911,7 +911,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     boats.forEach(b => {
       const typeLabel = b.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: b.id, icon: 'ferry', label: 'Ferje', typeLabel, name: b.name, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
+        id: b.id, icon: 'boat', label: 'Båt/Cruise', typeLabel, name: b.name, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
         departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
         transportType: 'ferry', docType: b.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
@@ -1978,9 +1978,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
-                  <AppIcon name="ferry" size={28} color={colors.accent} />
+                  <AppIcon name="boat" size={28} color={colors.accent} />
                   <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
-                    {editingId ? t('detail.edit') + ' ' + t('transport.ferry').toLowerCase() : t('common.add') + ' ' + t('transport.ferry').toLowerCase()}
+                    {editingId ? t('detail.edit') + ' ' + t('transport.boatCruise').toLowerCase() : t('common.add') + ' ' + t('transport.boatCruise').toLowerCase()}
                   </Text>
                 </View>
                 {!boatFormUtreise.isOneWay && (
@@ -2036,22 +2036,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <Text style={[styles.label, { color: colors.text }]}>{t('transport.oneWay')}</Text>
                     </TouchableOpacity>
                   </View>
-                  {!boatForm.isOneWay && (
-                    <>
-                      <View style={styles.field}>
-                        <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrival')}</Text>
-                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('boatArrDate')}>
-                          <Text style={{ color: boatForm.arrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{boatForm.arrivalDate || t('common.pickDate')}</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View style={styles.field}>
-                        <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrival')} {t('common.time')}</Text>
-                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('boatArrTime')}>
-                          <Text style={{ color: boatForm.arrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{boatForm.arrivalTime || t('common.pickTime')}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </>
-                  )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departureTerminal')}</Text>
                     <GooglePlacesInput value={boatForm.departureAddress} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, departureAddress: v }))} placeholder="Avgangsterminal adresse..." onSelect={(v) => handleBoatFormChange(f => ({ ...f, departureAddress: v }))} />
@@ -2164,22 +2148,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <Text style={[styles.label, { color: colors.text }]}>{t('transport.oneWay')}</Text>
                     </TouchableOpacity>
                   </View>
-                  {!taxiForm.isOneWay && (
-                    <>
-                      <View style={styles.field}>
-                        <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrival')} {t('common.date')}</Text>
-                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiArrDate')}>
-                          <Text style={{ color: taxiForm.arrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{taxiForm.arrivalDate || t('common.pickDate')}</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View style={styles.field}>
-                        <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrival')} {t('common.time')}</Text>
-                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiArrTime')}>
-                          <Text style={{ color: taxiForm.arrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{taxiForm.arrivalTime || t('common.pickTime')}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </>
-                  )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departureTerminal')}</Text>
                     <GooglePlacesInput value={taxiForm.departureAddress} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, departureAddress: v }))} placeholder="Henteadresse..." onSelect={(v) => handleTaxiFormChange(f => ({ ...f, departureAddress: v }))} />
@@ -2286,22 +2254,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <Text style={[styles.label, { color: colors.text }]}>{t('transport.oneWay')}</Text>
                     </TouchableOpacity>
                   </View>
-                  {!ferryForm.isOneWay && (
-                    <>
-                      <View style={styles.field}>
-                        <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrival')}</Text>
-                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryArrDate')}>
-                          <Text style={{ color: ferryForm.arrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.arrivalDate || t('common.pickDate')}</Text>
-                        </TouchableOpacity>
-                      </View>
-                      <View style={styles.field}>
-                        <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrival')} {t('common.time')}</Text>
-                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('ferryArrTime')}>
-                          <Text style={{ color: ferryForm.arrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{ferryForm.arrivalTime || t('common.pickTime')}</Text>
-                        </TouchableOpacity>
-                      </View>
-                    </>
-                  )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departureTerminal')}</Text>
                     <GooglePlacesInput value={ferryForm.departureAddress} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, departureAddress: v }))} placeholder="Avgangsterminal adresse..." onSelect={(v) => handleFerryFormChange(f => ({ ...f, departureAddress: v }))} />
