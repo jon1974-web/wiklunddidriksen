@@ -35,9 +35,9 @@ const typeConfig: Record<ItemType, { icon: string; label: string; editParam: str
   hotel: { icon: '🛏️', label: 'Hotell', editParam: 'openHotelEditId' },
   restaurant: { icon: '🍽️', label: 'Restaurant', editParam: 'openRestaurantEditId' },
   activity: { icon: '🎯', label: 'Aktivitet', editParam: 'openActivityEditId' },
-  boat: { icon: '⛴️', label: 'Ferje', editParam: 'openBoatEditId' },
+  boat: { icon: '⛵', label: 'Båt/Cruise', editParam: 'openBoatEditId' },
   taxi: { icon: '🚕', label: 'Taxi', editParam: 'openTaxiEditId' },
-  ferry: { icon: '🚢', label: 'Båt/Cruise', editParam: 'openFerryEditId' },
+  ferry: { icon: '⛴️', label: 'Ferje', editParam: 'openFerryEditId' },
 };
 
 export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navigation, route }) => {
