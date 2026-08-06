@@ -36,19 +36,53 @@ export async function geocodeCity(city: string): Promise<{ latitude: number; lon
   const cached = getCached<{ latitude: number; longitude: number }>(key);
   if (cached) return cached;
 
-  try {
-    const res = await fetch(`${GEOCODING_URL}?name=${encodeURIComponent(city)}&count=1&language=no`);
-    const data = await res.json();
-    if (data.results && data.results.length > 0) {
-      const result = data.results[0];
-      const coords = { latitude: result.latitude, longitude: result.longitude };
-      setCache(key, coords);
-      return coords;
-    }
+  const countryCodeMap: Record<string, string> = {
+    'Norway': 'NO', 'Sverige': 'SE', 'Sweden': 'SE', 'Danmark': 'DK', 'Denmark': 'DK',
+    'Finland': 'FI', 'Suomi': 'FI', 'Australia': 'AU', 'USA': 'US', 'United States': 'US',
+    'Storbritannia': 'GB', 'United Kingdom': 'GB', 'Tyskland': 'DE', 'Germany': 'DE',
+    'Frankrike': 'FR', 'France': 'FR', 'Spania': 'ES', 'Spain': 'ES', 'Italia': 'IT', 'Italy': 'IT',
+    'Hellas': 'GR', 'Greece': 'GR', 'Kroatia': 'HR', 'Croatia': 'HR', 'Thailand': 'TH',
+    'Japan': 'JP', 'Kina': 'CN', 'China': 'CN', 'Brasil': 'BR', 'Brazil': 'BR',
+    'India': 'IN', 'Mexico': 'MX', 'Canada': 'CA', 'New Zealand': 'NZ', 'Sør-Afrika': 'ZA',
+    'South Africa': 'ZA', 'Singapore': 'SG', 'Sør-Korea': 'KR', 'South Korea': 'KR',
+  };
+
+  const tryGeocode = async (query: string): Promise<{ latitude: number; longitude: number } | null> => {
+    try {
+      const res = await fetch(`${GEOCODING_URL}?name=${encodeURIComponent(query)}&count=1&language=no`);
+      const data = await res.json();
+      if (data.results && data.results.length > 0) {
+        const result = data.results[0];
+        return { latitude: result.latitude, longitude: result.longitude };
+      }
+    } catch {}
     return null;
-  } catch {
-    return null;
+  };
+
+  // Strategy 1: Full query as-is (e.g., "Melbourne, Australia")
+  const countryPart = city.includes(',') ? city.split(',').pop()?.trim() : null;
+  const cityPart = city.includes(',') ? city.split(',').slice(0, -1).join(',').trim() : city;
+  const fullQuery = countryPart ? `${cityPart}, ${countryPart}` : city;
+  let coords = await tryGeocode(fullQuery);
+  if (coords) { setCache(key, coords); return coords; }
+
+  // Strategy 2: City name alone (e.g., "Melbourne")
+  const cityName = cityPart.split(/\s+/)[0];
+  coords = await tryGeocode(cityName);
+  if (coords) { setCache(key, coords); return coords; }
+
+  // Strategy 3: City + country code (e.g., "Melbourne, AU")
+  if (countryPart) {
+    const code = countryCodeMap[countryPart] || countryPart.substring(0, 2).toUpperCase();
+    coords = await tryGeocode(`${cityName}, ${code}`);
+    if (coords) { setCache(key, coords); return coords; }
   }
+
+  // Strategy 4: Full original string as last resort
+  coords = await tryGeocode(city);
+  if (coords) { setCache(key, coords); return coords; }
+
+  return null;
 }
 
 function wmoToEmoji(code: number): string {
