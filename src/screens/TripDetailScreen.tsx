@@ -916,7 +916,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       allItems.push({
         id: b.id, icon: 'boat', label: 'Båt/Cruise', typeLabel, name: b.name, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
         departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
-        transportType: 'ferry', docType: b.type,
+        transportType: 'boat', docType: b.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
         onLongPress: canDelete ? () => setActionModal({ visible: true, title: b.name || 'Ferje', onEdit: () => openEditModal('boat', b), onDelete: () => handleDeleteBoat(b.id) }) : undefined,
         sortKey: `boat_${b.departureDate || ''}_${b.departureTime || ''}`,
