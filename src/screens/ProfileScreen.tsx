@@ -97,6 +97,7 @@ export const ProfileScreen: React.FC = () => {
   const [showHelpMatsenter, setShowHelpMatsenter] = useState(false);
   const [showHelpBirthdays, setShowHelpBirthdays] = useState(false);
   const [showHelpFamily, setShowHelpFamily] = useState(false);
+  const [showHelpMembers, setShowHelpMembers] = useState(false);
   const [showHelpSpond, setShowHelpSpond] = useState(false);
 
   useEffect(() => {
@@ -114,7 +115,7 @@ export const ProfileScreen: React.FC = () => {
       }
       setProfile(userProfile);
       if (userProfile?.familyId) {
-        setFamily(userProfile.familyId, userProfile.familyName);
+        setFamily(userProfile.familyId, userProfile.familyName, userProfile.familyRole);
       }
       if (userProfile?.calendarId) {
         const name = await getCalendarName(userProfile.calendarId);
@@ -1006,7 +1007,16 @@ export const ProfileScreen: React.FC = () => {
               </View>
               {familyMembers.length > 0 && (
                 <View style={[styles.memberList, { borderTopColor: colors.border }]}>
-                  <Text style={[styles.memberListTitle, { color: colors.text }]}>{t('profile.members')} ({familyMembers.length})</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+                    <Text style={[styles.memberListTitle, { color: colors.text, marginBottom: 0 }]}>{t('profile.members')} ({familyMembers.length})</Text>
+                    <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpMembers(true)}>
+                      <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                          <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
+                        </View>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                   {familyMembers.map((m) => (
                     <View key={m.profile.uid} style={[styles.memberRow, { borderBottomColor: colors.border }]}>
                       <View style={styles.memberInfo}>
@@ -1196,13 +1206,13 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.familyButton, { backgroundColor: colors.accent }]}
                   onPress={handleSaveSpondConfig}
                 >
-                  <Text style={styles.familyButtonText}>Lagre</Text>
+                  <Text style={styles.familyButtonText}>{t('common.save')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
-                  style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 8 }]}
+                  style={[styles.familyButton, { backgroundColor: 'transparent', borderWidth: 1, borderColor: colors.danger }]}
                   onPress={handleDisconnectSpond}
                 >
-                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Koble fra Spond</Text>
+                  <Text style={[styles.familyButtonText, { color: colors.danger }]}>{t('profile.spondDisconnect')}</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1326,6 +1336,13 @@ export const ProfileScreen: React.FC = () => {
       <HelpCenter visible={showHelpFamily} onClose={() => setShowHelpFamily(false)} title={t('profile.helpFamilyTitle')} sections={[
         { icon: '👨‍👩‍👧‍👦', title: t('profile.helpFamilyWhat'), text: t('profile.helpFamilyWhatText') },
         { icon: '👉', title: t('profile.helpFamilyHow'), text: t('profile.helpFamilyHowText'), tip: t('profile.helpFamilyTip') },
+      ]} />
+      <HelpCenter visible={showHelpMembers} onClose={() => setShowHelpMembers(false)} title={t('profile.helpMembersTitle')} sections={[
+        { icon: '👥', title: t('profile.helpMembersWhat'), text: t('profile.helpMembersWhatText') },
+        { icon: '👑', title: t('profile.helpMembersOwner'), text: t('profile.helpMembersOwnerText') },
+        { icon: '🛡️', title: t('profile.helpMembersAdmin'), text: t('profile.helpMembersAdminText') },
+        { icon: '👤', title: t('profile.helpMembersMember'), text: t('profile.helpMembersMemberText') },
+        { icon: '👉', title: t('profile.helpMembersHow'), text: t('profile.helpMembersHowText'), tip: t('profile.helpMembersTip') },
       ]} />
       <HelpCenter visible={showHelpSpond} onClose={() => setShowHelpSpond(false)} title={t('profile.helpSpondTitle')} sections={[
         { icon: '⚽', title: t('profile.helpSpondWhat'), text: t('profile.helpSpondWhatText') },
