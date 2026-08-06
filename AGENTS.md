@@ -40,7 +40,11 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - When adding new features, always add translation keys first, then use them in the code
 - For components that need language reactivity (useMemo), use `langKey` state or `i18n.on('languageChanged')` listener
 - **This applies to ALL user-facing text**: buttons, links, labels, text inputs, placeholder text, helper texts, error messages, alert titles/messages, section headers, empty states, tooltips, badge labels, and any other visible text
-- **This applies to ALL user-facing text**: buttons, links, labels, text inputs, placeholder text, helper texts, error messages, alert titles/messages, section headers, empty states, tooltips, badge labels, and any other visible text
+- **Translation sync rule**: After adding or modifying translation keys, always verify all 5 language files have identical key structures. Run this check before committing:
+  ```bash
+  node -e "const fs=require('fs');const langs=['nb','en','sv','da','fi'];const files={};for(const l of langs)files[l]=JSON.parse(fs.readFileSync('src/i18n/'+l+'.json','utf8'));const all={};for(const l of langs)for(const[ns,ks]of Object.entries(files[l])){if(!all[ns])all[ns]=new Set();for(const k of Object.keys(ks))all[ns].add(k)}for(const l of langs){const m=[];for(const[ns,ks]of Object.entries(all))for(const k of ks)if(!files[l][ns]||!files[l][ns][k])m.push(ns+'.'+k);if(m.length)console.log(l+' MISSING: '+m.join(', '))}else console.log(l+': OK')}"
+  ```
+  If keys are missing, add them to the affected files with appropriate translations before committing.
 
 ### Help Center (Info Modal)
 When adding help to a feature, follow this pattern:
