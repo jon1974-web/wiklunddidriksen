@@ -150,9 +150,27 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [actForm, setActForm] = useState(emptyAct);
   const [docForm, setDocForm] = useState(emptyDoc);
   const [linkForm, setLinkForm] = useState(emptyLink);
-  const [boatForm, setBoatForm] = useState(emptyBoat);
-  const [taxiForm, setTaxiForm] = useState(emptyTaxi);
-  const [ferryForm, setFerryForm] = useState(emptyFerry);
+  const [boatFormUtreise, setBoatFormUtreise] = useState(emptyBoat);
+  const [boatFormHjemreise, setBoatFormHjemreise] = useState(emptyBoat);
+  const [boatDirection, setBoatDirection] = useState<'utreise' | 'hjemreise'>('utreise');
+  const boatForm = boatDirection === 'utreise' ? boatFormUtreise : boatFormHjemreise;
+  const handleBoatFormChange = useCallback((updater: React.SetStateAction<typeof emptyBoat>) => {
+    if (boatDirection === 'utreise') { setBoatFormUtreise(updater); } else { setBoatFormHjemreise(updater); }
+  }, [boatDirection]);
+  const [taxiFormUtreise, setTaxiFormUtreise] = useState(emptyTaxi);
+  const [taxiFormHjemreise, setTaxiFormHjemreise] = useState(emptyTaxi);
+  const [taxiDirection, setTaxiDirection] = useState<'utreise' | 'hjemreise'>('utreise');
+  const taxiForm = taxiDirection === 'utreise' ? taxiFormUtreise : taxiFormHjemreise;
+  const handleTaxiFormChange = useCallback((updater: React.SetStateAction<typeof emptyTaxi>) => {
+    if (taxiDirection === 'utreise') { setTaxiFormUtreise(updater); } else { setTaxiFormHjemreise(updater); }
+  }, [taxiDirection]);
+  const [ferryFormUtreise, setFerryFormUtreise] = useState(emptyFerry);
+  const [ferryFormHjemreise, setFerryFormHjemreise] = useState(emptyFerry);
+  const [ferryDirection, setFerryDirection] = useState<'utreise' | 'hjemreise'>('utreise');
+  const ferryForm = ferryDirection === 'utreise' ? ferryFormUtreise : ferryFormHjemreise;
+  const handleFerryFormChange = useCallback((updater: React.SetStateAction<typeof emptyFerry>) => {
+    if (ferryDirection === 'utreise') { setFerryFormUtreise(updater); } else { setFerryFormHjemreise(updater); }
+  }, [ferryDirection]);
   const [showTransportPicker, setShowTransportPicker] = useState(false);
   const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; subtitle?: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
   const [showHelpTransport, setShowHelpTransport] = useState(false);
@@ -163,7 +181,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [showHelpDocuments, setShowHelpDocuments] = useState(false);
 
   // Unified picker state
-  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDate' | 'taxiTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
+  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDepDate' | 'taxiDepTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
   const [activePicker, setActivePicker] = useState<PickerField>(null);
 
   const handlePickerSelect = (value: string) => {
@@ -185,18 +203,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     else if (activePicker === 'hotelEndDate') setHotelForm(f => ({ ...f, endDate: value }));
     else if (activePicker === 'hotelCheckIn') setHotelForm(f => ({ ...f, checkInTime: value }));
     else if (activePicker === 'hotelCheckOut') setHotelForm(f => ({ ...f, checkOutTime: value }));
-    else if (activePicker === 'boatDepDate') setBoatForm(f => ({ ...f, departureDate: value }));
-    else if (activePicker === 'boatDepTime') setBoatForm(f => ({ ...f, departureTime: value }));
-    else if (activePicker === 'boatArrDate') setBoatForm(f => ({ ...f, arrivalDate: value }));
-    else if (activePicker === 'boatArrTime') setBoatForm(f => ({ ...f, arrivalTime: value }));
-    else if (activePicker === 'taxiDate') setTaxiForm(f => ({ ...f, departureDate: value }));
-    else if (activePicker === 'taxiTime') setTaxiForm(f => ({ ...f, departureTime: value }));
-    else if (activePicker === 'taxiArrDate') setTaxiForm(f => ({ ...f, arrivalDate: value }));
-    else if (activePicker === 'taxiArrTime') setTaxiForm(f => ({ ...f, arrivalTime: value }));
-    else if (activePicker === 'ferryDepDate') setFerryForm(f => ({ ...f, departureDate: value }));
-    else if (activePicker === 'ferryDepTime') setFerryForm(f => ({ ...f, departureTime: value }));
-    else if (activePicker === 'ferryArrDate') setFerryForm(f => ({ ...f, arrivalDate: value }));
-    else if (activePicker === 'ferryArrTime') setFerryForm(f => ({ ...f, arrivalTime: value }));
+    else if (activePicker === 'boatDepDate') handleBoatFormChange(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'boatDepTime') handleBoatFormChange(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'boatArrDate') handleBoatFormChange(f => ({ ...f, arrivalDate: value }));
+    else if (activePicker === 'boatArrTime') handleBoatFormChange(f => ({ ...f, arrivalTime: value }));
+    else if (activePicker === 'taxiDepDate') handleTaxiFormChange(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'taxiDepTime') handleTaxiFormChange(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'taxiArrDate') handleTaxiFormChange(f => ({ ...f, arrivalDate: value }));
+    else if (activePicker === 'taxiArrTime') handleTaxiFormChange(f => ({ ...f, arrivalTime: value }));
+    else if (activePicker === 'ferryDepDate') handleFerryFormChange(f => ({ ...f, departureDate: value }));
+    else if (activePicker === 'ferryDepTime') handleFerryFormChange(f => ({ ...f, departureTime: value }));
+    else if (activePicker === 'ferryArrDate') handleFerryFormChange(f => ({ ...f, arrivalDate: value }));
+    else if (activePicker === 'ferryArrTime') handleFerryFormChange(f => ({ ...f, arrivalTime: value }));
     setActivePicker(null);
   };
 
@@ -210,7 +228,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       hotelStartDate: t('pickers.startDate'), hotelEndDate: t('pickers.endDate'),
       hotelCheckIn: t('pickers.checkInTime'), hotelCheckOut: t('pickers.checkOutTime'),
       boatDepDate: t('pickers.departureDate'), boatDepTime: t('pickers.departureTime'), boatArrDate: t('pickers.arrivalDate'), boatArrTime: t('pickers.arrivalTime'),
-      taxiDate: t('pickers.date'), taxiTime: t('pickers.time'), taxiArrDate: t('pickers.arrivalDate'), taxiArrTime: t('pickers.arrivalTime'),
+      taxiDepDate: t('pickers.departureDate'), taxiDepTime: t('pickers.departureTime'), taxiArrDate: t('pickers.arrivalDate'), taxiArrTime: t('pickers.arrivalTime'),
       ferryDepDate: t('pickers.departureDate'), ferryDepTime: t('pickers.departureTime'), ferryArrDate: t('pickers.arrivalDate'), ferryArrTime: t('pickers.arrivalTime'),
     };
     return activePicker ? titles[activePicker] : '';
@@ -225,7 +243,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       restStartDate: restForm.startDate, restEndDate: restForm.endDate, restStartTime: restForm.startTime, restEndTime: restForm.endTime,
       hotelStartDate: hotelForm.startDate, hotelEndDate: hotelForm.endDate, hotelCheckIn: hotelForm.checkInTime, hotelCheckOut: hotelForm.checkOutTime,
       boatDepDate: boatForm.departureDate, boatDepTime: boatForm.departureTime, boatArrDate: boatForm.arrivalDate, boatArrTime: boatForm.arrivalTime,
-      taxiDate: taxiForm.departureDate, taxiTime: taxiForm.departureTime,
+      taxiDepDate: taxiForm.departureDate, taxiDepTime: taxiForm.departureTime, taxiArrDate: taxiForm.arrivalDate, taxiArrTime: taxiForm.arrivalTime,
       ferryDepDate: ferryForm.departureDate, ferryDepTime: ferryForm.departureTime, ferryArrDate: ferryForm.arrivalDate, ferryArrTime: ferryForm.arrivalTime,
     };
     return activePicker ? values[activePicker] || '' : '';
@@ -398,6 +416,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     setActForm(emptyAct);
     setDocForm(emptyDoc);
     setLinkForm(emptyLink);
+    setBoatFormUtreise(emptyBoat);
+    setBoatFormHjemreise(emptyBoat);
+    setBoatDirection('utreise');
+    setTaxiFormUtreise(emptyTaxi);
+    setTaxiFormHjemreise(emptyTaxi);
+    setTaxiDirection('utreise');
+    setFerryFormUtreise(emptyFerry);
+    setFerryFormHjemreise(emptyFerry);
+    setFerryDirection('utreise');
     setEditingId(null);
   };
 
@@ -485,11 +512,20 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } else if (modal === 'link') {
       setLinkForm({ title: item.title || '', url: item.url || '' });
     } else if (modal === 'boat') {
-      setBoatForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+      const isUtreise = item.type === 'utreise' || !item.type;
+      const boatData = { name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' };
+      if (isUtreise) { setBoatFormUtreise(boatData); } else { setBoatFormHjemreise(boatData); }
+      setBoatDirection(isUtreise ? 'utreise' : 'hjemreise');
     } else if (modal === 'taxi') {
-      setTaxiForm({ name: item.name || '', reference: item.reference || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || item.address || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+      const isUtreise = item.type === 'utreise' || !item.type;
+      const taxiData = { name: item.name || '', reference: item.reference || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || item.address || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' };
+      if (isUtreise) { setTaxiFormUtreise(taxiData); } else { setTaxiFormHjemreise(taxiData); }
+      setTaxiDirection(isUtreise ? 'utreise' : 'hjemreise');
     } else if (modal === 'ferry') {
-      setFerryForm({ name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' });
+      const isUtreise = item.type === 'utreise' || !item.type;
+      const ferryData = { name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' };
+      if (isUtreise) { setFerryFormUtreise(ferryData); } else { setFerryFormHjemreise(ferryData); }
+      setFerryDirection(isUtreise ? 'utreise' : 'hjemreise');
     }
     setActiveModal(modal);
   };
@@ -703,42 +739,42 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   const handleSaveBoat = useCallback(async () => {
     try {
-      const shared = { name: boatForm.name.trim() ? sanitizeInput(boatForm.name) : undefined, routeName: boatForm.routeName.trim() ? sanitizeInput(boatForm.routeName) : undefined, reference: boatForm.reference.trim() ? sanitizeInput(boatForm.reference) : undefined, cabin: boatForm.cabin.trim() ? sanitizeInput(boatForm.cabin) : undefined, isOneWay: boatForm.isOneWay || undefined, phone: boatForm.phone.trim() ? sanitizeInput(boatForm.phone) : undefined, hasCar: boatForm.hasCar || undefined, carRegistration: boatForm.hasCar && boatForm.carRegistration.trim() ? sanitizeInput(boatForm.carRegistration) : undefined, driver: boatForm.driver.trim() ? sanitizeInput(boatForm.driver) : undefined, passengers: boatForm.passengers.trim() ? sanitizeInput(boatForm.passengers) : undefined, note: boatForm.note.trim() ? sanitizeInput(boatForm.note) : undefined };
-      const utreiseData = cleanData({ ...shared, type: 'utreise', departureDate: boatForm.departureDate || undefined, departureTime: boatForm.departureTime || undefined, departureAddress: boatForm.departureAddress.trim() ? sanitizeInput(boatForm.departureAddress) : undefined, arrivalAddress: boatForm.arrivalAddress.trim() ? sanitizeInput(boatForm.arrivalAddress) : undefined });
-      const hjemreiseData = cleanData({ ...shared, type: 'hjemreise', departureDate: boatForm.arrivalDate || undefined, departureTime: boatForm.arrivalTime || undefined, departureAddress: boatForm.arrivalAddress.trim() ? sanitizeInput(boatForm.arrivalAddress) : undefined });
-      if (editingId) { await updateTripBoat(trip.id, editingId, boatForm.type === 'hjemreise' ? hjemreiseData : utreiseData); } else {
+      const shared = { name: boatFormUtreise.name.trim() ? sanitizeInput(boatFormUtreise.name) : undefined, routeName: boatFormUtreise.routeName.trim() ? sanitizeInput(boatFormUtreise.routeName) : undefined, reference: boatFormUtreise.reference.trim() ? sanitizeInput(boatFormUtreise.reference) : undefined, cabin: boatFormUtreise.cabin.trim() ? sanitizeInput(boatFormUtreise.cabin) : undefined, isOneWay: boatFormUtreise.isOneWay || undefined, phone: boatFormUtreise.phone.trim() ? sanitizeInput(boatFormUtreise.phone) : undefined, hasCar: boatFormUtreise.hasCar || undefined, carRegistration: boatFormUtreise.hasCar && boatFormUtreise.carRegistration.trim() ? sanitizeInput(boatFormUtreise.carRegistration) : undefined, driver: boatFormUtreise.driver.trim() ? sanitizeInput(boatFormUtreise.driver) : undefined, passengers: boatFormUtreise.passengers.trim() ? sanitizeInput(boatFormUtreise.passengers) : undefined, note: boatFormUtreise.note.trim() ? sanitizeInput(boatFormUtreise.note) : undefined };
+      const utreiseData = cleanData({ ...shared, type: 'utreise', departureDate: boatFormUtreise.departureDate || undefined, departureTime: boatFormUtreise.departureTime || undefined, departureAddress: boatFormUtreise.departureAddress.trim() ? sanitizeInput(boatFormUtreise.departureAddress) : undefined, arrivalAddress: boatFormUtreise.arrivalAddress.trim() ? sanitizeInput(boatFormUtreise.arrivalAddress) : undefined });
+      const hjemreiseData = cleanData({ ...shared, type: 'hjemreise', departureDate: boatFormHjemreise.departureDate || undefined, departureTime: boatFormHjemreise.departureTime || undefined, departureAddress: boatFormHjemreise.departureAddress.trim() ? sanitizeInput(boatFormHjemreise.departureAddress) : undefined });
+      if (editingId) { await updateTripBoat(trip.id, editingId, boatDirection === 'hjemreise' ? hjemreiseData : utreiseData); } else {
         await addTripBoat(trip.id, utreiseData);
-        if (!boatForm.isOneWay) { await addTripBoat(trip.id, hjemreiseData); }
+        if (!boatFormUtreise.isOneWay) { await addTripBoat(trip.id, hjemreiseData); }
       }
       resetForms(); setActiveModal(null); loadSubData();
     } catch (error) { crossAlert('Error', getErrorMessage(error)); }
-  }, [trip.id, boatForm, editingId, loadSubData]);
+  }, [trip.id, boatFormUtreise, boatFormHjemreise, boatDirection, editingId, loadSubData]);
 
   const handleSaveTaxi = useCallback(async () => {
     try {
-      const shared = { name: taxiForm.name.trim() ? sanitizeInput(taxiForm.name) : undefined, reference: taxiForm.reference.trim() ? sanitizeInput(taxiForm.reference) : undefined, isOneWay: taxiForm.isOneWay || undefined, phone: taxiForm.phone.trim() ? sanitizeInput(taxiForm.phone) : undefined, driver: taxiForm.driver.trim() ? sanitizeInput(taxiForm.driver) : undefined, passengers: taxiForm.passengers.trim() ? sanitizeInput(taxiForm.passengers) : undefined, note: taxiForm.note.trim() ? sanitizeInput(taxiForm.note) : undefined };
-      const utreiseData = cleanData({ ...shared, type: 'utreise', departureDate: taxiForm.departureDate || undefined, departureTime: taxiForm.departureTime || undefined, departureAddress: taxiForm.departureAddress.trim() ? sanitizeInput(taxiForm.departureAddress) : undefined });
-      const hjemreiseData = cleanData({ ...shared, type: 'hjemreise', departureDate: taxiForm.arrivalDate || undefined, departureTime: taxiForm.arrivalTime || undefined, departureAddress: taxiForm.arrivalAddress.trim() ? sanitizeInput(taxiForm.arrivalAddress) : undefined });
-      if (editingId) { await updateTripTaxi(trip.id, editingId, taxiForm.type === 'hjemreise' ? hjemreiseData : utreiseData); } else {
+      const shared = { name: taxiFormUtreise.name.trim() ? sanitizeInput(taxiFormUtreise.name) : undefined, reference: taxiFormUtreise.reference.trim() ? sanitizeInput(taxiFormUtreise.reference) : undefined, isOneWay: taxiFormUtreise.isOneWay || undefined, phone: taxiFormUtreise.phone.trim() ? sanitizeInput(taxiFormUtreise.phone) : undefined, driver: taxiFormUtreise.driver.trim() ? sanitizeInput(taxiFormUtreise.driver) : undefined, passengers: taxiFormUtreise.passengers.trim() ? sanitizeInput(taxiFormUtreise.passengers) : undefined, note: taxiFormUtreise.note.trim() ? sanitizeInput(taxiFormUtreise.note) : undefined };
+      const utreiseData = cleanData({ ...shared, type: 'utreise', departureDate: taxiFormUtreise.departureDate || undefined, departureTime: taxiFormUtreise.departureTime || undefined, departureAddress: taxiFormUtreise.departureAddress.trim() ? sanitizeInput(taxiFormUtreise.departureAddress) : undefined });
+      const hjemreiseData = cleanData({ ...shared, type: 'hjemreise', departureDate: taxiFormHjemreise.departureDate || undefined, departureTime: taxiFormHjemreise.departureTime || undefined, departureAddress: taxiFormHjemreise.departureAddress.trim() ? sanitizeInput(taxiFormHjemreise.departureAddress) : undefined });
+      if (editingId) { await updateTripTaxi(trip.id, editingId, taxiDirection === 'hjemreise' ? hjemreiseData : utreiseData); } else {
         await addTripTaxi(trip.id, utreiseData);
-        if (!taxiForm.isOneWay) { await addTripTaxi(trip.id, hjemreiseData); }
+        if (!taxiFormUtreise.isOneWay) { await addTripTaxi(trip.id, hjemreiseData); }
       }
       resetForms(); setActiveModal(null); loadSubData();
     } catch (error) { crossAlert('Error', getErrorMessage(error)); }
-  }, [trip.id, taxiForm, editingId, loadSubData]);
+  }, [trip.id, taxiFormUtreise, taxiFormHjemreise, taxiDirection, editingId, loadSubData]);
 
   const handleSaveFerry = useCallback(async () => {
     try {
-      const shared = { name: ferryForm.name.trim() ? sanitizeInput(ferryForm.name) : undefined, routeName: ferryForm.routeName.trim() ? sanitizeInput(ferryForm.routeName) : undefined, reference: ferryForm.reference.trim() ? sanitizeInput(ferryForm.reference) : undefined, cabin: ferryForm.cabin?.trim() ? sanitizeInput(ferryForm.cabin) : undefined, isOneWay: ferryForm.isOneWay || undefined, phone: ferryForm.phone.trim() ? sanitizeInput(ferryForm.phone) : undefined, hasCar: ferryForm.hasCar || undefined, carRegistration: ferryForm.hasCar && ferryForm.carRegistration.trim() ? sanitizeInput(ferryForm.carRegistration) : undefined, driver: ferryForm.driver.trim() ? sanitizeInput(ferryForm.driver) : undefined, passengers: ferryForm.passengers.trim() ? sanitizeInput(ferryForm.passengers) : undefined, note: ferryForm.note.trim() ? sanitizeInput(ferryForm.note) : undefined };
-      const utreiseData = cleanData({ ...shared, type: 'utreise', departureDate: ferryForm.departureDate || undefined, departureTime: ferryForm.departureTime || undefined, departureAddress: ferryForm.departureAddress.trim() ? sanitizeInput(ferryForm.departureAddress) : undefined, arrivalAddress: ferryForm.arrivalAddress.trim() ? sanitizeInput(ferryForm.arrivalAddress) : undefined });
-      const hjemreiseData = cleanData({ ...shared, type: 'hjemreise', departureDate: ferryForm.arrivalDate || undefined, departureTime: ferryForm.arrivalTime || undefined, departureAddress: ferryForm.arrivalAddress.trim() ? sanitizeInput(ferryForm.arrivalAddress) : undefined });
-      if (editingId) { await updateTripFerry(trip.id, editingId, ferryForm.type === 'hjemreise' ? hjemreiseData : utreiseData); } else {
+      const shared = { name: ferryFormUtreise.name.trim() ? sanitizeInput(ferryFormUtreise.name) : undefined, routeName: ferryFormUtreise.routeName.trim() ? sanitizeInput(ferryFormUtreise.routeName) : undefined, reference: ferryFormUtreise.reference.trim() ? sanitizeInput(ferryFormUtreise.reference) : undefined, cabin: ferryFormUtreise.cabin?.trim() ? sanitizeInput(ferryFormUtreise.cabin) : undefined, isOneWay: ferryFormUtreise.isOneWay || undefined, phone: ferryFormUtreise.phone.trim() ? sanitizeInput(ferryFormUtreise.phone) : undefined, hasCar: ferryFormUtreise.hasCar || undefined, carRegistration: ferryFormUtreise.hasCar && ferryFormUtreise.carRegistration.trim() ? sanitizeInput(ferryFormUtreise.carRegistration) : undefined, driver: ferryFormUtreise.driver.trim() ? sanitizeInput(ferryFormUtreise.driver) : undefined, passengers: ferryFormUtreise.passengers.trim() ? sanitizeInput(ferryFormUtreise.passengers) : undefined, note: ferryFormUtreise.note.trim() ? sanitizeInput(ferryFormUtreise.note) : undefined };
+      const utreiseData = cleanData({ ...shared, type: 'utreise', departureDate: ferryFormUtreise.departureDate || undefined, departureTime: ferryFormUtreise.departureTime || undefined, departureAddress: ferryFormUtreise.departureAddress.trim() ? sanitizeInput(ferryFormUtreise.departureAddress) : undefined, arrivalAddress: ferryFormUtreise.arrivalAddress.trim() ? sanitizeInput(ferryFormUtreise.arrivalAddress) : undefined });
+      const hjemreiseData = cleanData({ ...shared, type: 'hjemreise', departureDate: ferryFormHjemreise.departureDate || undefined, departureTime: ferryFormHjemreise.departureTime || undefined, departureAddress: ferryFormHjemreise.departureAddress.trim() ? sanitizeInput(ferryFormHjemreise.departureAddress) : undefined });
+      if (editingId) { await updateTripFerry(trip.id, editingId, ferryDirection === 'hjemreise' ? hjemreiseData : utreiseData); } else {
         await addTripFerry(trip.id, utreiseData);
-        if (!ferryForm.isOneWay) { await addTripFerry(trip.id, hjemreiseData); }
+        if (!ferryFormUtreise.isOneWay) { await addTripFerry(trip.id, hjemreiseData); }
       }
       resetForms(); setActiveModal(null); loadSubData();
     } catch (error) { crossAlert('Error', getErrorMessage(error)); }
-  }, [trip.id, ferryForm, editingId, loadSubData]);
+  }, [trip.id, ferryFormUtreise, ferryFormHjemreise, ferryDirection, editingId, loadSubData]);
 
   // Delete handlers
   const confirmDelete = (title: string, onConfirm: () => void) => {
@@ -1947,22 +1983,38 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     {editingId ? t('detail.edit') + ' ' + t('transport.ferry').toLowerCase() : t('common.add') + ' ' + t('transport.ferry').toLowerCase()}
                   </Text>
                 </View>
+                {!boatFormUtreise.isOneWay && (
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+                    <TouchableOpacity
+                      style={[styles.flightTypeOption, { backgroundColor: boatDirection === 'utreise' ? colors.accent : colors.inputBackground }]}
+                      onPress={() => setBoatDirection('utreise')}
+                    >
+                      <Text style={[styles.flightTypeText, { color: boatDirection === 'utreise' ? '#fff' : colors.text }]}>{t('transport.departure')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.flightTypeOption, { backgroundColor: boatDirection === 'hjemreise' ? '#E53935' : colors.inputBackground }]}
+                      onPress={() => setBoatDirection('hjemreise')}
+                    >
+                      <Text style={[styles.flightTypeText, { color: boatDirection === 'hjemreise' ? '#fff' : colors.text }]}>{t('transport.arrival')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.operator')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.name} onChangeText={(v) => setBoatForm(f => ({ ...f, name: v }))} placeholder="F.eks. Color Line" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.name} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, name: v }))} placeholder="F.eks. Color Line" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.routeName')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.routeName} onChangeText={(v) => setBoatForm(f => ({ ...f, routeName: v }))} placeholder="F.eks. Bergen–Tromsø" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.routeName} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, routeName: v }))} placeholder="F.eks. Bergen–Tromsø" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.reference')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.reference} onChangeText={(v) => setBoatForm(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.reference} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.cabin')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.cabin} onChangeText={(v) => setBoatForm(f => ({ ...f, cabin: v }))} placeholder="F.eks. Inner 2-sengs" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.cabin} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, cabin: v }))} placeholder="F.eks. Inner 2-sengs" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')}</Text>
@@ -1977,7 +2029,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => setBoatForm(f => ({ ...f, isOneWay: !f.isOneWay }))}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => handleBoatFormChange(f => ({ ...f, isOneWay: !f.isOneWay }))}>
                       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: boatForm.isOneWay ? colors.accent : colors.textDisabled, backgroundColor: boatForm.isOneWay ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                         {boatForm.isOneWay && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                       </View>
@@ -2002,18 +2054,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departureTerminal')}</Text>
-                    <GooglePlacesInput value={boatForm.departureAddress} onChangeText={(v) => setBoatForm(f => ({ ...f, departureAddress: v }))} placeholder="Avgangsterminal adresse..." onSelect={(v) => setBoatForm(f => ({ ...f, departureAddress: v }))} />
+                    <GooglePlacesInput value={boatForm.departureAddress} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, departureAddress: v }))} placeholder="Avgangsterminal adresse..." onSelect={(v) => handleBoatFormChange(f => ({ ...f, departureAddress: v }))} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrivalTerminal')}</Text>
-                    <GooglePlacesInput value={boatForm.arrivalAddress} onChangeText={(v) => setBoatForm(f => ({ ...f, arrivalAddress: v }))} placeholder="Ankomstterminal adresse..." onSelect={(v) => setBoatForm(f => ({ ...f, arrivalAddress: v }))} />
+                    <GooglePlacesInput value={boatForm.arrivalAddress} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, arrivalAddress: v }))} placeholder="Ankomstterminal adresse..." onSelect={(v) => handleBoatFormChange(f => ({ ...f, arrivalAddress: v }))} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.phone} onChangeText={(v) => setBoatForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.phone} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
                   </View>
                   <View style={styles.field}>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => setBoatForm(f => ({ ...f, hasCar: !f.hasCar }))}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => handleBoatFormChange(f => ({ ...f, hasCar: !f.hasCar }))}>
                       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: boatForm.hasCar ? colors.accent : colors.textDisabled, backgroundColor: boatForm.hasCar ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                         {boatForm.hasCar && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                       </View>
@@ -2023,22 +2075,22 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   {boatForm.hasCar && (
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('common.carRegNr')}</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.carRegistration} onChangeText={(v) => setBoatForm(f => ({ ...f, carRegistration: v }))} placeholder="F.eks. AB 12345" placeholderTextColor={colors.textDisabled} />
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.carRegistration} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, carRegistration: v }))} placeholder="F.eks. AB 12345" placeholderTextColor={colors.textDisabled} />
                     </View>
                   )}
                   {boatForm.hasCar && (
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('common.driver')}</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.driver} onChangeText={(v) => setBoatForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
+                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.driver} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
                     </View>
                   )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.passengers')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.passengers} onChangeText={(v) => setBoatForm(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.passengers} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.note} onChangeText={(v) => setBoatForm(f => ({ ...f, note: v }))} placeholder="F.eks. Bestilt middag ombord" placeholderTextColor={colors.textDisabled} />
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={boatForm.note} onChangeText={(v) => handleBoatFormChange(f => ({ ...f, note: v }))} placeholder="F.eks. Bestilt middag ombord" placeholderTextColor={colors.textDisabled} />
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
@@ -2067,29 +2119,45 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     {editingId ? t('detail.edit') + ' ' + t('transport.taxi').toLowerCase() : t('common.add') + ' ' + t('transport.taxi').toLowerCase()}
                   </Text>
                 </View>
+                {!taxiFormUtreise.isOneWay && (
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+                    <TouchableOpacity
+                      style={[styles.flightTypeOption, { backgroundColor: taxiDirection === 'utreise' ? colors.accent : colors.inputBackground }]}
+                      onPress={() => setTaxiDirection('utreise')}
+                    >
+                      <Text style={[styles.flightTypeText, { color: taxiDirection === 'utreise' ? '#fff' : colors.text }]}>{t('transport.departure')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.flightTypeOption, { backgroundColor: taxiDirection === 'hjemreise' ? '#E53935' : colors.inputBackground }]}
+                      onPress={() => setTaxiDirection('hjemreise')}
+                    >
+                      <Text style={[styles.flightTypeText, { color: taxiDirection === 'hjemreise' ? '#fff' : colors.text }]}>{t('transport.arrival')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.operator')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.name} onChangeText={(v) => setTaxiForm(f => ({ ...f, name: v }))} placeholder="F.eks. Oslo Taxi" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.name} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, name: v }))} placeholder="F.eks. Oslo Taxi" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.reference')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.reference} onChangeText={(v) => setTaxiForm(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.reference} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')} {t('common.date')}</Text>
-                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiDate')}>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiDepDate')}>
                       <Text style={{ color: taxiForm.departureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{taxiForm.departureDate || t('common.pickDate')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')} {t('common.time')}</Text>
-                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiTime')}>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('taxiDepTime')}>
                       <Text style={{ color: taxiForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{taxiForm.departureTime || t('common.pickTime')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => setTaxiForm(f => ({ ...f, isOneWay: !f.isOneWay }))}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => handleTaxiFormChange(f => ({ ...f, isOneWay: !f.isOneWay }))}>
                       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: taxiForm.isOneWay ? colors.accent : colors.textDisabled, backgroundColor: taxiForm.isOneWay ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                         {taxiForm.isOneWay && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                       </View>
@@ -2114,29 +2182,29 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departureTerminal')}</Text>
-                    <GooglePlacesInput value={taxiForm.departureAddress} onChangeText={(v) => setTaxiForm(f => ({ ...f, departureAddress: v }))} placeholder="Henteadresse..." onSelect={(v) => setTaxiForm(f => ({ ...f, departureAddress: v }))} />
+                    <GooglePlacesInput value={taxiForm.departureAddress} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, departureAddress: v }))} placeholder="Henteadresse..." onSelect={(v) => handleTaxiFormChange(f => ({ ...f, departureAddress: v }))} />
                   </View>
                   {!taxiForm.isOneWay && (
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrivalTerminal')}</Text>
-                      <GooglePlacesInput value={taxiForm.arrivalAddress} onChangeText={(v) => setTaxiForm(f => ({ ...f, arrivalAddress: v }))} placeholder="Leveringsadresse..." onSelect={(v) => setTaxiForm(f => ({ ...f, arrivalAddress: v }))} />
+                      <GooglePlacesInput value={taxiForm.arrivalAddress} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, arrivalAddress: v }))} placeholder="Leveringsadresse..." onSelect={(v) => handleTaxiFormChange(f => ({ ...f, arrivalAddress: v }))} />
                     </View>
                   )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.phone} onChangeText={(v) => setTaxiForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.phone} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.driver')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.driver} onChangeText={(v) => setTaxiForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.driver} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.passengers')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.passengers} onChangeText={(v) => setTaxiForm(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.passengers} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.note} onChangeText={(v) => setTaxiForm(f => ({ ...f, note: v }))} placeholder="F.eks. Bestilt for 4 personer" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={taxiForm.note} onChangeText={(v) => handleTaxiFormChange(f => ({ ...f, note: v }))} placeholder="F.eks. Bestilt for 4 personer" placeholderTextColor={colors.textDisabled} />
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
@@ -2165,22 +2233,38 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     {editingId ? t('detail.edit') + ' ' + t('transport.boatCruise').toLowerCase() : t('common.add') + ' ' + t('transport.boatCruise').toLowerCase()}
                   </Text>
                 </View>
+                {!ferryFormUtreise.isOneWay && (
+                  <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+                    <TouchableOpacity
+                      style={[styles.flightTypeOption, { backgroundColor: ferryDirection === 'utreise' ? colors.accent : colors.inputBackground }]}
+                      onPress={() => setFerryDirection('utreise')}
+                    >
+                      <Text style={[styles.flightTypeText, { color: ferryDirection === 'utreise' ? '#fff' : colors.text }]}>{t('transport.departure')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.flightTypeOption, { backgroundColor: ferryDirection === 'hjemreise' ? '#E53935' : colors.inputBackground }]}
+                      onPress={() => setFerryDirection('hjemreise')}
+                    >
+                      <Text style={[styles.flightTypeText, { color: ferryDirection === 'hjemreise' ? '#fff' : colors.text }]}>{t('transport.arrival')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.operator')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.name} onChangeText={(v) => setFerryForm(f => ({ ...f, name: v }))} placeholder="F.eks. Color Line" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.name} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, name: v }))} placeholder="F.eks. Color Line" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.routeName')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.routeName} onChangeText={(v) => setFerryForm(f => ({ ...f, routeName: v }))} placeholder="F.eks. Oslo–Frederikshavn" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.routeName} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, routeName: v }))} placeholder="F.eks. Oslo–Frederikshavn" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.cabin')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.cabin || ''} onChangeText={(v) => setFerryForm(f => ({ ...f, cabin: v }))} placeholder="F.eks. Inner 2-sengs" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.cabin || ''} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, cabin: v }))} placeholder="F.eks. Inner 2-sengs" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.reference')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.reference} onChangeText={(v) => setFerryForm(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.reference} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, reference: v }))} placeholder="Booking-referanse" placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departure')}</Text>
@@ -2195,7 +2279,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => setFerryForm(f => ({ ...f, isOneWay: !f.isOneWay }))}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => handleFerryFormChange(f => ({ ...f, isOneWay: !f.isOneWay }))}>
                       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: ferryForm.isOneWay ? colors.accent : colors.textDisabled, backgroundColor: ferryForm.isOneWay ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                         {ferryForm.isOneWay && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                       </View>
@@ -2220,18 +2304,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.departureTerminal')}</Text>
-                    <GooglePlacesInput value={ferryForm.departureAddress} onChangeText={(v) => setFerryForm(f => ({ ...f, departureAddress: v }))} placeholder="Avgangsterminal adresse..." onSelect={(v) => setFerryForm(f => ({ ...f, departureAddress: v }))} />
+                    <GooglePlacesInput value={ferryForm.departureAddress} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, departureAddress: v }))} placeholder="Avgangsterminal adresse..." onSelect={(v) => handleFerryFormChange(f => ({ ...f, departureAddress: v }))} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.arrivalTerminal')}</Text>
-                    <GooglePlacesInput value={ferryForm.arrivalAddress} onChangeText={(v) => setFerryForm(f => ({ ...f, arrivalAddress: v }))} placeholder="Ankomstterminal adresse..." onSelect={(v) => setFerryForm(f => ({ ...f, arrivalAddress: v }))} />
+                    <GooglePlacesInput value={ferryForm.arrivalAddress} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, arrivalAddress: v }))} placeholder="Ankomstterminal adresse..." onSelect={(v) => handleFerryFormChange(f => ({ ...f, arrivalAddress: v }))} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.phone} onChangeText={(v) => setFerryForm(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.phone} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, phone: v }))} placeholder="F.eks. +47 000 00 000" placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
                   </View>
                   <View style={styles.field}>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => setFerryForm(f => ({ ...f, hasCar: !f.hasCar }))}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => handleFerryFormChange(f => ({ ...f, hasCar: !f.hasCar }))}>
                       <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: ferryForm.hasCar ? colors.accent : colors.textDisabled, backgroundColor: ferryForm.hasCar ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                         {ferryForm.hasCar && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                       </View>
@@ -2241,22 +2325,22 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   {ferryForm.hasCar && (
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('common.carRegNr')}</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.carRegistration} onChangeText={(v) => setFerryForm(f => ({ ...f, carRegistration: v }))} placeholder="F.eks. AB 12345" placeholderTextColor={colors.textDisabled} />
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.carRegistration} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, carRegistration: v }))} placeholder="F.eks. AB 12345" placeholderTextColor={colors.textDisabled} />
                     </View>
                   )}
                   {ferryForm.hasCar && (
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('common.driver')}</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.driver} onChangeText={(v) => setFerryForm(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
+                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.driver} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, driver: v }))} placeholder="F.eks. Jon" placeholderTextColor={colors.textDisabled} />
                     </View>
                   )}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.passengers')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.passengers} onChangeText={(v) => setFerryForm(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.passengers} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, passengers: v }))} placeholder="F.eks. 4" placeholderTextColor={colors.textDisabled} keyboardType="number-pad" />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.note} onChangeText={(v) => setFerryForm(f => ({ ...f, note: v }))} placeholder="F.eks. Billett bestilt" placeholderTextColor={colors.textDisabled} />
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ferryForm.note} onChangeText={(v) => handleFerryFormChange(f => ({ ...f, note: v }))} placeholder="F.eks. Billett bestilt" placeholderTextColor={colors.textDisabled} />
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
@@ -2429,6 +2513,16 @@ const styles = StyleSheet.create({
     marginTop: 16,
     marginBottom: 8,
     overflow: 'hidden',
+  },
+  flightTypeOption: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  flightTypeText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   sectionHeader: {
     flexDirection: 'row',

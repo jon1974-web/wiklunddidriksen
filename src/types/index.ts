@@ -191,6 +191,7 @@ export interface TripBoat {
   routeName?: string;
   reference?: string;
   cabin?: string;
+  type?: 'utreise' | 'hjemreise';
   isOneWay?: boolean;
   departureDate?: string;
   departureTime?: string;
@@ -211,9 +212,14 @@ export interface TripTaxi {
   id: string;
   name?: string;
   reference?: string;
+  type?: 'utreise' | 'hjemreise';
+  isOneWay?: boolean;
   departureDate?: string;
   departureTime?: string;
-  address?: string;
+  arrivalDate?: string;
+  arrivalTime?: string;
+  departureAddress?: string;
+  arrivalAddress?: string;
   phone?: string;
   driver?: string;
   passengers?: string;
@@ -227,6 +233,7 @@ export interface TripFerry {
   routeName?: string;
   reference?: string;
   cabin?: string;
+  type?: 'utreise' | 'hjemreise';
   isOneWay?: boolean;
   departureDate?: string;
   departureTime?: string;

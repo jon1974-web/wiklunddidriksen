@@ -134,6 +134,19 @@ Performance directly impacts user experience. Treat it as a feature, not an afte
 - Without this, counters, lists, and summaries will show stale data until the app is fully refreshed
 - Example: TripDetailScreen needs focus listener because PackingListDetailScreen modifies packing list items
 
+### Transport Form Pattern (Trip Module)
+- All transport types (fly, tog, bil, boat, taxi, ferry) use the **dual form state** pattern:
+  - Two separate form states: `formUtreise` + `formHjemreise`
+  - A direction state: `direction: 'utreise' | 'hjemreise'`
+  - A change handler: `handleFormChange` that updates the correct state based on direction
+- **Avreise/Hjemreise tabs** in the modal let users switch between departure and arrival
+- **isOneWay** checkbox hides the Hjemreise tab
+- **Save logic**: Creates two Firestore documents (utreise + hjemreise) when not one-way
+- **Edit logic**: Loads data into the correct direction state based on `item.type`
+- **Picker fields**: Use `xxxDepDate`, `xxxDepTime`, `xxxArrDate`, `xxxArrTime` naming convention
+- **Pattern applies to**: fly, tog, bil (via TransportFormModal), boat, taxi, ferry (inline modals)
+- Reference: `TripDetailScreen.tsx` lines 130-172 for state setup, 740-777 for save handlers
+
 ### Rendering
 - Memoize computed values (sorted lists, filtered data, stamp calculations)
 - Avoid IIFEs in JSX — extract to `useMemo` or component functions
