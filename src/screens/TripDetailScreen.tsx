@@ -743,7 +743,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       const sharedHjemreise = { name: boatFormHjemreise.name.trim() ? sanitizeInput(boatFormHjemreise.name) : undefined, routeName: boatFormHjemreise.routeName.trim() ? sanitizeInput(boatFormHjemreise.routeName) : undefined, reference: boatFormHjemreise.reference.trim() ? sanitizeInput(boatFormHjemreise.reference) : undefined, cabin: boatFormHjemreise.cabin.trim() ? sanitizeInput(boatFormHjemreise.cabin) : undefined, isOneWay: boatFormUtreise.isOneWay || undefined, phone: boatFormHjemreise.phone.trim() ? sanitizeInput(boatFormHjemreise.phone) : undefined, hasCar: boatFormHjemreise.hasCar || undefined, carRegistration: boatFormHjemreise.hasCar && boatFormHjemreise.carRegistration.trim() ? sanitizeInput(boatFormHjemreise.carRegistration) : undefined, driver: boatFormHjemreise.driver.trim() ? sanitizeInput(boatFormHjemreise.driver) : undefined, passengers: boatFormHjemreise.passengers.trim() ? sanitizeInput(boatFormHjemreise.passengers) : undefined, note: boatFormHjemreise.note.trim() ? sanitizeInput(boatFormHjemreise.note) : undefined };
       const utreiseData = cleanData({ ...sharedUtreise, type: 'utreise', departureDate: boatFormUtreise.departureDate || undefined, departureTime: boatFormUtreise.departureTime || undefined, departureAddress: boatFormUtreise.departureAddress.trim() ? sanitizeInput(boatFormUtreise.departureAddress) : undefined, arrivalAddress: boatFormUtreise.arrivalAddress.trim() ? sanitizeInput(boatFormUtreise.arrivalAddress) : undefined });
       const hjemreiseData = cleanData({ ...sharedHjemreise, type: 'hjemreise', departureDate: boatFormHjemreise.departureDate || undefined, departureTime: boatFormHjemreise.departureTime || undefined, departureAddress: boatFormHjemreise.departureAddress.trim() ? sanitizeInput(boatFormHjemreise.departureAddress) : undefined, arrivalAddress: boatFormHjemreise.arrivalAddress.trim() ? sanitizeInput(boatFormHjemreise.arrivalAddress) : undefined });
-      if (editingId) { await updateTripBoat(trip.id, editingId, boatDirection === 'hjemreise' ? hjemreiseData : utreiseData); } else {
+      if (editingId) {
+        await updateTripBoat(trip.id, editingId, boatDirection === 'hjemreise' ? hjemreiseData : utreiseData);
+        if (!boatFormUtreise.isOneWay) {
+          const otherData = boatDirection === 'hjemreise' ? utreiseData : hjemreiseData;
+          const otherExists = boats.some(b => b.id !== editingId && b.type === (boatDirection === 'hjemreise' ? 'utreise' : 'hjemreise'));
+          if (!otherExists) {
+            await addTripBoat(trip.id, otherData);
+          }
+        }
+      } else {
         await addTripBoat(trip.id, utreiseData);
         if (!boatFormUtreise.isOneWay) { await addTripBoat(trip.id, hjemreiseData); }
       }
@@ -757,7 +766,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       const sharedHjemreise = { name: taxiFormHjemreise.name.trim() ? sanitizeInput(taxiFormHjemreise.name) : undefined, reference: taxiFormHjemreise.reference.trim() ? sanitizeInput(taxiFormHjemreise.reference) : undefined, isOneWay: taxiFormUtreise.isOneWay || undefined, phone: taxiFormHjemreise.phone.trim() ? sanitizeInput(taxiFormHjemreise.phone) : undefined, driver: taxiFormHjemreise.driver.trim() ? sanitizeInput(taxiFormHjemreise.driver) : undefined, passengers: taxiFormHjemreise.passengers.trim() ? sanitizeInput(taxiFormHjemreise.passengers) : undefined, note: taxiFormHjemreise.note.trim() ? sanitizeInput(taxiFormHjemreise.note) : undefined };
       const utreiseData = cleanData({ ...sharedUtreise, type: 'utreise', departureDate: taxiFormUtreise.departureDate || undefined, departureTime: taxiFormUtreise.departureTime || undefined, departureAddress: taxiFormUtreise.departureAddress.trim() ? sanitizeInput(taxiFormUtreise.departureAddress) : undefined });
       const hjemreiseData = cleanData({ ...sharedHjemreise, type: 'hjemreise', departureDate: taxiFormHjemreise.departureDate || undefined, departureTime: taxiFormHjemreise.departureTime || undefined, departureAddress: taxiFormHjemreise.departureAddress.trim() ? sanitizeInput(taxiFormHjemreise.departureAddress) : undefined, arrivalAddress: taxiFormHjemreise.arrivalAddress.trim() ? sanitizeInput(taxiFormHjemreise.arrivalAddress) : undefined });
-      if (editingId) { await updateTripTaxi(trip.id, editingId, taxiDirection === 'hjemreise' ? hjemreiseData : utreiseData); } else {
+      if (editingId) {
+        await updateTripTaxi(trip.id, editingId, taxiDirection === 'hjemreise' ? hjemreiseData : utreiseData);
+        if (!taxiFormUtreise.isOneWay) {
+          const otherData = taxiDirection === 'hjemreise' ? utreiseData : hjemreiseData;
+          const otherExists = taxis.some(t => t.id !== editingId && t.type === (taxiDirection === 'hjemreise' ? 'utreise' : 'hjemreise'));
+          if (!otherExists) {
+            await addTripTaxi(trip.id, otherData);
+          }
+        }
+      } else {
         await addTripTaxi(trip.id, utreiseData);
         if (!taxiFormUtreise.isOneWay) { await addTripTaxi(trip.id, hjemreiseData); }
       }
@@ -771,7 +789,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       const sharedHjemreise = { name: ferryFormHjemreise.name.trim() ? sanitizeInput(ferryFormHjemreise.name) : undefined, routeName: ferryFormHjemreise.routeName.trim() ? sanitizeInput(ferryFormHjemreise.routeName) : undefined, reference: ferryFormHjemreise.reference.trim() ? sanitizeInput(ferryFormHjemreise.reference) : undefined, cabin: ferryFormHjemreise.cabin?.trim() ? sanitizeInput(ferryFormHjemreise.cabin) : undefined, isOneWay: ferryFormUtreise.isOneWay || undefined, phone: ferryFormHjemreise.phone.trim() ? sanitizeInput(ferryFormHjemreise.phone) : undefined, hasCar: ferryFormHjemreise.hasCar || undefined, carRegistration: ferryFormHjemreise.hasCar && ferryFormHjemreise.carRegistration.trim() ? sanitizeInput(ferryFormHjemreise.carRegistration) : undefined, driver: ferryFormHjemreise.driver.trim() ? sanitizeInput(ferryFormHjemreise.driver) : undefined, passengers: ferryFormHjemreise.passengers.trim() ? sanitizeInput(ferryFormHjemreise.passengers) : undefined, note: ferryFormHjemreise.note.trim() ? sanitizeInput(ferryFormHjemreise.note) : undefined };
       const utreiseData = cleanData({ ...sharedUtreise, type: 'utreise', departureDate: ferryFormUtreise.departureDate || undefined, departureTime: ferryFormUtreise.departureTime || undefined, departureAddress: ferryFormUtreise.departureAddress.trim() ? sanitizeInput(ferryFormUtreise.departureAddress) : undefined, arrivalAddress: ferryFormUtreise.arrivalAddress.trim() ? sanitizeInput(ferryFormUtreise.arrivalAddress) : undefined });
       const hjemreiseData = cleanData({ ...sharedHjemreise, type: 'hjemreise', departureDate: ferryFormHjemreise.departureDate || undefined, departureTime: ferryFormHjemreise.departureTime || undefined, departureAddress: ferryFormHjemreise.departureAddress.trim() ? sanitizeInput(ferryFormHjemreise.departureAddress) : undefined, arrivalAddress: ferryFormHjemreise.arrivalAddress.trim() ? sanitizeInput(ferryFormHjemreise.arrivalAddress) : undefined });
-      if (editingId) { await updateTripFerry(trip.id, editingId, ferryDirection === 'hjemreise' ? hjemreiseData : utreiseData); } else {
+      if (editingId) {
+        await updateTripFerry(trip.id, editingId, ferryDirection === 'hjemreise' ? hjemreiseData : utreiseData);
+        if (!ferryFormUtreise.isOneWay) {
+          const otherData = ferryDirection === 'hjemreise' ? utreiseData : hjemreiseData;
+          const otherExists = ferries.some(f => f.id !== editingId && f.type === (ferryDirection === 'hjemreise' ? 'utreise' : 'hjemreise'));
+          if (!otherExists) {
+            await addTripFerry(trip.id, otherData);
+          }
+        }
+      } else {
         await addTripFerry(trip.id, utreiseData);
         if (!ferryFormUtreise.isOneWay) { await addTripFerry(trip.id, hjemreiseData); }
       }
