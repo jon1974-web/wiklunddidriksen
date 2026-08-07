@@ -144,7 +144,11 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
   };
 
   const today = new Date().toISOString().split('T')[0];
-  const upcoming = birthdays.filter(b => b.date >= today).slice(0, 5);
+  const todayMonthDay = today.substring(5); // "MM-DD"
+  const upcoming = birthdays.filter(b => {
+    const bMonthDay = b.date.substring(5);
+    return bMonthDay >= todayMonthDay;
+  }).slice(0, 5);
   const sorted = [...birthdays].sort((a, b) => {
     const aDays = getDaysUntilBirthday(a.date);
     const bDays = getDaysUntilBirthday(b.date);
@@ -180,10 +184,6 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       </View>
 
       <ScrollView style={styles.content}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
-        </TouchableOpacity>
-
         {/* Upcoming birthdays */}
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <View style={styles.cardHeader}>
