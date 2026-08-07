@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { DatePickerModal } from '../components/DatePickerModal';
+import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { scheduleEventReminder } from '../services/notificationService';
@@ -450,7 +451,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.location')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.location} onChangeText={(v) => setApptForm(f => ({ ...f, location: v }))} placeholder={t('health.locationPlaceholder')} placeholderTextColor={colors.textDisabled} />
+                    <GooglePlacesInput
+                      value={apptForm.location}
+                      onChangeText={(v) => setApptForm(f => ({ ...f, location: v }))}
+                      placeholder={t('health.locationPlaceholder')}
+                      onSelect={(v) => setApptForm(f => ({ ...f, location: v }))}
+                    />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.note')}</Text>

@@ -116,7 +116,8 @@ export const getSpondStampStatus = (
 type UnifiedItem =
   | (Event & { _type: 'event' })
   | (Trip & { _type: 'trip' })
-  | (SpondEvent & { _type: 'spond' });
+  | (SpondEvent & { _type: 'spond' })
+  | (HealthAppointment & { _type: 'healthAppointment' });
 
 export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
@@ -378,7 +379,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         const end = e.endTimestamp ? formatSpondDate(e.endTimestamp) : start;
         return selectedDate >= start && selectedDate <= end;
       }).map((e) => ({ ...e, _type: 'spond' as const }));
-      let dayItems = [...dayEvents, ...dayTrips, ...daySpond];
+      const dayHealth = healthAppointments.filter((a) => a.date === selectedDate).map((a) => ({
+        ...a, _type: 'healthAppointment' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.date, description: `${a.person}${a.location ? ' — ' + a.location : ''}`, icon: '🏥',
+      }));
+      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth];
       if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
       dayItems.sort(sortByDate);
@@ -388,6 +392,16 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       ...events.map((e) => ({ ...e, _type: 'event' as const })),
       ...trips.map((t) => ({ ...t, _type: 'trip' as const })),
       ...spondEvents.map((e) => ({ ...e, _type: 'spond' as const })),
+      ...healthAppointments.filter(a => a.date).map((a) => ({
+        ...a,
+        _type: 'healthAppointment' as const,
+        time: a.startTime || '09:00',
+        address: a.location || '',
+        title: a.title,
+        date: a.date,
+        description: `${a.person}${a.location ? ' — ' + a.location : ''}`,
+        icon: '🏥',
+      })),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
     const filtered = filterSource && filterSource !== 'app'
       ? allItems.filter((i) => i._type === 'spond' && i.groupName === filterSource)
