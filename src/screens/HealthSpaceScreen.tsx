@@ -259,7 +259,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
       </View>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppIcon name="transport" size={28} color="#E53935" />
           <Text style={[styles.screenTitle, { color: colors.text }]}>{t('spaces.health')}</Text>
