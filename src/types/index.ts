@@ -366,6 +366,7 @@ export interface HealthAppointment {
   note?: string;
   reminder?: string;
   addToCalendar?: boolean;
+  notificationId?: string;
   createdAt: number;
 }
 

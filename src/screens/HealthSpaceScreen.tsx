@@ -8,6 +8,7 @@ import { AppIcon } from '../components/AppIcon';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
+import { scheduleEventReminder } from '../services/notificationService';
 import {
   getHealthMedications, addHealthMedication, updateHealthMedication, deleteHealthMedication,
   getHealthAppointments, addHealthAppointment, updateHealthAppointment, deleteHealthAppointment,
@@ -47,7 +48,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
-  const [apptForm, setApptForm] = useState({ title: '', person: '', date: '', startTime: '', endTime: '', location: '', note: '' });
+  const [apptForm, setApptForm] = useState({ title: '', person: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
@@ -95,13 +96,55 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
       } else if (activeSection === 'appointments') {
         if (!apptForm.title.trim() || !apptForm.date) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
-        if (isEditing) await updateHealthAppointment(familyId, editingItem.id, apptForm);
-        else await addHealthAppointment(familyId, apptForm);
-        setApptForm({ title: '', person: persons[0] || '', date: '', startTime: '', endTime: '', location: '', note: '' });
+        let savedAppt;
+        if (isEditing) {
+          await updateHealthAppointment(familyId, editingItem.id, apptForm);
+          savedAppt = { ...apptForm, id: editingItem.id };
+        } else {
+          const id = await addHealthAppointment(familyId, apptForm);
+          savedAppt = { ...apptForm, id };
+        }
+        // Schedule notification if reminder is set
+        if (apptForm.reminder && savedAppt) {
+          const reminderMinutes = apptForm.reminder.includes('1 ' + t('health.reminder1Day').split(' ')[1]) ? 1440 :
+                                  apptForm.reminder.includes('3') ? 4320 : 10080;
+          const eventDate = new Date(`${apptForm.date}T${apptForm.startTime || '09:00'}:00`);
+          const notifId = await scheduleEventReminder(
+            `${t('health.appointments')}: ${apptForm.title}`,
+            `${apptForm.person} — ${apptForm.date} ${apptForm.startTime}${apptForm.location ? ' (' + apptForm.location + ')' : ''}`,
+            eventDate,
+            reminderMinutes
+          );
+          if (notifId && savedAppt.id) {
+            await updateHealthAppointment(familyId, savedAppt.id, { notificationId: notifId });
+          }
+        }
+        setApptForm({ title: '', person: persons[0] || '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
-        if (isEditing) await updateHealthVaccination(familyId, editingItem.id, vaccForm);
-        else await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
+        let savedVacc;
+        if (isEditing) {
+          await updateHealthVaccination(familyId, editingItem.id, vaccForm);
+          savedVacc = { ...vaccForm, id: editingItem.id, status: 'pending' };
+        } else {
+          const id = await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
+          savedVacc = { ...vaccForm, id, status: 'pending' };
+        }
+        // Schedule notification if reminder is set
+        if (vaccForm.reminder && savedVacc) {
+          const reminderMinutes = vaccForm.reminder.includes('1 ' + t('health.reminder1Day').split(' ')[1]) ? 1440 :
+                                  vaccForm.reminder.includes('3') ? 4320 : 10080;
+          const vaccDate = new Date(`${vaccForm.date}T09:00:00`);
+          const notifId = await scheduleEventReminder(
+            `${t('health.vaccinations')}: ${vaccForm.name}`,
+            `${vaccForm.person} — ${vaccForm.date}`,
+            vaccDate,
+            reminderMinutes
+          );
+          if (notifId && savedVacc.id) {
+            await updateHealthVaccination(familyId, savedVacc.id, { notificationId: notifId });
+          }
+        }
         setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', note: '' });
       } else if (activeSection === 'allergies') {
         if (!allergyForm.allergen.trim()) { crossAlert('Error', t('health.enterAllergen')); return; }
@@ -163,7 +206,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) setMedForm({ name: item.name, person: item.person, dosage: item.dosage, frequency: item.frequency, dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
     } else if (section === 'appointments') {
       const item = appointments.find(a => a.id === id);
-      if (item) setApptForm({ title: item.title, person: item.person, date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '' });
+      if (item) setApptForm({ title: item.title, person: item.person, date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '' });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
       if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', note: item.note || '' });
@@ -412,6 +455,16 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.note')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.note} onChangeText={(v) => setApptForm(f => ({ ...f, note: v }))} placeholder={t('health.notePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
+                    <View style={styles.personRow}>
+                      {['', t('health.reminder1Day'), t('health.reminder3Days'), t('health.reminder1Week')].map((r, i) => (
+                        <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: apptForm.reminder === r ? colors.accent : colors.inputBackground }]} onPress={() => setApptForm(f => ({ ...f, reminder: r }))}>
+                          <Text style={{ color: apptForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
                   </View>
                 </>
               )}
