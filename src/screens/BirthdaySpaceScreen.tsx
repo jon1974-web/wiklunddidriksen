@@ -195,20 +195,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
           {upcoming.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('birthdays.noUpcoming')}</Text>
           ) : (
-            upcoming.map(b => {
-              const days = getDaysUntilBirthday(b.date);
-              const badge = getCountdownBadge(b.date);
-              return (
-                <TouchableOpacity key={b.id} style={styles.item} onPress={() => { setSelectedBirthday(b); setShowGiftModal(true); }} onLongPress={() => setActionModal({ visible: true, id: b.id, title: b.name })}>
-                  <AppIcon name="birthday" size={20} color={colors.accent} />
-                  <View style={styles.itemText}>
-                    <Text style={[styles.itemTitle, { color: colors.text }]}>{b.name}</Text>
-                    <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{b.date} — {calculateAge(b.date)} {t('birthdays.years')}</Text>
-                  </View>
-                  <Text style={[styles.badge, { backgroundColor: badge.style === 'countdown-today' ? '#FFEBEE' : badge.style === 'countdown-soon' ? '#FFF3E0' : '#E8F5E9', color: badge.style === 'countdown-today' ? '#E53935' : badge.style === 'countdown-soon' ? '#FB8C00' : '#43A047' }]}>{badge.text}</Text>
-                </TouchableOpacity>
-              );
-            })
+            upcoming.map(b => renderBirthdayWithGifts(b))
           )}
         </View>
 
