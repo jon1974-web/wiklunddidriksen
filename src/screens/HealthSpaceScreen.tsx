@@ -254,7 +254,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginLeft: 16, marginTop: 16 }}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginLeft: 16, marginTop: 20 }}>
         <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
@@ -871,7 +871,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { padding: 16, paddingBottom: 8, borderBottomWidth: 1 },
+  header: { padding: 16, borderBottomWidth: 1 },
   screenTitle: { fontSize: 28, fontWeight: 'bold' },
   content: { flex: 1, padding: 16 },
   section: { borderRadius: 12, padding: 16, marginBottom: 12 },
