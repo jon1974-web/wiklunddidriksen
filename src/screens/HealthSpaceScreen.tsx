@@ -9,11 +9,11 @@ import { DatePickerModal } from '../components/DatePickerModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import {
-  getHealthMedications, addHealthMedication, deleteHealthMedication,
-  getHealthAppointments, addHealthAppointment, deleteHealthAppointment,
-  getHealthVaccinations, addHealthVaccination, deleteHealthVaccination,
-  getHealthAllergies, addHealthAllergy, deleteHealthAllergy,
-  getHealthGrowth, addHealthGrowth, deleteHealthGrowth,
+  getHealthMedications, addHealthMedication, updateHealthMedication, deleteHealthMedication,
+  getHealthAppointments, addHealthAppointment, updateHealthAppointment, deleteHealthAppointment,
+  getHealthVaccinations, addHealthVaccination, updateHealthVaccination, deleteHealthVaccination,
+  getHealthAllergies, addHealthAllergy, updateHealthAllergy, deleteHealthAllergy,
+  getHealthGrowth, addHealthGrowth, updateHealthGrowth, deleteHealthGrowth,
 } from '../services/healthService';
 import { HealthMedication, HealthAppointment, HealthVaccination, HealthAllergy, HealthGrowth } from '../types';
 import { ActionModal } from '../components/ActionModal';
@@ -40,7 +40,8 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   const [activeSection, setActiveSection] = useState<SectionType | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [deleteModal, setDeleteModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [editingItem, setEditingItem] = useState<{ id: string; section: SectionType } | null>(null);
+  const [actionModal, setActionModal] = useState<{ visible: boolean; id: string; title: string; section: SectionType }>({ visible: false, id: '', title: '', section: 'medications' });
   const [showHelp, setShowHelp] = useState(false);
   const [activePicker, setActivePicker] = useState<string | null>(null);
 
@@ -86,27 +87,35 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const handleAdd = async () => {
     if (!familyId) return;
     try {
+      const isEditing = editingItem !== null;
       if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('health.enterName')); return; }
-        await addHealthMedication(familyId, medForm);
+        if (isEditing) await updateHealthMedication(familyId, editingItem.id, medForm);
+        else await addHealthMedication(familyId, medForm);
         setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
       } else if (activeSection === 'appointments') {
         if (!apptForm.title.trim() || !apptForm.date) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
-        await addHealthAppointment(familyId, apptForm);
+        if (isEditing) await updateHealthAppointment(familyId, editingItem.id, apptForm);
+        else await addHealthAppointment(familyId, apptForm);
         setApptForm({ title: '', person: persons[0] || '', date: '', startTime: '', endTime: '', location: '', note: '' });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
-        await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
+        if (isEditing) await updateHealthVaccination(familyId, editingItem.id, vaccForm);
+        else await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
         setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', note: '' });
       } else if (activeSection === 'allergies') {
         if (!allergyForm.allergen.trim()) { crossAlert('Error', t('health.enterAllergen')); return; }
-        await addHealthAllergy(familyId, allergyForm);
+        if (isEditing) await updateHealthAllergy(familyId, editingItem.id, allergyForm);
+        else await addHealthAllergy(familyId, allergyForm);
         setAllergyForm({ allergen: '', person: persons[0] || '', severity: 'mild', note: '' });
       } else if (activeSection === 'growth') {
         if (!growthForm.height || !growthForm.weight || !growthForm.date) { crossAlert('Error', t('health.enterHeightWeightDate')); return; }
-        await addHealthGrowth(familyId, { ...growthForm, height: Number(growthForm.height), weight: Number(growthForm.weight) });
+        const growthData = { ...growthForm, height: Number(growthForm.height), weight: Number(growthForm.weight) };
+        if (isEditing) await updateHealthGrowth(familyId, editingItem.id, growthData);
+        else await addHealthGrowth(familyId, growthData);
         setGrowthForm({ person: persons[0] || '', height: '', weight: '', date: '', note: '' });
       }
+      setEditingItem(null);
       setShowAddModal(false);
       loadData();
     } catch (error) {
@@ -115,18 +124,26 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   };
 
   const handleDelete = async () => {
-    if (!familyId || !deleteModal.id) return;
+    if (!familyId || !actionModal.id) return;
     try {
-      if (activeSection === 'medications') await deleteHealthMedication(familyId, deleteModal.id);
-      else if (activeSection === 'appointments') await deleteHealthAppointment(familyId, deleteModal.id);
-      else if (activeSection === 'vaccinations') await deleteHealthVaccination(familyId, deleteModal.id);
-      else if (activeSection === 'allergies') await deleteHealthAllergy(familyId, deleteModal.id);
-      else if (activeSection === 'growth') await deleteHealthGrowth(familyId, deleteModal.id);
-      setDeleteModal({ visible: false, id: '', title: '' });
+      if (activeSection === 'medications') await deleteHealthMedication(familyId, actionModal.id);
+      else if (activeSection === 'appointments') await deleteHealthAppointment(familyId, actionModal.id);
+      else if (activeSection === 'vaccinations') await deleteHealthVaccination(familyId, actionModal.id);
+      else if (activeSection === 'allergies') await deleteHealthAllergy(familyId, actionModal.id);
+      else if (activeSection === 'growth') await deleteHealthGrowth(familyId, actionModal.id);
+      setActionModal({ visible: false, id: '', title: '' });
       loadData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
+  };
+
+  const handleEdit = () => {
+    if (!actionModal.id || !actionModal.section) return;
+    setActionModal({ visible: false, id: '', title: '' });
+    setActiveSection(actionModal.section);
+    setEditingItem({ id: actionModal.id, section: actionModal.section });
+    setShowAddModal(true);
   };
 
   const getDaysUntil = (dateStr: string): string => {
@@ -136,6 +153,28 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
     if (diff === 1) return t('health.tomorrow');
     return t('health.inDays', { count: diff });
   };
+
+  // Pre-fill form when editing
+  useEffect(() => {
+    if (!editingItem) return;
+    const { id, section } = editingItem;
+    if (section === 'medications') {
+      const item = medications.find(m => m.id === id);
+      if (item) setMedForm({ name: item.name, person: item.person, dosage: item.dosage, frequency: item.frequency, dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
+    } else if (section === 'appointments') {
+      const item = appointments.find(a => a.id === id);
+      if (item) setApptForm({ title: item.title, person: item.person, date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '' });
+    } else if (section === 'vaccinations') {
+      const item = vaccinations.find(v => v.id === id);
+      if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', note: item.note || '' });
+    } else if (section === 'allergies') {
+      const item = allergies.find(a => a.id === id);
+      if (item) setAllergyForm({ allergen: item.allergen, person: item.person, severity: item.severity, note: item.note || '' });
+    } else if (section === 'growth') {
+      const item = growth.find(g => g.id === id);
+      if (item) setGrowthForm({ person: item.person, height: String(item.height), weight: String(item.weight), date: item.date, note: item.note || '' });
+    }
+  }, [editingItem, medications, appointments, vaccinations, allergies, growth]);
 
   const renderSection = (title: string, icon: string, count: number, section: SectionType, children: React.ReactNode) => (
     <View style={[styles.section, { backgroundColor: colors.surface }]}>
@@ -147,7 +186,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         </View>
         <TouchableOpacity
           style={[styles.addButton, { backgroundColor: colors.accent }]}
-          onPress={() => { setActiveSection(section); setShowAddModal(true); }}
+          onPress={() => { setActiveSection(section); setEditingItem(null); setShowAddModal(true); }}
         >
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
         </TouchableOpacity>
@@ -182,7 +221,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noMedications')}</Text>
           ) : (
             medications.map(med => (
-              <TouchableOpacity key={med.id} style={styles.item} onLongPress={() => { setActiveSection('medications'); setDeleteModal({ visible: true, id: med.id, title: med.name }); }}>
+              <TouchableOpacity key={med.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: med.id, title: med.name, section: 'medications' })}>
                 <AppIcon name="medication" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{med.name}</Text>
@@ -199,7 +238,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAppointments')}</Text>
           ) : (
             appointments.map(appt => (
-              <TouchableOpacity key={appt.id} style={styles.item} onLongPress={() => { setActiveSection('appointments'); setDeleteModal({ visible: true, id: appt.id, title: appt.title }); }}>
+              <TouchableOpacity key={appt.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
                 <AppIcon name="calendar" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
@@ -219,7 +258,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noVaccinations')}</Text>
           ) : (
             vaccinations.map(vacc => (
-              <TouchableOpacity key={vacc.id} style={styles.item} onLongPress={() => { setActiveSection('vaccinations'); setDeleteModal({ visible: true, id: vacc.id, title: vacc.name }); }}>
+              <TouchableOpacity key={vacc.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: vacc.id, title: vacc.name, section: 'vaccinations' })}>
                 <AppIcon name="vaccination" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{vacc.name}</Text>
@@ -239,7 +278,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAllergies')}</Text>
           ) : (
             allergies.map(allergy => (
-              <TouchableOpacity key={allergy.id} style={styles.item} onLongPress={() => { setActiveSection('allergies'); setDeleteModal({ visible: true, id: allergy.id, title: allergy.allergen }); }}>
+              <TouchableOpacity key={allergy.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: allergy.id, title: allergy.allergen, section: 'allergies' })}>
                 <AppIcon name="allergy" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{allergy.allergen}</Text>
@@ -259,7 +298,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noGrowth')}</Text>
           ) : (
             growth.map(g => (
-              <TouchableOpacity key={g.id} style={styles.item} onLongPress={() => { setActiveSection('growth'); setDeleteModal({ visible: true, id: g.id, title: g.person }); }}>
+              <TouchableOpacity key={g.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: g.id, title: g.person, section: 'growth' })}>
                 <AppIcon name="growth" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{g.person}</Text>
@@ -495,10 +534,11 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
       {/* Delete confirmation */}
       <ActionModal
-        visible={deleteModal.visible}
-        title={deleteModal.title}
+        visible={actionModal.visible}
+        title={actionModal.title}
+        onEdit={handleEdit}
         onDelete={handleDelete}
-        onCancel={() => setDeleteModal({ visible: false, id: '', title: '' })}
+        onCancel={() => setActionModal({ visible: false, id: '', title: '', section: 'medications' })}
       />
 
       {/* Help Center */}
