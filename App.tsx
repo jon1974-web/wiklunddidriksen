@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { View, TouchableOpacity, Text, ActivityIndicator, Image, Animated } from 'react-native';
-import Svg, { Rect, Line, Path, Circle, Polygon } from 'react-native-svg';
+import Svg, { Rect, Line, Path, Circle, Polygon, Polyline } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
 
 import './src/i18n';
