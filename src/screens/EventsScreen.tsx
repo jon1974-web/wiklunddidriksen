@@ -382,7 +382,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const dayHealth = healthAppointments.filter((a) => a.date === selectedDate).map((a) => ({
         ...a, _type: 'healthAppointment' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.date, description: `${a.person}${a.location ? ' — ' + a.location : ''}`, icon: '🏥',
       }));
-      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth];
+      const dayVaccinations = healthVaccinations.filter((v) => v.date === selectedDate).map((v) => ({
+        ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('health.vaccinations')}: ${v.name}`, date: v.date, description: v.person, icon: '💉',
+      }));
+      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations];
       if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
       dayItems.sort(sortByDate);
@@ -401,6 +404,16 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         date: a.date,
         description: `${a.person}${a.location ? ' — ' + a.location : ''}`,
         icon: '🏥',
+      })),
+      ...healthVaccinations.filter(v => v.date).map((v) => ({
+        ...v,
+        _type: 'healthAppointment' as const,
+        time: '09:00',
+        address: v.location || '',
+        title: `${t('health.vaccinations')}: ${v.name}`,
+        date: v.date,
+        description: v.person,
+        icon: '💉',
       })),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
     const filtered = filterSource && filterSource !== 'app'

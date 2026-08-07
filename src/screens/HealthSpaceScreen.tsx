@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, TextInput, Modal, Alert } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, TextInput, Modal, Alert, Image, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { scheduleEventReminder } from '../services/notificationService';
+import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import {
   getHealthMedications, addHealthMedication, updateHealthMedication, deleteHealthMedication,
   getHealthAppointments, addHealthAppointment, updateHealthAppointment, deleteHealthAppointment,
@@ -44,13 +45,14 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<{ id: string; section: SectionType } | null>(null);
   const [actionModal, setActionModal] = useState<{ visible: boolean; id: string; title: string; section: SectionType }>({ visible: false, id: '', title: '', section: 'medications' });
+  const [detailModal, setDetailModal] = useState<{ visible: boolean; item: any; section: SectionType }>({ visible: false, item: null, section: 'medications' });
   const [showHelp, setShowHelp] = useState(false);
   const [activePicker, setActivePicker] = useState<string | null>(null);
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
   const [apptForm, setApptForm] = useState({ title: '', person: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
-  const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', note: '' });
+  const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
 
@@ -146,7 +148,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             await updateHealthVaccination(familyId, savedVacc.id, { notificationId: notifId });
           }
         }
-        setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', note: '' });
+        setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', location: '', note: '' });
       } else if (activeSection === 'allergies') {
         if (!allergyForm.allergen.trim()) { crossAlert('Error', t('health.enterAllergen')); return; }
         if (isEditing) await updateHealthAllergy(familyId, editingItem.id, allergyForm);
@@ -210,7 +212,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) setApptForm({ title: item.title, person: item.person, date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '' });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
-      if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', note: item.note || '' });
+      if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', location: item.location || '', note: item.note || '' });
     } else if (section === 'allergies') {
       const item = allergies.find(a => a.id === id);
       if (item) setAllergyForm({ allergen: item.allergen, person: item.person, severity: item.severity, note: item.note || '' });
@@ -265,7 +267,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noMedications')}</Text>
           ) : (
             medications.map(med => (
-              <TouchableOpacity key={med.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: med.id, title: med.name, section: 'medications' })}>
+              <TouchableOpacity key={med.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: med, section: 'medications' })} onLongPress={() => setActionModal({ visible: true, id: med.id, title: med.name, section: 'medications' })}>
                 <AppIcon name="medication" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{med.name}</Text>
@@ -282,7 +284,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAppointments')}</Text>
           ) : (
             appointments.map(appt => (
-              <TouchableOpacity key={appt.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
+              <TouchableOpacity key={appt.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: appt, section: 'appointments' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
                 <AppIcon name="calendar" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
@@ -302,7 +304,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noVaccinations')}</Text>
           ) : (
             vaccinations.map(vacc => (
-              <TouchableOpacity key={vacc.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: vacc.id, title: vacc.name, section: 'vaccinations' })}>
+              <TouchableOpacity key={vacc.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: vacc, section: 'vaccinations' })} onLongPress={() => setActionModal({ visible: true, id: vacc.id, title: vacc.name, section: 'vaccinations' })}>
                 <AppIcon name="vaccination" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{vacc.name}</Text>
@@ -322,7 +324,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAllergies')}</Text>
           ) : (
             allergies.map(allergy => (
-              <TouchableOpacity key={allergy.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: allergy.id, title: allergy.allergen, section: 'allergies' })}>
+              <TouchableOpacity key={allergy.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: allergy, section: 'allergies' })} onLongPress={() => setActionModal({ visible: true, id: allergy.id, title: allergy.allergen, section: 'allergies' })}>
                 <AppIcon name="allergy" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{allergy.allergen}</Text>
@@ -342,7 +344,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noGrowth')}</Text>
           ) : (
             growth.map(g => (
-              <TouchableOpacity key={g.id} style={styles.item} onLongPress={() => setActionModal({ visible: true, id: g.id, title: g.person, section: 'growth' })}>
+              <TouchableOpacity key={g.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: g, section: 'growth' })} onLongPress={() => setActionModal({ visible: true, id: g.id, title: g.person, section: 'growth' })}>
                 <AppIcon name="growth" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{g.person}</Text>
@@ -514,6 +516,15 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                       ))}
                     </View>
                   </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.location')}</Text>
+                    <GooglePlacesInput
+                      value={vaccForm.location}
+                      onChangeText={(v) => setVaccForm(f => ({ ...f, location: v }))}
+                      placeholder={t('health.locationPlaceholder')}
+                      onSelect={(v) => setVaccForm(f => ({ ...f, location: v }))}
+                    />
+                  </View>
                 </>
               )}
 
@@ -600,6 +611,209 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         onCancel={() => setActionModal({ visible: false, id: '', title: '', section: 'medications' })}
       />
 
+      {/* Detail Modal */}
+      <Modal visible={detailModal.visible} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
+              <Text style={[styles.modalTitle, { color: colors.text, marginBottom: 0 }]}>
+                {detailModal.section === 'medications' ? t('health.medications') :
+                 detailModal.section === 'appointments' ? t('health.appointments') :
+                 detailModal.section === 'vaccinations' ? t('health.vaccinations') :
+                 detailModal.section === 'allergies' ? t('health.allergies') :
+                 t('health.growth')}
+              </Text>
+              <TouchableOpacity onPress={() => setDetailModal({ visible: false, item: null, section: 'medications' })}>
+                <Text style={{ color: colors.textSecondary, fontSize: 18 }}>✕</Text>
+              </TouchableOpacity>
+            </View>
+            <ScrollView>
+              {detailModal.item && detailModal.section === 'medications' && (
+                <>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.medicationName')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.name}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.person}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.dosage')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.dosage}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.frequency')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.frequency}</Text>
+                  </View>
+                  {detailModal.item.dateFrom && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.dateFrom')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.dateFrom}</Text>
+                    </View>
+                  )}
+                  {detailModal.item.dateTo && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.dateTo')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.dateTo}</Text>
+                    </View>
+                  )}
+                  {detailModal.item.note && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.note')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.note}</Text>
+                    </View>
+                  )}
+                </>
+              )}
+              {detailModal.item && detailModal.section === 'appointments' && (
+                <>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.appointmentTitle')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.title}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.person}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.date')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.startTime')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.startTime}{detailModal.item.endTime ? ` - ${detailModal.item.endTime}` : ''}</Text>
+                  </View>
+                  {detailModal.item.location && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.location')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.accent }]}>{detailModal.item.location}</Text>
+                    </View>
+                  )}
+                  {detailModal.item.note && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.note')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.note}</Text>
+                    </View>
+                  )}
+                  {detailModal.item.location && (() => {
+                    const mapUrl = getStaticMapUrl(detailModal.item.location);
+                    return mapUrl ? (
+                      <TouchableOpacity style={{ marginTop: 12 }} onPress={() => Linking.openURL(getGoogleMapsUrl(detailModal.item.location))}>
+                        <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 150, borderRadius: 12 }} resizeMode="cover" />
+                      </TouchableOpacity>
+                    ) : null;
+                  })()}
+                </>
+              )}
+              {detailModal.item && detailModal.section === 'vaccinations' && (
+                <>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.vaccinationName')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.name}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.person}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.date')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
+                  </View>
+                  {detailModal.item.nextDue && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.nextDue')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.nextDue}</Text>
+                    </View>
+                  )}
+                  {detailModal.item.location && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.location')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.accent }]}>{detailModal.item.location}</Text>
+                    </View>
+                  )}
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.status')}</Text>
+                    <Text style={[styles.detailValue, { color: detailModal.item.status === 'completed' ? '#43A047' : '#FB8C00' }]}>{detailModal.item.status === 'completed' ? t('health.completed') : t('health.pending')}</Text>
+                  </View>
+                  {detailModal.item.location && (() => {
+                    const mapUrl = getStaticMapUrl(detailModal.item.location);
+                    return mapUrl ? (
+                      <TouchableOpacity style={{ marginTop: 12 }} onPress={() => Linking.openURL(getGoogleMapsUrl(detailModal.item.location))}>
+                        <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 150, borderRadius: 12 }} resizeMode="cover" />
+                      </TouchableOpacity>
+                    ) : null;
+                  })()}
+                </>
+              )}
+              {detailModal.item && detailModal.section === 'allergies' && (
+                <>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.allergen')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.allergen}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.person}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.severity')}</Text>
+                    <Text style={[styles.detailValue, { color: detailModal.item.severity === 'severe' ? '#E53935' : detailModal.item.severity === 'moderate' ? '#FB8C00' : '#43A047' }]}>{detailModal.item.severity === 'severe' ? t('health.severe') : detailModal.item.severity === 'moderate' ? t('health.moderate') : t('health.mild')}</Text>
+                  </View>
+                  {detailModal.item.note && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.note')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.note}</Text>
+                    </View>
+                  )}
+                </>
+              )}
+              {detailModal.item && detailModal.section === 'growth' && (
+                <>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.person}</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.height')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.height} cm</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.weight')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.weight} kg</Text>
+                  </View>
+                  <View style={styles.detailRow}>
+                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.date')}</Text>
+                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
+                  </View>
+                  {detailModal.item.note && (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.note')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.note}</Text>
+                    </View>
+                  )}
+                </>
+              )}
+            </ScrollView>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setDetailModal({ visible: false, item: null, section: 'medications' })}>
+                <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.close')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={() => {
+                const item = detailModal.item;
+                const section = detailModal.section;
+                setDetailModal({ visible: false, item: null, section: 'medications' });
+                setActiveSection(section);
+                setEditingItem({ id: item.id, section });
+                setShowAddModal(true);
+              }}>
+                <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.edit')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
       {/* Help Center */}
       <HelpCenter
         visible={showHelp}
@@ -672,4 +886,7 @@ const styles = StyleSheet.create({
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
   modalBtn: { flex: 1, padding: 14, borderRadius: 10, alignItems: 'center' },
   modalBtnText: { fontSize: 16, fontWeight: '600' },
+  detailRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
+  detailLabel: { fontSize: 14, fontWeight: '600' },
+  detailValue: { fontSize: 14, flex: 1, textAlign: 'right' },
 });

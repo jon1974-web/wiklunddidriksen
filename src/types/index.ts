@@ -378,6 +378,7 @@ export interface HealthVaccination {
   nextDue?: string;
   status: 'completed' | 'pending' | 'overdue';
   reminder?: string;
+  location?: string;
   note?: string;
   createdAt: number;
 }
