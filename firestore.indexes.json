@@ -40,6 +40,22 @@
         { "fieldPath": "familyId", "order": "ASCENDING" },
         { "fieldPath": "startDate", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "birthdays",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "familyId", "order": "ASCENDING" },
+        { "fieldPath": "date", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "gifts",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "birthdayId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
