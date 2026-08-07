@@ -147,10 +147,13 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
 
   const today = new Date().toISOString().split('T')[0];
   const todayMonthDay = today.substring(5); // "MM-DD"
-  const upcoming = birthdays.filter(b => {
-    const bMonthDay = b.date.substring(5);
-    return bMonthDay >= todayMonthDay;
-  }).slice(0, 5);
+  const upcoming = birthdays
+    .filter(b => {
+      const bMonthDay = b.date.substring(5);
+      return bMonthDay >= todayMonthDay;
+    })
+    .sort((a, b) => getDaysUntilBirthday(a.date) - getDaysUntilBirthday(b.date))
+    .slice(0, 5);
   const sorted = [...birthdays].sort((a, b) => {
     const aDays = getDaysUntilBirthday(a.date);
     const bDays = getDaysUntilBirthday(b.date);
