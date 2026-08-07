@@ -64,8 +64,8 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginBottom: 8 }}>
-        <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+        <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       <View style={[styles.card, { backgroundColor: colors.surface }]}>

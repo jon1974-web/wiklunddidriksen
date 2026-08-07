@@ -181,6 +181,9 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+            </TouchableOpacity>
             <AppIcon name="compass" size={28} color={colors.accent} />
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.title')}</Text>
           </View>

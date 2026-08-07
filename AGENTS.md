@@ -177,6 +177,26 @@ Good code is maintainable code. Quality is everyone's responsibility.
 - Components should be small and focused (< 300 lines ideal)
 - Use TypeScript interfaces for all props
 - Prefer composition over configuration props
+
+### Back Button Pattern (CRITICAL)
+All screens with a back button must use the **circular back button** — an arrow inside a circular border. This provides a consistent, tappable experience across the app.
+
+**Pattern:**
+```tsx
+<TouchableOpacity
+  onPress={() => navigation.goBack()}
+  style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
+>
+  <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+</TouchableOpacity>
+```
+
+**Rules:**
+- Use `navigation.goBack()` for the `onPress` handler
+- Circle: 36×36, borderRadius 18, borderWidth 1.5, borderColor `colors.border`
+- Arrow: fontSize 18, color `colors.accent`
+- Never use a plain `<Text>←</Text>` without the circular container
+- Check browser console for navigation errors if the button doesn't work
 - Extract repeated patterns into shared components
 
 ### State Management
