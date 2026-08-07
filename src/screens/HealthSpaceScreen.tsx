@@ -181,14 +181,14 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   };
 
   const handleDelete = async () => {
-    if (!familyId || !actionModal.id) return;
+    if (!familyId || !actionModal.id || !actionModal.section) return;
     try {
-      if (activeSection === 'medications') await deleteHealthMedication(familyId, actionModal.id);
-      else if (activeSection === 'appointments') await deleteHealthAppointment(familyId, actionModal.id);
-      else if (activeSection === 'vaccinations') await deleteHealthVaccination(familyId, actionModal.id);
-      else if (activeSection === 'allergies') await deleteHealthAllergy(familyId, actionModal.id);
-      else if (activeSection === 'growth') await deleteHealthGrowth(familyId, actionModal.id);
-      setActionModal({ visible: false, id: '', title: '' });
+      if (actionModal.section === 'medications') await deleteHealthMedication(familyId, actionModal.id);
+      else if (actionModal.section === 'appointments') await deleteHealthAppointment(familyId, actionModal.id);
+      else if (actionModal.section === 'vaccinations') await deleteHealthVaccination(familyId, actionModal.id);
+      else if (actionModal.section === 'allergies') await deleteHealthAllergy(familyId, actionModal.id);
+      else if (actionModal.section === 'growth') await deleteHealthGrowth(familyId, actionModal.id);
+      setActionModal({ visible: false, id: '', title: '', section: 'medications' });
       loadData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
