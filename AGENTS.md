@@ -185,16 +185,16 @@ All screens with a back button must use the **circular back button** — an arro
 ```tsx
 <TouchableOpacity
   onPress={() => navigation.goBack()}
-  style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
+  style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}
 >
-  <Text style={{ color: '#fff', fontSize: 18 }}>←</Text>
+  <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
 </TouchableOpacity>
 ```
 
 **Rules:**
 - Use `navigation.goBack()` for the `onPress` handler
-- Circle: 36×36, borderRadius 18, backgroundColor `colors.accent`
-- Arrow: fontSize 18, color `#fff` (white on accent background)
+- Circle: 36×36, borderRadius 18, borderWidth 1.5, borderColor `colors.accent`
+- Arrow: fontSize 18, color `colors.accent`
 - Follows the user's theme color automatically
 - Never use a plain `<Text>←</Text>` without the circular container
 - Check browser console for navigation errors if the button doesn't work
