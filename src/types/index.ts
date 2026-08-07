@@ -284,6 +284,7 @@ export interface GiftIdea {
   birthdayId: string;
   name: string;
   purchased: boolean;
+  year: number;
   createdAt: number;
 }
 
