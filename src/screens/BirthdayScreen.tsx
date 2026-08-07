@@ -155,8 +155,8 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: '#fff', fontSize: 18 }}>←</Text>
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>🎂 {t('birthdays.title')}</Text>
         <TouchableOpacity

@@ -80,8 +80,8 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-        <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+        <Text style={{ color: '#fff', fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       {/* Header card */}
