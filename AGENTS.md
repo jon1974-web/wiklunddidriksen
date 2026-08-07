@@ -198,6 +198,47 @@ All screens with a back button must use the **circular back button** — an arro
 - Follows the user's theme color automatically
 - Never use a plain `<Text>←</Text>` without the circular container
 - Check browser console for navigation errors if the button doesn't work
+
+### Item Interaction Pattern (Health, Trips, and similar modules)
+All modules with lists of items (Health, Trips, etc.) must follow a consistent interaction pattern:
+
+**1. Tap (short press) → Detail view**
+- Tapping an item opens a detail modal showing all fields
+- Detail modal has "Close" and "Edit" buttons
+- For items with location (Timer, Vaksiner): show a static map that opens Google Maps on tap
+
+**2. Long press → Edit and Delete options**
+- Long-pressing shows the custom `ActionModal` (not system alert)
+- ActionModal shows "Rediger" (Edit) and "Slett" (Delete) buttons
+- "Rediger" opens the add/edit form pre-filled with the item's data
+- "Slett" shows a confirmation dialog before deleting
+
+**3. Edit form**
+- Uses the same form modal as adding new items
+- Form is pre-filled with existing data when editing
+- All fields must be saved — never drop data during edit
+- Use `DatePickerModal` for date/time fields (same as events)
+- Use `GooglePlacesInput` for address/location fields
+
+**4. Delete**
+- Uses `ActionModal` with delete confirmation (branded, not system alert)
+- After deletion, data reloads from Firestore
+- If item has a `notificationId`, cancel the scheduled notification
+
+**Pattern reference:** `HealthSpaceScreen.tsx` — follow this pattern for all similar modules.
+
+### Edit Save Rule (CRITICAL)
+When saving an edited item, **all fields must be included in the update** — never drop data during edit. This applies to all modules (Health, Trips, etc.).
+
+**Common mistake:** Only saving the fields that changed, losing other data. Always spread the existing data with updates:
+```tsx
+await updateDoc(doc(db, collection, id), { ...existingData, ...changedFields });
+```
+
+**Checklist before saving:**
+- All form fields are included in the save payload
+- Existing data that wasn't changed is preserved
+- The item reappears correctly in the list after save
 - Extract repeated patterns into shared components
 
 ### State Management
