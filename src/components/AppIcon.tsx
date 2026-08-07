@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth';
   size?: number;
   color?: string;
 }
@@ -217,6 +217,39 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <Path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
       <Polyline points="9 22 9 12 15 12 15 22"/>
+    </Svg>
+  );
+
+  if (name === 'medication') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-6 9h6"/>
+      <Line x1="12" y1="10" x2="12" y2="18"/>
+    </Svg>
+  );
+
+  if (name === 'vaccination') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M7 21h10"/>
+      <Rect x="10" y="9" width="4" height="12" rx="1"/>
+      <Path d="M12 9V3a1 1 0 00-1-1H9a1 1 0 00-1 1v6"/>
+      <Path d="M12 9V3a1 1 0 011-1h2a1 1 0 011 1v6"/>
+      <Line x1="12" y1="3" x2="12" y2="9"/>
+    </Svg>
+  );
+
+  if (name === 'allergy') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+      <Line x1="12" y1="9" x2="12" y2="13"/>
+      <Line x1="12" y1="17" x2="12.01" y2="17"/>
+    </Svg>
+  );
+
+  if (name === 'growth') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 20V10"/>
+      <Path d="M18 20V4"/>
+      <Path d="M6 20v-4"/>
     </Svg>
   );
 

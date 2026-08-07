@@ -175,13 +175,13 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
       <ScrollView style={styles.content}>
         {/* Medications */}
-        {renderSection(t('health.medications'), 'transport', medications.length, 'medications', (
+        {renderSection(t('health.medications'), 'medication', medications.length, 'medications', (
           medications.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noMedications')}</Text>
           ) : (
             medications.map(med => (
               <TouchableOpacity key={med.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: med.id, title: med.name })}>
-                <AppIcon name="transport" size={20} color={colors.accent} />
+                <AppIcon name="medication" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{med.name}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{med.person} — {med.dosage} {med.frequency}</Text>
@@ -212,13 +212,13 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         ))}
 
         {/* Vaccinations */}
-        {renderSection(t('health.vaccinations'), 'destination', vaccinations.length, 'vaccinations', (
+        {renderSection(t('health.vaccinations'), 'vaccination', vaccinations.length, 'vaccinations', (
           vaccinations.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noVaccinations')}</Text>
           ) : (
             vaccinations.map(vacc => (
               <TouchableOpacity key={vacc.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: vacc.id, title: vacc.name })}>
-                <AppIcon name="destination" size={20} color={colors.accent} />
+                <AppIcon name="vaccination" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{vacc.name}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{vacc.person} — {vacc.date}</Text>
@@ -232,13 +232,13 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         ))}
 
         {/* Allergies */}
-        {renderSection(t('health.allergies'), 'activities', allergies.length, 'allergies', (
+        {renderSection(t('health.allergies'), 'allergy', allergies.length, 'allergies', (
           allergies.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAllergies')}</Text>
           ) : (
             allergies.map(allergy => (
               <TouchableOpacity key={allergy.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: allergy.id, title: allergy.allergen })}>
-                <AppIcon name="activities" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : colors.accent} />
+                <AppIcon name="allergy" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{allergy.allergen}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{allergy.person}</Text>
@@ -252,13 +252,13 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         ))}
 
         {/* Growth */}
-        {renderSection(t('health.growth'), 'weather', growth.length, 'growth', (
+        {renderSection(t('health.growth'), 'growth', growth.length, 'growth', (
           growth.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noGrowth')}</Text>
           ) : (
             growth.map(g => (
               <TouchableOpacity key={g.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: g.id, title: g.person })}>
-                <AppIcon name="weather" size={20} color={colors.accent} />
+                <AppIcon name="growth" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{g.person}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{g.height} cm / {g.weight} kg — {g.date}</Text>
