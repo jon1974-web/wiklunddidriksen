@@ -24,6 +24,7 @@ import { ShoppingListsScreen } from './src/screens/ShoppingListsScreen';
 import { ChatScreen } from './src/screens/ChatScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { BirthdayScreen } from './src/screens/BirthdayScreen';
+import { SpacesScreen } from './src/screens/SpacesScreen';
 import { TripsScreen } from './src/screens/TripsScreen';
 import { MealPlanScreen } from './src/screens/MealPlanScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
@@ -65,6 +66,7 @@ type RootStackParamList = {
   RecipeDetail: { recipe: import('./src/types').Recipe };
   ChatMain: undefined;
   TripsList: undefined;
+  SpacesList: undefined;
   AddTrip: undefined;
   TripDetail: { trip: Trip };
   TransportDetail: { flight: import('./src/types').TripFlight; tripId: string };
@@ -207,6 +209,11 @@ const TripsStack = () => {
     <Suspense fallback={<SuspenseFallback />}>
       <Stack.Navigator>
         <Stack.Screen
+          name="SpacesList"
+          component={SpacesScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="TripsList"
           component={TripsScreen}
           options={{ headerShown: false }}
@@ -309,6 +316,13 @@ const TabIcon = ({ icon, focused, accentColor }: { icon: string; focused: boolea
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <Path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
       <Circle cx="12" cy="7" r="4"/>
+    </Svg>
+  );
+
+  if (icon === 'house') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      <Polyline points="9 22 9 12 15 12 15 22"/>
     </Svg>
   );
 
@@ -468,13 +482,13 @@ const AppContent = () => {
               name="Trips"
               component={TripsStack}
               options={{
-                tabBarLabel: 'Reise',
-                tabBarIcon: ({ focused }) => <TabIcon icon="compass" focused={focused} accentColor={colors.accent} />,
+                tabBarLabel: 'Våre steder',
+                tabBarIcon: ({ focused }) => <TabIcon icon="house" focused={focused} accentColor={colors.accent} />,
               }}
               listeners={({ navigation }) => ({
                 tabPress: (e) => {
                   e.preventDefault();
-                  navigation.navigate('Trips', { screen: 'TripsList' });
+                  navigation.navigate('Trips', { screen: 'SpacesList' });
                 },
               })}
             />

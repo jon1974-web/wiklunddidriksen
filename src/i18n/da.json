@@ -148,6 +148,24 @@
     "startDate": "Startdato",
     "endDate": "Slutdato"
   },
+  "spaces": {
+    "title": "Vores steder",
+    "trips": "Rejser",
+    "health": "Sundhed",
+    "school": "Skole",
+    "birthdays": "Fødselsdage",
+    "pets": "Kæledyr",
+    "home": "Hjem",
+    "tripsCount": "{{count}} aktive rejser",
+    "healthCount": "{{count}} denne uge",
+    "schoolCount": "{{count}} henvendelser",
+    "birthdayCount": "{{count}} denne måned",
+    "petsCount": "{{count}} næste måned",
+    "homeCount": "{{count}} vedligeholdelse",
+    "customSpace": "Tilpasset",
+    "newSpace": "Nyt sted",
+    "createOwn": "Opret eget"
+  },
   "shopping": {
     "title": "Lister",
     "addList": "Ny liste",

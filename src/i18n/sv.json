@@ -148,6 +148,24 @@
     "startDate": "Startdatum",
     "endDate": "Slutdatum"
   },
+  "spaces": {
+    "title": "Våra platser",
+    "trips": "Resor",
+    "health": "Hälsa",
+    "school": "Skola",
+    "birthdays": "Födelsedagar",
+    "pets": "Husdjur",
+    "home": "Hem",
+    "tripsCount": "{{count}} aktiva resor",
+    "healthCount": "{{count}} denne veckan",
+    "schoolCount": "{{count}} ärenden",
+    "birthdayCount": "{{count}} denne månaden",
+    "petsCount": "{{count}} nästa månad",
+    "homeCount": "{{count}} underhåll",
+    "customSpace": "Anpassat",
+    "newSpace": "Nytt ställe",
+    "createOwn": "Skapa eget"
+  },
   "shopping": {
     "title": "Listor",
     "addList": "Ny lista",

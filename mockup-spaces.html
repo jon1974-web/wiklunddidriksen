@@ -104,6 +104,7 @@
     .form-field { margin-bottom: 16px; }
     .form-label { display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 6px; }
     .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: #333; background: #fafafa; }
+    .form-input.picker { display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
     .form-input:focus { border-color: var(--accent); outline: none; background: #fff; }
     .form-select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: #333; background: #fafafa; display: flex; justify-content: space-between; align-items: center; }
     .form-textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: #333; background: #fafafa; min-height: 80px; resize: vertical; }
@@ -367,15 +368,24 @@
       <div class="form-row">
         <div class="form-field" style="flex:1">
           <label class="form-label">Dato</label>
-          <div class="form-input">15. aug 2025</div>
+          <div class="form-input picker">
+            <span>15. aug 2025</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
         </div>
         <div class="form-field" style="flex:1">
           <label class="form-label">Starttid</label>
-          <div class="form-input">10:00</div>
+          <div class="form-input picker">
+            <span>10:00</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
         </div>
         <div class="form-field" style="flex:1">
           <label class="form-label">Sluttid</label>
-          <div class="form-input">10:30</div>
+          <div class="form-input picker">
+            <span>10:30</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2" stroke-linecap="round" style="width:16px;height:16px"><polyline points="6 9 12 15 18 9"/></svg>
+          </div>
         </div>
       </div>
       <div class="form-field">

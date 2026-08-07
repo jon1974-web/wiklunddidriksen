@@ -148,6 +148,24 @@
     "startDate": "Start date",
     "endDate": "End date"
   },
+  "spaces": {
+    "title": "Our Places",
+    "trips": "Trips",
+    "health": "Health",
+    "school": "School",
+    "birthdays": "Birthdays",
+    "pets": "Pets",
+    "home": "Home",
+    "tripsCount": "{{count}} active trips",
+    "healthCount": "{{count}} this week",
+    "schoolCount": "{{count}} items",
+    "birthdayCount": "{{count}} this month",
+    "petsCount": "{{count}} next month",
+    "homeCount": "{{count}} maintenance",
+    "customSpace": "Custom",
+    "newSpace": "New place",
+    "createOwn": "Create your own"
+  },
   "shopping": {
     "title": "Lists",
     "addList": "New list",

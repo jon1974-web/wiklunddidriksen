@@ -148,6 +148,24 @@
     "startDate": "Aloituspäivä",
     "endDate": "Lopetuspäivä"
   },
+  "spaces": {
+    "title": "Paikkamme",
+    "trips": "Matkat",
+    "health": "Terveys",
+    "school": "Koulu",
+    "birthdays": "Syntymäpäivät",
+    "pets": "Lemmikit",
+    "home": "Koti",
+    "tripsCount": "{{count}} aktiivista matkaa",
+    "healthCount": "{{count}} tällä viikolla",
+    "schoolCount": "{{count}} asiaa",
+    "birthdayCount": "{{count}} tässä kuussa",
+    "petsCount": "{{count}} ensi kuussa",
+    "homeCount": "{{count}} kunnossapitoa",
+    "customSpace": "Mukautettu",
+    "newSpace": "Uusi paikka",
+    "createOwn": "Luo oma"
+  },
   "shopping": {
     "title": "Listat",
     "addList": "Uusi lista",
