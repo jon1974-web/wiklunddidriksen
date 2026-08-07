@@ -358,6 +358,10 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.location')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.location} onChangeText={(v) => setApptForm(f => ({ ...f, location: v }))} placeholder={t('health.locationPlaceholder')} placeholderTextColor={colors.textDisabled} />
                   </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.note')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.note} onChangeText={(v) => setApptForm(f => ({ ...f, note: v }))} placeholder={t('health.notePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
                 </>
               )}
 
