@@ -83,6 +83,50 @@
     .name-card.selected { border-color: var(--accent); background: #E0F7FA; }
     .name-nb { font-size: 16px; font-weight: 700; color: #333; }
     .name-en { font-size: 12px; color: #666; }
+    
+    /* Week section header with toggle */
+    .week-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .week-note { font-size: 11px; color: #999; font-style: italic; margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+    .toggle { cursor: pointer; }
+    .toggle-track { width: 40px; height: 22px; border-radius: 11px; background: #ddd; position: relative; transition: background 0.2s; }
+    .toggle-track.active { background: var(--accent); }
+    .toggle-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute; top: 2px; left: 2px; transition: left 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .toggle-track.active .toggle-thumb { left: 20px; }
+    .toggle-row { display: flex; align-items: center; gap: 10px; }
+    .toggle-label { font-size: 13px; color: #333; }
+    
+    /* Form modal */
+    .form-modal { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.12); margin-bottom: 20px; }
+    .form-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #f0f0f0; }
+    .form-title { font-size: 16px; font-weight: 700; color: #333; }
+    .form-close { font-size: 18px; color: #999; cursor: pointer; }
+    .form-body { padding: 16px; }
+    .form-field { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 6px; }
+    .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: #333; background: #fafafa; }
+    .form-input:focus { border-color: var(--accent); outline: none; background: #fff; }
+    .form-select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: #333; background: #fafafa; display: flex; justify-content: space-between; align-items: center; }
+    .form-textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: #333; background: #fafafa; min-height: 80px; resize: vertical; }
+    .form-row { display: flex; gap: 12px; }
+    .form-divider { height: 1px; background: #f0f0f0; margin: 16px 0; }
+    .reminder-row { display: flex; gap: 8px; flex-wrap: wrap; }
+    .reminder-chip { padding: 6px 12px; border: 1px solid #ddd; border-radius: 20px; font-size: 13px; color: #666; cursor: pointer; }
+    .reminder-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .form-actions { display: flex; gap: 12px; padding: 16px; border-top: 1px solid #f0f0f0; }
+    .form-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; }
+    .form-btn.cancel { background: #f5f5f5; color: #666; }
+    .form-btn.save { background: var(--accent); color: #fff; }
+    
+    /* Event card */
+    .event-card { display: flex; background: #fff; border-radius: 12px; padding: 12px; margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid #E53935; }
+    .event-date { text-align: center; min-width: 48px; padding-right: 12px; border-right: 1px solid #f0f0f0; margin-right: 12px; }
+    .event-day { font-size: 22px; font-weight: 700; color: #333; line-height: 1; }
+    .event-month { font-size: 11px; color: #999; text-transform: uppercase; }
+    .event-content { flex: 1; }
+    .event-header { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+    .event-title { font-size: 14px; font-weight: 600; color: #333; }
+    .event-detail { font-size: 12px; color: #666; margin-bottom: 4px; }
+    .event-badges { display: flex; gap: 6px; }
   </style>
 </head>
 <body>
@@ -279,13 +323,17 @@
   </div>
 
   <div class="section-title">5. Min uke — Helse-integrering</div>
+  <p class="section-note">Helse-data vises i "Min uke" og i arrangementlisten. Synlighet styres med bryter.</p>
+  
   <div class="week-card">
-    <div class="week-section">
+    <div class="week-header">
       <div class="week-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg> Helse</div>
-      <div class="week-item"><div class="week-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div> Tannlegekontroll — lørdag 10:00</div>
-      <div class="week-item"><div class="week-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div> Voltaren går tom denne uken</div>
-      <div class="week-item"><div class="week-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div> Vaksinasjon — neste uke</div>
+      <div class="toggle"><div class="toggle-track"><div class="toggle-thumb"></div></div></div>
     </div>
+    <div class="week-item"><div class="week-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div> Tannlegekontroll — lørdag 10:00</div>
+    <div class="week-item"><div class="week-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div> Voltaren går tom denne uken</div>
+    <div class="week-item"><div class="week-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div> Vaksinasjon — neste uke</div>
+    <div class="week-note">Vises også i arrangementer og kalender</div>
     <div class="week-section">
       <div class="week-section-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg> Reiser</div>
       <div class="week-item"><div class="week-item-icon"><svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z" fill="var(--accent)" fill-opacity="0.15"/></svg></div> Melbourne om 12 dager</div>
@@ -296,7 +344,107 @@
     </div>
   </div>
 
-  <div class="section-title">6. Global søk (fremtidig)</div>
+  <div class="section-title">6. Legg til time — Skjema</div>
+  <p class="section-note">Samme mønster som arrangementer med påminnelser. Timen vises også i arrangementer og kalender.</p>
+  
+  <div class="form-modal">
+    <div class="form-header">
+      <div class="form-title">Legg til time</div>
+      <div class="form-close">✕</div>
+    </div>
+    <div class="form-body">
+      <div class="form-field">
+        <label class="form-label">Tittel</label>
+        <input class="form-input" type="text" placeholder="F.eks. Tannlegekontroll" value="Legetime">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Person</label>
+        <div class="form-select">
+          <span>Emma</span>
+          <span style="color: #999;">▾</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-field" style="flex:1">
+          <label class="form-label">Dato</label>
+          <div class="form-input">15. aug 2025</div>
+        </div>
+        <div class="form-field" style="flex:1">
+          <label class="form-label">Tid</label>
+          <div class="form-input">10:00</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Sted / Lege</label>
+        <input class="form-input" type="text" placeholder="F.eks. Colosseum Tannklinikk" value="Fastlegekontoret">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Notater</label>
+        <textarea class="form-textarea" placeholder="Eventuelle notater...">Kontroll av tennene til Emma</textarea>
+      </div>
+      <div class="form-divider"></div>
+      <div class="form-field">
+        <label class="form-label">Påminnelse</label>
+        <div class="reminder-row">
+          <div class="reminder-chip active">1 dag før</div>
+          <div class="reminder-chip">3 dager før</div>
+          <div class="reminder-chip">1 uke før</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Legg til i kalender</label>
+        <div class="toggle-row">
+          <div class="toggle"><div class="toggle-track active"><div class="toggle-thumb"></div></div></div>
+          <span class="toggle-label">Synlig i arrangementer og kalender</span>
+        </div>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="form-btn cancel">Avbryt</button>
+      <button class="form-btn save">Lagre</button>
+    </div>
+  </div>
+
+  <div class="section-title">7. Arrangementer — Helse-integrering</div>
+  <p class="section-note">Helse-timer vises som arrangementer med ikon og fargekode.</p>
+  
+  <div class="event-card">
+    <div class="event-date">
+      <div class="event-day">15</div>
+      <div class="event-month">AUG</div>
+    </div>
+    <div class="event-content">
+      <div class="event-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2.5" stroke-linecap="round" style="width:16px;height:16px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span class="event-title">Legetime — Emma</span>
+      </div>
+      <div class="event-detail">10:00 — Fastlegekontoret</div>
+      <div class="event-badges">
+        <span class="badge badge-red">Helse</span>
+        <span class="badge badge-blue">Påminnelse: 1 dag før</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="event-card">
+    <div class="event-date">
+      <div class="event-day">22</div>
+      <div class="event-month">AUG</div>
+    </div>
+    <div class="event-content">
+      <div class="event-header">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2.5" stroke-linecap="round" style="width:16px;height:16px"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span class="event-title">Vaksinasjon — Noah</span>
+      </div>
+      <div class="event-detail">14:30 — Legekontoret</div>
+      <div class="event-badges">
+        <span class="badge badge-red">Helse</span>
+        <span class="badge badge-green">Påminnelse: 3 dager før</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">8. Global søk (fremtidig)</div>
   <div class="search-bar">
     <div class="search-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
     <input class="search-input" type="text" placeholder="Søk i hele appen..." value="tannlege" readonly>
@@ -326,7 +474,7 @@
     <span class="search-result-badge">Helse</span>
   </div>
 
-  <div class="section-title">7. Fremtidig — Tilpassbare steder</div>
+  <div class="section-title">9. Fremtidig — Tilpassbare steder</div>
   <div class="space-grid">
     <div class="space-card" style="border-left-color: #00897B;">
       <div class="space-icon-svg"><svg viewBox="0 0 24 24" fill="none" stroke="#00897B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v8"/><path d="M8 12h8"/></svg></div>
