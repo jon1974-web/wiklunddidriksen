@@ -702,6 +702,38 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         </View>
       );
     }
+    if (item._type === 'healthAppointment') {
+      const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
+      return (
+        <TouchableOpacity
+          style={[styles.tripCard, { backgroundColor: colors.surface, borderLeftColor: '#E53935' }]}
+          onPress={() => navigation.navigate('Trips', { screen: 'HealthSpace' })}
+        >
+          <View style={styles.tripCardRow}>
+            <View style={styles.tripCardContent}>
+              <View style={styles.tripCardTitleRow}>
+                <Text style={styles.tripCardIcon}>🏥</Text>
+                <Text style={[styles.tripCardTitle, { color: colors.text }]}>{item.title}</Text>
+              </View>
+              <Text style={[styles.tripCardLocation, { color: colors.textSecondary }]}>
+                {item.person}{item.location ? ` — ${item.location}` : ''}
+              </Text>
+              <Text style={[styles.tripCardDates, { color: colors.textSecondary }]}>
+                {item.date} {item.startTime}
+              </Text>
+            </View>
+            {mapUrl && (
+              <TouchableOpacity
+                style={styles.tripMapContainer}
+                onPress={() => Linking.openURL(getGoogleMapsUrl(item.address))}
+              >
+                <Image source={{ uri: mapUrl }} style={styles.tripMapImage} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    }
     return (
       <EventCard
         event={item}
