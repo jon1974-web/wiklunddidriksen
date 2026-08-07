@@ -52,7 +52,7 @@ interface DayItem {
   logoUrl?: string;
 }
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {}, tripSubcollections = {} }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {}, tripSubcollections = {}, healthAppointments = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);

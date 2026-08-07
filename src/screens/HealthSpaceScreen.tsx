@@ -87,7 +87,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         setApptForm({ title: '', person: PERSONS[0], date: '', startTime: '', endTime: '', location: '', note: '' });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
-        await addHealthVaccination(familyId, vaccForm);
+        await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
         setVaccForm({ name: '', person: PERSONS[0], date: '', nextDue: '', note: '' });
       } else if (activeSection === 'allergies') {
         if (!allergyForm.allergen.trim()) { crossAlert('Error', t('health.enterAllergen')); return; }
@@ -483,7 +483,7 @@ const styles = StyleSheet.create({
   itemText: { flex: 1 },
   itemTitle: { fontSize: 14, fontWeight: '600' },
   itemSub: { fontSize: 12 },
-  badge: { fontSize: 11, fontWeight: '600', padding: '2px 8px', borderRadius: 10 },
+  badge: { fontSize: 11, fontWeight: '600', paddingVertical: 2, paddingHorizontal: 8, borderRadius: 10 },
   emptyText: { fontSize: 13, textAlign: 'center', paddingVertical: 12 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, maxHeight: '80%' },
