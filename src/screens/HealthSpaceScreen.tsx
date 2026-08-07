@@ -17,14 +17,13 @@ import {
 import { HealthMedication, HealthAppointment, HealthVaccination, HealthAllergy, HealthGrowth } from '../types';
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
+import { getFamilyMembersWithRoles } from '../services/familyService';
 
 type SectionType = 'medications' | 'appointments' | 'vaccinations' | 'allergies' | 'growth';
 
 interface HealthSpaceScreenProps {
   navigation: any;
 }
-
-const PERSONS = ['Pappa', 'Mamma', 'Emma', 'Noah'];
 
 export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
@@ -36,6 +35,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [vaccinations, setVaccinations] = useState<HealthVaccination[]>([]);
   const [allergies, setAllergies] = useState<HealthAllergy[]>([]);
   const [growth, setGrowth] = useState<HealthGrowth[]>([]);
+  const [persons, setPersons] = useState<string[]>([]);
 
   const [activeSection, setActiveSection] = useState<SectionType | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -43,11 +43,11 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [showHelp, setShowHelp] = useState(false);
 
   // Form states
-  const [medForm, setMedForm] = useState({ name: '', person: PERSONS[0], dosage: '', frequency: '', note: '' });
-  const [apptForm, setApptForm] = useState({ title: '', person: PERSONS[0], date: '', startTime: '', endTime: '', location: '', note: '' });
-  const [vaccForm, setVaccForm] = useState({ name: '', person: PERSONS[0], date: '', nextDue: '', note: '' });
-  const [allergyForm, setAllergyForm] = useState({ allergen: '', person: PERSONS[0], severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
-  const [growthForm, setGrowthForm] = useState({ person: PERSONS[0], height: '', weight: '', date: '', note: '' });
+  const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', note: '' });
+  const [apptForm, setApptForm] = useState({ title: '', person: '', date: '', startTime: '', endTime: '', location: '', note: '' });
+  const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', note: '' });
+  const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
+  const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
 
   const loadData = useCallback(async () => {
     if (!familyId) return;
@@ -71,6 +71,13 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  useEffect(() => {
+    if (!familyId) return;
+    getFamilyMembersWithRoles(familyId).then((members) => {
+      setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+    }).catch(() => {});
+  }, [familyId]);
+
   const today = new Date().toISOString().split('T')[0];
   const upcomingAppointments = appointments.filter(a => a.date >= today).slice(0, 3);
 
@@ -80,23 +87,23 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('health.enterName')); return; }
         await addHealthMedication(familyId, medForm);
-        setMedForm({ name: '', person: PERSONS[0], dosage: '', frequency: '', note: '' });
+        setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: '', note: '' });
       } else if (activeSection === 'appointments') {
         if (!apptForm.title.trim() || !apptForm.date) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
         await addHealthAppointment(familyId, apptForm);
-        setApptForm({ title: '', person: PERSONS[0], date: '', startTime: '', endTime: '', location: '', note: '' });
+        setApptForm({ title: '', person: persons[0] || '', date: '', startTime: '', endTime: '', location: '', note: '' });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
         await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
-        setVaccForm({ name: '', person: PERSONS[0], date: '', nextDue: '', note: '' });
+        setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', note: '' });
       } else if (activeSection === 'allergies') {
         if (!allergyForm.allergen.trim()) { crossAlert('Error', t('health.enterAllergen')); return; }
         await addHealthAllergy(familyId, allergyForm);
-        setAllergyForm({ allergen: '', person: PERSONS[0], severity: 'mild', note: '' });
+        setAllergyForm({ allergen: '', person: persons[0] || '', severity: 'mild', note: '' });
       } else if (activeSection === 'growth') {
         if (!growthForm.height || !growthForm.weight || !growthForm.date) { crossAlert('Error', t('health.enterHeightWeightDate')); return; }
         await addHealthGrowth(familyId, { ...growthForm, height: Number(growthForm.height), weight: Number(growthForm.weight) });
-        setGrowthForm({ person: PERSONS[0], height: '', weight: '', date: '', note: '' });
+        setGrowthForm({ person: persons[0] || '', height: '', weight: '', date: '', note: '' });
       }
       setShowAddModal(false);
       loadData();
@@ -140,7 +147,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           style={[styles.addButton, { backgroundColor: colors.accent }]}
           onPress={() => { setActiveSection(section); setShowAddModal(true); }}
         >
-          <AppIcon name="menu" size={14} color="#fff" />
+          <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
         </TouchableOpacity>
       </View>
       {children}
@@ -284,7 +291,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
-                      {PERSONS.map(p => (
+                      {persons.map(p => (
                         <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: medForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setMedForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: medForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
@@ -316,7 +323,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
-                      {PERSONS.map(p => (
+                      {persons.map(p => (
                         <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: apptForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setApptForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: apptForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
@@ -354,7 +361,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
-                      {PERSONS.map(p => (
+                      {persons.map(p => (
                         <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: vaccForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: vaccForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
@@ -382,7 +389,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
-                      {PERSONS.map(p => (
+                      {persons.map(p => (
                         <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: allergyForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setAllergyForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: allergyForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
@@ -408,7 +415,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
-                      {PERSONS.map(p => (
+                      {persons.map(p => (
                         <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: growthForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setGrowthForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: growthForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
@@ -478,7 +485,7 @@ const styles = StyleSheet.create({
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   sectionTitle: { fontSize: 14, fontWeight: '700' },
   sectionCount: { fontSize: 12 },
-  addButton: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  addButton: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
   item: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0', gap: 10 },
   itemText: { flex: 1 },
   itemTitle: { fontSize: 14, fontWeight: '600' },
