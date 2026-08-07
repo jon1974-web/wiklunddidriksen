@@ -5,6 +5,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
+import { DatePickerModal } from '../components/DatePickerModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import {
@@ -41,6 +42,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [showAddModal, setShowAddModal] = useState(false);
   const [deleteModal, setDeleteModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [showHelp, setShowHelp] = useState(false);
+  const [activePicker, setActivePicker] = useState<string | null>(null);
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
@@ -309,11 +311,15 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={{ flexDirection: 'row', gap: 12 }}>
                     <View style={[styles.field, { flex: 1 }]}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.dateFrom')}</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.dateFrom} onChangeText={(v) => setMedForm(f => ({ ...f, dateFrom: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('medDateFrom')}>
+                        <Text style={{ color: medForm.dateFrom ? colors.text : colors.textDisabled, fontSize: 16 }}>{medForm.dateFrom || 'Velg dato'}</Text>
+                      </TouchableOpacity>
                     </View>
                     <View style={[styles.field, { flex: 1 }]}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.dateTo')}</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.dateTo} onChangeText={(v) => setMedForm(f => ({ ...f, dateTo: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('medDateTo')}>
+                        <Text style={{ color: medForm.dateTo ? colors.text : colors.textDisabled, fontSize: 16 }}>{medForm.dateTo || 'Velg dato'}</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                   <View style={styles.field}>
@@ -342,16 +348,22 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.date')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.date} onChangeText={(v) => setApptForm(f => ({ ...f, date: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('apptDate')}>
+                      <Text style={{ color: apptForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>{apptForm.date || 'Velg dato'}</Text>
+                    </TouchableOpacity>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 12 }}>
                     <View style={[styles.field, { flex: 1 }]}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.startTime')}</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.startTime} onChangeText={(v) => setApptForm(f => ({ ...f, startTime: v }))} placeholder="HH:MM" placeholderTextColor={colors.textDisabled} />
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('apptStartTime')}>
+                        <Text style={{ color: apptForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{apptForm.startTime || 'Velg tid'}</Text>
+                      </TouchableOpacity>
                     </View>
                     <View style={[styles.field, { flex: 1 }]}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.endTime')}</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.endTime} onChangeText={(v) => setApptForm(f => ({ ...f, endTime: v }))} placeholder="HH:MM" placeholderTextColor={colors.textDisabled} />
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('apptEndTime')}>
+                        <Text style={{ color: apptForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{apptForm.endTime || 'Velg tid'}</Text>
+                      </TouchableOpacity>
                     </View>
                   </View>
                   <View style={styles.field}>
@@ -384,11 +396,15 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.date')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={vaccForm.date} onChangeText={(v) => setVaccForm(f => ({ ...f, date: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('vaccDate')}>
+                      <Text style={{ color: vaccForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>{vaccForm.date || 'Velg dato'}</Text>
+                    </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.nextDue')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={vaccForm.nextDue} onChangeText={(v) => setVaccForm(f => ({ ...f, nextDue: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('vaccNextDue')}>
+                      <Text style={{ color: vaccForm.nextDue ? colors.text : colors.textDisabled, fontSize: 16 }}>{vaccForm.nextDue || 'Velg dato'}</Text>
+                    </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
@@ -458,7 +474,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.date')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={growthForm.date} onChangeText={(v) => setGrowthForm(f => ({ ...f, date: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('growthDate')}>
+                      <Text style={{ color: growthForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>{growthForm.date || 'Velg dato'}</Text>
+                    </TouchableOpacity>
                   </View>
                 </>
               )}
@@ -494,6 +512,34 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           { icon: '📅', title: t('health.helpAppointments'), text: t('health.helpAppointmentsText') },
           { icon: '👉', title: t('health.helpHow'), text: t('health.helpHowText'), tip: t('health.helpTip') },
         ]}
+      />
+
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={activePicker?.includes('Date') || activePicker?.includes('date') || activePicker?.includes('Due') ? t('health.date') : t('health.startTime')}
+        mode={activePicker?.includes('Time') || activePicker?.includes('time') ? 'time' : 'date'}
+        selectedValue={
+          activePicker === 'medDateFrom' ? medForm.dateFrom :
+          activePicker === 'medDateTo' ? medForm.dateTo :
+          activePicker === 'apptDate' ? apptForm.date :
+          activePicker === 'apptStartTime' ? apptForm.startTime :
+          activePicker === 'apptEndTime' ? apptForm.endTime :
+          activePicker === 'vaccDate' ? vaccForm.date :
+          activePicker === 'vaccNextDue' ? vaccForm.nextDue :
+          activePicker === 'growthDate' ? growthForm.date : ''
+        }
+        onSelect={(value) => {
+          if (activePicker === 'medDateFrom') setMedForm(f => ({ ...f, dateFrom: value }));
+          else if (activePicker === 'medDateTo') setMedForm(f => ({ ...f, dateTo: value }));
+          else if (activePicker === 'apptDate') setApptForm(f => ({ ...f, date: value }));
+          else if (activePicker === 'apptStartTime') setApptForm(f => ({ ...f, startTime: value }));
+          else if (activePicker === 'apptEndTime') setApptForm(f => ({ ...f, endTime: value }));
+          else if (activePicker === 'vaccDate') setVaccForm(f => ({ ...f, date: value }));
+          else if (activePicker === 'vaccNextDue') setVaccForm(f => ({ ...f, nextDue: value }));
+          else if (activePicker === 'growthDate') setGrowthForm(f => ({ ...f, date: value }));
+          setActivePicker(null);
+        }}
+        onClose={() => setActivePicker(null)}
       />
     </SafeAreaView>
   );
