@@ -1,0 +1,499 @@
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, TextInput, Modal, Alert } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { useUserStore } from '../store/userStore';
+import { AppIcon } from '../components/AppIcon';
+import { crossAlert } from '../utils/alert';
+import { getErrorMessage } from '../utils/validation';
+import {
+  getHealthMedications, addHealthMedication, deleteHealthMedication,
+  getHealthAppointments, addHealthAppointment, deleteHealthAppointment,
+  getHealthVaccinations, addHealthVaccination, deleteHealthVaccination,
+  getHealthAllergies, addHealthAllergy, deleteHealthAllergy,
+  getHealthGrowth, addHealthGrowth, deleteHealthGrowth,
+} from '../services/healthService';
+import { HealthMedication, HealthAppointment, HealthVaccination, HealthAllergy, HealthGrowth } from '../types';
+import { ActionModal } from '../components/ActionModal';
+import { HelpCenter } from '../components/HelpCenter';
+
+type SectionType = 'medications' | 'appointments' | 'vaccinations' | 'allergies' | 'growth';
+
+interface HealthSpaceScreenProps {
+  navigation: any;
+}
+
+const PERSONS = ['Pappa', 'Mamma', 'Emma', 'Noah'];
+
+export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation }) => {
+  const { t } = useTranslation();
+  const { colors } = useTheme();
+  const familyId = useUserStore((state) => state.familyId);
+
+  const [medications, setMedications] = useState<HealthMedication[]>([]);
+  const [appointments, setAppointments] = useState<HealthAppointment[]>([]);
+  const [vaccinations, setVaccinations] = useState<HealthVaccination[]>([]);
+  const [allergies, setAllergies] = useState<HealthAllergy[]>([]);
+  const [growth, setGrowth] = useState<HealthGrowth[]>([]);
+
+  const [activeSection, setActiveSection] = useState<SectionType | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [deleteModal, setDeleteModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [showHelp, setShowHelp] = useState(false);
+
+  // Form states
+  const [medForm, setMedForm] = useState({ name: '', person: PERSONS[0], dosage: '', frequency: '', note: '' });
+  const [apptForm, setApptForm] = useState({ title: '', person: PERSONS[0], date: '', startTime: '', endTime: '', location: '', note: '' });
+  const [vaccForm, setVaccForm] = useState({ name: '', person: PERSONS[0], date: '', nextDue: '', note: '' });
+  const [allergyForm, setAllergyForm] = useState({ allergen: '', person: PERSONS[0], severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
+  const [growthForm, setGrowthForm] = useState({ person: PERSONS[0], height: '', weight: '', date: '', note: '' });
+
+  const loadData = useCallback(async () => {
+    if (!familyId) return;
+    try {
+      const [meds, appts, vaccs, alls, grow] = await Promise.all([
+        getHealthMedications(familyId),
+        getHealthAppointments(familyId),
+        getHealthVaccinations(familyId),
+        getHealthAllergies(familyId),
+        getHealthGrowth(familyId),
+      ]);
+      setMedications(meds);
+      setAppointments(appts);
+      setVaccinations(vaccs);
+      setAllergies(alls);
+      setGrowth(grow);
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  }, [familyId]);
+
+  useEffect(() => { loadData(); }, [loadData]);
+
+  const today = new Date().toISOString().split('T')[0];
+  const upcomingAppointments = appointments.filter(a => a.date >= today).slice(0, 3);
+
+  const handleAdd = async () => {
+    if (!familyId) return;
+    try {
+      if (activeSection === 'medications') {
+        if (!medForm.name.trim()) { crossAlert('Error', t('health.enterName')); return; }
+        await addHealthMedication(familyId, medForm);
+        setMedForm({ name: '', person: PERSONS[0], dosage: '', frequency: '', note: '' });
+      } else if (activeSection === 'appointments') {
+        if (!apptForm.title.trim() || !apptForm.date) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
+        await addHealthAppointment(familyId, apptForm);
+        setApptForm({ title: '', person: PERSONS[0], date: '', startTime: '', endTime: '', location: '', note: '' });
+      } else if (activeSection === 'vaccinations') {
+        if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
+        await addHealthVaccination(familyId, vaccForm);
+        setVaccForm({ name: '', person: PERSONS[0], date: '', nextDue: '', note: '' });
+      } else if (activeSection === 'allergies') {
+        if (!allergyForm.allergen.trim()) { crossAlert('Error', t('health.enterAllergen')); return; }
+        await addHealthAllergy(familyId, allergyForm);
+        setAllergyForm({ allergen: '', person: PERSONS[0], severity: 'mild', note: '' });
+      } else if (activeSection === 'growth') {
+        if (!growthForm.height || !growthForm.weight || !growthForm.date) { crossAlert('Error', t('health.enterHeightWeightDate')); return; }
+        await addHealthGrowth(familyId, { ...growthForm, height: Number(growthForm.height), weight: Number(growthForm.weight) });
+        setGrowthForm({ person: PERSONS[0], height: '', weight: '', date: '', note: '' });
+      }
+      setShowAddModal(false);
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!familyId || !deleteModal.id) return;
+    try {
+      if (activeSection === 'medications') await deleteHealthMedication(familyId, deleteModal.id);
+      else if (activeSection === 'appointments') await deleteHealthAppointment(familyId, deleteModal.id);
+      else if (activeSection === 'vaccinations') await deleteHealthVaccination(familyId, deleteModal.id);
+      else if (activeSection === 'allergies') await deleteHealthAllergy(familyId, deleteModal.id);
+      else if (activeSection === 'growth') await deleteHealthGrowth(familyId, deleteModal.id);
+      setDeleteModal({ visible: false, id: '', title: '' });
+      loadData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const getDaysUntil = (dateStr: string): string => {
+    const diff = Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    if (diff < 0) return t('health.past');
+    if (diff === 0) return t('health.today');
+    if (diff === 1) return t('health.tomorrow');
+    return t('health.inDays', { count: diff });
+  };
+
+  const renderSection = (title: string, icon: string, count: number, section: SectionType, children: React.ReactNode) => (
+    <View style={[styles.section, { backgroundColor: colors.surface }]}>
+      <View style={styles.sectionHeader}>
+        <View style={styles.sectionTitleRow}>
+          <AppIcon name={icon as any} size={18} color={colors.accent} />
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
+          <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({count})</Text>
+        </View>
+        <TouchableOpacity
+          style={[styles.addButton, { backgroundColor: colors.accent }]}
+          onPress={() => { setActiveSection(section); setShowAddModal(true); }}
+        >
+          <AppIcon name="menu" size={14} color="#fff" />
+        </TouchableOpacity>
+      </View>
+      {children}
+    </View>
+  );
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+          </TouchableOpacity>
+          <AppIcon name="transport" size={28} color="#E53935" />
+          <Text style={[styles.screenTitle, { color: colors.text }]}>{t('spaces.health')}</Text>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
+            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <ScrollView style={styles.content}>
+        {/* Medications */}
+        {renderSection(t('health.medications'), 'transport', medications.length, 'medications', (
+          medications.length === 0 ? (
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noMedications')}</Text>
+          ) : (
+            medications.map(med => (
+              <TouchableOpacity key={med.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: med.id, title: med.name })}>
+                <AppIcon name="transport" size={20} color={colors.accent} />
+                <View style={styles.itemText}>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>{med.name}</Text>
+                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{med.person} — {med.dosage} {med.frequency}</Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          )
+        ))}
+
+        {/* Appointments */}
+        {renderSection(t('health.appointments'), 'calendar', appointments.length, 'appointments', (
+          appointments.length === 0 ? (
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAppointments')}</Text>
+          ) : (
+            appointments.map(appt => (
+              <TouchableOpacity key={appt.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: appt.id, title: appt.title })}>
+                <AppIcon name="calendar" size={20} color={colors.accent} />
+                <View style={styles.itemText}>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
+                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{appt.date} {appt.startTime} — {appt.location || appt.person}</Text>
+                </View>
+                {appt.date >= today && (
+                  <Text style={[styles.badge, { backgroundColor: '#FFF3E0', color: '#FB8C00' }]}>{getDaysUntil(appt.date)}</Text>
+                )}
+              </TouchableOpacity>
+            ))
+          )
+        ))}
+
+        {/* Vaccinations */}
+        {renderSection(t('health.vaccinations'), 'destination', vaccinations.length, 'vaccinations', (
+          vaccinations.length === 0 ? (
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noVaccinations')}</Text>
+          ) : (
+            vaccinations.map(vacc => (
+              <TouchableOpacity key={vacc.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: vacc.id, title: vacc.name })}>
+                <AppIcon name="destination" size={20} color={colors.accent} />
+                <View style={styles.itemText}>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>{vacc.name}</Text>
+                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{vacc.person} — {vacc.date}</Text>
+                </View>
+                <Text style={[styles.badge, { backgroundColor: vacc.status === 'completed' ? '#E8F5E9' : '#FFF3E0', color: vacc.status === 'completed' ? '#43A047' : '#FB8C00' }]}>
+                  {vacc.status === 'completed' ? t('health.completed') : t('health.pending')}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )
+        ))}
+
+        {/* Allergies */}
+        {renderSection(t('health.allergies'), 'activities', allergies.length, 'allergies', (
+          allergies.length === 0 ? (
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAllergies')}</Text>
+          ) : (
+            allergies.map(allergy => (
+              <TouchableOpacity key={allergy.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: allergy.id, title: allergy.allergen })}>
+                <AppIcon name="activities" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : colors.accent} />
+                <View style={styles.itemText}>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>{allergy.allergen}</Text>
+                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{allergy.person}</Text>
+                </View>
+                <Text style={[styles.badge, { backgroundColor: allergy.severity === 'severe' ? '#FFEBEE' : allergy.severity === 'moderate' ? '#FFF3E0' : '#E8F5E9', color: allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : '#43A047' }]}>
+                  {allergy.severity === 'severe' ? t('health.severe') : allergy.severity === 'moderate' ? t('health.moderate') : t('health.mild')}
+                </Text>
+              </TouchableOpacity>
+            ))
+          )
+        ))}
+
+        {/* Growth */}
+        {renderSection(t('health.growth'), 'weather', growth.length, 'growth', (
+          growth.length === 0 ? (
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noGrowth')}</Text>
+          ) : (
+            growth.map(g => (
+              <TouchableOpacity key={g.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: g.id, title: g.person })}>
+                <AppIcon name="weather" size={20} color={colors.accent} />
+                <View style={styles.itemText}>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>{g.person}</Text>
+                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{g.height} cm / {g.weight} kg — {g.date}</Text>
+                </View>
+              </TouchableOpacity>
+            ))
+          )
+        ))}
+      </ScrollView>
+
+      {/* Add Modal */}
+      <Modal visible={showAddModal} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>
+              {activeSection === 'medications' ? t('health.addMedication') :
+               activeSection === 'appointments' ? t('health.addAppointment') :
+               activeSection === 'vaccinations' ? t('health.addVaccination') :
+               activeSection === 'allergies' ? t('health.addAllergy') :
+               t('health.addGrowth')}
+            </Text>
+            <ScrollView>
+              {/* Medication form */}
+              {activeSection === 'medications' && (
+                <>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.medicationName')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.name} onChangeText={(v) => setMedForm(f => ({ ...f, name: v }))} placeholder={t('health.medicationNamePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
+                    <View style={styles.personRow}>
+                      {PERSONS.map(p => (
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: medForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setMedForm(f => ({ ...f, person: p }))}>
+                          <Text style={{ color: medForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.dosage')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.dosage} onChangeText={(v) => setMedForm(f => ({ ...f, dosage: v }))} placeholder={t('health.dosagePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.frequency')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.frequency} onChangeText={(v) => setMedForm(f => ({ ...f, frequency: v }))} placeholder={t('health.frequencyPlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.note')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.note} onChangeText={(v) => setMedForm(f => ({ ...f, note: v }))} placeholder={t('health.notePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                </>
+              )}
+
+              {/* Appointment form */}
+              {activeSection === 'appointments' && (
+                <>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.appointmentTitle')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.title} onChangeText={(v) => setApptForm(f => ({ ...f, title: v }))} placeholder={t('health.appointmentTitlePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
+                    <View style={styles.personRow}>
+                      {PERSONS.map(p => (
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: apptForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setApptForm(f => ({ ...f, person: p }))}>
+                          <Text style={{ color: apptForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.date')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.date} onChangeText={(v) => setApptForm(f => ({ ...f, date: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.startTime')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.startTime} onChangeText={(v) => setApptForm(f => ({ ...f, startTime: v }))} placeholder="HH:MM" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.endTime')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.endTime} onChangeText={(v) => setApptForm(f => ({ ...f, endTime: v }))} placeholder="HH:MM" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.location')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.location} onChangeText={(v) => setApptForm(f => ({ ...f, location: v }))} placeholder={t('health.locationPlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                </>
+              )}
+
+              {/* Vaccination form */}
+              {activeSection === 'vaccinations' && (
+                <>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.vaccinationName')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={vaccForm.name} onChangeText={(v) => setVaccForm(f => ({ ...f, name: v }))} placeholder={t('health.vaccinationNamePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
+                    <View style={styles.personRow}>
+                      {PERSONS.map(p => (
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: vaccForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, person: p }))}>
+                          <Text style={{ color: vaccForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.date')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={vaccForm.date} onChangeText={(v) => setVaccForm(f => ({ ...f, date: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.nextDue')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={vaccForm.nextDue} onChangeText={(v) => setVaccForm(f => ({ ...f, nextDue: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                </>
+              )}
+
+              {/* Allergy form */}
+              {activeSection === 'allergies' && (
+                <>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.allergen')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={allergyForm.allergen} onChangeText={(v) => setAllergyForm(f => ({ ...f, allergen: v }))} placeholder={t('health.allergenPlaceholder')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
+                    <View style={styles.personRow}>
+                      {PERSONS.map(p => (
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: allergyForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setAllergyForm(f => ({ ...f, person: p }))}>
+                          <Text style={{ color: allergyForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.severity')}</Text>
+                    <View style={styles.personRow}>
+                      {(['mild', 'moderate', 'severe'] as const).map(s => (
+                        <TouchableOpacity key={s} style={[styles.personChip, { backgroundColor: allergyForm.severity === s ? (s === 'severe' ? '#E53935' : s === 'moderate' ? '#FB8C00' : '#43A047') : colors.inputBackground }]} onPress={() => setAllergyForm(f => ({ ...f, severity: s }))}>
+                          <Text style={{ color: allergyForm.severity === s ? '#fff' : colors.text, fontSize: 13 }}>{t(`health.${s}`)}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                </>
+              )}
+
+              {/* Growth form */}
+              {activeSection === 'growth' && (
+                <>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
+                    <View style={styles.personRow}>
+                      {PERSONS.map(p => (
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: growthForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setGrowthForm(f => ({ ...f, person: p }))}>
+                          <Text style={{ color: growthForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.height')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={growthForm.height} onChangeText={(v) => setGrowthForm(f => ({ ...f, height: v }))} placeholder="cm" placeholderTextColor={colors.textDisabled} keyboardType="numeric" />
+                    </View>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.weight')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={growthForm.weight} onChangeText={(v) => setGrowthForm(f => ({ ...f, weight: v }))} placeholder="kg" placeholderTextColor={colors.textDisabled} keyboardType="numeric" />
+                    </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.date')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={growthForm.date} onChangeText={(v) => setGrowthForm(f => ({ ...f, date: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                </>
+              )}
+            </ScrollView>
+            <View style={styles.modalActions}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowAddModal(false)}>
+                <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleAdd}>
+                <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.save')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Delete confirmation */}
+      <ActionModal
+        visible={deleteModal.visible}
+        title={deleteModal.title}
+        onDelete={handleDelete}
+        onCancel={() => setDeleteModal({ visible: false, id: '', title: '' })}
+      />
+
+      {/* Help Center */}
+      <HelpCenter
+        visible={showHelp}
+        onClose={() => setShowHelp(false)}
+        title={t('health.helpTitle')}
+        sections={[
+          { icon: '🏥', title: t('health.helpWhat'), text: t('health.helpWhatText') },
+          { icon: '💊', title: t('health.helpMedications'), text: t('health.helpMedicationsText') },
+          { icon: '📅', title: t('health.helpAppointments'), text: t('health.helpAppointmentsText') },
+          { icon: '👉', title: t('health.helpHow'), text: t('health.helpHowText'), tip: t('health.helpTip') },
+        ]}
+      />
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  header: { padding: 16, paddingBottom: 8, borderBottomWidth: 1 },
+  screenTitle: { fontSize: 28, fontWeight: 'bold' },
+  content: { flex: 1, padding: 16 },
+  section: { borderRadius: 12, padding: 16, marginBottom: 12 },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  sectionTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  sectionTitle: { fontSize: 14, fontWeight: '700' },
+  sectionCount: { fontSize: 12 },
+  addButton: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  item: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0', gap: 10 },
+  itemText: { flex: 1 },
+  itemTitle: { fontSize: 14, fontWeight: '600' },
+  itemSub: { fontSize: 12 },
+  badge: { fontSize: 11, fontWeight: '600', padding: '2px 8px', borderRadius: 10 },
+  emptyText: { fontSize: 13, textAlign: 'center', paddingVertical: 12 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 16, maxHeight: '80%' },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 16, textAlign: 'center' },
+  field: { marginBottom: 16 },
+  label: { fontSize: 13, fontWeight: '600', marginBottom: 6 },
+  input: { borderRadius: 10, padding: 14, fontSize: 16 },
+  personRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  personChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16 },
+  modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
+  modalBtn: { flex: 1, padding: 14, borderRadius: 10, alignItems: 'center' },
+  modalBtnText: { fontSize: 16, fontWeight: '600' },
+});

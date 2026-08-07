@@ -341,3 +341,60 @@ export interface TripSubcollections {
   activities: TripActivity[];
   packingLists: any[];
 }
+
+// Health Space Types
+export interface HealthMedication {
+  id: string;
+  name: string;
+  person: string;
+  dosage: string;
+  frequency: string;
+  note?: string;
+  createdAt: number;
+}
+
+export interface HealthAppointment {
+  id: string;
+  title: string;
+  person: string;
+  date: string;
+  startTime: string;
+  endTime?: string;
+  location?: string;
+  note?: string;
+  reminder?: string;
+  addToCalendar?: boolean;
+  createdAt: number;
+}
+
+export interface HealthVaccination {
+  id: string;
+  name: string;
+  person: string;
+  date: string;
+  nextDue?: string;
+  status: 'completed' | 'pending' | 'overdue';
+  note?: string;
+  createdAt: number;
+}
+
+export interface HealthAllergy {
+  id: string;
+  allergen: string;
+  person: string;
+  severity: 'mild' | 'moderate' | 'severe';
+  note?: string;
+  createdAt: number;
+}
+
+export interface HealthGrowth {
+  id: string;
+  person: string;
+  height: number;
+  weight: number;
+  date: string;
+  note?: string;
+  createdAt: number;
+}
+
+export type HealthItemType = 'medication' | 'appointment' | 'vaccination' | 'allergy' | 'growth';

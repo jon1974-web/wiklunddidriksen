@@ -915,6 +915,7 @@ export const ProfileScreen: React.FC = () => {
           { key: 'birthdays', icon: 'birthday', label: t('birthdays.title') },
           { key: 'meals', icon: 'utensils', label: t('mealPlanner.weeklyPlan') },
           { key: 'reiser', icon: 'compass', label: t('trips.title') },
+          { key: 'health', icon: 'transport', label: t('health.title') },
         ].map(section => (
           <TouchableOpacity
             key={section.key}

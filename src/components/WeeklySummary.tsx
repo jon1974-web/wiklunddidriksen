@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
-import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe } from '../types';
+import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,7 @@ interface WeeklySummaryProps {
   sectionSettings?: Record<string, boolean>;
   groupLogos?: Record<string, string>;
   tripSubcollections?: Record<string, any>;
+  healthAppointments?: HealthAppointment[];
 }
 
 const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
@@ -204,6 +205,30 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                     </View>
                   );
                 })}
+              </View>
+            );
+          })()}
+
+          {/* Health section */}
+          {sectionSettings.health !== false && (() => {
+            const { start, end } = getWeekRange(new Date());
+            const weekStr = start.toISOString().split('T')[0];
+            const endStr = end.toISOString().split('T')[0];
+            const weekAppointments = (healthAppointments || []).filter(a => a.date >= weekStr && a.date <= endStr);
+            if (weekAppointments.length === 0) return null;
+            return (
+              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
+                  <AppIcon name="transport" size={18} color="#E53935" />
+                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('health.title')}</Text>
+                </View>
+                {weekAppointments.map((a, i) => (
+                  <View key={i} style={[styles.birthdayItem, i < weekAppointments.length - 1 && { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
+                      {a.title} — {a.date} {a.startTime}{a.location ? ` (${a.location})` : ''}
+                    </Text>
+                  </View>
+                ))}
               </View>
             );
           })()}

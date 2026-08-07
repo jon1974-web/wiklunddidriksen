@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent, Birthday } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, Birthday, HealthAppointment } from '../types';
 import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
@@ -16,6 +16,7 @@ import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { getTrips, getTripTransport, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse, clearSpondToken } from '../services/spondService';
+import { getHealthAppointments } from '../services/healthService';
 import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
@@ -124,6 +125,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondEvents, setSpondEvents] = useState<SpondEvent[]>([]);
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
+  const [healthAppointments, setHealthAppointments] = useState<HealthAppointment[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
@@ -169,11 +171,22 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     }
   }, [familyId]);
 
+  const loadHealth = useCallback(async () => {
+    if (!familyId) return;
+    try {
+      const data = await getHealthAppointments(familyId);
+      setHealthAppointments(data);
+    } catch (error) {
+      // Silently fail for health
+    }
+  }, [familyId]);
+
   useEffect(() => {
     loadTrips();
-    const unsubscribe = navigation.addListener('focus', loadTrips);
+    loadHealth();
+    const unsubscribe = navigation.addListener('focus', () => { loadTrips(); loadHealth(); });
     return unsubscribe;
-  }, [navigation, loadTrips]);
+  }, [navigation, loadTrips, loadHealth]);
 
   useEffect(() => {
     if (!familyId) return;
@@ -861,6 +874,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         sectionSettings={minUkeSections}
         groupLogos={spondGroupLogos}
         tripSubcollections={tripSubcollections}
+        healthAppointments={healthAppointments}
       />
 
       <ActionModal
