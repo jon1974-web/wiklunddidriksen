@@ -182,7 +182,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noMedications')}</Text>
           ) : (
             medications.map(med => (
-              <TouchableOpacity key={med.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: med.id, title: med.name })}>
+              <TouchableOpacity key={med.id} style={styles.item} onLongPress={() => { setActiveSection('medications'); setDeleteModal({ visible: true, id: med.id, title: med.name }); }}>
                 <AppIcon name="medication" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{med.name}</Text>
@@ -199,7 +199,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAppointments')}</Text>
           ) : (
             appointments.map(appt => (
-              <TouchableOpacity key={appt.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: appt.id, title: appt.title })}>
+              <TouchableOpacity key={appt.id} style={styles.item} onLongPress={() => { setActiveSection('appointments'); setDeleteModal({ visible: true, id: appt.id, title: appt.title }); }}>
                 <AppIcon name="calendar" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
@@ -219,7 +219,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noVaccinations')}</Text>
           ) : (
             vaccinations.map(vacc => (
-              <TouchableOpacity key={vacc.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: vacc.id, title: vacc.name })}>
+              <TouchableOpacity key={vacc.id} style={styles.item} onLongPress={() => { setActiveSection('vaccinations'); setDeleteModal({ visible: true, id: vacc.id, title: vacc.name }); }}>
                 <AppIcon name="vaccination" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{vacc.name}</Text>
@@ -239,7 +239,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAllergies')}</Text>
           ) : (
             allergies.map(allergy => (
-              <TouchableOpacity key={allergy.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: allergy.id, title: allergy.allergen })}>
+              <TouchableOpacity key={allergy.id} style={styles.item} onLongPress={() => { setActiveSection('allergies'); setDeleteModal({ visible: true, id: allergy.id, title: allergy.allergen }); }}>
                 <AppIcon name="allergy" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{allergy.allergen}</Text>
@@ -259,7 +259,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noGrowth')}</Text>
           ) : (
             growth.map(g => (
-              <TouchableOpacity key={g.id} style={styles.item} onLongPress={() => setDeleteModal({ visible: true, id: g.id, title: g.person })}>
+              <TouchableOpacity key={g.id} style={styles.item} onLongPress={() => { setActiveSection('growth'); setDeleteModal({ visible: true, id: g.id, title: g.person }); }}>
                 <AppIcon name="growth" size={20} color={colors.accent} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{g.person}</Text>
