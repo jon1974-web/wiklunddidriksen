@@ -254,6 +254,11 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        </TouchableOpacity>
+      </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppIcon name="transport" size={28} color="#E53935" />
@@ -269,9 +274,6 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       </View>
 
       <ScrollView style={styles.content}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
-        </TouchableOpacity>
         {/* Medications */}
         {renderSection(t('health.medications'), 'medication', medications.length, 'medications', (
           medications.length === 0 ? (
