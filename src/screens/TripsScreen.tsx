@@ -190,7 +190,6 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.title')}</Text>
           </View>
         </View>
-        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
       {loading ? (

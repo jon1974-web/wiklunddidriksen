@@ -25,6 +25,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const familyId = useUserStore((state) => state.familyId);
+  const familyName = useUserStore((state) => state.familyName);
   const [tripCount, setTripCount] = useState(0);
   const [healthCount, setHealthCount] = useState(0);
 
@@ -113,6 +114,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
           </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
+        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
       <FlatList
@@ -139,6 +141,13 @@ const styles = StyleSheet.create({
   screenTitle: {
     fontSize: 28,
     fontWeight: 'bold',
+  },
+  familySubtitle: {
+    fontSize: 14,
+    fontStyle: 'italic',
+    marginLeft: 36,
+    marginTop: -4,
+    marginBottom: 8,
   },
   list: {
     padding: 16,
