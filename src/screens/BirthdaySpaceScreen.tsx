@@ -55,6 +55,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
   const [newGiftText, setNewGiftText] = useState('');
   const [actionModal, setActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [showHelp, setShowHelp] = useState(false);
+  const [expandedBirthdays, setExpandedBirthdays] = useState<Set<string>>(new Set());
 
   const loadData = useCallback(async () => {
     if (!familyId) return;

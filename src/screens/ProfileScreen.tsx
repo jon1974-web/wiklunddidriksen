@@ -95,7 +95,6 @@ export const ProfileScreen: React.FC = () => {
   const [showHelpNotifications, setShowHelpNotifications] = useState(false);
   const [showHelpMinUke, setShowHelpMinUke] = useState(false);
   const [showHelpMatsenter, setShowHelpMatsenter] = useState(false);
-  const [showHelpBirthdays, setShowHelpBirthdays] = useState(false);
   const [showHelpFamily, setShowHelpFamily] = useState(false);
   const [showHelpMembers, setShowHelpMembers] = useState(false);
   const [showHelpSpond, setShowHelpSpond] = useState(false);
@@ -972,25 +971,6 @@ export const ProfileScreen: React.FC = () => {
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-            <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('birthdays.title')}</Text>
-            <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpBirthdays(true)}>
-              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-                <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            style={[styles.familyButton, { backgroundColor: colors.accent }]}
-            onPress={() => navigation.navigate('Birthday')}
-          >
-            <Text style={styles.familyButtonText}>{t('birthdays.add')}</Text>
-          </TouchableOpacity>
-        </View>
-
-      <View style={[styles.section, { backgroundColor: colors.surface }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
             <Text style={[styles.sectionTitle, { color: colors.textSecondary, marginBottom: 0 }]}>{t('profile.family')}</Text>
             <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpFamily(true)}>
               <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
@@ -1344,10 +1324,6 @@ export const ProfileScreen: React.FC = () => {
         { icon: '🛡️', title: t('profile.helpMembersAdmin'), text: t('profile.helpMembersAdminText') },
         { icon: '👤', title: t('profile.helpMembersMember'), text: t('profile.helpMembersMemberText') },
         { icon: '👉', title: t('profile.helpMembersHow'), text: t('profile.helpMembersHowText'), tip: t('profile.helpMembersTip') },
-      ]} />
-      <HelpCenter visible={showHelpSpond} onClose={() => setShowHelpSpond(false)} title={t('profile.helpSpondTitle')} sections={[
-        { icon: '⚽', title: t('profile.helpSpondWhat'), text: t('profile.helpSpondWhatText') },
-        { icon: '👉', title: t('profile.helpSpondHow'), text: t('profile.helpSpondHowText'), tip: t('profile.helpSpondTip') },
       ]} />
 
     </SafeAreaView>
