@@ -1123,7 +1123,7 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
-  const { familyId, title, date, time, location, itemType, creatorName } = req.body || {};
+  const { familyId, title, date, time, location, itemType, creatorName, personName } = req.body || {};
   if (!familyId || !title) return res.status(400).json({ error: "familyId and title are required" });
 
   const db = getFirestore();
@@ -1156,8 +1156,8 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
       await getMessaging().send({
         token: t.fcmToken,
         notification: {
-          title: `${icon} ${creatorName || "En i familien"} la til en ${typeLabel}`,
-          body: `${title}${dateLabel ? ` — ${dateLabel}` : ""}`,
+          title: `${icon} ${creatorName || "En i familien"} la til en ${typeLabel} for ${personName || "familien"}`,
+          body: `${title}${dateLabel ? ` — ${dateLabel}` : ""}${location ? ` (${location})` : ""}`,
         },
         webpush: {
           notification: {

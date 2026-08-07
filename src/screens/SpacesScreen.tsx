@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { getTrips } from '../services/tripService';
+import { getHealthAppointments } from '../services/healthService';
 
 interface Space {
   id: string;
@@ -25,13 +26,18 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
   const { colors } = useTheme();
   const familyId = useUserStore((state) => state.familyId);
   const [tripCount, setTripCount] = useState(0);
+  const [healthCount, setHealthCount] = useState(0);
 
   useEffect(() => {
     if (!familyId) return;
+    const today = new Date().toISOString().split('T')[0];
     getTrips(familyId).then(trips => {
-      const today = new Date().toISOString().split('T')[0];
       const active = trips.filter(trip => trip.endDate >= today);
       setTripCount(active.length);
+    }).catch(() => {});
+    getHealthAppointments(familyId).then(appts => {
+      const future = appts.filter(a => a.date >= today);
+      setHealthCount(future.length);
     }).catch(() => {});
   }, [familyId]);
 
@@ -47,9 +53,9 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
     {
       id: 'health',
       name: t('spaces.health'),
-      icon: 'transport',
+      icon: 'medication',
       iconColor: '#E53935',
-      count: t('spaces.healthCount', { count: 2 }),
+      count: t('spaces.healthCount', { count: healthCount }),
       screen: 'HealthSpace',
     },
     {

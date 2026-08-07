@@ -172,6 +172,6 @@ export const notifyNewEvent = async (familyId: string, eventTitle: string, event
   await callFunction('notifyNewEvent', { familyId, eventTitle, eventDate, eventTime, creatorName });
 };
 
-export const notifyHealthItem = async (familyId: string, title: string, date: string, time: string, location: string, itemType: string, creatorName: string): Promise<void> => {
-  await callFunction('notifyHealthItem', { familyId, title, date, time, location, itemType, creatorName });
+export const notifyHealthItem = async (familyId: string, title: string, date: string, time: string, location: string, itemType: string, creatorName: string, personName: string): Promise<void> => {
+  await callFunction('notifyHealthItem', { familyId, title, date, time, location, itemType, creatorName, personName });
 };
