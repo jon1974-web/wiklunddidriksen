@@ -43,9 +43,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [showHelp, setShowHelp] = useState(false);
 
   // Form states
-  const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', note: '' });
+  const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
   const [apptForm, setApptForm] = useState({ title: '', person: '', date: '', startTime: '', endTime: '', location: '', note: '' });
-  const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', note: '' });
+  const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
 
@@ -87,7 +87,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('health.enterName')); return; }
         await addHealthMedication(familyId, medForm);
-        setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: '', note: '' });
+        setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
       } else if (activeSection === 'appointments') {
         if (!apptForm.title.trim() || !apptForm.date) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
         await addHealthAppointment(familyId, apptForm);
@@ -95,7 +95,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
         await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
-        setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', note: '' });
+        setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', note: '' });
       } else if (activeSection === 'allergies') {
         if (!allergyForm.allergen.trim()) { crossAlert('Error', t('health.enterAllergen')); return; }
         await addHealthAllergy(familyId, allergyForm);
@@ -306,6 +306,16 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.frequency')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.frequency} onChangeText={(v) => setMedForm(f => ({ ...f, frequency: v }))} placeholder={t('health.frequencyPlaceholder')} placeholderTextColor={colors.textDisabled} />
                   </View>
+                  <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.dateFrom')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.dateFrom} onChangeText={(v) => setMedForm(f => ({ ...f, dateFrom: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.dateTo')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.dateTo} onChangeText={(v) => setMedForm(f => ({ ...f, dateTo: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                    </View>
+                  </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.note')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.note} onChangeText={(v) => setMedForm(f => ({ ...f, note: v }))} placeholder={t('health.notePlaceholder')} placeholderTextColor={colors.textDisabled} />
@@ -375,6 +385,16 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.nextDue')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={vaccForm.nextDue} onChangeText={(v) => setVaccForm(f => ({ ...f, nextDue: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
+                    <View style={styles.personRow}>
+                      {['', t('health.reminder1Day'), t('health.reminder3Days'), t('health.reminder1Week')].map((r, i) => (
+                        <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: vaccForm.reminder === r ? colors.accent : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, reminder: r }))}>
+                          <Text style={{ color: vaccForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
                   </View>
                 </>
               )}

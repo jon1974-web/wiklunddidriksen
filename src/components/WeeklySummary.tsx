@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
-import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment } from '../types';
+import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +21,8 @@ interface WeeklySummaryProps {
   groupLogos?: Record<string, string>;
   tripSubcollections?: Record<string, any>;
   healthAppointments?: HealthAppointment[];
+  healthMedications?: HealthMedication[];
+  healthVaccinations?: HealthVaccination[];
 }
 
 const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
@@ -52,7 +54,7 @@ interface DayItem {
   logoUrl?: string;
 }
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {}, tripSubcollections = {}, healthAppointments = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {}, tripSubcollections = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -215,17 +217,39 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             const weekStr = start.toISOString().split('T')[0];
             const endStr = end.toISOString().split('T')[0];
             const weekAppointments = (healthAppointments || []).filter(a => a.date >= weekStr && a.date <= endStr);
-            if (weekAppointments.length === 0) return null;
+            const activeMedications = (healthMedications || []).filter(m => {
+              if (!m.dateFrom && !m.dateTo) return true;
+              if (m.dateFrom && m.dateTo) return m.dateFrom <= endStr && m.dateTo >= weekStr;
+              if (m.dateFrom) return m.dateFrom <= endStr;
+              if (m.dateTo) return m.dateTo >= weekStr;
+              return true;
+            });
+            const weekVaccinations = (healthVaccinations || []).filter(v => v.date >= weekStr && v.date <= endStr);
+            if (weekAppointments.length === 0 && activeMedications.length === 0 && weekVaccinations.length === 0) return null;
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="transport" size={18} color="#E53935" />
+                  <AppIcon name="medication" size={18} color="#E53935" />
                   <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('health.title')}</Text>
                 </View>
                 {weekAppointments.map((a, i) => (
-                  <View key={i} style={[styles.birthdayItem, i < weekAppointments.length - 1 && { borderBottomColor: colors.border }]}>
+                  <View key={`appt-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
                     <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                      {a.title} — {a.date} {a.startTime}{a.location ? ` (${a.location})` : ''}
+                      📅 {a.title} — {a.date} {a.startTime}{a.location ? ` (${a.location})` : ''}
+                    </Text>
+                  </View>
+                ))}
+                {weekVaccinations.map((v, i) => (
+                  <View key={`vacc-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
+                      💉 {v.name} — {v.person} ({v.date})
+                    </Text>
+                  </View>
+                ))}
+                {activeMedications.map((m, i) => (
+                  <View key={`med-${i}`} style={[styles.birthdayItem, i === activeMedications.length - 1 ? {} : { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
+                      💊 {m.name} — {m.person}{m.dateTo ? ` (til ${m.dateTo})` : ''}
                     </Text>
                   </View>
                 ))}

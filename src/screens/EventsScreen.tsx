@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent, Birthday, HealthAppointment } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, Birthday, HealthAppointment, HealthMedication, HealthVaccination } from '../types';
 import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
@@ -16,7 +16,7 @@ import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { getTrips, getTripTransport, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse, clearSpondToken } from '../services/spondService';
-import { getHealthAppointments } from '../services/healthService';
+import { getHealthAppointments, getHealthMedications, getHealthVaccinations } from '../services/healthService';
 import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
@@ -126,6 +126,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondRespondents, setSpondRespondents] = useState<SpondRespondent[]>([]);
   const [birthdays, setBirthdays] = useState<Birthday[]>([]);
   const [healthAppointments, setHealthAppointments] = useState<HealthAppointment[]>([]);
+  const [healthMedications, setHealthMedications] = useState<HealthMedication[]>([]);
+  const [healthVaccinations, setHealthVaccinations] = useState<HealthVaccination[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
@@ -174,8 +176,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const loadHealth = useCallback(async () => {
     if (!familyId) return;
     try {
-      const data = await getHealthAppointments(familyId);
-      setHealthAppointments(data);
+      const [appts, meds, vaccs] = await Promise.all([
+        getHealthAppointments(familyId),
+        getHealthMedications(familyId),
+        getHealthVaccinations(familyId),
+      ]);
+      setHealthAppointments(appts);
+      setHealthMedications(meds);
+      setHealthVaccinations(vaccs);
     } catch (error) {
       // Silently fail for health
     }
@@ -875,6 +883,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         groupLogos={spondGroupLogos}
         tripSubcollections={tripSubcollections}
         healthAppointments={healthAppointments}
+        healthMedications={healthMedications}
+        healthVaccinations={healthVaccinations}
       />
 
       <ActionModal

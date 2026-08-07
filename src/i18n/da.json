@@ -230,7 +230,14 @@
     "helpAppointmentsText": "Planlæg lægebesøg, tandlægebesøg og andre sundhedsaftaler. Tiderne vises også i begivenheder.",
     "helpHow": "Sådan gør du",
     "helpHowText": "Tryk på + for at tilføje et nyt element i hver sektion. Lang tryk for at slette.",
-    "helpTip": "Sundhedstider kan tilføjes til kalenderen og vises i 'Min uge'."
+    "helpTip": "Sundhedstider kan tilføjes til kalenderen og vises i 'Min uge'.",
+    "dateFrom": "Fra dato",
+    "dateTo": "Til dato",
+    "reminder": "Påmindelse",
+    "noReminder": "Ingen",
+    "reminder1Day": "1 dag før",
+    "reminder3Days": "3 dage før",
+    "reminder1Week": "1 uge før"
   },
   "shopping": {
     "title": "Lister",

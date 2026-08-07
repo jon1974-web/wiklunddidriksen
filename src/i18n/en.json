@@ -230,7 +230,14 @@
     "helpAppointmentsText": "Schedule doctor visits, dentist appointments and other health appointments. Appointments also appear in events.",
     "helpHow": "How to use it",
     "helpHowText": "Tap + to add a new item in each section. Long press to delete.",
-    "helpTip": "Health appointments can be added to the calendar and appear in 'My week'."
+    "helpTip": "Health appointments can be added to the calendar and appear in 'My week'.",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "reminder": "Reminder",
+    "noReminder": "None",
+    "reminder1Day": "1 day before",
+    "reminder3Days": "3 days before",
+    "reminder1Week": "1 week before"
   },
   "shopping": {
     "title": "Lists",

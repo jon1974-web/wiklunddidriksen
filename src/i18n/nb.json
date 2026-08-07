@@ -231,7 +231,14 @@
     "helpAppointmentsText": "Planlegg legetimer, tannlegebesøk og andre helseavtaler. Timen vises også i arrangementer.",
     "helpHow": "Slik gjør du",
     "helpHowText": "Trykk på + for å legge til et nytt element i hver seksjon. Hold inne for å slette.",
-    "helpTip": "Helseavtaler kan legges til i kalenderen og vises i «Min uke»."
+    "helpTip": "Helseavtaler kan legges til i kalenderen og vises i «Min uke».",
+    "dateFrom": "Fra dato",
+    "dateTo": "Til dato",
+    "reminder": "Påminnelse",
+    "noReminder": "Ingen",
+    "reminder1Day": "1 dag før",
+    "reminder3Days": "3 dager før",
+    "reminder1Week": "1 uke før"
   },
   "shopping": {
     "title": "Lister",

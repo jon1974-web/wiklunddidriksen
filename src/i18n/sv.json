@@ -230,7 +230,14 @@
     "helpAppointmentsText": "Planera läkarbesök, tandläkarbesök och andra hälsoavtal. Tiderna visas också i evenemang.",
     "helpHow": "Så här gör du",
     "helpHowText": "Tryck på + för att lägga till ett nytt element i varje sektion. Håll in för att ta bort.",
-    "helpTip": "Hälsotider kan läggas till i kalendern och visas i 'Min vecka'."
+    "helpTip": "Hälsotider kan läggas till i kalendern och visas i 'Min vecka'.",
+    "dateFrom": "Från datum",
+    "dateTo": "Till datum",
+    "reminder": "Påminnelse",
+    "noReminder": "Ingen",
+    "reminder1Day": "1 dag före",
+    "reminder3Days": "3 dagar före",
+    "reminder1Week": "1 vecka före"
   },
   "shopping": {
     "title": "Listor",

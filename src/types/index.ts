@@ -349,6 +349,8 @@ export interface HealthMedication {
   person: string;
   dosage: string;
   frequency: string;
+  dateFrom?: string;
+  dateTo?: string;
   note?: string;
   createdAt: number;
 }
@@ -374,6 +376,7 @@ export interface HealthVaccination {
   date: string;
   nextDue?: string;
   status: 'completed' | 'pending' | 'overdue';
+  reminder?: string;
   note?: string;
   createdAt: number;
 }
