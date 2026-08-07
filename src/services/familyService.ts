@@ -171,3 +171,7 @@ export const updateMemberRole = async (familyId: string, targetUid: string, newR
 export const notifyNewEvent = async (familyId: string, eventTitle: string, eventDate: string, eventTime: string, creatorName: string): Promise<void> => {
   await callFunction('notifyNewEvent', { familyId, eventTitle, eventDate, eventTime, creatorName });
 };
+
+export const notifyHealthItem = async (familyId: string, title: string, date: string, time: string, location: string, itemType: string, creatorName: string): Promise<void> => {
+  await callFunction('notifyHealthItem', { familyId, title, date, time, location, itemType, creatorName });
+};

@@ -1114,6 +1114,68 @@ exports.notifyNewEvent = onRequest({ region: "us-central1", memory: "256MB" }, a
   return res.status(200).json({ sent });
 });
 
+// Health notification — sends push notification to all family members
+exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { familyId, title, date, time, location, itemType, creatorName } = req.body || {};
+  if (!familyId || !title) return res.status(400).json({ error: "familyId and title are required" });
+
+  const db = getFirestore();
+  const familySnap = await db.collection("families").doc(familyId).get();
+  if (!familySnap.exists) return res.status(404).json({ error: "Family not found" });
+
+  const membersMap = familySnap.data().members || {};
+  const memberUids = Object.keys(membersMap).filter((u) => u !== uid);
+
+  const tokens = [];
+  for (let i = 0; i < memberUids.length; i += 10) {
+    const batch = memberUids.slice(i, i + 10);
+    const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
+    usersSnap.forEach((uDoc) => {
+      const uData = uDoc.data();
+      if (uData.fcmToken && uData.notificationsEnabled !== false) {
+        tokens.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
+      }
+    });
+  }
+
+  if (tokens.length === 0) return res.status(200).json({ sent: 0 });
+
+  const icon = itemType === "vaccination" ? "💉" : "🏥";
+  const typeLabel = itemType === "vaccination" ? "Vaksine" : "Time";
+  const dateLabel = date && time ? `${date} ${time}` : date || "";
+
+  const results = await Promise.allSettled(
+    tokens.map(async (t) => {
+      await getMessaging().send({
+        token: t.fcmToken,
+        notification: {
+          title: `${icon} ${creatorName || "En i familien"} la til en ${typeLabel}`,
+          body: `${title}${dateLabel ? ` — ${dateLabel}` : ""}`,
+        },
+        webpush: {
+          notification: {
+            icon: "/favicon.ico",
+            badge: "/favicon.ico",
+            tag: "health-reminder",
+          },
+          fcmOptions: { link: "/Våre steder" },
+        },
+        data: { url: "/Våre steder", type: "health-reminder" },
+      });
+    })
+  );
+
+  const sent = results.filter((r) => r.status === "fulfilled").length;
+  return res.status(200).json({ sent });
+});
+
 // Birthday reminders — runs daily at 08:00
 exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZone: "Europe/Oslo" }, async (event) => {
   const db = getFirestore();

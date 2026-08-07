@@ -10,6 +10,7 @@ import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { scheduleEventReminder } from '../services/notificationService';
+import { notifyHealthItem } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import {
   getHealthMedications, addHealthMedication, updateHealthMedication, deleteHealthMedication,
@@ -122,6 +123,11 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             await updateHealthAppointment(familyId, savedAppt.id, { notificationId: notifId });
           }
         }
+        // Send push notification to family members
+        if (!isEditing) {
+          const user = useUserStore.getState().user;
+          notifyHealthItem(familyId, apptForm.title, apptForm.date, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '').catch(() => {});
+        }
         setApptForm({ title: '', person: persons[0] || '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
@@ -147,6 +153,11 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           if (notifId && savedVacc.id) {
             await updateHealthVaccination(familyId, savedVacc.id, { notificationId: notifId });
           }
+        }
+        // Send push notification to family members
+        if (!isEditing) {
+          const user = useUserStore.getState().user;
+          notifyHealthItem(familyId, vaccForm.name, vaccForm.date, '', vaccForm.location || '', 'vaccination', user?.displayName || '').catch(() => {});
         }
         setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', location: '', note: '' });
       } else if (activeSection === 'allergies') {
