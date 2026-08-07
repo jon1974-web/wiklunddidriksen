@@ -117,6 +117,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
         birthdayId: selectedBirthday.id,
         name: newGiftText.trim(),
         purchased: false,
+        year: new Date().getFullYear(),
       });
       setNewGiftText('');
       loadData();
@@ -160,6 +161,90 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
     if (days === 0) return { text: t('health.today'), style: 'countdown-today' };
     if (days <= 14) return { text: t('health.inDays', { count: days }), style: 'countdown-soon' };
     return { text: t('health.inDays', { count: days }), style: 'countdown-later' };
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedBirthdays(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const getPreviousGifts = (birthdayId: string, currentYear: number) => {
+    const gifts = giftIdeas[birthdayId] || [];
+    const byYear: Record<number, GiftIdea[]> = {};
+    for (const g of gifts) {
+      if (g.year < currentYear) {
+        if (!byYear[g.year]) byYear[g.year] = [];
+        byYear[g.year].push(g);
+      }
+    }
+    return byYear;
+  };
+
+  const renderBirthdayWithGifts = (b: Birthday, showGifts: boolean = true) => {
+    const badge = getCountdownBadge(b.date);
+    const age = calculateAge(b.date);
+    const isExpanded = expandedBirthdays.has(b.id);
+    const currentYear = new Date().getFullYear();
+    const currentGifts = (giftIdeas[b.id] || []).filter(g => g.year === currentYear);
+    const previousGifts = getPreviousGifts(b.id, currentYear);
+
+    return (
+      <View key={b.id} style={[styles.card, { backgroundColor: colors.surface }]}>
+        <TouchableOpacity 
+          style={styles.birthdayItem} 
+          onPress={() => showGifts && toggleExpand(b.id)}
+          onLongPress={() => setActionModal({ visible: true, id: b.id, title: b.name })}
+        >
+          <AppIcon name="birthday" size={20} color={colors.accent} />
+          <View style={styles.itemText}>
+            <Text style={[styles.itemTitle, { color: colors.text }]}>{b.name} <Text style={styles.yearBadge}>{age} {t('birthdays.years')}</Text></Text>
+            <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{b.date}</Text>
+          </View>
+          <Text style={[styles.badge, { backgroundColor: badge.style === 'countdown-today' ? '#FFEBEE' : badge.style === 'countdown-soon' ? '#FFF3E0' : '#E8F5E9', color: badge.style === 'countdown-today' ? '#E53935' : badge.style === 'countdown-soon' ? '#FB8C00' : '#43A047' }]}>{badge.text}</Text>
+        </TouchableOpacity>
+
+        {showGifts && isExpanded && (
+          <View style={styles.expandContent}>
+            <View style={styles.cardHeader}>
+              <View style={styles.cardTitleRow}>
+                <AppIcon name="destination" size={16} color={colors.accent} />
+                <Text style={[styles.cardTitle, { color: colors.text }]}>{t('birthdays.giftList')} <Text style={styles.yearBadge}>{currentYear}</Text></Text>
+              </View>
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.accent }]} onPress={() => { setSelectedBirthday(b); setShowGiftModal(true); }}>
+                <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+              </TouchableOpacity>
+            </View>
+            {currentGifts.map(gift => (
+              <TouchableOpacity key={gift.id} style={styles.giftItem} onPress={() => handleToggleGift(gift)}>
+                <View style={[styles.giftCheckbox, gift.purchased && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
+                  {gift.purchased && <Text style={{ color: '#fff', fontSize: 12 }}>✓</Text>}
+                </View>
+                <Text style={[styles.giftText, gift.purchased && { textDecorationLine: 'line-through', color: colors.textSecondary }]}>{gift.name}</Text>
+              </TouchableOpacity>
+            ))}
+            <TouchableOpacity style={styles.giftAdd} onPress={() => { setSelectedBirthday(b); setShowGiftModal(true); }}>
+              <Text style={{ color: colors.accent, fontSize: 12 }}>+ {t('birthdays.addGiftIdea')}</Text>
+            </TouchableOpacity>
+
+            {Object.keys(previousGifts).length > 0 && (
+              <View style={styles.prevGifts}>
+                <Text style={styles.prevTitle}>{t('birthdays.previousGifts')}</Text>
+                {Object.entries(previousGifts).map(([year, gifts]) => (
+                  <View key={year} style={styles.prevItem}>
+                    <Text style={[styles.prevYear, { color: colors.text }]}>{year} — {t('birthdays.giftsPurchased', { count: gifts.filter(g => g.purchased).length })}</Text>
+                    <Text style={[styles.prevItems, { color: colors.textSecondary }]}>{gifts.map(g => g.name).join(', ')}</Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+      </View>
+    );
   };
 
   return (
