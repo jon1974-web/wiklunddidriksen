@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -105,6 +105,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
             <AppIcon name="house" size={28} color={colors.accent} />
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('spaces.title')}</Text>
           </View>
+          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
       </View>
 

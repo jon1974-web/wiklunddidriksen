@@ -187,7 +187,6 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
             <AppIcon name="compass" size={28} color={colors.accent} />
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.title')}</Text>
           </View>
-          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
