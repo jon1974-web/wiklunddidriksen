@@ -656,7 +656,21 @@
     "reminderTitle": "🎂 {name} har bursdag!",
     "reminderBody": "{name} har bursdag om {days} dager",
     "reminderToday": "{name} har bursdag i dag!",
-    "years": "år"
+    "years": "år",
+    "addBirthday": "Legg til bursdag",
+    "namePlaceholder": "F.eks. Mamma",
+    "day": "Dag",
+    "month": "Måned",
+    "year": "År",
+    "enterName": "Vennligst skriv inn navn",
+    "enterDate": "Vennligst fyll inn dato",
+    "upcoming": "Kommende bursdager",
+    "all": "Alle bursdager",
+    "noUpcoming": "Ingen kommende bursdager",
+    "giftList": "Gaveliste",
+    "addGiftIdea": "Legg til gaveidé",
+    "giftIdea": "Gaveidé",
+    "giftPlaceholder": "F.eks. LEGO sett"
   },
   "mealPlanner": {
     "title": "Matsenter",

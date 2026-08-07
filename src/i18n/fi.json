@@ -655,7 +655,21 @@
     "reminderTitle": "🎂 {name}:lla on syntymäpäivä!",
     "reminderBody": "{name}:n syntymäpäivä on {days} päivän päässä",
     "reminderToday": "{name}:lla on syntymäpäivä tänään!",
-    "years": "vuotta"
+    "years": "vuotta",
+    "addBirthday": "Lisää syntymäpäivä",
+    "namePlaceholder": "esim. Äiti",
+    "day": "Päivä",
+    "month": "Kuukausi",
+    "year": "Vuosi",
+    "enterName": "Anna nimi",
+    "enterDate": "Täytä päivämäärä",
+    "upcoming": "Tulevat syntymäpäivät",
+    "all": "Kaikki syntymäpäivät",
+    "noUpcoming": "Ei tulevia syntymäpäiviä",
+    "giftList": "Lahjalista",
+    "addGiftIdea": "Lisää lahjaidea",
+    "giftIdea": "Lahjaidea",
+    "giftPlaceholder": "esim. LEGO-setti"
   },
   "mealPlanner": {
     "title": "Ruokakeskus",

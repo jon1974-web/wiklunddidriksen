@@ -655,7 +655,21 @@
     "reminderTitle": "🎂 {name} has a birthday!",
     "reminderBody": "{name}'s birthday is in {days} days",
     "reminderToday": "{name} has a birthday today!",
-    "years": "years"
+    "years": "years",
+    "addBirthday": "Add birthday",
+    "namePlaceholder": "e.g. Mom",
+    "day": "Day",
+    "month": "Month",
+    "year": "Year",
+    "enterName": "Please enter a name",
+    "enterDate": "Please fill in the date",
+    "upcoming": "Upcoming birthdays",
+    "all": "All birthdays",
+    "noUpcoming": "No upcoming birthdays",
+    "giftList": "Gift list",
+    "addGiftIdea": "Add gift idea",
+    "giftIdea": "Gift idea",
+    "giftPlaceholder": "e.g. LEGO set"
   },
   "mealPlanner": {
     "title": "Food Center",

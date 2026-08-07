@@ -655,7 +655,21 @@
     "reminderTitle": "🎂 {name} har födelsedag!",
     "reminderBody": "{name} har födelsedag om {days} dagar",
     "reminderToday": "{name} har födelsedag idag!",
-    "years": "år"
+    "years": "år",
+    "addBirthday": "Lägg till födelsedag",
+    "namePlaceholder": "t.ex. Mamma",
+    "day": "Dag",
+    "month": "Månad",
+    "year": "År",
+    "enterName": "Vänligen ange ett namn",
+    "enterDate": "Vänligen fyll i datum",
+    "upcoming": "Kommande födelsedagar",
+    "all": "Alla födelsedagar",
+    "noUpcoming": "Inga kommande födelsedagar",
+    "giftList": "Gåvolista",
+    "addGiftIdea": "Lägg till gåvidé",
+    "giftIdea": "Gåvidé",
+    "giftPlaceholder": "t.ex. LEGO-set"
   },
   "mealPlanner": {
     "title": "Matcenter",

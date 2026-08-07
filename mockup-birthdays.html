@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bursdager — Mockup</title>
+  <style>
+    :root { --accent: #FB8C00; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; padding: 24px; max-width: 420px; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 4px; color: #333; font-size: 22px; }
+    .subtitle { text-align: center; color: #666; margin-bottom: 24px; font-size: 13px; }
+    .section-title { font-size: 16px; font-weight: 700; color: #333; margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
+    .header { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .header-row { display: flex; align-items: center; gap: 8; }
+    .back-btn { width: 36px; height: 36px; border-radius: 18px; border: 1.5px solid var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .back-btn span { color: var(--accent); font-size: 18px; }
+    .header-title { font-size: 28px; font-weight: bold; }
+    .help-btn { width: 18px; height: 18px; border-radius: 9px; background: #0097A7; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .help-inner { width: 12px; height: 12px; border-radius: 6px; background: #fff; display: flex; align-items: center; justify-content: center; }
+    .help-dot { width: 9px; height: 9px; border-radius: 4.5px; background: #0097A7; display: flex; align-items: center; justify-content: center; }
+    .help-text { color: #fff; font-size: 7px; font-weight: 800; }
+    .family-subtitle { font-size: 14px; font-style: italic; color: #666; margin-left: 36px; margin-top: -4px; margin-bottom: 8px; }
+    .card { background: #fff; border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+    .card-title { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .add-btn { width: 28px; height: 28px; border-radius: 14px; background: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .add-btn span { color: #fff; font-size: 18px; font-weight: 600; }
+    .birthday-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; gap: 12px; }
+    .birthday-item:last-child { border-bottom: none; }
+    .birthday-icon { width: 24px; text-align: center; }
+    .birthday-icon svg { width: 24px; height: 24px; }
+    .birthday-info { flex: 1; }
+    .birthday-name { font-size: 14px; font-weight: 600; }
+    .birthday-date { font-size: 12px; color: #666; }
+    .birthday-countdown { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; }
+    .countdown-today { background: #FFEBEE; color: #E53935; }
+    .countdown-soon { background: #FFF3E0; color: #FB8C00; }
+    .countdown-later { background: #E8F5E9; color: #43A047; }
+    .gift-section { margin-top: 8px; padding-top: 8px; border-top: 1px solid #f0f0f0; }
+    .gift-title { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
+    .gift-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; }
+    .gift-checkbox { width: 18px; height: 18px; border-radius: 4px; border: 2px solid #ddd; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .gift-checkbox.checked { background: var(--accent); border-color: var(--accent); }
+    .gift-text { font-size: 13px; flex: 1; }
+    .gift-text.purchased { text-decoration: line-through; color: #999; }
+    .gift-add { font-size: 12px; color: var(--accent); cursor: pointer; }
+    .empty-state { text-align: center; padding: 32px; color: #999; }
+  </style>
+</head>
+<body>
+
+  <h1>🎂 Bursdager — Mockup</h1>
+  <p class="subtitle">Fødselsdager og gaveliste for familien</p>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-row">
+      <div class="back-btn"><span>←</span></div>
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><path d="M12 3v4"/><path d="M8 7h8"/></svg>
+      <span class="header-title">Bursdager</span>
+      <div class="help-btn"><div class="help-inner"><div class="help-dot"><span class="help-text">i</span></div></div></div>
+    </div>
+    <div class="family-subtitle">Familien Wiklund Didriksen</div>
+  </div>
+
+  <!-- Upcoming birthdays -->
+  <div class="section-title">📅 Kommende bursdager</div>
+  
+  <div class="card">
+    <div class="birthday-item">
+      <div class="birthday-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="birthday-info">
+        <div class="birthday-name">Mamma (Kari)</div>
+        <div class="birthday-date">15. august 1975 — 50 år</div>
+      </div>
+      <span class="birthday-countdown countdown-soon">Om 8 dager</span>
+    </div>
+    <div class="birthday-item">
+      <div class="birthday-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="birthday-info">
+        <div class="birthday-name">Emma</div>
+        <div class="birthday-date">22. september 2016 — 9 år</div>
+      </div>
+      <span class="birthday-countdown countdown-later">Om 46 dager</span>
+    </div>
+  </div>
+
+  <!-- Gift planner for upcoming birthday -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+        Gaveliste — Mamma (50 år)
+      </div>
+      <div class="add-btn"><span>+</span></div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-checkbox checked"><span style="color: #fff; font-size: 12px;">✓</span></div>
+      <div class="gift-text purchased">Ny veske fra Louis Vuitton</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-checkbox"></div>
+      <div class="gift-text">Spa-dag med venninnene</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-checkbox"></div>
+      <div class="gift-text">Gavekort på favorittrestauranten</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-checkbox"></div>
+      <div class="gift-text">Bok av favorittforfatteren</div>
+    </div>
+    <div class="gift-add">+ Legg til gaveidé</div>
+  </div>
+
+  <!-- All birthdays -->
+  <div class="section-title">📋 Alle bursdager</div>
+  
+  <div class="card">
+    <div class="birthday-item">
+      <div class="birthday-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="birthday-info">
+        <div class="birthday-name">Bestefar (Ola)</div>
+        <div class="birthday-date">3. mars 1945 — 80 år</div>
+      </div>
+      <span class="birthday-countdown countdown-later">Des. 2025</span>
+    </div>
+    <div class="birthday-item">
+      <div class="birthday-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="birthday-info">
+        <div class="birthday-name">Mamma (Kari)</div>
+        <div class="birthday-date">15. august 1975 — 50 år</div>
+      </div>
+      <span class="birthday-countdown countdown-soon">Om 8 dager</span>
+    </div>
+    <div class="birthday-item">
+      <div class="birthday-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="birthday-info">
+        <div class="birthday-name">Pappa (Jon)</div>
+        <div class="birthday-date">20. november 1974 — 51 år</div>
+      </div>
+      <span class="birthday-countdown countdown-later">Om 105 dager</span>
+    </div>
+    <div class="birthday-item">
+      <div class="birthday-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="birthday-info">
+        <div class="birthday-name">Emma</div>
+        <div class="birthday-date">22. september 2016 — 9 år</div>
+      </div>
+      <span class="birthday-countdown countdown-later">Om 46 dager</span>
+    </div>
+    <div class="birthday-item">
+      <div class="birthday-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="birthday-info">
+        <div class="birthday-name">Noah</div>
+        <div class="birthday-date">10. januar 2019 — 7 år</div>
+      </div>
+      <span class="birthday-countdown countdown-later">Jan. 2026</span>
+    </div>
+    <div class="birthday-item">
+      <div class="birthday-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="birthday-info">
+        <div class="birthday-name">Bestemor (Liv)</div>
+        <div class="birthday-date">8. desember 1948 — 76 år</div>
+      </div>
+      <span class="birthday-countdown countdown-later">Des. 2025</span>
+    </div>
+  </div>
+
+  <!-- Gift planner for another birthday -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 12 20 22 4 22 4 12"/><rect x="2" y="7" width="20" height="5"/><line x1="12" y1="22" x2="12" y2="7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></svg>
+        Gaveliste — Noah (7 år)
+      </div>
+      <div class="add-btn"><span>+</span></div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-checkbox"></div>
+      <div class="gift-text">LEGO sett</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-checkbox checked"><span style="color: #fff; font-size: 12px;">✓</span></div>
+      <div class="gift-text purchased">Nintendo Switch spill</div>
+    </div>
+    <div class="gift-item">
+      <div class="gift-checkbox"></div>
+      <div class="gift-text">Sykkelhjelm</div>
+    </div>
+    <div class="gift-add">+ Legg til gaveidé</div>
+  </div>
+
+</body>
+</html>

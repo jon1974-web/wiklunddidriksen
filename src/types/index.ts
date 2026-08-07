@@ -279,6 +279,14 @@ export interface Birthday {
   createdAt: number;
 }
 
+export interface GiftIdea {
+  id: string;
+  birthdayId: string;
+  name: string;
+  purchased: boolean;
+  createdAt: number;
+}
+
 export interface RecipeIngredient {
   name: string;
   amount: string;

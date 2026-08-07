@@ -62,6 +62,13 @@ service cloud.firestore {
       allow update, delete: if request.auth != null;
     }
 
+    // Gift Ideas: any authenticated user can read/write (family-scoped client-side)
+    match /gifts/{giftId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null;
+    }
+
     // Recipes: any authenticated user can read/write (family-scoped client-side)
     match /recipes/{recipeId} {
       allow read: if request.auth != null;

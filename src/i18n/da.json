@@ -655,7 +655,21 @@
     "reminderTitle": "🎂 {name} har fødselsdag!",
     "reminderBody": "{name} har fødselsdag om {days} dage",
     "reminderToday": "{name} har fødselsdag i dag!",
-    "years": "år"
+    "years": "år",
+    "addBirthday": "Tilføj fødselsdag",
+    "namePlaceholder": "f.eks. Mor",
+    "day": "Dag",
+    "month": "Måned",
+    "year": "År",
+    "enterName": "Indtast venligst et navn",
+    "enterDate": "Udfyld venligst datoen",
+    "upcoming": "Kommende fødselsdage",
+    "all": "Alle fødselsdage",
+    "noUpcoming": "Ingen kommende fødselsdage",
+    "giftList": "Gaveliste",
+    "addGiftIdea": "Tilføj gaveidé",
+    "giftIdea": "Gaveidé",
+    "giftPlaceholder": "f.eks. LEGO-sæt"
   },
   "mealPlanner": {
     "title": "Madsenter",
