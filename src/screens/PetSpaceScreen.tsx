@@ -384,9 +384,13 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
               <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('pets.gender')}</Text>
                 <View style={styles.personRow}>
-                  {['Hann', 'Hunn', 'Ukjent'].map(g => (
-                    <TouchableOpacity key={g} style={[styles.personChip, { backgroundColor: petForm.gender === g ? PET_THEME : colors.inputBackground }]} onPress={() => setPetForm(f => ({ ...f, gender: g }))}>
-                      <Text style={{ color: petForm.gender === g ? '#fff' : colors.text, fontSize: 13 }}>{g === 'Hann' ? '♂️ ' : g === 'Hunn' ? '♀️ ' : ''}{t(`pets.${g.toLowerCase()}`)}</Text>
+                  {[
+                    { value: 'Hann', label: t('pets.male'), icon: '♂️' },
+                    { value: 'Hunn', label: t('pets.female'), icon: '♀️' },
+                    { value: 'Ukjent', label: t('pets.unknown'), icon: '' },
+                  ].map(g => (
+                    <TouchableOpacity key={g.value} style={[styles.personChip, { backgroundColor: petForm.gender === g.value ? PET_THEME : colors.inputBackground }]} onPress={() => setPetForm(f => ({ ...f, gender: g.value }))}>
+                      <Text style={{ color: petForm.gender === g.value ? '#fff' : colors.text, fontSize: 13 }}>{g.icon} {g.label}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -1067,6 +1071,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
             : t('common.time')
         }
         mode={activePicker?.includes('Time') || activePicker?.includes('time') ? 'time' : 'date'}
+        dateOffset={activePicker?.includes('Birthday') || activePicker?.includes('Chip') || activePicker?.includes('groomLast') || activePicker?.includes('medDateFrom') ? -365 : 0}
+        dateCount={activePicker?.includes('Birthday') || activePicker?.includes('Chip') ? 730 : 365}
         selectedValue={
           activePicker === 'petBirthday' ? petForm.birthday :
           activePicker === 'petChipDate' ? petForm.chipDate :

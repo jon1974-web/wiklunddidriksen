@@ -12,13 +12,13 @@ function getSubcollection(familyId: string, petId: string, subcollection: string
 
 // Pets
 export async function getPets(familyId: string): Promise<Pet[]> {
-  const q = query(collection(db, PETS_COLLECTION), where('familyId', '==', familyId), orderBy('createdAt', 'asc'));
+  const q = query(collection(db, PETS_COLLECTION, familyId), orderBy('createdAt', 'asc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Pet));
 }
 
-export async function addPet(data: Omit<Pet, 'id' | 'createdAt'>): Promise<string> {
-  const docRef = await addDoc(collection(db, PETS_COLLECTION), { ...data, createdAt: Date.now() });
+export async function addPet(familyId: string, data: Omit<Pet, 'id' | 'createdAt'>): Promise<string> {
+  const docRef = await addDoc(collection(db, PETS_COLLECTION, familyId), { ...data, createdAt: Date.now() });
   return docRef.id;
 }
 
