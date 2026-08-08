@@ -1,8 +1,8 @@
 [
   {
-    "origin": ["https://familiesenter-837bb.web.app", "https://familiesenter-837bb.firebaseapp.com"],
-    "method": ["GET", "HEAD"],
-    "responseHeader": ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges"],
+    "origin": ["https://familiesenter-837bb.web.app", "https://familiesenter-837bb.firebaseapp.com", "http://localhost:8081"],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE", "OPTIONS"],
+    "responseHeader": ["Content-Type", "Content-Length", "Content-Range", "Accept-Ranges", "Authorization", "X-Requested-With"],
     "maxAgeSeconds": 3600
   }
 ]

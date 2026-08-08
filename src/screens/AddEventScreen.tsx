@@ -343,6 +343,8 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         visible={activePicker !== null}
         title={getPickerTitle()}
         mode={isTimePicker ? 'time' : 'date'}
+        dateOffset={isTimePicker ? 0 : -365}
+        dateCount={isTimePicker ? 48 : 730}
         selectedValue={getPickerValue()}
         onSelect={handlePickerSelect}
         onClose={() => setActivePicker(null)}

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import i18n from '../i18n';
@@ -40,9 +40,7 @@ function generateTimeOptions(): Option[] {
   });
 }
 
-function isValidTimeFormat(input: string): boolean {
-  return /^\d{1,2}:\d{2}$/.test(input);
-}
+const ITEM_HEIGHT = 44;
 
 export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
   visible,
@@ -56,7 +54,9 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
   dateOffset = 0,
 }) => {
   const { colors } = useTheme();
+  const [dateInput, setDateInput] = useState('');
   const [customTime, setCustomTime] = useState('');
+  const scrollRef = useRef<ScrollView>(null);
 
   const options = useMemo(() => {
     if (customOptions) return customOptions;
@@ -65,25 +65,89 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
     return [];
   }, [customOptions, mode, dateCount, dateOffset]);
 
-  const handleCustomTimeSubmit = () => {
-    if (!customTime.trim()) return;
-    let normalized = customTime.trim();
-    if (/^\d{1,2}$/.test(normalized)) {
-      normalized = `${normalized.padStart(2, '0')}:00`;
-    } else if (/^\d{1,2}:\d{1,2}$/.test(normalized)) {
-      const [h, m] = normalized.split(':');
-      normalized = `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+  const scrollToIndex = useCallback((index: number) => {
+    if (scrollRef.current && index >= 0) {
+      setTimeout(() => {
+        scrollRef.current?.scrollTo({ y: index * ITEM_HEIGHT, animated: true });
+      }, 100);
     }
-    if (/^([01]\d|2[0-3]):([0-5]\d)$/.test(normalized)) {
-      onSelect(normalized);
-      setCustomTime('');
-      onClose();
-    }
-  };
+  }, []);
 
-  const handleOpen = () => {
-    setCustomTime(selectedValue || '');
-  };
+  const findDateIndex = useCallback((input: string): number => {
+    const trimmed = input.trim();
+    if (!trimmed) return -1;
+    return options.findIndex(opt => opt.value === trimmed);
+  }, [options]);
+
+  const handleInputChange = useCallback((text: string) => {
+    setDateInput(text);
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    let targetDate = '';
+    if (/^\d{4}$/.test(trimmed)) {
+      targetDate = `${trimmed}-01-01`;
+    } else if (/^\d{4}-\d{1,2}$/.test(trimmed)) {
+      const [y, m] = trimmed.split('-');
+      targetDate = `${y}-${m.padStart(2, '0')}-01`;
+    } else if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(trimmed)) {
+      const [y, m, d] = trimmed.split('-');
+      targetDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    }
+
+    if (targetDate) {
+      const idx = options.findIndex(opt => opt.value === targetDate);
+      if (idx >= 0) {
+        scrollToIndex(idx);
+      } else {
+        const year = parseInt(trimmed.substring(0, 4), 10);
+        if (!isNaN(year)) {
+          const yearStr = String(year);
+          const idxNear = options.findIndex(opt => opt.value.startsWith(yearStr));
+          if (idxNear >= 0) scrollToIndex(idxNear);
+        }
+      }
+    }
+  }, [options, scrollToIndex]);
+
+  const handleDateInputSubmit = useCallback(() => {
+    const trimmed = dateInput.trim();
+    let targetDate = '';
+    if (/^\d{4}$/.test(trimmed)) {
+      targetDate = `${trimmed}-01-01`;
+    } else if (/^\d{4}-\d{1,2}$/.test(trimmed)) {
+      const [y, m] = trimmed.split('-');
+      targetDate = `${y}-${m.padStart(2, '0')}-01`;
+    } else if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(trimmed)) {
+      const [y, m, d] = trimmed.split('-');
+      targetDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+    }
+    if (targetDate) {
+      const opt = options.find(o => o.value === targetDate);
+      if (opt) {
+        onSelect(opt.value);
+        onClose();
+      }
+    }
+  }, [dateInput, options, onSelect, onClose]);
+
+  const handleOpen = useCallback(() => {
+    if (mode === 'time') {
+      setCustomTime(selectedValue || '');
+      return;
+    }
+    if (selectedValue) {
+      setDateInput(selectedValue);
+      const idx = options.findIndex(opt => opt.value === selectedValue);
+      if (idx >= 0) scrollToIndex(idx);
+    } else {
+      const today = new Date();
+      const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+      setDateInput(todayStr);
+      const idx = options.findIndex(opt => opt.value === todayStr);
+      if (idx >= 0) scrollToIndex(idx);
+    }
+  }, [selectedValue, options, scrollToIndex, mode]);
 
   return (
     <Modal visible={visible} transparent animationType="slide" onShow={handleOpen}>
@@ -92,7 +156,22 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
           <TouchableWithoutFeedback>
             <View style={[styles.container, { backgroundColor: colors.surface }]}>
               <Text style={[styles.title, { color: colors.text, borderBottomColor: colors.border }]}>{title}</Text>
-              <ScrollView style={styles.scroll}>
+              {mode === 'date' && (
+                <View style={[styles.dateInputRow, { borderBottomColor: colors.border }]}>
+                  <TextInput
+                    style={[styles.dateInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+                    value={dateInput}
+                    onChangeText={handleInputChange}
+                    placeholder="Skriv år eller dato (f.eks. 2025 eller 2025-04-15)"
+                    placeholderTextColor={colors.textDisabled}
+                    keyboardType="numbers-and-punctuation"
+                    maxLength={10}
+                    returnKeyType="search"
+                    onSubmitEditing={handleDateInputSubmit}
+                  />
+                </View>
+              )}
+              <ScrollView ref={scrollRef} style={styles.scroll}>
                 {options.map((option) => (
                   <TouchableOpacity
                     key={option.value}
@@ -116,11 +195,39 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
                     placeholderTextColor={colors.textDisabled}
                     keyboardType="numbers-and-punctuation"
                     maxLength={5}
-                    onSubmitEditing={handleCustomTimeSubmit}
+                    onSubmitEditing={() => {
+                      if (!customTime.trim()) return;
+                      let normalized = customTime.trim();
+                      if (/^\d{1,2}$/.test(normalized)) {
+                        normalized = `${normalized.padStart(2, '0')}:00`;
+                      } else if (/^\d{1,2}:\d{1,2}$/.test(normalized)) {
+                        const [h, m] = normalized.split(':');
+                        normalized = `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+                      }
+                      if (/^([01]\d|2[0-3]):([0-5]\d)$/.test(normalized)) {
+                        onSelect(normalized);
+                        setCustomTime('');
+                        onClose();
+                      }
+                    }}
                   />
                   <TouchableOpacity
                     style={[styles.customTimeButton, { backgroundColor: colors.accent }]}
-                    onPress={handleCustomTimeSubmit}
+                    onPress={() => {
+                      if (!customTime.trim()) return;
+                      let normalized = customTime.trim();
+                      if (/^\d{1,2}$/.test(normalized)) {
+                        normalized = `${normalized.padStart(2, '0')}:00`;
+                      } else if (/^\d{1,2}:\d{1,2}$/.test(normalized)) {
+                        const [h, m] = normalized.split(':');
+                        normalized = `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+                      }
+                      if (/^([01]\d|2[0-3]):([0-5]\d)$/.test(normalized)) {
+                        onSelect(normalized);
+                        setCustomTime('');
+                        onClose();
+                      }
+                    }}
                   >
                     <Text style={styles.customTimeButtonText}>✓</Text>
                   </TouchableOpacity>
@@ -156,11 +263,24 @@ const styles = StyleSheet.create({
     padding: 16,
     borderBottomWidth: 1,
   },
+  dateInputRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+  },
+  dateInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    fontSize: 16,
+  },
   scroll: {
-    maxHeight: 340,
+    maxHeight: 300,
   },
   option: {
-    paddingVertical: 12,
+    height: ITEM_HEIGHT,
+    justifyContent: 'center',
     paddingHorizontal: 20,
     borderBottomWidth: 1,
   },

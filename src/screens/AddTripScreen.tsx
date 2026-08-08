@@ -147,6 +147,8 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         visible={activePicker !== null}
         title={activePicker === 'start' ? 'Velg startdato' : 'Velg sluttdato'}
         mode="date"
+        dateOffset={-365}
+        dateCount={730}
         selectedValue={activePicker === 'start' ? startDate : endDate}
         onSelect={(value) => activePicker === 'start' ? setStartDate(value) : setEndDate(value)}
         onClose={() => setActivePicker(null)}

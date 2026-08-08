@@ -357,7 +357,6 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                 <Text style={styles.gridEmoji}>{PET_ICONS[pet.type] || '🐾'}</Text>
               )}
               <Text style={[styles.gridName, { color: colors.text }]} numberOfLines={1}>{pet.name}</Text>
-              <Text style={[styles.gridType, { color: colors.textSecondary }]}>{pet.type}{pet.gender && pet.gender !== 'Ukjent' ? ` ${PET_GENDER_ICONS[pet.gender] || ''}` : ''}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
@@ -1133,14 +1132,17 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
         }
         mode={activePicker?.includes('Time') || activePicker?.includes('time') ? 'time' : 'date'}
         dateOffset={
-          activePicker === 'petBirthday' || activePicker === 'petChipDate' ? -365 :
-          activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? -365 :
-          activePicker === 'vetDate' || activePicker === 'foodTime' ? -30 :
-          activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? 0 : 0
+          activePicker === 'petBirthday' || activePicker === 'petChipDate' ? -5475 :
+          activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? -1825 :
+          activePicker === 'vetDate' ? -1825 :
+          activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? -365 :
+          activePicker === 'foodTime' ? 0 : 0
         }
         dateCount={
-          activePicker === 'petBirthday' || activePicker === 'petChipDate' ? 730 :
-          activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? 365 : 365
+          activePicker === 'petBirthday' || activePicker === 'petChipDate' ? 5840 :
+          activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? 2190 :
+          activePicker === 'vetDate' ? 2190 :
+          activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? 730 : 365
         }
         selectedValue={
           activePicker === 'petBirthday' ? petForm.birthday :
@@ -1197,13 +1199,13 @@ const styles = StyleSheet.create({
   content: { flex: 1, padding: 16 },
   gridSubtitle: { fontSize: 14, marginBottom: 12 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
-  gridTile: { width: '30%', aspectRatio: 1, borderRadius: 16, alignItems: 'center', justifyContent: 'center', padding: 12 },
-  gridTileAdd: { borderWidth: 2, borderStyle: 'dashed', backgroundColor: 'transparent' },
+  gridTile: { width: '30%', borderRadius: 16, alignItems: 'center', justifyContent: 'center', padding: 12 },
+  gridTileAdd: { borderWidth: 2, borderStyle: 'dashed', backgroundColor: 'transparent', aspectRatio: 1 },
   gridEmoji: { fontSize: 36, marginBottom: 6 },
-  gridPhoto: { width: 64, height: 64, borderRadius: 32, marginBottom: 6 },
+  gridPhoto: { width: 80, height: 80, borderRadius: 40, marginBottom: 6 },
   imagePicker: { width: '100%', height: 120, borderRadius: 12, borderWidth: 2, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
   formPhoto: { width: 120, height: 120, borderRadius: 60 },
-  gridName: { fontSize: 14, fontWeight: '600', textAlign: 'center' },
+  gridName: { fontSize: 16, fontWeight: '600', textAlign: 'center' },
   gridType: { fontSize: 12, marginTop: 2 },
   section: { borderRadius: 12, padding: 16, marginBottom: 12 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },

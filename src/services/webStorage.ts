@@ -5,28 +5,9 @@ export async function webUploadFile(path: string, blob: Blob): Promise<string> {
   const user = auth.currentUser;
   if (!user) throw new Error('Not authenticated');
 
-  const token = await user.getIdToken(true);
-  const bucket = 'familiesenter-837bb.firebasestorage.app';
-  const encodedPath = encodeURIComponent(path);
-
-  const res = await fetch(
-    `https://firebasestorage.googleapis.com/v0/b/${bucket}/o?uploadType=media&name=${encodedPath}`,
-    {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': blob.type || 'application/octet-stream',
-      },
-      body: blob,
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Upload failed (${res.status}): ${err}`);
-  }
-
-  return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodedPath}?alt=media`;
+  const storageRef = ref(storage, path);
+  await sdkUploadBytes(storageRef, blob);
+  return await sdkGetDownloadURL(storageRef);
 }
 
 export async function webGetDownloadURL(path: string): Promise<string> {
