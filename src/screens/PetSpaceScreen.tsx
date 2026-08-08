@@ -138,7 +138,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
       if (editingPet) {
         await updatePet(familyId, editingPet, petForm);
       } else {
-        await addPet({ ...petForm, familyId });
+        await addPet(familyId, { ...petForm });
       }
       setPetForm({ name: '', type: 'Katt', gender: 'Ukjent', breed: '', birthday: '', identification: '', passportNumber: '', chipId: '', chipDate: '' });
       setEditingPet(null);
