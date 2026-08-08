@@ -282,6 +282,7 @@ export interface Birthday {
 export interface GiftIdea {
   id: string;
   birthdayId: string;
+  familyId: string;
   name: string;
   purchased: boolean;
   year: number;
@@ -308,6 +309,7 @@ export interface Pet {
 export interface PetVetVisit {
   id: string;
   petId: string;
+  familyId: string;
   title: string;
   date: string;
   startTime: string;
@@ -324,6 +326,7 @@ export interface PetVetVisit {
 export interface PetMedication {
   id: string;
   petId: string;
+  familyId: string;
   name: string;
   dosage: string;
   frequency: string;
@@ -336,6 +339,7 @@ export interface PetMedication {
 export interface PetFood {
   id: string;
   petId: string;
+  familyId: string;
   name: string;
   time: string;
   amount: string;
@@ -346,6 +350,7 @@ export interface PetFood {
 export interface PetGrooming {
   id: string;
   petId: string;
+  familyId: string;
   name: string;
   lastDate: string;
   nextDate?: string;
@@ -356,6 +361,7 @@ export interface PetGrooming {
 export interface PetVaccination {
   id: string;
   petId: string;
+  familyId: string;
   name: string;
   date: string;
   nextDue?: string;
@@ -369,6 +375,7 @@ export interface PetVaccination {
 export interface PetInsurance {
   id: string;
   petId: string;
+  familyId: string;
   provider: string;
   policyNumber: string;
   expiryDate: string;

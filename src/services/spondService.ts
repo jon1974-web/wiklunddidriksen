@@ -176,18 +176,22 @@ export const clearSpondToken = (): void => {
   clearPersistedToken();
 };
 
-export const saveSpondResponse = async (eventId: string, accepted: boolean): Promise<void> => {
-  await setDoc(doc(db, 'spondResponses', eventId), {
+export const saveSpondResponse = async (familyId: string, eventId: string, accepted: boolean): Promise<void> => {
+  await setDoc(doc(db, 'spondResponses', `${familyId}_${eventId}`), {
+    familyId,
+    eventId,
     response: accepted,
     updatedAt: new Date().toISOString(),
   });
 };
 
-export const getSpondResponses = async (): Promise<Record<string, boolean>> => {
-  const snap = await getDocs(collection(db, 'spondResponses'));
+export const getSpondResponses = async (familyId: string): Promise<Record<string, boolean>> => {
+  const q = query(collection(db, 'spondResponses'), where('familyId', '==', familyId));
+  const snap = await getDocs(q);
   const responses: Record<string, boolean> = {};
   snap.forEach((doc) => {
-    responses[doc.id] = doc.data().response;
+    const data = doc.data();
+    responses[data.eventId] = data.response;
   });
   return responses;
 };

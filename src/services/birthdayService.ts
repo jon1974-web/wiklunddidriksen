@@ -27,9 +27,9 @@ export async function deleteBirthday(id: string): Promise<void> {
   await deleteDoc(doc(db, BIRTHDAYS_COLLECTION, id));
 }
 
-// Gift Ideas
-export async function getGiftIdeas(birthdayId: string): Promise<GiftIdea[]> {
-  const q = query(collection(db, GIFTS_COLLECTION), where('birthdayId', '==', birthdayId), orderBy('createdAt', 'asc'));
+// Gift Ideas (flat collection with familyId)
+export async function getGiftIdeas(familyId: string, birthdayId: string): Promise<GiftIdea[]> {
+  const q = query(collection(db, GIFTS_COLLECTION), where('familyId', '==', familyId), where('birthdayId', '==', birthdayId), orderBy('createdAt', 'asc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as GiftIdea));
 }

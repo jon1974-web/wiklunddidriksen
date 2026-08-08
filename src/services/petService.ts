@@ -11,8 +11,8 @@ export async function getPets(familyId: string): Promise<Pet[]> {
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Pet));
 }
 
-export async function addPet(data: Omit<Pet, 'id' | 'createdAt'>): Promise<string> {
-  const docRef = await addDoc(collection(db, 'pets'), { ...data, createdAt: Date.now() });
+export async function addPet(familyId: string, data: Omit<Pet, 'id' | 'createdAt'>): Promise<string> {
+  const docRef = await addDoc(collection(db, 'pets'), { ...data, familyId, createdAt: Date.now() });
   return docRef.id;
 }
 
@@ -24,9 +24,9 @@ export async function deletePet(petId: string): Promise<void> {
   await deleteDoc(doc(db, 'pets', petId));
 }
 
-// Vet Visits
-export async function getVetVisits(petId: string): Promise<PetVetVisit[]> {
-  const q = query(collection(db, 'petVetVisits'), where('petId', '==', petId), orderBy('date', 'asc'));
+// Vet Visits (flat collection with familyId + petId)
+export async function getVetVisits(familyId: string, petId: string): Promise<PetVetVisit[]> {
+  const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('date', 'asc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetVetVisit));
 }
@@ -44,9 +44,9 @@ export async function deleteVetVisit(visitId: string): Promise<void> {
   await deleteDoc(doc(db, 'petVetVisits', visitId));
 }
 
-// Medications
-export async function getPetMedications(petId: string): Promise<PetMedication[]> {
-  const q = query(collection(db, 'petMedications'), where('petId', '==', petId), orderBy('createdAt', 'desc'));
+// Medications (flat collection with familyId + petId)
+export async function getPetMedications(familyId: string, petId: string): Promise<PetMedication[]> {
+  const q = query(collection(db, 'petMedications'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetMedication));
 }
@@ -64,9 +64,9 @@ export async function deletePetMedication(medId: string): Promise<void> {
   await deleteDoc(doc(db, 'petMedications', medId));
 }
 
-// Food
-export async function getPetFood(petId: string): Promise<PetFood[]> {
-  const q = query(collection(db, 'petFood'), where('petId', '==', petId), orderBy('createdAt', 'desc'));
+// Food (flat collection with familyId + petId)
+export async function getPetFood(familyId: string, petId: string): Promise<PetFood[]> {
+  const q = query(collection(db, 'petFood'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetFood));
 }
@@ -84,9 +84,9 @@ export async function deletePetFood(foodId: string): Promise<void> {
   await deleteDoc(doc(db, 'petFood', foodId));
 }
 
-// Grooming
-export async function getPetGrooming(petId: string): Promise<PetGrooming[]> {
-  const q = query(collection(db, 'petGrooming'), where('petId', '==', petId), orderBy('lastDate', 'desc'));
+// Grooming (flat collection with familyId + petId)
+export async function getPetGrooming(familyId: string, petId: string): Promise<PetGrooming[]> {
+  const q = query(collection(db, 'petGrooming'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('lastDate', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetGrooming));
 }
@@ -104,9 +104,9 @@ export async function deletePetGrooming(groomId: string): Promise<void> {
   await deleteDoc(doc(db, 'petGrooming', groomId));
 }
 
-// Vaccinations
-export async function getPetVaccinations(petId: string): Promise<PetVaccination[]> {
-  const q = query(collection(db, 'petVaccinations'), where('petId', '==', petId), orderBy('date', 'desc'));
+// Vaccinations (flat collection with familyId + petId)
+export async function getPetVaccinations(familyId: string, petId: string): Promise<PetVaccination[]> {
+  const q = query(collection(db, 'petVaccinations'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('date', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetVaccination));
 }
@@ -124,9 +124,9 @@ export async function deletePetVaccination(vaccId: string): Promise<void> {
   await deleteDoc(doc(db, 'petVaccinations', vaccId));
 }
 
-// Insurance
-export async function getPetInsurance(petId: string): Promise<PetInsurance[]> {
-  const q = query(collection(db, 'petInsurance'), where('petId', '==', petId), orderBy('createdAt', 'desc'));
+// Insurance (flat collection with familyId + petId)
+export async function getPetInsurance(familyId: string, petId: string): Promise<PetInsurance[]> {
+  const q = query(collection(db, 'petInsurance'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('createdAt', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetInsurance));
 }

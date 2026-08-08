@@ -16,6 +16,44 @@ Security is non-negotiable. Every feature must be built with security in mind.
 - Subcollections inherit parent scoping
 - Test rules with Firebase Emulator before deploying
 
+### Family Data Isolation (CRITICAL)
+**Every document must have a `familyId` field.** This ensures:
+- A new family starts with completely empty data
+- No cross-family data leakage
+- Firestore rules can verify family membership
+
+**Pattern for flat collections:**
+```typescript
+// Add function MUST include familyId
+export async function addItem(data: Omit<Item, 'id' | 'createdAt'>): Promise<string> {
+  const docRef = await addDoc(collection(db, 'items'), { ...data, familyId, createdAt: Date.now() });
+  return docRef.id;
+}
+
+// Query MUST filter by familyId
+export async function getItems(familyId: string): Promise<Item[]> {
+  const q = query(collection(db, 'items'), where('familyId', '==', familyId), orderBy('createdAt', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as Item));
+}
+```
+
+**Firestore rules pattern:**
+```
+match /items/{itemId} {
+  allow read, write: if request.auth != null && 
+    get(/databases/$(database)/documents/families/$(resource.data.familyId)).data.members[request.auth.uid] != null;
+}
+```
+
+**Checklist for new collections:**
+- [ ] Document includes `familyId` field
+- [ ] Add function includes `familyId` parameter
+- [ ] Get function filters by `familyId`
+- [ ] Firestore rules verify family membership
+- [ ] Composite index supports the query
+- [ ] New family starts with empty data
+
 ### Cloud Functions
 - **ALWAYS** verify `request.auth` before processing
 - **NEVER** use `Access-Control-Allow-Origin: *` — restrict to your domain

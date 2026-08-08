@@ -66,7 +66,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       // Load gift ideas for each birthday
       const giftsMap: Record<string, GiftIdea[]> = {};
       for (const b of data) {
-        const gifts = await getGiftIdeas(b.id);
+        const gifts = await getGiftIdeas(familyId, b.id);
         giftsMap[b.id] = gifts;
       }
       setGiftIdeas(giftsMap);
@@ -138,6 +138,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
         name: newGiftText.trim(),
         purchased: false,
         year: new Date().getFullYear(),
+        familyId,
       });
       setNewGiftText('');
       loadData();
