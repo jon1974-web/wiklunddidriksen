@@ -10,11 +10,6 @@ service cloud.firestore {
       );
     }
 
-    // Helper to get familyId from resource (reads/updates) or request (creates)
-    function getFamilyId() {
-      return resource != null ? resource.data.familyId : request.resource.data.familyId;
-    }
-
     // Users: any authenticated user can read profiles (needed for family member lists)
     match /users/{uid} {
       allow read: if request.auth != null;
@@ -46,22 +41,26 @@ service cloud.firestore {
 
     // Events: family-scoped
     match /events/{eventId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Chat: family-scoped
     match /chat/{messageId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Shopping lists: family-scoped
     match /shoppingLists/{listId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Trips + subcollections: family-scoped
     match /trips/{tripId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
       match /{subcollection=**} {
         allow read, write: if request.auth != null;
       }
@@ -69,52 +68,62 @@ service cloud.firestore {
 
     // Birthdays: family-scoped
     match /birthdays/{birthdayId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Gift Ideas: family-scoped
     match /gifts/{giftId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Pets: family-scoped
     match /pets/{petId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Pet Vet Visits: family-scoped
     match /petVetVisits/{visitId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Pet Medications: family-scoped
     match /petMedications/{medId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Pet Food: family-scoped
     match /petFood/{foodId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Pet Grooming: family-scoped
     match /petGrooming/{groomId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Pet Vaccinations: family-scoped
     match /petVaccinations/{vaccId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Pet Insurance: family-scoped
     match /petInsurance/{insId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Spond Responses: family-scoped
     match /spondResponses/{responseId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Health: family-scoped
@@ -127,12 +136,14 @@ service cloud.firestore {
 
     // Recipes: family-scoped
     match /recipes/{recipeId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Meal Plans: family-scoped
     match /mealPlans/{planId} {
-      allow read, write: if request.auth != null && isFamilyMember(getFamilyId());
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
     // Sent notifications: Cloud Function write, user read own

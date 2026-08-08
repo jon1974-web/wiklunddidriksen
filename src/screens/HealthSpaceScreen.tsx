@@ -57,6 +57,13 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
 
+  const isDatePast = useCallback((dateStr: string): boolean => {
+    if (!dateStr) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return new Date(dateStr) < today;
+  }, []);
+
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
@@ -323,8 +330,8 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{vacc.name}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{vacc.person} — {vacc.date}</Text>
                 </View>
-                <Text style={[styles.badge, { backgroundColor: vacc.status === 'completed' ? '#E8F5E9' : '#FFF3E0', color: vacc.status === 'completed' ? '#43A047' : '#FB8C00' }]}>
-                  {vacc.status === 'completed' ? t('health.completed') : t('health.pending')}
+                <Text style={[styles.badge, { backgroundColor: (vacc.status === 'completed' || isDatePast(vacc.date)) ? '#E8F5E9' : '#FFF3E0', color: (vacc.status === 'completed' || isDatePast(vacc.date)) ? '#43A047' : '#FB8C00' }]}>
+                  {(vacc.status === 'completed' || isDatePast(vacc.date)) ? t('health.completed') : t('health.pending')}
                 </Text>
               </TouchableOpacity>
             ))
@@ -747,7 +754,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   )}
                   <View style={styles.detailRow}>
                     <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.status')}</Text>
-                    <Text style={[styles.detailValue, { color: detailModal.item.status === 'completed' ? '#43A047' : '#FB8C00' }]}>{detailModal.item.status === 'completed' ? t('health.completed') : t('health.pending')}</Text>
+                    <Text style={[styles.detailValue, { color: (detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? '#43A047' : '#FB8C00' }]}>{(detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? t('health.completed') : t('health.pending')}</Text>
                   </View>
                   {detailModal.item.location && (() => {
                     const mapUrl = getStaticMapUrl(detailModal.item.location);

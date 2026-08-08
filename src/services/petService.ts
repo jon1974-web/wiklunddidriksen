@@ -26,7 +26,7 @@ export async function deletePet(petId: string): Promise<void> {
 
 // Vet Visits (flat collection with familyId + petId)
 export async function getVetVisits(familyId: string, petId: string): Promise<PetVetVisit[]> {
-  const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('date', 'asc'));
+  const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('date', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetVetVisit));
 }

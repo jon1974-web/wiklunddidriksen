@@ -73,6 +73,13 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
   const [vaccForm, setVaccForm] = useState({ name: '', date: '', nextDue: '', reminder: '', status: 'completed' as 'completed' | 'pending', note: '' });
   const [insForm, setInsForm] = useState({ provider: '', policyNumber: '', expiryDate: '', documentUrl: '', note: '' });
 
+  const isDatePast = useCallback((dateStr: string): boolean => {
+    if (!dateStr) return false;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return new Date(dateStr) < today;
+  }, []);
+
   const loadPets = useCallback(async () => {
     if (!familyId) return;
     try {
@@ -589,8 +596,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{v.title}</Text>
                     <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{v.date} {v.startTime}{v.location ? ' — ' + v.location : ''}</Text>
                   </View>
-                  <Text style={[styles.badge, { backgroundColor: v.status === 'completed' ? '#E8F5E9' : '#FFF3E0', color: v.status === 'completed' ? '#43A047' : '#FB8C00' }]}>
-                    {v.status === 'completed' ? t('health.completed') : t('health.pending')}
+                  <Text style={[styles.badge, { backgroundColor: (v.status === 'completed' || isDatePast(v.date)) ? '#E8F5E9' : '#FFF3E0', color: (v.status === 'completed' || isDatePast(v.date)) ? '#43A047' : '#FB8C00' }]}>
+                    {(v.status === 'completed' || isDatePast(v.date)) ? t('health.completed') : t('health.pending')}
                   </Text>
                 </TouchableOpacity>
               ))
@@ -656,8 +663,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{v.name}</Text>
                     <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{v.date}{v.nextDue ? ` → ${v.nextDue}` : ''}</Text>
                   </View>
-                  <Text style={[styles.badge, { backgroundColor: v.status === 'completed' ? '#E8F5E9' : '#FFF3E0', color: v.status === 'completed' ? '#43A047' : '#FB8C00' }]}>
-                    {v.status === 'completed' ? t('health.completed') : t('health.pending')}
+                  <Text style={[styles.badge, { backgroundColor: (v.status === 'completed' || isDatePast(v.date)) ? '#E8F5E9' : '#FFF3E0', color: (v.status === 'completed' || isDatePast(v.date)) ? '#43A047' : '#FB8C00' }]}>
+                    {(v.status === 'completed' || isDatePast(v.date)) ? t('health.completed') : t('health.pending')}
                   </Text>
                 </TouchableOpacity>
               ))
@@ -950,7 +957,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                     )}
                     <View style={styles.detailRow}>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.status')}</Text>
-                      <Text style={[styles.detailValue, { color: detailModal.item.status === 'completed' ? '#43A047' : '#FB8C00' }]}>{detailModal.item.status === 'completed' ? t('health.completed') : t('health.pending')}</Text>
+                      <Text style={[styles.detailValue, { color: (detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? '#43A047' : '#FB8C00' }]}>{(detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? t('health.completed') : t('health.pending')}</Text>
                     </View>
                     {detailModal.item.note && (
                       <View style={styles.detailRow}>
@@ -1058,7 +1065,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                     )}
                     <View style={styles.detailRow}>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.status')}</Text>
-                      <Text style={[styles.detailValue, { color: detailModal.item.status === 'completed' ? '#43A047' : '#FB8C00' }]}>{detailModal.item.status === 'completed' ? t('health.completed') : t('health.pending')}</Text>
+                      <Text style={[styles.detailValue, { color: (detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? '#43A047' : '#FB8C00' }]}>{(detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? t('health.completed') : t('health.pending')}</Text>
                     </View>
                     {detailModal.item.note && (
                       <View style={styles.detailRow}>
@@ -1134,14 +1141,14 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
         dateOffset={
           activePicker === 'petBirthday' || activePicker === 'petChipDate' ? -5475 :
           activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? -1825 :
-          activePicker === 'vetDate' ? -1825 :
+          activePicker === 'vetDate' || activePicker === 'vaccDate' ? -1825 :
           activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? -365 :
           activePicker === 'foodTime' ? 0 : 0
         }
         dateCount={
           activePicker === 'petBirthday' || activePicker === 'petChipDate' ? 5840 :
           activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? 2190 :
-          activePicker === 'vetDate' ? 2190 :
+          activePicker === 'vetDate' || activePicker === 'vaccDate' ? 2190 :
           activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? 730 : 365
         }
         selectedValue={

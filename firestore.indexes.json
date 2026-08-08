@@ -72,7 +72,7 @@
       "fields": [
         { "fieldPath": "familyId", "order": "ASCENDING" },
         { "fieldPath": "petId", "order": "ASCENDING" },
-        { "fieldPath": "date", "order": "ASCENDING" }
+        { "fieldPath": "date", "order": "DESCENDING" }
       ]
     },
     {

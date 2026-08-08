@@ -168,6 +168,16 @@ Performance directly impacts user experience. Treat it as a feature, not an afte
 - Avoid N+1 queries — batch reads with `Promise.all` or collection group queries
 - Add composite indexes in `firestore.indexes.json` for multi-field queries
 
+### Firestore Indexing (CRITICAL)
+- **EVERY** Firestore query with multiple `where` + `orderBy` fields requires a composite index in `firestore.indexes.json`
+- Index field order matters: `where` fields first, then `orderBy` field
+- If you change `orderBy` direction (asc ↔ desc), update the index accordingly
+- If you add a new `where` clause to an existing query, add/update the index
+- After changing `firestore.indexes.json`, deploy with: `npx firebase-tools deploy --only firestore:indexes --project familiesenter-837bb`
+- **New collection = new index** — check `firestore.indexes.json` before adding any new Firestore collection
+- Indexes take a few minutes to build in production — test with the Firebase Emulator first for instant feedback
+- **Common error**: "The query requires an index" means a composite index is missing or has wrong field order/direction
+
 ### React Component Performance
 - Use `React.memo()` for components that receive stable props
 - Use `useMemo()` for expensive computations (sorting, filtering, derived data)
