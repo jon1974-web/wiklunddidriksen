@@ -288,36 +288,6 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
           )}
         </View>
 
-        {/* Gift lists for upcoming birthdays */}
-        {upcoming.map(b => {
-          const gifts = giftIdeas[b.id] || [];
-          if (gifts.length === 0 && !selectedBirthday) return null;
-          return (
-            <View key={`gift-${b.id}`} style={[styles.card, { backgroundColor: colors.surface }]}>
-              <View style={styles.cardHeader}>
-                <View style={styles.cardTitleRow}>
-                  <AppIcon name="destination" size={18} color={colors.accent} />
-                  <Text style={[styles.cardTitle, { color: colors.text }]}>{t('birthdays.giftList')} — {b.name}</Text>
-                </View>
-                <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.accent }]} onPress={() => { setSelectedBirthday(b); setShowGiftModal(true); }}>
-                  <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
-                </TouchableOpacity>
-              </View>
-              {gifts.map(gift => (
-                <TouchableOpacity key={gift.id} style={styles.giftItem} onPress={() => handleToggleGift(gift)} onLongPress={() => deleteGiftIdea(gift.id)}>
-                  <View style={[styles.giftCheckbox, gift.purchased && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
-                    {gift.purchased && <Text style={{ color: '#fff', fontSize: 12 }}>✓</Text>}
-                  </View>
-                  <Text style={[styles.giftText, gift.purchased && { textDecorationLine: 'line-through', color: colors.textSecondary }]}>{gift.name}</Text>
-                </TouchableOpacity>
-              ))}
-              <TouchableOpacity style={styles.giftAdd} onPress={() => { setSelectedBirthday(b); setShowGiftModal(true); }}>
-                <Text style={{ color: colors.accent, fontSize: 12 }}>+ {t('birthdays.addGiftIdea')}</Text>
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-
         {/* All birthdays */}
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <View style={styles.cardHeader}>
