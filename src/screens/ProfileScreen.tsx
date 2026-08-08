@@ -1310,10 +1310,6 @@ export const ProfileScreen: React.FC = () => {
         { icon: '🍽️', title: t('profile.helpMatsenterWhat'), text: t('profile.helpMatsenterWhatText') },
         { icon: '👉', title: t('profile.helpMatsenterHow'), text: t('profile.helpMatsenterHowText'), tip: t('profile.helpMatsenterTip') },
       ]} />
-      <HelpCenter visible={showHelpBirthdays} onClose={() => setShowHelpBirthdays(false)} title={t('profile.helpBirthdaysTitle')} sections={[
-        { icon: '🎂', title: t('profile.helpBirthdaysWhat'), text: t('profile.helpBirthdaysWhatText') },
-        { icon: '👉', title: t('profile.helpBirthdaysHow'), text: t('profile.helpBirthdaysHowText'), tip: t('profile.helpBirthdaysTip') },
-      ]} />
       <HelpCenter visible={showHelpFamily} onClose={() => setShowHelpFamily(false)} title={t('profile.helpFamilyTitle')} sections={[
         { icon: '👨‍👩‍👧‍👦', title: t('profile.helpFamilyWhat'), text: t('profile.helpFamilyWhatText') },
         { icon: '👉', title: t('profile.helpFamilyHow'), text: t('profile.helpFamilyHowText'), tip: t('profile.helpFamilyTip') },
