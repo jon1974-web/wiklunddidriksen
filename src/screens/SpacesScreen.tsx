@@ -81,7 +81,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       icon: 'activities',
       iconColor: '#8E24AA',
       count: t('spaces.petsCount', { count: 1 }),
-      screen: 'PetsSpace',
+      screen: 'PetSpace',
     },
     {
       id: 'home',
