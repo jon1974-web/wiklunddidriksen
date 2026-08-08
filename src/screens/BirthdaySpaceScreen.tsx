@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   itemSub: { fontSize: 12 },
   badge: { fontSize: 11, fontWeight: '600', paddingVertical: 2, paddingHorizontal: 8, borderRadius: 10 },
   emptyText: { fontSize: 13, textAlign: 'center', paddingVertical: 12 },
-  expandContent: { paddingTop: 8, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
+  expandContent: { paddingTop: 8, borderTopWidth: 1, borderTopColor: '#f0f0f0', paddingLeft: 36 },
   giftItem: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
   giftCheckbox: { width: 18, height: 18, borderRadius: 4, borderWidth: 2, borderColor: '#ddd', alignItems: 'center', justifyContent: 'center' },
   giftText: { fontSize: 13, flex: 1 },
