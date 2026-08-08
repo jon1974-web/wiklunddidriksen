@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet';
   size?: number;
   color?: string;
 }
@@ -250,6 +250,15 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
       <Path d="M12 20V10"/>
       <Path d="M18 20V4"/>
       <Path d="M6 20v-4"/>
+    </Svg>
+  );
+
+  if (name === 'pet') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="12" r="10"/>
+      <Path d="M8 14s1.5 2 4 2 4-2 4-2"/>
+      <Line x1="9" y1="9" x2="9.01" y2="9"/>
+      <Line x1="15" y1="9" x2="15.01" y2="9"/>
     </Svg>
   );
 

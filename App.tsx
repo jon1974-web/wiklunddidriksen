@@ -28,6 +28,7 @@ import { SpacesScreen } from './src/screens/SpacesScreen';
 import { TripsScreen } from './src/screens/TripsScreen';
 import { HealthSpaceScreen } from './src/screens/HealthSpaceScreen';
 import { BirthdaySpaceScreen } from './src/screens/BirthdaySpaceScreen';
+import { PetSpaceScreen } from './src/screens/PetSpaceScreen';
 import { MealPlanScreen } from './src/screens/MealPlanScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
 
@@ -223,6 +224,11 @@ const TripsStack = () => {
         <Stack.Screen
           name="BirthdaySpace"
           component={BirthdaySpaceScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PetSpace"
+          component={PetSpaceScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

@@ -288,6 +288,95 @@ export interface GiftIdea {
   createdAt: number;
 }
 
+// Pet Space Types
+export interface Pet {
+  id: string;
+  name: string;
+  type: string;
+  gender?: string;
+  breed?: string;
+  birthday?: string;
+  identification?: string;
+  passportNumber?: string;
+  chipId?: string;
+  chipDate?: string;
+  photoUrl?: string;
+  familyId: string;
+  createdAt: number;
+}
+
+export interface PetVetVisit {
+  id: string;
+  petId: string;
+  title: string;
+  date: string;
+  startTime: string;
+  endTime?: string;
+  location?: string;
+  note?: string;
+  reminder?: string;
+  notificationId?: string;
+  status: 'planned' | 'completed';
+  addToCalendar?: boolean;
+  createdAt: number;
+}
+
+export interface PetMedication {
+  id: string;
+  petId: string;
+  name: string;
+  dosage: string;
+  frequency: string;
+  dateFrom?: string;
+  dateTo?: string;
+  note?: string;
+  createdAt: number;
+}
+
+export interface PetFood {
+  id: string;
+  petId: string;
+  name: string;
+  time: string;
+  amount: string;
+  note?: string;
+  createdAt: number;
+}
+
+export interface PetGrooming {
+  id: string;
+  petId: string;
+  name: string;
+  lastDate: string;
+  nextDate?: string;
+  note?: string;
+  createdAt: number;
+}
+
+export interface PetVaccination {
+  id: string;
+  petId: string;
+  name: string;
+  date: string;
+  nextDue?: string;
+  reminder?: string;
+  notificationId?: string;
+  status: 'completed' | 'pending';
+  note?: string;
+  createdAt: number;
+}
+
+export interface PetInsurance {
+  id: string;
+  petId: string;
+  provider: string;
+  policyNumber: string;
+  expiryDate: string;
+  documentUrl?: string;
+  note?: string;
+  createdAt: number;
+}
+
 export interface RecipeIngredient {
   name: string;
   amount: string;
