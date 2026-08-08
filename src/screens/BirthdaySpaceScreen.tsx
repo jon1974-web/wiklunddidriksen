@@ -208,7 +208,17 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
             <Text style={[styles.itemTitle, { color: colors.text }]}>{b.name} <Text style={styles.yearBadge}>{age} {t('birthdays.years')}</Text></Text>
             <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{b.date}</Text>
           </View>
-          <Text style={[styles.badge, { backgroundColor: badge.style === 'countdown-today' ? '#FFEBEE' : badge.style === 'countdown-soon' ? '#FFF3E0' : '#E8F5E9', color: badge.style === 'countdown-today' ? '#E53935' : badge.style === 'countdown-soon' ? '#FB8C00' : '#43A047' }]}>{badge.text}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            {showGifts && currentGifts.length > 0 && (
+              <View style={[styles.giftCountBadge, { backgroundColor: colors.accent }]}>
+                <Text style={{ color: '#fff', fontSize: 10, fontWeight: '600' }}>🎁 {currentGifts.length}</Text>
+              </View>
+            )}
+            <Text style={[styles.badge, { backgroundColor: badge.style === 'countdown-today' ? '#FFEBEE' : badge.style === 'countdown-soon' ? '#FFF3E0' : '#E8F5E9', color: badge.style === 'countdown-today' ? '#E53935' : badge.style === 'countdown-soon' ? '#FB8C00' : '#43A047' }]}>{badge.text}</Text>
+            {showGifts && (
+              <Text style={{ color: colors.textSecondary, fontSize: 14 }}>{isExpanded ? '▼' : '▶'}</Text>
+            )}
+          </View>
         </TouchableOpacity>
 
         {showGifts && isExpanded && (
@@ -385,6 +395,7 @@ const styles = StyleSheet.create({
   itemTitle: { fontSize: 14, fontWeight: '600' },
   itemSub: { fontSize: 12 },
   badge: { fontSize: 11, fontWeight: '600', paddingVertical: 2, paddingHorizontal: 8, borderRadius: 10 },
+  giftCountBadge: { fontSize: 10, fontWeight: '600', paddingVertical: 2, paddingHorizontal: 6, borderRadius: 8 },
   emptyText: { fontSize: 13, textAlign: 'center', paddingVertical: 12 },
   expandContent: { paddingTop: 8, borderTopWidth: 1, borderTopColor: '#f0f0f0', paddingLeft: 36 },
   giftItem: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
