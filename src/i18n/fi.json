@@ -849,6 +849,8 @@
     "newPet": "Uusi lemmikki",
     "addPet": "Lisää lemmikki",
     "editPet": "Muokkaa lemmikkiä",
+    "photo": "Valokuva",
+    "uploadPhoto": "Lataa kuva",
     "name": "Nimi",
     "namePlaceholder": "esim. Luna",
     "type": "Tyyppi",

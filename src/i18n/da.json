@@ -849,6 +849,8 @@
     "newPet": "Nyt kæledyr",
     "addPet": "Tilføj kæledyr",
     "editPet": "Rediger kæledyr",
+    "photo": "Billede",
+    "uploadPhoto": "Upload billede",
     "name": "Navn",
     "namePlaceholder": "f.eks. Luna",
     "type": "Type",

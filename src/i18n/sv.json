@@ -849,6 +849,8 @@
     "newPet": "Nytt djur",
     "addPet": "Lägg till husdjur",
     "editPet": "Redigera husdjur",
+    "photo": "Bild",
+    "uploadPhoto": "Ladda upp bild",
     "name": "Namn",
     "namePlaceholder": "t.ex. Luna",
     "type": "Typ",

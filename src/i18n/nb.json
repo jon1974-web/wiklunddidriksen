@@ -850,6 +850,8 @@
     "newPet": "Nytt dyr",
     "addPet": "Legg til kjæledyr",
     "editPet": "Rediger kjæledyr",
+    "photo": "Bilde",
+    "uploadPhoto": "Last opp bilde",
     "name": "Navn",
     "namePlaceholder": "F.eks. Luna",
     "type": "Type",

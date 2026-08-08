@@ -135,10 +135,13 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
     if (!familyId) return;
     if (!petForm.name.trim()) { crossAlert('Error', t('pets.enterPetName')); return; }
     try {
+      const cleanData = Object.fromEntries(
+        Object.entries(petForm).filter(([_, v]) => v !== '' && v !== null && v !== undefined)
+      );
       if (editingPet) {
-        await updatePet(familyId, editingPet, petForm);
+        await updatePet(editingPet, cleanData);
       } else {
-        await addPet(familyId, { ...petForm });
+        await addPet(familyId, cleanData as any);
       }
       setPetForm({ name: '', type: 'Katt', gender: 'Ukjent', breed: '', birthday: '', identification: '', passportNumber: '', chipId: '', chipDate: '', photoUrl: '' });
       setEditingPet(null);

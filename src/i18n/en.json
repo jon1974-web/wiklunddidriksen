@@ -849,6 +849,8 @@
     "newPet": "New pet",
     "addPet": "Add pet",
     "editPet": "Edit pet",
+    "photo": "Photo",
+    "uploadPhoto": "Upload photo",
     "name": "Name",
     "namePlaceholder": "e.g. Luna",
     "type": "Type",
