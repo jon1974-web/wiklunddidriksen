@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
   const [petActionModal, setPetActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [showHelp, setShowHelp] = useState(false);
 
-  const [petForm, setPetForm] = useState({ name: '', type: 'Katt', gender: 'Ukjent', breed: '', birthday: '', identification: '', passportNumber: '', chipId: '', chipDate: '' });
+  const [petForm, setPetForm] = useState({ name: '', type: 'Katt', gender: 'Ukjent', breed: '', birthday: '', identification: '', passportNumber: '', chipId: '', chipDate: '', photoUrl: '' });
 
   const [vetVisits, setVetVisits] = useState<PetVetVisit[]>([]);
   const [medications, setMedications] = useState<PetMedication[]>([]);
@@ -140,7 +140,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
       } else {
         await addPet(familyId, { ...petForm });
       }
-      setPetForm({ name: '', type: 'Katt', gender: 'Ukjent', breed: '', birthday: '', identification: '', passportNumber: '', chipId: '', chipDate: '' });
+      setPetForm({ name: '', type: 'Katt', gender: 'Ukjent', breed: '', birthday: '', identification: '', passportNumber: '', chipId: '', chipDate: '', photoUrl: '' });
       setEditingPet(null);
       setShowAddPetModal(false);
       loadPets();
@@ -163,7 +163,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
   const handleEditPet = () => {
     const pet = pets.find(p => p.id === petActionModal.id);
     if (!pet) return;
-    setPetForm({ name: pet.name, type: pet.type, gender: pet.gender || 'Ukjent', breed: pet.breed || '', birthday: pet.birthday || '', identification: pet.identification || '', passportNumber: pet.passportNumber || '', chipId: pet.chipId || '', chipDate: pet.chipDate || '' });
+    setPetForm({ name: pet.name, type: pet.type, gender: pet.gender || 'Ukjent', breed: pet.breed || '', birthday: pet.birthday || '', identification: pet.identification || '', passportNumber: pet.passportNumber || '', chipId: pet.chipId || '', chipDate: pet.chipDate || '', photoUrl: pet.photoUrl || '' });
     setEditingPet(pet.id);
     setPetActionModal({ visible: false, id: '', title: '' });
     setShowAddPetModal(true);
@@ -347,14 +347,18 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
               onPress={() => setSelectedPet(pet)}
               onLongPress={() => setPetActionModal({ visible: true, id: pet.id, title: pet.name })}
             >
-              <Text style={styles.gridEmoji}>{PET_ICONS[pet.type] || '🐾'}</Text>
+              {pet.photoUrl ? (
+                <Image source={{ uri: pet.photoUrl }} style={styles.gridPhoto} />
+              ) : (
+                <Text style={styles.gridEmoji}>{PET_ICONS[pet.type] || '🐾'}</Text>
+              )}
               <Text style={[styles.gridName, { color: colors.text }]} numberOfLines={1}>{pet.name}</Text>
               <Text style={[styles.gridType, { color: colors.textSecondary }]}>{pet.type}{pet.gender && pet.gender !== 'Ukjent' ? ` ${PET_GENDER_ICONS[pet.gender] || ''}` : ''}</Text>
             </TouchableOpacity>
           ))}
           <TouchableOpacity
             style={[styles.gridTile, styles.gridTileAdd, { borderColor: colors.textDisabled }]}
-            onPress={() => { setEditingPet(null); setPetForm({ name: '', type: 'Katt', gender: 'Ukjent', breed: '', birthday: '', identification: '', passportNumber: '', chipId: '', chipDate: '' }); setShowAddPetModal(true); }}
+            onPress={() => { setEditingPet(null); setPetForm({ name: '', type: 'Katt', gender: 'Ukjent', breed: '', birthday: '', identification: '', passportNumber: '', chipId: '', chipDate: '', photoUrl: '' }); setShowAddPetModal(true); }}
           >
             <Text style={[styles.gridEmoji, { color: colors.textDisabled }]}>+</Text>
             <Text style={[styles.gridName, { color: colors.textDisabled }]}>{t('pets.newPet')}</Text>
@@ -367,6 +371,40 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>{editingPet ? t('pets.editPet') : t('pets.addPet')}</Text>
             <ScrollView>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('pets.photo')}</Text>
+                <TouchableOpacity
+                  style={[styles.imagePicker, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                  onPress={async () => {
+                    const { webUploadFile } = await import('../services/webStorage');
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = async (e: Event) => {
+                      const target = e.target as HTMLInputElement;
+                      const file = target.files?.[0];
+                      if (!file) return;
+                      try {
+                        const path = `pets/${familyId || 'temp'}/${Date.now()}_${file.name}`;
+                        const url = await webUploadFile(path, file);
+                        setPetForm(f => ({ ...f, photoUrl: url }));
+                      } catch (err) {
+                        crossAlert('Error', getErrorMessage(err));
+                      }
+                    };
+                    input.click();
+                  }}
+                >
+                  {petForm.photoUrl ? (
+                    <Image source={{ uri: petForm.photoUrl }} style={styles.formPhoto} />
+                  ) : (
+                    <View style={{ alignItems: 'center', gap: 4 }}>
+                      <Text style={{ color: colors.textSecondary, fontSize: 24 }}>📷</Text>
+                      <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{t('pets.uploadPhoto')}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </View>
               <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('pets.name')}</Text>
                 <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={petForm.name} onChangeText={(v) => setPetForm(f => ({ ...f, name: v }))} placeholder={t('pets.namePlaceholder')} placeholderTextColor={colors.textDisabled} />
@@ -457,7 +495,11 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
         </View>
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <Text style={{ fontSize: 28 }}>{PET_ICONS[selectedPet.type] || '🐾'}</Text>
+              {selectedPet.photoUrl ? (
+                <Image source={{ uri: selectedPet.photoUrl }} style={{ width: 56, height: 56, borderRadius: 28 }} />
+              ) : (
+                <Text style={{ fontSize: 28 }}>{PET_ICONS[selectedPet.type] || '🐾'}</Text>
+              )}
             <Text style={[styles.screenTitle, { color: colors.text }]}>{selectedPet.name}</Text>
           </View>
         </View>
@@ -1071,8 +1113,16 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
             : t('common.time')
         }
         mode={activePicker?.includes('Time') || activePicker?.includes('time') ? 'time' : 'date'}
-        dateOffset={activePicker?.includes('Birthday') || activePicker?.includes('Chip') || activePicker?.includes('groomLast') || activePicker?.includes('medDateFrom') ? -365 : 0}
-        dateCount={activePicker?.includes('Birthday') || activePicker?.includes('Chip') ? 730 : 365}
+        dateOffset={
+          activePicker === 'petBirthday' || activePicker === 'petChipDate' ? -365 :
+          activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? -365 :
+          activePicker === 'vetDate' || activePicker === 'foodTime' ? -30 :
+          activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? 0 : 0
+        }
+        dateCount={
+          activePicker === 'petBirthday' || activePicker === 'petChipDate' ? 730 :
+          activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? 365 : 365
+        }
         selectedValue={
           activePicker === 'petBirthday' ? petForm.birthday :
           activePicker === 'petChipDate' ? petForm.chipDate :
@@ -1131,6 +1181,9 @@ const styles = StyleSheet.create({
   gridTile: { width: '30%', aspectRatio: 1, borderRadius: 16, alignItems: 'center', justifyContent: 'center', padding: 12 },
   gridTileAdd: { borderWidth: 2, borderStyle: 'dashed', backgroundColor: 'transparent' },
   gridEmoji: { fontSize: 36, marginBottom: 6 },
+  gridPhoto: { width: 64, height: 64, borderRadius: 32, marginBottom: 6 },
+  imagePicker: { width: '100%', height: 120, borderRadius: 12, borderWidth: 2, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center' },
+  formPhoto: { width: 120, height: 120, borderRadius: 60 },
   gridName: { fontSize: 14, fontWeight: '600', textAlign: 'center' },
   gridType: { fontSize: 12, marginTop: 2 },
   section: { borderRadius: 12, padding: 16, marginBottom: 12 },
