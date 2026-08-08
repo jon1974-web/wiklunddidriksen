@@ -10,7 +10,6 @@ import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
-import { scheduleEventReminder } from '../services/notificationService';
 import { notifyHealthItem } from '../services/familyService';
 import { db } from '../services/firebase';
 import { addDoc, collection } from 'firebase/firestore';
@@ -209,18 +208,6 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
             icon: 'pet',
           };
           const docRef = await addDoc(collection(db, 'events'), eventData);
-          if (reminderMinutes > 0) {
-            const notifId = await scheduleEventReminder(
-              `${t('pets.vetVisits')}: ${vetForm.title}`,
-              `${selectedPet.name} — ${vetForm.date} ${vetForm.startTime}${vetForm.location ? ' (' + vetForm.location + ')' : ''}`,
-              eventDate,
-              reminderMinutes
-            );
-            if (notifId) {
-              const { updateDoc: fbUpdateDoc, doc: fbDoc } = await import('firebase/firestore');
-              await fbUpdateDoc(fbDoc(db, 'events', docRef.id), { notificationId: notifId });
-            }
-          }
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.date, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
         setVetForm({ title: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
@@ -267,18 +254,6 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
             icon: 'pet',
           };
           const docRef = await addDoc(collection(db, 'events'), eventData);
-          if (reminderMinutes > 0) {
-            const notifId = await scheduleEventReminder(
-              `${t('pets.vaccinations')}: ${vaccForm.name}`,
-              `${selectedPet.name} — ${vaccForm.date}`,
-              vaccDate,
-              reminderMinutes
-            );
-            if (notifId) {
-              const { updateDoc: fbUpdateDoc, doc: fbDoc } = await import('firebase/firestore');
-              await fbUpdateDoc(fbDoc(db, 'events', docRef.id), { notificationId: notifId });
-            }
-          }
           notifyHealthItem(familyId, `${selectedPet.name}: ${vaccForm.name}`, vaccForm.date, '', '', 'vaccination', user?.displayName || '', selectedPet.name).catch(() => {});
         }
         setVaccForm({ name: '', date: '', nextDue: '', reminder: '', status: 'completed', note: '' });

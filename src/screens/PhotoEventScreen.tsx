@@ -6,7 +6,6 @@ import { addDoc, collection } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
-import { scheduleEventReminder } from '../services/notificationService';
 import { getUserProfile, notifyNewEvent } from '../services/familyService';
 import { syncEventToCalendar } from '../services/calendarService';
 import { getReminderOptions } from '../constants/eventOptions';
@@ -191,19 +190,6 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
       }
 
       const docRef = await addDoc(collection(db, 'events'), eventData);
-
-      try {
-        const notifId = await scheduleEventReminder(
-          eventData.title,
-          eventData.description || 'Arrangement starter snart',
-          eventStartDate,
-          eventData.reminderMinutes
-        );
-        if (notifId) {
-          const { updateDoc, doc: docFn } = await import('firebase/firestore');
-          await updateDoc(docFn(db, 'events', docRef.id), { notificationId: notifId });
-        }
-      } catch {}
 
       try {
         const profile = await getUserProfile(user.uid);

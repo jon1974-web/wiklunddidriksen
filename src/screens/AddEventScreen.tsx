@@ -6,7 +6,6 @@ import { DatePickerModal } from '../components/DatePickerModal';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
-import { scheduleEventReminder } from '../services/notificationService';
 import { getUserProfile, notifyNewEvent } from '../services/familyService';
 import { syncEventToCalendar } from '../services/calendarService';
 import { getReminderOptions, getEndDateOptions, getEndTimeOptions } from '../constants/eventOptions';
@@ -117,17 +116,6 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
       }
 
       const docRef = await addDoc(collection(db, 'events'), eventData);
-
-      const notificationId = await scheduleEventReminder(
-        sanitizeInput(title),
-        description.trim() ? sanitizeInput(description) : `Arrangement starter om ${reminderMinutes} minutter`,
-        eventStartDate,
-        reminderMinutes
-      );
-
-      if (notificationId) {
-        await updateDoc(doc(db, 'events', docRef.id), { notificationId });
-      }
 
       if (user?.uid) {
         const profile = await getUserProfile(user.uid);

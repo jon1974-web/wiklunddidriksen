@@ -5,7 +5,7 @@ import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
 import { Event } from '../types';
 import { useTheme } from '../theme/ThemeContext';
-import { scheduleEventReminder, cancelNotification } from '../services/notificationService';
+import { cancelNotification } from '../services/notificationService';
 import { getUserProfile } from '../services/familyService';
 import { syncEventToCalendar, updateCalendarEvent, deleteCalendarEvent } from '../services/calendarService';
 import { useUserStore } from '../store/userStore';
@@ -161,21 +161,6 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       }
 
       await updateDoc(doc(db, 'events', event.id), updateData);
-
-      if (event.notificationId) {
-        await cancelNotification(event.notificationId);
-      }
-
-      const newNotificationId = await scheduleEventReminder(
-        title.trim(),
-        description.trim() || `Arrangement starter om ${reminderMinutes} minutter`,
-        eventStartDate,
-        reminderMinutes
-      );
-
-      if (newNotificationId) {
-        await updateDoc(doc(db, 'events', event.id), { notificationId: newNotificationId });
-      }
 
       if (user?.uid) {
         const profile = await getUserProfile(user.uid);

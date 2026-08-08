@@ -9,7 +9,7 @@ import { DatePickerModal } from '../components/DatePickerModal';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
-import { scheduleEventReminder } from '../services/notificationService';
+
 import { notifyHealthItem } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import {
@@ -115,21 +115,6 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           const id = await addHealthAppointment(familyId, apptForm);
           savedAppt = { ...apptForm, id };
         }
-        // Schedule notification if reminder is set
-        if (apptForm.reminder && savedAppt) {
-          const reminderMinutes = apptForm.reminder.includes('1 ' + t('health.reminder1Day').split(' ')[1]) ? 1440 :
-                                  apptForm.reminder.includes('3') ? 4320 : 10080;
-          const eventDate = new Date(`${apptForm.date}T${apptForm.startTime || '09:00'}:00`);
-          const notifId = await scheduleEventReminder(
-            `${t('health.appointments')}: ${apptForm.title}`,
-            `${apptForm.person} — ${apptForm.date} ${apptForm.startTime}${apptForm.location ? ' (' + apptForm.location + ')' : ''}`,
-            eventDate,
-            reminderMinutes
-          );
-          if (notifId && savedAppt.id) {
-            await updateHealthAppointment(familyId, savedAppt.id, { notificationId: notifId });
-          }
-        }
         // Send push notification to family members
         if (!isEditing) {
           const user = useUserStore.getState().user;
@@ -145,21 +130,6 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         } else {
           const id = await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
           savedVacc = { ...vaccForm, id, status: 'pending' };
-        }
-        // Schedule notification if reminder is set
-        if (vaccForm.reminder && savedVacc) {
-          const reminderMinutes = vaccForm.reminder.includes('1 ' + t('health.reminder1Day').split(' ')[1]) ? 1440 :
-                                  vaccForm.reminder.includes('3') ? 4320 : 10080;
-          const vaccDate = new Date(`${vaccForm.date}T09:00:00`);
-          const notifId = await scheduleEventReminder(
-            `${t('health.vaccinations')}: ${vaccForm.name}`,
-            `${vaccForm.person} — ${vaccForm.date}`,
-            vaccDate,
-            reminderMinutes
-          );
-          if (notifId && savedVacc.id) {
-            await updateHealthVaccination(familyId, savedVacc.id, { notificationId: notifId });
-          }
         }
         // Send push notification to family members
         if (!isEditing) {
