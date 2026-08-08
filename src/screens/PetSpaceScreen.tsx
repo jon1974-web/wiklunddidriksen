@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
+import * as ImagePicker from 'expo-image-picker';
 import { AppIcon } from '../components/AppIcon';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
@@ -379,25 +380,38 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                 <TouchableOpacity
                   style={[styles.imagePicker, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
                   onPress={async () => {
-                    const { webUploadFile } = await import('../services/webStorage');
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = async (e: Event) => {
-                      const target = e.target as HTMLInputElement;
-                      const file = target.files?.[0];
-                      if (!file) return;
+                    const result = await ImagePicker.launchImageLibraryAsync({
+                      mediaTypes: ['images'],
+                      allowsEditing: true,
+                      aspect: [1, 1],
+                      quality: 0.7,
+                      base64: true,
+                    });
+                    if (!result.canceled && result.assets[0]) {
                       try {
-                        const fileName = `pet_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                        const { webUploadFile } = await import('../services/webStorage');
+                        const asset = result.assets[0];
+                        const fileName = `pet_${Date.now()}.jpg`;
                         const path = `pet-photos/${fileName}`;
-                        const blob = new Blob([await file.arrayBuffer()], { type: file.type });
+                        let blob: Blob;
+                        if (asset.base64 && Platform.OS === 'web') {
+                          const byteString = atob(asset.base64);
+                          const ab = new ArrayBuffer(byteString.length);
+                          const ia = new Uint8Array(ab);
+                          for (let i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                          }
+                          blob = new Blob([ab], { type: 'image/jpeg' });
+                        } else {
+                          const response = await fetch(asset.uri);
+                          blob = await response.blob();
+                        }
                         const url = await webUploadFile(path, blob);
                         setPetForm(f => ({ ...f, photoUrl: url }));
                       } catch (err) {
                         crossAlert('Error', getErrorMessage(err));
                       }
-                    };
-                    input.click();
+                    }
                   }}
                 >
                   {petForm.photoUrl ? (
