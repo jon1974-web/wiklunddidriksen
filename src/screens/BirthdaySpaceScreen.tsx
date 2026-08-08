@@ -370,10 +370,11 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       <HelpCenter
         visible={showHelp}
         onClose={() => setShowHelp(false)}
-        title={t('profile.helpBirthdaysTitle')}
+        title={t('spaces.helpBirthdaysTitle')}
         sections={[
-          { icon: '🎂', title: t('profile.helpBirthdaysWhat'), text: t('profile.helpBirthdaysWhatText') },
-          { icon: '👉', title: t('profile.helpBirthdaysHow'), text: t('profile.helpBirthdaysHowText'), tip: t('profile.helpBirthdaysTip') },
+          { icon: '🎂', title: t('spaces.helpBirthdaysWhat'), text: t('spaces.helpBirthdaysWhatText') },
+          { icon: '🎁', title: t('spaces.helpBirthdaysGifts'), text: t('spaces.helpBirthdaysGiftsText') },
+          { icon: '👉', title: t('spaces.helpBirthdaysHow'), text: t('spaces.helpBirthdaysHowText'), tip: t('spaces.helpBirthdaysTip') },
         ]}
       />
     </SafeAreaView>

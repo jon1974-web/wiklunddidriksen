@@ -164,7 +164,15 @@
     "homeCount": "{{count}} kunnossapitoa",
     "customSpace": "Mukautettu",
     "newSpace": "Uusi paikka",
-    "createOwn": "Luo oma"
+    "createOwn": "Luo oma",
+    "helpBirthdaysTitle": "Syntymäpäivät",
+    "helpBirthdaysWhat": "Mitä ovat syntymäpäivät?",
+    "helpBirthdaysWhatText": "Syntymäpäivät näyttävät kaikkien perheen syntymäpäivät seuraavan esiintymisen mukaan järjestettynä. Voit lisätä, muokata ja poistaa syntymäpäiviä.",
+    "helpBirthdaysGifts": "Lahjalistat",
+    "helpBirthdaysGiftsText": "Jokaisella syntymäpäivällä voi olla oma lahjalista. Napauta syntymäpäivää nähdäksesi lahjaideat. Voit merkitä lahjat ostetuiksi ja nähdä edellisten vuosien lahjalistat.",
+    "helpBirthdaysHow": "Näin teet sen",
+    "helpBirthdaysHowText": "Napauta syntymäpäivää laajentaaksesi lahjalistan. Napauta + lisätäksesi uusia lahjaideoita. Pitkällä napautuksella poistat syntymäpäiviä.",
+    "helpBirthdaysTip": "Lahjalistat säilytetään vuodesta toiseen, jotta näet mitä ostit viime kerralla."
   },
   "health": {
     "title": "Terveys",

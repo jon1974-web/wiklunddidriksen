@@ -164,7 +164,15 @@
     "homeCount": "{{count}} maintenance",
     "customSpace": "Custom",
     "newSpace": "New place",
-    "createOwn": "Create your own"
+    "createOwn": "Create your own",
+    "helpBirthdaysTitle": "Birthdays",
+    "helpBirthdaysWhat": "What are Birthdays?",
+    "helpBirthdaysWhatText": "Birthdays shows all family birthdays sorted by next occurrence. You can add, edit and delete birthdays.",
+    "helpBirthdaysGifts": "Gift Lists",
+    "helpBirthdaysGiftsText": "Each birthday can have its own gift list. Tap a birthday to expand and see gift ideas. You can mark gifts as purchased and see previous years' gift lists.",
+    "helpBirthdaysHow": "How to use it",
+    "helpBirthdaysHowText": "Tap a birthday to expand the gift list. Tap + to add new gift ideas. Long press to delete birthdays.",
+    "helpBirthdaysTip": "Gift lists are preserved from year to year so you can see what you bought last time."
   },
   "health": {
     "title": "Health",

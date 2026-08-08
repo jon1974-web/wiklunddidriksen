@@ -164,7 +164,15 @@
     "homeCount": "{{count}} underhåll",
     "customSpace": "Anpassat",
     "newSpace": "Nytt ställe",
-    "createOwn": "Skapa eget"
+    "createOwn": "Skapa eget",
+    "helpBirthdaysTitle": "Födelsedagar",
+    "helpBirthdaysWhat": "Vad är Födelsedagar?",
+    "helpBirthdaysWhatText": "Födelsedagar visar alla familiens födelsedagar sorterade efter nästa förekomst. Du kan lägga till, redigera och ta bort födelsedagar.",
+    "helpBirthdaysGifts": "Gåvor",
+    "helpBirthdaysGiftsText": "Varje födelsedag kan ha en egen gåvolista. Tryck på födelsedagen för att expandera och se gåvidéer. Du kan markera gåvor som köpta och se tidigare års gåvolistor.",
+    "helpBirthdaysHow": "Så här gör du",
+    "helpBirthdaysHowText": "Tryck på en födelsedag för att expandera gåvolistan. Tryck på + för att lägga till nya gåvidéer. Håll in för att ta bort födelsedagar.",
+    "helpBirthdaysTip": "Gåvor bevaras från år till år så att du kan se vad du köpte förra gången."
   },
   "health": {
     "title": "Hälsa",

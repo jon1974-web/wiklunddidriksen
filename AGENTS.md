@@ -89,6 +89,13 @@ const [showHelp, setShowHelp] = useState(false);
 
 4. **Update help text when features change**: Whenever new functionality is added to a feature that has a Help Center modal, the help text MUST be updated to reflect the changes. This includes new buttons, new settings, changed workflows, etc. The help modal should always accurately describe the current state of the feature.
 
+5. **Thoroughly check feature behavior before writing articles**: Before creating or updating a help center article, you MUST:
+   - Open the feature and test every interaction (tap, long press, expand/collapse, etc.)
+   - Verify the exact workflow step-by-step
+   - Check what data is shown and how it's organized
+   - Test edge cases (empty states, single item, many items)
+   - The help text must accurately describe what the user will actually see and do — never assume or guess
+
 4. **Add translations** in all 5 languages (`nb.json`, `en.json`, `sv.json`, `da.json`, `fi.json`):
    - `helpTitle` — feature name
    - `helpWhat` / `helpWhatText` — what the feature does

@@ -164,7 +164,15 @@
     "homeCount": "{{count}} vedligeholdelse",
     "customSpace": "Tilpasset",
     "newSpace": "Nyt sted",
-    "createOwn": "Opret eget"
+    "createOwn": "Opret eget",
+    "helpBirthdaysTitle": "Fødselsdage",
+    "helpBirthdaysWhat": "Hvad er Fødselsdage?",
+    "helpBirthdaysWhatText": "Fødselsdage viser alle familiens fødselsdage sorteret efter næste forekomst. Du kan tilføje, redigere og slette fødselsdage.",
+    "helpBirthdaysGifts": "Gavelister",
+    "helpBirthdaysGiftsText": "Hver fødselsdag kan have sin egen gaveliste. Tryk på fødselsdagen for at udvide og se gaveideer. Du kan markere gaver som købt og se tidligere års gavelister.",
+    "helpBirthdaysHow": "Sådan gør du",
+    "helpBirthdaysHowText": "Tryk på en fødselsdag for at udvide gavelisten. Trykk på + for at tilføje nye gaveideer. Lang tryk for at slette fødselsdage.",
+    "helpBirthdaysTip": "Gavelister bevares fra år til år så du kan se hvad du købte sidste gang."
   },
   "health": {
     "title": "Sundhed",

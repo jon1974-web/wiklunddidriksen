@@ -165,7 +165,15 @@
     "homeCount": "{{count}} vedlikehold",
     "customSpace": "Egendefinert",
     "newSpace": "Nytt sted",
-    "createOwn": "Opprett eget"
+    "createOwn": "Opprett eget",
+    "helpBirthdaysTitle": "Bursdager",
+    "helpBirthdaysWhat": "Hva er Bursdager?",
+    "helpBirthdaysWhatText": "Bursdager viser alle familiens bursdager sortert etter neste forekomst. Du kan legge til, redigere og slette bursdager.",
+    "helpBirthdaysGifts": "Gavelister",
+    "helpBirthdaysGiftsText": "Hver bursdag kan ha en egen gaveliste. Trykk på bursdagen for å utvide og se gaveidéer. Du kan markere gaver som kjøpt og se tidligere års gavelister.",
+    "helpBirthdaysHow": "Slik gjør du",
+    "helpBirthdaysHowText": "Trykk på en bursdag for å utvide gavelisten. Trykk på + for å legge til nye gaveidéer. Hold inne for å slette bursdager.",
+    "helpBirthdaysTip": "Gavelister bevares fra år til år slik at du kan se hva du kjøpte forrige gang."
   },
   "health": {
     "title": "Helse",
