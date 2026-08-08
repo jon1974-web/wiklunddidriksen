@@ -70,6 +70,9 @@ type RootStackParamList = {
   ChatMain: undefined;
   TripsList: undefined;
   SpacesList: undefined;
+  HealthSpace: undefined;
+  BirthdaySpace: undefined;
+  PetSpace: undefined;
   AddTrip: undefined;
   TripDetail: { trip: Trip };
   TransportDetail: { flight: import('./src/types').TripFlight; tripId: string };
