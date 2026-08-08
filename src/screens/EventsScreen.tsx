@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent, Birthday, HealthAppointment, HealthMedication, HealthVaccination } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication } from '../types';
 import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
@@ -17,6 +17,7 @@ import { crossAlert } from '../utils/alert';
 import { getTrips, getTripTransport, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
 import { getSpondConfig, getSpondEvents, changeSpondResponse, clearSpondToken } from '../services/spondService';
 import { getHealthAppointments, getHealthMedications, getHealthVaccinations } from '../services/healthService';
+import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications } from '../services/petService';
 import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { WeeklySummary } from '../components/WeeklySummary';
@@ -129,6 +130,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [healthAppointments, setHealthAppointments] = useState<HealthAppointment[]>([]);
   const [healthMedications, setHealthMedications] = useState<HealthMedication[]>([]);
   const [healthVaccinations, setHealthVaccinations] = useState<HealthVaccination[]>([]);
+  const [petVetVisits, setPetVetVisits] = useState<PetVetVisit[]>([]);
+  const [petVaccinations, setPetVaccinations] = useState<PetVaccination[]>([]);
+  const [petMedications, setPetMedications] = useState<PetMedication[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
@@ -190,10 +194,27 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     }
   }, [familyId]);
 
+  const loadPets = useCallback(async () => {
+    if (!familyId) return;
+    try {
+      const [visits, vaccs, meds] = await Promise.all([
+        getAllVetVisits(familyId),
+        getAllPetVaccinations(familyId),
+        getAllPetMedications(familyId),
+      ]);
+      setPetVetVisits(visits);
+      setPetVaccinations(vaccs);
+      setPetMedications(meds);
+    } catch (error) {
+      // Silently fail for pets
+    }
+  }, [familyId]);
+
   useEffect(() => {
     loadTrips();
     loadHealth();
-    const unsubscribe = navigation.addListener('focus', () => { loadTrips(); loadHealth(); });
+    loadPets();
+    const unsubscribe = navigation.addListener('focus', () => { loadTrips(); loadHealth(); loadPets(); });
     return unsubscribe;
   }, [navigation, loadTrips, loadHealth]);
 
@@ -944,6 +965,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         healthAppointments={healthAppointments}
         healthMedications={healthMedications}
         healthVaccinations={healthVaccinations}
+        petVetVisits={petVetVisits}
+        petVaccinations={petVaccinations}
+        petMedications={petMedications}
       />
 
       <ActionModal

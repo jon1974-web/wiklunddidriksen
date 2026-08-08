@@ -1,5 +1,5 @@
 import {
-  collection, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, doc, where,
+  collection, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, doc, where, limit,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Pet, PetVetVisit, PetMedication, PetFood, PetGrooming, PetVaccination, PetInsurance } from '../types';
@@ -142,4 +142,23 @@ export async function updatePetInsurance(insId: string, data: Partial<PetInsuran
 
 export async function deletePetInsurance(insId: string): Promise<void> {
   await deleteDoc(doc(db, 'petInsurance', insId));
+}
+
+// Family-wide queries (for WeeklySummary)
+export async function getAllVetVisits(familyId: string): Promise<PetVetVisit[]> {
+  const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), orderBy('date', 'desc'), limit(50));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetVetVisit));
+}
+
+export async function getAllPetVaccinations(familyId: string): Promise<PetVaccination[]> {
+  const q = query(collection(db, 'petVaccinations'), where('familyId', '==', familyId), orderBy('date', 'desc'), limit(50));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetVaccination));
+}
+
+export async function getAllPetMedications(familyId: string): Promise<PetMedication[]> {
+  const q = query(collection(db, 'petMedications'), where('familyId', '==', familyId), orderBy('createdAt', 'desc'), limit(50));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetMedication));
 }

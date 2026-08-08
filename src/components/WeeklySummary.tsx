@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
-import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination } from '../types';
+import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,9 @@ interface WeeklySummaryProps {
   healthAppointments?: HealthAppointment[];
   healthMedications?: HealthMedication[];
   healthVaccinations?: HealthVaccination[];
+  petVetVisits?: PetVetVisit[];
+  petVaccinations?: PetVaccination[];
+  petMedications?: PetMedication[];
 }
 
 const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
@@ -54,7 +57,7 @@ interface DayItem {
   logoUrl?: string;
 }
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {}, tripSubcollections = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {}, tripSubcollections = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -249,7 +252,59 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                 {activeMedications.map((m, i) => (
                   <View key={`med-${i}`} style={[styles.birthdayItem, i === activeMedications.length - 1 ? {} : { borderBottomColor: colors.border }]}>
                     <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                      💊 {m.name} — {m.person}{m.dateTo ? ` (til ${m.dateTo})` : ''}
+                      💊 {m.name} — {m.person}
+                    </Text>
+                    <Text style={[styles.birthdayItemText, { color: colors.textSecondary, fontSize: 13 }]}>
+                      {[m.dosage, m.frequency].filter(Boolean).join(' · ')}{m.dateTo ? ` (til ${m.dateTo})` : ''}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            );
+          })()}
+
+          {/* Pets section */}
+          {sectionSettings.pets !== false && (() => {
+            const { start, end } = getWeekRange(new Date());
+            const weekStr = start.toISOString().split('T')[0];
+            const endStr = end.toISOString().split('T')[0];
+            const weekVetVisits = (petVetVisits || []).filter(v => v.date >= weekStr && v.date <= endStr);
+            const weekVaccinations = (petVaccinations || []).filter(v => v.date >= weekStr && v.date <= endStr);
+            const activeMedications = (petMedications || []).filter(m => {
+              if (!m.dateFrom && !m.dateTo) return true;
+              if (m.dateFrom && m.dateTo) return m.dateFrom <= endStr && m.dateTo >= weekStr;
+              if (m.dateFrom) return m.dateFrom <= endStr;
+              if (m.dateTo) return m.dateTo >= weekStr;
+              return true;
+            });
+            if (weekVetVisits.length === 0 && weekVaccinations.length === 0 && activeMedications.length === 0) return null;
+            return (
+              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
+                  <AppIcon name="pet" size={18} color="#FF9800" />
+                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('pets.title')}</Text>
+                </View>
+                {weekVetVisits.map((v, i) => (
+                  <View key={`vet-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
+                      🏥 {v.title} — {v.date} {v.startTime}{v.location ? ` (${v.location})` : ''}
+                    </Text>
+                  </View>
+                ))}
+                {weekVaccinations.map((v, i) => (
+                  <View key={`vacc-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
+                      💉 {v.name} — {v.date}
+                    </Text>
+                  </View>
+                ))}
+                {activeMedications.map((m, i) => (
+                  <View key={`med-${i}`} style={[styles.birthdayItem, i === activeMedications.length - 1 ? {} : { borderBottomColor: colors.border }]}>
+                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
+                      💊 {m.name}
+                    </Text>
+                    <Text style={[styles.birthdayItemText, { color: colors.textSecondary, fontSize: 13 }]}>
+                      {[m.dosage, m.frequency].filter(Boolean).join(' · ')}{m.dateTo ? ` (til ${m.dateTo})` : ''}
                     </Text>
                   </View>
                 ))}

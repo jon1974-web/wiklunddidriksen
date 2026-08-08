@@ -186,26 +186,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
       const isEditing = editingItem !== null;
       if (activeSection === 'vetVisits') {
         if (!vetForm.title.trim() || !vetForm.date) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
-        let savedVisit;
         if (isEditing) {
           await updateVetVisit(editingItem.id, vetForm);
-          savedVisit = { ...vetForm, id: editingItem.id };
         } else {
-          const id = await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId });
-          savedVisit = { ...vetForm, id };
-        }
-        if (vetForm.reminder && savedVisit) {
-          const reminderMinutes = vetForm.reminder.includes('1 d') ? 1440 : vetForm.reminder.includes('3') ? 4320 : 10080;
-          const eventDate = new Date(`${vetForm.date}T${vetForm.startTime || '09:00'}:00`);
-          const notifId = await scheduleEventReminder(
-            `${t('pets.vetVisits')}: ${vetForm.title}`,
-            `${selectedPet.name} — ${vetForm.date} ${vetForm.startTime}${vetForm.location ? ' (' + vetForm.location + ')' : ''}`,
-            eventDate,
-            reminderMinutes
-          );
-          if (notifId && savedVisit.id) {
-            await updateVetVisit(savedVisit.id, { notificationId: notifId });
-          }
+          await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId });
         }
         if (!isEditing && vetForm.date) {
           const reminderMinutes = vetForm.reminder ? (vetForm.reminder.includes('1 d') ? 1440 : vetForm.reminder.includes('3') ? 4320 : 10080) : 0;
@@ -218,7 +202,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
             time: vetForm.startTime || '09:00',
             endTime: vetForm.endTime || null,
             reminderMinutes,
-            reminderAt: new Date(eventDate.getTime() - reminderMinutes * 60 * 1000).toISOString(),
+            reminderAt: reminderMinutes > 0 ? new Date(eventDate.getTime() - reminderMinutes * 60 * 1000).toISOString() : null,
             createdBy: user?.uid,
             familyId,
             createdAt: Date.now(),
@@ -257,8 +241,46 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
         setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
-        if (isEditing) await updatePetVaccination(editingItem.id, vaccForm);
-        else await addPetVaccination({ ...vaccForm, petId: selectedPet.id, familyId, status: vaccForm.status || "completed" });
+        let savedVacc;
+        if (isEditing) {
+          await updatePetVaccination(editingItem.id, vaccForm);
+          savedVacc = { ...vaccForm, id: editingItem.id };
+        } else {
+          const id = await addPetVaccination({ ...vaccForm, petId: selectedPet.id, familyId, status: vaccForm.status || "completed" });
+          savedVacc = { ...vaccForm, id };
+        }
+        if (!isEditing && vaccForm.date) {
+          const reminderMinutes = vaccForm.reminder ? (vaccForm.reminder.includes('1 d') ? 1440 : vaccForm.reminder.includes('3') ? 4320 : 10080) : 0;
+          const vaccDate = new Date(`${vaccForm.date}T09:00:00`);
+          const eventData = {
+            title: `${PET_ICONS[selectedPet.type] || '🐾'} ${selectedPet.name}: ${vaccForm.name}`,
+            description: vaccForm.note || null,
+            address: null,
+            date: vaccForm.date,
+            time: '09:00',
+            endTime: null,
+            reminderMinutes,
+            reminderAt: reminderMinutes > 0 ? new Date(vaccDate.getTime() - reminderMinutes * 60 * 1000).toISOString() : null,
+            createdBy: user?.uid,
+            familyId,
+            createdAt: Date.now(),
+            icon: 'pet',
+          };
+          const docRef = await addDoc(collection(db, 'events'), eventData);
+          if (reminderMinutes > 0) {
+            const notifId = await scheduleEventReminder(
+              `${t('pets.vaccinations')}: ${vaccForm.name}`,
+              `${selectedPet.name} — ${vaccForm.date}`,
+              vaccDate,
+              reminderMinutes
+            );
+            if (notifId) {
+              const { updateDoc: fbUpdateDoc, doc: fbDoc } = await import('firebase/firestore');
+              await fbUpdateDoc(fbDoc(db, 'events', docRef.id), { notificationId: notifId });
+            }
+          }
+          notifyHealthItem(familyId, `${selectedPet.name}: ${vaccForm.name}`, vaccForm.date, '', '', 'vaccination', user?.displayName || '', selectedPet.name).catch(() => {});
+        }
         setVaccForm({ name: '', date: '', nextDue: '', reminder: '', status: 'completed', note: '' });
       } else if (activeSection === 'insurance') {
         if (!insForm.provider.trim()) { crossAlert('Error', t('pets.enterInsuranceInfo')); return; }
