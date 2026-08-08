@@ -155,7 +155,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
   const handleDeletePet = async () => {
     if (!familyId || !petActionModal.id) return;
     try {
-      await deletePet(familyId, petActionModal.id);
+      await deletePet(petActionModal.id);
       setPetActionModal({ visible: false, id: '', title: '' });
       loadPets();
     } catch (error) {
@@ -180,7 +180,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
         if (!vetForm.title.trim() || !vetForm.date) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
         let savedVisit;
         if (isEditing) {
-          await updateVetVisit(familyId, selectedPet.id, editingItem.id, vetForm);
+          await updateVetVisit(editingItem.id, vetForm);
           savedVisit = { ...vetForm, id: editingItem.id };
         } else {
           const id = await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId });
@@ -196,7 +196,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
             reminderMinutes
           );
           if (notifId && savedVisit.id) {
-            await updateVetVisit(familyId, selectedPet.id, savedVisit.id, { notificationId: notifId });
+            await updateVetVisit(savedVisit.id, { notificationId: notifId });
           }
         }
         if (!isEditing && vetForm.date) {
@@ -234,27 +234,27 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
         setVetForm({ title: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
       } else if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
-        if (isEditing) await updatePetMedication(familyId, selectedPet.id, editingItem.id, medForm);
+        if (isEditing) await updatePetMedication(editingItem.id, medForm);
         else await addPetMedication({ ...medForm, petId: selectedPet.id, familyId });
         setMedForm({ name: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
       } else if (activeSection === 'food') {
         if (!foodForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
-        if (isEditing) await updatePetFood(familyId, selectedPet.id, editingItem.id, foodForm);
+        if (isEditing) await updatePetFood(editingItem.id, foodForm);
         else await addPetFood({ ...foodForm, petId: selectedPet.id, familyId });
         setFoodForm({ name: '', time: '', amount: '', note: '' });
       } else if (activeSection === 'grooming') {
         if (!groomForm.name.trim() || !groomForm.lastDate) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
-        if (isEditing) await updatePetGrooming(familyId, selectedPet.id, editingItem.id, groomForm);
+        if (isEditing) await updatePetGrooming(editingItem.id, groomForm);
         else await addPetGrooming({ ...groomForm, petId: selectedPet.id, familyId });
         setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
-        if (isEditing) await updatePetVaccination(familyId, selectedPet.id, editingItem.id, vaccForm);
+        if (isEditing) await updatePetVaccination(editingItem.id, vaccForm);
         else await addPetVaccination({ ...vaccForm, petId: selectedPet.id, familyId, status: vaccForm.status || "completed" });
         setVaccForm({ name: '', date: '', nextDue: '', reminder: '', status: 'completed', note: '' });
       } else if (activeSection === 'insurance') {
         if (!insForm.provider.trim()) { crossAlert('Error', t('pets.enterInsuranceInfo')); return; }
-        if (isEditing) await updatePetInsurance(familyId, selectedPet.id, editingItem.id, insForm);
+        if (isEditing) await updatePetInsurance(editingItem.id, insForm);
         else await addPetInsurance({ ...insForm, petId: selectedPet.id, familyId });
         setInsForm({ provider: '', policyNumber: '', expiryDate: '', documentUrl: '', note: '' });
       }
