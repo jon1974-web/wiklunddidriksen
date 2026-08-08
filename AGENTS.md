@@ -165,6 +165,30 @@ Performance directly impacts user experience. Treat it as a feature, not an afte
 - Don't run expensive logic in the render path without memoization
 - Minimize state variables — group related state into objects
 
+### Incremental Implementation (CRITICAL for new features)
+When implementing new features, especially large ones, **always work in small, testable parts**:
+
+1. **Plan the feature** into logical steps (types → service → UI → translations → testing)
+2. **Implement one step at a time** — complete one step fully before moving to the next
+3. **After each step, verify it works** — deploy and have the user test
+4. **Check against the plan** — make sure what you built matches what was planned
+5. **Only then move to the next step** — don't batch multiple changes together
+
+**Why this matters:**
+- Catches missing details early (forgotten translations, broken navigation, etc.)
+- Prevents cascading errors from accumulating
+- User can test incrementally and give feedback
+- Easier to debug when something breaks
+
+**Example for Health Space:**
+1. ✅ Create types + service → deploy → test Firestore access
+2. ✅ Create basic screen with header → deploy → test navigation
+3. ✅ Add Medications section → deploy → test CRUD
+4. ✅ Add Vet Visits section → deploy → test CRUD
+5. ✅ Add remaining sections → deploy → test all
+6. ✅ Add translations → deploy → verify all languages
+7. ✅ Add to WeeklySummary → deploy → verify integration
+
 ### Code Splitting
 - Use `React.lazy()` for screens not immediately visible
 - Use dynamic imports for heavy dependencies
