@@ -7,7 +7,7 @@ import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
-import { getBirthdays, addBirthday, deleteBirthday, getGiftIdeas, addGiftIdea, updateGiftIdea, deleteGiftIdea } from '../services/birthdayService';
+import { getBirthdays, addBirthday, updateBirthday, deleteBirthday, getGiftIdeas, addGiftIdea, updateGiftIdea, deleteGiftIdea } from '../services/birthdayService';
 import { Birthday, GiftIdea } from '../types';
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
@@ -53,6 +53,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
   const [newMonth, setNewMonth] = useState('');
   const [newDay, setNewDay] = useState('');
   const [newGiftText, setNewGiftText] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [actionModal, setActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [showHelp, setShowHelp] = useState(false);
   const [expandedBirthdays, setExpandedBirthdays] = useState<Set<string>>(new Set());
@@ -82,17 +83,22 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
     if (!newYear || !newMonth || !newDay) { crossAlert('Error', t('birthdays.enterDate')); return; }
     try {
       const date = `${newYear}-${newMonth.padStart(2, '0')}-${newDay.padStart(2, '0')}`;
-      await addBirthday({
-        name: newName.trim(),
-        date,
-        addedBy: user.uid,
-        addedByName: user.displayName || '',
-        familyId,
-      });
+      if (editingId) {
+        await updateBirthday(editingId, { name: newName.trim(), date });
+      } else {
+        await addBirthday({
+          name: newName.trim(),
+          date,
+          addedBy: user.uid,
+          addedByName: user.displayName || '',
+          familyId,
+        });
+      }
       setNewName('');
       setNewYear('');
       setNewMonth('');
       setNewDay('');
+      setEditingId(null);
       setShowAddModal(false);
       loadData();
     } catch (error) {
@@ -109,6 +115,19 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
+  };
+
+  const handleEdit = () => {
+    const b = birthdays.find(b => b.id === actionModal.id);
+    if (!b) return;
+    const parts = b.date.split('-');
+    setNewName(b.name);
+    setNewDay(parts[2] || '');
+    setNewMonth(parts[1] || '');
+    setNewYear(parts[0] || '');
+    setEditingId(b.id);
+    setActionModal({ visible: false, id: '', title: '' });
+    setShowAddModal(true);
   };
 
   const handleAddGift = async () => {
@@ -362,6 +381,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       <ActionModal
         visible={actionModal.visible}
         title={actionModal.title}
+        onEdit={handleEdit}
         onDelete={handleDelete}
         onCancel={() => setActionModal({ visible: false, id: '', title: '' })}
       />
