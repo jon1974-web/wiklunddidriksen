@@ -388,8 +388,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                       const file = target.files?.[0];
                       if (!file) return;
                       try {
-                        const path = `pets/${familyId || 'temp'}/${Date.now()}_${file.name}`;
-                        const url = await webUploadFile(path, file);
+                        const fileName = `pet_${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                        const path = `pet-photos/${fileName}`;
+                        const blob = new Blob([await file.arrayBuffer()], { type: file.type });
+                        const url = await webUploadFile(path, blob);
                         setPetForm(f => ({ ...f, photoUrl: url }));
                       } catch (err) {
                         crossAlert('Error', getErrorMessage(err));
