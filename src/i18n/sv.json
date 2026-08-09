@@ -980,7 +980,7 @@
     "cameraRequired": "Kamerabehörighet krävs"
   },
   "schoolAI": {
-    "title": "AI-import av klasskontakter",
+    "title": "AI-import av klassekamrater",
     "instruction": "Ta eller välj en bild av kontaktlistan — AI läser ut namn och info automatiskt",
     "takePhoto": "Ta bild",
     "pickImage": "Välj bild",

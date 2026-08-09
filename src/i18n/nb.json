@@ -981,7 +981,7 @@
     "cameraRequired": "Kameratilgang er nødvendig"
   },
   "schoolAI": {
-    "title": "AI-import av klassekontakter",
+    "title": "AI-import av Klassekamerater",
     "instruction": "Ta eller velg et bilde av kontaktlisten — AI leser ut navn og info automatisk",
     "takePhoto": "Ta bilde",
     "pickImage": "Velg bilde",
