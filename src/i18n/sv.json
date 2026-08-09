@@ -975,6 +975,24 @@
     "enterPetName": "Vänligen ange ett namn",
     "enterVetVisitTitle": "Vänligen ange titel och datum",
     "enterMedicationName": "Vänligen ange ett namn",
-    "enterInsuranceInfo": "Vänligen ange försäkringsbolag"
+    "enterInsuranceInfo": "Vänligen ange försäkringsbolag",
+    "cameraRequired": "Kamerabehörighet krävs"
+  },
+  "schoolAI": {
+    "title": "AI-import av klasskontakter",
+    "instruction": "Ta eller välj en bild av kontaktlistan — AI läser ut namn och info automatiskt",
+    "takePhoto": "Ta bild",
+    "pickImage": "Välj bild",
+    "processing": "Behandlar bild...",
+    "noContacts": "Inga kontakter hittades i bilden",
+    "contactsFound": "kontakter hittades",
+    "selectAll": "Välj alla",
+    "deselectAll": "Avmarkera alla",
+    "addSelected": "Lägg till valda",
+    "saving": "Sparar...",
+    "contactsAdded": "kontakter tillagda",
+    "tryAgain": "Försök igen",
+    "timeout": "Timeout. Bilden kan vara för stor eller nätverket är långsamt.",
+    "serverError": "Kunde inte ansluta till servern. Cloud Function kan saknas."
   }
 }

@@ -459,7 +459,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 <TextInput style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text }]} placeholder={t('school.searchContacts')} placeholderTextColor={colors.textDisabled} value={contactSearch} onChangeText={setContactSearch} />
 
                 {/* AI Import Card */}
-                <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#F3E5F5' }]} onPress={() => crossAlert(t('school.comingSoon'), t('school.aiImportText'))}>
+                <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#F3E5F5' }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
                   <Text style={{ fontSize: 20 }}>📸</Text>
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: '#6A1B9A', fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>

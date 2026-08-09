@@ -975,6 +975,24 @@
     "enterPetName": "Indtast venligst et navn",
     "enterVetVisitTitle": "Indtast venligst en titel og dato",
     "enterMedicationName": "Indtast venligst et navn",
-    "enterInsuranceInfo": "Indtast venligst forsikringsselskab"
+    "enterInsuranceInfo": "Indtast venligst forsikringsselskab",
+    "cameraRequired": "Kameraadgang er nødvendig"
+  },
+  "schoolAI": {
+    "title": "AI-import af klassekontakter",
+    "instruction": "Tag eller vælg et billede af kontaktlisten — AI læser navne og info automatisk",
+    "takePhoto": "Tag billede",
+    "pickImage": "Vælg billede",
+    "processing": "Behandler billede...",
+    "noContacts": "Ingen kontakter fundet i billedet",
+    "contactsFound": "kontakter fundet",
+    "selectAll": "Vælg alle",
+    "deselectAll": "Fravælg alle",
+    "addSelected": "Tilføj valgte",
+    "saving": "Gemmer...",
+    "contactsAdded": "kontakter tilføjet",
+    "tryAgain": "Prøv igen",
+    "timeout": "Timeout. Billedet kan være for stort eller nettet er langsomt.",
+    "serverError": "Kunne ikke oprette forbindelse til serveren. Cloud Function kan mangle."
   }
 }

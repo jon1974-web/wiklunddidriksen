@@ -975,6 +975,24 @@
     "enterPetName": "Please enter a name",
     "enterVetVisitTitle": "Please enter title and date",
     "enterMedicationName": "Please enter a name",
-    "enterInsuranceInfo": "Please enter insurance provider"
+    "enterInsuranceInfo": "Please enter insurance provider",
+    "cameraRequired": "Camera access is required"
+  },
+  "schoolAI": {
+    "title": "AI Import Class Contacts",
+    "instruction": "Take or choose a photo of the contact list — AI reads names and info automatically",
+    "takePhoto": "Take photo",
+    "pickImage": "Choose image",
+    "processing": "Processing image...",
+    "noContacts": "No contacts found in the image",
+    "contactsFound": "contacts found",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "addSelected": "Add selected",
+    "saving": "Saving...",
+    "contactsAdded": "contacts added",
+    "tryAgain": "Try again",
+    "timeout": "Timeout. The image may be too large or the network is slow.",
+    "serverError": "Could not connect to server. Cloud Function may be missing."
   }
 }

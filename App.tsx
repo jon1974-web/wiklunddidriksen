@@ -46,6 +46,7 @@ const TransportDetailScreen = React.lazy(() => import('./src/screens/TransportDe
 const SpondEventDetailScreen = React.lazy(() => import('./src/screens/SpondEventDetailScreen').then(m => ({ default: m.SpondEventDetailScreen })));
 const TripItemDetailScreen = React.lazy(() => import('./src/screens/TripItemDetailScreen').then(m => ({ default: m.TripItemDetailScreen })));
 const PackingListDetailScreen = React.lazy(() => import('./src/screens/PackingListDetailScreen').then(m => ({ default: m.PackingListDetailScreen })));
+const SchoolAIScreen = React.lazy(() => import('./src/screens/SchoolAIScreen').then(m => ({ default: m.SchoolAIScreen })));
 
 const SuspenseFallback = () => (
   <ActivityIndicator size="large" style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />
@@ -75,6 +76,7 @@ type RootStackParamList = {
   BirthdaySpace: undefined;
   PetSpace: undefined;
   SchoolSpace: undefined;
+  SchoolAI: { childId: string; yearId: string; familyId: string };
   AddTrip: undefined;
   TripDetail: { trip: Trip };
   TransportDetail: { flight: import('./src/types').TripFlight; tripId: string };
@@ -240,6 +242,13 @@ const TripsStack = () => {
           name="SchoolSpace"
           component={SchoolSpaceScreen}
           options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SchoolAI"
+          component={SchoolAIScreen}
+          options={{
+            headerShown: false,
+          }}
         />
         <Stack.Screen
           name="TripsList"

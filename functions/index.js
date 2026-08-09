@@ -378,8 +378,8 @@ exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       return res.status(400).json({ error: "No image data received" });
     }
 
-    if (type !== "event" && type !== "recipe") {
-      return res.status(400).json({ error: "Invalid type. Only 'event' and 'recipe' are supported." });
+    if (type !== "event" && type !== "recipe" && type !== "classlist") {
+      return res.status(400).json({ error: "Invalid type. Only 'event', 'recipe', and 'classlist' are supported." });
     }
 
     const today = new Date().toISOString().split("T")[0];
@@ -423,6 +423,46 @@ Return ONLY valid JSON with this exact structure:
   ]
 }`;
       userText = "Extract all events visible in this image.";
+    } else if (type === "classlist") {
+      systemPrompt = `You are a class list parser. Extract ALL people (classmates and their parents) visible in this image and return structured data.
+
+For each person found, extract:
+- name: The child/student's name
+- childPhone: Child's phone number if visible, or empty string
+- childEmail: Child's email if visible, or empty string
+- parentName: First parent's name if visible, or empty string
+- parentPhone: First parent's phone if visible, or empty string
+- parentEmail: First parent's email if visible, or empty string
+- parentName2: Second parent's name if visible, or empty string
+- parentPhone2: Second parent's phone if visible, or empty string
+- parentEmail2: Second parent's email if visible, or empty string
+- address: Home address if visible, or empty string
+
+Norwegian names: Common Norwegian first names include Emma, Noah, Olivia, Liam, Mia, Lucas, Sophie, Ola, Kari, etc.
+Norwegian phone numbers: Typically 8 digits, often written as "XXX XX XXX" or "XXXX XXXX".
+
+If only one person is found, return an array with one element.
+If multiple people are found, return ALL of them.
+If no people can be identified, return an empty array.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "contacts": [
+    {
+      "name": "child name",
+      "childPhone": "phone or empty string",
+      "childEmail": "email or empty string",
+      "parentName": "parent name or empty string",
+      "parentPhone": "parent phone or empty string",
+      "parentEmail": "parent email or empty string",
+      "parentName2": "second parent name or empty string",
+      "parentPhone2": "second parent phone or empty string",
+      "parentEmail2": "second parent email or empty string",
+      "address": "address or empty string"
+    }
+  ]
+}`;
+      userText = "Extract all classmates and their parent contact information visible in this image.";
     } else {
       systemPrompt = `You are a recipe parser. Extract ALL recipes visible in this image and return structured data.
 
@@ -504,7 +544,7 @@ Return ONLY valid JSON with this exact structure:
         reminderMinutes: e.reminderMinutes || 30,
       }));
       return res.status(200).json({ events: normalized });
-    } else {
+    } else if (type === "recipe") {
       const recipes = Array.isArray(result.recipes) ? result.recipes : [];
       const validCategories = ["kylling", "kjoett", "fisk", "vegetar", "pasta", "gryte", "suppe", "frokost", "sott"];
       const normalized = recipes.map((r) => ({
@@ -523,6 +563,21 @@ Return ONLY valid JSON with this exact structure:
         cuisine: r.cuisine || "",
       }));
       return res.status(200).json({ recipes: normalized });
+    } else if (type === "classlist") {
+      const contacts = Array.isArray(result.contacts) ? result.contacts : [];
+      const normalized = contacts.map((c) => ({
+        name: c.name || "",
+        childPhone: c.childPhone || "",
+        childEmail: c.childEmail || "",
+        parentName: c.parentName || "",
+        parentPhone: c.parentPhone || "",
+        parentEmail: c.parentEmail || "",
+        parentName2: c.parentName2 || "",
+        parentPhone2: c.parentPhone2 || "",
+        parentEmail2: c.parentEmail2 || "",
+        address: c.address || "",
+      }));
+      return res.status(200).json({ contacts: normalized });
     }
   } catch (error) {
     console.error("Photo to data error:", error.message, error.stack);

@@ -975,6 +975,24 @@
     "enterPetName": "Anna nimi",
     "enterVetVisitTitle": "Anna otsikko ja päivämäärä",
     "enterMedicationName": "Anna nimi",
-    "enterInsuranceInfo": "Anna vakuutusyhtiö"
+    "enterInsuranceInfo": "Anna vakuutusyhtiö",
+    "cameraRequired": "Kameran käyttö vaaditaan"
+  },
+  "schoolAI": {
+    "title": "AI-tuonti luokan yhteystiedot",
+    "instruction": "Ota tai valitse kuva yhteystietoluettelosta — AI lukee nimet ja tiedot automaattisesti",
+    "takePhoto": "Ota kuva",
+    "pickImage": "Valitse kuva",
+    "processing": "Käsitellään kuvaa...",
+    "noContacts": "Ei yhteystietoja kuvasta",
+    "contactsFound": "yhteystietoa löytyi",
+    "selectAll": "Valitse kaikki",
+    "deselectAll": "Poista valinnat",
+    "addSelected": "Lisää valitut",
+    "saving": "Tallennetaan...",
+    "contactsAdded": "yhteystietoa lisätty",
+    "tryAgain": "Yritä uudelleen",
+    "timeout": "Aikakatkaisu. Kuva voi olla liian suuri tai verkko on hidas.",
+    "serverError": "Yhteys palvelimeen epäonnistui. Cloud Function voi puuttua."
   }
 }

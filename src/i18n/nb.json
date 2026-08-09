@@ -976,6 +976,24 @@
     "enterPetName": "Vennligst skriv inn navn",
     "enterVetVisitTitle": "Vennligst skriv inn tittel og dato",
     "enterMedicationName": "Vennligst skriv inn navn",
-    "enterInsuranceInfo": "Vennligst skriv inn forsikringsselskap"
+    "enterInsuranceInfo": "Vennligst skriv inn forsikringsselskap",
+    "cameraRequired": "Kameratilgang er nødvendig"
+  },
+  "schoolAI": {
+    "title": "AI-import av klassekontakter",
+    "instruction": "Ta eller velg et bilde av kontaktlisten — AI leser ut navn og info automatisk",
+    "takePhoto": "Ta bilde",
+    "pickImage": "Velg bilde",
+    "processing": "Behandler bilde...",
+    "noContacts": "Ingen kontakter funnet i bildet",
+    "contactsFound": "kontakter funnet",
+    "selectAll": "Velg alle",
+    "deselectAll": "Fjern alle",
+    "addSelected": "Legg til valgte",
+    "saving": "Lagrer...",
+    "contactsAdded": "kontakter lagt til",
+    "tryAgain": "Prøv igjen",
+    "timeout": "Tidsavbrudd. Bildet kan være for stort eller nettverket er tregt.",
+    "serverError": "Kunne ikke koble til serveren. Cloud Function kan mangle."
   }
 }
