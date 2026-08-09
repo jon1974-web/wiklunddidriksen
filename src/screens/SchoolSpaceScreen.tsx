@@ -443,7 +443,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   </TouchableOpacity>
                 </View>
                 {teachers.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c })}>
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
                       {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{c.subject}</Text> : null}
@@ -481,7 +481,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </TouchableOpacity>
 
                 {filteredClassmates.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c })}>
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
                       {c.parentName ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{t('school.parent')}: {c.parentName}</Text> : null}

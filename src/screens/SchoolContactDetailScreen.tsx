@@ -7,13 +7,13 @@ import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 interface SchoolContactDetailScreenProps {
   navigation: any;
-  route: { params: { contact: SchoolContact } };
+  route: { params: { contact: SchoolContact; childId?: string; yearId?: string } };
 }
 
 export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
-  const { contact } = route.params;
+  const { contact, childId, yearId } = route.params;
 
   const mapUrl = useMemo(() => {
     return contact.address ? getStaticMapUrl(contact.address, 15, '600x300') : null;
@@ -151,9 +151,19 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         </View>
       )}
 
-      <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.accent }]} onPress={() => navigation.goBack()}>
-        <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>{t('common.close')}</Text>
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+        <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => navigation.goBack()}>
+          <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600' }}>{t('common.close')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.accent, flex: 1 }]} onPress={() => {
+          navigation.goBack();
+          setTimeout(() => {
+            navigation.navigate('SchoolSpace', { editContactId: contact.id });
+          }, 100);
+        }}>
+          <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>{t('common.edit')}</Text>
+        </TouchableOpacity>
+      </View>
 
       <View style={{ height: 40 }} />
     </ScrollView>
