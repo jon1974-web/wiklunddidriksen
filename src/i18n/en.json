@@ -216,6 +216,8 @@
     "autumn": "Fall",
     "spring": "Spring",
     "importFromImage": "Import from image",
+    "importClassList": "Import class list from image",
+    "classContacts": "Class contacts",
     "aiImportText": "Take a photo of the class contact list — AI reads names and info automatically",
     "aiDescription": "AI recognizes children, parents, names, phone numbers and email addresses",
     "comingSoon": "Coming soon",

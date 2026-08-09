@@ -217,6 +217,8 @@
     "autumn": "Høst",
     "spring": "Vår",
     "importFromImage": "Importer fra bilde",
+    "importClassList": "Importer klasseliste fra bilde",
+    "classContacts": "Klassekontakter",
     "aiImportText": "Ta bilde av kontaktlisten fra skolen — AI leser ut navn og info automatisk",
     "aiDescription": "AI gjenkjenner barn, foreldre, navn, telefonnumre og e-postadresser",
     "comingSoon": "Snart tilgjengelig",

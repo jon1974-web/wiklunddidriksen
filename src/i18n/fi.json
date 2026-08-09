@@ -216,6 +216,8 @@
     "autumn": "Syksy",
     "spring": "Kevät",
     "importFromImage": "Tuo kuvasta",
+    "importClassList": "Tuo luettelo kuvasta",
+    "classContacts": "Luokkayhteystiedot",
     "aiImportText": "Ota kuva luokan yhteystietoluettelosta — AI lukee nimet ja tiedot automaattisesti",
     "aiDescription": "AI tunnistaa lapset, vanhemmat, nimet, puhelinnumerot ja sähköpostiosoitteet",
     "comingSoon": "Tulossa pian",

@@ -417,7 +417,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 <View style={styles.sectionHeader}>
                   <View style={styles.sectionTitleRow}>
                     <Text style={styles.sectionIcon}>👩‍🏫</Text>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.teachers')}</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.classContacts')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({teachers.length})</Text>
                   </View>
                   <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', name: '', subject: '', childName: '', parentName: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
@@ -456,9 +456,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
                 {/* AI Import Card */}
                 <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#F3E5F5' }]} onPress={() => crossAlert(t('school.comingSoon'), t('school.aiImportText'))}>
-                  <Text style={{ fontSize: 20 }}>🤖</Text>
+                  <Text style={{ fontSize: 20 }}>📸</Text>
                   <View style={{ flex: 1 }}>
-                    <Text style={{ color: '#6A1B9A', fontWeight: '600', fontSize: 14 }}>{t('school.importFromImage')}</Text>
+                    <Text style={{ color: '#6A1B9A', fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
                     <Text style={{ color: '#8E24AA', fontSize: 12 }}>{t('school.aiDescription')}</Text>
                   </View>
                 </TouchableOpacity>
