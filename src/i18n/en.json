@@ -200,7 +200,8 @@
     "date": "Date",
     "startTime": "Start time",
     "endTime": "End time",
-    "location": "Location / Doctor",
+    "location": "Location",
+    "doctor": "Doctor",
     "locationPlaceholder": "e.g. Family doctor office",
     "vaccinationName": "Vaccine name",
     "vaccinationNamePlaceholder": "e.g. MMR",
@@ -243,6 +244,7 @@
     "dateTo": "To date",
     "reminder": "Reminder",
     "noReminder": "None",
+    "status": "Status",
     "reminder1Day": "1 day before",
     "reminder3Days": "3 days before",
     "reminder1Week": "1 week before"

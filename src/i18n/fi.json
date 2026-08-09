@@ -200,7 +200,8 @@
     "date": "Päivämäärä",
     "startTime": "Aloitusaika",
     "endTime": "Lopetusaika",
-    "location": "Paikka / Lääkäri",
+    "location": "Paikka",
+    "doctor": "Lääkäri",
     "locationPlaceholder": "esim. Terveydenhoitaja",
     "vaccinationName": "Rokotuksen nimi",
     "vaccinationNamePlaceholder": "esim. MMR",
@@ -243,6 +244,7 @@
     "dateTo": "Lopetuspäivä",
     "reminder": "Muistutus",
     "noReminder": "Ei muistutusta",
+    "status": "Status",
     "reminder1Day": "1 päivä ennen",
     "reminder3Days": "3 päivää ennen",
     "reminder1Week": "1 viikko ennen"

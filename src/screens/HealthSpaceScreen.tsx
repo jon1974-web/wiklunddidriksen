@@ -52,7 +52,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
-  const [apptForm, setApptForm] = useState({ title: '', person: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
+  const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
@@ -120,7 +120,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           const user = useUserStore.getState().user;
           notifyHealthItem(familyId, apptForm.title, apptForm.date, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
         }
-        setApptForm({ title: '', person: persons[0] || '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
+        setApptForm({ title: '', person: persons[0] || '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
         let savedVacc;
@@ -197,7 +197,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) setMedForm({ name: item.name, person: item.person, dosage: item.dosage, frequency: item.frequency, dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
     } else if (section === 'appointments') {
       const item = appointments.find(a => a.id === id);
-      if (item) setApptForm({ title: item.title, person: item.person, date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '' });
+      if (item) setApptForm({ title: item.title, person: item.person, doctor: item.doctor || '', date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '' });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
       if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', location: item.location || '', note: item.note || '' });
@@ -442,6 +442,15 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     </View>
                   </View>
                   <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.doctor')}</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      value={apptForm.doctor}
+                      onChangeText={(v) => setApptForm(f => ({ ...f, doctor: v }))}
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+                  <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.location')}</Text>
                     <GooglePlacesInput
                       value={apptForm.location}
@@ -666,6 +675,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
                     <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.person}</Text>
                   </View>
+                  {detailModal.item.doctor ? (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.doctor')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.doctor}</Text>
+                    </View>
+                  ) : null}
                   <View style={styles.detailRow}>
                     <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.date')}</Text>
                     <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
@@ -680,6 +695,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                       <Text style={[styles.detailValue, { color: colors.accent }]}>{detailModal.item.location}</Text>
                     </View>
                   )}
+                  {detailModal.item.reminder ? (
+                    <View style={styles.detailRow}>
+                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.reminder')}</Text>
+                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.reminder}</Text>
+                    </View>
+                  ) : null}
                   {detailModal.item.note && (
                     <View style={styles.detailRow}>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.note')}</Text>

@@ -201,7 +201,8 @@
     "date": "Dato",
     "startTime": "Starttid",
     "endTime": "Sluttid",
-    "location": "Sted / Lege",
+    "location": "Sted",
+    "doctor": "Lege",
     "locationPlaceholder": "F.eks. Fastlegekontoret",
     "vaccinationName": "Navn på vaksine",
     "vaccinationNamePlaceholder": "F.eks. MMR",
@@ -244,6 +245,7 @@
     "dateTo": "Til dato",
     "reminder": "Påminnelse",
     "noReminder": "Ingen",
+    "status": "Status",
     "reminder1Day": "1 dag før",
     "reminder3Days": "3 dager før",
     "reminder1Week": "1 uke før"

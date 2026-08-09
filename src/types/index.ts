@@ -311,6 +311,7 @@ export interface PetVetVisit {
   petId: string;
   familyId: string;
   title: string;
+  doctor?: string;
   date: string;
   startTime: string;
   endTime?: string;
@@ -464,6 +465,7 @@ export interface HealthAppointment {
   id: string;
   title: string;
   person: string;
+  doctor?: string;
   date: string;
   startTime: string;
   endTime?: string;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +25,7 @@ import {
 import { Pet, PetVetVisit, PetMedication, PetFood, PetGrooming, PetVaccination, PetInsurance } from '../types';
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
+import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 const PET_ICONS: Record<string, string> = { 'Katt': '🐱', 'Hund': '🐶', 'Fisk': '🐟', 'Fugl': '🐦', 'Kanin': '🐰', 'Hamster': '🐹', 'Skilpadde': '🐢', 'Hest': '🐴', 'Anna': '🐾' };
 const PET_TYPES = ['Katt', 'Hund', 'Fisk', 'Fugl', 'Kanin', 'Skilpadde', 'Hamster', 'Hest', 'Anna'];
@@ -65,7 +66,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
   const [detailModal, setDetailModal] = useState<{ visible: boolean; item: any; section: PetSectionType }>({ visible: false, item: null, section: 'vetVisits' });
   const [activePicker, setActivePicker] = useState<string | null>(null);
 
-  const [vetForm, setVetForm] = useState({ title: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed' });
+  const [vetForm, setVetForm] = useState({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed' });
   const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -119,7 +120,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
     const { id, section } = editingItem;
     if (section === 'vetVisits') {
       const item = vetVisits.find(v => v.id === id);
-      if (item) setVetForm({ title: item.title, date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', status: item.status });
+      if (item) setVetForm({ title: item.title, doctor: item.doctor || '', date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', status: item.status });
     } else if (section === 'medications') {
       const item = medications.find(m => m.id === id);
       if (item) setMedForm({ name: item.name, dosage: item.dosage, frequency: item.frequency, dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
@@ -210,7 +211,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
           const docRef = await addDoc(collection(db, 'events'), eventData);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.date, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
-        setVetForm({ title: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
+        setVetForm({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
       } else if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetMedication(editingItem.id, medForm);
@@ -296,7 +297,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
   };
 
   const resetItemForms = () => {
-    setVetForm({ title: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
+    setVetForm({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
     setMedForm({ name: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
     setFoodForm({ name: '', time: '', amount: '', note: '' });
     setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -725,6 +726,15 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                       </View>
                     </View>
                     <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.doctor')}</Text>
+                      <TextInput
+                        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                        value={vetForm.doctor}
+                        onChangeText={(v) => setVetForm(f => ({ ...f, doctor: v }))}
+                        placeholderTextColor={colors.textDisabled}
+                      />
+                    </View>
+                    <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.location')}</Text>
                       <GooglePlacesInput
                         value={vetForm.location}
@@ -938,6 +948,12 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('pets.vetTitle')}</Text>
                       <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.title}</Text>
                     </View>
+                    {detailModal.item.doctor ? (
+                      <View style={styles.detailRow}>
+                        <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.doctor')}</Text>
+                        <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.doctor}</Text>
+                      </View>
+                    ) : null}
                     <View style={styles.detailRow}>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('common.date')}</Text>
                       <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
@@ -952,6 +968,12 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                         <Text style={[styles.detailValue, { color: PET_THEME }]}>{detailModal.item.location}</Text>
                       </View>
                     )}
+                    {detailModal.item.reminder ? (
+                      <View style={styles.detailRow}>
+                        <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.reminder')}</Text>
+                        <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.reminder}</Text>
+                      </View>
+                    ) : null}
                     <View style={styles.detailRow}>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.status')}</Text>
                       <Text style={[styles.detailValue, { color: (detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? '#43A047' : '#FB8C00' }]}>{(detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? t('health.completed') : t('health.pending')}</Text>
@@ -962,6 +984,14 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                         <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.note}</Text>
                       </View>
                     )}
+                    {detailModal.item.location && (() => {
+                      const mapUrl = getStaticMapUrl(detailModal.item.location);
+                      return mapUrl ? (
+                        <TouchableOpacity style={{ marginTop: 12 }} onPress={() => Linking.openURL(getGoogleMapsUrl(detailModal.item.location))}>
+                          <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 150, borderRadius: 12 }} resizeMode="cover" />
+                        </TouchableOpacity>
+                      ) : null;
+                    })()}
                   </>
                 )}
                 {detailModal.item && detailModal.section === 'medications' && (
