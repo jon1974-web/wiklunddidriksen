@@ -220,7 +220,7 @@
     "importClassList": "Importer klasseliste fra bilde",
     "classContacts": "Klassekontakter",
     "aiImportText": "Ta bilde av kontaktlisten fra skolen — AI leser ut navn og info automatisk",
-    "aiDescription": "AI gjenkjenner barn, foreldre, navn, telefonnumre og e-postadresser",
+    "aiDescription": "AI gjenkjenner barn, opptil to foreldre per barn, navn, telefonnumre og e-postadresser",
     "comingSoon": "Snart tilgjengelig",
     "deleteScheduleConfirm": "Er du sikker på at du vil slette denne timeplanen?",
     "helpTitle": "Skole",

@@ -46,7 +46,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [yearForm, setYearForm] = useState({ year: '', grade: '', school: '' });
 
   const [showAddContactModal, setShowAddContactModal] = useState(false);
-  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', name: '', subject: '', childName: '', parentName: '', phone: '', email: '', notes: '' });
+  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', name: '', subject: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [contactActionModal, setContactActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
@@ -165,7 +165,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       } else {
         await addSchoolContact(data as any);
       }
-      setContactForm({ role: 'teacher', name: '', subject: '', childName: '', parentName: '', phone: '', email: '', notes: '' });
+      setContactForm({ role: 'teacher', name: '', subject: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
       setEditingContactId(null);
       setShowAddContactModal(false);
       loadYearData();
@@ -203,6 +203,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     setContactForm({
       role: contact.role, name: contact.name, subject: contact.subject || '',
       childName: (contact as any).childName || '', parentName: contact.parentName || '',
+      parentPhone: contact.parentPhone || '', parentEmail: contact.parentEmail || '',
+      parentName2: contact.parentName2 || '', parentPhone2: contact.parentPhone2 || '', parentEmail2: contact.parentEmail2 || '',
       phone: contact.childPhone || contact.parentPhone || '', email: contact.childEmail || contact.parentEmail || '',
       notes: contact.notes || '',
     });
@@ -447,7 +449,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({classmates.length})</Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 8 }}>
-                    <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'classmate', name: '', subject: '', childName: '', parentName: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                    <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'classmate', name: '', subject: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                       <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                     </TouchableOpacity>
                   </View>
@@ -470,6 +472,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                       {c.parentName ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{t('school.parent')}: {c.parentName}</Text> : null}
                       {c.parentPhone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {c.parentPhone}</Text> : null}
                       {c.parentEmail ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {c.parentEmail}</Text> : null}
+                      {c.parentName2 ? <Text style={{ color: colors.textSecondary, fontSize: 13, marginTop: 4 }}>{t('school.parent')} 2: {c.parentName2}</Text> : null}
+                      {c.parentPhone2 ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {c.parentPhone2}</Text> : null}
+                      {c.parentEmail2 ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {c.parentEmail2}</Text> : null}
                       {c.notes ? <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 4 }}>{c.notes}</Text> : null}
                       {renderContactActions(c.parentPhone, c.parentEmail)}
                     </View>
@@ -567,10 +572,16 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.subject} onChangeText={(v) => setContactForm(f => ({ ...f, subject: v }))} placeholderTextColor={colors.textDisabled} />
                   </View>
                 ) : (
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>{t('school.parentName')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentName} onChangeText={(v) => setContactForm(f => ({ ...f, parentName: v }))} placeholderTextColor={colors.textDisabled} />
-                  </View>
+                  <>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.parentName')} 1</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentName} onChangeText={(v) => setContactForm(f => ({ ...f, parentName: v }))} placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.parentName')} 2</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentName2} onChangeText={(v) => setContactForm(f => ({ ...f, parentName2: v }))} placeholderTextColor={colors.textDisabled} />
+                    </View>
+                  </>
                 )}
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('school.phone')}</Text>

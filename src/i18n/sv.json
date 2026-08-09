@@ -219,7 +219,7 @@
     "importClassList": "Importera klasslista från bild",
     "classContacts": "Klasskontakter",
     "aiImportText": "Ta en bild av klassens kontaktlista — AI läser ut namn och info automatiskt",
-    "aiDescription": "AI känner igen barn, föräldrar, namn, telefonnummer och e-postadresser",
+    "aiDescription": "AI känner igen barn, upp till två föräldrar per barn, namn, telefonnummer och e-postadresser",
     "comingSoon": "Kommer snart",
     "deleteScheduleConfirm": "Är du säker på att du vill ta bort detta schema?",
     "helpTitle": "Skola",

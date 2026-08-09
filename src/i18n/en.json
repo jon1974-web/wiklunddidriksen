@@ -219,7 +219,7 @@
     "importClassList": "Import class list from image",
     "classContacts": "Class contacts",
     "aiImportText": "Take a photo of the class contact list — AI reads names and info automatically",
-    "aiDescription": "AI recognizes children, parents, names, phone numbers and email addresses",
+    "aiDescription": "AI recognizes children, up to two parents per child, names, phone numbers and email addresses",
     "comingSoon": "Coming soon",
     "deleteScheduleConfirm": "Are you sure you want to delete this schedule?",
     "helpTitle": "School",

@@ -543,6 +543,9 @@ export interface SchoolContact {
   parentName?: string;
   parentPhone?: string;
   parentEmail?: string;
+  parentName2?: string;
+  parentPhone2?: string;
+  parentEmail2?: string;
   notes?: string;
   familyId: string;
   createdAt: number;

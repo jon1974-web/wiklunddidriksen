@@ -219,7 +219,7 @@
     "importClassList": "Importer klasseoversigt fra billede",
     "classContacts": "Klassekontakter",
     "aiImportText": "Tag et billede af klassens kontaktliste — AI læser navne og info automatisk",
-    "aiDescription": "AI genkender børn, forældre, navne, telefonnumre og e-mailadresser",
+    "aiDescription": "AI genkender børn, op til to forældre per barn, navne, telefonnumre og e-mailadresser",
     "comingSoon": "Kommer snart",
     "deleteScheduleConfirm": "Er du sikker på, at du vil slette dette skema?",
     "helpTitle": "Skole",

@@ -219,7 +219,7 @@
     "importClassList": "Tuo luettelo kuvasta",
     "classContacts": "Luokkayhteystiedot",
     "aiImportText": "Ota kuva luokan yhteystietoluettelosta — AI lukee nimet ja tiedot automaattisesti",
-    "aiDescription": "AI tunnistaa lapset, vanhemmat, nimet, puhelinnumerot ja sähköpostiosoitteet",
+    "aiDescription": "AI tunnistaa lapset, kaksi vanhempia lapsia kohti, nimet, puhelinnumerot ja sähköpostiosoitteet",
     "comingSoon": "Tulossa pian",
     "deleteScheduleConfirm": "Haluatko varmasti poistaa tämän aikataulun?",
     "helpTitle": "Koulu",
