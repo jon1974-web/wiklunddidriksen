@@ -552,7 +552,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>{editingContactId ? t('school.editContact') : t('school.addContact')}</Text>
               <ScrollView>
-                <Text style={[styles.label, { color: colors.text, fontWeight: '700', fontSize: 16, marginBottom: 12 }]}>{contactForm.role === 'teacher' ? t('school.addContactTeacher') : t('school.addContactClassmate')}</Text>
+                <Text style={[styles.label, { color: colors.text, fontWeight: '700', fontSize: 16, marginBottom: 12 }]}>{contactForm.role === 'teacher' ? '👩‍🏫 ' + t('school.addContactTeacher') : '👦 ' + t('school.addContactClassmate')}</Text>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{contactForm.role === 'teacher' ? t('school.teacherName') : t('school.childName')}</Text>
                   <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.name} onChangeText={(v) => setContactForm(f => ({ ...f, name: v }))} placeholderTextColor={colors.textDisabled} />
