@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, TextInput, Modal, Alert, Image, Linking } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, TextInput, Modal, Alert, Image, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +10,7 @@ import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 
-import { notifyHealthItem } from '../services/familyService';
+import { notifyHealthItem, getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import {
   getHealthMedications, addHealthMedication, updateHealthMedication, deleteHealthMedication,
@@ -49,6 +49,8 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [detailModal, setDetailModal] = useState<{ visible: boolean; item: any; section: SectionType }>({ visible: false, item: null, section: 'medications' });
   const [showHelp, setShowHelp] = useState(false);
   const [activePicker, setActivePicker] = useState<string | null>(null);
+  const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
+  const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
@@ -79,6 +81,14 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       setVaccinations(vaccs);
       setAllergies(alls);
       setGrowth(grow);
+      const user = useUserStore.getState().user;
+      if (user) {
+        const profile = await getUserProfile(user.uid);
+        if (profile?.calendarEmail) {
+          setUserCalendarEmail(profile.calendarEmail);
+          setUserCalendarProvider(profile.calendarProvider || 'google');
+        }
+      }
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -668,54 +678,94 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               )}
               {detailModal.item && detailModal.section === 'appointments' && (
                 <>
-                  <View style={styles.detailRow}>
-                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.appointmentTitle')}</Text>
-                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.title}</Text>
-                  </View>
-                  <View style={styles.detailRow}>
-                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
-                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.person}</Text>
-                  </View>
-                  {detailModal.item.doctor ? (
-                    <View style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.doctor')}</Text>
-                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.doctor}</Text>
+                  <View style={[styles.viewCard, { backgroundColor: colors.background }]}>
+                    <Text style={styles.viewIcon}>🏥</Text>
+                    <Text style={[styles.viewTitle, { color: colors.text }]}>{detailModal.item.title}</Text>
+                    {detailModal.item.person && (
+                      <Text style={[styles.viewDescription, { color: colors.textSecondary }]}>👤 {detailModal.item.person}</Text>
+                    )}
+                    {detailModal.item.doctor && (
+                      <Text style={[styles.viewDescription, { color: colors.textSecondary }]}>🩺 {detailModal.item.doctor}</Text>
+                    )}
+                    <View style={[styles.viewDivider, { backgroundColor: colors.border }]} />
+                    <View style={styles.viewDetailRow}>
+                      <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅 {t('health.date')}</Text>
+                      <Text style={[styles.viewDetailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
                     </View>
-                  ) : null}
-                  <View style={styles.detailRow}>
-                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.date')}</Text>
-                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
+                    <View style={styles.viewDetailRow}>
+                      <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐 {t('health.startTime')}</Text>
+                      <Text style={[styles.viewDetailValue, { color: colors.text }]}>{detailModal.item.startTime}{detailModal.item.endTime ? ` - ${detailModal.item.endTime}` : ''}</Text>
+                    </View>
+                    {detailModal.item.location && (
+                      <View style={styles.viewDetailRow}>
+                        <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍 {t('health.location')}</Text>
+                        <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{detailModal.item.location}</Text>
+                      </View>
+                    )}
+                    {detailModal.item.reminder && (
+                      <View style={styles.viewDetailRow}>
+                        <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔 {t('health.reminder')}</Text>
+                        <Text style={[styles.viewDetailValue, { color: colors.text }]}>{detailModal.item.reminder}</Text>
+                      </View>
+                    )}
+                    {detailModal.item.note && (
+                      <View style={styles.viewDetailRow}>
+                        <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📝 {t('health.note')}</Text>
+                        <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={3}>{detailModal.item.note}</Text>
+                      </View>
+                    )}
                   </View>
-                  <View style={styles.detailRow}>
-                    <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.startTime')}</Text>
-                    <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.startTime}{detailModal.item.endTime ? ` - ${detailModal.item.endTime}` : ''}</Text>
-                  </View>
-                  {detailModal.item.location && (
-                    <View style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.location')}</Text>
-                      <Text style={[styles.detailValue, { color: colors.accent }]}>{detailModal.item.location}</Text>
-                    </View>
-                  )}
-                  {detailModal.item.reminder ? (
-                    <View style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.reminder')}</Text>
-                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.reminder}</Text>
-                    </View>
-                  ) : null}
-                  {detailModal.item.note && (
-                    <View style={styles.detailRow}>
-                      <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.note')}</Text>
-                      <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.note}</Text>
-                    </View>
-                  )}
                   {detailModal.item.location && (() => {
                     const mapUrl = getStaticMapUrl(detailModal.item.location);
                     return mapUrl ? (
-                      <TouchableOpacity style={{ marginTop: 12 }} onPress={() => Linking.openURL(getGoogleMapsUrl(detailModal.item.location))}>
-                        <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 150, borderRadius: 12 }} resizeMode="cover" />
+                      <TouchableOpacity
+                        style={[styles.viewMapContainer, { backgroundColor: colors.surface }]}
+                        onPress={() => Linking.openURL(getGoogleMapsUrl(detailModal.item.location))}
+                      >
+                        <Image source={{ uri: mapUrl }} style={styles.viewMapImage} />
+                        <Text style={[styles.viewMapLabel, { color: colors.accent }]}>{t('tips.openGoogleMaps')}</Text>
                       </TouchableOpacity>
                     ) : null;
                   })()}
+                  {Platform.OS === 'web' && (
+                    <View style={{ marginTop: 8 }}>
+                      {userCalendarProvider && userCalendarEmail ? (
+                        <TouchableOpacity
+                          style={[styles.calendarWebButton, { backgroundColor: userCalendarProvider === 'google' ? '#4285F4' : '#0078D4' }]}
+                          onPress={() => {
+                            const [h, m] = (detailModal.item.startTime || '09:00').split(':').map(Number);
+                            const start = new Date(detailModal.item.date);
+                            start.setHours(h, m, 0, 0);
+                            let end: Date;
+                            if (detailModal.item.endTime) {
+                              const [eh, em] = detailModal.item.endTime.split(':').map(Number);
+                              end = new Date(detailModal.item.date);
+                              end.setHours(eh, em, 0, 0);
+                            } else {
+                              end = new Date(start.getTime() + 60 * 60 * 1000);
+                            }
+                            if (userCalendarProvider === 'google') {
+                              const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+                              const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(detailModal.item.title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(detailModal.item.note || '')}&location=${encodeURIComponent(detailModal.item.location || '')}`;
+                              Linking.openURL(url);
+                            } else {
+                              const fmt = (d: Date) => d.toISOString();
+                              const url = `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(detailModal.item.title)}&startdt=${fmt(start)}&enddt=${fmt(end)}&body=${encodeURIComponent(detailModal.item.note || '')}&location=${encodeURIComponent(detailModal.item.location || '')}`;
+                              Linking.openURL(url);
+                            }
+                          }}
+                        >
+                          <Text style={styles.calendarWebButtonText}>
+                            {userCalendarProvider === 'google' ? t('calendar.addToGoogle') : t('calendar.addToOutlook')}
+                          </Text>
+                        </TouchableOpacity>
+                      ) : (
+                        <Text style={[styles.sectionLabel, { color: colors.textDisabled, textAlign: 'center' }]}>
+                          {t('calendar.saveEmailProfile')}
+                        </Text>
+                      )}
+                    </View>
+                  )}
                 </>
               )}
               {detailModal.item && detailModal.section === 'vaccinations' && (
@@ -915,4 +965,18 @@ const styles = StyleSheet.create({
   detailRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   detailLabel: { fontSize: 14, fontWeight: '600' },
   detailValue: { fontSize: 14, flex: 1, textAlign: 'right' },
+  viewCard: { borderRadius: 12, padding: 20, marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  viewIcon: { fontSize: 42, marginBottom: 10 },
+  viewTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 8 },
+  viewDescription: { fontSize: 15, lineHeight: 20, marginBottom: 4 },
+  viewDivider: { height: 1, marginVertical: 12 },
+  viewDetailRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 10 },
+  viewDetailLabel: { fontSize: 14, flex: 1 },
+  viewDetailValue: { fontSize: 14, fontWeight: '500', flex: 2, textAlign: 'right' },
+  viewMapContainer: { borderRadius: 12, overflow: 'hidden', marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  viewMapImage: { width: '100%', height: 180 },
+  viewMapLabel: { fontSize: 14, fontWeight: '600', textAlign: 'center', padding: 10 },
+  calendarWebButton: { padding: 14, borderRadius: 12, alignItems: 'center' },
+  calendarWebButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  sectionLabel: { fontSize: 13, fontWeight: '600' },
 });
