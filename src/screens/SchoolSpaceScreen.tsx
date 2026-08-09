@@ -161,14 +161,15 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!familyId || !selectedChild || !selectedYear) return;
     if (!contactForm.name.trim()) { crossAlert('Error', t('school.enterContactName')); return; }
     try {
-      const data = {
+      const rawData = {
         ...contactForm,
         childId: selectedChild.id,
         yearId: selectedYear.id,
         familyId,
-        childPhone: contactForm.role === 'classmate' ? contactForm.phone : undefined,
-        childEmail: contactForm.role === 'classmate' ? contactForm.email : undefined,
+        childPhone: contactForm.role === 'classmate' ? contactForm.phone : '',
+        childEmail: contactForm.role === 'classmate' ? contactForm.email : '',
       };
+      const data = Object.fromEntries(Object.entries(rawData).filter(([_, v]) => v !== '' && v != null));
       if (editingContactId) {
         await updateSchoolContact(editingContactId, data as any);
       } else {
