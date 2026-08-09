@@ -47,9 +47,6 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         {isTeacher && contact.subject && (
           <Text style={[s.viewDescription, { color: colors.textSecondary }]}>📚 {contact.subject}</Text>
         )}
-        {!isTeacher && contact.parentName && (
-          <Text style={[s.viewDescription, { color: colors.textSecondary }]}>👤 {contact.parentName}</Text>
-        )}
         <View style={[s.viewDivider, { backgroundColor: colors.border }]} />
 
         {contact.childPhone && (
