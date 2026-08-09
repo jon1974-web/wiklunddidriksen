@@ -574,23 +574,43 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 ) : (
                   <>
                     <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{t('school.parentName')} 1</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentName} onChangeText={(v) => setContactForm(f => ({ ...f, parentName: v }))} placeholderTextColor={colors.textDisabled} />
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.childPhone')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.phone} onChangeText={(v) => setContactForm(f => ({ ...f, phone: v }))} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
                     </View>
                     <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{t('school.parentName')} 2</Text>
-                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentName2} onChangeText={(v) => setContactForm(f => ({ ...f, parentName2: v }))} placeholderTextColor={colors.textDisabled} />
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.childEmail')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.email} onChangeText={(v) => setContactForm(f => ({ ...f, email: v }))} placeholderTextColor={colors.textDisabled} keyboardType="email-address" />
+                    </View>
+                    <View style={[styles.field, { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 12, marginTop: 4 }]}>
+                      <Text style={[styles.label, { color: colors.text, fontWeight: '700' }]}>{t('school.parentName')} 1</Text>
+                    </View>
+                    <View style={styles.field}>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentName} onChangeText={(v) => setContactForm(f => ({ ...f, parentName: v }))} placeholder={t('school.parentNamePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.phone')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentPhone} onChangeText={(v) => setContactForm(f => ({ ...f, parentPhone: v }))} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.email')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentEmail} onChangeText={(v) => setContactForm(f => ({ ...f, parentEmail: v }))} placeholderTextColor={colors.textDisabled} keyboardType="email-address" />
+                    </View>
+                    <View style={[styles.field, { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 12, marginTop: 4 }]}>
+                      <Text style={[styles.label, { color: colors.text, fontWeight: '700' }]}>{t('school.parentName')} 2</Text>
+                    </View>
+                    <View style={styles.field}>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentName2} onChangeText={(v) => setContactForm(f => ({ ...f, parentName2: v }))} placeholder={t('school.parentNamePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.phone')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentPhone2} onChangeText={(v) => setContactForm(f => ({ ...f, parentPhone2: v }))} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.email')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.parentEmail2} onChangeText={(v) => setContactForm(f => ({ ...f, parentEmail2: v }))} placeholderTextColor={colors.textDisabled} keyboardType="email-address" />
                     </View>
                   </>
                 )}
-                <View style={styles.field}>
-                  <Text style={[styles.label, { color: colors.text }]}>{t('school.phone')}</Text>
-                  <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.phone} onChangeText={(v) => setContactForm(f => ({ ...f, phone: v }))} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
-                </View>
-                <View style={styles.field}>
-                  <Text style={[styles.label, { color: colors.text }]}>{t('school.email')}</Text>
-                  <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.email} onChangeText={(v) => setContactForm(f => ({ ...f, email: v }))} placeholderTextColor={colors.textDisabled} keyboardType="email-address" />
-                </View>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
                   <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.notes} onChangeText={(v) => setContactForm(f => ({ ...f, notes: v }))} placeholderTextColor={colors.textDisabled} multiline />
