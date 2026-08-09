@@ -726,11 +726,12 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                       </View>
                     </View>
                     <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{t('health.doctor')}</Text>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('pets.veterinarian')}</Text>
                       <TextInput
                         style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                         value={vetForm.doctor}
                         onChangeText={(v) => setVetForm(f => ({ ...f, doctor: v }))}
+                        placeholder={t('pets.veterinarianPlaceholder')}
                         placeholderTextColor={colors.textDisabled}
                       />
                     </View>
@@ -950,7 +951,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                     </View>
                     {detailModal.item.doctor ? (
                       <View style={styles.detailRow}>
-                        <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.doctor')}</Text>
+                        <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('pets.veterinarian')}</Text>
                         <Text style={[styles.detailValue, { color: colors.text }]}>{detailModal.item.doctor}</Text>
                       </View>
                     ) : null}

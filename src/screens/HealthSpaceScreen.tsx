@@ -447,6 +447,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                       style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                       value={apptForm.doctor}
                       onChangeText={(v) => setApptForm(f => ({ ...f, doctor: v }))}
+                      placeholder={t('health.doctorPlaceholder')}
                       placeholderTextColor={colors.textDisabled}
                     />
                   </View>
