@@ -40,7 +40,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [activeSemester, setActiveSemester] = useState<'høst' | 'vår'>('høst');
 
   const [showAddChildModal, setShowAddChildModal] = useState(false);
-  const [childForm, setChildForm] = useState({ name: '', school: '', grade: '', photoUrl: '' });
+  const [childForm, setChildForm] = useState({ name: '', school: '', phone: '', email: '', photoUrl: '' });
   const [editingChildId, setEditingChildId] = useState<string | null>(null);
   const [childActionModal, setChildActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
 
@@ -114,7 +114,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       } else {
         await addSchoolChild(cleanData as any);
       }
-      setChildForm({ name: '', school: '', grade: '', photoUrl: '' });
+      setChildForm({ name: '', school: '', phone: '', email: '', photoUrl: '' });
       setEditingChildId(null);
       setShowAddChildModal(false);
       loadChildren();
@@ -138,7 +138,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const handleEditChild = () => {
     const child = children.find(c => c.id === childActionModal.id);
     if (!child) return;
-    setChildForm({ name: child.name, school: child.school || '', grade: (child as any).grade || '', photoUrl: child.photoUrl || '' });
+    setChildForm({ name: child.name, school: child.school || '', phone: child.phone || '', email: child.email || '', photoUrl: child.photoUrl || '' });
     setEditingChildId(child.id);
     setChildActionModal({ visible: false, id: '', title: '' });
     setShowAddChildModal(true);
@@ -331,7 +331,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
           ))}
           <TouchableOpacity
             style={[styles.gridTile, styles.gridTileAdd, { borderColor: colors.textDisabled }]}
-            onPress={() => { setEditingChildId(null); setChildForm({ name: '', school: '', grade: '', photoUrl: '' }); setShowAddChildModal(true); }}
+            onPress={() => { setEditingChildId(null); setChildForm({ name: '', school: '', phone: '', email: '', photoUrl: '' }); setShowAddChildModal(true); }}
           >
             <Text style={[styles.gridEmoji, { color: colors.textDisabled }]}>+</Text>
             <Text style={[styles.gridName, { color: colors.textDisabled }]}>{t('school.addChild')}</Text>
@@ -353,8 +353,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={childForm.school} onChangeText={(v) => setChildForm(f => ({ ...f, school: v }))} placeholderTextColor={colors.textDisabled} />
               </View>
               <View style={styles.field}>
-                <Text style={[styles.label, { color: colors.text }]}>{t('school.grade')}</Text>
-                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={childForm.grade} onChangeText={(v) => setChildForm(f => ({ ...f, grade: v }))} placeholderTextColor={colors.textDisabled} />
+                <Text style={[styles.label, { color: colors.text }]}>{t('school.phone')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={childForm.phone} onChangeText={(v) => setChildForm(f => ({ ...f, phone: v }))} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+              </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('school.email')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={childForm.email} onChangeText={(v) => setChildForm(f => ({ ...f, email: v }))} placeholderTextColor={colors.textDisabled} keyboardType="email-address" />
               </View>
             </ScrollView>
             <View style={styles.modalActions}>
@@ -392,6 +396,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             <View>
               <Text style={[styles.screenTitle, { color: colors.text, fontSize: 22 }]}>{selectedChild.name}</Text>
               {selectedChild.school ? <Text style={{ color: colors.textSecondary, fontSize: 14 }}>{selectedChild.school}{(selectedChild as any).grade ? ` — ${(selectedChild as any).grade}` : ''}</Text> : null}
+              {selectedChild.phone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {selectedChild.phone}</Text> : null}
+              {selectedChild.email ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {selectedChild.email}</Text> : null}
             </View>
           </View>
         </View>

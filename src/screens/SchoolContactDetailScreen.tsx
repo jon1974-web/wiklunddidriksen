@@ -116,6 +116,15 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         </View>
       )}
 
+      {contact.notes && (
+        <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
+          <View style={s.viewDetailRow}>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📝 {t('common.note')}</Text>
+            <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.notes}</Text>
+          </View>
+        </View>
+      )}
+
       {contact.address && (
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
           <View style={s.viewDetailRow}>
@@ -133,15 +142,6 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
           <Image source={{ uri: mapUrl }} style={s.viewMapImage} />
           <Text style={[s.viewMapLabel, { color: colors.accent }]}>{t('tips.openGoogleMaps')}</Text>
         </TouchableOpacity>
-      )}
-
-      {contact.notes && (
-        <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
-          <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📝 {t('common.note')}</Text>
-            <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.notes}</Text>
-          </View>
-        </View>
       )}
 
       {isTeacher && contact.phone && (

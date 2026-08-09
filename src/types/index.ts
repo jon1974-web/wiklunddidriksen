@@ -516,6 +516,8 @@ export interface SchoolChild {
   id: string;
   name: string;
   school?: string;
+  phone?: string;
+  email?: string;
   photoUrl?: string;
   familyId: string;
   createdAt: number;
