@@ -251,13 +251,6 @@ const TripsStack = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="SchoolAI"
-          component={SchoolAIScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
           name="TripsList"
           component={TripsScreen}
           options={{ headerShown: false }}
