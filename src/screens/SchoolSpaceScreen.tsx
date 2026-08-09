@@ -49,6 +49,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', name: '', subject: '', childName: '', parentName: '', phone: '', email: '', notes: '' });
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [contactActionModal, setContactActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
 
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [viewingImage, setViewingImage] = useState<string | null>(null);
@@ -179,6 +180,18 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       await deleteSchoolContact(contactActionModal.id);
       setContactActionModal({ visible: false, id: '', title: '' });
       loadYearData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleDeleteYear = async () => {
+    if (!yearActionModal.id) return;
+    try {
+      await deleteSchoolYear(yearActionModal.id);
+      setYearActionModal({ visible: false, id: '', title: '' });
+      setSelectedYear(null);
+      loadYears();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -388,7 +401,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
             {years.map(y => (
-              <TouchableOpacity key={y.id} style={[styles.yearTab, { backgroundColor: selectedYear?.id === y.id ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setSelectedYear(y)}>
+              <TouchableOpacity key={y.id} style={[styles.yearTab, { backgroundColor: selectedYear?.id === y.id ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setSelectedYear(y)} onLongPress={() => setYearActionModal({ visible: true, id: y.id, title: y.year })}>
                 <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.text, fontSize: 14, fontWeight: '600' }}>{y.year}</Text>
                 {y.grade ? <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.textSecondary, fontSize: 12 }}>{y.grade}</Text> : null}
               </TouchableOpacity>
@@ -581,6 +594,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         </Modal>
 
         <ActionModal visible={contactActionModal.visible} title={contactActionModal.title} onEdit={handleEditContact} onDelete={handleDeleteContact} onCancel={() => setContactActionModal({ visible: false, id: '', title: '' })} />
+
+        <ActionModal visible={yearActionModal.visible} title={yearActionModal.title} onDelete={handleDeleteYear} onCancel={() => setYearActionModal({ visible: false, id: '', title: '' })} />
       </>
     );
   };
