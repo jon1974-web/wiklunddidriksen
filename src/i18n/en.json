@@ -209,6 +209,7 @@
     "subject": "Subject",
     "phone": "Phone",
     "email": "Email",
+    "sendEmail": "Send email",
     "address": "Address",
     "addressPlaceholder": "e.g. Street 1, Oslo",
     "parent": "Parent",

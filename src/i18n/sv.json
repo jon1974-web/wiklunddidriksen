@@ -209,6 +209,7 @@
     "subject": "Ämne",
     "phone": "Telefon",
     "email": "E-post",
+    "sendEmail": "Skicka e-post",
     "address": "Adress",
     "addressPlaceholder": "t.ex. Gatan 1, Stockholm",
     "parent": "Förälder",

@@ -209,6 +209,7 @@
     "subject": "Fag",
     "phone": "Telefon",
     "email": "E-mail",
+    "sendEmail": "Send e-mail",
     "address": "Adresse",
     "addressPlaceholder": "f.eks. Gadevej 1, København",
     "parent": "Forælder",

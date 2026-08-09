@@ -34,6 +34,18 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
   };
 
   const isTeacher = contact.role === 'teacher';
+  const firstName = contact.name.split(' ')[0];
+
+  const renderActionButtons = (phone?: string, email?: string, name?: string) => {
+    const personName = name?.split(' ')[0] || '';
+    return (
+      <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+        {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(phone)}><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600' }}>📞 {t('school.call')} {personName}</Text></TouchableOpacity>}
+        {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleCopy(phone)}><Text style={{ color: '#1E88E5', fontSize: 12, fontWeight: '600' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
+        {email && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => handleEmail(email)}><Text style={{ color: '#FB8C00', fontSize: 12, fontWeight: '600' }}>✉️ {t('school.sendEmail')}</Text></TouchableOpacity>}
+      </View>
+    );
+  };
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={{ padding: 16 }}>
@@ -61,13 +73,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.childEmail}</Text>
           </View>
         )}
-        {!isTeacher && (contact.childPhone || contact.childEmail) && (
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-            {contact.childPhone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(contact.childPhone!)}><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600' }}>📞 {t('school.call')}</Text></TouchableOpacity>}
-            {contact.childPhone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleCopy(contact.childPhone!)}><Text style={{ color: '#1E88E5', fontSize: 12, fontWeight: '600' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
-            {contact.childEmail && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => handleEmail(contact.childEmail!)}><Text style={{ color: '#FB8C00', fontSize: 12, fontWeight: '600' }}>✉️ {t('school.email')}</Text></TouchableOpacity>}
-          </View>
-        )}
+        {!isTeacher && (contact.childPhone || contact.childEmail) && renderActionButtons(contact.childPhone, contact.childEmail, contact.name)}
         {isTeacher && contact.phone && (
           <View style={s.viewDetailRow}>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.phone')}</Text>
@@ -80,13 +86,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.email}</Text>
           </View>
         )}
-        {isTeacher && (contact.phone || contact.email) && (
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-            {contact.phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(contact.phone!)}><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600' }}>📞 {t('school.call')}</Text></TouchableOpacity>}
-            {contact.phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleCopy(contact.phone!)}><Text style={{ color: '#1E88E5', fontSize: 12, fontWeight: '600' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
-            {contact.email && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => handleEmail(contact.email!)}><Text style={{ color: '#FB8C00', fontSize: 12, fontWeight: '600' }}>✉️ {t('school.email')}</Text></TouchableOpacity>}
-          </View>
-        )}
+        {isTeacher && (contact.phone || contact.email) && renderActionButtons(contact.phone, contact.email, contact.name)}
       </View>
 
       {!isTeacher && contact.parentName && (
@@ -100,11 +100,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>✉️ {t('school.email')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentEmail || '—'}</Text>
           </View>
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-            {contact.parentPhone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(contact.parentPhone!)}><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600' }}>📞 {t('school.call')}</Text></TouchableOpacity>}
-            {contact.parentPhone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleCopy(contact.parentPhone!)}><Text style={{ color: '#1E88E5', fontSize: 12, fontWeight: '600' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
-            {contact.parentEmail && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => handleEmail(contact.parentEmail!)}><Text style={{ color: '#FB8C00', fontSize: 12, fontWeight: '600' }}>✉️ {t('school.email')}</Text></TouchableOpacity>}
-          </View>
+          {renderActionButtons(contact.parentPhone, contact.parentEmail, contact.parentName)}
         </View>
       )}
 
@@ -119,11 +115,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>✉️ {t('school.email')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentEmail2 || '—'}</Text>
           </View>
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-            {contact.parentPhone2 && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(contact.parentPhone2!)}><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600' }}>📞 {t('school.call')}</Text></TouchableOpacity>}
-            {contact.parentPhone2 && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleCopy(contact.parentPhone2!)}><Text style={{ color: '#1E88E5', fontSize: 12, fontWeight: '600' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
-            {contact.parentEmail2 && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => handleEmail(contact.parentEmail2!)}><Text style={{ color: '#FB8C00', fontSize: 12, fontWeight: '600' }}>✉️ {t('school.email')}</Text></TouchableOpacity>}
-          </View>
+          {renderActionButtons(contact.parentPhone2, contact.parentEmail2, contact.parentName2)}
         </View>
       )}
 

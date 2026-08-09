@@ -209,6 +209,7 @@
     "subject": "Aine",
     "phone": "Puhelin",
     "email": "Sähköposti",
+    "sendEmail": "Lähetä sähköposti",
     "address": "Osoite",
     "addressPlaceholder": "esim. Katutie 1, Helsinki",
     "parent": "Vanhempi",
