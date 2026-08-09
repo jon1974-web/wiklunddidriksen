@@ -210,6 +210,8 @@
     "subject": "Fag",
     "phone": "Telefon",
     "email": "E-post",
+    "address": "Adresse",
+    "addressPlaceholder": "F.eks. Gatevei 1, Oslo",
     "parent": "Forelder",
     "role": "Rolle",
     "call": "Ring",

@@ -5,6 +5,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
+import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import {
@@ -46,7 +47,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [yearForm, setYearForm] = useState({ year: '', grade: '', school: '' });
 
   const [showAddContactModal, setShowAddContactModal] = useState(false);
-  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', name: '', subject: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [contactActionModal, setContactActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
@@ -165,7 +166,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       } else {
         await addSchoolContact(data as any);
       }
-      setContactForm({ role: 'teacher', name: '', subject: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+      setContactForm({ role: 'teacher', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
       setEditingContactId(null);
       setShowAddContactModal(false);
       loadYearData();
@@ -205,6 +206,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       childName: (contact as any).childName || '', parentName: contact.parentName || '',
       parentPhone: contact.parentPhone || '', parentEmail: contact.parentEmail || '',
       parentName2: contact.parentName2 || '', parentPhone2: contact.parentPhone2 || '', parentEmail2: contact.parentEmail2 || '',
+      address: contact.address || '',
       phone: contact.childPhone || contact.parentPhone || '', email: contact.childEmail || contact.parentEmail || '',
       notes: contact.notes || '',
     });
@@ -422,7 +424,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.classContacts')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({teachers.length})</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', name: '', subject: '', childName: '', parentName: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -449,7 +451,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({classmates.length})</Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 8 }}>
-                    <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'classmate', name: '', subject: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                    <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'classmate', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                       <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                     </TouchableOpacity>
                   </View>
@@ -602,6 +604,15 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     </View>
                   </>
                 )}
+                <View style={styles.field}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('school.address')}</Text>
+                  <GooglePlacesInput
+                    value={contactForm.address}
+                    onChangeText={(v) => setContactForm(f => ({ ...f, address: v }))}
+                    placeholder={t('school.addressPlaceholder')}
+                    onSelect={(v) => setContactForm(f => ({ ...f, address: v }))}
+                  />
+                </View>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
                   <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.notes} onChangeText={(v) => setContactForm(f => ({ ...f, notes: v }))} placeholderTextColor={colors.textDisabled} multiline />

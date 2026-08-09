@@ -209,6 +209,8 @@
     "subject": "Subject",
     "phone": "Phone",
     "email": "Email",
+    "address": "Address",
+    "addressPlaceholder": "e.g. Street 1, Oslo",
     "parent": "Parent",
     "role": "Role",
     "call": "Call",

@@ -538,6 +538,7 @@ export interface SchoolContact {
   name: string;
   role: 'teacher' | 'classmate';
   subject?: string;
+  address?: string;
   childPhone?: string;
   childEmail?: string;
   parentName?: string;

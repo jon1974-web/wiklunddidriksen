@@ -209,6 +209,8 @@
     "subject": "Aine",
     "phone": "Puhelin",
     "email": "Sähköposti",
+    "address": "Osoite",
+    "addressPlaceholder": "esim. Katutie 1, Helsinki",
     "parent": "Vanhempi",
     "role": "Rooli",
     "call": "Soita",

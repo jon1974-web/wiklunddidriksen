@@ -209,6 +209,8 @@
     "subject": "Ämne",
     "phone": "Telefon",
     "email": "E-post",
+    "address": "Adress",
+    "addressPlaceholder": "t.ex. Gatan 1, Stockholm",
     "parent": "Förälder",
     "role": "Roll",
     "call": "Ring",

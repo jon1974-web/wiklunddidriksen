@@ -209,6 +209,8 @@
     "subject": "Fag",
     "phone": "Telefon",
     "email": "E-mail",
+    "address": "Adresse",
+    "addressPlaceholder": "f.eks. Gadevej 1, København",
     "parent": "Forælder",
     "role": "Rolle",
     "call": "Ring",
