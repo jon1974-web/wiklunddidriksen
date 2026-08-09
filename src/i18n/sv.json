@@ -196,6 +196,8 @@
     "teacher": "Lärare",
     "classmate": "Klasskamrat",
     "addContact": "Lägg till kontakt",
+    "addContactTeacher": "Lägg till kontaktlärare",
+    "addContactClassmate": "Lägg till klassekamrat",
     "editContact": "Redigera kontakt",
     "teacherName": "Lärarens namn",
     "parentName": "Föräldrars namn",

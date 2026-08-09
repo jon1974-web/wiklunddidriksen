@@ -196,6 +196,8 @@
     "teacher": "Opettaja",
     "classmate": "Luokkatoveri",
     "addContact": "Lisää yhteystieto",
+    "addContactTeacher": "Lisää yhteysopettaja",
+    "addContactClassmate": "Lisää luokkatoveri",
     "editContact": "Muokkaa yhteystietoa",
     "teacherName": "Opettajan nimi",
     "parentName": "Vanhemman nimi",

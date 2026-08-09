@@ -196,6 +196,8 @@
     "teacher": "Teacher",
     "classmate": "Classmate",
     "addContact": "Add Contact",
+    "addContactTeacher": "Add contact teacher",
+    "addContactClassmate": "Add classmate",
     "editContact": "Edit Contact",
     "teacherName": "Teacher's name",
     "parentName": "Parent name",

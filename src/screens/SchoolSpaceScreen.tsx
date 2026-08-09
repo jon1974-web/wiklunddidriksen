@@ -552,16 +552,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>{editingContactId ? t('school.editContact') : t('school.addContact')}</Text>
               <ScrollView>
-                <View style={styles.field}>
-                  <Text style={[styles.label, { color: colors.text }]}>{t('school.role')}</Text>
-                  <View style={styles.personRow}>
-                    {(['teacher', 'classmate'] as const).map(r => (
-                      <TouchableOpacity key={r} style={[styles.personChip, { backgroundColor: contactForm.role === r ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setContactForm(f => ({ ...f, role: r }))}>
-                        <Text style={{ color: contactForm.role === r ? '#fff' : colors.text, fontSize: 14 }}>{r === 'teacher' ? t('school.teacher') : t('school.classmate')}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </View>
+                <Text style={[styles.label, { color: colors.text, fontWeight: '700', fontSize: 16, marginBottom: 12 }]}>{contactForm.role === 'teacher' ? t('school.addContactTeacher') : t('school.addContactClassmate')}</Text>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{contactForm.role === 'teacher' ? t('school.teacherName') : t('school.childName')}</Text>
                   <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.name} onChangeText={(v) => setContactForm(f => ({ ...f, name: v }))} placeholderTextColor={colors.textDisabled} />

@@ -196,6 +196,8 @@
     "teacher": "Lærer",
     "classmate": "Klassekammerat",
     "addContact": "Tilføj kontakt",
+    "addContactTeacher": "Tilføj kontaktlærer",
+    "addContactClassmate": "Tilføj klassekammerat",
     "editContact": "Rediger kontakt",
     "teacherName": "Lærerens navn",
     "parentName": "Forældres navn",
