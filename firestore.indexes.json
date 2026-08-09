@@ -156,15 +156,15 @@
       "collectionGroup": "schoolYears",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "childId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "familyId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
       ]
     },
     {
       "collectionGroup": "schoolContacts",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "yearId", "order": "ASCENDING" },
+        { "fieldPath": "familyId", "order": "ASCENDING" },
         { "fieldPath": "createdAt", "order": "ASCENDING" }
       ]
     },
@@ -172,8 +172,8 @@
       "collectionGroup": "schoolSchedules",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "yearId", "order": "ASCENDING" },
-        { "fieldPath": "createdAt", "order": "DESCENDING" }
+        { "fieldPath": "familyId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "ASCENDING" }
       ]
     }
   ],

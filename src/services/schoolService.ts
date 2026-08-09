@@ -25,10 +25,12 @@ export async function deleteSchoolChild(childId: string): Promise<void> {
 }
 
 // School Years
-export async function getSchoolYears(childId: string): Promise<SchoolYear[]> {
-  const q = query(collection(db, 'schoolYears'), where('childId', '==', childId));
+export async function getSchoolYears(familyId: string, childId: string): Promise<SchoolYear[]> {
+  const q = query(collection(db, 'schoolYears'), where('familyId', '==', familyId));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolYear));
+  return snapshot.docs
+    .map((d) => ({ id: d.id, ...d.data() } as SchoolYear))
+    .filter((y) => y.childId === childId);
 }
 
 export async function addSchoolYear(data: Omit<SchoolYear, 'id' | 'createdAt'>): Promise<string> {
@@ -45,10 +47,12 @@ export async function deleteSchoolYear(yearId: string): Promise<void> {
 }
 
 // Contacts (teachers + classmates)
-export async function getSchoolContacts(yearId: string): Promise<SchoolContact[]> {
-  const q = query(collection(db, 'schoolContacts'), where('yearId', '==', yearId));
+export async function getSchoolContacts(familyId: string, yearId: string): Promise<SchoolContact[]> {
+  const q = query(collection(db, 'schoolContacts'), where('familyId', '==', familyId));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolContact));
+  return snapshot.docs
+    .map((d) => ({ id: d.id, ...d.data() } as SchoolContact))
+    .filter((c) => c.yearId === yearId);
 }
 
 export async function addSchoolContact(data: Omit<SchoolContact, 'id' | 'createdAt'>): Promise<string> {
@@ -65,10 +69,12 @@ export async function deleteSchoolContact(contactId: string): Promise<void> {
 }
 
 // Schedules
-export async function getSchoolSchedules(yearId: string): Promise<SchoolSchedule[]> {
-  const q = query(collection(db, 'schoolSchedules'), where('yearId', '==', yearId));
+export async function getSchoolSchedules(familyId: string, yearId: string): Promise<SchoolSchedule[]> {
+  const q = query(collection(db, 'schoolSchedules'), where('familyId', '==', familyId));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolSchedule));
+  return snapshot.docs
+    .map((d) => ({ id: d.id, ...d.data() } as SchoolSchedule))
+    .filter((s) => s.yearId === yearId);
 }
 
 export async function addSchoolSchedule(data: Omit<SchoolSchedule, 'id' | 'createdAt'>): Promise<string> {

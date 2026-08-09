@@ -66,30 +66,30 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   }, [familyId]);
 
   const loadYears = useCallback(async () => {
-    if (!selectedChild) return;
+    if (!selectedChild || !familyId) return;
     try {
-      const data = await getSchoolYears(selectedChild.id);
+      const data = await getSchoolYears(familyId, selectedChild.id);
       setYears(data);
       if (data.length > 0 && !selectedYear) setSelectedYear(data[0]);
       else if (data.length === 0) setSelectedYear(null);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [selectedChild]);
+  }, [selectedChild, familyId]);
 
   const loadYearData = useCallback(async () => {
-    if (!selectedYear) { setContacts([]); setSchedules([]); return; }
+    if (!selectedYear || !familyId) { setContacts([]); setSchedules([]); return; }
     try {
       const [c, s] = await Promise.all([
-        getSchoolContacts(selectedYear.id),
-        getSchoolSchedules(selectedYear.id),
+        getSchoolContacts(familyId, selectedYear.id),
+        getSchoolSchedules(familyId, selectedYear.id),
       ]);
       setContacts(c);
       setSchedules(s);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [selectedYear]);
+  }, [selectedYear, familyId]);
 
   useEffect(() => { loadChildren(); }, [loadChildren]);
   useEffect(() => { if (selectedChild) loadYears(); }, [selectedChild, loadYears]);
