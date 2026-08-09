@@ -447,11 +447,15 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </View>
                 {teachers.map(c => (
                   <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
-                      {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{c.subject}</Text> : null}
-                      {c.phone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {c.phone}</Text> : null}
-                      {c.email ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {c.email}</Text> : null}
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
+                        {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📚 {c.subject}</Text> : null}
+                      </View>
+                      <View style={{ flexDirection: 'row', gap: 6 }}>
+                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>}
+                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><Text style={{ color: '#FB8C00', fontSize: 14 }}>✉️</Text></TouchableOpacity>}
+                      </View>
                     </View>
                   </TouchableOpacity>
                 ))}
@@ -484,13 +488,20 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </TouchableOpacity>
 
                 {filteredClassmates.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
-                    <View style={{ flex: 1 }}>
-                      <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
-                      {c.parentName ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{t('school.parent')}: {c.parentName}</Text> : null}
-                      {c.parentPhone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {c.parentPhone}</Text> : null}
-                      {c.parentEmail ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {c.parentEmail}</Text> : null}
-                    </View>
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
+                    <Text style={[styles.contactName, { color: colors.text, marginBottom: 6 }]}>{c.name}</Text>
+                    {c.parentName ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName}</Text>
+                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone?.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>
+                      </View>
+                    ) : null}
+                    {c.parentName2 ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName2}</Text>
+                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone2?.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>
+                      </View>
+                    ) : null}
                   </TouchableOpacity>
                 ))}
                 {filteredClassmates.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
@@ -711,6 +722,7 @@ const styles = StyleSheet.create({
   contactGroupTitle: { fontSize: 13, fontWeight: '600', marginBottom: 8, marginTop: 4 },
   contactCard: { padding: 12, borderRadius: 10, marginBottom: 8 },
   contactName: { fontSize: 15, fontWeight: '600' },
+  contactActionBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   contactActionBtn: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12 },
   semesterTabs: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   semesterTab: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },

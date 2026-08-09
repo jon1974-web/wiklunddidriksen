@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kontakt-kort — Mockup</title>
+  <style>
+    :root { --accent: #43A047; --bg: #f5f5f5; --surface: #fff; --text: #333; --text2: #666; --text3: #999; --border: #f0f0f0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); padding: 24px; max-width: 420px; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 4px; color: var(--text); font-size: 22px; }
+    .subtitle { text-align: center; color: var(--text2); margin-bottom: 24px; font-size: 13px; }
+    .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
+    .section-note { font-size: 12px; color: var(--text2); margin-bottom: 16px; line-height: 1.5; }
+    .card { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .card-row { display: flex; align-items: center; justify-content: space-between; }
+    .card-left { flex: 1; }
+    .card-name { font-size: 15px; font-weight: 600; color: var(--text); }
+    .card-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+    .card-actions { display: flex; gap: 6px; }
+    .action-btn { width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; border: none; }
+    .btn-call { background: #E8F5E9; color: #43A047; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+    .btn-email { background: #FFF3E0; color: #FB8C00; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; border: none; cursor: pointer; }
+    .btn-email { background: #FFF3E0; }
+  </style>
+</head>
+<body>
+  <h1>📋 Kontakt-kort Mockup</h1>
+  <p class="subtitle">Oppdatert design med Ring/Epost-knapper på kortet</p>
+
+  <div class="section-title">Kontaktlærer</div>
+  <div class="section-note">Navn og fag til venstre, Ring og Epost-knapper til høyre.</div>
+
+  <div class="card">
+    <div class="card-row">
+      <div class="card-left">
+        <div class="card-name">Kari Hansen</div>
+        <div class="card-sub">📚 Klasselærer</div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn btn-call" title="Ring Kari">📞</button>
+        <button class="action-btn btn-email" title="Send e-post">✉️</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-row">
+      <div class="card-left">
+        <div class="card-name">Ole Berg</div>
+        <div class="card-sub">📚 Gym</div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn btn-call" title="Ring Ole">📞</button>
+        <button class="action-btn btn-email" title="Send e-post">✉️</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-row">
+      <div class="card-left">
+        <div class="card-name">Line Solberg</div>
+        <div class="card-sub">📚 Kunst og håndverk</div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn btn-call" title="Ring Line">📞</button>
+        <button class="action-btn btn-email" title="Send e-post">✉️</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Klassekamerater</div>
+  <div class="section-note">Barnets navn med foreldre under. Ring-knapp for hver forelder.</div>
+
+  <div class="card">
+    <div style="margin-bottom: 8px;">
+      <div class="card-name">Lucas Andersen</div>
+    </div>
+    <div class="card-row" style="margin-bottom: 4px;">
+      <div class="card-left">
+        <div class="card-sub">👤 Monica Andersen</div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn btn-call" title="Ring Monica">📞</button>
+      </div>
+    </div>
+    <div class="card-row">
+      <div class="card-left">
+        <div class="card-sub">👤 Tom Andersen</div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn btn-call" title="Ring Tom">📞</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="margin-bottom: 8px;">
+      <div class="card-name">Mia Johansen</div>
+    </div>
+    <div class="card-row">
+      <div class="card-left">
+        <div class="card-sub">👤 Per Johansen</div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn btn-call" title="Ring Per">📞</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="margin-bottom: 8px;">
+      <div class="card-name">Elias Nilsen</div>
+    </div>
+    <div class="card-row" style="margin-bottom: 4px;">
+      <div class="card-left">
+        <div class="card-sub">👤 Hanne Nilsen</div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn btn-call" title="Ring Hanne">📞</button>
+      </div>
+    </div>
+    <div class="card-row">
+      <div class="card-left">
+        <div class="card-sub">👤 Lars Nilsen</div>
+      </div>
+      <div class="card-actions">
+        <button class="action-btn btn-call" title="Ring Lars">📞</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
