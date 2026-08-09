@@ -147,16 +147,6 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         </TouchableOpacity>
       )}
 
-      {isTeacher && contact.phone && (
-        <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
-          <View style={{ flexDirection: 'row', gap: 8, marginTop: 4 }}>
-            <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9', flex: 1 }]} onPress={() => handleCall(contact.phone!)}><Text style={{ color: '#43A047', fontSize: 13, fontWeight: '600' }}>📞 {t('school.call')}</Text></TouchableOpacity>
-            {contact.phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD', flex: 1 }]} onPress={() => handleCopy(contact.phone!)}><Text style={{ color: '#1E88E5', fontSize: 13, fontWeight: '600' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
-            {contact.email && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFF3E0', flex: 1 }]} onPress={() => handleEmail(contact.email!)}><Text style={{ color: '#FB8C00', fontSize: 13, fontWeight: '600' }}>✉️ {t('school.email')}</Text></TouchableOpacity>}
-          </View>
-        </View>
-      )}
-
       <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
         <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => navigation.goBack()}>
           <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600' }}>{t('common.close')}</Text>
