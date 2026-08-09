@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
+import * as ImagePicker from 'expo-image-picker';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import {
@@ -219,9 +220,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!familyId || !selectedChild || !selectedYear) return;
     try {
       const { webUploadFile } = await import('../services/webStorage');
-      const result = await import('expo-image-picker').then(m => m.default.launchImageLibraryAsync({
+      const result = await ImagePicker.launchImageLibraryAsync({
         mediaTypes: ['images'], quality: 0.7, base64: true,
-      }));
+      });
       if (result.canceled || !result.assets[0]) return;
       setLoading(true);
       const asset = result.assets[0];
