@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skole — Mockup</title>
+  <style>
+    :root { --accent: #43A047; --bg: #f5f5f5; --surface: #fff; --text: #333; --text2: #666; --text3: #999; --border: #f0f0f0; --danger: #E53935; --orange: #FB8C00; --blue: #1E88E5; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); padding: 24px; max-width: 420px; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 4px; color: var(--text); font-size: 22px; }
+    .subtitle { text-align: center; color: var(--text2); margin-bottom: 24px; font-size: 13px; }
+    .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 2px solid var(--accent); }
+    .section-note { font-size: 12px; color: var(--text2); margin-bottom: 16px; line-height: 1.5; }
+
+    /* Grid */
+    .child-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+    .child-card { background: var(--surface); border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); cursor: pointer; transition: transform 0.15s, box-shadow 0.15s; border-left: 4px solid var(--accent); }
+    .child-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+    .child-avatar { width: 64px; height: 64px; border-radius: 32px; background: #E8F5E9; display: flex; align-items: center; justify-content: center; font-size: 28px; }
+    .child-avatar img { width: 100%; height: 100%; border-radius: 32px; object-fit: cover; }
+    .child-name { font-size: 16px; font-weight: 700; color: var(--text); }
+    .child-detail { font-size: 12px; color: var(--text3); }
+    .add-card { border: 2px dashed #ccc; background: transparent; border-left-color: #ccc; }
+    .add-card .child-avatar { background: transparent; font-size: 28px; color: #ccc; }
+
+    /* Detail header */
+    .detail-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 16px; background: var(--surface); border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .detail-back { font-size: 20px; color: var(--accent); cursor: pointer; width: 36px; height: 36px; border-radius: 18px; border: 1.5px solid var(--accent); display: flex; align-items: center; justify-content: center; }
+    .detail-avatar { width: 56px; height: 56px; border-radius: 28px; background: #E8F5E9; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .detail-avatar img { width: 100%; height: 100%; border-radius: 28px; object-fit: cover; }
+    .detail-info { flex: 1; }
+    .detail-name { font-size: 18px; font-weight: 700; color: var(--text); }
+    .detail-sub { font-size: 12px; color: var(--text2); }
+
+    /* Sections */
+    .detail-section { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .detail-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .detail-section-title { font-size: 14px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 6px; }
+    .detail-section-title .icon { width: 18px; height: 18px; }
+    .add-circle { width: 28px; height: 28px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+    .add-circle svg { width: 14px; height: 14px; }
+
+    /* Items */
+    .detail-item { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .detail-item:last-child { border-bottom: none; }
+    .detail-item-icon { width: 36px; height: 36px; border-radius: 18px; background: #E8F5E9; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .detail-item-text { flex: 1; }
+    .detail-item-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .detail-item-sub { font-size: 12px; color: var(--text2); }
+    .detail-item-actions { display: flex; gap: 4px; }
+    .action-btn { width: 28px; height: 28px; border-radius: 14px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; }
+
+    /* Contact actions */
+    .contact-actions { display: flex; gap: 6px; margin-top: 6px; }
+    .contact-action { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 14px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; text-decoration: none; }
+    .contact-action.call { background: #E8F5E9; color: #43A047; }
+    .contact-action.call:hover { background: #C8E6C9; }
+    .contact-action.copy { background: #E3F2FD; color: #1E88E5; }
+    .contact-action.copy:hover { background: #BBDEFB; }
+    .contact-action.email { background: #FFF3E0; color: #FB8C00; }
+    .contact-action.email:hover { background: #FFE0B2; }
+
+    /* Search */
+    .search-bar { display: flex; align-items: center; gap: 8px; background: var(--bg); border-radius: 10px; padding: 10px 12px; margin-bottom: 12px; border: 1px solid var(--border); }
+    .search-bar input { flex: 1; border: none; outline: none; font-size: 14px; color: var(--text); background: transparent; }
+    .search-bar input::placeholder { color: var(--text3); }
+    .search-bar .search-icon { color: var(--text3); font-size: 14px; }
+    .search-count { font-size: 11px; color: var(--text3); margin-bottom: 8px; }
+
+    /* Badges */
+    .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; white-space: nowrap; }
+    .badge-green { background: #E8F5E9; color: #43A047; }
+    .badge-orange { background: #FFF3E0; color: #FB8C00; }
+    .badge-blue { background: #E3F2FD; color: #1E88E5; }
+
+    /* AI import card */
+    .ai-import { background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%); border-radius: 12px; padding: 16px; margin-top: 12px; display: flex; align-items: center; gap: 12px; cursor: pointer; border: 1.5px dashed var(--accent); }
+    .ai-import-icon { width: 40px; height: 40px; border-radius: 20px; background: var(--accent); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .ai-import-text { flex: 1; }
+    .ai-import-title { font-size: 13px; font-weight: 700; color: var(--accent); }
+    .ai-import-sub { font-size: 11px; color: var(--text2); }
+
+    /* Schedule */
+    .schedule-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+    .schedule-card { background: var(--bg); border-radius: 10px; overflow: hidden; cursor: pointer; }
+    .schedule-card img { width: 100%; height: 100px; object-fit: cover; display: block; }
+    .schedule-card-label { padding: 8px 10px; font-size: 12px; font-weight: 600; color: var(--text); }
+    .schedule-card-sub { font-size: 11px; color: var(--text3); padding: 0 10px 8px; }
+    .upload-card { border: 2px dashed #ccc; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 130px; cursor: pointer; }
+    .upload-card:hover { border-color: var(--accent); }
+    .upload-icon { font-size: 28px; color: #ccc; margin-bottom: 4px; }
+    .upload-text { font-size: 12px; color: var(--text3); font-weight: 600; }
+
+    /* Form */
+    .form-modal { background: var(--surface); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.12); margin-bottom: 20px; }
+    .form-header { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid var(--border); }
+    .form-title { font-size: 16px; font-weight: 700; color: var(--text); }
+    .form-close { font-size: 18px; color: var(--text3); cursor: pointer; }
+    .form-body { padding: 16px; }
+    .form-field { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600; color: var(--text2); margin-bottom: 6px; }
+    .form-input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: var(--text); background: #fafafa; }
+    .form-input:focus { border-color: var(--accent); outline: none; background: #fff; }
+    .form-textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 10px; font-size: 15px; color: var(--text); background: #fafafa; min-height: 60px; resize: vertical; }
+    .form-row { display: flex; gap: 12px; }
+    .form-actions { display: flex; gap: 12px; padding: 16px; border-top: 1px solid var(--border); }
+    .form-btn { flex: 1; padding: 12px; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; border: none; }
+    .form-btn.cancel { background: var(--bg); color: var(--text2); }
+    .form-btn.save { background: var(--accent); color: #fff; }
+
+    /* Tabs */
+    .tab-row { display: flex; gap: 8px; margin-bottom: 16px; }
+    .tab-chip { padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; border: 1.5px solid #ddd; color: var(--text2); background: var(--surface); }
+    .tab-chip.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    /* Search */
+    .search-note { font-size: 11px; color: var(--text3); font-style: italic; margin-top: 8px; padding: 8px 12px; background: #FFF8E1; border-radius: 8px; border-left: 3px solid var(--orange); }
+  </style>
+</head>
+<body>
+  <h1>📚 Skole</h1>
+  <p class="subtitle">School module mockup · Familiesenter</p>
+
+  <!-- 1. Children Grid -->
+  <div class="section-title">1. Oversikt — Barn</div>
+  <div class="section-note">Grid med alle barn i familien. Trykk på et barn for å se detaljer. Herfra kan man også legge til nye barn.</div>
+  <div class="child-grid">
+    <div class="child-card" onclick="document.getElementById('child-detail').style.display='block'">
+      <div class="child-avatar">👧</div>
+      <div class="child-name">Emma</div>
+      <div class="child-detail">4. klasse · Sofiesborg</div>
+    </div>
+    <div class="child-card">
+      <div class="child-avatar">👦</div>
+      <div class="child-name">Noah</div>
+      <div class="child-detail">7. klasse · Sofiesborg</div>
+    </div>
+    <div class="child-card add-card">
+      <div class="child-avatar">+</div>
+      <div class="child-name" style="color: #ccc;">Legg til barn</div>
+    </div>
+  </div>
+
+  <!-- 2. Child Detail Screen -->
+  <div id="child-detail">
+    <div class="section-title">2. Detalj — Emma</div>
+    <div class="section-note">Barndetalj med seksjoner for lærere, klassekamerater og timeplan. Basisinfo øverst.</div>
+
+    <div class="detail-header">
+      <div class="detail-back">←</div>
+      <div class="detail-avatar">👧</div>
+      <div class="detail-info">
+        <div class="detail-name">Emma Wiklund Didriksen</div>
+        <div class="detail-sub">4. klasse · Sofiesborg skole · Født 2016</div>
+      </div>
+    </div>
+
+    <!-- School Year Selector -->
+    <div class="detail-section" style="padding: 12px 16px;">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-size: 13px; font-weight: 700; color: var(--accent);">Skoleår</div>
+          <div style="font-size: 15px; font-weight: 600; color: var(--text);">2025–2026 · 4. klasse</div>
+        </div>
+        <div style="background: var(--accent); color: #fff; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer;">Bytt ▾</div>
+      </div>
+      <div style="margin-top: 10px; display: flex; gap: 6px; flex-wrap: wrap;">
+        <div class="tab-chip active" style="font-size: 12px; padding: 6px 12px;">2025–2026 · 4. klasse</div>
+        <div class="tab-chip" style="font-size: 12px; padding: 6px 12px;">2024–2025 · 3. klasse</div>
+        <div class="tab-chip" style="font-size: 12px; padding: 6px 12px; border-style: dashed; color: var(--accent);">+ Nytt skoleår</div>
+      </div>
+    </div>
+
+    <!-- Teacher contacts -->
+    <div class="detail-section">
+      <div class="detail-section-header">
+        <div class="detail-section-title">👩‍🏫 Kontakter / Lærere</div>
+        <div class="add-circle">+</div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-icon">👩‍🏫</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Kari Hansen</div>
+          <div class="detail-item-sub">Klasselærer</div>
+          <div class="contact-actions">
+            <a href="tel:98765432" class="contact-action call">📞 Ring</a>
+            <button class="contact-action copy" onclick="navigator.clipboard.writeText('987 65 432')">📋 Kopier</button>
+            <a href="mailto:kari.hansen@skole.no" class="contact-action email">✉️ E-post</a>
+          </div>
+        </div>
+        <div class="detail-item-actions">
+          <div class="action-btn" style="background: #E3F2FD;">✏️</div>
+          <div class="action-btn" style="background: #FFEBEE;">🗑️</div>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-icon">👨‍🏫</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Ole Berg</div>
+          <div class="detail-item-sub">Gym</div>
+          <div class="contact-actions">
+            <a href="tel:91234567" class="contact-action call">📞 Ring</a>
+            <button class="contact-action copy" onclick="navigator.clipboard.writeText('912 34 567')">📋 Kopier</button>
+            <a href="mailto:ole.berg@skole.no" class="contact-action email">✉️ E-post</a>
+          </div>
+        </div>
+        <div class="detail-item-actions">
+          <div class="action-btn" style="background: #E3F2FD;">✏️</div>
+          <div class="action-btn" style="background: #FFEBEE;">🗑️</div>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-icon">👩‍🎨</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Line Solberg</div>
+          <div class="detail-item-sub">Kunst og håndverk</div>
+          <div class="contact-actions">
+            <a href="mailto:line.solberg@skole.no" class="contact-action email">✉️ E-post</a>
+          </div>
+        </div>
+        <div class="detail-item-actions">
+          <div class="action-btn" style="background: #E3F2FD;">✏️</div>
+          <div class="action-btn" style="background: #FFEBEE;">🗑️</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Classmates -->
+    <div class="detail-section">
+      <div class="detail-section-header">
+        <div class="detail-section-title">👥 Klassekamerater</div>
+        <div class="add-circle">+</div>
+      </div>
+      <div class="search-bar">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="Søk etter navn, forelder, telefon...">
+      </div>
+      <div class="search-count">3 klassekamerater</div>
+      <div class="detail-item">
+        <div class="detail-item-icon">👦</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Lucas Andersen</div>
+          <div class="detail-item-sub">Forelder: Monica Andersen</div>
+          <div class="contact-actions">
+            <a href="tel:45678901" class="contact-action call">📞 Ring</a>
+            <button class="contact-action copy" onclick="navigator.clipboard.writeText('456 78 901')">📋 Kopier</button>
+          </div>
+        </div>
+        <div class="detail-item-actions">
+          <div class="action-btn" style="background: #E3F2FD;">✏️</div>
+          <div class="action-btn" style="background: #FFEBEE;">🗑️</div>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-icon">👧</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Mia Johansen</div>
+          <div class="detail-item-sub">Forelder: Per Johansen</div>
+          <div class="contact-actions">
+            <a href="tel:56789012" class="contact-action call">📞 Ring</a>
+            <button class="contact-action copy" onclick="navigator.clipboard.writeText('567 89 012')">📋 Kopier</button>
+            <a href="mailto:per.johansen@mail.no" class="contact-action email">✉️ E-post</a>
+          </div>
+        </div>
+        <div class="detail-item-actions">
+          <div class="action-btn" style="background: #E3F2FD;">✏️</div>
+          <div class="action-btn" style="background: #FFEBEE;">🗑️</div>
+        </div>
+      </div>
+      <div class="detail-item">
+        <div class="detail-item-icon">👦</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Elias Nilsen</div>
+          <div class="detail-item-sub">Forelder: Hanne Nilsen</div>
+          <div class="contact-actions">
+            <a href="tel:67890123" class="contact-action call">📞 Ring</a>
+            <button class="contact-action copy" onclick="navigator.clipboard.writeText('678 90 123')">📋 Kopier</button>
+          </div>
+        </div>
+        <div class="detail-item-actions">
+          <div class="action-btn" style="background: #E3F2FD;">✏️</div>
+          <div class="action-btn" style="background: #FFEBEE;">🗑️</div>
+        </div>
+      </div>
+      <div class="ai-import">
+        <div class="ai-import-icon">📸</div>
+        <div class="ai-import-text">
+          <div class="ai-import-title">Importer fra bilde</div>
+          <div class="ai-import-sub">Ta bilde av kontaktlisten fra skolen — AI leser ut navn og info automatisk</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule -->
+    <div class="detail-section">
+      <div class="detail-section-header">
+        <div class="detail-section-title">🗓️ Timeplan / Semester</div>
+        <div class="add-circle">+</div>
+      </div>
+      <div class="tab-row">
+        <div class="tab-chip active">Høst 2025</div>
+        <div class="tab-chip">Vår 2026</div>
+      </div>
+      <div class="schedule-grid">
+        <div class="schedule-card" onclick="document.getElementById('schedule-viewer').style.display='flex'">
+          <div style="width:100%;height:100px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:32px;">📋</div>
+          <div class="schedule-card-label">Høstsemester</div>
+          <div class="schedule-card-sub">Lastet opp 15. aug</div>
+        </div>
+        <div class="schedule-card upload-card">
+          <div class="upload-icon">+</div>
+          <div class="upload-text">Last opp ny</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Schedule Full-Screen Viewer -->
+  <div class="section-title">3. Timeplan — Fullskjerm</div>
+  <div class="section-note">Trykk på et schedule-bilde åpner det i fullskjerm. Støtter landskapsmodus for å se timeplanen best mulig. Kan zoome inn/ut.</div>
+
+  <div id="schedule-viewer" style="display: flex; flex-direction: column; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 20px; position: relative;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(0,0,0,0.8);">
+      <span style="color: #fff; font-size: 14px; font-weight: 600;">Emma — Høst 2025</span>
+      <span style="color: #fff; font-size: 20px; cursor: pointer;">✕</span>
+    </div>
+    <div style="width: 100%; aspect-ratio: 16/9; background: linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 50%, #A5D6A7 100%); display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px;">
+      <div style="font-size: 48px;">📋</div>
+      <div style="color: #2E7D32; font-size: 16px; font-weight: 600;">Timeplan — Høst 2025</div>
+      <div style="color: #558B2F; font-size: 12px;">Sofiesborg skole · 4. klasse</div>
+      <div style="margin-top: 12px; display: flex; gap: 8px;">
+        <div style="background: rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 8px; color: #2E7D32; font-size: 11px;">🔍 Zoom inn</div>
+        <div style="background: rgba(255,255,255,0.3); padding: 6px 12px; border-radius: 8px; color: #2E7D32; font-size: 11px;">↻ Rotér</div>
+      </div>
+    </div>
+    <div style="padding: 8px 16px; background: rgba(0,0,0,0.8); display: flex; justify-content: space-between; align-items: center;">
+      <span style="color: #999; font-size: 12px;">📱 Snu telefonen for landskapsvisning</span>
+      <span style="color: var(--accent); font-size: 12px; font-weight: 600;">Slett</span>
+    </div>
+  </div>
+
+  <!-- 4. Add Contact Form — Teacher -->
+  <div class="section-title">4. Skjema — Legg til kontakt</div>
+  <div class="section-note">Skjemaet endrer felt basert på rollen. Lærere har fag og skole-e-post. Klassekamerater har foreldre-felter.</div>
+
+  <div class="form-modal">
+    <div class="form-header">
+      <div class="form-title">Legg til lærer</div>
+      <div class="form-close">✕</div>
+    </div>
+    <div class="form-body">
+      <div class="form-field">
+        <label class="form-label">Rolle</label>
+        <div class="tab-row">
+          <div class="tab-chip active">👩‍🏫 Lærer</div>
+          <div class="tab-chip">👦 Klassekamerat</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Navn</label>
+        <input class="form-input" type="text" placeholder="F.eks. Kari Hansen" value="">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Fag</label>
+        <input class="form-input" type="text" placeholder="F.eks. Klasselærer, Gym, Kunst" value="">
+      </div>
+      <div class="form-row">
+        <div class="form-field" style="flex:1">
+          <label class="form-label">Telefon</label>
+          <input class="form-input" type="tel" placeholder="987 65 432" value="">
+        </div>
+        <div class="form-field" style="flex:1">
+          <label class="form-label">E-post</label>
+          <input class="form-input" type="email" placeholder="navn@skole.no" value="">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Notat</label>
+        <textarea class="form-textarea" placeholder="Eventuelle notater..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="form-btn cancel">Avbryt</button>
+      <button class="form-btn save">Lagre</button>
+    </div>
+  </div>
+
+  <!-- 5. Add Contact Form — Classmate -->
+  <div class="form-modal">
+    <div class="form-header">
+      <div class="form-title">Legg til klassekamerat</div>
+      <div class="form-close">✕</div>
+    </div>
+    <div class="form-body">
+      <div class="form-field">
+        <label class="form-label">Rolle</label>
+        <div class="tab-row">
+          <div class="tab-chip">👩‍🏫 Lærer</div>
+          <div class="tab-chip active">👦 Klassekamerat</div>
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Barnets navn</label>
+        <input class="form-input" type="text" placeholder="F.eks. Lucas Andersen" value="">
+      </div>
+      <div class="form-row">
+        <div class="form-field" style="flex:1">
+          <label class="form-label">Barnets telefon</label>
+          <input class="form-input" type="tel" placeholder="Valgfritt" value="">
+        </div>
+        <div class="form-field" style="flex:1">
+          <label class="form-label">Barnets e-post</label>
+          <input class="form-input" type="email" placeholder="Valgfritt" value="">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Foreldre/navn</label>
+        <input class="form-input" type="text" placeholder="F.eks. Monica Andersen" value="">
+      </div>
+      <div class="form-row">
+        <div class="form-field" style="flex:1">
+          <label class="form-label">Foreldre telefon</label>
+          <input class="form-input" type="tel" placeholder="456 78 901" value="">
+        </div>
+        <div class="form-field" style="flex:1">
+          <label class="form-label">Foreldre e-post</label>
+          <input class="form-input" type="email" placeholder="forelder@mail.no" value="">
+        </div>
+      </div>
+      <div class="form-field">
+        <label class="form-label">Notat</label>
+        <textarea class="form-textarea" placeholder="Eventuelle notater..."></textarea>
+      </div>
+    </div>
+    <div class="form-actions">
+      <button class="form-btn cancel">Avbryt</button>
+      <button class="form-btn save">Lagre</button>
+    </div>
+  </div>
+
+  <!-- 4. AI Import Flow -->
+  <div class="section-title">4. AI-import fra bilde</div>
+  <div class="section-note">Samme mønster som Foto til arrangementer. Ta bilde av kontaktlisten, AI leser ut navn og info. Brukeren bekrefter/redigerer før lagring.</div>
+
+  <div class="detail-section">
+    <div class="detail-section-header">
+      <div class="detail-section-title">📸 Fotografer kontaktliste</div>
+    </div>
+    <div class="ai-import" style="margin-top: 0;">
+      <div class="ai-import-icon">📷</div>
+      <div class="ai-import-text">
+        <div class="ai-import-title">Ta bilde av klassens kontaktliste</div>
+        <div class="ai-import-sub">AI gjenkjenner barn, foreldre, navn, telefonnumre og e-postadresser</div>
+      </div>
+    </div>
+    <div style="margin-top: 16px;">
+      <div class="detail-item" style="background: #F1F8E9; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+        <div class="detail-item-icon">✅</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Lucas Andersen</div>
+          <div class="detail-item-sub">Forelder: Monica Andersen · 456 78 901</div>
+        </div>
+        <span class="badge badge-green">Godkjent</span>
+      </div>
+      <div class="detail-item" style="background: #F1F8E9; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+        <div class="detail-item-icon">✅</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Mia Johansen</div>
+          <div class="detail-item-sub">Forelder: Per Johansen · 567 89 012</div>
+        </div>
+        <span class="badge badge-green">Godkjent</span>
+      </div>
+      <div class="detail-item" style="background: #FFF3E0; border-radius: 8px; padding: 12px; margin-bottom: 8px;">
+        <div class="detail-item-icon">⚠️</div>
+        <div class="detail-item-text">
+          <div class="detail-item-title">Elias Nils…</div>
+          <div class="detail-item-sub">Ufullstendig — sjekk navn</div>
+        </div>
+        <span class="badge badge-orange">Trenger bekreftelse</span>
+      </div>
+    </div>
+    <div class="form-actions" style="padding: 12px 0 0; border-top: 1px solid var(--border); margin-top: 12px;">
+      <button class="form-btn cancel">Avbryt</button>
+      <button class="form-btn save">Legg til alle (3)</button>
+    </div>
+  </div>
+
+  <!-- 5. Search integration note -->
+  <div class="section-title">5. Global søk — Fremtidig</div>
+  <div class="section-note">Lærere, klassekamerater og timeplaner skal være søkbare i det globale søket. Søkbare felt lagres i en egen søkeindeks.</div>
+  <div class="search-note">
+    💡 <strong>Søkbar data:</strong> Lærernavn, fag, klassekameratnavn, foreldrenavn, telefon, e-post, skolenavn, klasse. Timeplan-metadata (semester, år) er også søkbare. Søkindeksen oppdateres automatisk ved endringer.
+  </div>
+
+  <!-- 6. Data model note -->
+  <div class="section-title">6. Firestore — Datamodell</div>
+  <div class="section-note">Forslag til Firestore-struktur for Skole-modulen.</div>
+  <div class="detail-section" style="font-family: monospace; font-size: 12px; line-height: 1.8;">
+    <div style="color: var(--accent); font-weight: 700; margin-bottom: 8px;">📁 school/{familyId}/</div>
+    <div style="padding-left: 16px;">
+      <div>📄 children/{childId}</div>
+      <div style="padding-left: 16px; color: var(--text2);">
+        name, school, photoUrl, familyId, createdAt
+      </div>
+      <div style="padding-left: 16px; margin-top: 8px;">📁 schoolYears/{yearId}</div>
+      <div style="padding-left: 32px; color: var(--text2);">
+        year ("2025-2026"), grade ("4. klasse"), school ("Sofiesborg"), familyId, createdAt
+      </div>
+      <div style="padding-left: 32px; margin-top: 4px;">📄 contacts/{contactId}</div>
+      <div style="padding-left: 48px; color: var(--text2);">
+        name, role, subject, parentName, phone, email, notes, familyId, createdAt
+      </div>
+      <div style="padding-left: 32px; margin-top: 4px;">📄 schedules/{scheduleId}</div>
+      <div style="padding-left: 48px; color: var(--text2);">
+        semester (høst/vår), imageUrl, fileName, familyId, createdAt
+      </div>
+      <div style="padding-left: 16px; margin-top: 8px;">📁 searchIndex/{contactId}</div>
+      <div style="padding-left: 32px; color: var(--text2);">
+        queryText, module: "school", childName, year, contactId, familyId
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

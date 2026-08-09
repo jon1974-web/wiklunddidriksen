@@ -7,6 +7,7 @@ import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { getTrips } from '../services/tripService';
 import { getHealthAppointments } from '../services/healthService';
+import { getSchoolChildren } from '../services/schoolService';
 
 interface Space {
   id: string;
@@ -28,6 +29,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
   const familyName = useUserStore((state) => state.familyName);
   const [tripCount, setTripCount] = useState(0);
   const [healthCount, setHealthCount] = useState(0);
+  const [schoolCount, setSchoolCount] = useState(0);
 
   useEffect(() => {
     if (!familyId) return;
@@ -39,6 +41,9 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
     getHealthAppointments(familyId).then(appts => {
       const future = appts.filter(a => a.date >= today);
       setHealthCount(future.length);
+    }).catch(() => {});
+    getSchoolChildren(familyId).then(children => {
+      setSchoolCount(children.length);
     }).catch(() => {});
   }, [familyId]);
 
@@ -64,7 +69,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       name: t('spaces.school'),
       icon: 'documents',
       iconColor: '#43A047',
-      count: t('spaces.schoolCount', { count: 3 }),
+      count: t('spaces.schoolCount', { count: schoolCount }),
       screen: 'SchoolSpace',
     },
     {

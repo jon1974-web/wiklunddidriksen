@@ -510,3 +510,51 @@ export interface HealthGrowth {
 }
 
 export type HealthItemType = 'medication' | 'appointment' | 'vaccination' | 'allergy' | 'growth';
+
+// School module types
+export interface SchoolChild {
+  id: string;
+  name: string;
+  school?: string;
+  photoUrl?: string;
+  familyId: string;
+  createdAt: number;
+}
+
+export interface SchoolYear {
+  id: string;
+  childId: string;
+  year: string;
+  grade: string;
+  school?: string;
+  familyId: string;
+  createdAt: number;
+}
+
+export interface SchoolContact {
+  id: string;
+  yearId: string;
+  childId: string;
+  name: string;
+  role: 'teacher' | 'classmate';
+  subject?: string;
+  childPhone?: string;
+  childEmail?: string;
+  parentName?: string;
+  parentPhone?: string;
+  parentEmail?: string;
+  notes?: string;
+  familyId: string;
+  createdAt: number;
+}
+
+export interface SchoolSchedule {
+  id: string;
+  yearId: string;
+  childId: string;
+  semester: 'høst' | 'vår';
+  imageUrl: string;
+  fileName: string;
+  familyId: string;
+  createdAt: number;
+}

@@ -134,6 +134,30 @@ service cloud.firestore {
       }
     }
 
+    // School Children: family-scoped
+    match /schoolChildren/{childId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
+    // School Years: family-scoped
+    match /schoolYears/{yearId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
+    // School Contacts: family-scoped
+    match /schoolContacts/{contactId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
+    // School Schedules: family-scoped
+    match /schoolSchedules/{scheduleId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
     // Recipes: family-scoped
     match /recipes/{recipeId} {
       allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
