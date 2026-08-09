@@ -26,7 +26,7 @@ export async function deleteSchoolChild(childId: string): Promise<void> {
 
 // School Years
 export async function getSchoolYears(childId: string): Promise<SchoolYear[]> {
-  const q = query(collection(db, 'schoolYears'), where('childId', '==', childId), orderBy('createdAt', 'desc'));
+  const q = query(collection(db, 'schoolYears'), where('childId', '==', childId));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolYear));
 }
@@ -46,7 +46,7 @@ export async function deleteSchoolYear(yearId: string): Promise<void> {
 
 // Contacts (teachers + classmates)
 export async function getSchoolContacts(yearId: string): Promise<SchoolContact[]> {
-  const q = query(collection(db, 'schoolContacts'), where('yearId', '==', yearId), orderBy('createdAt', 'asc'));
+  const q = query(collection(db, 'schoolContacts'), where('yearId', '==', yearId));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolContact));
 }
@@ -66,7 +66,7 @@ export async function deleteSchoolContact(contactId: string): Promise<void> {
 
 // Schedules
 export async function getSchoolSchedules(yearId: string): Promise<SchoolSchedule[]> {
-  const q = query(collection(db, 'schoolSchedules'), where('yearId', '==', yearId), orderBy('createdAt', 'desc'));
+  const q = query(collection(db, 'schoolSchedules'), where('yearId', '==', yearId));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolSchedule));
 }
