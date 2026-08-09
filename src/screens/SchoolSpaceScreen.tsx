@@ -430,13 +430,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   </TouchableOpacity>
                 </View>
                 {teachers.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c })}>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
                       {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{c.subject}</Text> : null}
                       {c.phone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {c.phone}</Text> : null}
                       {c.email ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {c.email}</Text> : null}
-                      {renderContactActions(c.phone, c.email)}
                     </View>
                   </TouchableOpacity>
                 ))}
@@ -469,17 +468,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </TouchableOpacity>
 
                 {filteredClassmates.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c })}>
                     <View style={{ flex: 1 }}>
                       <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
                       {c.parentName ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{t('school.parent')}: {c.parentName}</Text> : null}
                       {c.parentPhone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {c.parentPhone}</Text> : null}
                       {c.parentEmail ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {c.parentEmail}</Text> : null}
-                      {c.parentName2 ? <Text style={{ color: colors.textSecondary, fontSize: 13, marginTop: 4 }}>{t('school.parent')} 2: {c.parentName2}</Text> : null}
-                      {c.parentPhone2 ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {c.parentPhone2}</Text> : null}
-                      {c.parentEmail2 ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {c.parentEmail2}</Text> : null}
-                      {c.notes ? <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 4 }}>{c.notes}</Text> : null}
-                      {renderContactActions(c.parentPhone, c.parentEmail)}
                     </View>
                   </TouchableOpacity>
                 ))}
