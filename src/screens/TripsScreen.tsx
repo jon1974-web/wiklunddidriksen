@@ -13,6 +13,7 @@ import { crossAlert } from '../utils/alert';
 import { ActionModal } from '../components/ActionModal';
 import { getForecast, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
 import { AppIcon } from '../components/AppIcon';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface TripsScreenProps {
   navigation: any;
@@ -179,14 +180,14 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.trips, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: MODULE_COLORS.trips, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-            <AppIcon name="compass" size={28} color={colors.accent} />
+            <AppIcon name="compass" size={28} color={MODULE_COLORS.trips} />
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.title')}</Text>
           </View>
         </View>
@@ -214,7 +215,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       )}
 
       <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.accent }]}
+        style={[styles.fab, { backgroundColor: MODULE_COLORS.trips }]}
         onPress={() => navigation.navigate('AddTrip')}
       >
         <Text style={styles.fabText}>+</Text>

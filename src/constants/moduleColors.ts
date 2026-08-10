@@ -1,5 +1,5 @@
 export const MODULE_COLORS = {
-  trips: '#1565C0',
+  trips: '#42A5F5',
   health: '#E53935',
   school: '#43A047',
   birthdays: '#FB8C00',
