@@ -120,7 +120,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     {transportForm.transportType === 'fly' ? t('transport.airline') : transportForm.transportType === 'tog' ? t('transport.trainOperator') : t('transport.rentalCompany')}
                   </Text>
                   <TextInput
-                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                     value={transportForm.airline}
                     onChangeText={(v) => set({ airline: v })}
                     placeholder={transportForm.transportType === 'fly' ? t('common.placeholderAirline') : transportForm.transportType === 'tog' ? t('common.placeholderTrainOperator') : t('common.placeholderRentalCompany')}
@@ -132,7 +132,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     {transportForm.transportType === 'fly' ? t('transport.flightNumber') : transportForm.transportType === 'tog' ? t('transport.trainRoute') : t('transport.bookingNumber')}
                   </Text>
                   <TextInput
-                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                     value={transportForm.flightNumber}
                     onChangeText={(v) => set({ flightNumber: v })}
                     placeholder={transportForm.transportType === 'fly' ? t('common.placeholderFlightNumber') : transportForm.transportType === 'tog' ? t('common.placeholderTrainRoute') : t('common.placeholderBookingNumber')}
@@ -145,7 +145,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     {t('transport.reference')}
                   </Text>
                   <TextInput
-                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                     value={transportForm.reference}
                     onChangeText={(v) => set({ reference: v })}
                     placeholder={t('common.placeholderReference')}
@@ -157,7 +157,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.seatNumber')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={transportForm.seatNumber}
                       onChangeText={(v) => set({ seatNumber: v })}
                       placeholder={t('common.placeholderSeat')}
@@ -170,7 +170,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('transport.wagon')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={transportForm.wagon}
                       onChangeText={(v) => set({ wagon: v })}
                       placeholder={t('common.placeholderWagonSeat')}
@@ -183,7 +183,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('common.driver')}</Text>
                       <TextInput
-                        style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                        style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                         value={transportForm.driver}
                         onChangeText={(v) => set({ driver: v })}
                         placeholder={t('common.placeholderDriverName')}
@@ -266,7 +266,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                       {transportForm.transportType === 'bil' ? 'Hentedato' : t('transport.departureDateLabel')}
                     </Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => onOpenPicker('flightDepDate')}
                     >
                       <Text style={{ color: transportForm.departureDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -279,7 +279,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                       {transportForm.transportType === 'bil' ? 'Hentetid' : t('transport.departureTimeLabel')}
                     </Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => onOpenPicker('flightDepTime')}
                     >
                       <Text style={{ color: transportForm.departureTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -296,7 +296,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                       {transportForm.transportType === 'bil' ? t('transport.dropoff') : t('transport.arrivalDateLabel')}
                     </Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => onOpenPicker('flightArrDate')}
                     >
                       <Text style={{ color: transportForm.arrivalDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -309,7 +309,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                       {transportForm.transportType === 'bil' ? t('transport.dropoff') : t('transport.arrivalTimeLabel')}
                     </Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => onOpenPicker('flightArrTime')}
                     >
                       <Text style={{ color: transportForm.arrivalTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -322,7 +322,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>
                   <TextInput
-                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                     value={transportForm.phone}
                     onChangeText={(v) => set({ phone: v })}
                     placeholder={t('common.placeholderPhoneFormat')}
@@ -333,7 +333,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
                   <TextInput
-                    style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                     value={transportForm.note}
                     onChangeText={(v) => set({ note: v })}
                     placeholder="..."
@@ -342,7 +342,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 </View>
               </ScrollView>
               <View style={styles.modalActions}>
-                <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={onCancel}>
+                <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={onCancel}>
                   <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={onSave}>

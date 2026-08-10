@@ -1210,7 +1210,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           />
 
           {stagedCity && (
-            <View style={[styles.stagedCityRow, { borderColor: MODULE_COLORS.trips, backgroundColor: colors.inputBackground }]}>
+            <View style={[styles.stagedCityRow, { borderColor: MODULE_COLORS.trips, backgroundColor: MODULE_COLORS.tripsBg }]}>
               <Text style={[styles.stagedCityName, { color: colors.text }]}>📍 {stagedCity}</Text>
               {tipsLoading ? (
                 <View style={[styles.generateButton, { backgroundColor: MODULE_COLORS.trips, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
@@ -1463,7 +1463,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={tripTitle}
                       onChangeText={setTripTitle}
                       placeholder={t('common.placeholderTripTitle')}
@@ -1491,7 +1491,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.country')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={tripCountry}
                       onChangeText={setTripCountry}
                       placeholder={t('common.placeholderCountry')}
@@ -1505,7 +1505,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       {TRIP_ICONS.map((i) => (
                         <TouchableOpacity
                           key={i}
-                          style={[styles.iconOption, { backgroundColor: colors.inputBackground, borderColor: tripIcon === i ? MODULE_COLORS.trips : colors.border }]}
+                          style={[styles.iconOption, { backgroundColor: MODULE_COLORS.tripsBg, borderColor: tripIcon === i ? MODULE_COLORS.trips : colors.border }]}
                           onPress={() => setTripIcon(i)}
                         >
                           <Text style={styles.iconText}>{i}</Text>
@@ -1517,7 +1517,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Fra dato</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('tripStart')}
                     >
                       <Text style={{ color: tripStartDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1529,7 +1529,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Til dato</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('tripEnd')}
                     >
                       <Text style={{ color: tripEndDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1539,7 +1539,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveTripEdit}>
@@ -1589,7 +1589,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={hotelForm.name}
                       onChangeText={(v) => setHotelForm(f => ({ ...f, name: v }))}
                       placeholder={t('common.placeholderHotelName')}
@@ -1608,7 +1608,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.phone')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={hotelForm.phone}
                       onChangeText={(v) => setHotelForm(f => ({ ...f, phone: v }))}
                       placeholder={t('common.placeholderPhone')}
@@ -1619,7 +1619,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.startDate')}</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('hotelStartDate')}
                     >
                       <Text style={{ color: hotelForm.startDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1630,7 +1630,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.endDate')}</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('hotelEndDate')}
                     >
                       <Text style={{ color: hotelForm.endDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1641,7 +1641,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('hotels.checkIn')}</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('hotelCheckIn')}
                     >
                       <Text style={{ color: hotelForm.checkInTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1652,7 +1652,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('hotels.checkOut')}</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('hotelCheckOut')}
                     >
                       <Text style={{ color: hotelForm.checkOutTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1663,7 +1663,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={hotelForm.note}
                       onChangeText={(v) => setHotelForm(f => ({ ...f, note: v }))}
                       placeholder={t('common.placeholderHotelNote')}
@@ -1672,7 +1672,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveHotel}>
@@ -1698,7 +1698,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={restForm.name}
                       onChangeText={(v) => setRestForm(f => ({ ...f, name: v }))}
                       placeholder={t('common.placeholderRestaurantName')}
@@ -1716,32 +1716,32 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('pickers.startDate')}</Text>
-                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('restStartDate')}>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActivePicker('restStartDate')}>
                       <Text style={{ color: restForm.startDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{restForm.startDate || t('pickers.startDate')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('pickers.endDate')}</Text>
-                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('restEndDate')}>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActivePicker('restEndDate')}>
                       <Text style={{ color: restForm.endDate ? colors.text : colors.textDisabled, fontSize: 16 }}>{restForm.endDate || t('pickers.endDate')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('pickers.startTime')}</Text>
-                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('restStartTime')}>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActivePicker('restStartTime')}>
                       <Text style={{ color: restForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{restForm.startTime || t('pickers.startTime')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('pickers.endTime')}</Text>
-                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('restEndTime')}>
+                    <TouchableOpacity style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActivePicker('restEndTime')}>
                       <Text style={{ color: restForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{restForm.endTime || t('pickers.endTime')}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={restForm.note}
                       onChangeText={(v) => setRestForm(f => ({ ...f, note: v }))}
                       placeholder={t('common.placeholderRestaurantNote')}
@@ -1750,7 +1750,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveRestaurant}>
@@ -1776,7 +1776,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.name')} *</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={actForm.name}
                       onChangeText={(v) => setActForm(f => ({ ...f, name: v }))}
                       placeholder={t('activities.placeholderName')}
@@ -1795,7 +1795,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.startDate')}</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('actStartDate')}
                     >
                       <Text style={{ color: actForm.startDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1806,7 +1806,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.endDate')}</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('actEndDate')}
                     >
                       <Text style={{ color: actForm.endDate ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1817,7 +1817,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('pickers.startTime')}</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('actStartTime')}
                     >
                       <Text style={{ color: actForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1828,7 +1828,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('pickers.endTime')}</Text>
                     <TouchableOpacity
-                      style={[styles.input, { backgroundColor: colors.inputBackground }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('actEndTime')}
                     >
                       <Text style={{ color: actForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
@@ -1839,7 +1839,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={actForm.note}
                       onChangeText={(v) => setActForm(f => ({ ...f, note: v }))}
                       placeholder={t('activities.placeholderNote')}
@@ -1848,7 +1848,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveActivity}>
@@ -1874,7 +1874,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.title')} *</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={docForm.title}
                       onChangeText={(v) => setDocForm(f => ({ ...f, title: v }))}
                       placeholder={t('documents.placeholderTitle')}
@@ -1884,7 +1884,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={docForm.note}
                       onChangeText={(v) => setDocForm(f => ({ ...f, note: v }))}
                       placeholder={t('documents.placeholderNote')}
@@ -1905,7 +1905,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveDocument}>
@@ -1931,7 +1931,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.title')} *</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={linkForm.title}
                       onChangeText={(v) => setLinkForm(f => ({ ...f, title: v }))}
                       placeholder={t('links.placeholderTitle')}
@@ -1941,7 +1941,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('links.url')} *</Text>
                     <TextInput
-                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={linkForm.url}
                       onChangeText={(v) => setLinkForm(f => ({ ...f, url: v }))}
                       placeholder="https://..."
@@ -1953,7 +1953,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveLink}>
@@ -1985,7 +1985,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 ].map((opt) => (
                   <TouchableOpacity
                     key={opt.label}
-                    style={[styles.modalButton, { backgroundColor: colors.inputBackground, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }]}
+                    style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg, marginBottom: 8, flexDirection: 'row', alignItems: 'center', gap: 12 }]}
                     onPress={() => {
                       setShowTransportPicker(false);
                       openAddModal(opt.type, opt.transportType);
@@ -1995,7 +1995,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.modalButtonText, { color: colors.text, textAlign: 'left' }]}>{opt.label}</Text>
                   </TouchableOpacity>
                 ))}
-                <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground, marginTop: 4 }]} onPress={() => setShowTransportPicker(false)}>
+                <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.tripsBg, marginTop: 4 }]} onPress={() => setShowTransportPicker(false)}>
                   <Text style={[styles.modalButtonText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
               </View>
@@ -2058,7 +2058,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.text }]}>{t('packing.addList')}</Text>
                 <TextInput
-                  style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                  style={[styles.modalInput, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                   value={newPackingListTitle}
                   onChangeText={setNewPackingListTitle}
                   placeholder={t('packing.listNamePlaceholder')}
