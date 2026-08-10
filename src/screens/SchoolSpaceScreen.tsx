@@ -272,6 +272,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   };
 
   const teachers = contacts.filter(c => c.role === 'teacher');
+  const admins = contacts.filter(c => c.role === 'admin');
   const classmates = contacts.filter(c => c.role === 'classmate');
   const filteredClassmates = classmates.filter(c => {
     if (!contactSearch.trim()) return true;
@@ -462,6 +463,37 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 {teachers.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
               </View>
 
+              {/* Helse og administrasjon Section */}
+              <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <View style={styles.sectionHeader}>
+                  <View style={styles.sectionTitleRow}>
+                    <Text style={styles.sectionIcon}>🏥</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.healthAdmin')}</Text>
+                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({admins.length})</Text>
+                  </View>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'admin', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                    <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+                  </TouchableOpacity>
+                </View>
+                {admins.map(c => (
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <View style={{ flex: 1 }}>
+                        <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
+                        {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{c.subject}</Text> : null}
+                        {c.phone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {c.phone}</Text> : null}
+                        {c.email ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {c.email}</Text> : null}
+                      </View>
+                      <View style={{ flexDirection: 'row', gap: 6 }}>
+                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>}
+                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><Text style={{ color: '#FB8C00', fontSize: 14 }}>✉️</Text></TouchableOpacity>}
+                      </View>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+                {admins.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
+              </View>
+
               {/* Schedule Section */}
               <View style={[styles.section, { backgroundColor: colors.surface }]}>
                 <View style={styles.sectionHeader}>
@@ -576,12 +608,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <Text style={[styles.modalTitle, { color: colors.text }]}>{editingContactId ? t('school.editContact') : t('school.addContact')}</Text>
               <ScrollView>
-                <Text style={[styles.label, { color: colors.text, fontWeight: '700', fontSize: 16, marginBottom: 12 }]}>{contactForm.role === 'teacher' ? '👩‍🏫 ' + t('school.addContactTeacher') : '👦 ' + t('school.addContactClassmate')}</Text>
+                <Text style={[styles.label, { color: colors.text, fontWeight: '700', fontSize: 16, marginBottom: 12 }]}>{contactForm.role === 'teacher' ? '👩‍🏫 ' + t('school.addContactTeacher') : contactForm.role === 'admin' ? '🏥 ' + t('school.addHealthAdmin') : '👦 ' + t('school.addContactClassmate')}</Text>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{contactForm.role === 'teacher' ? t('school.teacherName') : t('school.childName')}</Text>
                   <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.name} onChangeText={(v) => setContactForm(f => ({ ...f, name: v }))} placeholderTextColor={colors.textDisabled} />
                 </View>
-                {contactForm.role === 'teacher' ? (
+                {contactForm.role === 'teacher' || contactForm.role === 'admin' ? (
                   <>
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('school.subject')}</Text>

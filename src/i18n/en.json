@@ -216,6 +216,8 @@
     "role": "Role",
     "call": "Call",
     "copy": "Copy",
+    "healthAdmin": "Health and administration",
+    "addHealthAdmin": "Add health/admin contact",
     "noContacts": "No contacts added",
     "noYears": "No school years added",
     "searchContacts": "Search name, parent, phone...",

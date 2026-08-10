@@ -538,7 +538,7 @@ export interface SchoolContact {
   yearId: string;
   childId: string;
   name: string;
-  role: 'teacher' | 'classmate';
+  role: 'teacher' | 'classmate' | 'admin';
   subject?: string;
   address?: string;
   childPhone?: string;

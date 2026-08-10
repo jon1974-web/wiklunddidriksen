@@ -216,6 +216,8 @@
     "role": "Roll",
     "call": "Ring",
     "copy": "Kopiera",
+    "healthAdmin": "Hälsa och administration",
+    "addHealthAdmin": "Lägg till hälsa/admin-kontakt",
     "noContacts": "Inga kontakter tillagda",
     "noYears": "Inga skolår tillagda",
     "searchContacts": "Sök namn, förälder, telefon...",

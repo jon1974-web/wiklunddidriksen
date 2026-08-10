@@ -216,6 +216,8 @@
     "role": "Rooli",
     "call": "Soita",
     "copy": "Kopioi",
+    "healthAdmin": "Terveys ja hallinto",
+    "addHealthAdmin": "Lisää terveys/hallintoyhteystieto",
     "noContacts": "Ei yhteystietoja",
     "noYears": "Ei kouluvuosia",
     "searchContacts": "Hae nimellä, vanhemmalla, puhelimella...",

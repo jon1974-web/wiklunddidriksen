@@ -217,6 +217,8 @@
     "role": "Rolle",
     "call": "Ring",
     "copy": "Kopier",
+    "healthAdmin": "Helse og administrasjon",
+    "addHealthAdmin": "Legg til helse/admin-kontakt",
     "noContacts": "Ingen kontakter lagt til",
     "noYears": "Ingen skoleår lagt til",
     "searchContacts": "Søk etter navn, forelder, telefon...",
