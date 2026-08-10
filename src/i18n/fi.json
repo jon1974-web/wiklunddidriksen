@@ -139,7 +139,7 @@
     "weeklySummary": "Oma viikko"
   },
   "trips": {
-    "title": "Matkat",
+    "title": "Matkamme",
     "noTripsWeek": "Ei matkoja tällä viikolla",
     "addTrip": "Uusi matka",
     "noTrips": "Ei matkoja lisätty",
@@ -176,7 +176,7 @@
     "helpBirthdaysTip": "Lahjalistat säilytetään vuodesta toiseen, jotta näet mitä ostit viime kerralla."
   },
   "school": {
-    "title": "Koulu",
+    "title": "Vår skola",
     "ourChildren": "Lapsemme",
     "addChild": "Lisää lapsi",
     "editChild": "Muokkaa lasta",
@@ -751,7 +751,7 @@
     "giftPlaceholder": "esim. LEGO-setti"
   },
   "mealPlanner": {
-    "title": "Ruokakeskus",
+    "title": "Vår mat",
     "weeklyPlan": "Viikkoasuunnitelma",
     "recipes": "Reseptit",
     "shoppingList": "Ostoslista",

@@ -140,7 +140,7 @@
     "endTime120": "2 timer"
   },
   "trips": {
-    "title": "Reiser",
+    "title": "Våre reiser",
     "noTripsWeek": "Ingen reiser denne uken",
     "addTrip": "Ny reise",
     "noTrips": "Ingen reiser lagt til",
@@ -177,7 +177,7 @@
     "helpBirthdaysTip": "Gavelister bevares fra år til år slik at du kan se hva du kjøpte forrige gang."
   },
   "school": {
-    "title": "Skole",
+    "title": "Vår skole",
     "ourChildren": "Våre barn",
     "addChild": "Legg til barn",
     "editChild": "Rediger barn",
@@ -752,7 +752,7 @@
     "giftPlaceholder": "F.eks. LEGO sett"
   },
   "mealPlanner": {
-    "title": "Matsenter",
+    "title": "Vår mat",
     "weeklyPlan": "Ukemeny",
     "recipes": "Oppskrifter",
     "shoppingList": "Handleliste",

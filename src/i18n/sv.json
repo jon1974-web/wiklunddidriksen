@@ -139,7 +139,7 @@
     "weeklySummary": "Min vecka"
   },
   "trips": {
-    "title": "Resor",
+    "title": "Våra resor",
     "noTripsWeek": "Inga resor denne veckan",
     "addTrip": "Ny resa",
     "noTrips": "Inga resor tillagda",
@@ -176,7 +176,7 @@
     "helpBirthdaysTip": "Gåvor bevaras från år till år så att du kan se vad du köpte förra gången."
   },
   "school": {
-    "title": "Skola",
+    "title": "Vår skola",
     "ourChildren": "Våra barn",
     "addChild": "Lägg till barn",
     "editChild": "Redigera barn",
@@ -751,7 +751,7 @@
     "giftPlaceholder": "t.ex. LEGO-set"
   },
   "mealPlanner": {
-    "title": "Matcenter",
+    "title": "Vår mat",
     "weeklyPlan": "Veckomeny",
     "recipes": "Recept",
     "shoppingList": "Inköpslista",

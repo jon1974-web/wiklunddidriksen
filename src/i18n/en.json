@@ -139,7 +139,7 @@
     "endTime120": "2 hours"
   },
   "trips": {
-    "title": "Trips",
+    "title": "Our Trips",
     "noTripsWeek": "No trips this week",
     "addTrip": "New trip",
     "noTrips": "No trips added",
@@ -176,7 +176,7 @@
     "helpBirthdaysTip": "Gift lists are preserved from year to year so you can see what you bought last time."
   },
   "school": {
-    "title": "School",
+    "title": "Our School",
     "ourChildren": "Our Children",
     "addChild": "Add Child",
     "editChild": "Edit Child",
@@ -751,7 +751,7 @@
     "giftPlaceholder": "e.g. LEGO set"
   },
   "mealPlanner": {
-    "title": "Food Center",
+    "title": "Our Meals",
     "weeklyPlan": "Weekly Plan",
     "recipes": "Recipes",
     "shoppingList": "Shopping List",

@@ -139,7 +139,7 @@
     "weeklySummary": "Min uge"
   },
   "trips": {
-    "title": "Rejser",
+    "title": "Vore rejser",
     "noTripsWeek": "Ingen rejser denne uge",
     "addTrip": "Ny rejse",
     "noTrips": "Ingen rejser tilføjet",
@@ -176,7 +176,7 @@
     "helpBirthdaysTip": "Gavelister bevares fra år til år så du kan se hvad du købte sidste gang."
   },
   "school": {
-    "title": "Skole",
+    "title": "Vores skole",
     "ourChildren": "Vores børn",
     "addChild": "Tilføj barn",
     "editChild": "Rediger barn",
@@ -751,7 +751,7 @@
     "giftPlaceholder": "f.eks. LEGO-sæt"
   },
   "mealPlanner": {
-    "title": "Madsenter",
+    "title": "Vores mad",
     "weeklyPlan": "Ugeplan",
     "recipes": "Opskrifter",
     "shoppingList": "Indkøbsliste",
