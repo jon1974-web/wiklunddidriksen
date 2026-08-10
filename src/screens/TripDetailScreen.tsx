@@ -1374,7 +1374,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           </View>
           {docsExpanded && (
             <TouchableOpacity
-              style={[styles.addButton, { backgroundColor: colors.accent }]}
+              style={[styles.addButton, { backgroundColor: MODULE_COLORS.trips }]}
               onPress={() => openAddModal('document')}
             >
               <Text style={styles.addButtonText}>+</Text>
@@ -1542,7 +1542,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveTripEdit}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveTripEdit}>
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>Lagre</Text>
                   </TouchableOpacity>
                 </View>
@@ -1675,7 +1675,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveHotel}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveHotel}>
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? t('common.save') : t('common.add')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -1753,7 +1753,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveRestaurant}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveRestaurant}>
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? t('common.save') : t('common.add')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -1851,7 +1851,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveActivity}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveActivity}>
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? t('common.save') : t('common.add')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -1900,7 +1900,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       }}
                     />
                     {docForm.fileName ? (
-                      <Text style={[styles.fileInfo, { color: colors.accent }]}>📎 {docForm.fileName}</Text>
+                      <Text style={[styles.fileInfo, { color: MODULE_COLORS.trips }]}>📎 {docForm.fileName}</Text>
                     ) : null}
                   </View>
                 </ScrollView>
@@ -1908,7 +1908,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveDocument}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveDocument}>
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? t('common.save') : t('common.add')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -1956,7 +1956,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveModal(null)}>
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={handleSaveLink}>
+                  <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveLink}>
                     <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? t('common.save') : t('common.add')}</Text>
                   </TouchableOpacity>
                 </View>
@@ -1991,7 +1991,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       openAddModal(opt.type, opt.transportType);
                     }}
                   >
-                    <AppIcon name={opt.iconName} size={22} color={colors.accent} />
+                    <AppIcon name={opt.iconName} size={22} color={MODULE_COLORS.trips} />
                     <Text style={[styles.modalButtonText, { color: colors.text, textAlign: 'left' }]}>{opt.label}</Text>
                   </TouchableOpacity>
                 ))}
@@ -2069,7 +2069,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20 }} onPress={() => { setShowAddPackingList(false); setNewPackingListTitle(''); }}>
                     <Text style={{ color: colors.textSecondary, fontSize: 16 }}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, backgroundColor: colors.accent }} onPress={handleCreatePackingList}>
+                    <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, backgroundColor: MODULE_COLORS.trips }} onPress={handleCreatePackingList}>
                     <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>{t('common.add')}</Text>
                   </TouchableOpacity>
                 </View>

@@ -304,8 +304,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const renderGrid = () => (
     <>
       <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.school, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: MODULE_COLORS.school, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
@@ -394,8 +394,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     return (
       <>
         <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
-          <TouchableOpacity onPress={() => { setSelectedChild(null); setSelectedYear(null); }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+          <TouchableOpacity onPress={() => { setSelectedChild(null); setSelectedYear(null); }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.school, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: MODULE_COLORS.school, fontSize: 18 }}>←</Text>
           </TouchableOpacity>
         </View>
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>

@@ -380,7 +380,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
                       {persons.map(p => (
-                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: medForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setMedForm(f => ({ ...f, person: p }))}>
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: medForm.person === p ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setMedForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: medForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
                       ))}
@@ -426,7 +426,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
                       {persons.map(p => (
-                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: apptForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setApptForm(f => ({ ...f, person: p }))}>
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: apptForm.person === p ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setApptForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: apptForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
                       ))}
@@ -479,7 +479,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
                     <View style={styles.personRow}>
                       {['', t('health.reminder1Day'), t('health.reminder3Days'), t('health.reminder1Week')].map((r, i) => (
-                        <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: apptForm.reminder === r ? colors.accent : colors.inputBackground }]} onPress={() => setApptForm(f => ({ ...f, reminder: r }))}>
+                        <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: apptForm.reminder === r ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setApptForm(f => ({ ...f, reminder: r }))}>
                           <Text style={{ color: apptForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
                         </TouchableOpacity>
                       ))}
@@ -499,7 +499,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
                       {persons.map(p => (
-                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: vaccForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, person: p }))}>
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: vaccForm.person === p ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: vaccForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
                       ))}
@@ -521,7 +521,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
                     <View style={styles.personRow}>
                       {['', t('health.reminder1Day'), t('health.reminder3Days'), t('health.reminder1Week')].map((r, i) => (
-                        <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: vaccForm.reminder === r ? colors.accent : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, reminder: r }))}>
+                        <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: vaccForm.reminder === r ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, reminder: r }))}>
                           <Text style={{ color: vaccForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
                         </TouchableOpacity>
                       ))}
@@ -550,7 +550,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
                       {persons.map(p => (
-                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: allergyForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setAllergyForm(f => ({ ...f, person: p }))}>
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: allergyForm.person === p ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setAllergyForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: allergyForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
                       ))}
@@ -576,7 +576,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
                       {persons.map(p => (
-                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: growthForm.person === p ? colors.accent : colors.inputBackground }]} onPress={() => setGrowthForm(f => ({ ...f, person: p }))}>
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: growthForm.person === p ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setGrowthForm(f => ({ ...f, person: p }))}>
                           <Text style={{ color: growthForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
                         </TouchableOpacity>
                       ))}
@@ -605,7 +605,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowAddModal(false)}>
                 <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleAdd}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: MODULE_COLORS.health }]} onPress={handleAdd}>
                 <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.save')}</Text>
               </TouchableOpacity>
             </View>
@@ -724,7 +724,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                         onPress={() => Linking.openURL(getGoogleMapsUrl(detailModal.item.location))}
                       >
                         <Image source={{ uri: mapUrl }} style={styles.viewMapImage} />
-                        <Text style={[styles.viewMapLabel, { color: colors.accent }]}>{t('tips.openGoogleMaps')}</Text>
+                        <Text style={[styles.viewMapLabel, { color: MODULE_COLORS.health }]}>{t('tips.openGoogleMaps')}</Text>
                       </TouchableOpacity>
                     ) : null;
                   })()}
@@ -792,7 +792,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   {detailModal.item.location && (
                     <View style={styles.detailRow}>
                       <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.location')}</Text>
-                      <Text style={[styles.detailValue, { color: colors.accent }]}>{detailModal.item.location}</Text>
+                      <Text style={[styles.detailValue, { color: MODULE_COLORS.health }]}>{detailModal.item.location}</Text>
                     </View>
                   )}
                   <View style={styles.detailRow}>
@@ -862,7 +862,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setDetailModal({ visible: false, item: null, section: 'medications' })}>
                 <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.close')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={() => {
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: MODULE_COLORS.health }]} onPress={() => {
                 const item = detailModal.item;
                 const section = detailModal.section;
                 setDetailModal({ visible: false, item: null, section: 'medications' });

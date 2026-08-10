@@ -5,6 +5,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getBirthdays, addBirthday, updateBirthday, deleteBirthday, getGiftIdeas, addGiftIdea, updateGiftIdea, deleteGiftIdea } from '../services/birthdayService';
@@ -223,14 +224,14 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
           onPress={() => showGifts && toggleExpand(b.id)}
           onLongPress={() => setActionModal({ visible: true, id: b.id, title: b.name })}
         >
-          <AppIcon name="birthday" size={20} color={colors.accent} />
+          <AppIcon name="birthday" size={20} color={MODULE_COLORS.birthdays} />
           <View style={styles.itemText}>
             <Text style={[styles.itemTitle, { color: colors.text }]}>{b.name} <Text style={styles.yearBadge}>{age} {t('birthdays.years')}</Text></Text>
             <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{b.date}</Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
             {showGifts && currentGifts.length > 0 && (
-              <View style={[styles.giftCountBadge, { backgroundColor: colors.accent }]}>
+              <View style={[styles.giftCountBadge, { backgroundColor: MODULE_COLORS.birthdays }]}>
                 <Text style={{ color: '#fff', fontSize: 10, fontWeight: '600' }}>🎁 {currentGifts.length}</Text>
               </View>
             )}
@@ -245,23 +246,23 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
           <View style={styles.expandContent}>
             <View style={styles.cardHeader}>
               <View style={styles.cardTitleRow}>
-                <AppIcon name="destination" size={16} color={colors.accent} />
+                <AppIcon name="destination" size={16} color={MODULE_COLORS.birthdays} />
                 <Text style={[styles.cardTitle, { color: colors.text }]}>{t('birthdays.giftList')} <Text style={styles.yearBadge}>{currentYear}</Text></Text>
               </View>
-              <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.accent }]} onPress={() => { setSelectedBirthday(b); setShowGiftModal(true); }}>
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: MODULE_COLORS.birthdays }]} onPress={() => { setSelectedBirthday(b); setShowGiftModal(true); }}>
                 <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
               </TouchableOpacity>
             </View>
             {currentGifts.map(gift => (
               <TouchableOpacity key={gift.id} style={styles.giftItem} onPress={() => handleToggleGift(gift)}>
-                <View style={[styles.giftCheckbox, gift.purchased && { backgroundColor: colors.accent, borderColor: colors.accent }]}>
+                <View style={[styles.giftCheckbox, gift.purchased && { backgroundColor: MODULE_COLORS.birthdays, borderColor: MODULE_COLORS.birthdays }]}>
                   {gift.purchased && <Text style={{ color: '#fff', fontSize: 12 }}>✓</Text>}
                 </View>
                 <Text style={[styles.giftText, gift.purchased && { textDecorationLine: 'line-through', color: colors.textSecondary }]}>{gift.name}</Text>
               </TouchableOpacity>
             ))}
             <TouchableOpacity style={styles.giftAdd} onPress={() => { setSelectedBirthday(b); setShowGiftModal(true); }}>
-              <Text style={{ color: colors.accent, fontSize: 12 }}>+ {t('birthdays.addGiftIdea')}</Text>
+              <Text style={{ color: MODULE_COLORS.birthdays, fontSize: 12 }}>+ {t('birthdays.addGiftIdea')}</Text>
             </TouchableOpacity>
 
             {Object.keys(previousGifts).length > 0 && (
@@ -284,13 +285,13 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.birthdays, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: MODULE_COLORS.birthdays, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <AppIcon name="birthday" size={28} color={colors.accent} />
+          <AppIcon name="birthday" size={28} color={MODULE_COLORS.birthdays} />
           <Text style={[styles.screenTitle, { color: colors.text }]}>{t('spaces.birthdays')}</Text>
           <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
@@ -307,10 +308,10 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <View style={styles.cardHeader}>
             <View style={styles.cardTitleRow}>
-              <AppIcon name="birthday" size={18} color={colors.accent} />
+              <AppIcon name="birthday" size={18} color={MODULE_COLORS.birthdays} />
               <Text style={[styles.cardTitle, { color: colors.text }]}>{t('birthdays.all')}</Text>
             </View>
-            <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.accent }]} onPress={() => setShowAddModal(true)}>
+            <TouchableOpacity style={[styles.addButton, { backgroundColor: MODULE_COLORS.birthdays }]} onPress={() => setShowAddModal(true)}>
               <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
             </TouchableOpacity>
           </View>
@@ -349,7 +350,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowAddModal(false)}>
                 <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleAddBirthday}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: MODULE_COLORS.birthdays }]} onPress={handleAddBirthday}>
                 <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.save')}</Text>
               </TouchableOpacity>
             </View>
@@ -370,7 +371,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowGiftModal(false); setNewGiftText(''); }}>
                 <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleAddGift}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: MODULE_COLORS.birthdays }]} onPress={handleAddGift}>
                 <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.add')}</Text>
               </TouchableOpacity>
             </View>
