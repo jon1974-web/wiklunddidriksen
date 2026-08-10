@@ -241,6 +241,11 @@ const TripsStack = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name="MealPlan"
+          component={MealPlanScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name="SchoolSpace"
           component={SchoolSpaceScreen}
           options={{ headerShown: false }}
