@@ -610,13 +610,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
               <ScrollView>
                 <Text style={[styles.label, { color: colors.text, fontWeight: '700', fontSize: 16, marginBottom: 12 }]}>{contactForm.role === 'teacher' ? '👩‍🏫 ' + t('school.addContactTeacher') : contactForm.role === 'admin' ? '🏥 ' + t('school.addHealthAdmin') : '👦 ' + t('school.addContactClassmate')}</Text>
                 <View style={styles.field}>
-                  <Text style={[styles.label, { color: colors.text }]}>{contactForm.role === 'teacher' ? t('school.teacherName') : t('school.childName')}</Text>
+                  <Text style={[styles.label, { color: colors.text }]}>{contactForm.role === 'teacher' ? t('school.teacherName') : contactForm.role === 'admin' ? t('school.name') : t('school.childName')}</Text>
                   <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.name} onChangeText={(v) => setContactForm(f => ({ ...f, name: v }))} placeholderTextColor={colors.textDisabled} />
                 </View>
                 {contactForm.role === 'teacher' || contactForm.role === 'admin' ? (
                   <>
                     <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{t('school.subject')}</Text>
+                      <Text style={[styles.label, { color: colors.text }]}>{contactForm.role === 'admin' ? t('school.role') : t('school.subject')}</Text>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.subject} onChangeText={(v) => setContactForm(f => ({ ...f, subject: v }))} placeholderTextColor={colors.textDisabled} />
                     </View>
                     <View style={styles.field}>
