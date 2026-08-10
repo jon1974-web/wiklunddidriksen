@@ -90,16 +90,16 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-        <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.trips, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+        <Text style={{ color: MODULE_COLORS.trips, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       {/* Header card */}
-      <View style={[styles.headerCard, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]}>
+      <View style={[styles.headerCard, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.trips }]}>
         <View style={styles.headerRow}>
           <Text style={styles.headerIcon}>{config.icon}</Text>
           <View style={styles.headerText}>
-            <Text style={[styles.headerDir, { color: colors.accent }]}>{config.label}</Text>
+            <Text style={[styles.headerDir, { color: MODULE_COLORS.trips }]}>{config.label}</Text>
             <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={2}>
               {item.name}
             </Text>
@@ -115,14 +115,14 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow(t('common.phone'), item.phone)}
             {(item.startDate || item.endDate) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📅 {t('hotels.stay')}</Text>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>📅 {t('hotels.stay')}</Text>
                 {item.startDate && renderRow(t('common.startDate'), formatDate(item.startDate))}
                 {item.endDate && renderRow(t('common.endDate'), formatDate(item.endDate))}
               </View>
             )}
             {(item.checkInTime || item.checkOutTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🕐 {t('hotels.times')}</Text>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>🕐 {t('hotels.times')}</Text>
                 {item.checkInTime && renderRow(t('hotels.checkIn'), item.checkInTime)}
                 {item.checkOutTime && renderRow(t('hotels.checkOut'), item.checkOutTime)}
               </View>
@@ -142,14 +142,14 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow(t('common.address'), item.address)}
             {(item.startDate || item.endDate) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📅 {t('common.date')}</Text>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>📅 {t('common.date')}</Text>
                 {item.startDate && renderRow(t('common.startDate'), formatDate(item.startDate))}
                 {item.endDate && renderRow(t('common.endDate'), formatDate(item.endDate))}
               </View>
             )}
             {(item.startTime || item.endTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🕐 {t('common.time')}</Text>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>🕐 {t('common.time')}</Text>
                 {item.startTime && renderRow(t('pickers.startTime'), item.startTime)}
                 {item.endTime && renderRow(t('pickers.endTime'), item.endTime)}
               </View>
@@ -164,7 +164,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow(t('common.reference'), item.reference)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 {t('transport.departure')}</Text>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>🛫 {t('transport.departure')}</Text>
                 {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
                 {item.departureTime && renderRow(t('common.time'), item.departureTime)}
                 {item.departureAddress && renderRow(t('transport.departureTerminal'))}
@@ -192,7 +192,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow(t('common.reference'), item.reference)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>📍 {t('transport.pickup')}</Text>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>📍 {t('transport.pickup')}</Text>
                 {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
                 {item.departureTime && renderRow(t('common.time'), item.departureTime)}
                 {item.departureAddress && renderRow(t('transport.pickupAddress'))}
@@ -220,7 +220,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             {renderRow(t('transport.cabin'), item.cabin)}
             {(item.departureDate || item.departureTime) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
-                <Text style={[styles.timeSectionTitle, { color: colors.accent }]}>🛫 {t('transport.departure')}</Text>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>🛫 {t('transport.departure')}</Text>
                 {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
                 {item.departureTime && renderRow(t('common.time'), item.departureTime)}
                 {item.departureAddress && renderRow(t('transport.departureTerminal'))}
@@ -256,14 +256,14 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
               <Image source={{ uri: getStaticMapUrl(item.departureAddress, 15, '600x200') }} style={[styles.mapImage, { height: 160 }]} />
               <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.departureAddress}</Text>
-                <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
+                <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Maps →</Text>
               </View>
             </TouchableOpacity>
           )}
           {item.departureAddress && item.arrivalAddress && (
             <View style={[styles.arrowContainer, { backgroundColor: colors.surface }]}>
               <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
-              <Text style={[styles.arrowIcon, { color: colors.accent }]}>⛵ →</Text>
+              <Text style={[styles.arrowIcon, { color: MODULE_COLORS.trips }]}>⛵ →</Text>
               <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
             </View>
           )}
@@ -276,7 +276,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
               <Image source={{ uri: getStaticMapUrl(item.arrivalAddress, 15, '600x200') }} style={[styles.mapImage, { height: 160 }]} />
               <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.arrivalAddress}</Text>
-                <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
+                <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Maps →</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -290,7 +290,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           <Image source={{ uri: getStaticMapUrl(item.address, 15, '600x300') }} style={styles.mapImage} />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
             <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.address}</Text>
-            <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Google Maps →</Text>
+            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Google Maps →</Text>
           </View>
         </TouchableOpacity>
       ) : null}
@@ -304,7 +304,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           <Text style={[styles.actionButtonText, { color: colors.text }]}>{t('detail.back')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.accent }]}
+          style={[styles.actionButton, { backgroundColor: MODULE_COLORS.trips }]}
           onPress={() => {
             navigation.navigate({ name: 'TripDetail', params: { trip, openItemEditId: item.id, openItemType: itemType }, merge: true });
           }}

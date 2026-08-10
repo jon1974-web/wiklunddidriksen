@@ -1,9 +1,16 @@
 export const MODULE_COLORS = {
   trips: '#42A5F5',
+  tripsBg: '#E3F2FD',
   health: '#E53935',
+  healthBg: '#FFEBEE',
   school: '#43A047',
+  schoolBg: '#E8F5E9',
   birthdays: '#FB8C00',
+  birthdaysBg: '#FFF3E0',
   pets: '#8E24AA',
+  petsBg: '#F3E5F5',
   mealplan: '#0097A7',
+  mealplanBg: '#E0F7FA',
   home: '#5C6BC0',
+  homeBg: '#E8EAF6',
 } as const;

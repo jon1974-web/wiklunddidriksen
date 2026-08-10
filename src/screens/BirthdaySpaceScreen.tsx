@@ -283,7 +283,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.birthdaysBg }]} edges={['top']}>
       <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.birthdays, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: MODULE_COLORS.birthdays, fontSize: 18 }}>←</Text>

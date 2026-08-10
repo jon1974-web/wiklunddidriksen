@@ -241,7 +241,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.healthBg }]} edges={['top']}>
       <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.health, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: MODULE_COLORS.health, fontSize: 18 }}>←</Text>

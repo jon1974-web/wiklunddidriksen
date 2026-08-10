@@ -176,8 +176,8 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-        <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.trips, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+        <Text style={{ color: MODULE_COLORS.trips, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
         <View style={styles.headerRow}>
           <View style={styles.headerInfo}>
@@ -215,7 +215,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
           placeholderTextColor={colors.textDisabled}
           onSubmitEditing={handleAddItem}
         />
-        <TouchableOpacity style={[styles.addItemButton, { backgroundColor: colors.accent }]} onPress={handleAddItem}>
+        <TouchableOpacity style={[styles.addItemButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleAddItem}>
           <Text style={styles.addItemButtonText}>{t('shopping.addButton')}</Text>
         </TouchableOpacity>
       </View>
@@ -259,7 +259,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
                 <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.modalCreateButton, { backgroundColor: colors.accent }]}
+                style={[styles.modalCreateButton, { backgroundColor: MODULE_COLORS.trips }]}
                 onPress={handleConfirmRename}
               >
                 <Text style={styles.modalCreateText}>{t('common.save')}</Text>
@@ -286,7 +286,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
               <TouchableOpacity style={styles.modalCancelButton} onPress={() => { setCopyModalVisible(false); setCopyTitle(''); }}>
                 <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalCreateButton, { backgroundColor: colors.accent }]} onPress={handleConfirmCopy}>
+              <TouchableOpacity style={[styles.modalCreateButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleConfirmCopy}>
                 <Text style={styles.modalCreateText}>{t('common.add')}</Text>
               </TouchableOpacity>
             </View>

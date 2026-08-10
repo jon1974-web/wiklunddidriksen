@@ -18,6 +18,7 @@ import { getFaviconUrl } from '../utils/favicon';
 import { deleteTripTransport } from '../services/tripService';
 import { useTranslation } from 'react-i18next';
 import { AppIcon } from '../components/AppIcon';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface TransportDetailScreenProps {
   navigation: any;
@@ -32,7 +33,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
 
   const transportIconName = f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : 'fly';
   const typeLabel = f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : t('transport.carRental');
-  const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
+  const typeColor = f.type === 'utreise' ? MODULE_COLORS.trips : '#E53935';
   const dirLabel = f.transportType === 'bil'
     ? (f.type === 'utreise' ? 'Henting' : 'Levering')
     : (f.type === 'utreise' ? 'Utreise' : 'Hjemreise');
@@ -80,14 +81,14 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-        <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.trips, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+        <Text style={{ color: MODULE_COLORS.trips, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       {/* Header card */}
       <View style={[styles.headerCard, { backgroundColor: colors.surface, borderLeftColor: typeColor }]}>
         <View style={styles.headerRow}>
-          <AppIcon name={transportIconName as any} size={28} color={colors.accent} />
+          <AppIcon name={transportIconName as any} size={28} color={MODULE_COLORS.trips} />
           <View style={styles.headerText}>
             <Text style={[styles.headerDir, { color: typeColor }]}>{dirLabel}</Text>
             <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={2}>
@@ -157,7 +158,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
           />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
             <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.departureAddress}</Text>
-            <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
+            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Maps →</Text>
           </View>
         </TouchableOpacity>
       )}
@@ -165,8 +166,8 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
         <View style={[styles.arrowContainer, { backgroundColor: colors.surface }]}>
           <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-            <AppIcon name={transportIconName as any} size={20} color={colors.accent} />
-            <Text style={[styles.arrowIcon, { color: colors.accent }]}>→</Text>
+            <AppIcon name={transportIconName as any} size={20} color={MODULE_COLORS.trips} />
+            <Text style={[styles.arrowIcon, { color: MODULE_COLORS.trips }]}>→</Text>
           </View>
           <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
         </View>
@@ -183,7 +184,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
           />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
             <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.arrivalAddress}</Text>
-            <Text style={[styles.mapOverlayLink, { color: colors.accent }]}>Åpne i Maps →</Text>
+            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Maps →</Text>
           </View>
         </TouchableOpacity>
       )}
@@ -197,7 +198,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
           <Text style={[styles.actionButtonText, { color: colors.text }]}>{t('detail.back')}</Text>
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.actionButton, { backgroundColor: colors.accent }]}
+          style={[styles.actionButton, { backgroundColor: MODULE_COLORS.trips }]}
           onPress={() => {
             navigation.navigate({ name: 'TripDetail', params: { trip, openFlightEditId: f.id }, merge: true });
           }}
