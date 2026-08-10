@@ -1,3 +1,4 @@
+import { MODULE_COLORS } from "../constants/moduleColors";
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { GooglePlacesInput } from './GooglePlacesInput';
@@ -96,7 +97,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
               <ScrollView style={styles.modalScroll}>
                 <View style={styles.flightTypeRow}>
                   <TouchableOpacity
-                    style={[styles.flightTypeOption, { backgroundColor: transportForm.type === 'utreise' ? colors.accent : colors.inputBackground }]}
+                    style={[styles.flightTypeOption, { backgroundColor: transportForm.type === 'utreise' ? MODULE_COLORS.trips : colors.inputBackground }]}
                     onPress={() => handleDirectionToggle('utreise')}
                   >
                     <Text style={[styles.flightTypeText, { color: transportForm.type === 'utreise' ? '#fff' : colors.text }]}>
@@ -194,7 +195,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 {transportForm.type === 'utreise' && (
                   <View style={styles.field}>
                     <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }} onPress={() => onTransportFormChange((f: any) => ({ ...f, isOneWay: !f.isOneWay }))}>
-                      <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: transportForm.isOneWay ? colors.accent : colors.textDisabled, backgroundColor: transportForm.isOneWay ? colors.accent : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+                      <View style={{ width: 22, height: 22, borderRadius: 6, borderWidth: 2, borderColor: transportForm.isOneWay ? MODULE_COLORS.trips : colors.textDisabled, backgroundColor: transportForm.isOneWay ? MODULE_COLORS.trips : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
                         {transportForm.isOneWay && <Text style={{ color: '#fff', fontSize: 14, fontWeight: 'bold' }}>✓</Text>}
                       </View>
                       <Text style={[styles.label, { color: colors.text }]}>{t('transport.oneWay')}</Text>
@@ -344,7 +345,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
                 <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.inputBackground }]} onPress={onCancel}>
                   <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.modalButton, { backgroundColor: colors.accent }]} onPress={onSave}>
+                <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={onSave}>
                   <Text style={[styles.modalButtonText, { color: '#fff' }]}>{editingId ? t('common.save') : t('common.add')}</Text>
                 </TouchableOpacity>
               </View>

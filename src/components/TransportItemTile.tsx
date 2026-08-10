@@ -34,7 +34,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
   const iconName = icon === 'ferry' ? 'ferry' as const : icon === 'boat' ? 'boat' as const : icon === 'taxi' ? 'taxi' as const : icon === 'train' ? 'train' as const : icon === 'car' ? 'car' as const : 'fly' as const;
   const depIcon = iconName === 'ferry' || iconName === 'boat' ? '⚓' : iconName === 'taxi' ? '📍' : '🛫';
   const arrIcon = iconName === 'ferry' || iconName === 'boat' ? '🏁' : iconName === 'taxi' ? '📍' : '🛬';
-  const tileColor = isHjemreise ? '#E53935' : colors.accent;
+  const tileColor = isHjemreise ? '#E53935' : MODULE_COLORS.trips;
   const carrierDomain = name ? getCarrierDomain(name) : null;
   const logoUrl = carrierDomain ? getFaviconUrl(carrierDomain) : null;
 
@@ -50,8 +50,8 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
           <Text style={[styles.calendarDay, { color: colors.text, textAlign: 'center' }]}>{calDay}</Text>
           <Text style={[styles.calendarMonth, { color: colors.textSecondary, textAlign: 'center' }]}>{calMonth}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, position: 'absolute', left: 6, top: 24 }}>
-            <AppIcon name={iconName as any} size={20} color={colors.accent} />
-            <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>
+            <AppIcon name={iconName as any} size={20} color={MODULE_COLORS.trips} />
+            <Text style={{ color: MODULE_COLORS.trips, fontWeight: '700', fontSize: 14 }}>
               {iconName === 'fly' ? t('transport.fly') : iconName === 'train' ? t('transport.train') : iconName === 'car' ? t('transport.carRental') : iconName === 'boat' ? t('transport.boatCruise') : iconName === 'ferry' ? t('transport.ferry') : t('transport.taxi')}
             </Text>
           </View>

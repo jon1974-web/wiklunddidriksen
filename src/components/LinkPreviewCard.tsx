@@ -42,7 +42,7 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = React.memo(({ lin
         <Text style={[styles.title, { color: colors.text }]} numberOfLines={1}>
           {link.title}
         </Text>
-        <Text style={[styles.domain, { color: colors.accent }]} numberOfLines={1}>
+        <Text style={[styles.domain, { color: MODULE_COLORS.trips }]} numberOfLines={1}>
           🔗 {domain}
         </Text>
       </View>

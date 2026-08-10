@@ -62,7 +62,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
   return (
     <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       <View style={styles.header}>
-        <AppIcon name="currency" size={22} color={colors.accent} />
+        <AppIcon name="currency" size={22} color={MODULE_COLORS.trips} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>{t('currency.title')}</Text>
       </View>
 
@@ -74,7 +74,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
             style={[
               styles.quickBtn,
               { borderColor: colors.border },
-              amount === String(q) && { backgroundColor: colors.accent, borderColor: colors.accent },
+              amount === String(q) && { backgroundColor: MODULE_COLORS.trips, borderColor: MODULE_COLORS.trips },
             ]}
             onPress={() => setAmount(String(q))}
           >
@@ -113,7 +113,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
         </View>
 
         <TouchableOpacity style={[styles.swapBtn, { borderColor: colors.border }]} onPress={handleSwap}>
-          <Text style={[styles.swapBtnText, { color: colors.accent }]}>⇄</Text>
+          <Text style={[styles.swapBtnText, { color: MODULE_COLORS.trips }]}>⇄</Text>
         </TouchableOpacity>
 
         <View style={styles.currencySelectWrapper}>
@@ -129,15 +129,15 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
       {/* Result */}
       {loading ? (
         <View style={styles.resultBox}>
-          <ActivityIndicator size="small" color={colors.accent} />
+          <ActivityIndicator size="small" color={MODULE_COLORS.trips} />
         </View>
       ) : error ? (
         <View style={[styles.resultBox, { borderColor: '#FFCDD2' }]}>
           <Text style={[styles.errorText, { color: '#E53935' }]}>{error}</Text>
         </View>
       ) : result ? (
-        <View style={[styles.resultBox, { backgroundColor: colors.accentLight || '#f0f9fa', borderColor: colors.accent + '30' }]}>
-          <Text style={[styles.resultMain, { color: colors.accent }]}>
+        <View style={[styles.resultBox, { backgroundColor: MODULE_COLORS.tripsLight || '#f0f9fa', borderColor: MODULE_COLORS.trips + '30' }]}>
+          <Text style={[styles.resultMain, { color: MODULE_COLORS.trips }]}>
             {result.amount?.toLocaleString(getLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.from} = {' '}
             {result.result?.toLocaleString(getLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.to}
           </Text>

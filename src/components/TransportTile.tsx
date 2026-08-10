@@ -29,7 +29,7 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
   const arrCode = extractCode(f.arrivalAddress);
 
   const transportIconName = f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : f.transportType === 'boat' ? 'boat' : f.transportType === 'ferry' ? 'ferry' : f.transportType === 'taxi' ? 'taxi' : 'fly';
-  const typeColor = f.type === 'utreise' ? colors.accent : '#E53935';
+  const typeColor = f.type === 'utreise' ? MODULE_COLORS.trips : '#E53935';
   const calDate = f.departureDate || f.arrivalDate;
   let calDay = '';
   let calMonth = '';
@@ -56,8 +56,8 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
           <Text style={[styles.calendarDay, { color: colors.text, textAlign: 'center' }]}>{calDay}</Text>
           <Text style={[styles.calendarMonth, { color: colors.textSecondary, textAlign: 'center' }]}>{calMonth}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, position: 'absolute', left: 6, top: 24 }}>
-            <AppIcon name={transportIconName as any} size={20} color={colors.accent} />
-            <Text style={{ color: colors.accent, fontWeight: '700', fontSize: 14 }}>
+            <AppIcon name={transportIconName as any} size={20} color={MODULE_COLORS.trips} />
+            <Text style={{ color: MODULE_COLORS.trips, fontWeight: '700', fontSize: 14 }}>
               {f.transportType === 'fly' ? t('transport.fly') : f.transportType === 'tog' ? t('transport.train') : f.transportType === 'bil' ? t('transport.carRental') : f.transportType === 'boat' ? t('transport.boatCruise') : f.transportType === 'ferry' ? t('transport.ferry') : t('transport.taxi')}
             </Text>
           </View>
@@ -83,7 +83,7 @@ export const TransportTile: React.FC<TransportTileProps> = React.memo(({ flight,
           </Text>
         )}
         {f.airline && <Text style={[styles.tileName, { color: colors.text }]} numberOfLines={1}>{f.airline}</Text>}
-        {f.flightNumber && <Text style={[styles.tileDetail, { color: colors.accent }]} numberOfLines={1}>{f.flightNumber}</Text>}
+        {f.flightNumber && <Text style={[styles.tileDetail, { color: MODULE_COLORS.trips }]} numberOfLines={1}>{f.flightNumber}</Text>}
         {f.reference && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}> {t('common.reference')}: {f.reference}</Text>}
         {f.seatNumber && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}> {t('transport.seatNumber')}: {f.seatNumber}</Text>}
         {f.wagon && <Text style={[styles.tileDetail, { color: colors.textSecondary }]} numberOfLines={1}>{f.wagon}</Text>}
