@@ -264,7 +264,7 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
     borderLeftWidth: 4,
-    borderLeftColor: '#0097A7',
+    borderLeftColor: MODULE_COLORS.trips,
   },
   cardRow: {
     flexDirection: 'row',

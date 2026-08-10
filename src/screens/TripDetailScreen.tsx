@@ -65,6 +65,7 @@ import { LinkPreviewCard } from '../components/LinkPreviewCard';
 import { ActionModal } from '../components/ActionModal';
 import { CurrencyConverter } from '../components/CurrencyConverter';
 import { TRIP_ICONS } from '../constants/tripIcons';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
 import { WeatherDay } from '../types';
 import { doc, updateDoc } from 'firebase/firestore';
@@ -809,7 +810,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const renderSectionHeader = (title: string, iconName: string, onAdd: () => void, onHelp?: () => void) => (
     <View style={styles.sectionHeader}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-        <AppIcon name={iconName as any} size={22} color={colors.accent} />
+        <AppIcon name={iconName as any} size={22} color={MODULE_COLORS.trips} />
         <Text style={[styles.sectionTitle, { color: colors.text }]}>
           {title}
         </Text>
@@ -961,8 +962,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-        <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.trips, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+        <Text style={{ color: MODULE_COLORS.trips, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -2304,7 +2305,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     backgroundColor: '#e0f7fa',
     borderLeftWidth: 3,
-    borderLeftColor: '#0097A7',
+    borderLeftColor: MODULE_COLORS.trips,
   },
   weatherDayText: {
     fontSize: 13,
