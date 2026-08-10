@@ -824,7 +824,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           </TouchableOpacity>
         )}
       </View>
-      <TouchableOpacity style={[styles.addButton, { backgroundColor: colors.accent }]} onPress={onAdd}>
+      <TouchableOpacity style={[styles.addButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={onAdd}>
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
     </View>
@@ -993,7 +993,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <AppIcon name="weather" size={22} color={colors.accent} />
+              <AppIcon name="weather" size={22} color={MODULE_COLORS.trips} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('weather.title')}</Text>
             </View>
             {isActive && (
@@ -1002,7 +1002,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 disabled={refreshingWeather}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Text style={{ color: colors.accent, fontSize: 14 }}>{refreshingWeather ? '⟳ ' + t('weather.refreshing') : '↻ ' + t('weather.refresh')}</Text>
+                <Text style={{ color: MODULE_COLORS.trips, fontSize: 14 }}>{refreshingWeather ? '⟳ ' + t('weather.refreshing') : '↻ ' + t('weather.refresh')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -1043,11 +1043,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               {weatherPages > 1 && (
                 <View style={styles.weatherPagination}>
                   <TouchableOpacity disabled={weatherPage === 0} onPress={() => setWeatherPage((p) => p - 1)}>
-                    <Text style={{ color: weatherPage === 0 ? colors.textDisabled : colors.accent }}>← {t('weather.previous')}</Text>
+                    <Text style={{ color: weatherPage === 0 ? colors.textDisabled : MODULE_COLORS.trips }}>← {t('weather.previous')}</Text>
                   </TouchableOpacity>
                   <Text style={{ color: colors.textSecondary }}>{weatherPage + 1} / {weatherPages}</Text>
                   <TouchableOpacity disabled={weatherPage >= weatherPages - 1} onPress={() => setWeatherPage((p) => p + 1)}>
-                    <Text style={{ color: weatherPage >= weatherPages - 1 ? colors.textDisabled : colors.accent }}>{t('weather.next')} →</Text>
+                    <Text style={{ color: weatherPage >= weatherPages - 1 ? colors.textDisabled : MODULE_COLORS.trips }}>{t('weather.next')} →</Text>
                   </TouchableOpacity>
                 </View>
               )}
@@ -1185,7 +1185,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       <View style={[styles.sectionCard, { backgroundColor: colors.surface }]}>
         <View style={styles.sectionHeader}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
-            <AppIcon name="destination" size={22} color={colors.accent} />
+            <AppIcon name="destination" size={22} color={MODULE_COLORS.trips} />
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('tips.title')}</Text>
             <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpTips(true)}>
               <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
@@ -1210,16 +1210,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           />
 
           {stagedCity && (
-            <View style={[styles.stagedCityRow, { borderColor: colors.accent, backgroundColor: colors.inputBackground }]}>
+            <View style={[styles.stagedCityRow, { borderColor: MODULE_COLORS.trips, backgroundColor: colors.inputBackground }]}>
               <Text style={[styles.stagedCityName, { color: colors.text }]}>📍 {stagedCity}</Text>
               {tipsLoading ? (
-                <View style={[styles.generateButton, { backgroundColor: colors.accent, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
+                <View style={[styles.generateButton, { backgroundColor: MODULE_COLORS.trips, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
                   <ActivityIndicator size="small" color="#fff" />
                   <Text style={styles.generateButtonText}>Genererer...</Text>
                 </View>
               ) : (
                 <TouchableOpacity
-                  style={[styles.generateButton, { backgroundColor: colors.accent }]}
+                  style={[styles.generateButton, { backgroundColor: MODULE_COLORS.trips }]}
                   onPress={() => handleGenerateTips(stagedCity)}
                 >
                   <Text style={styles.generateButtonText}>Generer</Text>
@@ -1256,7 +1256,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     disabled={tipsLoading}
                     hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   >
-                    <Text style={[styles.tipsRefreshBtn, { color: colors.accent }]}>
+                    <Text style={[styles.tipsRefreshBtn, { color: MODULE_COLORS.trips }]}>
                       {tipsLoading ? '...' : '↻'}
                     </Text>
                   </TouchableOpacity>
@@ -1293,7 +1293,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                           <View key={i} style={styles.phraseRow}>
                             <Text style={[styles.phraseText, { color: colors.text }]}>{p.no}</Text>
                             <Text style={[styles.phraseArrow, { color: colors.textSecondary }]}> → </Text>
-                            <Text style={[styles.phraseText, { color: colors.accent }]}>{p.local}</Text>
+                            <Text style={[styles.phraseText, { color: MODULE_COLORS.trips }]}>{p.local}</Text>
                             {p.pronunciation ? (
                               <Text style={[styles.phrasePron, { color: colors.textSecondary }]}> ({p.pronunciation})</Text>
                             ) : null}
@@ -1361,7 +1361,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '\u25bc' : '\u25b6'}</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <AppIcon name="documents" size={22} color={colors.accent} />
+              <AppIcon name="documents" size={22} color={MODULE_COLORS.trips} />
               <Text style={[styles.tipsExpandTitle, { color: colors.text }]}>{t('documents.title')}</Text>
             </View>
             <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelpDocuments(true)}>
@@ -1397,12 +1397,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <View style={styles.docContent}>
                       <Text style={[styles.itemName, { color: colors.text }]}>{d.title}</Text>
                       {d.note && <Text style={[styles.itemNote, { color: colors.textSecondary }]}>{d.note}</Text>}
-                      {d.fileName && <Text style={[styles.itemDetail, { color: colors.accent }]}>📎 {d.fileName}</Text>}
+                      {d.fileName && <Text style={[styles.itemDetail, { color: MODULE_COLORS.trips }]}>📎 {d.fileName}</Text>}
                     </View>
                     <View style={styles.docActions}>
                       {d.fileUrl && (
                         <TouchableOpacity onPress={() => openFileUrl(d.fileUrl)} style={styles.docAction}>
-                          <Text style={{ color: colors.accent, fontSize: 14 }}>{t('documents.open')}</Text>
+                          <Text style={{ color: MODULE_COLORS.trips, fontSize: 14 }}>{t('documents.open')}</Text>
                         </TouchableOpacity>
                       )}
                       {canDelete && (
@@ -1505,7 +1505,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       {TRIP_ICONS.map((i) => (
                         <TouchableOpacity
                           key={i}
-                          style={[styles.iconOption, { backgroundColor: colors.inputBackground, borderColor: tripIcon === i ? colors.accent : colors.border }]}
+                          style={[styles.iconOption, { backgroundColor: colors.inputBackground, borderColor: tripIcon === i ? MODULE_COLORS.trips : colors.border }]}
                           onPress={() => setTripIcon(i)}
                         >
                           <Text style={styles.iconText}>{i}</Text>
