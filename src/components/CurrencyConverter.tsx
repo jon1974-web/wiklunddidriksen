@@ -137,7 +137,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
           <Text style={[styles.errorText, { color: '#E53935' }]}>{error}</Text>
         </View>
       ) : result ? (
-        <View style={[styles.resultBox, { backgroundColor: MODULE_COLORS.tripsLight || '#f0f9fa', borderColor: MODULE_COLORS.trips + '30' }]}>
+        <View style={[styles.resultBox, { backgroundColor: MODULE_COLORS.tripsBg, borderColor: MODULE_COLORS.trips + '30' }]}>
           <Text style={[styles.resultMain, { color: MODULE_COLORS.trips }]}>
             {result.amount?.toLocaleString(getLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.from} = {' '}
             {result.result?.toLocaleString(getLocale(i18n.language), { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {result.to}

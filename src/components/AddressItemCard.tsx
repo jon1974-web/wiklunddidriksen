@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Image, Linking, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface AddressItemCardProps {
   name: string;
@@ -20,7 +21,7 @@ export const AddressItemCard: React.FC<AddressItemCardProps> = React.memo(({
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.surfaceVariant }]}
+      style={[styles.card, { backgroundColor: MODULE_COLORS.tripsBg }]}
       onPress={onPress}
       onLongPress={onLongPress}
     >
