@@ -4,6 +4,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { SchoolContact } from '../types';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface SchoolContactDetailScreenProps {
   navigation: any;
@@ -48,9 +49,9 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={{ padding: 16 }}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { borderColor: colors.accent }]}>
-        <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.schoolBg }]} contentContainerStyle={{ padding: 16 }}>
+      <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { borderColor: MODULE_COLORS.school }]}>
+        <Text style={{ color: MODULE_COLORS.school, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
@@ -91,7 +92,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
 
       {!isTeacher && contact.parentName && (
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
-          <Text style={[s.viewDescription, { color: colors.accent, fontWeight: '700', marginBottom: 8 }]}>👤 {t('school.parentName')} 1</Text>
+          <Text style={[s.viewDescription, { color: MODULE_COLORS.school, fontWeight: '700', marginBottom: 8 }]}>👤 {t('school.parentName')} 1</Text>
           <View style={s.viewDetailRow}>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.phone')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentPhone || '—'}</Text>
@@ -106,7 +107,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
 
       {!isTeacher && contact.parentName2 && (
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
-          <Text style={[s.viewDescription, { color: colors.accent, fontWeight: '700', marginBottom: 8 }]}>👤 {t('school.parentName')} 2</Text>
+          <Text style={[s.viewDescription, { color: MODULE_COLORS.school, fontWeight: '700', marginBottom: 8 }]}>👤 {t('school.parentName')} 2</Text>
           <View style={s.viewDetailRow}>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.phone')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentPhone2 || '—'}</Text>
@@ -143,7 +144,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
           onPress={() => Linking.openURL(getGoogleMapsUrl(contact.address!))}
         >
           <Image source={{ uri: mapUrl }} style={s.viewMapImage} />
-          <Text style={[s.viewMapLabel, { color: colors.accent }]}>{t('tips.openGoogleMaps')}</Text>
+          <Text style={[s.viewMapLabel, { color: MODULE_COLORS.school }]}>{t('tips.openGoogleMaps')}</Text>
         </TouchableOpacity>
       )}
 
@@ -151,7 +152,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => navigation.goBack()}>
           <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600' }}>{t('common.close')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.accent, flex: 1 }]} onPress={() => {
+        <TouchableOpacity style={[styles.editButton, { backgroundColor: MODULE_COLORS.school, flex: 1 }]} onPress={() => {
           navigation.goBack();
           setTimeout(() => {
             navigation.navigate('SchoolSpace', { editContactId: contact.id });

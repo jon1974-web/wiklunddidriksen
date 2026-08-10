@@ -50,7 +50,6 @@
     "placeholderWagonSeat": "f.eks. Vogn 3, Plads 22",
     "selectDate": "Vælg dato",
     "selectTime": "Vælg tid",
-    "add": "Tilføj",
     "ok": "OK",
     "none": "Ingen",
     "name": "Navn",
@@ -980,7 +979,15 @@
     "enterVetVisitTitle": "Indtast venligst en titel og dato",
     "enterMedicationName": "Indtast venligst et navn",
     "enterInsuranceInfo": "Indtast venligst forsikringsselskab",
-    "cameraRequired": "Kameraadgang er nødvendig"
+    "cameraRequired": "Kameraadgang er nødvendig",
+    "helpTitle": "Kæledyr",
+    "helpWhat": "Hvad er dette?",
+    "helpWhatText": "Her kan du administrere alle familiens kæledyr. Tilføj kæledyr med navn, type, race og anden vigtig information. For hvert kæledyr kan du holde styr på dyrlægebesøg, medicin, foder, pleje, vaccinationer og forsikring.",
+    "helpHow": "Sådan bruger du det",
+    "helpHowText": "Tryk på \"+\" for at tilføje et nyt kæledyr. Tryk på et kæledyr for at se detaljer og tilføje information i de forskellige sektioner. Langtryk på et kæledyr for at redigere eller slette det. I hver sektion trykker du \"+\" for at tilføje nye poster.",
+    "helpTip": "Dyrlægebesøg og vaccinationer med påmindelser tilføjes automatisk til din kalender.",
+    "helpFeatures": "Funktioner",
+    "helpFeaturesText": "Dyrlægebesøg: Planlæg besøg med dato, tid, sted og påmindelser. Medicin: Hold styr på medicin med dosering og frekvens. Foder: Planlæg foder rutiner med tid og mængde. Pleje: Hold styr på pelspleje og klipning. Vaccinationer: Registrer vaccinationer med næste forfaldsdato. Forsikring: Gem forsikringsinformation og dokumenter."
   },
   "schoolAI": {
     "title": "AI-import af klassekammerater",

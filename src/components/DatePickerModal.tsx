@@ -19,6 +19,7 @@ interface DatePickerModalProps {
   mode?: 'date' | 'time';
   dateCount?: number;
   dateOffset?: number;
+  accentColor?: string;
 }
 
 function generateDateOptions(count: number, offset: number): Option[] {
@@ -52,8 +53,10 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
   mode,
   dateCount = 365,
   dateOffset = 0,
+  accentColor,
 }) => {
   const { colors } = useTheme();
+  const resolvedAccent = accentColor || colors.accent;
   const [dateInput, setDateInput] = useState('');
   const [customTime, setCustomTime] = useState('');
   const scrollRef = useRef<ScrollView>(null);
@@ -175,7 +178,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
                 {options.map((option) => (
                   <TouchableOpacity
                     key={option.value}
-                    style={[styles.option, { borderBottomColor: colors.border }, selectedValue === option.value && { backgroundColor: colors.accent }]}
+                    style={[styles.option, { borderBottomColor: colors.border }, selectedValue === option.value && { backgroundColor: resolvedAccent }]}
                     onPress={() => { onSelect(option.value); onClose(); }}
                   >
                     <Text style={[styles.optionText, { color: selectedValue === option.value ? '#fff' : colors.text }]}>
@@ -212,7 +215,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
                     }}
                   />
                   <TouchableOpacity
-                    style={[styles.customTimeButton, { backgroundColor: colors.accent }]}
+                    style={[styles.customTimeButton, { backgroundColor: resolvedAccent }]}
                     onPress={() => {
                       if (!customTime.trim()) return;
                       let normalized = customTime.trim();
@@ -234,7 +237,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
                 </View>
               )}
               <TouchableOpacity style={[styles.closeButton, { borderTopColor: colors.border }]} onPress={onClose}>
-                <Text style={[styles.closeText, { color: colors.accent }]}>Lukk</Text>
+                <Text style={[styles.closeText, { color: resolvedAccent }]}>Lukk</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>

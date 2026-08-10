@@ -50,8 +50,6 @@
     "placeholderWagonSeat": "F.eks. Vogn 3, Plass 22",
     "selectDate": "Velg dato",
     "selectTime": "Velg tid",
-    "add": "Legg til",
-    "no": "Nei",
     "ok": "OK",
     "none": "Ingen",
     "name": "Navn",
@@ -981,7 +979,15 @@
     "enterVetVisitTitle": "Vennligst skriv inn tittel og dato",
     "enterMedicationName": "Vennligst skriv inn navn",
     "enterInsuranceInfo": "Vennligst skriv inn forsikringsselskap",
-    "cameraRequired": "Kameratilgang er nødvendig"
+    "cameraRequired": "Kameratilgang er nødvendig",
+    "helpTitle": "Kjæledyr",
+    "helpWhat": "Hva er dette?",
+    "helpWhatText": "Her kan du administrere alle familiens kjæledyr. Legg til kjæledyr med navn, type, rase og annen viktig informasjon. For hvert kjæledyr kan du holde oversikt over veterinærbesøk, medisiner, fôring, stell, vaksiner og forsikring.",
+    "helpHow": "Slik bruker du det",
+    "helpHowText": "Trykk på «+» for å legge til et nytt kjæledyr. Trykk på et kjæledyr for å se detaljer og legge til informasjon i de ulike seksjonene. Langtrykk på et kjæledyr for å redigere eller slette det. I hver seksjon trykker du «+» for å legge til nye oppføringer.",
+    "helpTip": "Vet-besøk og vaksiner med påminnelse legges automatisk til i kalenderen din.",
+    "helpFeatures": "Funksjoner",
+    "helpFeaturesText": "Veterinærbesøk: Planlegg besøk med dato, tid, sted og påminnelse. Medisiner: Følg med på medisiner med dosering og frekvens. Foring: Planlegg fôringsrutiner med tid og mengde. Stell: Hold oversikt over pelsstell og klipping. Vaksiner: Registrer vaksiner med neste forfallsdato. Forsikring: Lagre forsikringsinformasjon og dokumenter."
   },
   "schoolAI": {
     "title": "AI-import av Klassekamerater",

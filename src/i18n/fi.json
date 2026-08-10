@@ -50,7 +50,6 @@
     "placeholderWagonSeat": "esim. Vaunu 3, Paikka 22",
     "selectDate": "Valitse päivämäärä",
     "selectTime": "Valitse aika",
-    "add": "Lisää",
     "ok": "OK",
     "none": "Ei mitään",
     "name": "Nimi",
@@ -980,7 +979,15 @@
     "enterVetVisitTitle": "Anna otsikko ja päivämäärä",
     "enterMedicationName": "Anna nimi",
     "enterInsuranceInfo": "Anna vakuutusyhtiö",
-    "cameraRequired": "Kameran käyttö vaaditaan"
+    "cameraRequired": "Kameran käyttö vaaditaan",
+    "helpTitle": "Lemmikit",
+    "helpWhat": "Mikä tämä on?",
+    "helpWhatText": "Täällä voit hallita kaikkia perheen lemmikkejä. Lisää lemmikkejä nimellä, tyypillä, rodulla ja muulla tärkeällä tiedolla. Jokaisesta lemmikistä voit seurata eläinlääkärivierejä, lääkkeitä, ruokailua, hoitoa, rokotuksia ja vakuutuksia.",
+    "helpHow": "Näin käytät sitä",
+    "helpHowText": "Auta \"+\" lisätäksesi uuden lemmikin. Napauta lemmikkiä nähdäksesi yksityiskohdat ja lisätäksesi tietoja eri osioissa. Paina pitkään lemmikkiä muokataksesi tai poistaaksesi sen. Jokaisessa osiossa auta \"+\" lisätäksesi uusia merkintöjä.",
+    "helpTip": "Eläinlääkärivierailut ja rokotukset muistutuksilla lisätään automaattisesti kalenteriisi.",
+    "helpFeatures": "Ominaisuudet",
+    "helpFeaturesText": "Eläinlääkärivierailut: Suunnittele vierailut päivämäärällä, ajalla, paikalla ja muistutuksilla. Lääkkeet: Seuraa lääkkeitä annostuksen ja taajuuden mukaan. Ruokailu: Suunnittele ruokailurytmit ajalla ja määrällä. Hoito: Seuraa karvanhoitoa ja leikkuuja. Rokotukset: Rekisteröi rokotukset seuraavana eräpäivänä. Vakuutus: Tallenna vakuutustiedot ja dokumentit."
   },
   "schoolAI": {
     "title": "AI-tuonti luokkatoverit",

@@ -50,7 +50,6 @@
     "placeholderWagonSeat": "t.ex. Vagn 3, Plats 22",
     "selectDate": "Välj datum",
     "selectTime": "Välj tid",
-    "add": "Lägg till",
     "ok": "OK",
     "none": "Ingen",
     "name": "Namn",
@@ -980,7 +979,15 @@
     "enterVetVisitTitle": "Vänligen ange titel och datum",
     "enterMedicationName": "Vänligen ange ett namn",
     "enterInsuranceInfo": "Vänligen ange försäkringsbolag",
-    "cameraRequired": "Kamerabehörighet krävs"
+    "cameraRequired": "Kamerabehörighet krävs",
+    "helpTitle": "Husdjur",
+    "helpWhat": "Vad är detta?",
+    "helpWhatText": "Här kan du hantera alla familiens husdjur. Lägg till husdjur med namn, typ, ras och annan viktig information. För varje husdjur kan du hålla koll på veterinärbesök, mediciner, foder, skötsel, vaccinationer och försäkring.",
+    "helpHow": "Så här använder du det",
+    "helpHowText": "Tryck på \"+\" för att lägga till ett nytt husdjur. Tryck på ett husdjur för att se detaljer och lägga till information i de olika avsnitten. Tryck länge på ett husdjur för att redigera eller ta bort det. I varje avsnitt trycker du \"+\" för att lägga till nya poster.",
+    "helpTip": "Veterinärbesök och vaccinationer med påminnelser läggs automatiskt till i din kalender.",
+    "helpFeatures": "Funktioner",
+    "helpFeaturesText": "Veterinärbesök: Schemalägg besök med datum, tid, plats och påminnelser. Mediciner: Håll koll på mediciner med dos och frekvens. Foder: Planera foderrutiner med tid och mängd. Skötsel: Håll koll på pälsvård och klippning. Vaccinationer: Registrera vaccinationer med nästa förfallodatum. Försäkring: Spara försäkringsinformation och dokument."
   },
   "schoolAI": {
     "title": "AI-import av klassekamrater",

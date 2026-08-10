@@ -50,7 +50,6 @@
     "placeholderWagonSeat": "e.g. Car 3, Seat 22",
     "selectDate": "Select date",
     "selectTime": "Select time",
-    "add": "Add",
     "ok": "OK",
     "none": "None",
     "name": "Name",
@@ -980,7 +979,15 @@
     "enterVetVisitTitle": "Please enter title and date",
     "enterMedicationName": "Please enter a name",
     "enterInsuranceInfo": "Please enter insurance provider",
-    "cameraRequired": "Camera access is required"
+    "cameraRequired": "Camera access is required",
+    "helpTitle": "Pets",
+    "helpWhat": "What is this?",
+    "helpWhatText": "Here you can manage all the family's pets. Add pets with name, type, breed and other important information. For each pet you can keep track of vet visits, medications, food, grooming, vaccinations and insurance.",
+    "helpHow": "How to use it",
+    "helpHowText": "Tap \"+\" to add a new pet. Tap a pet to see details and add information in the various sections. Long-press a pet to edit or delete it. In each section, tap \"+\" to add new entries.",
+    "helpTip": "Vet visits and vaccinations with reminders are automatically added to your calendar.",
+    "helpFeatures": "Features",
+    "helpFeaturesText": "Vet visits: Schedule appointments with date, time, location and reminders. Medications: Track medications with dosage and frequency. Food: Plan feeding routines with time and amount. Grooming: Keep track of grooming and grooming sessions. Vaccinations: Register vaccinations with next due date. Insurance: Store insurance information and documents."
   },
   "schoolAI": {
     "title": "AI Import Classmates",

@@ -340,8 +340,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
   const renderGrid = () => (
     <>
       <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.pets, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: MODULE_COLORS.pets, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
@@ -514,6 +514,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
         onEdit={handleEditPet}
         onDelete={handleDeletePet}
         onCancel={() => setPetActionModal({ visible: false, id: '', title: '' })}
+        accentColor={MODULE_COLORS.pets}
       />
     </>
   );
@@ -523,8 +524,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
     return (
       <>
         <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
-          <TouchableOpacity onPress={() => { setSelectedPet(null); }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+          <TouchableOpacity onPress={() => { setSelectedPet(null); }} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.pets, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: MODULE_COLORS.pets, fontSize: 18 }}>←</Text>
           </TouchableOpacity>
         </View>
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
@@ -935,6 +936,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
           onEdit={handleEditItem}
           onDelete={handleDeleteItem}
           onCancel={() => setItemActionModal({ visible: false, id: '', title: '', section: 'vetVisits' })}
+          accentColor={MODULE_COLORS.pets}
         />
 
         <Modal visible={detailModal.visible} transparent animationType="slide">
@@ -956,7 +958,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
               <ScrollView>
                 {detailModal.item && detailModal.section === 'vetVisits' && (
                   <>
-                    <View style={[styles.viewCard, { backgroundColor: colors.background }]}>
+                    <View style={[styles.viewCard, { backgroundColor: colors.surface }]}>
                       <Text style={styles.viewIcon}>🏥</Text>
                       <Text style={[styles.viewTitle, { color: colors.text }]}>{detailModal.item.title}</Text>
                       {detailModal.item.doctor && (
@@ -1002,7 +1004,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
                           onPress={() => Linking.openURL(getGoogleMapsUrl(detailModal.item.location))}
                         >
                           <Image source={{ uri: mapUrl }} style={styles.viewMapImage} />
-                          <Text style={[styles.viewMapLabel, { color: colors.accent }]}>{t('tips.openGoogleMaps')}</Text>
+                          <Text style={[styles.viewMapLabel, { color: MODULE_COLORS.pets }]}>{t('tips.openGoogleMaps')}</Text>
                         </TouchableOpacity>
                       ) : null;
                     })()}
@@ -1208,7 +1210,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.petsBg }]} edges={['top']}>
       {selectedPet ? renderDetail() : renderGrid()}
 
       <DatePickerModal
@@ -1264,16 +1266,17 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
           setActivePicker(null);
         }}
         onClose={() => setActivePicker(null)}
+        accentColor={MODULE_COLORS.pets}
       />
 
       <HelpCenter
         visible={showHelp}
         onClose={() => setShowHelp(false)}
-        title={t('pets.title')}
+        title={t('pets.helpTitle')}
         sections={[
-          { icon: '🐾', title: t('pets.title'), text: t('pets.ourPets') },
-          { icon: '📅', title: t('pets.vetVisits'), text: t('pets.addVetVisit') },
-          { icon: '👉', title: t('pets.title'), text: t('pets.addPet') },
+          { icon: '🐾', title: t('pets.helpWhat'), text: t('pets.helpWhatText') },
+          { icon: '👉', title: t('pets.helpHow'), text: t('pets.helpHowText'), tip: t('pets.helpTip') },
+          { icon: '⚙️', title: t('pets.helpFeatures'), text: t('pets.helpFeaturesText') },
         ]}
       />
     </SafeAreaView>

@@ -620,6 +620,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         onEdit={handleEdit}
         onDelete={handleDelete}
         onCancel={() => setActionModal({ visible: false, id: '', title: '', section: 'medications' })}
+        accentColor={MODULE_COLORS.health}
       />
 
       {/* Detail Modal */}
@@ -930,6 +931,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           setActivePicker(null);
         }}
         onClose={() => setActivePicker(null)}
+        accentColor={MODULE_COLORS.health}
       />
     </SafeAreaView>
   );
