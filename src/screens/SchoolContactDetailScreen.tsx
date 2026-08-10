@@ -33,7 +33,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
     if (email) Linking.openURL(`mailto:${email}`);
   };
 
-  const isTeacher = contact.role === 'teacher';
+  const isTeacher = contact.role === 'teacher' || contact.role === 'admin';
   const firstName = contact.name.split(' ')[0];
 
   const renderActionButtons = (phone?: string, email?: string, name?: string) => {
