@@ -217,8 +217,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           {/* Health section */}
           {sectionSettings.health !== false && (() => {
             const { start, end } = getWeekRange(new Date());
-            const weekStr = start.toISOString().split('T')[0];
-            const endStr = end.toISOString().split('T')[0];
+            const weekStr = toLocalDateStr(start);
+            const endStr = toLocalDateStr(end);
             const weekAppointments = (healthAppointments || []).filter(a => a.date >= weekStr && a.date <= endStr);
             const activeMedications = (healthMedications || []).filter(m => {
               if (!m.dateFrom && !m.dateTo) return true;
@@ -266,8 +266,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           {/* Pets section */}
           {sectionSettings.pets !== false && (() => {
             const { start, end } = getWeekRange(new Date());
-            const weekStr = start.toISOString().split('T')[0];
-            const endStr = end.toISOString().split('T')[0];
+            const weekStr = toLocalDateStr(start);
+            const endStr = toLocalDateStr(end);
             const weekVetVisits = (petVetVisits || []).filter(v => v.date >= weekStr && v.date <= endStr);
             const weekVaccinations = (petVaccinations || []).filter(v => v.date >= weekStr && v.date <= endStr);
             const activeMedications = (petMedications || []).filter(m => {
