@@ -1071,14 +1071,15 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-              <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
-              </TouchableOpacity>
-              <Text style={[styles.title, { color: colors.text }]}>{t('mealPlanner.title')}</Text>
-            </View>
+        <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <AppIcon name="utensils" size={28} color={colors.accent} />
+            <Text style={[styles.title, { color: colors.text }]}>{t('mealPlanner.title')}</Text>
           </View>
           {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
         </View>
