@@ -269,7 +269,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           ) : (
             medications.map(med => (
               <TouchableOpacity key={med.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: med, section: 'medications' })} onLongPress={() => setActionModal({ visible: true, id: med.id, title: med.name, section: 'medications' })}>
-                <AppIcon name="medication" size={20} color={colors.accent} />
+                <AppIcon name="medication" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{med.name}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{med.person} — {med.dosage} {med.frequency}</Text>
@@ -286,7 +286,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           ) : (
             appointments.map(appt => (
               <TouchableOpacity key={appt.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: appt, section: 'appointments' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
-                <AppIcon name="calendar" size={20} color={colors.accent} />
+                <AppIcon name="calendar" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{appt.date} {appt.startTime} — {appt.location || appt.person}</Text>
@@ -306,7 +306,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           ) : (
             vaccinations.map(vacc => (
               <TouchableOpacity key={vacc.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: vacc, section: 'vaccinations' })} onLongPress={() => setActionModal({ visible: true, id: vacc.id, title: vacc.name, section: 'vaccinations' })}>
-                <AppIcon name="vaccination" size={20} color={colors.accent} />
+                <AppIcon name="vaccination" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{vacc.name}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{vacc.person} — {vacc.date}</Text>
@@ -326,7 +326,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           ) : (
             allergies.map(allergy => (
               <TouchableOpacity key={allergy.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: allergy, section: 'allergies' })} onLongPress={() => setActionModal({ visible: true, id: allergy.id, title: allergy.allergen, section: 'allergies' })}>
-                <AppIcon name="allergy" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : colors.accent} />
+                        <AppIcon name="allergy" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : MODULE_COLORS.health} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{allergy.allergen}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{allergy.person}</Text>
@@ -346,7 +346,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           ) : (
             growth.map(g => (
               <TouchableOpacity key={g.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: g, section: 'growth' })} onLongPress={() => setActionModal({ visible: true, id: g.id, title: g.person, section: 'growth' })}>
-                <AppIcon name="growth" size={20} color={colors.accent} />
+                <AppIcon name="growth" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{g.person}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{g.height} cm / {g.weight} kg — {g.date}</Text>
