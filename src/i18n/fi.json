@@ -155,6 +155,7 @@
     "school": "Koulu",
     "birthdays": "Syntymäpäivät",
     "pets": "Lemmikit",
+    "mealplan": "Ruokakeskus",
     "home": "Koti",
     "tripsCount": "{{count}} aktiivista matkaa",
     "healthCount": "{{count}} tällä viikolla",

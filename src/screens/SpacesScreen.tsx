@@ -52,7 +52,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       id: 'trips',
       name: t('spaces.trips'),
       icon: 'compass',
-      iconColor: colors.accent,
+      iconColor: '#1565C0',
       count: t('spaces.tripsCount', { count: tripCount }),
       screen: 'TripsList',
     },
@@ -87,6 +87,14 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       iconColor: '#8E24AA',
       count: t('spaces.petsCount', { count: 1 }),
       screen: 'PetSpace',
+    },
+    {
+      id: 'mealplan',
+      name: t('spaces.mealplan'),
+      icon: 'utensils',
+      iconColor: '#0097A7',
+      count: '',
+      screen: 'MealPlan',
     },
     {
       id: 'home',

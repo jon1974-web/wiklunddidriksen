@@ -505,14 +505,6 @@ const AppContent = () => {
               }}
             />
             <Tab.Screen
-              name="Shopping"
-              component={MealPlanStack}
-              options={{
-                tabBarLabel: 'Matsenter',
-                tabBarIcon: ({ focused }) => <TabIcon icon="utensils" focused={focused} accentColor={colors.accent} />,
-              }}
-            />
-            <Tab.Screen
               name="Chat"
               component={ChatStack}
               options={{

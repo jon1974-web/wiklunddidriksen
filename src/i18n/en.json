@@ -155,6 +155,7 @@
     "school": "School",
     "birthdays": "Birthdays",
     "pets": "Pets",
+    "mealplan": "Meal Center",
     "home": "Home",
     "tripsCount": "{{count}} active trips",
     "healthCount": "{{count}} this week",
