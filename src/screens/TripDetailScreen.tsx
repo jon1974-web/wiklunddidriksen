@@ -1013,11 +1013,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           ) : (
             <>
               <View style={styles.weatherHeaderRow}>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 3 }]} numberOfLines={1}>{t('weather.day')}</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>{t('weather.weather')}</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 2, textAlign: 'center' }]} numberOfLines={1}>{t('weather.temp')}</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'center' }]} numberOfLines={1}>{t('weather.uv')}</Text>
-                <Text style={[styles.weatherHeaderText, { color: '#0097A7', flex: 1, textAlign: 'right' }]} numberOfLines={1}>{t('weather.water')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 3 }]} numberOfLines={1}>{t('weather.day')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{t('weather.weather')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 2, textAlign: 'center' }]} numberOfLines={1}>{t('weather.temp')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{t('weather.uv')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 1, textAlign: 'right' }]} numberOfLines={1}>{t('weather.water')}</Text>
               </View>
               {pagedWeather.map((day, i) => {
                 const isToday = day.date === today;

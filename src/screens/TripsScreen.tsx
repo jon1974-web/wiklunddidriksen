@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   refreshIcon: {
     fontSize: 12,
-    color: '#0097A7',
+    color: MODULE_COLORS.trips,
     marginLeft: 2,
   },
   mapContainer: {
