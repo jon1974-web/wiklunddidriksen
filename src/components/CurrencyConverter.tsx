@@ -89,7 +89,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
       {/* Amount input */}
       <View style={styles.amountRow}>
         <Text style={[styles.amountLabel, { color: colors.textSecondary }]}>{t('currency.amount')}</Text>
-        <View style={[styles.amountInputWrapper, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+        <View style={[styles.amountInputWrapper, { backgroundColor: MODULE_COLORS.tripsBg, borderColor: colors.border }]}>
           <TextInput
             style={[styles.amountInput, { color: colors.text }]}
             value={amount}
@@ -106,7 +106,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
       <View style={styles.currencyRow}>
         <View style={styles.currencySelectWrapper}>
           <Text style={[styles.selectLabel, { color: colors.textSecondary }]}>{t('currency.from')}</Text>
-          <View style={[styles.picker, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+          <View style={[styles.picker, { backgroundColor: MODULE_COLORS.tripsBg, borderColor: colors.border }]}>
             <Text style={[styles.pickerText, { color: colors.text }]}>
               {fromInfo?.flag} {fromCurrency}
             </Text>
@@ -119,7 +119,7 @@ export const CurrencyConverter: React.FC<CurrencyConverterProps> = React.memo(({
 
         <View style={styles.currencySelectWrapper}>
           <Text style={[styles.selectLabel, { color: colors.textSecondary }]}>{t('currency.to')}</Text>
-          <View style={[styles.picker, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
+          <View style={[styles.picker, { backgroundColor: MODULE_COLORS.tripsBg, borderColor: colors.border }]}>
             <Text style={[styles.pickerText, { color: colors.text }]}>
               {toInfo?.flag} {toCurrency}
             </Text>

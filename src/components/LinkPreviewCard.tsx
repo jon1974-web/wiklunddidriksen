@@ -26,7 +26,7 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = React.memo(({ lin
 
   return (
     <TouchableOpacity
-      style={[styles.card, { backgroundColor: colors.surfaceVariant }]}
+      style={[styles.card, { backgroundColor: MODULE_COLORS.tripsBg }]}
       onPress={onPress}
       onLongPress={onLongPress}
     >
@@ -34,7 +34,7 @@ export const LinkPreviewCard: React.FC<LinkPreviewCardProps> = React.memo(({ lin
         {faviconUrl ? (
           <Image source={{ uri: faviconUrl }} style={styles.favicon} resizeMode="contain" />
         ) : (
-          <View style={[styles.faviconFallback, { backgroundColor: colors.inputBackground }]}>
+          <View style={[styles.faviconFallback, { backgroundColor: MODULE_COLORS.tripsBg }]}>
             <Text style={styles.linkIcon}>🔗</Text>
           </View>
         )}

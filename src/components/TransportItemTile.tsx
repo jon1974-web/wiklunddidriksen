@@ -41,7 +41,7 @@ export const TransportItemTile: React.FC<TransportItemTileProps> = React.memo(({
 
   return (
     <TouchableOpacity
-      style={[styles.tile, { backgroundColor: colors.surfaceVariant, borderLeftColor: tileColor }]}
+      style={[styles.tile, { backgroundColor: MODULE_COLORS.tripsBg, borderLeftColor: tileColor }]}
       onPress={onPress}
       onLongPress={onLongPress}
     >

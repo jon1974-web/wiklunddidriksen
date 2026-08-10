@@ -1026,7 +1026,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     styles.weatherRow,
                     isToday && styles.weatherTodayRow,
                     !isToday && i % 2 === 0 && { backgroundColor: colors.surface },
-                    !isToday && i % 2 !== 0 && { backgroundColor: colors.background },
+                    !isToday && i % 2 !== 0 && { backgroundColor: MODULE_COLORS.tripsBg },
                   ]}>
                     <Text style={[styles.weatherDayText, { color: colors.text, flex: 3, ...(isToday && { fontWeight: '600' }) }]} numberOfLines={1}>{formatShortDate(day.date)}</Text>
                     <Text style={{ flex: 1, textAlign: 'center', fontSize: 22 }}>{wmoToEmoji(day.weatherCode)}</Text>
@@ -1240,7 +1240,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             return (
               <View key={entry.city} style={[styles.tipsExpandable, { borderColor: colors.border }]}>
                 <TouchableOpacity
-                  style={[styles.tipsExpandHeader, { backgroundColor: colors.inputBackground }]}
+                  style={[styles.tipsExpandHeader, { backgroundColor: MODULE_COLORS.tripsBg }]}
                   onPress={() => setExpandedTipsCity(isExpanded ? null : entry.city)}
                 >
                   <Text style={[styles.tipsExpandIcon, { color: colors.textSecondary }]}>{isExpanded ? '▼' : '▶'}</Text>
@@ -1263,7 +1263,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 </TouchableOpacity>
 
                 {isExpanded && (
-                  <View style={[styles.tipsExpandBody, { backgroundColor: colors.inputBackground }]}>
+                  <View style={[styles.tipsExpandBody, { backgroundColor: MODULE_COLORS.tripsBg }]}>
                     {entry.tips.overview ? (
                       <Text style={[styles.tipsOverview, { color: colors.text }]}>{entry.tips.overview}</Text>
                     ) : null}
@@ -1389,7 +1389,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               documents.map((d) => (
                 <TouchableOpacity
                   key={d.id}
-                  style={[styles.itemCard, { backgroundColor: colors.inputBackground }]}
+                  style={[styles.itemCard, { backgroundColor: MODULE_COLORS.tripsBg }]}
                   onPress={() => openEditModal('document', d)}
                   onLongPress={canDelete ? () => handleDeleteDocument(d.id) : undefined}
                 >
@@ -1429,7 +1429,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             packingLists.map((pl) => (
               <TouchableOpacity
                 key={pl.id}
-                style={[styles.itemCard, { backgroundColor: colors.inputBackground }]}
+                style={[styles.itemCard, { backgroundColor: MODULE_COLORS.tripsBg }]}
                 onPress={() => navigation.navigate('PackingListDetail', { list: pl, tripId: trip.id })}
                 onLongPress={() => setActionModal({ visible: true, title: pl.title || t('packing.title'), onEdit: () => navigation.navigate('PackingListDetail', { list: pl, tripId: trip.id }), onDelete: () => { deleteTripPackingList(trip.id, pl.id).then(() => loadSubData()); } })}
               >
