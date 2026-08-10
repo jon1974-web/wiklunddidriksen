@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Min uke — Fargeendringer Mockup</title>
+  <style>
+    :root { --bg: #f5f5f5; --surface: #fff; --text: #333; --text2: #666; --text3: #999; --border: #f0f0f0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); padding: 24px; max-width: 420px; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 4px; color: var(--text); font-size: 22px; }
+    .subtitle { text-align: center; color: var(--text2); margin-bottom: 24px; font-size: 13px; }
+    .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #0097A7; }
+    .section-note { font-size: 12px; color: var(--text2); margin-bottom: 16px; line-height: 1.5; }
+    .card { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .section-header { display: flex; align-items: center; gap: 8px; padding: 12px 16px 0; }
+    .section-icon { width: 18px; height: 18px; }
+    .section-title-text { font-size: 14px; font-weight: 700; }
+    .item { padding: 8px 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text); }
+    .item-icon { font-size: 14px; width: 20px; text-align: center; }
+    .day-header { font-size: 13px; font-weight: 700; padding: 8px 16px 4px; }
+    .day-today { background: rgba(0,151,167,0.1); border-left: 3px solid #0097A7; margin-left: -16px; padding-left: 28px; }
+    .note { font-size: 11px; color: var(--text3); font-style: italic; padding: 8px 16px; border-top: 1px solid var(--border); }
+    .close-btn { background: #0097A7; color: #fff; border: none; padding: 8px 16px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>📅 Min uke — Fargeendringer</h1>
+  <p class="subtitle">Hvert Seksjon bruker fargen fra sin tile · Familiesenter</p>
+
+  <div class="section-title">Nåværende design (uten modul-farger)</div>
+  <div class="section-note">Alle seksjoner bruker samme accent-farge. Ingen visuell forskjell mellom modulene.</div>
+
+  <div class="card">
+    <div class="section-header">
+      <span style="font-size: 18px;">🏥</span>
+      <span class="section-title-text" style="color: #333;">Helse</span>
+    </div>
+    <div class="item"><span class="item-icon">📅</span> Tannlegekontroll — lørdag 10:00</div>
+    <div class="item"><span class="item-icon">💊</span> Voltaren går tom denne uken</div>
+    <div class="item"><span class="item-icon">💉</span> Vaksinasjon — neste uke</div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <span style="font-size: 18px;">🐾</span>
+      <span class="section-title-text" style="color: #333;">Kjæledyr</span>
+    </div>
+    <div class="item"><span class="item-icon">🏥</span> Veterinærbesøk — onsdag 14:00</div>
+    <div class="item"><span class="item-icon">💉</span> Vaksine for Smartus — 20. aug</div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <span style="font-size: 18px;">📅</span>
+      <span class="section-title-text" style="color: #333;">Arrangementer</span>
+    </div>
+    <div class="day-header day-today">Mandag 10. aug</div>
+    <div class="item"><span class="item-icon">📅</span> Fotballtrening — 17:00</div>
+    <div class="day-header">Tirsdag 11. aug</div>
+    <div class="item" style="color: var(--text3); font-style: italic;">Ingen arrangementer</div>
+  </div>
+
+  <div class="section-title">Ny design (med modul-farger)</div>
+  <div class="section-note">Hvert seksjon bruker sin egen farge for ikon, tittel og elementer. Mye mer scannbart.</div>
+
+  <div class="card">
+    <div class="section-header">
+      <span style="font-size: 18px;">🏥</span>
+      <span class="section-title-text" style="color: #E53935;">Helse</span>
+    </div>
+    <div class="item"><span class="item-icon" style="color: #E53935;">📅</span> Tannlegekontroll — lørdag 10:00</div>
+    <div class="item"><span class="item-icon" style="color: #E53935;">💊</span> Voltaren går tom denne uken</div>
+    <div class="item"><span class="item-icon" style="color: #E53935;">💉</span> Vaksinasjon — neste uke</div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <span style="font-size: 18px;">🐾</span>
+      <span class="section-title-text" style="color: #8E24AA;">Kjæledyr</span>
+    </div>
+    <div class="item"><span class="item-icon" style="color: #8E24AA;">🏥</span> Veterinærbesøk — onsdag 14:00</div>
+    <div class="item"><span class="item-icon" style="color: #8E24AA;">💉</span> Vaksine for Smartus — 20. aug</div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <span style="font-size: 18px;">📅</span>
+      <span class="section-title-text" style="color: #0097A7;">Arrangementer</span>
+    </div>
+    <div class="day-header day-today">Mandag 10. aug</div>
+    <div class="item"><span class="item-icon" style="color: #0097A7;">📅</span> Fotballtrening — 17:00</div>
+    <div class="day-header">Tirsdag 11. aug</div>
+    <div class="item" style="color: var(--text3); font-style: italic;">Ingen arrangementer</div>
+  </div>
+
+  <div class="card">
+    <div class="section-header">
+      <span style="font-size: 18px;">🍲</span>
+      <span class="section-title-text" style="color: #0097A7;">Vår mat</span>
+    </div>
+    <div class="item"><span class="item-icon" style="color: #0097A7;">🥞</span> Pannekaker — mandag</div>
+    <div class="item"><span class="item-icon" style="color: #0097A7;">🥪</span> Wrap — tirsdag</div>
+  </div>
+
+</body>
+</html>

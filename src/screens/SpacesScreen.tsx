@@ -8,6 +8,7 @@ import { AppIcon } from '../components/AppIcon';
 import { getTrips } from '../services/tripService';
 import { getHealthAppointments } from '../services/healthService';
 import { getSchoolChildren } from '../services/schoolService';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface Space {
   id: string;
@@ -52,7 +53,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       id: 'trips',
       name: t('spaces.trips'),
       icon: 'compass',
-      iconColor: '#1565C0',
+      iconColor: MODULE_COLORS.trips,
       count: t('spaces.tripsCount', { count: tripCount }),
       screen: 'TripsList',
     },
@@ -60,7 +61,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       id: 'health',
       name: t('spaces.health'),
       icon: 'medication',
-      iconColor: '#E53935',
+      iconColor: MODULE_COLORS.health,
       count: t('spaces.healthCount', { count: healthCount }),
       screen: 'HealthSpace',
     },
@@ -68,7 +69,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       id: 'school',
       name: t('spaces.school'),
       icon: 'documents',
-      iconColor: '#43A047',
+      iconColor: MODULE_COLORS.school,
       count: t('spaces.schoolCount', { count: schoolCount }),
       screen: 'SchoolSpace',
     },
@@ -76,7 +77,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       id: 'birthdays',
       name: t('spaces.birthdays'),
       icon: 'birthday',
-      iconColor: '#FB8C00',
+      iconColor: MODULE_COLORS.birthdays,
       count: t('spaces.birthdayCount', { count: 2 }),
       screen: 'BirthdaySpace',
     },
@@ -84,7 +85,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       id: 'pets',
       name: t('spaces.pets'),
       icon: 'activities',
-      iconColor: '#8E24AA',
+      iconColor: MODULE_COLORS.pets,
       count: t('spaces.petsCount', { count: 1 }),
       screen: 'PetSpace',
     },
@@ -92,7 +93,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       id: 'mealplan',
       name: t('spaces.mealplan'),
       icon: 'utensils',
-      iconColor: '#0097A7',
+      iconColor: MODULE_COLORS.mealplan,
       count: '',
       screen: 'MealPlan',
     },
@@ -100,7 +101,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       id: 'home',
       name: t('spaces.home'),
       icon: 'hotel',
-      iconColor: '#5C6BC0',
+      iconColor: MODULE_COLORS.home,
       count: t('spaces.homeCount', { count: 4 }),
       screen: 'HomeSpace',
     },

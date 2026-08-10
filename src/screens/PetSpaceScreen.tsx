@@ -26,10 +26,11 @@ import { Pet, PetVetVisit, PetMedication, PetFood, PetGrooming, PetVaccination, 
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 const PET_ICONS: Record<string, string> = { 'Katt': '🐱', 'Hund': '🐶', 'Fisk': '🐟', 'Fugl': '🐦', 'Kanin': '🐰', 'Hamster': '🐹', 'Skilpadde': '🐢', 'Hest': '🐴', 'Anna': '🐾' };
 const PET_TYPES = ['Katt', 'Hund', 'Fisk', 'Fugl', 'Kanin', 'Skilpadde', 'Hamster', 'Hest', 'Anna'];
-const PET_THEME = '#8E24AA';
+const PET_THEME = MODULE_COLORS.pets;
 
 type PetSectionType = 'vetVisits' | 'medications' | 'food' | 'grooming' | 'vaccinations' | 'insurance';
 

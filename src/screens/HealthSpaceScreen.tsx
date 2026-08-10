@@ -23,6 +23,7 @@ import { HealthMedication, HealthAppointment, HealthVaccination, HealthAllergy, 
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 import { getFamilyMembersWithRoles } from '../services/familyService';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 type SectionType = 'medications' | 'appointments' | 'vaccinations' | 'allergies' | 'growth';
 
@@ -224,12 +225,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
     <View style={[styles.section, { backgroundColor: colors.surface }]}>
       <View style={styles.sectionHeader}>
         <View style={styles.sectionTitleRow}>
-          <AppIcon name={icon as any} size={18} color={colors.accent} />
+          <AppIcon name={icon as any} size={18} color={MODULE_COLORS.health} />
           <Text style={[styles.sectionTitle, { color: colors.text }]}>{title}</Text>
           <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({count})</Text>
         </View>
         <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: colors.accent }]}
+          style={[styles.addButton, { backgroundColor: MODULE_COLORS.health }]}
           onPress={() => { setActiveSection(section); setEditingItem(null); setShowAddModal(true); }}
         >
           <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
@@ -242,8 +243,8 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.health, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: MODULE_COLORS.health, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
       </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>

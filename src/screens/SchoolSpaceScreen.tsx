@@ -8,6 +8,7 @@ import { AppIcon } from '../components/AppIcon';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import * as ImagePicker from 'expo-image-picker';
 import { crossAlert } from '../utils/alert';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
 import {
   getSchoolChildren, addSchoolChild, updateSchoolChild, deleteSchoolChild,
@@ -19,7 +20,7 @@ import { SchoolChild, SchoolYear, SchoolContact, SchoolSchedule } from '../types
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 
-const SCHOOL_THEME = '#1565C0';
+const SCHOOL_THEME = MODULE_COLORS.school;
 
 interface SchoolSpaceScreenProps {
   navigation: any;

@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
 import { AppIcon } from './AppIcon';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface WeeklySummaryProps {
   visible: boolean;
@@ -180,8 +181,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
               return (
                 <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                    <AppIcon name="birthday" size={18} color={colors.accent} />
-                    <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('birthdays.title')}</Text>
+                    <AppIcon name="birthday" size={18} color={MODULE_COLORS.birthdays} />
+                    <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.birthdays }]}>{t('birthdays.title')}</Text>
                   </View>
                   <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('birthdays.noBirthdaysWeek')}</Text>
                 </View>
@@ -190,8 +191,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="birthday" size={18} color={colors.accent} />
-                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('birthdays.title')}</Text>
+                  <AppIcon name="birthday" size={18} color={MODULE_COLORS.birthdays} />
+                  <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.birthdays }]}>{t('birthdays.title')}</Text>
                 </View>
                 {weekBirthdays.map((b, i) => {
                   const bDate = new Date(b.date);
@@ -232,8 +233,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="medication" size={18} color="#E53935" />
-                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('health.title')}</Text>
+                  <AppIcon name="medication" size={18} color={MODULE_COLORS.health} />
+                  <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.health }]}>{t('health.title')}</Text>
                 </View>
                 {weekAppointments.map((a, i) => (
                   <View key={`appt-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
@@ -281,8 +282,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="pet" size={18} color="#FF9800" />
-                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('pets.title')}</Text>
+                  <AppIcon name="pet" size={18} color={MODULE_COLORS.pets} />
+                  <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.pets }]}>{t('pets.title')}</Text>
                 </View>
                 {weekVetVisits.map((v, i) => (
                   <View key={`vet-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
@@ -340,8 +341,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="utensils" size={18} color={colors.accent} />
-                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('mealPlanner.weeklyPlan')}</Text>
+                   <AppIcon name="utensils" size={18} color={MODULE_COLORS.mealplan} />
+                   <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.mealplan }]}>{t('mealPlanner.weeklyPlan')}</Text>
                 </View>
                 {plannedCount === 0 ? (
                   <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('mealPlanner.noMealsPlanned')}</Text>
@@ -385,8 +386,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
               return (
                 <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                    <AppIcon name="compass" size={18} color={colors.accent} />
-                    <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('trips.title')}</Text>
+                    <AppIcon name="compass" size={18} color={MODULE_COLORS.trips} />
+                    <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.trips }]}>{t('trips.title')}</Text>
                   </View>
                   <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('trips.noTripsWeek')}</Text>
                 </View>
@@ -396,8 +397,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="compass" size={18} color={colors.accent} />
-                  <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('trips.title')}</Text>
+                  <AppIcon name="compass" size={18} color={MODULE_COLORS.trips} />
+                  <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.trips }]}>{t('trips.title')}</Text>
                 </View>
                 {weekTrips.map((trip) => {
                   const sub = tripSubcollections[trip.id];

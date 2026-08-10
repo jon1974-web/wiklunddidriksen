@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tile + Innhold — Fargeendringer Mockup</title>
+  <style>
+    :root { --bg: #f5f5f5; --surface: #fff; --text: #333; --text2: #666; --text3: #999; --border: #f0f0f0; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); padding: 24px; max-width: 420px; margin: 0 auto; }
+    h1 { text-align: center; margin-bottom: 4px; color: var(--text); font-size: 22px; }
+    .subtitle { text-align: center; color: var(--text2); margin-bottom: 24px; font-size: 13px; }
+    .section-title { font-size: 16px; font-weight: 700; color: var(--text); margin: 28px 0 12px; padding-bottom: 6px; border-bottom: 2px solid #0097A7; }
+    .section-note { font-size: 12px; color: var(--text2); margin-bottom: 16px; line-height: 1.5; }
+    .tile-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 20px; }
+    .tile { background: var(--surface); border-radius: 16px; padding: 20px 16px; display: flex; flex-direction: column; align-items: center; gap: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border-left: 4px solid; }
+    .tile-icon { font-size: 32px; }
+    .tile-name { font-size: 14px; font-weight: 700; color: var(--text); }
+    .tile-count { font-size: 11px; color: var(--text3); }
+    .detail-page { background: var(--bg); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.12); margin-bottom: 20px; }
+    .detail-header-bar { display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: var(--surface); border-bottom: 1px solid var(--border); }
+    .detail-back { width: 36px; height: 36px; border-radius: 18px; border: 1.5px solid; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+    .detail-title { font-size: 18px; font-weight: 700; }
+    .detail-body { padding: 16px; }
+    .card { background: var(--surface); border-radius: 12px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .section-title-text { font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+    .add-btn { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: #fff; font-size: 18px; font-weight: 600; }
+    .item { padding: 10px 0; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; }
+    .item:last-child { border-bottom: none; }
+    .item-icon { width: 36px; height: 36px; border-radius: 18px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+    .item-text { flex: 1; }
+    .item-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .item-sub { font-size: 12px; color: var(--text2); }
+    .badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+    .btn { padding: 14px; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; border: none; text-align: center; }
+    .btn-primary { color: #fff; }
+    .btn-secondary { background: var(--bg); color: var(--text2); }
+  </style>
+</head>
+<body>
+  <h1>🏠 Våre steder — Fargeendringer</h1>
+  <p class="subtitle">Modul-spesifikke farger på tiles og innholdssider · Familiesenter</p>
+
+  <div class="section-title">1. Tiles med modul-farger</div>
+  <div class="tile-grid">
+    <div class="tile" style="border-left-color: #1565C0;"><div class="tile-icon">🧭</div><div class="tile-name">Våre reiser</div><div class="tile-count">3 aktive turer</div></div>
+    <div class="tile" style="border-left-color: #E53935;"><div class="tile-icon">🏥</div><div class="tile-name">Vår helse</div><div class="tile-count">2 timer denne uken</div></div>
+    <div class="tile" style="border-left-color: #43A047;"><div class="tile-icon">🏫</div><div class="tile-name">Vår skole</div><div class="tile-count">2 kontaktlærere</div></div>
+    <div class="tile" style="border-left-color: #FB8C00;"><div class="tile-icon">🎂</div><div class="tile-name">Våre bursdager</div><div class="tile-count">1 denne måneden</div></div>
+    <div class="tile" style="border-left-color: #8E24AA;"><div class="tile-icon">🐾</div><div class="tile-name">Våre kjæledyr</div><div class="tile-count">1 vaksine neste måned</div></div>
+    <div class="tile" style="border-left-color: #0097A7;"><div class="tile-icon">🍽️</div><div class="tile-name">Vår mat</div></div>
+    <div class="tile" style="border-left-color: #5C6BC0;"><div class="tile-icon">🏠</div><div class="tile-name">Vårt hjem</div></div>
+  </div>
+
+  <div class="section-title">2. Innholdsside — Helse (rød farge)</div>
+  <div class="section-note">Seksjonsikoner, tittel og +-knapp bruker rød farge (#E53935) fra Helse-tilen.</div>
+  <div class="detail-page">
+    <div class="detail-header-bar">
+      <div class="detail-back" style="border-color: #E53935; color: #E53935;">←</div>
+      <span style="font-size: 20px;">🏥</span>
+      <span class="detail-title">Vår helse</span>
+    </div>
+    <div class="detail-body">
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title-text" style="color: #E53935;">💊 Medisiner</div>
+          <div class="add-btn" style="background: #E53935;">+</div>
+        </div>
+        <div class="item">
+          <div class="item-icon" style="background: #FFEBEE;">💊</div>
+          <div class="item-text"><div class="item-title">Paracet 500mg</div><div class="item-sub">Emma — 1 tablett ved behov</div></div>
+          <span class="badge" style="background: #E8F5E9; color: #43A047;">På lager</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title-text" style="color: #E53935;">📅 Timer</div>
+          <div class="add-btn" style="background: #E53935;">+</div>
+        </div>
+        <div class="item">
+          <div class="item-icon" style="background: #FFEBEE;">📅</div>
+          <div class="item-text"><div class="item-title">Tannlegekontroll</div><div class="item-sub">15. aug 10:00 — Colosseum</div></div>
+          <span class="badge" style="background: #FFF3E0; color: #FB8C00;">Om 8 dager</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; padding: 16px;">
+        <button class="btn btn-secondary" style="flex: 1;">Lukk</button>
+        <button class="btn btn-primary" style="flex: 1; background: #E53935;">Rediger</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">3. Innholdsside — Kjæledyr (lilla farge)</div>
+  <div class="section-note">Seksjonsikoner, tittel og +-knapp bruker lilla farge (#8E24AA) fra Kjæledyr-tilen.</div>
+  <div class="detail-page">
+    <div class="detail-header-bar">
+      <div class="detail-back" style="border-color: #8E24AA; color: #8E24AA;">←</div>
+      <span style="font-size: 20px;">🐾</span>
+      <span class="detail-title">Våre kjæledyr</span>
+    </div>
+    <div class="detail-body">
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title-text" style="color: #8E24AA;">🏥 Veterinærbesøk</div>
+          <div class="add-btn" style="background: #8E24AA;">+</div>
+        </div>
+        <div class="item">
+          <div class="item-icon" style="background: #F3E5F5;">🏥</div>
+          <div class="item-text"><div class="item-title">Vaksine for å bli smartere</div><div class="item-sub">20. aug 14:00 — Dyreklinikken</div></div>
+          <span class="badge" style="background: #E8F5E9; color: #43A047;">Fullført</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-header">
+          <div class="section-title-text" style="color: #8E24AA;">💊 Medisiner</div>
+          <div class="add-btn" style="background: #8E24AA;">+</div>
+        </div>
+        <div class="item">
+          <div class="item-icon" style="background: #F3E5F5;">💊</div>
+          <div class="item-text"><div class="item-title">Flåttmiddel</div><div class="item-sub">Smartus — 1 gang i måneden</div></div>
+          <span class="badge" style="background: #E8F5E9; color: #43A047;">Aktiv</span>
+        </div>
+      </div>
+      <div style="display: flex; gap: 12px; padding: 16px;">
+        <button class="btn btn-secondary" style="flex: 1;">Lukk</button>
+        <button class="btn btn-primary" style="flex: 1; background: #8E24AA;">Rediger</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">4. Sammenligning</div>
+  <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 20px;">
+    <tr style="background: #f0f0f0;"><th style="padding: 8px; text-align: left;">Element</th><th style="padding: 8px; text-align: left;">Nå</th><th style="padding: 8px; text-align: left;">Nytt</th></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid var(--border);">Seksjonsikon</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Accent-farge</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Modul-farge</td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid var(--border);">Tittel</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Accent-farge</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Modul-farge</td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid var(--border);">+-knapp</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Accent-farge</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Modul-farge</td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid var(--border);">Tilbake-pil</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Accent-farge</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Modul-farge</td></tr>
+    <tr><td style="padding: 8px; border-bottom: 1px solid var(--border);">Status-badge</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Grunnfarge</td><td style="padding: 8px; border-bottom: 1px solid var(--border);">Grunnfarge (beholdes)</td></tr>
+    <tr><td style="padding: 8px;">Min uke-elementer</td><td style="padding: 8px;">Accent-farge</td><td style="padding: 8px;">Kilde-modul farge</td></tr>
+  </table>
+
+</body>
+</html>
