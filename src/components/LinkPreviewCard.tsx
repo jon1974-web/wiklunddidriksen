@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { TripLink } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getFaviconUrl, extractDomain } from '../utils/favicon';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface LinkPreviewCardProps {
   link: TripLink;

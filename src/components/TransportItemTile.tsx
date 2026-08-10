@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { formatDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
 import { AppIcon } from './AppIcon';

@@ -3,6 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator 
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { AppIcon } from './AppIcon';
 import { getLocale } from '../constants/languages';
 import { ALL_CURRENCIES, CURRENCY_INFO, getCurrencyForCountry, getCurrencyForLanguage } from '../constants/currencies';

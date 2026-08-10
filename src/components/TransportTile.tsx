@@ -3,6 +3,7 @@ import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { TripFlight } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getCarrierDomain } from '../constants/carrierDomains';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { getFaviconUrl } from '../utils/favicon';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
