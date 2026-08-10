@@ -227,10 +227,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
               if (m.dateTo) return m.dateTo >= weekStr;
               return true;
             });
-            const weekVaccinations = (healthVaccinations || []).filter(v => {
-              const filterDate = v.nextDue || v.date;
-              return filterDate >= weekStr && filterDate <= endStr;
-            });
+            const weekVaccinations = (healthVaccinations || []).filter(v => v.date >= weekStr && v.date <= endStr);
             if (weekAppointments.length === 0 && activeMedications.length === 0 && weekVaccinations.length === 0) return null;
             return (
               <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
@@ -272,10 +269,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             const weekStr = start.toISOString().split('T')[0];
             const endStr = end.toISOString().split('T')[0];
             const weekVetVisits = (petVetVisits || []).filter(v => v.date >= weekStr && v.date <= endStr);
-            const weekVaccinations = (petVaccinations || []).filter(v => {
-              const filterDate = v.nextDue || v.date;
-              return filterDate >= weekStr && filterDate <= endStr;
-            });
+            const weekVaccinations = (petVaccinations || []).filter(v => v.date >= weekStr && v.date <= endStr);
             const activeMedications = (petMedications || []).filter(m => {
               if (!m.dateFrom && !m.dateTo) return true;
               if (m.dateFrom && m.dateTo) return m.dateFrom <= endStr && m.dateTo >= weekStr;
