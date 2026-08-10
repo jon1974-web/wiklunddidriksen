@@ -462,6 +462,35 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 {teachers.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
               </View>
 
+              {/* Schedule Section */}
+              <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <View style={styles.sectionHeader}>
+                  <View style={styles.sectionTitleRow}>
+                    <AppIcon name="calendar" size={18} color={SCHOOL_THEME} />
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.schedule')}</Text>
+                  </View>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={handleAddSchedule}>
+                    {loading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>}
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.semesterTabs}>
+                  <TouchableOpacity style={[styles.semesterTab, { backgroundColor: activeSemester === 'høst' ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setActiveSemester('høst')}>
+                    <Text style={{ color: activeSemester === 'høst' ? '#fff' : colors.text, fontWeight: '600', fontSize: 14 }}>{t('school.autumn')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.semesterTab, { backgroundColor: activeSemester === 'vår' ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setActiveSemester('vår')}>
+                    <Text style={{ color: activeSemester === 'vår' ? '#fff' : colors.text, fontWeight: '600', fontSize: 14 }}>{t('school.spring')}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.scheduleGrid}>
+                  {schedules.filter(s => s.semester === activeSemester).map(s => (
+                    <TouchableOpacity key={s.id} style={styles.scheduleThumb} onPress={() => setViewingImage(s.imageUrl)} onLongPress={() => crossAlert(t('common.delete'), t('school.deleteScheduleConfirm'), () => handleDeleteSchedule(s.id))}>
+                      <Image source={{ uri: s.imageUrl }} style={styles.scheduleImage} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                {schedules.filter(s => s.semester === activeSemester).length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noSchedule')}</Text>}
+              </View>
+
               {/* Classmates Section */}
               <View style={[styles.section, { backgroundColor: colors.surface }]}>
                 <View style={styles.sectionHeader}>
@@ -505,35 +534,6 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   </TouchableOpacity>
                 ))}
                 {filteredClassmates.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
-              </View>
-
-              {/* Schedule Section */}
-              <View style={[styles.section, { backgroundColor: colors.surface }]}>
-                <View style={styles.sectionHeader}>
-                  <View style={styles.sectionTitleRow}>
-                    <AppIcon name="calendar" size={18} color={SCHOOL_THEME} />
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.schedule')}</Text>
-                  </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={handleAddSchedule}>
-                    {loading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>}
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.semesterTabs}>
-                  <TouchableOpacity style={[styles.semesterTab, { backgroundColor: activeSemester === 'høst' ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setActiveSemester('høst')}>
-                    <Text style={{ color: activeSemester === 'høst' ? '#fff' : colors.text, fontWeight: '600', fontSize: 14 }}>{t('school.autumn')}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity style={[styles.semesterTab, { backgroundColor: activeSemester === 'vår' ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setActiveSemester('vår')}>
-                    <Text style={{ color: activeSemester === 'vår' ? '#fff' : colors.text, fontWeight: '600', fontSize: 14 }}>{t('school.spring')}</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.scheduleGrid}>
-                  {schedules.filter(s => s.semester === activeSemester).map(s => (
-                    <TouchableOpacity key={s.id} style={styles.scheduleThumb} onPress={() => setViewingImage(s.imageUrl)} onLongPress={() => crossAlert(t('common.delete'), t('school.deleteScheduleConfirm'), () => handleDeleteSchedule(s.id))}>
-                      <Image source={{ uri: s.imageUrl }} style={styles.scheduleImage} />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-                {schedules.filter(s => s.semester === activeSemester).length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noSchedule')}</Text>}
               </View>
             </>
           )}
