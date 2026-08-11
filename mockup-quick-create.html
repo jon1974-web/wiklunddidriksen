@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Create Mockup</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a1a; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+
+  :root { --accent: #4CAF50; }
+
+  .phone-frame {
+    width: 375px;
+    height: 812px;
+    background: #f5f5f5;
+    border-radius: 40px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .status-bar {
+    height: 44px;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .content {
+    flex: 1;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 14px;
+  }
+
+  .tab-bar {
+    height: 82px;
+    background: #fff;
+    border-top: 1px solid #eee;
+    display: flex;
+    align-items: flex-start;
+    padding-top: 8px;
+    position: relative;
+  }
+
+  .tab-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding-top: 4px;
+    cursor: pointer;
+  }
+  .tab-item .tab-label { font-size: 10px; color: #999; }
+  .tab-item.active .tab-label { color: var(--accent); font-weight: 600; }
+  .tab-item.active svg { stroke: var(--accent); }
+  .tab-item.active svg rect[fill], .tab-item.active svg circle[fill], .tab-item.active svg polygon[fill] { fill: var(--accent); }
+
+  .center-btn {
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 56px;
+    height: 56px;
+    border-radius: 28px;
+    background: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    cursor: pointer;
+    z-index: 10;
+    transition: transform 0.2s, background 0.3s;
+  }
+  .center-btn:hover { transform: translateX(-50%) scale(1.05); }
+  .center-btn:active { transform: translateX(-50%) scale(0.95); }
+  .center-btn .plus {
+    color: #fff;
+    font-size: 32px;
+    font-weight: 300;
+    line-height: 1;
+    margin-top: -2px;
+  }
+
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 20;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .overlay.show { opacity: 1; pointer-events: all; }
+
+  .bottom-sheet {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    border-radius: 20px 20px 0 0;
+    z-index: 30;
+    transform: translateY(100%);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    max-height: 75%;
+    display: flex;
+    flex-direction: column;
+  }
+  .bottom-sheet.show { transform: translateY(0); }
+
+  .sheet-handle {
+    width: 36px;
+    height: 4px;
+    background: #ddd;
+    border-radius: 2px;
+    margin: 10px auto 0;
+  }
+
+  .sheet-header {
+    padding: 16px 20px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .sheet-title { font-size: 18px; font-weight: 700; color: #333; }
+  .sheet-close {
+    width: 30px;
+    height: 30px;
+    border-radius: 15px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: #666;
+  }
+
+  .sheet-content {
+    padding: 0 20px 34px;
+    overflow-y: auto;
+  }
+
+  .section { margin-bottom: 20px; }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+  .section-icon { font-size: 16px; }
+  .section-title { font-size: 13px; font-weight: 700; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .option:hover { background: #f5f5f5; }
+  .option:active { background: #eee; }
+  .option-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .option-text { flex: 1; }
+  .option-label { font-size: 15px; font-weight: 500; color: #333; }
+  .option-desc { font-size: 12px; color: #999; margin-top: 1px; }
+  .option-arrow { color: #ccc; font-size: 16px; }
+
+  .bg-green { background: #E8F5E9; }
+  .bg-red { background: #FFEBEE; }
+  .bg-purple { background: #F3E5F5; }
+  .bg-blue { background: #E3F2FD; }
+
+  .label { font-size: 12px; color: #999; margin-top: 8px; text-align: center; }
+  h2 { font-size: 16px; color: #fff; margin-bottom: 16px; text-align: center; }
+</style>
+</head>
+<body>
+
+<div>
+  <h2>Tab Bar with Center + Button</h2>
+
+  <div class="phone-frame">
+    <div class="status-bar">
+      <span>9:41</span>
+      <span>🔋</span>
+    </div>
+
+    <div class="content">
+      <span>Event list content</span>
+    </div>
+
+    <div class="tab-bar">
+      <div class="tab-item active">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#4CAF50" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+          <line x1="16" y1="2" x2="16" y2="6"/>
+          <line x1="8" y1="2" x2="8" y2="6"/>
+          <line x1="3" y1="10" x2="21" y2="10"/>
+          <rect x="7" y="13" width="4" height="4" rx="1" fill="#4CAF50" stroke="none"/>
+        </svg>
+        <span class="tab-label">Arrangementer</span>
+      </div>
+      <div class="tab-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/>
+        </svg>
+        <span class="tab-label">Chat</span>
+      </div>
+
+      <div class="center-btn" onclick="toggleSheet()">
+        <span class="plus">+</span>
+      </div>
+
+      <div class="tab-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span class="tab-label">Våre steder</span>
+      </div>
+      <div class="tab-item">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </svg>
+        <span class="tab-label">Profil</span>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="toggleSheet()"></div>
+
+    <div class="bottom-sheet" id="bottomSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <span class="sheet-title">Hva vil du opprette?</span>
+        <div class="sheet-close" onclick="toggleSheet()">✕</div>
+      </div>
+      <div class="sheet-content">
+
+        <div class="section">
+          <div class="section-header">
+            <span class="section-icon">📅</span>
+            <span class="section-title">Arrangementer</span>
+          </div>
+          <div class="option" onclick="alert('Navigerer til: Nytt arrangement')">
+            <div class="option-icon bg-green">📝</div>
+            <div class="option-text">
+              <div class="option-label">Nytt arrangement</div>
+              <div class="option-desc">Opprett et arrangement manuelt</div>
+            </div>
+            <span class="option-arrow">›</span>
+          </div>
+          <div class="option" onclick="alert('Navigerer til: Tale til arrangement')">
+            <div class="option-icon bg-green">🎤</div>
+            <div class="option-text">
+              <div class="option-label">Tale til arrangement</div>
+              <div class="option-desc">Snakk for å opprette et arrangement</div>
+            </div>
+            <span class="option-arrow">›</span>
+          </div>
+          <div class="option" onclick="alert('Navigerer til: Foto til arrangement')">
+            <div class="option-icon bg-green">📷</div>
+            <div class="option-text">
+              <div class="option-label">Foto til arrangement</div>
+              <div class="option-desc">Ta bilde for å opprette arrangement</div>
+            </div>
+            <span class="option-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <span class="section-icon">🏥</span>
+            <span class="section-title">Helse</span>
+          </div>
+          <div class="option" onclick="alert('Navigerer til: Time')">
+            <div class="option-icon bg-red">🩺</div>
+            <div class="option-text">
+              <div class="option-label">Time (lege/tannlege)</div>
+              <div class="option-desc">Legg til en time i Helse</div>
+            </div>
+            <span class="option-arrow">›</span>
+          </div>
+          <div class="option" onclick="alert('Navigerer til: Vaksinering')">
+            <div class="option-icon bg-red">💉</div>
+            <div class="option-text">
+              <div class="option-label">Vaksinering</div>
+              <div class="option-desc">Registrer en vaksinering</div>
+            </div>
+            <span class="option-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <span class="section-icon">🐾</span>
+            <span class="section-title">Kjæledyr</span>
+          </div>
+          <div class="option" onclick="alert('Navigerer til: Veterinærbesøk')">
+            <div class="option-icon bg-purple">🏥</div>
+            <div class="option-text">
+              <div class="option-label">Veterinærbesøk</div>
+              <div class="option-desc">Legg til et veterinærbesøk</div>
+            </div>
+            <span class="option-arrow">›</span>
+          </div>
+          <div class="option" onclick="alert('Navigerer til: Vaksine (kjæledyr)')">
+            <div class="option-icon bg-purple">💉</div>
+            <div class="option-text">
+              <div class="option-label">Vaksine</div>
+              <div class="option-desc">Registrer en vaksine for kjæledyr</div>
+            </div>
+            <span class="option-arrow">›</span>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-header">
+            <span class="section-icon">✈️</span>
+            <span class="section-title">Reiser</span>
+          </div>
+          <div class="option" onclick="alert('Navigerer til: Ny reise')">
+            <div class="option-icon bg-blue">🧳</div>
+            <div class="option-text">
+              <div class="option-label">Ny reise</div>
+              <div class="option-desc">Opprett en ny reise</div>
+            </div>
+            <span class="option-arrow">›</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <p class="label" style="color: #999; margin-top: 16px;">Tap the + button to open the create menu</p>
+  <p class="label" style="color: #666; margin-top: 8px; font-weight: 600;">Tap a color to preview theme:</p>
+  <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px;">
+    <div onclick="setTheme('#4CAF50')" style="width: 32px; height: 32px; border-radius: 16px; background: #4CAF50; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>
+    <div onclick="setTheme('#E53935')" style="width: 32px; height: 32px; border-radius: 16px; background: #E53935; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>
+    <div onclick="setTheme('#0097A7')" style="width: 32px; height: 32px; border-radius: 16px; background: #0097A7; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>
+    <div onclick="setTheme('#42A5F5')" style="width: 32px; height: 32px; border-radius: 16px; background: #42A5F5; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>
+    <div onclick="setTheme('#9C27B0')" style="width: 32px; height: 32px; border-radius: 16px; background: #9C27B0; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>
+    <div onclick="setTheme('#E87C3E')" style="width: 32px; height: 32px; border-radius: 16px; background: #E87C3E; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>
+    <div onclick="setTheme('#F48FB1')" style="width: 32px; height: 32px; border-radius: 16px; background: #F48FB1; cursor: pointer; border: 2px solid rgba(255,255,255,0.3); box-shadow: 0 2px 6px rgba(0,0,0,0.3);"></div>
+  </div>
+</div>
+
+<script>
+function toggleSheet() {
+  document.getElementById('overlay').classList.toggle('show');
+  document.getElementById('bottomSheet').classList.toggle('show');
+}
+
+function setTheme(color) {
+  document.documentElement.style.setProperty('--accent', color);
+}
+</script>
+
+</body>
+</html>
