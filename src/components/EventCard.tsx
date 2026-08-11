@@ -80,7 +80,7 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
           <Text style={[styles.calMonth, { color: colors.textSecondary }]}>{monthStr}</Text>
         </View>
         <View style={styles.content}>
-          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>{event.title}</Text>
+          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>{event.icon ? `${event.icon} ` : ''}{event.title}</Text>
           <View style={styles.timeRow}>
             <ClockIcon />
             <Text style={[styles.time, { color: colors.text }]}>{timeText}</Text>

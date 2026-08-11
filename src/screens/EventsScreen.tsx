@@ -685,16 +685,17 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
             </View>
             <View style={styles.spondCardContent}>
-              <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.heading}</Text>
+              <View style={styles.spondTitleRow}>
+                {item.groupName && spondGroupLogos[item.groupName] ? (
+                  <Image source={{ uri: spondGroupLogos[item.groupName] }} style={styles.spondTitleLogo} />
+                ) : (
+                  <Text style={styles.spondTitleFallback}>🏟️</Text>
+                )}
+                <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.heading}</Text>
+              </View>
               {item.groupName && (
                 <View style={styles.spondGroupRow}>
-                  {spondGroupLogos[item.groupName] ? (
-                    <Image source={{ uri: spondGroupLogos[item.groupName] }} style={styles.spondGroupLogo} />
-                  ) : (
-                    <View style={[styles.spondGroupDot, { backgroundColor: SPOND_COLOR }]}>
-                      <Text style={styles.spondGroupDotText}>🏟️</Text>
-                    </View>
-                  )}
+                  <Text style={styles.spondTeamIcon}>👥</Text>
                   <Text style={[styles.spondGroupName, { color: colors.textSecondary }]} numberOfLines={1}>{item.groupName}</Text>
                 </View>
               )}
@@ -1199,6 +1200,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     lineHeight: 22,
+  },
+  spondTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  spondTitleLogo: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+  },
+  spondTitleFallback: {
+    fontSize: 16,
+  },
+  spondTeamIcon: {
+    fontSize: 12,
   },
   spondCardDates: {
     fontSize: 13,
