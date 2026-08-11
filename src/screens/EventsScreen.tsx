@@ -20,6 +20,7 @@ import { getHealthAppointments, getHealthMedications, getHealthVaccinations } fr
 import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications } from '../services/petService';
 import { getUserProfile } from '../services/familyService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { WeeklySummary } from '../components/WeeklySummary';
 import { MissedRemindersBanner } from '../components/MissedRemindersBanner';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +31,7 @@ interface EventsScreenProps {
 }
 
 const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#00BCD4', '#8BC34A', '#FF5722'];
-const TRIP_COLOR = '#0097A7';
+const TRIP_COLOR = MODULE_COLORS.trips;
 const SPOND_COLOR = '#E53935';
 
 export const SPOND_GROUP_LOGOS: Record<string, any> = {};
