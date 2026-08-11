@@ -361,6 +361,11 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+      <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        </TouchableOpacity>
+      </View>
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{t('photoRecipe.instruction')}</Text>
       </View>
