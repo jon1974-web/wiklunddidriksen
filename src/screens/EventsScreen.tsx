@@ -118,7 +118,9 @@ type UnifiedItem =
   | (Event & { _type: 'event' })
   | (Trip & { _type: 'trip' })
   | (SpondEvent & { _type: 'spond' })
-  | (HealthAppointment & { _type: 'healthAppointment' });
+  | (HealthAppointment & { _type: 'healthAppointment' })
+  | (PetVetVisit & { _type: 'petVetVisit'; title: string; address?: string; time: string; icon?: string })
+  | (PetVaccination & { _type: 'petVaccination'; title: string; address?: string; time: string; icon?: string });
 
 export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
@@ -602,7 +604,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const tripMapUrl = item.city ? getStaticMapUrl(locationQuery) : null;
       return (
         <TouchableOpacity
-          style={[styles.tripCard, { backgroundColor: colors.surface }]}
+          style={[styles.tripCard, { backgroundColor: colors.surface, borderLeftColor: TRIP_COLOR }]}
           onPress={() => navigation.navigate('Trips', { screen: 'TripDetail', params: { trip: item } })}
         >
           <View style={styles.tripCardRow}>
@@ -636,7 +638,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = MONTHS_SV[startDate.getMonth()];
       const calYear = startDate.getFullYear();
-      const currentYear = new Date().getFullYear();
       const startTime = formatSpondTimestamp(item.startTimestamp);
       const endTime = item.endTimestamp ? formatSpondTimestamp(item.endTimestamp) : null;
       const timeText = endTime ? `${startTime} – ${endTime}` : startTime;
@@ -652,7 +653,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface }]}
+          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: SPOND_COLOR }]}
           activeOpacity={0.7}
           onPress={() => navigation.navigate('EventDetail_Spond', {
             event: item,
@@ -719,23 +720,37 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     }
     if (item._type === 'healthAppointment') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
+      const d = item.date ? new Date(item.date) : null;
+      const calDay = d ? d.getDate() : '?';
+      const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
+      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
+      const calYear = d ? d.getFullYear() : new Date().getFullYear();
+      const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
           style={[styles.tripCard, { backgroundColor: colors.surface, borderLeftColor: '#E53935' }]}
           onPress={() => navigation.navigate('Trips', { screen: 'HealthSpace' })}
         >
           <View style={styles.tripCardRow}>
-            <View style={styles.tripCardContent}>
-              <View style={styles.tripCardTitleRow}>
-                <Text style={styles.tripCardIcon}>🏥</Text>
-                <Text style={[styles.tripCardTitle, { color: colors.text }]}>{item.title}</Text>
+            <View style={styles.spondCalIcon}>
+              <View style={[styles.spondCalTopBar, { backgroundColor: '#E53935' }]}>
+                <Text style={styles.spondCalYear}>{calYear}</Text>
               </View>
+              <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
+              <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
+            </View>
+            <View style={styles.tripCardContent}>
+              <Text style={[styles.tripCardTitle, { color: colors.text }]}>{item.title}</Text>
               <Text style={[styles.tripCardLocation, { color: colors.textSecondary }]}>
                 {item.person}{item.location ? ` — ${item.location}` : ''}
               </Text>
-              <Text style={[styles.tripCardDates, { color: colors.textSecondary }]}>
-                {item.date} {item.startTime}
-              </Text>
+              <View style={styles.spondTimeRow}>
+                <View style={styles.spondClockOuter}>
+                  <View style={styles.spondClockHandV} />
+                  <View style={styles.spondClockHandH} />
+                </View>
+                <Text style={[styles.spondCardTime, { color: colors.text }]}>{timeText}</Text>
+              </View>
             </View>
             {mapUrl && (
               <TouchableOpacity
@@ -1117,6 +1132,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
+    borderLeftWidth: 4,
   },
   spondCardRow: {
     flexDirection: 'row',

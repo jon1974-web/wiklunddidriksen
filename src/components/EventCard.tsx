@@ -57,8 +57,6 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
   const dayNum = d ? d.getDate() : '?';
   const monthStr = d ? MONTHS[d.getMonth()] : '';
   const year = d ? d.getFullYear() : new Date().getFullYear();
-  const currentYear = new Date().getFullYear();
-  const showYear = year !== currentYear;
 
   const timeText = event.endTime
     ? `${formatTime(event.time)} – ${formatTime(event.endTime)}`
@@ -72,11 +70,11 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
   };
 
   return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface }]} onPress={onPress} onLongPress={canDelete ? onLongPress : undefined}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderLeftColor: colors.accent }]} onPress={onPress} onLongPress={canDelete ? onLongPress : undefined}>
       <View style={styles.row}>
         <View style={styles.calIcon}>
           <View style={[styles.calTopBar, { backgroundColor: colors.accent }]}>
-            {showYear && <Text style={styles.calYear}>{year}</Text>}
+            <Text style={styles.calYear}>{year}</Text>
           </View>
           <Text style={[styles.calDay, { color: colors.text }]}>{dayNum}</Text>
           <Text style={[styles.calMonth, { color: colors.textSecondary }]}>{monthStr}</Text>
@@ -112,6 +110,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
+    borderLeftWidth: 4,
   },
   row: {
     flexDirection: 'row',
