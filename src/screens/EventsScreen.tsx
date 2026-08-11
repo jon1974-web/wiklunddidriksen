@@ -602,30 +602,40 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     if (item._type === 'trip') {
       const locationQuery = item.country ? `${item.city}, ${item.country}` : item.city;
       const tripMapUrl = item.city ? getStaticMapUrl(locationQuery) : null;
+      const d = item.startDate ? new Date(item.startDate) : null;
+      const calDay = d ? d.getDate() : '?';
+      const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
+      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
+      const calYear = d ? d.getFullYear() : new Date().getFullYear();
+      const dateText = item.endDate ? `${formatDate(item.startDate)} – ${formatDate(item.endDate)}` : formatDate(item.startDate);
       return (
         <TouchableOpacity
-          style={[styles.tripCard, { backgroundColor: colors.surface, borderLeftColor: TRIP_COLOR }]}
+          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: TRIP_COLOR }]}
           onPress={() => navigation.navigate('Trips', { screen: 'TripDetail', params: { trip: item } })}
         >
-          <View style={styles.tripCardRow}>
-            <View style={styles.tripCardContent}>
-              <View style={styles.tripCardTitleRow}>
-                <Text style={styles.tripCardIcon}>{item.icon || '✈️'}</Text>
-                <Text style={[styles.tripCardTitle, { color: colors.text }]}>{item.title}</Text>
+          <View style={styles.spondCardRow}>
+            <View style={styles.spondCalIcon}>
+              <View style={[styles.spondCalTopBar, { backgroundColor: TRIP_COLOR }]}>
+                <Text style={styles.spondCalYear}>{calYear}</Text>
               </View>
-              <Text style={[styles.tripCardLocation, { color: colors.textSecondary }]}>
+              <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
+              <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
+            </View>
+            <View style={styles.spondCardContent}>
+              <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.icon || '✈️'} {item.title}</Text>
+              <Text style={[styles.spondCardAddress, { color: colors.textSecondary }]}>
                 {item.city}{item.country ? `, ${item.country}` : ''}
               </Text>
-              <Text style={[styles.tripCardDates, { color: colors.textSecondary }]}>
-                {formatDate(item.startDate)} - {formatDate(item.endDate)}
+              <Text style={[styles.spondCardDates, { color: colors.textSecondary, fontSize: 13, marginTop: 3 }]}>
+                {dateText}
               </Text>
             </View>
             {tripMapUrl && (
               <TouchableOpacity
-                style={styles.tripMapContainer}
+                style={styles.spondMapContainer}
                 onPress={() => Linking.openURL(getGoogleMapsUrl(locationQuery))}
               >
-                <Image source={{ uri: tripMapUrl }} style={styles.tripMapImage} />
+                <Image source={{ uri: tripMapUrl }} style={styles.spondMapImage} />
               </TouchableOpacity>
             )}
           </View>
@@ -728,10 +738,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
-          style={[styles.tripCard, { backgroundColor: colors.surface, borderLeftColor: '#E53935' }]}
+          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: '#E53935' }]}
           onPress={() => navigation.navigate('Trips', { screen: 'HealthSpace' })}
         >
-          <View style={styles.tripCardRow}>
+          <View style={styles.spondCardRow}>
             <View style={styles.spondCalIcon}>
               <View style={[styles.spondCalTopBar, { backgroundColor: '#E53935' }]}>
                 <Text style={styles.spondCalYear}>{calYear}</Text>
@@ -739,11 +749,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
             </View>
-            <View style={styles.tripCardContent}>
-              <Text style={[styles.tripCardTitle, { color: colors.text }]}>{item.title}</Text>
-              <Text style={[styles.tripCardLocation, { color: colors.textSecondary }]}>
-                {item.person}{item.location ? ` — ${item.location}` : ''}
-              </Text>
+            <View style={styles.spondCardContent}>
+              <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
               <View style={styles.spondTimeRow}>
                 <View style={styles.spondClockOuter}>
                   <View style={styles.spondClockHandV} />
@@ -751,13 +758,16 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
                 </View>
                 <Text style={[styles.spondCardTime, { color: colors.text }]}>{timeText}</Text>
               </View>
+              {item.address && (
+                <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>📍 {item.address}</Text>
+              )}
             </View>
             {mapUrl && (
               <TouchableOpacity
-                style={styles.tripMapContainer}
+                style={styles.spondMapContainer}
                 onPress={() => Linking.openURL(getGoogleMapsUrl(item.address))}
               >
-                <Image source={{ uri: mapUrl }} style={styles.tripMapImage} />
+                <Image source={{ uri: mapUrl }} style={styles.spondMapImage} />
               </TouchableOpacity>
             )}
           </View>
@@ -1185,6 +1195,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     lineHeight: 22,
+  },
+  spondCardDates: {
+    fontSize: 13,
+    marginTop: 3,
   },
   spondGroupRow: {
     flexDirection: 'row',
