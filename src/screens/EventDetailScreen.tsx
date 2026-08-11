@@ -202,7 +202,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       setEventData({
         ...eventData,
         ...updateData,
-        notificationId: newNotificationId || eventData.notificationId,
+        notificationId: eventData.notificationId,
       });
       setIsEditing(false);
     } catch (error) {
