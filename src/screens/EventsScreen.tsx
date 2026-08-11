@@ -624,11 +624,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             </View>
             <View style={styles.spondCardContent}>
               <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.icon || '✈️'} {item.title}</Text>
+              <View style={styles.spondTimeRow}>
+                <View style={styles.tripDateIconOuter}>
+                  <View style={styles.tripDateIconTop} />
+                </View>
+                <Text style={[styles.spondCardTime, { color: colors.text }]}>{dateText}</Text>
+              </View>
               <Text style={[styles.spondCardAddress, { color: colors.textSecondary }]}>
-                {item.city}{item.country ? `, ${item.country}` : ''}
-              </Text>
-              <Text style={[styles.spondCardDates, { color: colors.textSecondary, fontSize: 13, marginTop: 3 }]}>
-                {dateText}
+                📍 {item.city}{item.country ? `, ${item.country}` : ''}
               </Text>
             </View>
             {tripMapUrl && (
@@ -1260,6 +1263,23 @@ const styles = StyleSheet.create({
   spondCardTime: {
     fontSize: 15,
     fontWeight: '700',
+  },
+  tripDateIconOuter: {
+    width: 14,
+    height: 14,
+    borderRadius: 3,
+    borderWidth: 1.5,
+    borderColor: '#999',
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingTop: 1,
+  },
+  tripDateIconTop: {
+    width: '100%',
+    height: 3,
+    backgroundColor: '#999',
+    borderTopLeftRadius: 1.5,
+    borderTopRightRadius: 1.5,
   },
   spondCardAddress: {
     fontSize: 13,
