@@ -631,109 +631,90 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       );
     }
     if (item._type === 'spond') {
-      const startDate = formatSpondDate(item.startTimestamp);
-      const endDate = item.endTimestamp ? formatSpondDate(item.endTimestamp) : null;
-      const dateText = endDate
-        ? `${formatDate(startDate)} - ${formatDate(endDate)}`
-        : formatDate(startDate);
+      const startDate = new Date(item.startTimestamp);
+      const calDay = startDate.getDate();
+      const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
+      const calMonth = MONTHS_SV[startDate.getMonth()];
+      const calYear = startDate.getFullYear();
+      const currentYear = new Date().getFullYear();
       const startTime = formatSpondTimestamp(item.startTimestamp);
       const endTime = item.endTimestamp ? formatSpondTimestamp(item.endTimestamp) : null;
-      const timeText = endTime ? `${startTime} - ${endTime}` : startTime;
-      const accepted = item.responses?.acceptedIds?.length || 0;
-      const declined = item.responses?.declinedIds?.length || 0;
-      const unanswered = item.responses?.unansweredIds?.length || 0;
+      const timeText = endTime ? `${startTime} – ${endTime}` : startTime;
       const stampStatus = getSpondStampStatus(item, spondRespondents);
+      const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
+
+      let badgeBg = '#FFF8E1';
+      let badgeColor = '#F57F17';
+      let badgeText = '● Ikke svart';
+      if (stampStatus?.type === 'accepted') { badgeBg = '#E8F5E9'; badgeColor = '#2E7D32'; badgeText = '✓ Akseptert'; }
+      else if (stampStatus?.type === 'declined') { badgeBg = '#FFEBEE'; badgeColor = '#C62828'; badgeText = '✕ Avslått'; }
+      else if (stampStatus?.type === 'partial') { badgeBg = '#FFF8E1'; badgeColor = '#F57F17'; badgeText = '● Delvis'; }
+
       return (
-        <View style={[styles.spondCard, { backgroundColor: colors.surface }]}>
-          <TouchableOpacity
-            style={styles.spondCardContent}
-            activeOpacity={0.7}
-            onPress={() => navigation.navigate('EventDetail_Spond', {
-              event: item,
-              spondRespondents,
-              spondConfig,
-              groupLogos: spondGroupLogos,
-            })}
-          >
-            <View style={styles.spondCardTitleRow}>
-              {item.groupName && spondGroupLogos[item.groupName] ? (
-                <Image source={{ uri: spondGroupLogos[item.groupName] }} style={styles.spondCardLogo} />
-              ) : (
-                <Text style={styles.spondCardIcon}>🏟️</Text>
-              )}
+        <TouchableOpacity
+          style={[styles.spondCard, { backgroundColor: colors.surface }]}
+          activeOpacity={0.7}
+          onPress={() => navigation.navigate('EventDetail_Spond', {
+            event: item,
+            spondRespondents,
+            spondConfig,
+            groupLogos: spondGroupLogos,
+          })}
+        >
+          <View style={styles.spondCardRow}>
+            <View style={styles.spondCalIcon}>
+              <View style={[styles.spondCalTopBar, { backgroundColor: SPOND_COLOR }]}>
+                <Text style={styles.spondCalYear}>{calYear}</Text>
+              </View>
+              <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
+              <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
+            </View>
+            <View style={styles.spondCardContent}>
               <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.heading}</Text>
-            </View>
-            {item.description && (
-              <Text style={[styles.spondCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{item.description}</Text>
-            )}
-            <Text style={[styles.spondCardDates, { color: colors.textSecondary }]}>
-              {dateText}{timeText ? ` · ${timeText}` : ''}
-            </Text>
-            {item.address && (
-              <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>{item.address}</Text>
-            )}
-          </TouchableOpacity>
-          {item.responses && (
-            <Text style={styles.spondCardResponseCounts}>
-              <Text style={{ color: '#4CAF50' }}>{accepted} akseptert</Text>
-              <Text style={{ color: colors.textDisabled }}> · </Text>
-              <Text style={{ color: '#E53935' }}>{declined} avslått</Text>
-              <Text style={{ color: colors.textDisabled }}> · </Text>
-              <Text style={{ color: '#C8A96E' }}>{unanswered} ikke svart</Text>
-            </Text>
-          )}
-          {item.groupId && (
-            <View style={styles.spondCardIconsRow}>
-              <TouchableOpacity
-                style={[styles.spondIconBtn, { backgroundColor: colors.accentLight }]}
-                onPress={() => setResponseModal({ event: item, groupId: item.groupId!, type: 'accept' })}
-              >
-                <Text style={styles.spondIconText}>✓</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.spondIconBtn, { backgroundColor: '#FFEBEE' }]}
-                onPress={() => setResponseModal({ event: item, groupId: item.groupId!, type: 'decline' })}
-              >
-                <Text style={[styles.spondIconText, { color: colors.danger }]}>✕</Text>
-              </TouchableOpacity>
-            </View>
-          )}
-          {stampStatus?.type === 'accepted' && (
-            <View style={styles.spondStampAccepted} pointerEvents="none">
-              <Text style={styles.spondStampTextAccepted}>AKSEPTERT</Text>
-            </View>
-          )}
-          {stampStatus?.type === 'declined' && (
-            <View style={styles.spondStampDeclined} pointerEvents="none">
-              <Text style={styles.spondStampTextDeclined}>AVSLÅTT</Text>
-            </View>
-          )}
-          {stampStatus?.type === 'unanswered' && (
-            <View style={styles.spondStampUnanswered} pointerEvents="none">
-              <Text style={styles.spondStampTextUnanswered}>IKKE SVART</Text>
-            </View>
-          )}
-          {stampStatus?.type === 'partial' && (
-            <View style={styles.spondStampPartial} pointerEvents="none">
-              <Text style={styles.spondStampTextPartial}>DELVIS</Text>
-              {stampStatus.details.length > 1 && (
-                <View style={styles.spondStampNames}>
-                  {stampStatus.details.map((d, i) => (
-                    <Text
-                      key={i}
-                      style={[
-                        styles.spondStampName,
-                        { color: d.status === 'accepted' ? '#4CAF50' : d.status === 'declined' ? '#E53935' : colors.textDisabled },
-                      ]}
-                    >
-                      {d.name}
-                    </Text>
-                  ))}
+              {item.groupName && (
+                <View style={styles.spondGroupRow}>
+                  {spondGroupLogos[item.groupName] ? (
+                    <Image source={{ uri: spondGroupLogos[item.groupName] }} style={styles.spondGroupLogo} />
+                  ) : (
+                    <View style={[styles.spondGroupDot, { backgroundColor: SPOND_COLOR }]}>
+                      <Text style={styles.spondGroupDotText}>🏟️</Text>
+                    </View>
+                  )}
+                  <Text style={[styles.spondGroupName, { color: colors.textSecondary }]} numberOfLines={1}>{item.groupName}</Text>
+                </View>
+              )}
+              <View style={styles.spondTimeRow}>
+                <View style={styles.spondClockOuter}>
+                  <View style={styles.spondClockHandV} />
+                  <View style={styles.spondClockHandH} />
+                </View>
+                <Text style={[styles.spondCardTime, { color: colors.text }]}>{timeText}</Text>
+              </View>
+              {item.address && (
+                <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>📍 {item.address}</Text>
+              )}
+              {stampStatus && (
+                <View style={[styles.spondBadge, { backgroundColor: badgeBg }]}>
+                  <Text style={[styles.spondBadgeText, { color: badgeColor }]}>{badgeText}</Text>
                 </View>
               )}
             </View>
+            {mapUrl && (
+              <TouchableOpacity style={styles.spondMapContainer} onPress={() => Linking.openURL(getGoogleMapsUrl(item.address!))}>
+                <Image source={{ uri: mapUrl }} style={styles.spondMapImage} />
+              </TouchableOpacity>
+            )}
+          </View>
+          {stampStatus?.type === 'partial' && stampStatus.details.length > 1 && (
+            <View style={styles.spondPartialRow}>
+              {stampStatus.details.map((d, i) => (
+                <Text key={i} style={[styles.spondPartialName, { color: d.status === 'accepted' ? '#4CAF50' : d.status === 'declined' ? '#E53935' : colors.textDisabled }]}>
+                  {d.name}: {d.status === 'accepted' ? '✓' : d.status === 'declined' ? '✕' : '●'}
+                </Text>
+              ))}
+            </View>
           )}
-        </View>
+        </TouchableOpacity>
       );
     }
     if (item._type === 'healthAppointment') {
@@ -1128,156 +1109,164 @@ const styles = StyleSheet.create({
   },
   spondCard: {
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     marginHorizontal: 16,
     marginVertical: 6,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.08,
     shadowRadius: 4,
     elevation: 3,
-    borderLeftWidth: 4,
-    borderLeftColor: SPOND_COLOR,
+  },
+  spondCardRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 14,
+  },
+  spondCalIcon: {
+    width: 64,
+    borderRadius: 12,
     overflow: 'hidden',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+    backgroundColor: '#fff',
+    flexShrink: 0,
   },
-  spondCardIcon: {
-    fontSize: 22,
+  spondCalTopBar: {
+    width: '100%',
+    height: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  spondCardLogo: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
+  spondCalYear: {
+    fontSize: 9,
+    fontWeight: '700',
+    color: '#fff',
+    letterSpacing: 0.5,
+  },
+  spondCalDay: {
+    fontSize: 26,
+    fontWeight: '800',
+    lineHeight: 30,
+    marginTop: 2,
+  },
+  spondCalMonth: {
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 4,
   },
   spondCardContent: {
+    flex: 1,
     gap: 2,
   },
   spondCardTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
+    lineHeight: 22,
   },
-  spondCardTitleRow: {
+  spondGroupRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-  },
-  spondCardDesc: {
-    fontSize: 14,
+    gap: 4,
     marginTop: 2,
   },
-  spondCardDates: {
-    fontSize: 14,
-    marginTop: 4,
+  spondGroupLogo: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
   },
-  spondCardAddress: {
-    fontSize: 14,
-    marginTop: 4,
-    fontWeight: '500',
-  },
-  spondCardResponseIcons: {
-    flexDirection: 'row',
-    gap: 6,
-    marginRight: 8,
-  },
-  spondIconBtn: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  spondGroupDot: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  spondIconText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#4CAF50',
+  spondGroupDotText: {
+    fontSize: 8,
   },
-  spondCardIconsRow: {
+  spondGroupName: {
+    fontSize: 12,
+  },
+  spondTimeRow: {
     flexDirection: 'row',
-    gap: 8,
-    marginTop: 20,
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 3,
   },
-  spondCardResponseCounts: {
-    fontSize: 13,
-    marginTop: 6,
-  },
-  spondStampAccepted: {
-    position: 'absolute',
-    right: 8,
-    bottom: 44,
-    transform: [{ rotate: '-20deg' }],
-    borderWidth: 2,
-    borderColor: '#4CAF50',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    opacity: 0.7,
-  },
-  spondStampTextAccepted: {
-    color: '#4CAF50',
-    fontSize: 13,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-  },
-  spondStampDeclined: {
-    position: 'absolute',
-    right: 8,
-    bottom: 44,
-    transform: [{ rotate: '-20deg' }],
-    borderWidth: 2,
-    borderColor: '#E53935',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    opacity: 0.7,
-  },
-  spondStampTextDeclined: {
-    color: '#E53935',
-    fontSize: 13,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-  },
-  spondStampUnanswered: {
-    position: 'absolute',
-    right: 8,
-    bottom: 44,
-    transform: [{ rotate: '-20deg' }],
-    borderWidth: 2,
-    borderColor: '#C8A96E',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    opacity: 0.7,
-  },
-  spondStampTextUnanswered: {
-    color: '#C8A96E',
-    fontSize: 13,
-    fontWeight: 'bold',
-    letterSpacing: 2,
-  },
-  spondStampPartial: {
-    position: 'absolute',
-    right: 8,
-    bottom: 44,
-    transform: [{ rotate: '-20deg' }],
-    borderWidth: 2,
-    borderColor: '#C8A96E',
-    borderRadius: 4,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    opacity: 0.7,
+  spondClockOuter: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    borderWidth: 1.5,
+    borderColor: '#999',
+    justifyContent: 'center',
     alignItems: 'center',
   },
-  spondStampTextPartial: {
-    color: '#C8A96E',
-    fontSize: 13,
-    fontWeight: 'bold',
-    letterSpacing: 2,
+  spondClockHandV: {
+    position: 'absolute',
+    width: 1.5,
+    height: 3.5,
+    backgroundColor: '#999',
+    top: 2,
+    borderRadius: 1,
   },
-  spondStampNames: {
+  spondClockHandH: {
+    position: 'absolute',
+    width: 3,
+    height: 1.5,
+    backgroundColor: '#999',
+    left: 4.5,
+    top: 5.5,
+    borderRadius: 1,
+  },
+  spondCardTime: {
+    fontSize: 15,
+    fontWeight: '700',
+  },
+  spondCardAddress: {
+    fontSize: 13,
+    fontWeight: '500',
     marginTop: 2,
-    alignItems: 'center',
   },
-  spondStampName: {
-    fontSize: 9,
+  spondBadge: {
+    alignSelf: 'flex-start',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 6,
+    marginTop: 4,
+  },
+  spondBadgeText: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  spondMapContainer: {
+    marginLeft: 4,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  spondMapImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+  },
+  spondPartialRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginTop: 8,
+    paddingTop: 8,
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  spondPartialName: {
+    fontSize: 12,
     fontWeight: '600',
   },
   fab: {
