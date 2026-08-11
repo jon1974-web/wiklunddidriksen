@@ -300,6 +300,21 @@ const TripsStack = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="RecipeDetail"
+          component={RecipeDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="ShoppingListDetail"
+          component={ShoppingListDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PhotoRecipe"
+          component={PhotoRecipeScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </Suspense>
   );
