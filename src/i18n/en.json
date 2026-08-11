@@ -1005,5 +1005,28 @@
     "tryAgain": "Try again",
     "timeout": "Timeout. The image may be too large or the network is slow.",
     "serverError": "Could not connect to server. Cloud Function may be missing."
+  },
+  "quickCreate": {
+    "title": "What do you want to create?",
+    "events": "Events",
+    "newEvent": "New event",
+    "newEventDesc": "Create an event manually",
+    "voiceEvent": "Voice to event",
+    "voiceEventDesc": "Speak to create an event",
+    "photoEvent": "Photo to event",
+    "photoEventDesc": "Take a photo to create an event",
+    "health": "Health",
+    "healthAppointment": "Appointment (doctor/dentist)",
+    "healthAppointmentDesc": "Add an appointment in Health",
+    "healthVaccination": "Vaccination",
+    "healthVaccinationDesc": "Register a vaccination",
+    "pets": "Pets",
+    "petVetVisit": "Vet visit",
+    "petVetVisitDesc": "Add a vet visit",
+    "petVaccination": "Vaccination",
+    "petVaccinationDesc": "Register a vaccination for a pet",
+    "trips": "Trips",
+    "newTrip": "New trip",
+    "newTripDesc": "Create a new trip"
   }
 }

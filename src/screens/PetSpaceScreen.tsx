@@ -36,9 +36,10 @@ type PetSectionType = 'vetVisits' | 'medications' | 'food' | 'grooming' | 'vacci
 
 interface PetSpaceScreenProps {
   navigation: any;
+  route?: { params?: { openAddSection?: PetSectionType } };
 }
 
-export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) => {
+export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const familyId = useUserStore((state) => state.familyId);
@@ -125,6 +126,19 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation }) =>
 
   useEffect(() => { loadPets(); }, [loadPets]);
   useEffect(() => { if (selectedPet) loadPetData(); }, [selectedPet, loadPetData]);
+
+  useEffect(() => {
+    if (route?.params?.openAddSection && pets.length > 0 && !selectedPet) {
+      setSelectedPet(pets[0]);
+      setTimeout(() => {
+        setActiveSection(route.params!.openAddSection!);
+        setEditingItem(null);
+        resetItemForms();
+        setShowItemModal(true);
+        navigation.setParams({ openAddSection: undefined });
+      }, 500);
+    }
+  }, [route?.params?.openAddSection, pets, selectedPet]);
 
   useEffect(() => {
     if (!editingItem) return;

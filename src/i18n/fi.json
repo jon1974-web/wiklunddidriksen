@@ -1005,5 +1005,28 @@
     "tryAgain": "Yritä uudelleen",
     "timeout": "Aikakatkaisu. Kuva voi olla liian suuri tai verkko on hidas.",
     "serverError": "Yhteys palvelimeen epäonnistui. Cloud Function voi puuttua."
+  },
+  "quickCreate": {
+    "title": "Mitä haluat luoda?",
+    "events": "Tapahtumat",
+    "newEvent": "Uusi tapahtuma",
+    "newEventDesc": "Luo tapahtuma manuaalisesti",
+    "voiceEvent": "Puhe tapahtumaan",
+    "voiceEventDesc": "Puhu luodaksesi tapahtuman",
+    "photoEvent": "Valokuva tapahtumaan",
+    "photoEventDesc": "Ota valokuva luodaksesi tapahtuman",
+    "health": "Terveys",
+    "healthAppointment": "Aika (lääkäri/hammaslääkäri)",
+    "healthAppointmentDesc": "Lisää aika Terveys-osioon",
+    "healthVaccination": "Rokotus",
+    "healthVaccinationDesc": "Rekisteröi rokotus",
+    "pets": "Lemmikit",
+    "petVetVisit": "Eläinlääkärivierailu",
+    "petVetVisitDesc": "Lisää eläinlääkärivierailu",
+    "petVaccination": "Rokotus",
+    "petVaccinationDesc": "Rekisteröi rokotus lemmikille",
+    "trips": "Matkat",
+    "newTrip": "Uusi matka",
+    "newTripDesc": "Luo uusi matka"
   }
 }

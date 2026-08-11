@@ -29,9 +29,10 @@ type SectionType = 'medications' | 'appointments' | 'vaccinations' | 'allergies'
 
 interface HealthSpaceScreenProps {
   navigation: any;
+  route?: { params?: { openAddSection?: SectionType } };
 }
 
-export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation }) => {
+export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const familyId = useUserStore((state) => state.familyId);
@@ -103,6 +104,15 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
     }).catch(() => {});
   }, [familyId]);
+
+  useEffect(() => {
+    if (route?.params?.openAddSection) {
+      setActiveSection(route.params.openAddSection);
+      setEditingItem(null);
+      setShowAddModal(true);
+      navigation.setParams({ openAddSection: undefined });
+    }
+  }, [route?.params?.openAddSection]);
 
   const today = new Date().toISOString().split('T')[0];
   const upcomingAppointments = appointments.filter(a => a.date >= today).slice(0, 3);

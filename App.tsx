@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Suspense, useRef } from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, createNavigationContainerRef } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -7,6 +7,8 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { View, TouchableOpacity, Text, ActivityIndicator, Image, Animated } from 'react-native';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline } from 'react-native-svg';
 import { useNavigation } from '@react-navigation/native';
+import { CustomTabBar } from './src/components/CustomTabBar';
+import { QuickCreateModal } from './src/components/QuickCreateModal';
 
 import './src/i18n';
 import i18n from './src/i18n';
@@ -391,9 +393,12 @@ const TabIcon = ({ icon, focused, accentColor }: { icon: string; focused: boolea
   return null;
 };
 
+const navigationRef = createNavigationContainerRef();
+
 const AppContent = () => {
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
+  const [showQuickCreate, setShowQuickCreate] = useState(false);
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
@@ -494,67 +499,36 @@ const AppContent = () => {
 
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer ref={navigationRef}>
         <OfflineBanner />
         {user ? (
-          <Tab.Navigator
-            screenOptions={{
-              headerShown: false,
-              tabBarShowLabel: false,
-              tabBarActiveTintColor: colors.accent,
-              tabBarInactiveTintColor: colors.textDisabled,
-              tabBarStyle: {
-                backgroundColor: colors.surface,
-                borderTopColor: colors.border,
-                paddingBottom: 8,
-                paddingTop: 8,
-                height: 60,
-              },
-              tabBarLabelStyle: {
-                fontSize: 12,
-                fontWeight: '600',
-              },
-            }}
-          >
-            <Tab.Screen
-              name="Events"
-              component={EventsStack}
-              options={{
-                tabBarLabel: 'Arrangementer',
-                tabBarIcon: ({ focused }) => <TabIcon icon="calendar" focused={focused} accentColor={colors.accent} />,
+          <>
+            <Tab.Navigator
+              tabBar={(props) => <CustomTabBar {...props} onCreatePress={() => setShowQuickCreate(true)} />}
+              screenOptions={{
+                headerShown: false,
               }}
+            >
+              <Tab.Screen name="Events" component={EventsStack} />
+              <Tab.Screen name="Chat" component={ChatStack} />
+              <Tab.Screen
+                name="Trips"
+                component={TripsStack}
+                listeners={({ navigation }) => ({
+                  tabPress: (e) => {
+                    e.preventDefault();
+                    navigation.navigate('Trips', { screen: 'SpacesList' });
+                  },
+                })}
+              />
+              <Tab.Screen name="Profile" component={ProfileStack} />
+            </Tab.Navigator>
+            <QuickCreateModal
+              visible={showQuickCreate}
+              onClose={() => setShowQuickCreate(false)}
+              navigation={navigationRef}
             />
-            <Tab.Screen
-              name="Chat"
-              component={ChatStack}
-              options={{
-                tabBarLabel: 'Chat',
-                tabBarIcon: ({ focused }) => <TabIcon icon="chat" focused={focused} accentColor={colors.accent} />,
-              }}
-            />
-            <Tab.Screen
-              name="Trips"
-              component={TripsStack}
-              options={{
-                tabBarLabel: 'Våre steder',
-                tabBarIcon: ({ focused }) => <TabIcon icon="house" focused={focused} accentColor={colors.accent} />,
-              }}
-              listeners={({ navigation }) => ({
-                tabPress: (e) => {
-                  e.preventDefault();
-                  navigation.navigate('Trips', { screen: 'SpacesList' });
-                },
-              })}
-            />
-            <Tab.Screen
-              name="Profile"
-              component={ProfileStack}
-              options={{
-                tabBarLabel: 'Profil',
-                tabBarIcon: ({ focused }) => <TabIcon icon="person" focused={focused} accentColor={colors.accent} />,
-              }}
-            />
-          </Tab.Navigator>
+          </>
         ) : (
           <AuthScreen />
         )}

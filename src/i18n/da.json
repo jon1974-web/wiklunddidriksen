@@ -1005,5 +1005,28 @@
     "tryAgain": "Prøv igen",
     "timeout": "Timeout. Billedet kan være for stort eller nettet er langsomt.",
     "serverError": "Kunne ikke oprette forbindelse til serveren. Cloud Function kan mangle."
+  },
+  "quickCreate": {
+    "title": "Hvad vil du oprette?",
+    "events": "Begivenheder",
+    "newEvent": "Ny begivenhed",
+    "newEventDesc": "Opret en begivenhed manuelt",
+    "voiceEvent": "Tale til begivenhed",
+    "voiceEventDesc": "Tal for at oprette en begivenhed",
+    "photoEvent": "Foto til begivenhed",
+    "photoEventDesc": "Tag et billede for at oprette en begivenhed",
+    "health": "Sundhed",
+    "healthAppointment": "Tid (læge/tandlæge)",
+    "healthAppointmentDesc": "Tilføj en tid i Sundhed",
+    "healthVaccination": "Vaccination",
+    "healthVaccinationDesc": "Registrer en vaccination",
+    "pets": "Kæledyr",
+    "petVetVisit": "Dyrlægebesøg",
+    "petVetVisitDesc": "Tilføj et dyrlægebesøg",
+    "petVaccination": "Vaccination",
+    "petVaccinationDesc": "Registrer en vaccination for kæledyr",
+    "trips": "Rejser",
+    "newTrip": "Ny rejse",
+    "newTripDesc": "Opret en ny rejse"
   }
 }

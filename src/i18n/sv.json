@@ -1005,5 +1005,28 @@
     "tryAgain": "Försök igen",
     "timeout": "Timeout. Bilden kan vara för stor eller nätverket är långsamt.",
     "serverError": "Kunde inte ansluta till servern. Cloud Function kan saknas."
+  },
+  "quickCreate": {
+    "title": "Vad vill du skapa?",
+    "events": "Evenemang",
+    "newEvent": "Nytt evenemang",
+    "newEventDesc": "Skapa ett evenemang manuellt",
+    "voiceEvent": "Tal till evenemang",
+    "voiceEventDesc": "Prata för att skapa ett evenemang",
+    "photoEvent": "Foto till evenemang",
+    "photoEventDesc": "Ta ett foto för att skapa ett evenemang",
+    "health": "Hälsa",
+    "healthAppointment": "Besök (läkare/tandläkare)",
+    "healthAppointmentDesc": "Lägg till ett besök i Hälsa",
+    "healthVaccination": "Vaccination",
+    "healthVaccinationDesc": "Registrera en vaccination",
+    "pets": "Husdjur",
+    "petVetVisit": "Veterinärbesök",
+    "petVetVisitDesc": "Lägg till ett veterinärbesök",
+    "petVaccination": "Vaccination",
+    "petVaccinationDesc": "Registrera en vaccination för husdjur",
+    "trips": "Resor",
+    "newTrip": "Ny resa",
+    "newTripDesc": "Skapa en ny resa"
   }
 }

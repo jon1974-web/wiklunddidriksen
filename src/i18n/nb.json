@@ -1005,5 +1005,28 @@
     "tryAgain": "Prøv igjen",
     "timeout": "Tidsavbrudd. Bildet kan være for stort eller nettverket er tregt.",
     "serverError": "Kunne ikke koble til serveren. Cloud Function kan mangle."
+  },
+  "quickCreate": {
+    "title": "Hva vil du opprette?",
+    "events": "Arrangementer",
+    "newEvent": "Nytt arrangement",
+    "newEventDesc": "Opprett et arrangement manuelt",
+    "voiceEvent": "Tale til arrangement",
+    "voiceEventDesc": "Snakk for å opprette et arrangement",
+    "photoEvent": "Foto til arrangement",
+    "photoEventDesc": "Ta bilde for å opprette arrangement",
+    "health": "Helse",
+    "healthAppointment": "Time (lege/tannlege)",
+    "healthAppointmentDesc": "Legg til en time i Helse",
+    "healthVaccination": "Vaksinering",
+    "healthVaccinationDesc": "Registrer en vaksinering",
+    "pets": "Kjæledyr",
+    "petVetVisit": "Veterinærbesøk",
+    "petVetVisitDesc": "Legg til et veterinærbesøk",
+    "petVaccination": "Vaksine",
+    "petVaccinationDesc": "Registrer en vaksine for kjæledyr",
+    "trips": "Reiser",
+    "newTrip": "Ny reise",
+    "newTripDesc": "Opprett en ny reise"
   }
 }
