@@ -2,24 +2,13 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, StyleSheet, ScrollView } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { AppIcon } from './AppIcon';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface QuickCreateModalProps {
   visible: boolean;
   onClose: () => void;
   navigation: any;
-}
-
-interface CreateOption {
-  icon: string;
-  labelKey: string;
-  descKey: string;
-  onPress: () => void;
-}
-
-interface CreateSection {
-  icon: string;
-  titleKey: string;
-  options: CreateOption[];
 }
 
 export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ visible, onClose, navigation }) => {
@@ -30,81 +19,6 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
     onClose();
     setTimeout(navigateFn, 300);
   };
-
-  const sections: CreateSection[] = [
-    {
-      icon: '📅',
-      titleKey: 'quickCreate.events',
-      options: [
-        {
-          icon: '📝',
-          labelKey: 'quickCreate.newEvent',
-          descKey: 'quickCreate.newEventDesc',
-          onPress: () => navigateAndClose(() => navigation.navigate('Events', { screen: 'AddEvent' })),
-        },
-        {
-          icon: '🎤',
-          labelKey: 'quickCreate.voiceEvent',
-          descKey: 'quickCreate.voiceEventDesc',
-          onPress: () => navigateAndClose(() => navigation.navigate('Events', { screen: 'VoiceEvent' })),
-        },
-        {
-          icon: '📷',
-          labelKey: 'quickCreate.photoEvent',
-          descKey: 'quickCreate.photoEventDesc',
-          onPress: () => navigateAndClose(() => navigation.navigate('Events', { screen: 'PhotoEvent' })),
-        },
-      ],
-    },
-    {
-      icon: '🏥',
-      titleKey: 'quickCreate.health',
-      options: [
-        {
-          icon: '🩺',
-          labelKey: 'quickCreate.healthAppointment',
-          descKey: 'quickCreate.healthAppointmentDesc',
-          onPress: () => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments' } })),
-        },
-        {
-          icon: '💉',
-          labelKey: 'quickCreate.healthVaccination',
-          descKey: 'quickCreate.healthVaccinationDesc',
-          onPress: () => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'vaccinations' } })),
-        },
-      ],
-    },
-    {
-      icon: '🐾',
-      titleKey: 'quickCreate.pets',
-      options: [
-        {
-          icon: '🏥',
-          labelKey: 'quickCreate.petVetVisit',
-          descKey: 'quickCreate.petVetVisitDesc',
-          onPress: () => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits' } })),
-        },
-        {
-          icon: '💉',
-          labelKey: 'quickCreate.petVaccination',
-          descKey: 'quickCreate.petVaccinationDesc',
-          onPress: () => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vaccinations' } })),
-        },
-      ],
-    },
-    {
-      icon: '✈️',
-      titleKey: 'quickCreate.trips',
-      options: [
-        {
-          icon: '🧳',
-          labelKey: 'quickCreate.newTrip',
-          descKey: 'quickCreate.newTripDesc',
-          onPress: () => navigateAndClose(() => navigation.navigate('Trips', { screen: 'AddTrip' })),
-        },
-      ],
-    },
-  ];
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -120,26 +34,103 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                 </TouchableOpacity>
               </View>
               <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                {sections.map((section, sIdx) => (
-                  <View key={sIdx} style={styles.section}>
-                    <View style={styles.sectionHeader}>
-                      <Text style={styles.sectionIcon}>{section.icon}</Text>
-                      <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t(section.titleKey)}</Text>
-                    </View>
-                    {section.options.map((option, oIdx) => (
-                      <TouchableOpacity key={oIdx} style={[styles.option, { backgroundColor: colors.surface }]} onPress={option.onPress} activeOpacity={0.7}>
-                        <View style={[styles.optionIcon, { backgroundColor: colors.inputBackground }]}>
-                          <Text style={styles.optionEmoji}>{option.icon}</Text>
-                        </View>
-                        <View style={styles.optionText}>
-                          <Text style={[styles.optionLabel, { color: colors.text }]}>{t(option.labelKey)}</Text>
-                          <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>{t(option.descKey)}</Text>
-                        </View>
-                        <Text style={[styles.optionArrow, { color: colors.textDisabled }]}>›</Text>
-                      </TouchableOpacity>
-                    ))}
+
+                {/* Arrangementer */}
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <AppIcon name="calendar" size={18} color={colors.accent} />
+                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('quickCreate.events')}</Text>
                   </View>
-                ))}
+                  <OptionRow
+                    icon="calendar"
+                    iconColor={colors.accent}
+                    label={t('quickCreate.newEvent')}
+                    desc={t('quickCreate.newEventDesc')}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'AddEvent' }))}
+                    colors={colors}
+                  />
+                  <OptionRow
+                    icon="calendar"
+                    iconColor={colors.accent}
+                    label={t('quickCreate.voiceEvent')}
+                    desc={t('quickCreate.voiceEventDesc')}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'VoiceEvent' }))}
+                    colors={colors}
+                  />
+                  <OptionRow
+                    icon="calendar"
+                    iconColor={colors.accent}
+                    label={t('quickCreate.photoEvent')}
+                    desc={t('quickCreate.photoEventDesc')}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'PhotoEvent' }))}
+                    colors={colors}
+                  />
+                </View>
+
+                {/* Helse */}
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <AppIcon name="medication" size={18} color={MODULE_COLORS.health} />
+                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('quickCreate.health')}</Text>
+                  </View>
+                  <OptionRow
+                    icon="calendar"
+                    iconColor={MODULE_COLORS.health}
+                    label={t('quickCreate.healthAppointment')}
+                    desc={t('quickCreate.healthAppointmentDesc')}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments' } }))}
+                    colors={colors}
+                  />
+                  <OptionRow
+                    icon="vaccination"
+                    iconColor={MODULE_COLORS.health}
+                    label={t('quickCreate.healthVaccination')}
+                    desc={t('quickCreate.healthVaccinationDesc')}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'vaccinations' } }))}
+                    colors={colors}
+                  />
+                </View>
+
+                {/* Kjæledyr */}
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <AppIcon name="pet" size={18} color={MODULE_COLORS.pets} />
+                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('quickCreate.pets')}</Text>
+                  </View>
+                  <OptionRow
+                    icon="calendar"
+                    iconColor={MODULE_COLORS.pets}
+                    label={t('quickCreate.petVetVisit')}
+                    desc={t('quickCreate.petVetVisitDesc')}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits' } }))}
+                    colors={colors}
+                  />
+                  <OptionRow
+                    icon="vaccination"
+                    iconColor={MODULE_COLORS.pets}
+                    label={t('quickCreate.petVaccination')}
+                    desc={t('quickCreate.petVaccinationDesc')}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vaccinations' } }))}
+                    colors={colors}
+                  />
+                </View>
+
+                {/* Reiser */}
+                <View style={styles.section}>
+                  <View style={styles.sectionHeader}>
+                    <AppIcon name="transport" size={18} color={MODULE_COLORS.trips} />
+                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('quickCreate.trips')}</Text>
+                  </View>
+                  <OptionRow
+                    icon="transport"
+                    iconColor={MODULE_COLORS.trips}
+                    label={t('quickCreate.newTrip')}
+                    desc={t('quickCreate.newTripDesc')}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'AddTrip' }))}
+                    colors={colors}
+                  />
+                </View>
+
               </ScrollView>
             </View>
           </TouchableWithoutFeedback>
@@ -148,6 +139,26 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
     </Modal>
   );
 });
+
+const OptionRow = ({ icon, iconColor, label, desc, onPress, colors }: {
+  icon: string;
+  iconColor: string;
+  label: string;
+  desc: string;
+  onPress: () => void;
+  colors: any;
+}) => (
+  <TouchableOpacity style={[styles.option, { backgroundColor: colors.surface }]} onPress={onPress} activeOpacity={0.7}>
+    <View style={[styles.optionIcon, { backgroundColor: iconColor + '18' }]}>
+      <AppIcon name={icon as any} size={20} color={iconColor} />
+    </View>
+    <View style={styles.optionText}>
+      <Text style={[styles.optionLabel, { color: colors.text }]}>{label}</Text>
+      <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>{desc}</Text>
+    </View>
+    <Text style={[styles.optionArrow, { color: colors.textDisabled }]}>›</Text>
+  </TouchableOpacity>
+);
 
 const styles = StyleSheet.create({
   overlay: {
@@ -206,9 +217,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
-  sectionIcon: {
-    fontSize: 16,
-  },
   sectionTitle: {
     fontSize: 13,
     fontWeight: '700',
@@ -228,9 +236,6 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  optionEmoji: {
-    fontSize: 18,
   },
   optionText: {
     flex: 1,

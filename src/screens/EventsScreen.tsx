@@ -929,26 +929,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         }
       />
 
-      <TouchableOpacity
-        style={[styles.fabMic, { backgroundColor: colors.accent }]}
-        onPress={() => navigation.navigate('VoiceEvent')}
-      >
-        <Text style={styles.fabMicText}>🎙️</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.fabCamera, { backgroundColor: colors.accent }]}
-        onPress={() => navigation.navigate('PhotoEvent')}
-      >
-        <Text style={styles.fabMicText}>📷</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={[styles.fab, { backgroundColor: colors.accent }]}
-        onPress={() => navigation.navigate('AddEvent')}
-      >
-        <Text style={styles.fabText}>+</Text>
-      </TouchableOpacity>
 
       {responseModal && spondConfig && (
         <SpondResponseModal
