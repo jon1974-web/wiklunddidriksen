@@ -1043,5 +1043,14 @@
     "thu": "TO",
     "fri": "PE",
     "sat": "LA"
+  },
+  "weekly": {
+    "birthdayAge": "{name} täyttää {age} vuotta",
+    "allDay": "Koko päivä",
+    "from": "Lähtien {city}",
+    "fromStart": "Lähtien alusta",
+    "to": "Asti {city}",
+    "toEnd": "Asti loppuun",
+    "ongoing": "Käynnissä"
   }
 }

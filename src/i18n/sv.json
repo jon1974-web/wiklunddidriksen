@@ -1043,5 +1043,14 @@
     "thu": "TOR",
     "fri": "FRE",
     "sat": "LÖR"
+  },
+  "weekly": {
+    "birthdayAge": "{name} fyller {age} år",
+    "allDay": "Hela dagen",
+    "from": "Från {city}",
+    "fromStart": "Från start",
+    "to": "Till {city}",
+    "toEnd": "Till slut",
+    "ongoing": "Pågår"
   }
 }

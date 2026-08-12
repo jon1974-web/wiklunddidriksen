@@ -185,7 +185,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         const bDate = new Date(b.date);
         if (bDate.getMonth() === d.getMonth() && bDate.getDate() === d.getDate()) {
           const age = new Date().getFullYear() - bDate.getFullYear();
-          items.push({ type: 'birthday', icon: 'birthday', iconBg: '#FFF3E0', title: `${b.name} fyller ${age} år`, time: '' });
+          items.push({ type: 'birthday', icon: 'birthday', iconBg: '#FFF3E0', title: t('weekly.birthdayAge', { name: b.name, age }), time: '' });
           birthdayCount++;
         }
       });
@@ -196,10 +196,10 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           const isStart = dateStr === tr.startDate;
           const isEnd = dateStr === tr.endDate;
           let time = '';
-          if (isStart && isEnd) time = 'Hele dagen';
-          else if (isStart) time = `Fra ${tr.city || 'start'}`;
-          else if (isEnd) time = `Til ${tr.city || 'slutt'}`;
-          else time = tr.city || 'Pågår';
+          if (isStart && isEnd) time = t('weekly.allDay');
+          else if (isStart) time = tr.city ? t('weekly.from', { city: tr.city }) : t('weekly.fromStart');
+          else if (isEnd) time = tr.city ? t('weekly.to', { city: tr.city }) : t('weekly.toEnd');
+          else time = tr.city || t('weekly.ongoing');
           items.push({ type: 'trip', icon: 'transport', iconBg: '#E3F2FD', title: tr.title, time });
           if (isStart) tripCount++;
         }

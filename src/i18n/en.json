@@ -1043,5 +1043,14 @@
     "thu": "THU",
     "fri": "FRI",
     "sat": "SAT"
+  },
+  "weekly": {
+    "birthdayAge": "{name} turns {age}",
+    "allDay": "All day",
+    "from": "From {city}",
+    "fromStart": "From start",
+    "to": "To {city}",
+    "toEnd": "To end",
+    "ongoing": "Ongoing"
   }
 }
