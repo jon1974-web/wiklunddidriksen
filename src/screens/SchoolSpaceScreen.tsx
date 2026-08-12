@@ -53,6 +53,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [contactActionModal, setContactActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [scheduleActionModal, setScheduleActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
 
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [viewingImage, setViewingImage] = useState<string | null>(null);
@@ -514,7 +515,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </View>
                 <View style={styles.scheduleGrid}>
                   {schedules.filter(s => s.semester === activeSemester).map(s => (
-                    <TouchableOpacity key={s.id} style={styles.scheduleThumb} onPress={() => setViewingImage(s.imageUrl)} onLongPress={() => crossAlert(t('common.delete'), t('school.deleteScheduleConfirm'), () => handleDeleteSchedule(s.id))}>
+                    <TouchableOpacity key={s.id} style={styles.scheduleThumb} onPress={() => setViewingImage(s.imageUrl)} onLongPress={() => setScheduleActionModal({ visible: true, id: s.id, title: t('school.schedule') })}>
                       <Image source={{ uri: s.imageUrl }} style={styles.scheduleImage} />
                     </TouchableOpacity>
                   ))}
@@ -696,6 +697,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         <ActionModal visible={contactActionModal.visible} title={contactActionModal.title} onEdit={handleEditContact} onDelete={handleDeleteContact} onCancel={() => setContactActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
 
         <ActionModal visible={yearActionModal.visible} title={yearActionModal.title} onDelete={handleDeleteYear} onCancel={() => setYearActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
+        <ActionModal visible={scheduleActionModal.visible} title={scheduleActionModal.title} onDelete={() => { handleDeleteSchedule(scheduleActionModal.id); setScheduleActionModal({ visible: false, id: '', title: '' }); }} onCancel={() => setScheduleActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
       </>
     );
   };
