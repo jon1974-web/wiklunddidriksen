@@ -448,7 +448,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   </TouchableOpacity>
                 </View>
                 {teachers.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: MODULE_COLORS.schoolBg }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
@@ -477,7 +477,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   </TouchableOpacity>
                 </View>
                 {admins.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: MODULE_COLORS.schoolBg }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
@@ -548,7 +548,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </TouchableOpacity>
 
                 {filteredClassmates.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: MODULE_COLORS.schoolBg }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <Text style={[styles.contactName, { color: colors.text, marginBottom: 6 }]}>{c.name}</Text>
                     {c.parentName ? (
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
