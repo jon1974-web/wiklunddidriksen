@@ -77,6 +77,9 @@ const RATE_LIMITS = {
   destinationTips: { maxRequests: 10, windowMinutes: 1 },
   notifyNewEvent: { maxRequests: 10, windowMinutes: 1 },
   notifyHealthItem: { maxRequests: 10, windowMinutes: 1 },
+  aiRecipeSuggestions: { maxRequests: 10, windowMinutes: 1 },
+  importRecipeFromUrl: { maxRequests: 5, windowMinutes: 1 },
+  translateRecipe: { maxRequests: 10, windowMinutes: 1 },
 };
 
 async function checkRateLimit(uid, functionName) {
@@ -1423,6 +1426,10 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
+  if (!(await checkRateLimit(uid, "aiRecipeSuggestions"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
   const { prompt, existingRecipes = [], searchLanguage = "norsk", responseLanguage = "norsk" } = req.body || {};
   if (!prompt || typeof prompt !== "string") {
     return res.status(400).json({ error: "prompt is required" });
@@ -1544,6 +1551,10 @@ exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB"
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
+  if (!(await checkRateLimit(uid, "importRecipeFromUrl"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
   const { url, language } = req.body || {};
   if (!url || typeof url !== "string") {
     return res.status(400).json({ error: "url is required" });
@@ -1631,6 +1642,10 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
 
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await checkRateLimit(uid, "translateRecipe"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
 
   const { recipeId, name, description, ingredients, instructions } = req.body || {};
   if (!recipeId || !name) {
