@@ -33,8 +33,44 @@
         "destination": "/firebase-messaging-sw.js"
       },
       {
-        "source": "/docs/**",
-        "destination": "/docs"
+        "source": "/docs/privacy-no.html",
+        "destination": "/docs/privacy-no.html"
+      },
+      {
+        "source": "/docs/terms-no.html",
+        "destination": "/docs/terms-no.html"
+      },
+      {
+        "source": "/docs/privacy-en.html",
+        "destination": "/docs/privacy-en.html"
+      },
+      {
+        "source": "/docs/terms-en.html",
+        "destination": "/docs/terms-en.html"
+      },
+      {
+        "source": "/docs/privacy-sv.html",
+        "destination": "/docs/privacy-sv.html"
+      },
+      {
+        "source": "/docs/terms-sv.html",
+        "destination": "/docs/terms-sv.html"
+      },
+      {
+        "source": "/docs/privacy-da.html",
+        "destination": "/docs/privacy-da.html"
+      },
+      {
+        "source": "/docs/terms-da.html",
+        "destination": "/docs/terms-da.html"
+      },
+      {
+        "source": "/docs/privacy-fi.html",
+        "destination": "/docs/privacy-fi.html"
+      },
+      {
+        "source": "/docs/terms-fi.html",
+        "destination": "/docs/terms-fi.html"
       },
       {
         "source": "**",
