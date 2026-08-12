@@ -89,13 +89,19 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
     setSaving(true);
     try {
       for (const c of selected) {
-        await addSchoolContact({
+        const data: Record<string, any> = {
           name: c.name, role: 'classmate', childId, yearId, familyId,
-          childPhone: c.childPhone || undefined, childEmail: c.childEmail || undefined,
-          parentName: c.parentName || undefined, parentPhone: c.parentPhone || undefined, parentEmail: c.parentEmail || undefined,
-          parentName2: c.parentName2 || undefined, parentPhone2: c.parentPhone2 || undefined, parentEmail2: c.parentEmail2 || undefined,
-          address: c.address || undefined,
-        });
+        };
+        if (c.childPhone) data.childPhone = c.childPhone;
+        if (c.childEmail) data.childEmail = c.childEmail;
+        if (c.parentName) data.parentName = c.parentName;
+        if (c.parentPhone) data.parentPhone = c.parentPhone;
+        if (c.parentEmail) data.parentEmail = c.parentEmail;
+        if (c.parentName2) data.parentName2 = c.parentName2;
+        if (c.parentPhone2) data.parentPhone2 = c.parentPhone2;
+        if (c.parentEmail2) data.parentEmail2 = c.parentEmail2;
+        if (c.address) data.address = c.address;
+        await addSchoolContact(data);
       }
       setSuccessModal({ visible: true, title: t('common.success'), subtitle: `${selected.length} ${t('schoolAI.contactsAdded')}` });
     } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); } finally { setSaving(false); }
