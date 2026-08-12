@@ -46,6 +46,29 @@ async function verifyAuth(req) {
   }
 }
 
+// Spond password encryption/decryption
+const SPOND_ENCRYPTION_KEY = process.env.SPOND_ENCRYPTION_KEY || "familiesenter-default-key-change-me";
+
+function encryptSpondPassword(plaintext) {
+  const key = crypto.createHash("sha256").update(SPOND_ENCRYPTION_KEY).digest();
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
+  let encrypted = cipher.update(plaintext, "utf8", "hex");
+  encrypted += cipher.final("hex");
+  return iv.toString("hex") + ":" + encrypted;
+}
+
+function decryptSpondPassword(encrypted) {
+  if (!encrypted || !encrypted.includes(":")) return encrypted;
+  const key = crypto.createHash("sha256").update(SPOND_ENCRYPTION_KEY).digest();
+  const [ivHex, encryptedData] = encrypted.split(":");
+  const iv = Buffer.from(ivHex, "hex");
+  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
+  let decrypted = decipher.update(encryptedData, "hex", "utf8");
+  decrypted += decipher.final("utf8");
+  return decrypted;
+}
+
 exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
 
@@ -64,12 +87,15 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
 
   const { action, email, password, token, groupId, groupIds, max, eventId, memberId, accepted } = req.body || {};
 
+  // Decrypt password if it's encrypted
+  const decryptedPassword = password ? decryptSpondPassword(password) : password;
+
   try {
     if (action === "login") {
       const response = await fetch(`${SPOND_API_BASE}/auth2/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password: decryptedPassword }),
       });
       const result = await response.json();
       if (!response.ok) {
@@ -1879,6 +1905,48 @@ exports.migrateTransportData = onRequest({ region: "us-central1" }, async (req, 
   } catch (error) {
     console.error("Migration error:", error);
     return res.status(500).json({ error: "Migration failed" });
+  }
+});
+
+// Encrypt a Spond password before storing in Firestore
+exports.encryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { password } = req.body || {};
+  if (!password) return res.status(400).json({ error: "password is required" });
+
+  try {
+    const encrypted = encryptSpondPassword(password);
+    return res.status(200).json({ encrypted });
+  } catch (error) {
+    console.error("Encryption error:", error);
+    return res.status(500).json({ error: "Encryption failed" });
+  }
+});
+
+// Decrypt a Spond password (for use in Cloud Functions only)
+exports.decryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { encrypted } = req.body || {};
+  if (!encrypted) return res.status(400).json({ error: "encrypted is required" });
+
+  try {
+    const decrypted = decryptSpondPassword(encrypted);
+    return res.status(200).json({ decrypted });
+  } catch (error) {
+    console.error("Decryption error:", error);
+    return res.status(500).json({ error: "Decryption failed" });
   }
 });
 

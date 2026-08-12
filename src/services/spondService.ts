@@ -2,6 +2,7 @@ import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { Platform } from 'react-native';
 import { db, auth } from './firebase';
 import { SpondEvent, SpondGroup, SpondConfig, SpondMember } from '../types';
+import { encryptSpondPassword, decryptSpondPassword } from './familyService';
 
 const SPOND_PROXY_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/spondProxy';
 const SPOND_TOKEN_KEY = 'spond_cached_token';
@@ -163,13 +164,31 @@ export const changeSpondResponse = async (
 };
 
 export const saveSpondConfig = async (familyId: string, config: SpondConfig): Promise<void> => {
-  await setDoc(doc(db, 'families', familyId, 'config', 'spond'), config);
+  // Encrypt password before saving to Firestore
+  const encryptedConfig = { ...config };
+  if (config.password && !config.password.startsWith('enc:')) {
+    try {
+      encryptedConfig.password = 'enc:' + await encryptSpondPassword(config.password);
+    } catch (e) {
+      console.warn('Failed to encrypt Spond password, saving as plaintext:', e);
+    }
+  }
+  await setDoc(doc(db, 'families', familyId, 'config', 'spond'), encryptedConfig);
 };
 
 export const getSpondConfig = async (familyId: string): Promise<SpondConfig | null> => {
   const snap = await getDoc(doc(db, 'families', familyId, 'config', 'spond'));
   if (!snap.exists()) return null;
-  return snap.data() as SpondConfig;
+  const data = snap.data() as SpondConfig;
+  // Decrypt password if encrypted
+  if (data.password && data.password.startsWith('enc:')) {
+    try {
+      data.password = await decryptSpondPassword(data.password.substring(4));
+    } catch (e) {
+      console.warn('Failed to decrypt Spond password:', e);
+    }
+  }
+  return data;
 };
 
 export const clearSpondToken = (): void => {

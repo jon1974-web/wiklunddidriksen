@@ -175,3 +175,13 @@ export const notifyNewEvent = async (familyId: string, eventTitle: string, event
 export const notifyHealthItem = async (familyId: string, title: string, date: string, time: string, location: string, itemType: string, creatorName: string, personName: string): Promise<void> => {
   await callFunction('notifyHealthItem', { familyId, title, date, time, location, itemType, creatorName, personName });
 };
+
+export const encryptSpondPassword = async (password: string): Promise<string> => {
+  const result = await callFunction('encryptSpondPassword', { password });
+  return result.encrypted;
+};
+
+export const decryptSpondPassword = async (encrypted: string): Promise<string> => {
+  const result = await callFunction('decryptSpondPassword', { encrypted });
+  return result.decrypted;
+};
