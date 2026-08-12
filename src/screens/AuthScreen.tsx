@@ -60,6 +60,12 @@ export const AuthScreen: React.FC = () => {
       return;
     }
 
+    // If already authenticated (went back from step 2/3), just proceed
+    if (authUser) {
+      setStep('language');
+      return;
+    }
+
     setLoading(true);
     try {
       if (isLogin) {
