@@ -74,7 +74,8 @@
     "pickStartDate": "Velg startdato",
     "pickEndDate": "Velg sluttdato",
     "pickStartTime": "Velg starttid",
-    "pickEndTime": "Velg sluttid"
+    "pickEndTime": "Velg sluttid",
+    "continue": "Fortsett"
   },
   "auth": {
     "title": "Familiesenter",

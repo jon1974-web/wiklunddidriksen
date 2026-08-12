@@ -74,7 +74,8 @@
     "pickStartDate": "Valitse aloituspäivä",
     "pickEndDate": "Valitse lopetuspäivä",
     "pickStartTime": "Valitse aloitusaika",
-    "pickEndTime": "Valitse lopetusaika"
+    "pickEndTime": "Valitse lopetusaika",
+    "continue": "Jatka"
   },
   "auth": {
     "title": "Perhekeskus",

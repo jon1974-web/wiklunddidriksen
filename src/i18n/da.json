@@ -74,7 +74,8 @@
     "pickStartDate": "Vælg startdato",
     "pickEndDate": "Vælg slutdato",
     "pickStartTime": "Vælg starttid",
-    "pickEndTime": "Vælg sluttid"
+    "pickEndTime": "Vælg sluttid",
+    "continue": "Fortsæt"
   },
   "auth": {
     "title": "Familiecenter",

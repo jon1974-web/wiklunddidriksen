@@ -74,7 +74,8 @@
     "pickStartDate": "Pick start date",
     "pickEndDate": "Pick end date",
     "pickStartTime": "Pick start time",
-    "pickEndTime": "Pick end time"
+    "pickEndTime": "Pick end time",
+    "continue": "Continue"
   },
   "auth": {
     "title": "Family Center",

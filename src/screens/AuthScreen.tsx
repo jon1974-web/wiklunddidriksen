@@ -393,23 +393,23 @@ const styles = StyleSheet.create({
   languageGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: 10,
     marginBottom: 24,
   },
   languageOption: {
     width: '47%',
-    padding: 16,
-    borderRadius: 12,
+    padding: 12,
+    borderRadius: 10,
     borderWidth: 1.5,
     alignItems: 'center',
     flexDirection: 'row',
-    gap: 10,
+    gap: 8,
   },
   languageFlag: {
-    fontSize: 24,
+    fontSize: 20,
   },
   languageLabel: {
-    fontSize: 15,
+    fontSize: 14,
     fontWeight: '600',
   },
 });
