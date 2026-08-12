@@ -33,12 +33,12 @@
         "destination": "/firebase-messaging-sw.js"
       },
       {
-        "source": "/docs/privacy-no.html",
-        "destination": "/docs/privacy-no.html"
+        "source": "/docs/privacy-nb.html",
+        "destination": "/docs/privacy-nb.html"
       },
       {
-        "source": "/docs/terms-no.html",
-        "destination": "/docs/terms-no.html"
+        "source": "/docs/terms-nb.html",
+        "destination": "/docs/terms-nb.html"
       },
       {
         "source": "/docs/privacy-en.html",
