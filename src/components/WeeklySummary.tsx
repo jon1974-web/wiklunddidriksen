@@ -279,11 +279,11 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                           {item.logoUrl ? (
                             <Image source={{ uri: item.logoUrl }} style={styles.itemLogo} />
                           ) : isEmoji ? (
-                            <View style={[styles.itemIcon, { backgroundColor: item.iconBg }]}>
+                            <View style={[styles.itemIcon]}>
                               <Text style={{ fontSize: 12 }}>{item.icon}</Text>
                             </View>
                           ) : (
-                            <View style={[styles.itemIcon, { backgroundColor: item.iconBg }]}>
+                            <View style={[styles.itemIcon]}>
                               <AppIcon name={item.icon as any} size={13} color={itemColor} />
                             </View>
                           )}
@@ -321,7 +321,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                   const endLabel = new Date(trip.endDate + 'T23:59:59').toLocaleDateString(getLocale(i18nInstance.language), { day: 'numeric', month: 'short' });
                   return (
                     <View key={trip.id} style={[styles.tripItem, i < trips.length - 1 && { borderBottomColor: colors.border }]}>
-                      <View style={[styles.itemIcon, { backgroundColor: '#E3F2FD' }]}>
+                      <View style={[styles.itemIcon]}>
                         <AppIcon name="transport" size={13} color={MODULE_COLORS.trips} />
                       </View>
                       <Text style={[styles.itemName, { color: colors.text, flex: 1 }]} numberOfLines={1}>{trip.title}</Text>
@@ -376,7 +376,7 @@ const styles = StyleSheet.create({
   dayCardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 10 },
   dayCardItems: { flex: 1, gap: 4 },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  itemIcon: { width: 20, height: 20, borderRadius: 5, alignItems: 'center', justifyContent: 'center' },
+  itemIcon: { width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
   itemLogo: { width: 20, height: 20, borderRadius: 5 },
   itemName: { fontSize: 12, fontWeight: '500', flex: 1 },
   itemTime: { fontSize: 11, fontWeight: '600', color: '#999' },
