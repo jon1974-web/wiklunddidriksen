@@ -104,7 +104,12 @@
     "inviteRegisterButton": "Registrera och gå med",
     "inviteLoginButton": "Logga in och gå med",
     "registerHint": "Registrera dig för att skapa en ny familj.",
-    "inviteJoinHint": "Eller använd en inbjudningslänk för att gå med i en befintlig familj."
+    "inviteJoinHint": "Eller använd en inbjudningslänk för att gå med i en befintlig familj.",
+    "selectLanguage": "Välj ditt språk",
+    "createFamily": "Skapa din familj",
+    "familyName": "Familjenamn",
+    "familyNameRequired": "Vänligen ange ett familjenamn",
+    "createFamilyButton": "Skapa familj"
   },
   "events": {
     "title": "Evenemang",

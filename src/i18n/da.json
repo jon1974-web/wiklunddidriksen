@@ -104,7 +104,12 @@
     "inviteRegisterButton": "Registrer og bliv med",
     "inviteLoginButton": "Log ind og bliv med",
     "registerHint": "Registrer dig for at oprette en ny familie.",
-    "inviteJoinHint": "Eller brug et invitationslink til at blive med i en eksisterende familie."
+    "inviteJoinHint": "Eller brug et invitationslink til at blive med i en eksisterende familie.",
+    "selectLanguage": "Vælg dit sprog",
+    "createFamily": "Opret din familie",
+    "familyName": "Familjenavn",
+    "familyNameRequired": "Vennligst indtast et familienavn",
+    "createFamilyButton": "Opret familie"
   },
   "events": {
     "title": "Begivenheder",

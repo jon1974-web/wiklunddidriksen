@@ -104,7 +104,12 @@
     "notificationsOn": "On",
     "notificationsOff": "Off",
     "notificationsOnHelp": "Reminders are sent before events.",
-    "notificationsOffHelp": "Notifications are disabled."
+    "notificationsOffHelp": "Notifications are disabled.",
+    "selectLanguage": "Select your language",
+    "createFamily": "Create your family",
+    "familyName": "Family name",
+    "familyNameRequired": "Please enter a family name",
+    "createFamilyButton": "Create family"
   },
   "events": {
     "title": "Events",

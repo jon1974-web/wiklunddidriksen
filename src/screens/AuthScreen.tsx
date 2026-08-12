@@ -1,14 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
-import { createOrUpdateUser, getUserProfile, joinFamilyByInviteCode } from '../services/familyService';
+import { createOrUpdateUser, getUserProfile, joinFamilyByInviteCode, createFamily } from '../services/familyService';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
+import { LANGUAGES } from '../constants/languages';
+import { setLanguage } from '../i18n';
+import i18n from '../i18n';
+
+const TEAL = '#0097A7';
+
+type Step = 'account' | 'language' | 'family';
 
 export const AuthScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -26,9 +33,12 @@ export const AuthScreen: React.FC = () => {
   const [name, setName] = useState('');
   const [isLogin, setIsLogin] = useState(!hasInvite);
   const [loading, setLoading] = useState(false);
+  const [step, setStep] = useState<Step>(hasInvite ? 'language' : 'account');
+  const [selectedLanguage, setSelectedLanguage] = useState('nb');
+  const [familyName, setFamilyName] = useState('');
 
   useEffect(() => {
-    if (hasInvite) setIsLogin(false);
+    if (hasInvite) setStep('language');
   }, [hasInvite]);
 
   const handleJoin = async () => {
@@ -87,6 +97,10 @@ export const AuthScreen: React.FC = () => {
             email: userEmail,
             displayName: name,
           });
+
+          if (!hasInvite) {
+            setStep('language');
+          }
         } catch (registerError: any) {
           if (registerError?.code === 'auth/email-already-in-use') {
             const result = await signInWithEmailAndPassword(auth, email, password);
@@ -114,12 +128,43 @@ export const AuthScreen: React.FC = () => {
     }
   };
 
-  return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Image source={require('../../assets/icon.png')} style={{ width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }} />
-      <Text style={[styles.title, { color: '#0097A7' }]}>{t('auth.title')}</Text>
+  const handleLanguageSelect = async () => {
+    setLanguage(selectedLanguage);
+    if (hasInvite) {
+      // Auto-join family from invite link
+      setLoading(true);
+      try {
+        await handleJoin();
+      } catch {
+        // Error already handled in handleJoin
+      } finally {
+        setLoading(false);
+      }
+    } else {
+      setStep('family');
+    }
+  };
+
+  const handleCreateFamily = async () => {
+    if (!familyName.trim()) {
+      crossAlert(t('common.error'), t('auth.familyNameRequired'));
+      return;
+    }
+    setLoading(true);
+    try {
+      const result = await createFamily(familyName.trim());
+      setFamily(result.familyId, familyName.trim(), 'owner');
+    } catch (error: any) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const renderAccountStep = () => (
+    <>
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-        {hasInvite ? t('auth.inviteTitle') : isLogin ? t('auth.login') : t('auth.register')}
+        {isLogin ? t('auth.login') : t('auth.register')}
       </Text>
 
       {hasInvite && (
@@ -164,7 +209,7 @@ export const AuthScreen: React.FC = () => {
       />
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: '#0097A7', opacity: loading ? 0.6 : 1 }]}
+        style={[styles.button, { backgroundColor: TEAL, opacity: loading ? 0.6 : 1 }]}
         onPress={handleAuth}
         disabled={loading}
       >
@@ -175,7 +220,7 @@ export const AuthScreen: React.FC = () => {
 
       {!hasInvite && (
         <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-          <Text style={[styles.switchText, { color: '#0097A7' }]}>
+          <Text style={[styles.switchText, { color: TEAL }]}>
             {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
           </Text>
         </TouchableOpacity>
@@ -186,6 +231,90 @@ export const AuthScreen: React.FC = () => {
           {t('auth.registerHint')}
         </Text>
       )}
+    </>
+  );
+
+  const renderLanguageStep = () => (
+    <>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+        {t('auth.selectLanguage')}
+      </Text>
+
+      <View style={styles.languageGrid}>
+        {LANGUAGES.filter(l => l.hasTranslation).map((lang) => (
+          <TouchableOpacity
+            key={lang.code}
+            style={[
+              styles.languageOption,
+              {
+                backgroundColor: selectedLanguage === lang.code ? TEAL : colors.surface,
+                borderColor: selectedLanguage === lang.code ? TEAL : colors.border,
+              },
+            ]}
+            onPress={() => setSelectedLanguage(lang.code)}
+          >
+            <Text style={styles.languageFlag}>{lang.flag}</Text>
+            <Text style={[styles.languageLabel, { color: selectedLanguage === lang.code ? '#fff' : colors.text }]}>
+              {lang.englishName}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: TEAL }]}
+        onPress={handleLanguageSelect}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>{loading ? '...' : t('common.continue')}</Text>
+      </TouchableOpacity>
+    </>
+  );
+
+  const renderFamilyStep = () => (
+    <>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+        {t('auth.createFamily')}
+      </Text>
+
+      <TextInput
+        style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+        placeholder={t('auth.familyName')}
+        placeholderTextColor={colors.textDisabled}
+        value={familyName}
+        onChangeText={setFamilyName}
+        autoCapitalize="words"
+      />
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: TEAL, opacity: loading ? 0.6 : 1 }]}
+        onPress={handleCreateFamily}
+        disabled={loading}
+      >
+        <Text style={styles.buttonText}>{loading ? '...' : t('auth.createFamilyButton')}</Text>
+      </TouchableOpacity>
+    </>
+  );
+
+  return (
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <Image source={require('../../assets/icon.png')} style={{ width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }} />
+        <Text style={[styles.title, { color: TEAL }]}>{t('auth.title')}</Text>
+
+        {/* Progress indicator */}
+        {step !== 'account' && (
+          <View style={styles.progressRow}>
+            {['account', 'language', 'family'].map((s, i) => (
+              <View key={s} style={[styles.progressDot, { backgroundColor: i <= ['account', 'language', 'family'].indexOf(step) ? TEAL : colors.border }]} />
+            ))}
+          </View>
+        )}
+
+        {step === 'account' && renderAccountStep()}
+        {step === 'language' && renderLanguageStep()}
+        {step === 'family' && renderFamilyStep()}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -193,8 +322,12 @@ export const AuthScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
+  },
+  scrollContent: {
     padding: 24,
+    paddingTop: 60,
+    flexGrow: 1,
+    justifyContent: 'center',
   },
   title: {
     fontSize: 32,
@@ -206,6 +339,17 @@ const styles = StyleSheet.create({
     fontSize: 20,
     textAlign: 'center',
     marginBottom: 32,
+  },
+  progressRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 8,
+    marginBottom: 32,
+  },
+  progressDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   inviteBanner: {
     borderRadius: 12,
@@ -249,5 +393,27 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 12,
     fontSize: 13,
+  },
+  languageGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginBottom: 24,
+  },
+  languageOption: {
+    width: '47%',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  languageFlag: {
+    fontSize: 24,
+  },
+  languageLabel: {
+    fontSize: 15,
+    fontWeight: '600',
   },
 });

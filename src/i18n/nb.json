@@ -104,7 +104,12 @@
     "notificationsOn": "På",
     "notificationsOff": "Av",
     "notificationsOnHelp": "Påminnelser sendes før arrangementer.",
-    "notificationsOffHelp": "Varsler er deaktivert."
+    "notificationsOffHelp": "Varsler er deaktivert.",
+    "selectLanguage": "Velg ditt språk",
+    "createFamily": "Opprett din familie",
+    "familyName": "Familienavn",
+    "familyNameRequired": "Vennligst skriv inn et familienavn",
+    "createFamilyButton": "Opprett familie"
   },
   "events": {
     "title": "Avtaler",

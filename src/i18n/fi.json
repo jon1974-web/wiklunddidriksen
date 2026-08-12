@@ -104,7 +104,12 @@
     "inviteRegisterButton": "Rekisteröidy ja liity",
     "inviteLoginButton": "Kirjaudu ja liity",
     "registerHint": "Rekisteröidy luodaksesi uuden perheen.",
-    "inviteJoinHint": "Tai käytä kutsulinkkiä liittyäksesi olemassa olevaan perheeseen."
+    "inviteJoinHint": "Tai käytä kutsulinkkiä liittyäksesi olemassa olevaan perheeseen.",
+    "selectLanguage": "Valitse kieli",
+    "createFamily": "Luo perheesi",
+    "familyName": "Perheen nimi",
+    "familyNameRequired": "Anna perheen nimi",
+    "createFamilyButton": "Luo perhe"
   },
   "events": {
     "title": "Tapahtumat",
