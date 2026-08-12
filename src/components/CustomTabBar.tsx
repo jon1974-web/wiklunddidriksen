@@ -116,10 +116,10 @@ const styles = StyleSheet.create({
     paddingTop: 4,
   },
   tabItemLeft: {
-    paddingRight: 32,
+    paddingRight: 24,
   },
   tabItemRight: {
-    paddingLeft: 32,
+    paddingLeft: 24,
   },
   tabLabel: {
     fontSize: 10,
