@@ -1034,5 +1034,14 @@
     "chat": "Chat",
     "trips": "Våre steder",
     "profile": "Profil"
+  },
+  "days": {
+    "sun": "SØN",
+    "mon": "MAN",
+    "tue": "TIRS",
+    "wed": "ONS",
+    "thu": "TORS",
+    "fri": "FRE",
+    "sat": "LØR"
   }
 }

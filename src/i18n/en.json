@@ -1034,5 +1034,14 @@
     "chat": "Chat",
     "trips": "Our places",
     "profile": "Profile"
+  },
+  "days": {
+    "sun": "SUN",
+    "mon": "MON",
+    "tue": "TUE",
+    "wed": "WED",
+    "thu": "THU",
+    "fri": "FRI",
+    "sat": "SAT"
   }
 }

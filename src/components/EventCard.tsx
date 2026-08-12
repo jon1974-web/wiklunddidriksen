@@ -3,10 +3,11 @@ import { View, Text, TouchableOpacity, Image, Linking, StyleSheet } from 'react-
 import { Event } from '../types';
 import { formatDate, formatTime } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
-const DAYS = ['SØN','MAN','TIRS','ONS','TORS','FRE','LØR'];
+const DAY_KEYS = ['days.sun','days.mon','days.tue','days.wed','days.thu','days.fri','days.sat'];
 
 interface EventCardProps {
   event: Event;
@@ -53,11 +54,12 @@ const clockStyles = StyleSheet.create({
 
 export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress, onLongPress, canDelete }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   const d = event.date ? new Date(event.date) : null;
   const dayNum = d ? d.getDate() : '?';
   const monthStr = d ? MONTHS[d.getMonth()] : '';
-  const dayName = d ? DAYS[d.getDay()] : '';
+  const dayName = d ? t(DAY_KEYS[d.getDay()]) : '';
 
   const timeText = event.endTime
     ? `${formatTime(event.time)} – ${formatTime(event.endTime)}`

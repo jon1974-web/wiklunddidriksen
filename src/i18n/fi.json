@@ -1034,5 +1034,14 @@
     "chat": "Chat",
     "trips": "Paikkamme",
     "profile": "Profiili"
+  },
+  "days": {
+    "sun": "SU",
+    "mon": "MA",
+    "tue": "TI",
+    "wed": "KE",
+    "thu": "TO",
+    "fri": "PE",
+    "sat": "LA"
   }
 }

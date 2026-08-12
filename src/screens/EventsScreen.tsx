@@ -33,7 +33,7 @@ interface EventsScreenProps {
 const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#00BCD4', '#8BC34A', '#FF5722'];
 const TRIP_COLOR = MODULE_COLORS.trips;
 const SPOND_COLOR = '#E53935';
-const DAYS = ['SØN','MAN','TIRS','ONS','TORS','FRE','LØR'];
+const DAY_KEYS = ['days.sun','days.mon','days.tue','days.wed','days.thu','days.fri','days.sat'];
 
 export const SPOND_GROUP_LOGOS: Record<string, any> = {};
 
@@ -608,7 +608,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
-      const calDayName = d ? DAYS[d.getDay()] : '';
+      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
       const dateText = item.endDate ? `${formatDate(item.startDate)} – ${formatDate(item.endDate)}` : formatDate(item.startDate);
       return (
         <TouchableOpacity
@@ -652,7 +652,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const calDay = startDate.getDate();
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = MONTHS_SV[startDate.getMonth()];
-      const calDayName = DAYS[startDate.getDay()];
+      const calDayName = t(DAY_KEYS[startDate.getDay()]);
       const startTime = formatSpondTimestamp(item.startTimestamp);
       const endTime = item.endTimestamp ? formatSpondTimestamp(item.endTimestamp) : null;
       const timeText = endTime ? `${startTime} – ${endTime}` : startTime;
@@ -740,7 +740,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
-      const calDayName = d ? DAYS[d.getDay()] : '';
+      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
