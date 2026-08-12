@@ -1028,5 +1028,11 @@
     "trips": "Matkat",
     "newTrip": "Uusi matka",
     "newTripDesc": "Luo uusi matka"
+  },
+  "tabs": {
+    "events": "Tapahtumat",
+    "chat": "Chat",
+    "trips": "Paikkamme",
+    "profile": "Profiili"
   }
 }

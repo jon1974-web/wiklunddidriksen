@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Svg, { Rect, Line, Path, Circle, Polyline } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface TabBarProps {
   state: any;
@@ -54,22 +55,23 @@ const TAB_ICONS: Record<string, string> = {
   Profile: 'person',
 };
 
-const TAB_LABELS: Record<string, string> = {
-  Events: 'Avtaler',
-  Chat: 'Chat',
-  Trips: 'Våre steder',
-  Profile: 'Profil',
+const TAB_KEYS: Record<string, string> = {
+  Events: 'tabs.events',
+  Chat: 'tabs.chat',
+  Trips: 'tabs.trips',
+  Profile: 'tabs.profile',
 };
 
 export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descriptors, navigation, onCreatePress }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <View style={[styles.tabBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
       {state.routes.map((route: any, index: number) => {
         const isFocused = state.index === index;
         const icon = TAB_ICONS[route.name] || 'calendar';
-        const label = TAB_LABELS[route.name] || route.name;
+        const label = t(TAB_KEYS[route.name] || route.name);
 
         const onPress = () => {
           if (route.name === 'Trips') {

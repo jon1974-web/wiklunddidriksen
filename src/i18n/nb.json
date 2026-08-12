@@ -1028,5 +1028,11 @@
     "trips": "Reiser",
     "newTrip": "Ny reise",
     "newTripDesc": "Opprett en ny reise"
+  },
+  "tabs": {
+    "events": "Avtaler",
+    "chat": "Chat",
+    "trips": "Våre steder",
+    "profile": "Profil"
   }
 }

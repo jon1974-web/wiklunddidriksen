@@ -1028,5 +1028,11 @@
     "trips": "Trips",
     "newTrip": "New trip",
     "newTripDesc": "Create a new trip"
+  },
+  "tabs": {
+    "events": "Events",
+    "chat": "Chat",
+    "trips": "Our places",
+    "profile": "Profile"
   }
 }
