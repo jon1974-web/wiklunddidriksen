@@ -325,11 +325,39 @@ export const AuthScreen: React.FC = () => {
         {step === 'language' && renderLanguageStep()}
         {step === 'family' && renderFamilyStep()}
 
+        {/* Language selector on login page */}
+        {step === 'account' && (
+          <View style={styles.loginLangRow}>
+            {LANGUAGES.filter(l => l.hasTranslation).map((lang) => (
+              <TouchableOpacity
+                key={lang.code}
+                style={[
+                  styles.loginLangChip,
+                  {
+                    backgroundColor: selectedLanguage === lang.code ? TEAL : colors.surface,
+                    borderColor: selectedLanguage === lang.code ? TEAL : colors.border,
+                  },
+                ]}
+                onPress={() => {
+                  setSelectedLanguage(lang.code);
+                  setLanguage(lang.code);
+                }}
+              >
+                <Text style={styles.loginLangFlag}>{lang.flag}</Text>
+                <Text style={[styles.loginLangCode, { color: selectedLanguage === lang.code ? '#fff' : colors.text }]}>
+                  {lang.label}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        {/* Legal text */}
         <Text style={[styles.legalText, { color: colors.textDisabled }]}>
           {t('auth.legalPrefix')}{' '}
-          <Text style={[styles.legalLink, { color: TEAL }]} onPress={() => Linking.openURL('/docs/terms.html')}>{t('auth.termsLink')}</Text>
+          <Text style={[styles.legalLink, { color: TEAL }]} onPress={() => Linking.openURL(`/docs/terms-${selectedLanguage}.html`)}>{t('auth.termsLink')}</Text>
           {' '}{t('auth.legalAnd')}{' '}
-          <Text style={[styles.legalLink, { color: TEAL }]} onPress={() => Linking.openURL('/docs/privacy.html')}>{t('auth.privacyLink')}</Text>
+          <Text style={[styles.legalLink, { color: TEAL }]} onPress={() => Linking.openURL(`/docs/privacy-${selectedLanguage}.html`)}>{t('auth.privacyLink')}</Text>
         </Text>
       </ScrollView>
     </SafeAreaView>
@@ -451,5 +479,28 @@ const styles = StyleSheet.create({
   },
   legalLink: {
     fontWeight: '600',
+  },
+  loginLangRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 6,
+    marginTop: 24,
+    marginBottom: 8,
+  },
+  loginLangChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 3,
+    paddingVertical: 6,
+    paddingHorizontal: 8,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  loginLangFlag: {
+    fontSize: 14,
+  },
+  loginLangCode: {
+    fontSize: 10,
+    fontWeight: '700',
   },
 });
