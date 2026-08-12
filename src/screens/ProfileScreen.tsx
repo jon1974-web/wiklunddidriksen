@@ -80,7 +80,7 @@ export const ProfileScreen: React.FC = () => {
   const [calendarEmail, setCalendarEmail] = useState('');
   const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ birthdays: true, meals: true });
+  const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ meals: true });
   const [uploading, setUploading] = useState(false);
   const [spondEmail, setSpondEmail] = useState('');
   const [spondPassword, setSpondPassword] = useState('');
@@ -911,10 +911,7 @@ export const ProfileScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
         {[
-          { key: 'birthdays', icon: 'birthday', label: t('birthdays.title') },
           { key: 'meals', icon: 'utensils', label: t('mealPlanner.weeklyPlan') },
-          { key: 'reiser', icon: 'compass', label: t('trips.title') },
-          { key: 'health', icon: 'transport', label: t('health.title') },
         ].map(section => (
           <TouchableOpacity
             key={section.key}

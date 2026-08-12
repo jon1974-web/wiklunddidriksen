@@ -18,7 +18,6 @@ interface WeeklySummaryProps {
   birthdays?: Birthday[];
   mealPlan?: MealPlan | null;
   recipes?: Recipe[];
-  sectionSettings?: Record<string, boolean>;
   groupLogos?: Record<string, string>;
   tripSubcollections?: Record<string, any>;
   healthAppointments?: HealthAppointment[];

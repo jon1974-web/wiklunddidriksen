@@ -149,7 +149,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [showWeeklySummary, setShowWeeklySummary] = useState(false);
   const [mealPlan, setMealPlan] = useState<any>(null);
   const [recipes, setRecipes] = useState<any[]>([]);
-  const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ birthdays: true, meals: true, reiser: true });
+  const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ meals: true });
   const [tripSubcollections, setTripSubcollections] = useState<Record<string, any>>({});
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
