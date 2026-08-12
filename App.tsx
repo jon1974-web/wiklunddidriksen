@@ -448,7 +448,6 @@ const AppContent = () => {
           email: userEmail,
           displayName: firebaseUser.displayName || 'User',
         };
-        setUser(userData);
 
         try {
           let profile = await getUserProfile(firebaseUser.uid);
@@ -460,9 +459,15 @@ const AppContent = () => {
             });
             profile = await getUserProfile(firebaseUser.uid);
           }
-          if (profile) {
-            setUser({ ...userData, avatarUrl: profile.avatarUrl || undefined });
+
+          // If user has no familyId, they haven't completed registration wizard
+          // Don't call setUser — let AuthScreen handle the wizard
+          if (profile && !profile.familyId) {
+            setLoading(false);
+            return;
           }
+
+          setUser({ ...userData, avatarUrl: profile?.avatarUrl || undefined });
           if (profile?.familyId) {
             setFamily(profile.familyId, profile.familyName, profile.familyRole || null);
           }
