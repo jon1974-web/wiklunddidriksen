@@ -17,8 +17,8 @@
   .frame-close { width: 28px; height: 28px; border-radius: 14px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #666; cursor: pointer; }
   .frame-content { padding: 12px; max-height: 750px; overflow-y: auto; }
 
-  .c-health { color: #E53935; } .c-pets { color: #8E24AA; } .c-trips { color: #42A5F5; } .c-meals { color: #0097A7; } .c-events { color: #43A047; } .c-birthdays { color: #FB8C00; }
-  .bc-health { background: #E53935; } .bc-pets { background: #8E24AA; } .bc-trips { background: #42A5F5; } .bc-meals { background: #0097A7; } .bc-events { background: #43A047; } .bc-birthdays { background: #FB8C00; }
+  .c-health { color: #E53935; } .c-pets { color: #8E24AA; } .c-trips { color: #42A5F5; } .c-meals { color: #0097A7; } .c-events { color: #0097A7; } .c-birthdays { color: #FB8C00; }
+  .bc-health { background: #E53935; } .bc-pets { background: #8E24AA; } .bc-trips { background: #42A5F5; } .bc-meals { background: #0097A7; } .bc-events { background: #0097A7; } .bc-birthdays { background: #FB8C00; }
 
   .label { font-size: 12px; color: #888; text-align: center; margin-top: 12px; margin-bottom: 4px; font-weight: 600; }
 
@@ -30,20 +30,20 @@
 
   /* Day card */
   .day-card { background: #fff; border-radius: 12px; margin-bottom: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
-  .day-card.today { border: 2px solid #43A047; }
+  .day-card.today { border: 2px solid #0097A7; }
   .day-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px 6px; }
 
   /* Calendar icon */
   .cal-icon { width: 44px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1.5px solid #e0e0e0; }
-  .cal-icon.today { border-color: #43A047; box-shadow: 0 2px 6px rgba(67,160,71,0.2); }
+  .cal-icon.today { border-color: #0097A7; box-shadow: 0 2px 6px rgba(0,151,167,0.2); }
   .cal-top { height: 13px; display: flex; align-items: center; justify-content: center; }
   .cal-top span { font-size: 7px; font-weight: 800; }
-  .cal-top.today { background: #43A047; }
+  .cal-top.today { background: #0097A7; }
   .cal-top.today span { color: #fff; }
   .cal-top.other { background: #f0f0f0; }
   .cal-top.other span { color: #999; }
   .cal-day { font-size: 16px; font-weight: 800; text-align: center; line-height: 1.1; padding-top: 1px; }
-  .cal-day.today { color: #43A047; }
+  .cal-day.today { color: #0097A7; }
   .cal-day.other { color: #999; }
   .cal-month { font-size: 7px; font-weight: 700; text-align: center; text-transform: uppercase; padding-bottom: 2px; }
   .cal-month.other { color: #bbb; }
@@ -98,8 +98,8 @@
       <div class="stat-chip"><div class="stat-num c-events">1</div><div class="stat-label c-events">Avtale</div></div>
       <div class="stat-chip"><div class="stat-num c-health">2</div><div class="stat-label c-health">Helse</div></div>
       <div class="stat-chip"><div class="stat-num c-pets">3</div><div class="stat-label c-pets">Kjæledyr</div></div>
+      <div class="stat-chip"><div class="stat-num c-trips">1</div><div class="stat-label c-trips">Reiser</div></div>
       <div class="stat-chip"><div class="stat-num" style="color:#FB8C00">1</div><div class="stat-label" style="color:#FB8C00">Bursdag</div></div>
-      <div class="stat-chip"><div class="stat-num c-meals">14</div><div class="stat-label c-meals">Mat</div></div>
     </div>
 
     <!-- Day cards -->
