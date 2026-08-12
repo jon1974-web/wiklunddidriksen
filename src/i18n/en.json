@@ -110,7 +110,11 @@
     "createFamily": "Create your family",
     "familyName": "Family name",
     "familyNameRequired": "Please enter a family name",
-    "createFamilyButton": "Create family"
+    "createFamilyButton": "Create family",
+    "legalPrefix": "By using Familiesenter you agree to our",
+    "termsLink": "terms",
+    "legalAnd": "and",
+    "privacyLink": "privacy policy"
   },
   "events": {
     "title": "Events",

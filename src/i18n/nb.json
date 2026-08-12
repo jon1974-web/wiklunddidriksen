@@ -110,7 +110,11 @@
     "createFamily": "Opprett din familie",
     "familyName": "Familienavn",
     "familyNameRequired": "Vennligst skriv inn et familienavn",
-    "createFamilyButton": "Opprett familie"
+    "createFamilyButton": "Opprett familie",
+    "legalPrefix": "Ved å bruke Familiesenter godtar du våre",
+    "termsLink": "vilkår",
+    "legalAnd": "og",
+    "privacyLink": "personvernerklæring"
   },
   "events": {
     "title": "Avtaler",

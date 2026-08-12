@@ -110,7 +110,11 @@
     "createFamily": "Skapa din familj",
     "familyName": "Familjenamn",
     "familyNameRequired": "Vänligen ange ett familjenamn",
-    "createFamilyButton": "Skapa familj"
+    "createFamilyButton": "Skapa familj",
+    "legalPrefix": "Genom att använda Familiesenter godkänner du våra",
+    "termsLink": "villkor",
+    "legalAnd": "och",
+    "privacyLink": "integritetspolicy"
   },
   "events": {
     "title": "Evenemang",

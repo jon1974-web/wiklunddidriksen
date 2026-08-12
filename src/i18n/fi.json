@@ -110,7 +110,11 @@
     "createFamily": "Luo perheesi",
     "familyName": "Perheen nimi",
     "familyNameRequired": "Anna perheen nimi",
-    "createFamilyButton": "Luo perhe"
+    "createFamilyButton": "Luo perhe",
+    "legalPrefix": "Käyttämällä Familiesenter hyväksyt",
+    "termsLink": "ehdot",
+    "legalAnd": "ja",
+    "privacyLink": "tietosuojakäytännön"
   },
   "events": {
     "title": "Tapahtumat",

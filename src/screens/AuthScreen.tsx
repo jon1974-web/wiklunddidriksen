@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User } from 'firebase/auth';
 import { auth } from '../services/firebase';
@@ -324,6 +324,13 @@ export const AuthScreen: React.FC = () => {
         {step === 'account' && renderAccountStep()}
         {step === 'language' && renderLanguageStep()}
         {step === 'family' && renderFamilyStep()}
+
+        <Text style={[styles.legalText, { color: colors.textDisabled }]}>
+          {t('auth.legalPrefix')}{' '}
+          <Text style={[styles.legalLink, { color: TEAL }]} onPress={() => Linking.openURL('/docs/terms.html')}>{t('auth.termsLink')}</Text>
+          {' '}{t('auth.legalAnd')}{' '}
+          <Text style={[styles.legalLink, { color: TEAL }]} onPress={() => Linking.openURL('/docs/privacy.html')}>{t('auth.privacyLink')}</Text>
+        </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -435,5 +442,14 @@ const styles = StyleSheet.create({
   langCode: {
     fontSize: 12,
     fontWeight: '700',
+  },
+  legalText: {
+    fontSize: 12,
+    textAlign: 'center',
+    marginTop: 32,
+    lineHeight: 18,
+  },
+  legalLink: {
+    fontWeight: '600',
   },
 });
