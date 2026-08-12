@@ -92,7 +92,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
 
       {!isTeacher && contact.parentName && (
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
-          <Text style={[s.viewDescription, { color: MODULE_COLORS.school, fontWeight: '700', marginBottom: 8 }]}>👤 {t('school.parentName')} 1</Text>
+          <Text style={[s.viewDescription, { color: MODULE_COLORS.school, fontWeight: '700', marginBottom: 8 }]}>👤 {contact.parentName}</Text>
           <View style={s.viewDetailRow}>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.phone')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentPhone || '—'}</Text>
@@ -107,7 +107,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
 
       {!isTeacher && contact.parentName2 && (
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
-          <Text style={[s.viewDescription, { color: MODULE_COLORS.school, fontWeight: '700', marginBottom: 8 }]}>👤 {t('school.parentName')} 2</Text>
+          <Text style={[s.viewDescription, { color: MODULE_COLORS.school, fontWeight: '700', marginBottom: 8 }]}>👤 {contact.parentName2}</Text>
           <View style={s.viewDetailRow}>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.phone')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentPhone2 || '—'}</Text>
