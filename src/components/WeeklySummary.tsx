@@ -185,7 +185,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       birthdays.forEach((b) => {
         const bDate = new Date(b.date);
         if (bDate.getMonth() === d.getMonth() && bDate.getDate() === d.getDate()) {
-          items.push({ type: 'birthday', icon: 'birthday', iconBg: '#FFF3E0', title: `${b.name} fyller år`, time: '' });
+          const age = new Date().getFullYear() - bDate.getFullYear();
+          items.push({ type: 'birthday', icon: 'birthday', iconBg: '#FFF3E0', title: `${b.name} fyller ${age} år`, time: '' });
           birthdayCount++;
         }
       });
@@ -272,10 +273,15 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                   <View style={styles.dayCardItems}>
                     {day.items.length > 0 ? day.items.map((item, i) => {
                       const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : MODULE_COLORS.birthdays;
+                      const isEmoji = item.type === 'event' && item.icon && item.icon.length <= 2 && /[\u{1F000}-\u{1FFFF}]/u.test(item.icon);
                       return (
                         <View key={i} style={styles.itemRow}>
                           {item.logoUrl ? (
                             <Image source={{ uri: item.logoUrl }} style={styles.itemLogo} />
+                          ) : isEmoji ? (
+                            <View style={[styles.itemIcon, { backgroundColor: item.iconBg }]}>
+                              <Text style={{ fontSize: 12 }}>{item.icon}</Text>
+                            </View>
                           ) : (
                             <View style={[styles.itemIcon, { backgroundColor: item.iconBg }]}>
                               <AppIcon name={item.icon as any} size={13} color={itemColor} />
