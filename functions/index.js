@@ -107,6 +107,22 @@ async function checkRateLimit(uid, functionName) {
   return true;
 }
 
+// Audit logging - log critical actions
+async function logAuditEvent(uid, action, details = {}) {
+  try {
+    const db = getFirestore();
+    await db.collection("auditLogs").add({
+      uid,
+      action,
+      details,
+      timestamp: new Date().toISOString(),
+      ip: details.ip || "unknown",
+    });
+  } catch (error) {
+    console.error("Audit log error:", error.message);
+  }
+}
+
 exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
 
@@ -918,6 +934,8 @@ exports.createFamily = onRequest({ region: "us-central1", memory: "256MB" }, asy
     familyRole: "owner",
   });
 
+  await logAuditEvent(uid, "family_created", { familyId: familyRef.id, familyName: name.trim() });
+
   return res.status(200).json({ familyId: familyRef.id });
 });
 
@@ -1003,6 +1021,8 @@ exports.joinFamilyByInviteCode = onRequest({ region: "us-central1", memory: "256
     familyRole: "member",
   });
 
+  await logAuditEvent(uid, "family_joined", { familyId: familyDoc.id, familyName: familyData.name });
+
   return res.status(200).json({ familyId: familyDoc.id, familyName: familyData.name });
 });
 
@@ -1038,6 +1058,8 @@ exports.leaveFamily = onRequest({ region: "us-central1", memory: "256MB" }, asyn
     familyName: null,
     familyRole: FieldValue.delete(),
   });
+
+  await logAuditEvent(uid, "family_left", { familyId: userData.familyId, familyName: familyData.name });
 
   return res.status(200).json({ success: true });
 });
@@ -1078,6 +1100,8 @@ exports.removeFamilyMember = onRequest({ region: "us-central1", memory: "256MB" 
     familyName: null,
     familyRole: FieldValue.delete(),
   });
+
+  await logAuditEvent(uid, "family_member_removed", { familyId, targetUid, familyName: familyData.name });
 
   return res.status(200).json({ success: true });
 });
