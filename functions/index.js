@@ -69,6 +69,41 @@ function decryptSpondPassword(encrypted) {
   return decrypted;
 }
 
+// Rate limiting - per-user, per-function
+const RATE_LIMITS = {
+  spondProxy: { maxRequests: 30, windowMinutes: 1 },
+  photoToData: { maxRequests: 5, windowMinutes: 1 },
+  voiceToEvent: { maxRequests: 5, windowMinutes: 1 },
+  destinationTips: { maxRequests: 10, windowMinutes: 1 },
+  notifyNewEvent: { maxRequests: 10, windowMinutes: 1 },
+  notifyHealthItem: { maxRequests: 10, windowMinutes: 1 },
+};
+
+async function checkRateLimit(uid, functionName) {
+  const limits = RATE_LIMITS[functionName];
+  if (!limits) return true;
+
+  const db = getFirestore();
+  const now = new Date();
+  const windowStart = new Date(now.getTime() - limits.windowMinutes * 60 * 1000);
+
+  const rateLimitRef = db.collection("rateLimits").doc(`${uid}_${functionName}`);
+  const snap = await rateLimitRef.get();
+
+  if (snap.exists) {
+    const data = snap.data();
+    const requests = (data.requests || []).filter(ts => new Date(ts) > windowStart);
+    if (requests.length >= limits.maxRequests) {
+      return false;
+    }
+    requests.push(now.toISOString());
+    await rateLimitRef.set({ requests, lastUpdated: now.toISOString() });
+  } else {
+    await rateLimitRef.set({ requests: [now.toISOString()], lastUpdated: now.toISOString() });
+  }
+  return true;
+}
+
 exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
 
@@ -83,6 +118,11 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
   const uid = await verifyAuth(req);
   if (!uid) {
     return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  // Rate limit check
+  if (!(await checkRateLimit(uid, "spondProxy"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
   }
 
   const { action, email, password, token, groupId, groupIds, max, eventId, memberId, accepted } = req.body || {};
@@ -226,6 +266,11 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
   const uid = await verifyAuth(req);
   if (!uid) {
     return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  // Rate limit check
+  if (!(await checkRateLimit(uid, "voiceToEvent"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
   }
 
   if (!OPENAI_API_KEY) {
@@ -389,6 +434,11 @@ exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, asyn
   const uid = await verifyAuth(req);
   if (!uid) {
     return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  // Rate limit check
+  if (!(await checkRateLimit(uid, "photoToData"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
   }
 
   if (!OPENAI_API_KEY) {
@@ -753,6 +803,11 @@ exports.destinationTips = onRequest({ region: "us-central1", memory: "256MB" }, 
   const uid = await verifyAuth(req);
   if (!uid) {
     return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  // Rate limit check
+  if (!(await checkRateLimit(uid, "destinationTips"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
   }
 
   if (!OPENAI_API_KEY) {
@@ -1142,6 +1197,11 @@ exports.notifyNewEvent = onRequest({ region: "us-central1", memory: "256MB" }, a
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
+  // Rate limit check
+  if (!(await checkRateLimit(uid, "notifyNewEvent"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
   const { familyId, eventTitle, eventDate, eventTime, creatorName } = req.body || {};
   if (!familyId || !eventTitle) return res.status(400).json({ error: "familyId og eventTitle er påkrevd" });
 
@@ -1203,6 +1263,11 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
 
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  // Rate limit check
+  if (!(await checkRateLimit(uid, "notifyHealthItem"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
 
   const { familyId, title, date, time, location, itemType, creatorName, personName } = req.body || {};
   if (!familyId || !title) return res.status(400).json({ error: "familyId and title are required" });
