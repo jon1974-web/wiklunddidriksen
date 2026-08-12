@@ -24,9 +24,10 @@ const SCHOOL_THEME = MODULE_COLORS.school;
 
 interface SchoolSpaceScreenProps {
   navigation: any;
+  route?: { params?: { editContactId?: string } };
 }
 
-export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation }) => {
+export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const familyId = useUserStore((state) => state.familyId);
@@ -101,6 +102,33 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   useEffect(() => { loadYearData(); }, [loadYearData]);
 
   useEffect(() => {
+    if (route?.params?.editContactId && contacts.length > 0) {
+      const contact = contacts.find(c => c.id === route.params!.editContactId);
+      if (contact) {
+        setEditingContactId(contact.id);
+        setContactForm({
+          role: contact.role || 'classmate',
+          name: contact.name || '',
+          subject: contact.subject || '',
+          address: contact.address || '',
+          childName: contact.childName || '',
+          parentName: contact.parentName || '',
+          parentPhone: contact.parentPhone || '',
+          parentEmail: contact.parentEmail || '',
+          parentName2: contact.parentName2 || '',
+          parentPhone2: contact.parentPhone2 || '',
+          parentEmail2: contact.parentEmail2 || '',
+          phone: contact.childPhone || contact.phone || '',
+          email: contact.childEmail || contact.email || '',
+          notes: contact.notes || '',
+        });
+        setShowAddContactModal(true);
+        navigation.setParams({ editContactId: undefined });
+      }
+    }
+  }, [route?.params?.editContactId, contacts]);
+
+  useEffect(() => {
     if (selectedChild && years.length > 0 && !selectedYear) {
       setSelectedYear(years[0]);
     }
@@ -170,13 +198,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         familyId,
       };
       if (contactForm.role === 'classmate') {
-        rawData.childPhone = contactForm.phone;
-        rawData.childEmail = contactForm.email;
+        rawData.childPhone = contactForm.phone || null;
+        rawData.childEmail = contactForm.email || null;
       }
-      const data = Object.fromEntries(Object.entries(rawData).filter(([_, v]) => v !== '' && v != null));
       if (editingContactId) {
-        await updateSchoolContact(editingContactId, data as any);
+        await updateSchoolContact(editingContactId, rawData as any);
       } else {
+        const data = Object.fromEntries(Object.entries(rawData).filter(([_, v]) => v !== '' && v != null));
         await addSchoolContact(data as any);
       }
       setContactForm({ role: 'teacher', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
