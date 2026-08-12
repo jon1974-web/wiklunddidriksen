@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Weekly Summary — Combined Design</title>
+<title>Weekly Summary — Combined Design v2</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a1a; padding: 20px; }
@@ -17,23 +17,18 @@
   .frame-close { width: 28px; height: 28px; border-radius: 14px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #666; cursor: pointer; }
   .frame-content { padding: 12px; max-height: 750px; overflow-y: auto; }
 
-  .c-health { color: #E53935; } .c-pets { color: #8E24AA; } .c-trips { color: #42A5F5; } .c-meals { color: #0097A7; } .c-events { color: #0097A7; } .c-birthdays { color: #FB8C00; }
-  .bc-health { background: #E53935; } .bc-pets { background: #8E24AA; } .bc-trips { background: #42A5F5; } .bc-meals { background: #0097A7; } .bc-events { background: #0097A7; } .bc-birthdays { background: #FB8C00; }
+  .c-health { color: #E53935; } .c-pets { color: #8E24AA; } .c-meals { color: #0097A7; } .c-events { color: #43A047; } .c-birthdays { color: #FB8C00; }
+  .bc-health { background: #E53935; } .bc-pets { background: #8E24AA; } .bc-meals { background: #0097A7; } .bc-events { background: #43A047; } .bc-birthdays { background: #FB8C00; }
 
-  .label { font-size: 12px; color: #888; text-align: center; margin-top: 12px; margin-bottom: 4px; font-weight: 600; }
-
-  /* Stats counters */
   .stats-row { display: flex; gap: 4px; margin-bottom: 12px; }
   .stat-chip { flex: 1; background: #fff; border-radius: 10px; padding: 10px 4px 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
   .stat-num { font-size: 22px; font-weight: 800; line-height: 1; }
   .stat-label { font-size: 8px; font-weight: 600; margin-top: 3px; text-transform: uppercase; letter-spacing: 0.3px; }
 
-  /* Day card */
   .day-card { background: #fff; border-radius: 12px; margin-bottom: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
   .day-card.today { border: 2px solid #0097A7; }
-  .day-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px 6px; }
+  .day-header { display: flex; align-items: center; gap: 8px; padding: 10px 12px 8px; }
 
-  /* Calendar icon */
   .cal-icon { width: 44px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08); border: 1.5px solid #e0e0e0; }
   .cal-icon.today { border-color: #0097A7; box-shadow: 0 2px 6px rgba(0,151,167,0.2); }
   .cal-top { height: 13px; display: flex; align-items: center; justify-content: center; }
@@ -51,16 +46,14 @@
   .day-items { padding: 0 12px 8px; }
   .day-empty { font-size: 11px; color: #ccc; font-style: italic; padding: 2px 0; }
 
-  /* Item row */
   .item { display: flex; align-items: center; gap: 6px; padding: 4px 0; }
   .item-icon { width: 18px; height: 18px; border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
   .item-icon svg { width: 13px; height: 13px; }
   .item-text { flex: 1; min-width: 0; }
   .item-name { font-size: 12px; font-weight: 500; color: #333; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .item-meta { font-size: 10px; color: #999; }
-  .item-badge { font-size: 9px; font-weight: 600; padding: 1px 6px; border-radius: 4px; flex-shrink: 0; }
+  .item-time { font-size: 11px; font-weight: 600; color: #333; flex-shrink: 0; }
 
-  /* Meal compact */
   .section { margin-bottom: 10px; border-radius: 12px; overflow: hidden; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
   .section-header { display: flex; align-items: center; gap: 6px; padding: 10px 12px 4px; }
   .section-icon { width: 18px; height: 18px; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
@@ -76,13 +69,12 @@
 </head>
 <body>
 
-<h1>Weekly Summary — Combined Design</h1>
-<h2>Stats + Card per Day + Matplan</h2>
+<h1>Weekly Summary — Final Design</h1>
+<h2>Stats + Card per Day + Matplan · Teal active day</h2>
 
 <div class="options">
 
 <div>
-<p class="label">Today = green, others = gray</p>
 <div class="phone-frame">
   <div class="frame-header">
     <div>
@@ -98,11 +90,9 @@
       <div class="stat-chip"><div class="stat-num c-events">1</div><div class="stat-label c-events">Avtale</div></div>
       <div class="stat-chip"><div class="stat-num c-health">2</div><div class="stat-label c-health">Helse</div></div>
       <div class="stat-chip"><div class="stat-num c-pets">3</div><div class="stat-label c-pets">Kjæledyr</div></div>
-      <div class="stat-chip"><div class="stat-num c-trips">1</div><div class="stat-label c-trips">Reiser</div></div>
       <div class="stat-chip"><div class="stat-num" style="color:#FB8C00">1</div><div class="stat-label" style="color:#FB8C00">Bursdag</div></div>
     </div>
 
-    <!-- Day cards -->
     <!-- MAN - TODAY -->
     <div class="day-card today">
       <div class="day-header">
@@ -115,25 +105,22 @@
           <div class="item">
             <div class="item-icon" style="background:#FFF3E0"><svg viewBox="0 0 24 24" fill="none" stroke="#FB8C00" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div>
             <div class="item-text">
-              <div class="item-name">🎉 Hilde fyller 40 år</div>
+              <div class="item-name">Hilde fyller 40 år</div>
             </div>
-            <div class="item-badge" style="background:#FFF3E0;color:#FB8C00">🎂</div>
           </div>
           <div class="item">
             <div class="item-icon" style="background:#E8F5E9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2.5" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
             <div class="item-text">
               <div class="item-name">Farsund Maraton</div>
-              <div class="item-meta">09:00</div>
             </div>
-            <div class="item-badge" style="background:#E8F5E9;color:#43A047">Avtale</div>
+            <div class="item-time">09:00</div>
           </div>
           <div class="item">
             <div class="item-icon" style="background:#F3E5F5"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
             <div class="item-text">
               <div class="item-name">Luna: Vaksinasjon</div>
-              <div class="item-meta">10:30 · 📍 Dyreklinikken</div>
             </div>
-            <div class="item-badge" style="background:#F3E5F5;color:#8E24AA">Kjæledyr</div>
+            <div class="item-time">10:30</div>
           </div>
         </div>
       </div>
@@ -151,24 +138,22 @@
           <div class="item">
             <div class="item-icon" style="background:#FFEBEE"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2.5" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/></svg></div>
             <div class="item-text">
-              <div class="item-name">Time hos tannlege</div>
-              <div class="item-meta">10:00 · 📍 Tannklinikken</div>
+              <div class="item-name">Tannlege — Jon</div>
             </div>
-            <div class="item-badge" style="background:#FFEBEE;color:#E53935">Helse</div>
+            <div class="item-time">10:00 – 11:00</div>
           </div>
           <div class="item">
             <div class="item-icon" style="background:#FFEBEE"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
             <div class="item-text">
               <div class="item-name">Vaksine — Jon</div>
-              <div class="item-meta">14:00</div>
             </div>
-            <div class="item-badge" style="background:#FFEBEE;color:#E53935">Helse</div>
+            <div class="item-time">14:00</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ONS - empty -->
+    <!-- ONS -->
     <div class="day-card">
       <div class="day-header">
         <div class="cal-icon other">
@@ -193,9 +178,8 @@
             <div class="item-icon" style="background:#F3E5F5"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
             <div class="item-text">
               <div class="item-name">Luna: Veterinærbesøk</div>
-              <div class="item-meta">14:00 · 📍 Dyreklinikken</div>
             </div>
-            <div class="item-badge" style="background:#F3E5F5;color:#8E24AA">Kjæledyr</div>
+            <div class="item-time">14:00</div>
           </div>
         </div>
       </div>
@@ -214,9 +198,8 @@
             <div class="item-icon" style="background:#F3E5F5"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2.5" stroke-linecap="round"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
             <div class="item-text">
               <div class="item-name">Max: Tannrens</div>
-              <div class="item-meta">11:00</div>
             </div>
-            <div class="item-badge" style="background:#F3E5F5;color:#8E24AA">Kjæledyr</div>
+            <div class="item-time">11:00 – 12:00</div>
           </div>
         </div>
       </div>
