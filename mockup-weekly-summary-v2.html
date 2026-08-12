@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weekly Summary — More Options</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #1a1a1a; padding: 20px; }
+
+  h1 { color: #fff; text-align: center; font-size: 22px; margin-bottom: 8px; }
+  h2 { color: #aaa; text-align: center; font-size: 14px; margin-bottom: 30px; font-weight: 400; }
+
+  .options { display: flex; gap: 24px; justify-content: center; flex-wrap: wrap; }
+
+  .phone-frame {
+    width: 340px;
+    background: #f5f5f5;
+    border-radius: 32px;
+    overflow: hidden;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    flex-shrink: 0;
+  }
+
+  .frame-header { background: #fff; padding: 12px 16px 8px; border-bottom: 1px solid #eee; }
+  .frame-title { font-size: 15px; font-weight: 700; color: #333; margin-bottom: 2px; }
+  .frame-subtitle { font-size: 11px; color: #999; }
+  .frame-content { padding: 12px; max-height: 750px; overflow-y: auto; }
+
+  .cal-icon { width: 48px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .cal-icon-sm { width: 36px; }
+  .cal-top { height: 12px; display: flex; align-items: center; justify-content: center; }
+  .cal-top span { font-size: 7px; font-weight: 700; color: #fff; }
+  .cal-day { font-size: 18px; font-weight: 800; color: #333; text-align: center; line-height: 1.1; }
+  .cal-day-sm { font-size: 14px; }
+  .cal-month { font-size: 7px; font-weight: 700; color: #999; text-align: center; text-transform: uppercase; }
+
+  .section { margin-bottom: 12px; border-radius: 12px; overflow: hidden; background: #fff; }
+  .section-header { display: flex; align-items: center; gap: 6px; padding: 10px 12px 6px; }
+  .section-icon { width: 18px; height: 18px; border-radius: 5px; display: flex; align-items: center; justify-content: center; }
+  .section-icon svg { width: 14px; height: 14px; }
+  .section-title { font-size: 13px; font-weight: 700; }
+  .section-body { padding: 0 12px 10px; }
+
+  .item { display: flex; align-items: center; gap: 6px; padding: 3px 0; }
+  .item-icon { width: 16px; height: 16px; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .item-icon svg { width: 12px; height: 12px; }
+  .item-title { font-size: 12px; color: #333; flex: 1; }
+  .item-time { font-size: 11px; color: #999; font-weight: 600; }
+  .item-empty { font-size: 11px; color: #ccc; font-style: italic; }
+
+  .day-row { padding: 6px 0; border-bottom: 1px solid #f0f0f0; }
+  .day-row:last-child { border-bottom: none; }
+  .day-row.today { background: #E3F2FD; margin: 0 -12px; padding: 6px 12px; border-left: 3px solid #42A5F5; }
+  .day-header { font-size: 11px; font-weight: 700; color: #666; margin-bottom: 3px; }
+  .day-row.today .day-header { color: #42A5F5; }
+
+  .meal-row { display: flex; align-items: center; padding: 4px 0; border-bottom: 1px solid #f0f0f0; }
+  .meal-row:last-child { border-bottom: none; }
+  .meal-day { font-size: 11px; font-weight: 700; width: 30px; color: #333; }
+  .meal-content { font-size: 10px; color: #666; flex: 1; }
+
+  .bg-health { background: #FFEBEE; }
+  .bg-pets { background: #F3E5F5; }
+  .bg-trips { background: #E3F2FD; }
+  .bg-meals { background: #E0F7FA; }
+  .bg-events { background: #E8F5E9; }
+  .c-health { color: #E53935; }
+  .c-pets { color: #8E24AA; }
+  .c-trips { color: #42A5F5; }
+  .c-meals { color: #0097A7; }
+  .c-events { color: #43A047; }
+  .bc-health { background: #E53935; }
+  .bc-pets { background: #8E24AA; }
+  .bc-trips { background: #42A5F5; }
+  .bc-meals { background: #0097A7; }
+  .bc-events { background: #43A047; }
+  .bc-birthdays { background: #FB8C00; }
+
+  .label { font-size: 12px; color: #888; text-align: center; margin-top: 12px; margin-bottom: 4px; font-weight: 600; }
+
+  /* Expandable */
+  .expand-trigger { display: flex; align-items: center; gap: 4px; padding: 4px 0; cursor: pointer; }
+  .expand-trigger .arrow { font-size: 10px; color: #999; transition: transform 0.2s; }
+  .expand-content { padding-left: 16px; display: none; }
+  .expand-content.show { display: block; }
+
+  /* Trip sub */
+  .trip-sub { display: flex; align-items: center; gap: 4px; padding: 2px 0 2px 12px; }
+  .trip-sub-icon { width: 12px; height: 12px; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+  .trip-sub-icon svg { width: 10px; height: 10px; }
+  .trip-sub-text { font-size: 10px; color: #666; flex: 1; }
+  .trip-sub-detail { font-size: 9px; color: #999; }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #e0e0e0; }
+  .timeline-item { position: relative; padding: 6px 0 6px 16px; }
+  .timeline-dot { position: absolute; left: -16px; top: 10px; width: 12px; height: 12px; border-radius: 6px; border: 2px solid #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+  .timeline-time { font-size: 10px; font-weight: 700; color: #999; margin-bottom: 2px; }
+  .timeline-card { background: #fff; border-radius: 8px; padding: 8px 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.08); display: flex; align-items: center; gap: 6px; }
+  .timeline-card-title { font-size: 12px; font-weight: 500; color: #333; flex: 1; }
+  .timeline-card-badge { font-size: 9px; font-weight: 600; padding: 2px 6px; border-radius: 4px; }
+
+  /* Tiles */
+  .tile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .tile { border-radius: 10px; padding: 10px; display: flex; flex-direction: column; gap: 4px; }
+  .tile-header { display: flex; align-items: center; gap: 4px; }
+  .tile-icon { width: 14px; height: 14px; border-radius: 3px; display: flex; align-items: center; justify-content: center; }
+  .tile-icon svg { width: 10px; height: 10px; }
+  .tile-title { font-size: 10px; font-weight: 700; }
+  .tile-items { display: flex; flex-direction: column; gap: 2px; }
+  .tile-item { font-size: 10px; color: #333; }
+  .tile-empty { font-size: 9px; color: #ccc; font-style: italic; }
+  .tile-count { font-size: 20px; font-weight: 800; margin-top: 2px; }
+
+  .day-strip { display: flex; gap: 4px; margin-bottom: 8px; overflow-x: auto; padding-bottom: 4px; }
+  .day-chip { flex-shrink: 0; padding: 6px 10px; border-radius: 8px; text-align: center; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.08); min-width: 44px; }
+  .day-chip.active { background: #43A047; }
+  .day-chip .chip-day { font-size: 9px; font-weight: 700; color: #999; }
+  .day-chip.active .chip-day { color: #fff; }
+  .day-chip .chip-num { font-size: 16px; font-weight: 800; color: #333; }
+  .day-chip.active .chip-num { color: #fff; }
+  .day-chip .chip-dot { width: 4px; height: 4px; border-radius: 2px; margin: 2px auto 0; }
+</style>
+</head>
+<body>
+
+<h1>Weekly Summary — More Options</h1>
+<h2>Unified avtaler, tiles, and timeline views</h2>
+
+<div class="options">
+
+<!-- OPTION E: Unified Avtaler + Expandable Trips -->
+<div>
+<p class="label">Option E: Unified Avtaler</p>
+<div class="phone-frame">
+  <div class="frame-header">
+    <div class="frame-title">Din uke</div>
+    <div class="frame-subtitle">Uke 33 · 12. august – 18. august 2026</div>
+  </div>
+  <div class="frame-content">
+
+    <!-- Day strip -->
+    <div class="day-strip">
+      <div class="day-chip active"><div class="chip-day">MAN</div><div class="chip-num">12</div><div class="chip-dot" style="background:#43A047"></div></div>
+      <div class="day-chip"><div class="chip-day">TIR</div><div class="chip-num">13</div><div class="chip-dot" style="background:#E53935"></div></div>
+      <div class="day-chip"><div class="chip-day">ONS</div><div class="chip-num">14</div></div>
+      <div class="day-chip"><div class="chip-day">TOR</div><div class="chip-num">15</div><div class="chip-dot" style="background:#8E24AA"></div></div>
+      <div class="day-chip"><div class="chip-day">FRE</div><div class="chip-num">16</div><div class="chip-dot" style="background:#8E24AA"></div></div>
+      <div class="day-chip"><div class="chip-day">LØR</div><div class="chip-num">17</div></div>
+      <div class="day-chip"><div class="chip-day">SØN</div><div class="chip-num">18</div></div>
+    </div>
+
+    <!-- Unified Avtaler section -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon bc-events"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <span class="section-title c-events">Avtaler hele uken</span>
+      </div>
+      <div class="section-body">
+
+        <!-- MAN -->
+        <div class="day-row today">
+          <div class="day-header" style="color:#42A5F5">MAN 12. august</div>
+          <div class="item"><div class="item-icon bc-events"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg></div><span class="item-title">Farsund Maraton</span><span class="item-time">09:00</span></div>
+          <div class="item"><div class="item-icon bc-pets"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div><span class="item-title">Luna: Vaksinasjon</span><span class="item-time">10:30</span></div>
+        </div>
+
+        <!-- TIR -->
+        <div class="day-row">
+          <div class="day-header">TIR 13. august</div>
+          <div class="item"><div class="item-icon bc-health"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/></svg></div><span class="item-title">Time hos tannlege</span><span class="item-time">10:00</span></div>
+          <div class="item"><div class="item-icon bc-health"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div><span class="item-title">Vaksine — Jon</span><span class="item-time">14:00</span></div>
+        </div>
+
+        <!-- ONS -->
+        <div class="day-row">
+          <div class="day-header">ONS 14. august</div>
+          <span class="item-empty">Ingen avtaler</span>
+        </div>
+
+        <!-- TOR -->
+        <div class="day-row">
+          <div class="day-header">TOR 15. august</div>
+          <div class="item"><div class="item-icon bc-pets"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div><span class="item-title">Luna: Veterinærbesøk</span><span class="item-time">14:00</span></div>
+        </div>
+
+        <!-- FRE -->
+        <div class="day-row">
+          <div class="day-header">FRE 16. august</div>
+          <div class="item"><div class="item-icon bc-pets"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div><span class="item-title">Max: Tannrens</span><span class="item-time">11:00</span></div>
+        </div>
+
+        <div class="day-row"><div class="day-header">LØR 17. august</div><span class="item-empty">—</span></div>
+        <div class="day-row"><div class="day-header">SØN 18. august</div><span class="item-empty">—</span></div>
+
+        <!-- Trips - expandable -->
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 2px solid #E3F2FD;">
+          <div class="expand-trigger" onclick="this.nextElementSibling.classList.toggle('show'); this.querySelector('.arrow').textContent = this.nextElementSibling.classList.contains('show') ? '▼' : '▶'">
+            <div class="item-icon bc-trips"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div>
+            <span class="item-title" style="font-weight:600">✈️ Sommerferie Spania</span>
+            <span class="item-time">28. MAR – 04. APR</span>
+            <span class="arrow" style="font-size:10px; color:#999">▶</span>
+          </div>
+          <div class="expand-content">
+            <div class="trip-sub"><div class="trip-sub-icon bc-trips"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><span class="trip-sub-text">Hotel Continental</span><span class="trip-sub-detail">28. MAR – 04. APR</span></div>
+            <div class="trip-sub"><div class="trip-sub-icon bc-trips"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/></svg></div><span class="trip-sub-text">SAS flight</span><span class="trip-sub-detail">28. MAR · 07:00</span></div>
+            <div class="trip-sub"><div class="trip-sub-icon bc-trips"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><span class="trip-sub-text">Rest. La Plaza</span><span class="trip-sub-detail">29. MAR · 19:00</span></div>
+            <div class="trip-sub"><div class="trip-sub-icon bc-trips"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg></div><span class="trip-sub-text">Strandtur</span><span class="trip-sub-detail">30. MAR</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Matplan -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon bc-meals"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/></svg></div>
+        <span class="section-title c-meals">Matplan</span>
+      </div>
+      <div class="section-body">
+        <div class="meal-row"><span class="meal-day">MAN</span><span class="meal-content">🥞 Pannekaker · 🥪 Salat · 🍝 Pasta</span></div>
+        <div class="meal-row"><span class="meal-day">TIR</span><span class="meal-content">🥞 Havregrøt · 🥪 Wrap · 🍛 Karri</span></div>
+        <div class="meal-row"><span class="meal-day">ONS</span><span class="meal-content">🥞 Smoothie · 🥪 Brødskiver · —</span></div>
+        <div class="meal-row"><span class="meal-day">TOR</span><span class="meal-content">— · — · 🍕 Pizza</span></div>
+        <div class="meal-row"><span class="meal-day">FRE</span><span class="meal-content">— · — · 🍔 Burgere</span></div>
+        <div class="meal-row"><span class="meal-day">LØR</span><span class="meal-content">— · — · 🍣 Sushi</span></div>
+        <div class="meal-row"><span class="meal-day">SØN</span><span class="meal-content">— · — · 🍲 Gryte</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- OPTION F: Tile Layout -->
+<div>
+<p class="label">Option F: Tile Grid</p>
+<div class="phone-frame">
+  <div class="frame-header">
+    <div class="frame-title">Din uke</div>
+    <div class="frame-subtitle">Uke 33 · 12. august – 18. august 2026</div>
+  </div>
+  <div class="frame-content">
+
+    <!-- Day strip -->
+    <div class="day-strip">
+      <div class="day-chip active"><div class="chip-day">MAN</div><div class="chip-num">12</div></div>
+      <div class="day-chip"><div class="chip-day">TIR</div><div class="chip-num">13</div></div>
+      <div class="day-chip"><div class="chip-day">ONS</div><div class="chip-num">14</div></div>
+      <div class="day-chip"><div class="chip-day">TOR</div><div class="chip-num">15</div></div>
+      <div class="day-chip"><div class="chip-day">FRE</div><div class="chip-num">16</div></div>
+      <div class="day-chip"><div class="chip-day">LØR</div><div class="chip-num">17</div></div>
+      <div class="day-chip"><div class="chip-day">SØN</div><div class="chip-num">18</div></div>
+    </div>
+
+    <div class="tile-grid">
+      <!-- Events tile -->
+      <div class="tile bg-events">
+        <div class="tile-header">
+          <div class="tile-icon bc-events"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div>
+          <span class="tile-title c-events">Avtaler</span>
+        </div>
+        <div class="tile-count c-events">3</div>
+        <div class="tile-items">
+          <div class="tile-item">🏃 Farsund Maraton</div>
+          <div class="tile-item">⚽ Fotballtrening</div>
+          <div class="tile-item">🎂 Emmas bursdag</div>
+        </div>
+      </div>
+
+      <!-- Health tile -->
+      <div class="tile bg-health">
+        <div class="tile-header">
+          <div class="tile-icon bc-health"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/></svg></div>
+          <span class="tile-title c-health">Helse</span>
+        </div>
+        <div class="tile-count c-health">2</div>
+        <div class="tile-items">
+          <div class="tile-item">🩺 Tannlege — TIR 10:00</div>
+          <div class="tile-item">💉 Vaksine Jon — ONS</div>
+        </div>
+      </div>
+
+      <!-- Pets tile -->
+      <div class="tile bg-pets">
+        <div class="tile-header">
+          <div class="tile-icon bc-pets"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+          <span class="tile-title c-pets">Kjæledyr</span>
+        </div>
+        <div class="tile-count c-pets">2</div>
+        <div class="tile-items">
+          <div class="tile-item">🏥 Luna: Vaksinasjon</div>
+          <div class="tile-item">🦷 Max: Tannrens</div>
+        </div>
+      </div>
+
+      <!-- Trips tile -->
+      <div class="tile bg-trips">
+        <div class="tile-header">
+          <div class="tile-icon bc-trips"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div>
+          <span class="tile-title c-trips">Reiser</span>
+        </div>
+        <div class="tile-count c-trips">1</div>
+        <div class="tile-items">
+          <div class="tile-item">✈️ Sommerferie Spania</div>
+          <div class="tile-item" style="font-size:9px; color:#999">28. MAR – 04. APR</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Matplan full width -->
+    <div class="section" style="margin-top: 12px;">
+      <div class="section-header">
+        <div class="section-icon bc-meals"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/></svg></div>
+        <span class="section-title c-meals">Matplan</span>
+        <span style="margin-left:auto; font-size:11px; color:#0097A7; font-weight:600">14/21 planlagt</span>
+      </div>
+      <div class="section-body">
+        <div class="meal-row"><span class="meal-day">MAN</span><span class="meal-content">🥞 Pannekaker · 🥪 Salat · 🍝 Pasta</span></div>
+        <div class="meal-row"><span class="meal-day">TIR</span><span class="meal-content">🥞 Havregrøt · 🥪 Wrap · 🍛 Karri</span></div>
+        <div class="meal-row"><span class="meal-day">ONS</span><span class="meal-content">🥞 Smoothie · 🥪 Brødskiver · —</span></div>
+        <div class="meal-row"><span class="meal-day">TOR</span><span class="meal-content">— · — · 🍕 Pizza</span></div>
+        <div class="meal-row"><span class="meal-day">FRE</span><span class="meal-content">— · — · 🍔 Burgere</span></div>
+        <div class="meal-row"><span class="meal-day">LØR</span><span class="meal-content">— · — · 🍣 Sushi</span></div>
+        <div class="meal-row"><span class="meal-day">SØN</span><span class="meal-content">— · — · 🍲 Gryte</span></div>
+      </div>
+    </div>
+
+    <!-- Today detail -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon bc-events"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <span class="section-title c-events">I dag — MAN 12. august</span>
+      </div>
+      <div class="section-body">
+        <div class="item"><div class="item-icon bc-events"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg></div><span class="item-title">Farsund Maraton</span><span class="item-time">09:00</span></div>
+        <div class="item"><div class="item-icon bc-pets"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div><span class="item-title">Luna: Vaksinasjon</span><span class="item-time">10:30</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+<!-- OPTION G: Timeline View -->
+<div>
+<p class="label">Option G: Timeline</p>
+<div class="phone-frame">
+  <div class="frame-header">
+    <div class="frame-title">Din uke</div>
+    <div class="frame-subtitle">Uke 33 · 12. august – 18. august 2026</div>
+  </div>
+  <div class="frame-content">
+
+    <!-- Day strip -->
+    <div class="day-strip">
+      <div class="day-chip active"><div class="chip-day">MAN</div><div class="chip-num">12</div></div>
+      <div class="day-chip"><div class="chip-day">TIR</div><div class="chip-num">13</div></div>
+      <div class="day-chip"><div class="chip-day">ONS</div><div class="chip-num">14</div></div>
+      <div class="day-chip"><div class="chip-day">TOR</div><div class="chip-num">15</div></div>
+      <div class="day-chip"><div class="chip-day">FRE</div><div class="chip-num">16</div></div>
+      <div class="day-chip"><div class="chip-day">LØR</div><div class="chip-num">17</div></div>
+      <div class="day-chip"><div class="chip-day">SØN</div><div class="chip-num">18</div></div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon bc-events"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <span class="section-title c-events">Tidslinje — denne uken</span>
+      </div>
+      <div class="section-body">
+        <div class="timeline">
+
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#43A047"></div>
+            <div class="timeline-time">MAN 12 · 09:00</div>
+            <div class="timeline-card">
+              <div class="item-icon bc-events"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/></svg></div>
+              <span class="timeline-card-title">Farsund Maraton</span>
+              <span class="timeline-card-badge" style="background:#E8F5E9; color:#43A047">Avtale</span>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#8E24AA"></div>
+            <div class="timeline-time">MAN 12 · 10:30</div>
+            <div class="timeline-card">
+              <div class="item-icon bc-pets"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+              <span class="timeline-card-title">Luna: Vaksinasjon</span>
+              <span class="timeline-card-badge" style="background:#F3E5F5; color:#8E24AA">Kjæledyr</span>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#E53935"></div>
+            <div class="timeline-time">TIR 13 · 10:00</div>
+            <div class="timeline-card">
+              <div class="item-icon bc-health"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/></svg></div>
+              <span class="timeline-card-title">Time hos tannlege</span>
+              <span class="timeline-card-badge" style="background:#FFEBEE; color:#E53935">Helse</span>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#E53935"></div>
+            <div class="timeline-time">TIR 13 · 14:00</div>
+            <div class="timeline-card">
+              <div class="item-icon bc-health"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+              <span class="timeline-card-title">Vaksine — Jon</span>
+              <span class="timeline-card-badge" style="background:#FFEBEE; color:#E53935">Helse</span>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#8E24AA"></div>
+            <div class="timeline-time">TOR 15 · 14:00</div>
+            <div class="timeline-card">
+              <div class="item-icon bc-pets"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+              <span class="timeline-card-title">Luna: Veterinærbesøk</span>
+              <span class="timeline-card-badge" style="background:#F3E5F5; color:#8E24AA">Kjæledyr</span>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#8E24AA"></div>
+            <div class="timeline-time">FRE 16 · 11:00</div>
+            <div class="timeline-card">
+              <div class="item-icon bc-pets"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg></div>
+              <span class="timeline-card-title">Max: Tannrens</span>
+              <span class="timeline-card-badge" style="background:#F3E5F5; color:#8E24AA">Kjæledyr</span>
+            </div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-dot" style="background:#42A5F5"></div>
+            <div class="timeline-time">28. MAR – 04. APR</div>
+            <div class="timeline-card">
+              <div class="item-icon bc-trips"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div>
+              <span class="timeline-card-title">✈️ Sommerferie Spania</span>
+              <span class="timeline-card-badge" style="background:#E3F2FD; color:#42A5F5">Reise</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Matplan -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon bc-meals"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/><line x1="7" y1="2" x2="7" y2="22"/></svg></div>
+        <span class="section-title c-meals">Matplan</span>
+      </div>
+      <div class="section-body">
+        <div class="meal-row"><span class="meal-day">MAN</span><span class="meal-content">🥞 Pannekaker · 🥪 Salat · 🍝 Pasta</span></div>
+        <div class="meal-row"><span class="meal-day">TIR</span><span class="meal-content">🥞 Havregrøt · 🥪 Wrap · 🍛 Karri</span></div>
+        <div class="meal-row"><span class="meal-day">ONS</span><span class="meal-content">🥞 Smoothie · 🥪 Brødskiver · —</span></div>
+        <div class="meal-row"><span class="meal-day">TOR</span><span class="meal-content">— · — · 🍕 Pizza</span></div>
+        <div class="meal-row"><span class="meal-day">FRE</span><span class="meal-content">— · — · 🍔 Burgere</span></div>
+        <div class="meal-row"><span class="meal-day">LØR</span><span class="meal-content">— · — · 🍣 Sushi</span></div>
+        <div class="meal-row"><span class="meal-day">SØN</span><span class="meal-content">— · — · 🍲 Gryte</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+
+</div>
+
+</body>
+</html>
