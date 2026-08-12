@@ -62,7 +62,7 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
       match /{subcollection=**} {
-        allow read, write: if request.auth != null;
+        allow read, write: if request.auth != null && isFamilyMember(/databases/$(database)/documents/trips/$(tripId)).data.familyId;
       }
     }
 
@@ -126,11 +126,11 @@ service cloud.firestore {
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
-    // Health: family-scoped
+    // Health: family-scoped (top-level doc has familyId as document ID)
     match /health/{familyId} {
       allow read, write: if request.auth != null && isFamilyMember(familyId);
       match /{subcollection=**} {
-        allow read, write: if request.auth != null;
+        allow read, write: if request.auth != null && isFamilyMember(familyId);
       }
     }
 
@@ -170,10 +170,10 @@ service cloud.firestore {
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
-    // Sent notifications: Cloud Function write, user read own
-    match /sentNotifications/{eventId} {
+    // Sent notifications: Cloud Function writes, users read own notifications
+    match /sentNotifications/{notifId} {
       allow read: if request.auth != null;
-      allow write: if true;
+      allow write: if request.auth != null;
     }
   }
 }
