@@ -284,7 +284,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                             </View>
                           ) : (
                             <View style={[styles.itemIcon]}>
-                              <AppIcon name={item.icon as any} size={13} color={itemColor} />
+                              <AppIcon name={item.icon as any} size={16} color={itemColor} />
                             </View>
                           )}
                           <Text style={[styles.itemName, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
@@ -376,10 +376,10 @@ const styles = StyleSheet.create({
   dayCardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 10 },
   dayCardItems: { flex: 1, gap: 4 },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  itemIcon: { width: 20, height: 20, alignItems: 'center', justifyContent: 'center' },
-  itemLogo: { width: 20, height: 20, borderRadius: 5 },
-  itemName: { fontSize: 12, fontWeight: '500', flex: 1 },
-  itemTime: { fontSize: 11, fontWeight: '600', color: '#999' },
+  itemIcon: { width: 24, height: 24, alignItems: 'center', justifyContent: 'center' },
+  itemLogo: { width: 24, height: 24, borderRadius: 6 },
+  itemName: { fontSize: 13, fontWeight: '500', flex: 1 },
+  itemTime: { fontSize: 12, fontWeight: '600', color: '#999' },
   dayEmpty: { fontSize: 11, fontStyle: 'italic' },
   section: { borderRadius: 12, marginBottom: 10, overflow: 'hidden' },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 10, paddingBottom: 4 },
