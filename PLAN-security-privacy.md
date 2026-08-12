@@ -1,40 +1,42 @@
 # Security & Privacy Plan
 
-## Current Assessment: 3.5/10
+## Current Assessment: 6.4/10
 
 ### Strengths
 - Firebase Auth with password hashing
-- Family-scoped Firestore rules for top-level collections
+- Family-scoped Firestore rules for all collections (including subcollections)
 - Server-side authorization in Cloud Functions
 - Input sanitization on client side
 - TLS encryption in transit (Google-managed)
 - HTTPS enforced by Firebase Hosting
+- AES-256-CBC encryption for Spond passwords
+- Per-user rate limiting on all 9 user-facing Cloud Functions
+- Security headers (X-Frame-Options, CSP, etc.)
+- Audit logging for family management operations
+- Path-based storage rules with size limits
+- Comprehensive documentation (8 documents)
 
-### Critical Gaps to Fix
+### Remaining Gaps
 
 | Gap | Severity | ISO 27001 | GDPR |
 |-----|----------|-----------|------|
-| Storage rules wide-open | CRITICAL | A.9.4.1 | Art. 25 |
-| Trip subcollection rules allow any user | CRITICAL | A.9.4.1 | Art. 5(1)(f) |
-| Health subcollection rules allow any user | CRITICAL | A.9.4.1 | Art. 9 |
-| Spond password stored unencrypted | HIGH | A.9.2.4 | Art. 32 |
-| OpenAI API key in plaintext .env | HIGH | A.9.2.4 | — |
+| Spond password key rotation needed | HIGH | A.9.2.4 | — |
 | No MFA/2FA | HIGH | A.9.4.2 | Art. 32 |
-| No rate limiting | HIGH | A.12.1.4 | Art. 32 |
 | No backup/recovery | HIGH | A.12.3.1 | Art. 5(1)(e) |
-| No GDPR features | HIGH | — | Art. 6, 7, 12-20 |
-| No audit logging | MEDIUM | A.12.4.1 | — |
-| No security headers | MEDIUM | — | — |
-| No account deletion | MEDIUM | — | Art. 17 |
+| No GDPR features (export, deletion) | HIGH | — | Art. 15, 17, 20 |
+| No health data encryption | MEDIUM | A.9.4.1 | Art. 9 |
+| No DPIA for health data | MEDIUM | — | Art. 35 |
 
 ### Remediation Plan
 
-**Phase 1 (Immediate):**
-1. Fix storage rules
-2. Fix subcollection rules
-3. Encrypt Spond password
-4. Rotate OpenAI API key
-5. Add rate limiting
+**Phase 1 (COMPLETED):**
+1. ✅ Fix storage rules
+2. ✅ Fix subcollection rules
+3. ✅ Encrypt Spond password
+4. ✅ Add rate limiting
+5. ✅ Add security headers
+6. ✅ Add audit logging
+7. ✅ Documentation created
 
 **Phase 2 (This Sprint):**
 1. Add MFA support
@@ -62,6 +64,7 @@
 | Art. 32 - Security of processing | PARTIAL |
 | Art. 35 - DPIA | NOT MET |
 
-## ISO 27001 Readiness: ~30%
-- Strong on authentication and top-level data isolation
-- Weak on subcollection security, encryption, backups, audit logging
+## ISO 27001 Readiness: ~55%
+- Strong on authentication, data isolation, and rate limiting
+- Good progress on encryption and audit logging
+- Still need MFA, backups, and health data encryption
