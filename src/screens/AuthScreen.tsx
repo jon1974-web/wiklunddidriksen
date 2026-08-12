@@ -237,12 +237,12 @@ export const AuthScreen: React.FC = () => {
         {t('auth.selectLanguage')}
       </Text>
 
-      <View style={styles.languageGrid}>
+      <View style={styles.languageRow}>
         {LANGUAGES.filter(l => l.hasTranslation).map((lang) => (
           <TouchableOpacity
             key={lang.code}
             style={[
-              styles.languageOption,
+              styles.langChip,
               {
                 backgroundColor: selectedLanguage === lang.code ? TEAL : colors.surface,
                 borderColor: selectedLanguage === lang.code ? TEAL : colors.border,
@@ -250,9 +250,9 @@ export const AuthScreen: React.FC = () => {
             ]}
             onPress={() => setSelectedLanguage(lang.code)}
           >
-            <Text style={styles.languageFlag}>{lang.flag}</Text>
-            <Text style={[styles.languageLabel, { color: selectedLanguage === lang.code ? '#fff' : colors.text }]}>
-              {lang.englishName}
+            <Text style={styles.langFlag}>{lang.flag}</Text>
+            <Text style={[styles.langCode, { color: selectedLanguage === lang.code ? '#fff' : colors.text }]}>
+              {lang.label}
             </Text>
           </TouchableOpacity>
         ))}
@@ -390,26 +390,27 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 13,
   },
-  languageGrid: {
+  languageRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 24,
-  },
-  languageOption: {
-    width: '47%',
-    padding: 12,
-    borderRadius: 10,
-    borderWidth: 1.5,
-    alignItems: 'center',
-    flexDirection: 'row',
+    justifyContent: 'center',
     gap: 8,
+    marginBottom: 24,
+    flexWrap: 'wrap',
   },
-  languageFlag: {
-    fontSize: 20,
+  langChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 20,
+    borderWidth: 1.5,
   },
-  languageLabel: {
-    fontSize: 14,
-    fontWeight: '600',
+  langFlag: {
+    fontSize: 16,
+  },
+  langCode: {
+    fontSize: 12,
+    fontWeight: '700',
   },
 });
