@@ -33,6 +33,10 @@
         "destination": "/firebase-messaging-sw.js"
       },
       {
+        "source": "/docs/**",
+        "destination": "/docs"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
