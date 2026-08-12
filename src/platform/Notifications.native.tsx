@@ -44,7 +44,7 @@ export const requestNotificationPermission = async (): Promise<boolean> => {
 
   if (Platform.OS === 'android') {
     await Notifications.setNotificationChannelAsync('events', {
-      name: 'Arrangementer',
+      name: 'Avtaler',
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: '#4CAF50',

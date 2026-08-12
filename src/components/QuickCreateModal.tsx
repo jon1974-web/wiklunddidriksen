@@ -35,7 +35,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
               </View>
               <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
 
-                {/* Arrangementer */}
+                {/* Avtaler */}
                 <View style={styles.section}>
                   <View style={styles.sectionHeader}>
                     <AppIcon name="calendar" size={18} color={colors.accent} />

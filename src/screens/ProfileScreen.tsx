@@ -431,7 +431,7 @@ export const ProfileScreen: React.FC = () => {
     if (!user) return;
     crossAlert(
       'Koble fra kalender',
-      'Arrangementer vil ikke lenger synkroniseres med kalenderen din.',
+      'Avtaler vil ikke lenger synkroniseres med kalenderen din.',
       [
         { text: 'Avbryt', style: 'cancel' },
         {

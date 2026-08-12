@@ -459,7 +459,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             );
           })()}
 
-          {/* Arrangementer section */}
+          {/* Avtaler section */}
             <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
                 <AppIcon name="calendar" size={18} color={colors.accent} />

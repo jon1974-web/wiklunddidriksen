@@ -55,7 +55,7 @@ const TAB_ICONS: Record<string, string> = {
 };
 
 const TAB_LABELS: Record<string, string> = {
-  Events: 'Arrangementer',
+  Events: 'Avtaler',
   Chat: 'Chat',
   Trips: 'Våre steder',
   Profile: 'Profil',
