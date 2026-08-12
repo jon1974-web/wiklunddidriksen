@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
@@ -11,7 +11,6 @@ import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../constants/languages';
 import { setLanguage } from '../i18n';
-import i18n from '../i18n';
 
 const TEAL = '#0097A7';
 
@@ -36,12 +35,13 @@ export const AuthScreen: React.FC = () => {
   const [step, setStep] = useState<Step>(hasInvite ? 'language' : 'account');
   const [selectedLanguage, setSelectedLanguage] = useState('nb');
   const [familyName, setFamilyName] = useState('');
+  const [authUser, setAuthUser] = useState<User | null>(null);
 
   useEffect(() => {
     if (hasInvite) setStep('language');
   }, [hasInvite]);
 
-  const handleJoin = async () => {
+  const handleJoin = async (user: User) => {
     if (!pendingInviteCode) return;
     try {
       const joinResult = await joinFamilyByInviteCode(pendingInviteCode);
@@ -66,6 +66,7 @@ export const AuthScreen: React.FC = () => {
         const result = await signInWithEmailAndPassword(auth, email, password);
         const userProfile = await getUserProfile(result.user.uid);
         const displayName = userProfile?.displayName || result.user.displayName || 'User';
+        setAuthUser(result.user);
         setUser({
           uid: result.user.uid,
           email: result.user.email || '',
@@ -74,7 +75,7 @@ export const AuthScreen: React.FC = () => {
         });
 
         if (hasInvite) {
-          await handleJoin();
+          await handleJoin(result.user);
         }
       } else {
         try {
@@ -88,17 +89,11 @@ export const AuthScreen: React.FC = () => {
             displayName: name,
           });
 
+          setAuthUser(result.user);
+
           if (hasInvite) {
-            await handleJoin();
-          }
-
-          setUser({
-            uid,
-            email: userEmail,
-            displayName: name,
-          });
-
-          if (!hasInvite) {
+            await handleJoin(result.user);
+          } else {
             setStep('language');
           }
         } catch (registerError: any) {
@@ -106,6 +101,7 @@ export const AuthScreen: React.FC = () => {
             const result = await signInWithEmailAndPassword(auth, email, password);
             const userProfile = await getUserProfile(result.user.uid);
             const displayName = userProfile?.displayName || result.user.displayName || name;
+            setAuthUser(result.user);
             setUser({
               uid: result.user.uid,
               email: result.user.email || '',
@@ -114,7 +110,7 @@ export const AuthScreen: React.FC = () => {
             });
 
             if (hasInvite) {
-              await handleJoin();
+              await handleJoin(result.user);
             }
           } else {
             throw registerError;
@@ -128,18 +124,10 @@ export const AuthScreen: React.FC = () => {
     }
   };
 
-  const handleLanguageSelect = async () => {
+  const handleLanguageSelect = () => {
     setLanguage(selectedLanguage);
-    if (hasInvite) {
-      // Auto-join family from invite link
-      setLoading(true);
-      try {
-        await handleJoin();
-      } catch {
-        // Error already handled in handleJoin
-      } finally {
-        setLoading(false);
-      }
+    if (hasInvite && authUser) {
+      handleJoin(authUser);
     } else {
       setStep('family');
     }
@@ -154,6 +142,15 @@ export const AuthScreen: React.FC = () => {
     try {
       const result = await createFamily(familyName.trim());
       setFamily(result.familyId, familyName.trim(), 'owner');
+      if (authUser) {
+        const userProfile = await getUserProfile(authUser.uid);
+        setUser({
+          uid: authUser.uid,
+          email: authUser.email || '',
+          displayName: userProfile?.displayName || authUser.displayName || name,
+          avatarUrl: userProfile?.avatarUrl || undefined,
+        });
+      }
     } catch (error: any) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
@@ -262,7 +259,7 @@ export const AuthScreen: React.FC = () => {
       </View>
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: TEAL }]}
+        style={[styles.button, { backgroundColor: TEAL, opacity: loading ? 0.6 : 1 }]}
         onPress={handleLanguageSelect}
         disabled={loading}
       >
@@ -302,7 +299,6 @@ export const AuthScreen: React.FC = () => {
         <Image source={require('../../assets/icon.png')} style={{ width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }} />
         <Text style={[styles.title, { color: TEAL }]}>{t('auth.title')}</Text>
 
-        {/* Progress indicator */}
         {step !== 'account' && (
           <View style={styles.progressRow}>
             {['account', 'language', 'family'].map((s, i) => (
