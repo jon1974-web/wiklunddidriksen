@@ -84,6 +84,24 @@ match /items/{itemId} {
   ```
   If keys are missing, add them to the affected files with appropriate translations before committing.
 
+### Documentation Updates (CRITICAL)
+When adding new features, making security changes, or any work that affects user-facing functionality, **ALWAYS update the relevant documentation in ALL languages**:
+
+**User-facing documents (must be in all 5 languages):**
+- `docs/users/user-guide.md` — End-user guide
+- `public/docs/privacy-{lang}.html` — Privacy policy (nb, en, sv, da, fi)
+- `public/docs/terms-{lang}.html` — Terms of service (nb, en, sv, da, fi)
+- Help center content in the app (via i18n translation keys)
+
+**Technical documents (English only is fine):**
+- `docs/systems/architecture.md` — System architecture
+- `docs/operations/deployment.md` — Deployment procedures
+- `docs/operations/monitoring.md` — Monitoring guide
+- `docs/PLAN-admin-ui.md` — Admin UI plan
+- `PLAN-security-privacy.md` — Security assessment
+
+**Rule of thumb:** If a document is read by end users, it must be in all 5 languages. If it's read by developers/admins, English is sufficient.
+
 ### Help Center (Info Modal)
 When adding help to a feature, follow this pattern:
 
