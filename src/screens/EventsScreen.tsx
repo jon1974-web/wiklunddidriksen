@@ -829,7 +829,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             <Text style={[styles.toggleText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>{t('events.calendarView')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.toggleButton, { backgroundColor: TRIP_COLOR }]}
+            style={[styles.minUkeButton, { borderColor: MODULE_COLORS.mealplan }]}
             onPress={() => {
               // Re-fetch mealPlan and recipes
               if (familyId) {
@@ -856,7 +856,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               setShowWeeklySummary(true);
             }}
           >
-            <Text style={[styles.toggleText, { color: '#fff' }]}>{t('events.weeklySummary')}</Text>
+            <AppIcon name="calendar" size={16} color={MODULE_COLORS.mealplan} />
+            <Text style={[styles.minUkeText, { color: MODULE_COLORS.mealplan }]}>{t('events.weeklySummary')}</Text>
           </TouchableOpacity>
         </View>
         {spondGroupLogos && Object.keys(spondGroupLogos).length > 0 && (
@@ -1003,6 +1004,19 @@ const styles = StyleSheet.create({
   },
   toggleText: {
     fontSize: 14,
+  },
+  minUkeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
+    borderWidth: 1.5,
+  },
+  minUkeText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
   filterIcon: {
     width: 28,
