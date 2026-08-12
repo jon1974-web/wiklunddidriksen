@@ -2,7 +2,7 @@ import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
 import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication } from '../types';
 import { useTheme } from '../theme/ThemeContext';
-import { getWeekNumber, formatTime, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
+import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
@@ -29,13 +29,12 @@ interface WeeklySummaryProps {
   petMedications?: PetMedication[];
 }
 
-const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
-const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+const MONTHS = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
 
 const getWeekRange = (date: Date): { start: Date; end: Date } => {
   const d = new Date(date);
   const day = d.getDay();
-  const diff = day === 0 ? -6 : 1 - day; // Monday = start
+  const diff = day === 0 ? -6 : 1 - day;
   const start = new Date(d);
   start.setDate(d.getDate() + diff);
   start.setHours(0, 0, 0, 0);
@@ -49,16 +48,48 @@ const toLocalDateStr = (date: Date): string => {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 };
 
-interface DayItem {
-  type: 'event' | 'trip' | 'spond' | 'meal';
-  title: string;
-  timeRange: string;
-  icon: string;
-  groupName?: string;
-  logoUrl?: string;
-}
+const DAY_NAMES_NB = ['MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR', 'SØN'];
+const DAY_NAMES_KEY = ['weekdays.monday', 'weekdays.tuesday', 'weekdays.wednesday', 'weekdays.thursday', 'weekdays.friday', 'weekdays.saturday', 'weekdays.sunday'];
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], sectionSettings = {}, groupLogos = {}, tripSubcollections = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [] }) => {
+const ClockIcon = ({ size = 12, color = '#999' }: { size?: number; color?: string }) => (
+  <View style={{ width: size, height: size, borderRadius: size / 2, borderWidth: 1.5, borderColor: color, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ position: 'absolute', width: 1.5, height: size * 0.3, backgroundColor: color, top: 2 }} />
+    <View style={{ position: 'absolute', width: size * 0.25, height: 1.5, backgroundColor: color, left: size * 0.35, top: size * 0.42 }} />
+  </View>
+);
+
+const CalendarIcon = ({ dayName, dayNum, monthStr, isToday, accentColor }: { dayName: string; dayNum: number; monthStr: string; isToday: boolean; accentColor: string }) => (
+  <View style={[calStyles.icon, isToday && { borderColor: accentColor, shadowColor: accentColor, shadowOpacity: 0.2, shadowRadius: 6, shadowOffset: { width: 0, height: 2 }, elevation: 4 }]}>
+    <View style={[calStyles.top, isToday ? { backgroundColor: accentColor } : { backgroundColor: '#f0f0f0' }]}>
+      <Text style={[calStyles.topText, isToday ? { color: '#fff' } : { color: '#999' }]}>{dayName}</Text>
+    </View>
+    <Text style={[calStyles.day, isToday ? { color: accentColor } : { color: '#999' }]}>{dayNum}</Text>
+    <Text style={[calStyles.month, isToday ? {} : { color: '#bbb' }]}>{monthStr}</Text>
+  </View>
+);
+
+const calStyles = StyleSheet.create({
+  icon: { width: 48, borderRadius: 8, overflow: 'hidden', backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#e0e0e0' },
+  top: { height: 14, justifyContent: 'center', alignItems: 'center' },
+  topText: { fontSize: 8, fontWeight: '800' },
+  day: { fontSize: 18, fontWeight: '800', textAlign: 'center', lineHeight: 20, marginTop: 1 },
+  month: { fontSize: 8, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase' },
+});
+
+const StatChip = ({ count, label, color }: { count: number; label: string; color: string }) => (
+  <View style={statStyles.chip}>
+    <Text style={[statStyles.num, { color }]}>{count}</Text>
+    <Text style={[statStyles.label, { color }]}>{label}</Text>
+  </View>
+);
+
+const statStyles = StyleSheet.create({
+  chip: { flex: 1, backgroundColor: '#fff', borderRadius: 10, paddingVertical: 10, paddingHorizontal: 4, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 3, elevation: 1 },
+  num: { fontSize: 22, fontWeight: '800', lineHeight: 24 },
+  label: { fontSize: 8, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.3 },
+});
+
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -69,89 +100,146 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     return () => i18nInstance.off('languageChanged', handler);
   }, [i18nInstance]);
 
+  const today = useMemo(() => new Date(), []);
+  const todayStr = toLocalDateStr(today);
+
   const weekData = useMemo(() => {
     const now = new Date();
     const { start, end } = getWeekRange(now);
     const weekNum = getWeekNumber(now);
-    const startStr = toLocalDateStr(start);
 
-    const days: { date: Date; dayName: string; dateLabel: string; items: DayItem[] }[] = [];
+    const weekStr = toLocalDateStr(start);
+    const endStr = toLocalDateStr(end);
+
+    // Count stats
+    let eventCount = 0;
+    let healthCount = 0;
+    let petCount = 0;
+    let tripCount = 0;
+    let birthdayCount = 0;
+
+    // Build days with items
+    const days: { date: Date; dayName: string; dayNameShort: string; dateNum: number; monthStr: string; items: { type: string; icon: string; iconBg: string; title: string; time: string }[] }[] = [];
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       const dateStr = toLocalDateStr(d);
-      const dateLabel = d.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'short' });
-      const items: DayItem[] = [];
+      const items: { type: string; icon: string; iconBg: string; title: string; time: string }[] = [];
 
+      // Events + Spond
       events.forEach((e) => {
         const eStart = e.date;
         const eEnd = e.endDate || e.date;
         if (dateStr >= eStart && dateStr <= eEnd) {
-          const timeRange = e.endTime
-            ? `${formatTime(e.time)} – ${formatTime(e.endTime)}`
-            : formatTime(e.time);
-          items.push({
-            type: 'event',
-            title: e.title,
-            timeRange,
-            icon: e.icon || '📅',
-          });
+          const time = e.endTime ? `${formatTime(e.time)} – ${formatTime(e.endTime)}` : formatTime(e.time);
+          items.push({ type: 'event', icon: e.icon || 'calendar', iconBg: '#E8F5E9', title: e.title, time });
+          eventCount++;
         }
       });
-
-      trips.forEach((t) => {
-        if (dateStr >= t.startDate && dateStr <= t.endDate) {
-          const isStart = dateStr === t.startDate;
-          const isEnd = dateStr === t.endDate;
-          let timeRange = '';
-          if (isStart && isEnd) timeRange = 'Hele dagen';
-          else if (isStart) timeRange = `Fra ${t.city || 'start'}`;
-          else if (isEnd) timeRange = `Til ${t.city || 'slutt'}`;
-          else timeRange = t.city || 'Pågår';
-          items.push({
-            type: 'trip',
-            title: t.title,
-            timeRange,
-            icon: 'compass',
-          });
-        }
-      });
-
+      // Spond events
       spondEvents.forEach((e) => {
         const sStart = formatSpondDate(e.startTimestamp);
         const sEnd = e.endTimestamp ? formatSpondDate(e.endTimestamp) : sStart;
         if (dateStr >= sStart && dateStr <= sEnd) {
           const startTime = formatSpondTimestamp(e.startTimestamp);
           const endTime = e.endTimestamp ? formatSpondTimestamp(e.endTimestamp) : null;
-          const timeRange = endTime ? `${startTime} – ${endTime}` : startTime;
-          items.push({
-            type: 'spond',
-            title: e.heading,
-            timeRange,
-            icon: '🏟️',
-            groupName: e.groupName,
-            logoUrl: e.groupName ? groupLogos[e.groupName] : undefined,
-          });
+          const time = endTime ? `${startTime} – ${endTime}` : startTime;
+          const logoUrl = e.groupName ? groupLogos[e.groupName] : undefined;
+          items.push({ type: 'spond', icon: 'calendar', iconBg: '#E8F5E9', title: e.heading, time, logoUrl });
+          eventCount++;
         }
       });
 
-      items.sort((a, b) => a.timeRange.localeCompare(b.timeRange));
+      // Health — appointments + vaccinations
+      healthAppointments.forEach((a) => {
+        if (a.date === dateStr) {
+          const time = a.endTime ? `${a.startTime || ''} – ${a.endTime}` : a.startTime || '';
+          items.push({ type: 'health', icon: 'medication', iconBg: '#FFEBEE', title: `${a.title} — ${a.person}`, time });
+          healthCount++;
+        }
+      });
+      healthVaccinations.forEach((v) => {
+        if (v.date === dateStr) {
+          items.push({ type: 'health', icon: 'vaccination', iconBg: '#FFEBEE', title: `${v.name} — ${v.person}`, time: '' });
+          healthCount++;
+        }
+      });
+
+      // Pets
+      petVetVisits.forEach((v) => {
+        if (v.date === dateStr) {
+          const time = v.endTime ? `${v.startTime || ''} – ${v.endTime}` : v.startTime || '';
+          items.push({ type: 'pet', icon: 'pet', iconBg: '#F3E5F5', title: `${v.title} — ${v.petId}`, time });
+          petCount++;
+        }
+      });
+      petVaccinations.forEach((v) => {
+        if (v.date === dateStr) {
+          items.push({ type: 'pet', icon: 'vaccination', iconBg: '#F3E5F5', title: `${v.name} — ${v.petId}`, time: '' });
+          petCount++;
+        }
+      });
+
+      // Birthdays
+      birthdays.forEach((b) => {
+        const bDate = new Date(b.date);
+        if (bDate.getMonth() === d.getMonth() && bDate.getDate() === d.getDate()) {
+          items.push({ type: 'birthday', icon: 'birthday', iconBg: '#FFF3E0', title: `${b.name} fyller år`, time: '' });
+          birthdayCount++;
+        }
+      });
+
+      // Trips
+      trips.forEach((tr) => {
+        if (dateStr >= tr.startDate && dateStr <= tr.endDate) {
+          const isStart = dateStr === tr.startDate;
+          const isEnd = dateStr === tr.endDate;
+          let time = '';
+          if (isStart && isEnd) time = 'Hele dagen';
+          else if (isStart) time = `Fra ${tr.city || 'start'}`;
+          else if (isEnd) time = `Til ${tr.city || 'slutt'}`;
+          else time = tr.city || 'Pågår';
+          items.push({ type: 'trip', icon: 'transport', iconBg: '#E3F2FD', title: tr.title, time });
+          if (isStart) tripCount++;
+        }
+      });
 
       days.push({
         date: d,
-        dayName: t(DAY_NAMES_KEY[i]),
-        dateLabel,
+        dayName: DAY_NAMES_NB[i],
+        dayNameShort: t(DAY_NAMES_KEY[i]),
+        dateNum: d.getDate(),
+        monthStr: MONTHS[d.getMonth()],
         items,
       });
     }
 
-    return { weekNum, days, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
-  }, [events, trips, spondEvents, mealPlan, recipes, t, i18nInstance, langKey]);
+    return { weekNum, days, eventCount, healthCount, petCount, tripCount, birthdayCount, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
+  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, t, i18nInstance, langKey]);
+
+  // Meal plan data
+  const mealData = useMemo(() => {
+    if (!mealPlan?.meals) return null;
+    const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const DAY_LABELS = ['MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR', 'SØN'];
+    let plannedCount = 0;
+    const totalSlots = 21;
+    const rows = DAY_KEYS.map((key, i) => {
+      const dayMeals = mealPlan.meals[key] || {};
+      const parts: string[] = [];
+      if (dayMeals.frokost) { const r = recipes.find(rec => rec.id === dayMeals.frokost); if (r) { parts.push(`🥞 ${r.name}`); plannedCount++; } }
+      if (dayMeals.lunsj) { const r = recipes.find(rec => rec.id === dayMeals.lunsj); if (r) { parts.push(`🥪 ${r.name}`); plannedCount++; } }
+      if (dayMeals.middag) { const r = recipes.find(rec => rec.id === dayMeals.middag); if (r) { parts.push(`🍽️ ${r.name}`); plannedCount++; } }
+      return { day: DAY_LABELS[i], meals: parts, hasMeals: parts.length > 0 };
+    });
+    return { rows, plannedCount, totalSlots };
+  }, [mealPlan, recipes, langKey]);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <View style={[styles.container, { backgroundColor: colors.background }]}>
+        {/* Header */}
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
           <View style={styles.headerContent}>
             <Text style={[styles.headerTitle, { color: colors.text }]}>{t('events.weeklySummary')}</Text>
@@ -159,336 +247,108 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
               {t('weekdays.week')} {weekData.weekNum} · {weekData.startLabel} – {weekData.endLabel}
             </Text>
           </View>
-          <TouchableOpacity onPress={onClose} style={[styles.closeButton, { backgroundColor: '#0097A7' }]}>
-            <Text style={styles.closeButtonText}>{t('common.close')}</Text>
+          <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: colors.inputBackground }]}>
+            <Text style={[styles.closeBtnText, { color: colors.textSecondary }]}>✕</Text>
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-          {/* Birthday section */}
-          {sectionSettings.birthdays !== false && (() => {
-            const { start, end } = getWeekRange(new Date());
-            const weekBirthdays = birthdays.filter(b => {
-              const bDate = new Date(b.date);
-              const bMonth = bDate.getMonth();
-              const bDay = bDate.getDate();
-              for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-                if (d.getMonth() === bMonth && d.getDate() === bDay) return true;
-              }
-              return false;
-            });
-            if (weekBirthdays.length === 0) {
-              return (
-                <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                    <AppIcon name="birthday" size={18} color={MODULE_COLORS.birthdays} />
-                    <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.birthdays }]}>{t('birthdays.title')}</Text>
-                  </View>
-                  <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('birthdays.noBirthdaysWeek')}</Text>
-                </View>
-              );
-            }
-            return (
-              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="birthday" size={18} color={MODULE_COLORS.birthdays} />
-                  <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.birthdays }]}>{t('birthdays.title')}</Text>
-                </View>
-                {weekBirthdays.map((b, i) => {
-                  const bDate = new Date(b.date);
-                  const today = new Date();
-                  const age = today.getFullYear() - bDate.getFullYear();
-                  const dayName = new Date(start.getTime() + [...Array(7)].findIndex((_, di) => {
-                    const d = new Date(start);
-                    d.setDate(d.getDate() + di);
-                    return d.getMonth() === bDate.getMonth() && d.getDate() === bDate.getDate();
-                  }) * 86400000).toLocaleDateString(getLocale(i18n.language), { weekday: 'long' });
-                  return (
-                    <View key={i} style={[styles.birthdayItem, i < weekBirthdays.length - 1 && { borderBottomColor: colors.border }]}>
-                      <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                        {b.name} fyller {age} år ({dayName})
-                      </Text>
-                    </View>
-                  );
-                })}
-              </View>
-            );
-          })()}
-
-          {/* Health section */}
-          {sectionSettings.health !== false && (() => {
-            const { start, end } = getWeekRange(new Date());
-            const weekStr = toLocalDateStr(start);
-            const endStr = toLocalDateStr(end);
-            const weekAppointments = (healthAppointments || []).filter(a => a.date >= weekStr && a.date <= endStr);
-            const activeMedications = (healthMedications || []).filter(m => {
-              if (!m.dateFrom && !m.dateTo) return true;
-              if (m.dateFrom && m.dateTo) return m.dateFrom <= endStr && m.dateTo >= weekStr;
-              if (m.dateFrom) return m.dateFrom <= endStr;
-              if (m.dateTo) return m.dateTo >= weekStr;
-              return true;
-            });
-            const weekVaccinations = (healthVaccinations || []).filter(v => v.date >= weekStr && v.date <= endStr);
-            if (weekAppointments.length === 0 && activeMedications.length === 0 && weekVaccinations.length === 0) return null;
-            return (
-              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="medication" size={18} color={MODULE_COLORS.health} />
-                  <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.health }]}>{t('health.title')}</Text>
-                </View>
-                {weekAppointments.map((a, i) => (
-                  <View key={`appt-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
-                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                      📅 {a.title} — {a.date} {a.startTime}{a.location ? ` (${a.location})` : ''}
-                    </Text>
-                  </View>
-                ))}
-                {weekVaccinations.map((v, i) => (
-                  <View key={`vacc-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
-                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                      💉 {v.name} — {v.person} ({v.date})
-                    </Text>
-                  </View>
-                ))}
-                {activeMedications.map((m, i) => (
-                  <View key={`med-${i}`} style={[styles.birthdayItem, i === activeMedications.length - 1 ? {} : { borderBottomColor: colors.border }]}>
-                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                      💊 {m.name} — {m.person}
-                    </Text>
-                    <Text style={[styles.birthdayItemText, { color: colors.textSecondary, fontSize: 13 }]}>
-                      {[m.dosage, m.frequency].filter(Boolean).join(' · ')}{m.dateTo ? ` (til ${m.dateTo})` : ''}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            );
-          })()}
-
-          {/* Pets section */}
-          {sectionSettings.pets !== false && (() => {
-            const { start, end } = getWeekRange(new Date());
-            const weekStr = toLocalDateStr(start);
-            const endStr = toLocalDateStr(end);
-            const weekVetVisits = (petVetVisits || []).filter(v => v.date >= weekStr && v.date <= endStr);
-            const weekVaccinations = (petVaccinations || []).filter(v => v.date >= weekStr && v.date <= endStr);
-            const activeMedications = (petMedications || []).filter(m => {
-              if (!m.dateFrom && !m.dateTo) return true;
-              if (m.dateFrom && m.dateTo) return m.dateFrom <= endStr && m.dateTo >= weekStr;
-              if (m.dateFrom) return m.dateFrom <= endStr;
-              if (m.dateTo) return m.dateTo >= weekStr;
-              return true;
-            });
-            if (weekVetVisits.length === 0 && weekVaccinations.length === 0 && activeMedications.length === 0) return null;
-            return (
-              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="pet" size={18} color={MODULE_COLORS.pets} />
-                  <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.pets }]}>{t('pets.title')}</Text>
-                </View>
-                {weekVetVisits.map((v, i) => (
-                  <View key={`vet-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
-                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                      🏥 {v.title} — {v.date} {v.startTime}{v.location ? ` (${v.location})` : ''}
-                    </Text>
-                  </View>
-                ))}
-                {weekVaccinations.map((v, i) => (
-                  <View key={`vacc-${i}`} style={[styles.birthdayItem, { borderBottomColor: colors.border }]}>
-                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                      💉 {v.name} — {v.date}
-                    </Text>
-                  </View>
-                ))}
-                {activeMedications.map((m, i) => (
-                  <View key={`med-${i}`} style={[styles.birthdayItem, i === activeMedications.length - 1 ? {} : { borderBottomColor: colors.border }]}>
-                    <Text style={[styles.birthdayItemText, { color: colors.text }]}>
-                      💊 {m.name}
-                    </Text>
-                    <Text style={[styles.birthdayItemText, { color: colors.textSecondary, fontSize: 13 }]}>
-                      {[m.dosage, m.frequency].filter(Boolean).join(' · ')}{m.dateTo ? ` (til ${m.dateTo})` : ''}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            );
-          })()}
-
-          {/* Meal plan compact section */}
-          {sectionSettings.meals !== false && mealPlan?.meals && (() => {
-            const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-            const DAY_LABELS_SHORT = ['man', 'tir', 'ons', 'tor', 'fre', 'lør', 'søn'];
-            const showFrokost = sectionSettings.mealFrokost !== false;
-            const showLunsj = sectionSettings.mealLunsj !== false;
-            const showMiddag = sectionSettings.mealMiddag !== false;
-            const enabledSlots = (showFrokost ? 1 : 0) + (showLunsj ? 1 : 0) + (showMiddag ? 1 : 0);
-            const totalSlots = 7 * enabledSlots;
-            let plannedCount = 0;
-            const dayRows = DAY_KEYS.map((key, i) => {
-              const dayMeals = mealPlan.meals[key] || {};
-              const frokostRecipe = showFrokost && dayMeals.frokost ? recipes.find(r => r.id === dayMeals.frokost) : null;
-              const lunsjRecipe = showLunsj && dayMeals.lunsj ? recipes.find(r => r.id === dayMeals.lunsj) : null;
-              const middagRecipe = showMiddag && dayMeals.middag ? recipes.find(r => r.id === dayMeals.middag) : null;
-              if (frokostRecipe) plannedCount++;
-              if (lunsjRecipe) plannedCount++;
-              if (middagRecipe) plannedCount++;
-              const mealParts = [];
-              if (frokostRecipe) mealParts.push(`🥞 ${frokostRecipe.name}`);
-              if (lunsjRecipe) mealParts.push(`🥪 ${lunsjRecipe.name}`);
-              if (middagRecipe) mealParts.push(`🍽️ ${middagRecipe.name}`);
-              return { day: DAY_LABELS_SHORT[i], meals: mealParts, hasMeals: mealParts.length > 0 };
-            });
-
-            return (
-              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                   <AppIcon name="utensils" size={18} color={MODULE_COLORS.mealplan} />
-                   <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.mealplan }]}>{t('mealPlanner.weeklyPlan')}</Text>
-                </View>
-                {plannedCount === 0 ? (
-                  <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('mealPlanner.noMealsPlanned')}</Text>
-                ) : (
-                  <>
-                    <Text style={[styles.mealProgress, { color: colors.textSecondary, paddingHorizontal: 16 }]}>
-                      {t('mealPlanner.mealsPlanned', { planned: plannedCount, total: totalSlots })}
-                    </Text>
-                    {dayRows.map((row, i) => (
-                      <View key={i} style={[styles.mealDayRow, i < 6 && { borderBottomColor: colors.border }]}>
-                        <Text style={[styles.mealDayLabel, { color: colors.text }]}>{row.day}</Text>
-                        <Text style={[styles.mealDayContent, { color: row.hasMeals ? colors.text : colors.textDisabled }]}>
-                          {row.hasMeals ? row.meals.join(' · ') : '—'}
-                        </Text>
-                      </View>
-                    ))}
-                  </>
-                )}
-              </View>
-            );
-          })()}
-
-          {/* Reiser (Trips) section */}
-          {sectionSettings.reiser !== false && (() => {
-            const today = new Date();
-            const dayOfWeek = today.getDay();
-            const monday = new Date(today);
-            monday.setDate(today.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek - 1));
-            monday.setHours(0, 0, 0, 0);
-            const sunday = new Date(monday);
-            sunday.setDate(monday.getDate() + 6);
-            sunday.setHours(23, 59, 59, 999);
-
-            const weekTrips = trips.filter(tr => {
-              const start = new Date(tr.startDate + 'T00:00:00');
-              const end = new Date(tr.endDate + 'T23:59:59');
-              return start <= sunday && end >= monday;
-            });
-
-            if (weekTrips.length === 0) {
-              return (
-                <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                    <AppIcon name="compass" size={18} color={MODULE_COLORS.trips} />
-                    <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.trips }]}>{t('trips.title')}</Text>
-                  </View>
-                  <Text style={[styles.birthdayEmpty, { color: colors.textDisabled }]}>{t('trips.noTripsWeek')}</Text>
-                </View>
-              );
-            }
-
-            return (
-              <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                  <AppIcon name="compass" size={18} color={MODULE_COLORS.trips} />
-                  <Text style={[styles.birthdaySectionTitle, { color: MODULE_COLORS.trips }]}>{t('trips.title')}</Text>
-                </View>
-                {weekTrips.map((trip) => {
-                  const sub = tripSubcollections[trip.id];
-                  const startDate = new Date(trip.startDate + 'T00:00:00');
-                  const endDate = new Date(trip.endDate + 'T23:59:59');
-                  const startLabel = startDate.toLocaleDateString(getLocale(i18nInstance.language), { day: 'numeric', month: 'short' });
-                  const endLabel = endDate.toLocaleDateString(getLocale(i18nInstance.language), { day: 'numeric', month: 'short' });
-
-                  return (
-                    <View key={trip.id} style={{ marginBottom: 12, paddingBottom: 12, borderBottomWidth: 1, borderBottomColor: colors.border }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8, marginTop: 12, paddingLeft: 24 }}>
-                        <AppIcon name="compass" size={16} color={MODULE_COLORS.trips} />
-                        <Text style={{ color: colors.text, fontWeight: '700', fontSize: 15 }}>{trip.title}</Text>
-                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({startLabel} – {endLabel})</Text>
-                      </View>
-                      {sub && (() => {
-                        const items: { icon: string; name: string; detail: string; sortDate: string }[] = [];
-
-                        sub.flights?.forEach((f: any) => {
-                          items.push({ icon: f.transportType === 'tog' ? 'train' : f.transportType === 'bil' ? 'car' : 'fly', name: f.airline || t('transport.fly'), detail: [f.departureDate ? formatDate(f.departureDate) : '', f.departureTime, f.arrivalTime].filter(Boolean).join(' · '), sortDate: f.departureDate || 'zzz' });
-                        });
-                        sub.boats?.forEach((b: any) => {
-                          items.push({ icon: 'boat', name: b.name || t('transport.boatCruise'), detail: [b.departureDate ? formatDate(b.departureDate) : '', b.departureTime, b.arrivalTime].filter(Boolean).join(' · '), sortDate: b.departureDate || 'zzz' });
-                        });
-                        sub.hotels?.forEach((h: any) => {
-                          items.push({ icon: 'hotel', name: h.name || t('hotels.title'), detail: [h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – '), sortDate: h.startDate || 'zzz' });
-                        });
-                        sub.restaurants?.forEach((r: any) => {
-                          items.push({ icon: 'utensils', name: r.name || t('restaurants.title'), detail: [r.startDate ? formatDate(r.startDate) : '', r.startTime].filter(Boolean).join(' · '), sortDate: r.startDate || 'zzz' });
-                        });
-                        sub.activities?.forEach((a: any) => {
-                          items.push({ icon: 'activities', name: a.name || t('activities.title'), detail: [a.startDate ? formatDate(a.startDate) : '', a.startTime].filter(Boolean).join(' · '), sortDate: a.startDate || 'zzz' });
-                        });
-                        sub.packingLists?.filter((pl: any) => pl.items && pl.items.some((i: any) => !i.checked)).forEach((pl: any) => {
-                          const total = pl.items?.length || 0;
-                          const checked = pl.items?.filter((i: any) => i.checked).length || 0;
-                          items.push({ icon: 'packing', name: pl.title || t('packing.title'), detail: `${checked}/${total} ${t('shopping.itemsChecked')}`, sortDate: 'zzz' });
-                        });
-
-                        if (items.length === 0) {
-                          return <Text style={{ color: colors.textDisabled, fontSize: 13, fontStyle: 'italic' }}>{t('detail.noTransport')}</Text>;
-                        }
-
-                        items.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
-
-                        return items.map((item, i) => (
-                          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4, paddingLeft: 40 }}>
-                            <AppIcon name={item.icon as any} size={16} color={colors.accent} />
-                            <Text style={{ color: colors.text, fontSize: 13, flex: 1 }} numberOfLines={1}>{item.name}</Text>
-                            <Text style={{ color: colors.textSecondary, fontSize: 12 }} numberOfLines={1}>{item.detail}</Text>
-                          </View>
-                        ));
-                      })()}
-                    </View>
-                  );
-                })}
-              </View>
-            );
-          })()}
-
-          {/* Avtaler section */}
-            <View style={[styles.birthdaySection, { backgroundColor: colors.surface }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 16, paddingTop: 12 }}>
-                <AppIcon name="calendar" size={18} color={colors.accent} />
-                <Text style={[styles.birthdaySectionTitle, { color: colors.text }]}>{t('events.title')}</Text>
-              </View>
-            {weekData.days.map((day, idx) => {
-              const isToday = toLocalDateStr(day.date) === toLocalDateStr(new Date());
-              return (
-                <View key={idx} style={[{ paddingVertical: 10, paddingHorizontal: 16, borderBottomWidth: 2, borderBottomColor: colors.accent + '40' }, isToday && { backgroundColor: colors.accent + '20', borderLeftWidth: 3, borderLeftColor: colors.accent, marginLeft: -16, paddingLeft: 28, paddingRight: 16, borderBottomRightRadius: 6 }]}>
-                  <Text style={[{ fontSize: 13, fontWeight: '700', marginBottom: 4 }, { color: isToday ? colors.accent : colors.text }]}>{day.dayName} {day.dateLabel}</Text>
-                  {day.items.length > 0 ? (
-                    day.items.map((item, i) => (
-                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
-                        {item.logoUrl ? (
-                          <Image source={{ uri: item.logoUrl }} style={{ width: 18, height: 18, borderRadius: 4 }} />
-                        ) : (
-                          <AppIcon name={item.icon as any} size={16} color={colors.accent} />
-                        )}
-                        <Text style={{ color: colors.text, fontSize: 13, flex: 1 }} numberOfLines={1}>{item.title}</Text>
-                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{item.timeRange}</Text>
-                      </View>
-                    ))
-                  ) : (
-                    <Text style={{ color: colors.textDisabled, fontSize: 13, fontStyle: 'italic' }}>{t('events.noEventsDay')}</Text>
-                  )}
-                </View>
-              );
-            })}
+        <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+          {/* Stats bar */}
+          <View style={styles.statsRow}>
+            <StatChip count={weekData.eventCount} label={t('quickCreate.events')} color={MODULE_COLORS.home} />
+            <StatChip count={weekData.healthCount} label={t('health.title')} color={MODULE_COLORS.health} />
+            <StatChip count={weekData.petCount} label={t('pets.title')} color={MODULE_COLORS.pets} />
+            <StatChip count={weekData.tripCount} label={t('quickCreate.trips')} color={MODULE_COLORS.trips} />
+            <StatChip count={weekData.birthdayCount} label={t('birthdays.title')} color={MODULE_COLORS.birthdays} />
           </View>
+
+          {/* Day cards */}
+          {weekData.days.map((day, idx) => {
+            const isToday = toLocalDateStr(day.date) === todayStr;
+            return (
+              <View key={idx} style={[styles.dayCard, isToday && { borderColor: MODULE_COLORS.mealplan, borderWidth: 2 }]}>
+                <View style={styles.dayCardHeader}>
+                  <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={MODULE_COLORS.mealplan} />
+                  <View style={styles.dayCardItems}>
+                    {day.items.length > 0 ? day.items.map((item, i) => {
+                      const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : MODULE_COLORS.birthdays;
+                      return (
+                        <View key={i} style={styles.itemRow}>
+                          {item.logoUrl ? (
+                            <Image source={{ uri: item.logoUrl }} style={styles.itemLogo} />
+                          ) : (
+                            <View style={[styles.itemIcon, { backgroundColor: item.iconBg }]}>
+                              <AppIcon name={item.icon as any} size={13} color={itemColor} />
+                            </View>
+                          )}
+                          <Text style={[styles.itemName, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
+                          {item.time ? <Text style={[styles.itemTime, { color: colors.textSecondary }]}>{item.time}</Text> : null}
+                        </View>
+                      );
+                    }) : (
+                      <Text style={[styles.dayEmpty, { color: colors.textDisabled }]}>{t('events.noEventsDay')}</Text>
+                    )}
+                  </View>
+                </View>
+              </View>
+            );
+          })}
+
+          {/* Trips section */}
+          {trips.filter(tr => {
+            const { start, end } = getWeekRange(new Date());
+            return tr.startDate <= toLocalDateStr(end) && tr.endDate >= toLocalDateStr(start);
+          }).length > 0 && (
+            <View style={[styles.section, { backgroundColor: colors.surface }]}>
+              <View style={styles.sectionHeader}>
+                <View style={[styles.sectionIcon, { backgroundColor: MODULE_COLORS.trips }]}>
+                  <AppIcon name="transport" size={14} color="#fff" />
+                </View>
+                <Text style={[styles.sectionTitle, { color: MODULE_COLORS.trips }]}>{t('quickCreate.trips')}</Text>
+              </View>
+              <View style={styles.sectionBody}>
+                {trips.filter(tr => {
+                  const { start, end } = getWeekRange(new Date());
+                  return tr.startDate <= toLocalDateStr(end) && tr.endDate >= toLocalDateStr(start);
+                }).map((trip, i) => {
+                  const startLabel = new Date(trip.startDate + 'T00:00:00').toLocaleDateString(getLocale(i18nInstance.language), { day: 'numeric', month: 'short' });
+                  const endLabel = new Date(trip.endDate + 'T23:59:59').toLocaleDateString(getLocale(i18nInstance.language), { day: 'numeric', month: 'short' });
+                  return (
+                    <View key={trip.id} style={[styles.tripItem, i < trips.length - 1 && { borderBottomColor: colors.border }]}>
+                      <View style={[styles.itemIcon, { backgroundColor: '#E3F2FD' }]}>
+                        <AppIcon name="transport" size={13} color={MODULE_COLORS.trips} />
+                      </View>
+                      <Text style={[styles.itemName, { color: colors.text, flex: 1 }]} numberOfLines={1}>{trip.title}</Text>
+                      <Text style={[styles.itemTime, { color: colors.textSecondary }]}>{startLabel} – {endLabel}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          )}
+
+          {/* Matplan */}
+          {mealData && (
+            <View style={[styles.section, { backgroundColor: colors.surface }]}>
+              <View style={styles.sectionHeader}>
+                <View style={[styles.sectionIcon, { backgroundColor: MODULE_COLORS.mealplan }]}>
+                  <AppIcon name="utensils" size={14} color="#fff" />
+                </View>
+                <Text style={[styles.sectionTitle, { color: MODULE_COLORS.mealplan }]}>{t('mealPlanner.weeklyPlan')}</Text>
+                <Text style={[styles.sectionCount, { color: MODULE_COLORS.mealplan }]}>{mealData.plannedCount}/{mealData.totalSlots}</Text>
+              </View>
+              <View style={styles.sectionBody}>
+                {mealData.rows.map((row, i) => (
+                  <View key={i} style={[styles.mealRow, i % 2 === 0 && { backgroundColor: '#fafafa' }]}>
+                    <Text style={[styles.mealDay, { color: colors.text }]}>{row.day}</Text>
+                    <Text style={[styles.mealContent, { color: row.hasMeals ? colors.text : colors.textDisabled }]}>
+                      {row.hasMeals ? row.meals.join(' · ') : '—'}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          )}
         </ScrollView>
       </View>
     </Modal>
@@ -496,163 +356,33 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 });
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-  },
-  headerContent: {
-    flex: 1,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  headerSubtitle: {
-    fontSize: 13,
-    marginTop: 2,
-  },
-  closeButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  scrollView: {
-    flex: 1,
-  },
-  scrollContent: {
-    padding: 16,
-    gap: 12,
-  },
-  daySection: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  dayHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: 'transparent',
-  },
-  dayName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  dayDate: {
-    fontSize: 14,
-  },
-  itemRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    gap: 12,
-  },
-  itemIcon: {
-    fontSize: 20,
-    marginTop: 2,
-  },
-  itemContent: {
-    flex: 1,
-    gap: 8,
-  },
-  itemTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  itemTime: {
-    fontSize: 13,
-  },
-  itemGroup: {
-    fontSize: 12,
-    fontWeight: '500',
-  },
-  emptyDay: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  birthdaySection: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    marginBottom: 12,
-  },
-  birthdaySectionTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    lineHeight: 20,
-  },
-  birthdayEmpty: {
-    fontSize: 14,
-    fontStyle: 'italic',
-    paddingHorizontal: 16,
-    paddingBottom: 12,
-  },
-  birthdayItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-  },
-  birthdayItemText: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  mealSection: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  mealSectionTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 4,
-  },
-  mealProgress: {
-    fontSize: 13,
-    paddingHorizontal: 16,
-    paddingBottom: 8,
-  },
-  mealDayRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-  },
-  mealDayLabel: {
-    fontSize: 14,
-    fontWeight: '700',
-    width: 36,
-  },
-  mealDayContent: {
-    fontSize: 14,
-    flex: 1,
-  },
+  container: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1 },
+  headerContent: { flex: 1 },
+  headerTitle: { fontSize: 18, fontWeight: '700' },
+  headerSubtitle: { fontSize: 12, marginTop: 2 },
+  closeBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  closeBtnText: { fontSize: 14, fontWeight: '600' },
+  scrollView: { flex: 1 },
+  scrollContent: { padding: 12 },
+  statsRow: { flexDirection: 'row', gap: 4, marginBottom: 12 },
+  dayCard: { backgroundColor: '#fff', borderRadius: 12, marginBottom: 8, borderWidth: 1, borderColor: '#e8e8e8', overflow: 'hidden' },
+  dayCardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 10 },
+  dayCardItems: { flex: 1, gap: 4 },
+  itemRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  itemIcon: { width: 20, height: 20, borderRadius: 5, alignItems: 'center', justifyContent: 'center' },
+  itemLogo: { width: 20, height: 20, borderRadius: 5 },
+  itemName: { fontSize: 12, fontWeight: '500', flex: 1 },
+  itemTime: { fontSize: 11, fontWeight: '600', color: '#999' },
+  dayEmpty: { fontSize: 11, fontStyle: 'italic' },
+  section: { borderRadius: 12, marginBottom: 10, overflow: 'hidden' },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 10, paddingBottom: 4 },
+  sectionIcon: { width: 18, height: 18, borderRadius: 5, alignItems: 'center', justifyContent: 'center' },
+  sectionTitle: { fontSize: 13, fontWeight: '700', flex: 1 },
+  sectionCount: { fontSize: 10, fontWeight: '600' },
+  sectionBody: { padding: 0, paddingBottom: 8 },
+  tripItem: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 10, borderBottomWidth: 1 },
+  mealRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 3, paddingHorizontal: 10 },
+  mealDay: { fontSize: 10, fontWeight: '700', width: 30 },
+  mealContent: { fontSize: 10, flex: 1 },
 });
