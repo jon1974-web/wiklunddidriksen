@@ -47,12 +47,12 @@ export async function deleteSchoolYear(yearId: string): Promise<void> {
 }
 
 // Contacts (teachers + classmates)
-export async function getSchoolContacts(familyId: string, yearId: string): Promise<SchoolContact[]> {
-  const q = query(collection(db, 'schoolContacts'), where('familyId', '==', familyId));
+export async function getSchoolContacts(familyId: string, yearId: string, childId?: string): Promise<SchoolContact[]> {
+  let q = query(collection(db, 'schoolContacts'), where('familyId', '==', familyId));
   const snapshot = await getDocs(q);
   return snapshot.docs
     .map((d) => ({ id: d.id, ...d.data() } as SchoolContact))
-    .filter((c) => c.yearId === yearId);
+    .filter((c) => c.yearId === yearId && (!childId || c.childId === childId));
 }
 
 export async function addSchoolContact(data: Omit<SchoolContact, 'id' | 'createdAt'>): Promise<string> {

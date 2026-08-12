@@ -86,7 +86,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!selectedYear || !familyId) { setContacts([]); setSchedules([]); return; }
     try {
       const [c, s] = await Promise.all([
-        getSchoolContacts(familyId, selectedYear.id),
+        getSchoolContacts(familyId, selectedYear.id, selectedChild?.id),
         getSchoolSchedules(familyId, selectedYear.id),
       ]);
       setContacts(c);
@@ -94,7 +94,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [selectedYear, familyId]);
+  }, [selectedYear, familyId, selectedChild]);
 
   useEffect(() => { loadChildren(); }, [loadChildren]);
   useEffect(() => { if (selectedChild) loadYears(); }, [selectedChild, loadYears]);
