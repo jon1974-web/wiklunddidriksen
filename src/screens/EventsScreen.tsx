@@ -33,6 +33,7 @@ interface EventsScreenProps {
 const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#00BCD4', '#8BC34A', '#FF5722'];
 const TRIP_COLOR = MODULE_COLORS.trips;
 const SPOND_COLOR = '#E53935';
+const DAYS = ['SØN','MAN','TIRS','ONS','TORS','FRE','LØR'];
 
 export const SPOND_GROUP_LOGOS: Record<string, any> = {};
 
@@ -607,7 +608,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
-      const calYear = d ? d.getFullYear() : new Date().getFullYear();
+      const calDayName = d ? DAYS[d.getDay()] : '';
       const dateText = item.endDate ? `${formatDate(item.startDate)} – ${formatDate(item.endDate)}` : formatDate(item.startDate);
       return (
         <TouchableOpacity
@@ -617,7 +618,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <View style={styles.spondCardRow}>
             <View style={styles.spondCalIcon}>
               <View style={[styles.spondCalTopBar, { backgroundColor: TRIP_COLOR }]}>
-                <Text style={styles.spondCalYear}>{calYear}</Text>
+                <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
               <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
@@ -651,7 +652,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const calDay = startDate.getDate();
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = MONTHS_SV[startDate.getMonth()];
-      const calYear = startDate.getFullYear();
+      const calDayName = DAYS[startDate.getDay()];
       const startTime = formatSpondTimestamp(item.startTimestamp);
       const endTime = item.endTimestamp ? formatSpondTimestamp(item.endTimestamp) : null;
       const timeText = endTime ? `${startTime} – ${endTime}` : startTime;
@@ -679,7 +680,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <View style={styles.spondCardRow}>
             <View style={styles.spondCalIcon}>
               <View style={[styles.spondCalTopBar, { backgroundColor: SPOND_COLOR }]}>
-                <Text style={styles.spondCalYear}>{calYear}</Text>
+                <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
               <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
@@ -739,7 +740,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
-      const calYear = d ? d.getFullYear() : new Date().getFullYear();
+      const calDayName = d ? DAYS[d.getDay()] : '';
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
@@ -749,7 +750,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <View style={styles.spondCardRow}>
             <View style={styles.spondCalIcon}>
               <View style={[styles.spondCalTopBar, { backgroundColor: '#E53935' }]}>
-                <Text style={styles.spondCalYear}>{calYear}</Text>
+                <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
               <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>

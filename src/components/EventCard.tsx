@@ -6,6 +6,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
+const DAYS = ['SØN','MAN','TIRS','ONS','TORS','FRE','LØR'];
 
 interface EventCardProps {
   event: Event;
@@ -56,7 +57,7 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
   const d = event.date ? new Date(event.date) : null;
   const dayNum = d ? d.getDate() : '?';
   const monthStr = d ? MONTHS[d.getMonth()] : '';
-  const year = d ? d.getFullYear() : new Date().getFullYear();
+  const dayName = d ? DAYS[d.getDay()] : '';
 
   const timeText = event.endTime
     ? `${formatTime(event.time)} – ${formatTime(event.endTime)}`
@@ -74,7 +75,7 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
       <View style={styles.row}>
         <View style={styles.calIcon}>
           <View style={[styles.calTopBar, { backgroundColor: colors.accent }]}>
-            <Text style={styles.calYear}>{year}</Text>
+            <Text style={styles.calYear}>{dayName}</Text>
           </View>
           <Text style={[styles.calDay, { color: colors.text }]}>{dayNum}</Text>
           <Text style={[styles.calMonth, { color: colors.textSecondary }]}>{monthStr}</Text>
