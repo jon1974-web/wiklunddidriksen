@@ -233,6 +233,10 @@ export const AuthScreen: React.FC = () => {
 
   const renderLanguageStep = () => (
     <>
+      <TouchableOpacity onPress={() => setStep('account')} style={[styles.backBtn, { borderColor: TEAL }]}>
+        <Text style={{ color: TEAL, fontSize: 18 }}>←</Text>
+      </TouchableOpacity>
+
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
         {t('auth.selectLanguage')}
       </Text>
@@ -270,6 +274,10 @@ export const AuthScreen: React.FC = () => {
 
   const renderFamilyStep = () => (
     <>
+      <TouchableOpacity onPress={() => setStep('language')} style={[styles.backBtn, { borderColor: TEAL }]}>
+        <Text style={{ color: TEAL, fontSize: 18 }}>←</Text>
+      </TouchableOpacity>
+
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
         {t('auth.createFamily')}
       </Text>
@@ -330,6 +338,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 8,
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
   },
   subtitle: {
     fontSize: 20,
