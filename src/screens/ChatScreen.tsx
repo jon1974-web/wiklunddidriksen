@@ -254,18 +254,18 @@ export const ChatScreen: React.FC = () => {
 
       <View style={[styles.inputContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
         <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: colors.inputBackground }]}
+          style={[styles.iconButton, { backgroundColor: colors.accent }]}
           onPress={handlePickImage}
           disabled={uploading}
         >
-          <AppIcon name="image" size={20} color={colors.text} />
+          <AppIcon name="image" size={20} color="#fff" />
         </TouchableOpacity>
         <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: colors.inputBackground }]}
+          style={[styles.iconButton, { backgroundColor: colors.accent }]}
           onPress={handleTakePhoto}
           disabled={uploading}
         >
-          <AppIcon name="camera" size={20} color={colors.text} />
+          <AppIcon name="camera" size={20} color="#fff" />
         </TouchableOpacity>
         <TextInput
           style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
