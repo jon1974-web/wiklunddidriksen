@@ -1055,7 +1055,7 @@
     "sat": "SAT"
   },
   "weekly": {
-    "birthdayAge": "{name} turns {age}",
+    "birthdayAge": "{{name}} turns {{age}}",
     "allDay": "All day",
     "from": "From {city}",
     "fromStart": "From start",

@@ -1055,7 +1055,7 @@
     "sat": "LA"
   },
   "weekly": {
-    "birthdayAge": "{name} täyttää {age} vuotta",
+    "birthdayAge": "{{name}} täyttää {{age}} vuotta",
     "allDay": "Koko päivä",
     "from": "Lähtien {city}",
     "fromStart": "Lähtien alusta",

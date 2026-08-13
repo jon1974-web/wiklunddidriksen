@@ -1055,7 +1055,7 @@
     "sat": "LØR"
   },
   "weekly": {
-    "birthdayAge": "{name} bliver {age} år",
+    "birthdayAge": "{{name}} bliver {{age}} år",
     "allDay": "Hele dagen",
     "from": "Fra {city}",
     "fromStart": "Fra start",
