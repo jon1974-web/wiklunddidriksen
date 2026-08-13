@@ -1611,14 +1611,18 @@ exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB"
           role: "system",
           content: `You are a recipe extraction assistant. Extract recipe data from the provided HTML content of a recipe webpage.
 
-IMPORTANT: The content is raw HTML. Ignore all HTML tags, scripts, CSS, navigation, ads, and non-recipe content. Focus ONLY on the actual recipe data.
+IMPORTANT RULES:
+1. The content is raw HTML. Ignore all HTML tags, scripts, CSS, navigation, ads, and non-recipe content. Focus ONLY on the actual recipe data.
+2. Extract instructions EXACTLY as written on the page - do NOT shorten, summarize, or rephrase them. Copy the full text of each step.
+3. Extract ingredients EXACTLY as written - include all amounts, units, and ingredient names exactly as they appear.
+4. If the recipe is already in ${responseLangName}, keep the text as-is. Only translate if it's in a different language.
 
 Return ONLY valid JSON with this exact structure:
 {
   "name": "Recipe name in ${responseLangName}",
   "description": "Short 1-2 sentence description in ${responseLangName}",
   "ingredients": [{"name": "Ingredient name in ${responseLangName}", "amount": "Amount", "unit": "Unit"}],
-  "instructions": ["Step 1 in ${responseLangName}", "Step 2 in ${responseLangName}"],
+  "instructions": ["Full step 1 exactly as written", "Full step 2 exactly as written"],
   "time": 30,
   "portions": 4,
   "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott",
@@ -1626,16 +1630,16 @@ Return ONLY valid JSON with this exact structure:
   "cuisine": ""
 }
 
-Extract the recipe name, ingredients with amounts and units, step-by-step instructions, estimated cooking time in minutes, number of servings, and categorize the dish.
+Extract the recipe name, ingredients with amounts and units, step-by-step instructions (EXACTLY as written, no shortening), estimated cooking time in minutes, number of servings, and categorize the dish.
 If you cannot extract a recipe from the content, return {"error": "Could not extract recipe from URL"}.`,
         },
         {
           role: "user",
-          content: `Extract the recipe from this webpage content. Ignore all HTML tags, scripts, ads, navigation menus, and focus only on the recipe ingredients, instructions, and metadata:\n\n${html.substring(0, 12000)}`,
+          content: `Extract the recipe from this webpage content. IMPORTANT: Copy instructions EXACTLY as written - do not shorten or summarize them. Ignore all HTML tags, scripts, ads, navigation menus, and focus only on the recipe ingredients, instructions, and metadata:\n\n${html.substring(0, 12000)}`,
         },
       ],
       temperature: 0.3,
-      max_tokens: 2000,
+      max_tokens: 3000,
     });
 
     const content = completion.choices[0]?.message?.content;
