@@ -26,6 +26,7 @@ interface WeeklySummaryProps {
   petVetVisits?: PetVetVisit[];
   petVaccinations?: PetVaccination[];
   petMedications?: PetMedication[];
+  sectionSettings?: Record<string, boolean>;
 }
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
@@ -88,7 +89,7 @@ const statStyles = StyleSheet.create({
   label: { fontSize: 8, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.3 },
 });
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {} }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -240,17 +241,21 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     const DAY_KEYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     const DAY_LABELS = ['MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR', 'SØN'];
     let plannedCount = 0;
-    const totalSlots = 21;
+    const showFrokost = sectionSettings.mealFrokost !== false;
+    const showLunsj = sectionSettings.mealLunsj !== false;
+    const showMiddag = sectionSettings.mealMiddag !== false;
+    const activeMeals = (showFrokost ? 1 : 0) + (showLunsj ? 1 : 0) + (showMiddag ? 1 : 0);
+    const totalSlots = activeMeals * 7;
     const rows = DAY_KEYS.map((key, i) => {
       const dayMeals = mealPlan.meals[key] || {};
       const parts: string[] = [];
-      if (dayMeals.frokost) { const r = recipes.find(rec => rec.id === dayMeals.frokost); if (r) { parts.push(`🥞 ${r.name}`); plannedCount++; } }
-      if (dayMeals.lunsj) { const r = recipes.find(rec => rec.id === dayMeals.lunsj); if (r) { parts.push(`🥪 ${r.name}`); plannedCount++; } }
-      if (dayMeals.middag) { const r = recipes.find(rec => rec.id === dayMeals.middag); if (r) { parts.push(`🍽️ ${r.name}`); plannedCount++; } }
+      if (showFrokost && dayMeals.frokost) { const r = recipes.find(rec => rec.id === dayMeals.frokost); if (r) { parts.push(`🥞 ${r.name}`); plannedCount++; } }
+      if (showLunsj && dayMeals.lunsj) { const r = recipes.find(rec => rec.id === dayMeals.lunsj); if (r) { parts.push(`🥪 ${r.name}`); plannedCount++; } }
+      if (showMiddag && dayMeals.middag) { const r = recipes.find(rec => rec.id === dayMeals.middag); if (r) { parts.push(`🍽️ ${r.name}`); plannedCount++; } }
       return { day: DAY_LABELS[i], meals: parts, hasMeals: parts.length > 0 };
     });
     return { rows, plannedCount, totalSlots };
-  }, [mealPlan, recipes, langKey]);
+  }, [mealPlan, recipes, langKey, sectionSettings]);
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
