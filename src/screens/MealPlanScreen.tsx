@@ -74,6 +74,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showUrlImport, setShowUrlImport] = useState(false);
   const [importUrl, setImportUrl] = useState('');
   const [importLoading, setImportLoading] = useState(false);
+  const [importedRecipe, setImportedRecipe] = useState<any>(null);
+  const [showImportPreview, setShowImportPreview] = useState(false);
 
   const getRandomRecipe = () => {
     if (recipes.length === 0) return;
@@ -528,32 +530,46 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       }
       const data = await res.json();
       if (data.recipe) {
-        const docRef = await addDoc(collection(db, 'recipes'), {
-          name: data.recipe.name,
-          description: data.recipe.description || '',
-          ingredients: data.recipe.ingredients || [],
-          instructions: data.recipe.instructions || [],
-          time: data.recipe.time || 0,
-          portions: data.recipe.portions || 4,
-          category: data.recipe.category || 'kjoett',
-          variation: data.recipe.variation || '',
-          cuisine: data.recipe.cuisine || '',
-          isFavorite: false,
-          createdBy: user.uid,
-          familyId: familyId || '',
-          createdAt: Date.now(),
-        });
-        const detectedLang = importUrl.includes('.no') ? 'norsk' : importUrl.includes('.se') ? 'svensk' : importUrl.includes('.dk') ? 'dansk' : importUrl.includes('.fi') ? 'finsk' : 'engelsk';
-        triggerRecipeTranslation(docRef.id, data.recipe.name, data.recipe.description || '', data.recipe.ingredients || [], data.recipe.instructions || [], detectedLang);
-        setInfoModal({ visible: true, title: t('common.success'), message: `"${data.recipe.name}" lagt til i oppskriftsboken` });
+        setImportedRecipe(data.recipe);
         setShowUrlImport(false);
-        setImportUrl('');
-        loadData();
+        setShowImportPreview(true);
+      } else {
+        crossAlert(t('common.error'), data.error || 'Ingen oppskrift funnet');
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setImportLoading(false);
+    }
+  };
+
+  const handleSaveImportedRecipe = async () => {
+    if (!importedRecipe || !user) return;
+    try {
+      const docRef = await addDoc(collection(db, 'recipes'), {
+        name: importedRecipe.name,
+        description: importedRecipe.description || '',
+        ingredients: importedRecipe.ingredients || [],
+        instructions: importedRecipe.instructions || [],
+        time: importedRecipe.time || 0,
+        portions: importedRecipe.portions || 4,
+        category: importedRecipe.category || 'kjoett',
+        variation: importedRecipe.variation || '',
+        cuisine: importedRecipe.cuisine || '',
+        isFavorite: false,
+        createdBy: user.uid,
+        familyId: familyId || '',
+        createdAt: Date.now(),
+      });
+      const detectedLang = importUrl.includes('.no') ? 'norsk' : importUrl.includes('.se') ? 'svensk' : importUrl.includes('.dk') ? 'dansk' : importUrl.includes('.fi') ? 'finsk' : 'engelsk';
+      triggerRecipeTranslation(docRef.id, importedRecipe.name, importedRecipe.description || '', importedRecipe.ingredients || [], importedRecipe.instructions || [], detectedLang);
+      setInfoModal({ visible: true, title: t('common.success'), message: `"${importedRecipe.name}" lagt til i oppskriftsboken` });
+      setShowImportPreview(false);
+      setImportedRecipe(null);
+      setImportUrl('');
+      loadRecipes();
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -1503,6 +1519,52 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent, opacity: importLoading ? 0.5 : 1 }]} onPress={handleUrlImport} disabled={importLoading}>
                     <Text style={[styles.modalBtnText, { color: '#fff' }]}>{importLoading ? t('common.loading') : t('common.add')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Import Preview Modal */}
+      <Modal visible={showImportPreview && importedRecipe} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => { setShowImportPreview(false); setImportedRecipe(null); }}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>🤖 Forhåndsvisning</Text>
+                <ScrollView>
+                  <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 8 }]}>{importedRecipe?.name}</Text>
+                  {importedRecipe?.description && (
+                    <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8 }}>{importedRecipe.description}</Text>
+                  )}
+                  {importedRecipe?.time > 0 && (
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>⏱️ {importedRecipe.time} min · 🍽️ {importedRecipe.portions || 4} porsjoner</Text>
+                  )}
+                  {importedRecipe?.ingredients?.length > 0 && (
+                    <View style={{ marginTop: 8 }}>
+                      <Text style={{ fontWeight: '600', color: colors.text, marginBottom: 4 }}>Ingredienser:</Text>
+                      {importedRecipe.ingredients.map((ing: any, i: number) => (
+                        <Text key={i} style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 2 }}>• {ing.amount} {ing.unit} {ing.name}</Text>
+                      ))}
+                    </View>
+                  )}
+                  {importedRecipe?.instructions?.length > 0 && (
+                    <View style={{ marginTop: 8 }}>
+                      <Text style={{ fontWeight: '600', color: colors.text, marginBottom: 4 }}>Fremgangsmåte:</Text>
+                      {importedRecipe.instructions.map((step: string, i: number) => (
+                        <Text key={i} style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 2 }}>{i + 1}. {step}</Text>
+                      ))}
+                    </View>
+                  )}
+                </ScrollView>
+                <View style={styles.modalActions}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowImportPreview(false); setImportedRecipe(null); }}>
+                    <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleSaveImportedRecipe}>
+                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.saveRecipe')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
