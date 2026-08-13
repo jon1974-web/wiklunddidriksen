@@ -845,7 +845,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                     {/* Tider og påminnelser */}
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.timesAndReminders')}</Text>
-                      {medForm.timeSlots.map((slot, i) => (
+                      {(medForm.timeSlots || []).map((slot, i) => (
                         <View key={i} style={[styles.timeSlot, { backgroundColor: colors.inputBackground }]}>
                           <Text style={[styles.timeSlotLabel, { color: colors.textSecondary }]}>{t('health.time')} {i + 1}:</Text>
                           <TouchableOpacity style={[styles.timeInput, { backgroundColor: colors.surface }]} onPress={() => setActivePicker(`medTime${i}`)}>
