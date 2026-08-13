@@ -46,7 +46,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     iconColor={colors.accent}
                     label={t('quickCreate.newEvent')}
                     desc={t('quickCreate.newEventDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'AddEvent' }))}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'AddEvent', params: { _t: Date.now() } }))}
                     colors={colors}
                   />
                   <OptionRow
@@ -54,7 +54,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     iconColor={colors.accent}
                     label={t('quickCreate.voiceEvent')}
                     desc={t('quickCreate.voiceEventDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'VoiceEvent' }))}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } }))}
                     colors={colors}
                   />
                   <OptionRow
@@ -62,7 +62,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     iconColor={colors.accent}
                     label={t('quickCreate.photoEvent')}
                     desc={t('quickCreate.photoEventDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'PhotoEvent' }))}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'PhotoEvent', params: { _t: Date.now() } }))}
                     colors={colors}
                   />
                 </View>
@@ -126,7 +126,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     iconColor={MODULE_COLORS.trips}
                     label={t('quickCreate.newTrip')}
                     desc={t('quickCreate.newTripDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'AddTrip' }))}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }))}
                     colors={colors}
                   />
                 </View>
