@@ -330,7 +330,8 @@ export interface PetMedication {
   familyId: string;
   name: string;
   dosage: string;
-  frequency: string;
+  frequency: number;
+  timeSlots: MedicationTimeSlot[];
   dateFrom?: string;
   dateTo?: string;
   note?: string;
@@ -449,12 +450,18 @@ export interface TripSubcollections {
 }
 
 // Health Space Types
+export interface MedicationTimeSlot {
+  time: string;
+  reminderMinutes: number;
+}
+
 export interface HealthMedication {
   id: string;
   name: string;
   person: string;
   dosage: string;
-  frequency: string;
+  frequency: number;
+  timeSlots: MedicationTimeSlot[];
   dateFrom?: string;
   dateTo?: string;
   note?: string;

@@ -55,7 +55,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
   // Form states
-  const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
+  const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: '', dateTo: '', note: '' });
   const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
@@ -429,10 +429,50 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.dosage')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.dosage} onChangeText={(v) => setMedForm(f => ({ ...f, dosage: v }))} placeholder={t('health.dosagePlaceholder')} placeholderTextColor={colors.textDisabled} />
                   </View>
+
+                  {/* Frekvens */}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.frequency')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={medForm.frequency} onChangeText={(v) => setMedForm(f => ({ ...f, frequency: v }))} placeholder={t('health.frequencyPlaceholder')} placeholderTextColor={colors.textDisabled} />
+                    <View style={styles.personRow}>
+                      {[1, 2, 3, 4].map(n => (
+                        <TouchableOpacity key={n} style={[styles.personChip, { backgroundColor: medForm.frequency === n ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => {
+                          const newSlots = [...medForm.timeSlots];
+                          while (newSlots.length < n) newSlots.push({ time: '08:00', reminderMinutes: 15 });
+                          while (newSlots.length > n) newSlots.pop();
+                          setMedForm(f => ({ ...f, frequency: n, timeSlots: newSlots }));
+                        }}>
+                          <Text style={{ color: medForm.frequency === n ? '#fff' : colors.text, fontSize: 13 }}>{n}x</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
                   </View>
+
+                  {/* Tider og påminnelser */}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.timesAndReminders')}</Text>
+                    {medForm.timeSlots.map((slot, i) => (
+                      <View key={i} style={[styles.timeSlot, { backgroundColor: colors.inputBackground }]}>
+                        <Text style={[styles.timeSlotLabel, { color: colors.textSecondary }]}>{t('health.time')} {i + 1}:</Text>
+                        <TouchableOpacity style={[styles.timeInput, { backgroundColor: colors.surface }]} onPress={() => setActivePicker(`medTime${i}`)}>
+                          <Text style={{ color: colors.text, fontSize: 16 }}>{slot.time}</Text>
+                        </TouchableOpacity>
+                        <View style={styles.reminderRow}>
+                          <Text style={[styles.reminderLabel, { color: colors.textSecondary }]}>{t('health.reminder')}:</Text>
+                          {[0, 15, 30, 60].map(mins => (
+                            <TouchableOpacity key={mins} style={[styles.reminderChip, { backgroundColor: slot.reminderMinutes === mins ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => {
+                              const newSlots = [...medForm.timeSlots];
+                              newSlots[i] = { ...newSlots[i], reminderMinutes: mins };
+                              setMedForm(f => ({ ...f, timeSlots: newSlots }));
+                            }}>
+                              <Text style={{ color: slot.reminderMinutes === mins ? '#fff' : colors.text, fontSize: 10 }}>{mins === 0 ? t('health.noReminder') : mins < 60 ? `${mins}m` : `${mins/60}t`}</Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+
+                  {/* Dato fra/til */}
                   <View style={{ flexDirection: 'row', gap: 12 }}>
                     <View style={[styles.field, { flex: 1 }]}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.dateFrom')}</Text>
@@ -1001,6 +1041,12 @@ const styles = StyleSheet.create({
   input: { borderRadius: 10, padding: 14, fontSize: 16 },
   personRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   personChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16 },
+  timeSlot: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 8, marginBottom: 8 },
+  timeSlotLabel: { fontSize: 12, fontWeight: '600', minWidth: 50 },
+  timeInput: { padding: 8, borderRadius: 8, minWidth: 80 },
+  reminderRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 'auto' },
+  reminderLabel: { fontSize: 10 },
+  reminderChip: { paddingVertical: 3, paddingHorizontal: 6, borderRadius: 8 },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
   modalBtn: { flex: 1, padding: 14, borderRadius: 10, alignItems: 'center' },
   modalBtnText: { fontSize: 16, fontWeight: '600' },

@@ -326,7 +326,9 @@
     "reminder1Day": "1 day before",
     "reminder3Days": "3 days before",
     "reminder1Week": "1 week before",
-    "ongoing": "Ongoing"
+    "ongoing": "Ongoing",
+    "timesAndReminders": "Times and reminders",
+    "time": "Time"
   },
   "shopping": {
     "title": "Lists",

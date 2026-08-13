@@ -326,7 +326,9 @@
     "reminder1Day": "1 päivä ennen",
     "reminder3Days": "3 päivää ennen",
     "reminder1Week": "1 viikko ennen",
-    "ongoing": "Käynnissä"
+    "ongoing": "Käynnissä",
+    "timesAndReminders": "Ajankohtaut ja muistutukset",
+    "time": "Aika"
   },
   "shopping": {
     "title": "Listat",

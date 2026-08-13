@@ -326,7 +326,9 @@
     "reminder1Day": "1 dag före",
     "reminder3Days": "3 dagar före",
     "reminder1Week": "1 vecka före",
-    "ongoing": "Pågående"
+    "ongoing": "Pågående",
+    "timesAndReminders": "Tider och påminnelser",
+    "time": "Tid"
   },
   "shopping": {
     "title": "Listor",
