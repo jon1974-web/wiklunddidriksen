@@ -2065,13 +2065,14 @@ exports.decryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB
 exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
-  const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000);
+  const fiveMinAgo = new Date(now.getTime() - 10 * 60 * 1000);
   const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000);
 
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
   // Get all families
   const familiesSnap = await db.collection("families").limit(100).get();
+  console.log(`checkMedicationReminders: Found ${familiesSnap.docs.length} families`);
   const notifications = [];
   const familyMembersCache = {};
 
@@ -2091,11 +2092,13 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", reg
       .get();
 
     // Process health medications
+    console.log(`checkMedicationReminders: Family ${familyId} has ${healthMedsSnap.docs.length} health meds, ${petMedsSnap.docs.length} pet meds`);
     for (const doc of healthMedsSnap.docs) {
       const medData = doc.data();
-      if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) continue;
-      if (medData.dateTo && medData.dateTo < todayStr) continue;
-      if (medData.dateFrom && medData.dateFrom > todayStr) continue;
+      console.log(`checkMedicationReminders: Health med ${doc.id}: frequency=${medData.frequency} type=${typeof medData.frequency} timeSlots=${JSON.stringify(medData.timeSlots)} dateTo=${medData.dateTo} dateFrom=${medData.dateFrom}`);
+      if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) { console.log(`  -> SKIP: no timeSlots`); continue; }
+      if (medData.dateTo && medData.dateTo < todayStr) { console.log(`  -> SKIP: dateTo passed`); continue; }
+      if (medData.dateFrom && medData.dateFrom > todayStr) { console.log(`  -> SKIP: dateFrom not yet`); continue; }
 
       for (const slot of medData.timeSlots) {
         if (!slot.time || !slot.reminderMinutes) continue;
