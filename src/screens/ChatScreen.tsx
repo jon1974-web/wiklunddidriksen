@@ -14,7 +14,6 @@ import { getErrorMessage } from '../utils/validation';
 import { uriToBlob } from '../utils/upload';
 import { getUserProfile } from '../services/familyService';
 import { AppIcon } from '../components/AppIcon';
-import { AppIcon } from '../components/AppIcon';
 
 export const ChatScreen: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
