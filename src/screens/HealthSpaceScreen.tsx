@@ -997,7 +997,8 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           activePicker === 'apptEndTime' ? apptForm.endTime :
           activePicker === 'vaccDate' ? vaccForm.date :
           activePicker === 'vaccNextDue' ? vaccForm.nextDue :
-          activePicker === 'growthDate' ? growthForm.date : ''
+          activePicker === 'growthDate' ? growthForm.date :
+          activePicker?.startsWith('medTime') ? (medForm.timeSlots[parseInt(activePicker.replace('medTime', ''))]?.time || '') : ''
         }
         onSelect={(value) => {
           if (activePicker === 'medDateFrom') setMedForm(f => ({ ...f, dateFrom: value }));

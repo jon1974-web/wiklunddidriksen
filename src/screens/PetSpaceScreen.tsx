@@ -1327,7 +1327,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           activePicker === 'groomNextDate' ? groomForm.nextDate :
           activePicker === 'vaccDate' ? vaccForm.date :
           activePicker === 'vaccNextDue' ? vaccForm.nextDue :
-          activePicker === 'insExpiryDate' ? insForm.expiryDate : ''
+          activePicker === 'insExpiryDate' ? insForm.expiryDate :
+          activePicker?.startsWith('medTime') ? (medForm.timeSlots[parseInt(activePicker.replace('medTime', ''))]?.time || '') : ''
         }
         onSelect={(value) => {
           if (activePicker === 'petBirthday') setPetForm(f => ({ ...f, birthday: value }));
@@ -1343,6 +1344,14 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           else if (activePicker === 'vaccDate') setVaccForm(f => ({ ...f, date: value }));
           else if (activePicker === 'vaccNextDue') setVaccForm(f => ({ ...f, nextDue: value }));
           else if (activePicker === 'insExpiryDate') setInsForm(f => ({ ...f, expiryDate: value }));
+          else if (activePicker?.startsWith('medTime')) {
+            const idx = parseInt(activePicker.replace('medTime', ''));
+            const newSlots = [...medForm.timeSlots];
+            if (newSlots[idx]) {
+              newSlots[idx] = { ...newSlots[idx], time: value };
+              setMedForm(f => ({ ...f, timeSlots: newSlots }));
+            }
+          }
           setActivePicker(null);
         }}
         onClose={() => setActivePicker(null)}
