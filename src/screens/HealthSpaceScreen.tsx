@@ -322,7 +322,13 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           vaccinations.length === 0 ? (
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noVaccinations')}</Text>
           ) : (
-            vaccinations.map(vacc => (
+            [...vaccinations].sort((a, b) => {
+              const aPast = a.date < today;
+              const bPast = b.date < today;
+              if (aPast && !bPast) return 1;
+              if (!aPast && bPast) return -1;
+              return a.date.localeCompare(b.date);
+            }).map(vacc => (
               <TouchableOpacity key={vacc.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: vacc, section: 'vaccinations' })} onLongPress={() => setActionModal({ visible: true, id: vacc.id, title: vacc.name, section: 'vaccinations' })}>
                 <AppIcon name="vaccination" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>

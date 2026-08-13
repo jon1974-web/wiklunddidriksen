@@ -613,7 +613,13 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
             vetVisits.length === 0 ? (
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('pets.noVetVisits')}</Text>
             ) : (
-              vetVisits.map(v => (
+              [...vetVisits].sort((a, b) => {
+                const aPast = isDatePast(a.date);
+                const bPast = isDatePast(b.date);
+                if (aPast && !bPast) return 1;
+                if (!aPast && bPast) return -1;
+                return a.date.localeCompare(b.date);
+              }).map(v => (
                 <TouchableOpacity key={v.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: v, section: 'vetVisits' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.title, section: 'vetVisits' })}>
                   <AppIcon name="calendar" size={20} color={PET_THEME} />
                   <View style={styles.itemText}>
@@ -680,7 +686,13 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
             vaccinations.length === 0 ? (
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('pets.noVaccinations')}</Text>
             ) : (
-              vaccinations.map(v => (
+              [...vaccinations].sort((a, b) => {
+                const aPast = isDatePast(a.date);
+                const bPast = isDatePast(b.date);
+                if (aPast && !bPast) return 1;
+                if (!aPast && bPast) return -1;
+                return a.date.localeCompare(b.date);
+              }).map(v => (
                 <TouchableOpacity key={v.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: v, section: 'vaccinations' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.name, section: 'vaccinations' })}>
                   <AppIcon name="vaccination" size={20} color={PET_THEME} />
                   <View style={styles.itemText}>
