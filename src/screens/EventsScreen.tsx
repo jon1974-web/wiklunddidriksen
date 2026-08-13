@@ -413,7 +413,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const dayVaccinations = healthVaccinations.filter((v) => v.date === selectedDate).map((v) => ({
         ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('health.vaccinations')}: ${v.name}`, date: v.date, description: v.person, icon: '💉',
       }));
-      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations];
+      const dayPetVetVisits = petVetVisits.filter((v) => v.date === selectedDate).map((v) => ({
+        ...v, _type: 'healthAppointment' as const, time: v.startTime || '09:00', address: v.location || '', title: v.title, date: v.date, description: v.petId, icon: '🐾',
+      }));
+      const dayPetVaccinations = petVaccinations.filter((v) => v.date === selectedDate).map((v) => ({
+        ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('pets.vaccinations')}: ${v.name}`, date: v.date, description: v.petId, icon: '🐾',
+      }));
+      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
       else if (filterModule === 'health') dayItems = dayItems.filter((i) => i._type === 'healthAppointment');
       else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && (i as any).icon === '🐾');
@@ -446,6 +452,26 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         date: v.date,
         description: v.person,
         icon: '💉',
+      })),
+      ...petVetVisits.filter(v => v.date).map((v) => ({
+        ...v,
+        _type: 'healthAppointment' as const,
+        time: v.startTime || '09:00',
+        address: v.location || '',
+        title: v.title,
+        date: v.date,
+        description: v.petId,
+        icon: '🐾',
+      })),
+      ...petVaccinations.filter(v => v.date).map((v) => ({
+        ...v,
+        _type: 'healthAppointment' as const,
+        time: '09:00',
+        address: v.location || '',
+        title: `${t('pets.vaccinations')}: ${v.name}`,
+        date: v.date,
+        description: v.petId,
+        icon: '🐾',
       })),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
     let filtered = allItems;
@@ -765,7 +791,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
             </View>
             <View style={styles.spondCardContent}>
-              <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.title}</Text>
+              <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.icon === '🏥' ? '❤️' : item.icon || '❤️'} {item.title}</Text>
               <View style={styles.spondTimeRow}>
                 <View style={styles.spondClockOuter}>
                   <View style={styles.spondClockHandV} />
