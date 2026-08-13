@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     height: 62,
     position: 'relative',
     marginHorizontal: 10,
-    marginBottom: 16,
+    marginBottom: 24,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06,
