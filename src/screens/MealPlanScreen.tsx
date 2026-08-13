@@ -567,7 +567,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setShowImportPreview(false);
       setImportedRecipe(null);
       setImportUrl('');
-      loadRecipes();
+      loadData();
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     }
