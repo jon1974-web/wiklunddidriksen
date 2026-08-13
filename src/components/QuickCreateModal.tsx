@@ -78,7 +78,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     iconColor={MODULE_COLORS.health}
                     label={t('quickCreate.healthAppointment')}
                     desc={t('quickCreate.healthAppointmentDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments' } }))}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }))}
                     colors={colors}
                   />
                   <OptionRow
@@ -86,7 +86,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     iconColor={MODULE_COLORS.health}
                     label={t('quickCreate.healthVaccination')}
                     desc={t('quickCreate.healthVaccinationDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'vaccinations' } }))}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }))}
                     colors={colors}
                   />
                 </View>
@@ -102,7 +102,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     iconColor={MODULE_COLORS.pets}
                     label={t('quickCreate.petVetVisit')}
                     desc={t('quickCreate.petVetVisitDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits' } }))}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }))}
                     colors={colors}
                   />
                   <OptionRow
@@ -110,7 +110,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     iconColor={MODULE_COLORS.pets}
                     label={t('quickCreate.petVaccination')}
                     desc={t('quickCreate.petVaccinationDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vaccinations' } }))}
+                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }))}
                     colors={colors}
                   />
                 </View>
