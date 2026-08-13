@@ -8,6 +8,7 @@ import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { TRIP_ICONS } from '../constants/tripIcons';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { geocodeCity } from '../services/weatherService';
 import { useTranslation } from 'react-i18next';
 
@@ -64,9 +65,9 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity
         onPress={() => navigation.goBack()}
-        style={[styles.backBtn, { borderColor: colors.accent }]}
+        style={[styles.backBtn, { borderColor: MODULE_COLORS.trips }]}
       >
-        <Text style={[styles.backBtnText, { color: colors.accent }]}>←</Text>
+        <Text style={[styles.backBtnText, { color: MODULE_COLORS.trips }]}>←</Text>
       </TouchableOpacity>
       <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.addTrip')}</Text>
 
@@ -88,7 +89,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
           {TRIP_ICONS.map((i) => (
             <TouchableOpacity
               key={i}
-              style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: icon === i ? colors.accent : colors.border }]}
+              style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: icon === i ? MODULE_COLORS.trips : colors.border }]}
               onPress={() => setIcon(i)}
             >
               <Text style={styles.iconText}>{i}</Text>
@@ -145,7 +146,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleSave}>
+      <TouchableOpacity style={[styles.button, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSave}>
         <Text style={styles.buttonText}>{t('common.save')}</Text>
       </TouchableOpacity>
 
