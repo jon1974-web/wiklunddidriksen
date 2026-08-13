@@ -459,8 +459,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                             const [h, m] = slot.time.split(':').map(Number);
                             const now = new Date();
                             const utcDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0));
-                            const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
-                            return `${String(localDate.getHours()).padStart(2, '0')}:${String(localDate.getMinutes()).padStart(2, '0')}`;
+                            const localH = utcDate.getUTCHours();
+                            const localM = utcDate.getUTCMinutes();
+                            return `${String(localH).padStart(2, '0')}:${String(localM).padStart(2, '0')}`;
                           })()}</Text>
                         </TouchableOpacity>
                         <View style={styles.reminderRow}>
@@ -1011,8 +1012,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             const [h, m] = utcTime.split(':').map(Number);
             const now = new Date();
             const utcDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0));
-            const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
-            return `${String(localDate.getHours()).padStart(2, '0')}:${String(localDate.getMinutes()).padStart(2, '0')}`;
+            const localH = utcDate.getUTCHours();
+            const localM = utcDate.getUTCMinutes();
+            return `${String(localH).padStart(2, '0')}:${String(localM).padStart(2, '0')}`;
           })() : ''
         }
         onSelect={(value) => {
@@ -1024,8 +1026,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             const [h, m] = value.split(':').map(Number);
             const now = new Date();
             const localDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
-            const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
-            const utcTime = `${String(utcDate.getHours()).padStart(2, '0')}:${String(utcDate.getMinutes()).padStart(2, '0')}`;
+            const utcTime = `${String(localDate.getUTCHours()).padStart(2, '0')}:${String(localDate.getUTCMinutes()).padStart(2, '0')}`;
             const newSlots = [...medForm.timeSlots];
             if (newSlots[idx]) {
               newSlots[idx] = { ...newSlots[idx], time: utcTime };
