@@ -454,7 +454,14 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                       <View key={i} style={[styles.timeSlot, { backgroundColor: colors.inputBackground }]}>
                         <Text style={[styles.timeSlotLabel, { color: colors.textSecondary }]}>{t('health.time')} {i + 1}:</Text>
                         <TouchableOpacity style={[styles.timeInput, { backgroundColor: colors.surface }]} onPress={() => setActivePicker(`medTime${i}`)}>
-                          <Text style={{ color: colors.text, fontSize: 16 }}>{slot.time}</Text>
+                          <Text style={{ color: colors.text, fontSize: 16 }}>{(() => {
+                            if (!slot.time) return '';
+                            const [h, m] = slot.time.split(':').map(Number);
+                            const now = new Date();
+                            const utcDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0));
+                            const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
+                            return `${String(localDate.getHours()).padStart(2, '0')}:${String(localDate.getMinutes()).padStart(2, '0')}`;
+                          })()}</Text>
                         </TouchableOpacity>
                         <View style={styles.reminderRow}>
                           <Text style={[styles.reminderLabel, { color: colors.textSecondary }]}>{t('health.reminder')}:</Text>
@@ -998,16 +1005,30 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           activePicker === 'vaccDate' ? vaccForm.date :
           activePicker === 'vaccNextDue' ? vaccForm.nextDue :
           activePicker === 'growthDate' ? growthForm.date :
-          activePicker?.startsWith('medTime') ? (medForm.timeSlots[parseInt(activePicker.replace('medTime', ''))]?.time || '') : ''
+          activePicker?.startsWith('medTime') ? (() => {
+            const utcTime = medForm.timeSlots[parseInt(activePicker.replace('medTime', ''))]?.time || '';
+            if (!utcTime) return '';
+            const [h, m] = utcTime.split(':').map(Number);
+            const now = new Date();
+            const utcDate = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0));
+            const localDate = new Date(utcDate.getTime() + utcDate.getTimezoneOffset() * 60000);
+            return `${String(localDate.getHours()).padStart(2, '0')}:${String(localDate.getMinutes()).padStart(2, '0')}`;
+          })() : ''
         }
         onSelect={(value) => {
           if (activePicker === 'medDateFrom') setMedForm(f => ({ ...f, dateFrom: value }));
           else if (activePicker === 'medDateTo') setMedForm(f => ({ ...f, dateTo: value }));
           else if (activePicker?.startsWith('medTime')) {
             const idx = parseInt(activePicker.replace('medTime', ''));
+            // Convert local time to UTC for storage
+            const [h, m] = value.split(':').map(Number);
+            const now = new Date();
+            const localDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, 0, 0);
+            const utcDate = new Date(localDate.getTime() - localDate.getTimezoneOffset() * 60000);
+            const utcTime = `${String(utcDate.getHours()).padStart(2, '0')}:${String(utcDate.getMinutes()).padStart(2, '0')}`;
             const newSlots = [...medForm.timeSlots];
             if (newSlots[idx]) {
-              newSlots[idx] = { ...newSlots[idx], time: value };
+              newSlots[idx] = { ...newSlots[idx], time: utcTime };
               setMedForm(f => ({ ...f, timeSlots: newSlots }));
             }
           }

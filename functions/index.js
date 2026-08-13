@@ -2062,7 +2062,7 @@ exports.decryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB
 
 // Scheduled function: check medication reminders every 5 minutes
 // Sends push notifications for medications with time slots and reminders
-exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", timeZone: "Europe/Oslo", region: "us-central1" }, async (event) => {
+exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
