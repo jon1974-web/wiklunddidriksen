@@ -168,7 +168,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       healthMedications.forEach((m) => {
         const isActive = (!m.dateFrom || m.dateFrom <= dateStr) && (!m.dateTo || m.dateTo >= dateStr);
         if (isActive) {
-          items.push({ type: 'health', icon: 'medication', iconBg: '#FFEBEE', title: `${m.name} — ${m.person}`, time: m.frequency || '' });
+          items.push({ type: 'health', icon: 'medication', iconBg: '#FFEBEE', title: `${m.name} — ${m.person}`, time: [m.dosage, (m.timeSlots || []).map(s => s.time).join(', ')].filter(Boolean).join(' · ') });
           healthCount++;
         }
       });
@@ -191,7 +191,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       petMedications.forEach((m) => {
         const isActive = (!m.dateFrom || m.dateFrom <= dateStr) && (!m.dateTo || m.dateTo >= dateStr);
         if (isActive) {
-          items.push({ type: 'pet', icon: 'medication', iconBg: '#F3E5F5', title: `${m.name}`, time: m.frequency || '' });
+          items.push({ type: 'pet', icon: 'medication', iconBg: '#F3E5F5', title: `${m.name}`, time: [m.dosage, (m.timeSlots || []).map(s => s.time).join(', ')].filter(Boolean).join(' · ') });
           petCount++;
         }
       });
