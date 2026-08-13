@@ -700,6 +700,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         onDelete={handleDelete}
         onCancel={() => setActionModal({ visible: false, id: '', title: '', section: 'medications' })}
         accentColor={MODULE_COLORS.health}
+        editColor={colors.accent}
       />
 
       {/* Detail Modal */}

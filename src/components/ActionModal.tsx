@@ -11,14 +11,16 @@ interface ActionModalProps {
   onDelete?: () => void;
   onCancel: () => void;
   accentColor?: string;
+  editColor?: string;
 }
 
 export const ActionModal: React.FC<ActionModalProps> = React.memo(({
-  visible, title, subtitle, onEdit, onDelete, onCancel, accentColor,
+  visible, title, subtitle, onEdit, onDelete, onCancel, accentColor, editColor,
 }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const resolvedAccent = accentColor || colors.accent;
+  const resolvedEditColor = editColor || resolvedAccent;
 
   return (
     <Modal visible={visible} transparent animationType="fade">
@@ -32,7 +34,7 @@ export const ActionModal: React.FC<ActionModalProps> = React.memo(({
 
               {onEdit && (
                 <TouchableOpacity
-                  style={[styles.button, { backgroundColor: resolvedAccent }]}
+                  style={[styles.button, { backgroundColor: resolvedEditColor }]}
                   onPress={() => { onEdit(); onCancel(); }}
                 >
                   <Text style={[styles.buttonText, { color: '#fff' }]}>✎ {t('actionModal.edit')}</Text>
