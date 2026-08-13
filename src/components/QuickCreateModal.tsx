@@ -16,6 +16,7 @@ const SECTIONS = [
     key: 'events',
     colorKey: 'accent' as const,
     lockedColor: null,
+    headerIcon: 'calendar' as const,
     items: [
       { icon: 'calendar' as const, nav: (n: any) => n.navigate('Events', { screen: 'AddEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.newEvent' },
       { icon: 'calendar' as const, nav: (n: any) => n.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.voiceEvent' },
@@ -26,6 +27,7 @@ const SECTIONS = [
     key: 'health',
     colorKey: null,
     lockedColor: MODULE_COLORS.health,
+    headerIcon: 'medication' as const,
     items: [
       { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }), labelKey: 'quickCreate.healthAppointment' },
       { icon: 'vaccination' as const, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }), labelKey: 'quickCreate.healthVaccination' },
@@ -35,6 +37,7 @@ const SECTIONS = [
     key: 'pets',
     colorKey: null,
     lockedColor: MODULE_COLORS.pets,
+    headerIcon: 'pet' as const,
     items: [
       { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }), labelKey: 'quickCreate.petVetVisit' },
       { icon: 'vaccination' as const, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }), labelKey: 'quickCreate.petVaccination' },
@@ -44,6 +47,7 @@ const SECTIONS = [
     key: 'trips',
     colorKey: null,
     lockedColor: MODULE_COLORS.trips,
+    headerIcon: 'transport' as const,
     items: [
       { icon: 'transport' as const, nav: (n: any) => n.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }), labelKey: 'quickCreate.newTrip' },
     ],
@@ -79,9 +83,12 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     <View key={section.key} style={styles.card}>
                       <View style={[styles.cardBorder, { backgroundColor: sectionColor }]} />
                       <View style={styles.cardContent}>
-                        <Text style={[styles.cardTitle, { color: sectionColor }]}>
-                          {t(`quickCreate.${section.key}`)}
-                        </Text>
+                        <View style={styles.cardTitleRow}>
+                          <AppIcon name={section.headerIcon} size={16} color={sectionColor} />
+                          <Text style={[styles.cardTitle, { color: sectionColor }]}>
+                            {t(`quickCreate.${section.key}`)}
+                          </Text>
+                        </View>
                         <View style={styles.cardActions}>
                           {section.items.map((item, idx) => (
                             <TouchableOpacity
@@ -174,10 +181,15 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingLeft: 12,
   },
+  cardTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 8,
+  },
   cardTitle: {
     fontSize: 14,
     fontWeight: '700',
-    marginBottom: 8,
   },
   cardActions: {
     flexDirection: 'row',
