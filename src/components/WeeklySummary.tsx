@@ -164,6 +164,14 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           healthCount++;
         }
       });
+      // Health medications — show on active days
+      healthMedications.forEach((m) => {
+        const isActive = (!m.dateFrom || m.dateFrom <= dateStr) && (!m.dateTo || m.dateTo >= dateStr);
+        if (isActive) {
+          items.push({ type: 'health', icon: 'medication', iconBg: '#FFEBEE', title: `${m.name} — ${m.person}`, time: m.frequency || '' });
+          healthCount++;
+        }
+      });
 
       // Pets
       petVetVisits.forEach((v) => {
@@ -176,6 +184,14 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       petVaccinations.forEach((v) => {
         if (v.date === dateStr) {
           items.push({ type: 'pet', icon: 'vaccination', iconBg: '#F3E5F5', title: `${v.name} — ${v.petId}`, time: '' });
+          petCount++;
+        }
+      });
+      // Pet medications — show on active days
+      petMedications.forEach((m) => {
+        const isActive = (!m.dateFrom || m.dateFrom <= dateStr) && (!m.dateTo || m.dateTo >= dateStr);
+        if (isActive) {
+          items.push({ type: 'pet', icon: 'medication', iconBg: '#F3E5F5', title: `${m.name}`, time: m.frequency || '' });
           petCount++;
         }
       });

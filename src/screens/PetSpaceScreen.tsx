@@ -638,15 +638,30 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
             medications.length === 0 ? (
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('pets.noMedications')}</Text>
             ) : (
-              medications.map(m => (
-                <TouchableOpacity key={m.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: m, section: 'medications' })} onLongPress={() => setItemActionModal({ visible: true, id: m.id, title: m.name, section: 'medications' })}>
-                  <AppIcon name="medication" size={20} color={PET_THEME} />
-                  <View style={styles.itemText}>
-                    <Text style={[styles.itemTitle, { color: colors.text }]}>{m.name}</Text>
-                    <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{m.dosage} {m.frequency}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))
+              [...medications].sort((a, b) => {
+                const aPast = a.dateTo && isDatePast(a.dateTo);
+                const bPast = b.dateTo && isDatePast(b.dateTo);
+                if (aPast && !bPast) return 1;
+                if (!aPast && bPast) return -1;
+                return (a.dateFrom || '').localeCompare(b.dateFrom || '');
+              }).map(m => {
+                const isFinished = m.dateTo && isDatePast(m.dateTo);
+                const isActive = m.dateFrom && (!m.dateTo || !isDatePast(m.dateTo));
+                return (
+                  <TouchableOpacity key={m.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: m, section: 'medications' })} onLongPress={() => setItemActionModal({ visible: true, id: m.id, title: m.name, section: 'medications' })}>
+                    <AppIcon name="medication" size={20} color={PET_THEME} />
+                    <View style={styles.itemText}>
+                      <Text style={[styles.itemTitle, { color: colors.text }]}>{m.name}</Text>
+                      <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{m.dosage} {m.frequency}</Text>
+                    </View>
+                    {isFinished ? (
+                      <Text style={[styles.badge, { backgroundColor: '#E8F5E9', color: '#43A047' }]}>{t('health.completed')}</Text>
+                    ) : isActive ? (
+                      <Text style={[styles.badge, { backgroundColor: '#FFF3E0', color: '#FB8C00' }]}>{t('health.ongoing')}</Text>
+                    ) : null}
+                  </TouchableOpacity>
+                );
+              })
             )
           ))}
 

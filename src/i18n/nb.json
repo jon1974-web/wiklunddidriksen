@@ -325,7 +325,8 @@
     "status": "Status",
     "reminder1Day": "1 dag før",
     "reminder3Days": "3 dager før",
-    "reminder1Week": "1 uke før"
+    "reminder1Week": "1 uke før",
+    "ongoing": "Pågående"
   },
   "shopping": {
     "title": "Lister",

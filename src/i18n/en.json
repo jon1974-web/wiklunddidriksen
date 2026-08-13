@@ -325,7 +325,8 @@
     "status": "Status",
     "reminder1Day": "1 day before",
     "reminder3Days": "3 days before",
-    "reminder1Week": "1 week before"
+    "reminder1Week": "1 week before",
+    "ongoing": "Ongoing"
   },
   "shopping": {
     "title": "Lists",
