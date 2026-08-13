@@ -129,14 +129,18 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
 
   useEffect(() => {
     if (route?.params?.openAddSection && pets.length > 0 && !selectedPet) {
-      setSelectedPet(pets[0]);
-      setTimeout(() => {
-        setActiveSection(route.params!.openAddSection!);
-        setEditingItem(null);
-        resetItemForms();
-        setShowItemModal(true);
-        navigation.setParams({ openAddSection: undefined });
-      }, 500);
+      if (pets.length === 1) {
+        // Only one pet — auto-select and open modal
+        setSelectedPet(pets[0]);
+        setTimeout(() => {
+          setActiveSection(route.params!.openAddSection!);
+          setEditingItem(null);
+          resetItemForms();
+          setShowItemModal(true);
+          navigation.setParams({ openAddSection: undefined });
+        }, 500);
+      }
+      // Multiple pets — user sees the grid and selects manually
     }
   }, [route?.params?.openAddSection, pets, selectedPet]);
 
@@ -378,7 +382,18 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
             <TouchableOpacity
               key={pet.id}
               style={[styles.gridTile, { backgroundColor: colors.surface }]}
-              onPress={() => setSelectedPet(pet)}
+              onPress={() => {
+                setSelectedPet(pet);
+                if (route?.params?.openAddSection) {
+                  setTimeout(() => {
+                    setActiveSection(route.params!.openAddSection!);
+                    setEditingItem(null);
+                    resetItemForms();
+                    setShowItemModal(true);
+                    navigation.setParams({ openAddSection: undefined });
+                  }, 300);
+                }
+              }}
               onLongPress={() => setPetActionModal({ visible: true, id: pet.id, title: pet.name })}
             >
               {pet.photoUrl ? (
