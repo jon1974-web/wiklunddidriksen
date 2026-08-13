@@ -117,8 +117,7 @@ export const ProfileScreen: React.FC = () => {
         setFamily(userProfile.familyId, userProfile.familyName, userProfile.familyRole);
       }
       if (userProfile?.calendarId) {
-        const name = await getCalendarName(userProfile.calendarId);
-        setCalendarName(name);
+        getCalendarName(userProfile.calendarId).then((name) => setCalendarName(name));
       }
       if (userProfile?.calendarEmail) {
         setCalendarEmail(userProfile.calendarEmail);
@@ -132,9 +131,11 @@ export const ProfileScreen: React.FC = () => {
       if (userProfile?.minUkeSections) {
         setMinUkeSections(userProfile.minUkeSections);
       }
+      setLoading(false);
+
+      // Load Spond config in background (non-blocking)
       if (userProfile?.familyId) {
-        try {
-          const spondConfig = await getSpondConfig(userProfile.familyId);
+        getSpondConfig(userProfile.familyId).then((spondConfig) => {
           if (spondConfig) {
             setSpondEmail(spondConfig.email);
             setSpondPassword(spondConfig.password);
@@ -145,21 +146,27 @@ export const ProfileScreen: React.FC = () => {
               setSpondRespondents(spondConfig.respondents.map((r) => r.spondId));
             }
             setSpondLoading(true);
-            const allMembers: any[] = [];
-            for (const group of spondConfig.groups) {
-              try {
-                const members = await getSpondMembers(spondConfig.email, spondConfig.password, group.id);
-                members.forEach((m: any) => allMembers.push({ ...m, groupId: group.id, groupName: group.name }));
-              } catch {}
-            }
-            setSpondAllMembers(allMembers);
-            setSpondLoading(false);
+            Promise.allSettled(
+              spondConfig.groups.map((group) =>
+                getSpondMembers(spondConfig.email, spondConfig.password, group.id).then((members) =>
+                  members.map((m: any) => ({ ...m, groupId: group.id, groupName: group.name }))
+                )
+              )
+            ).then((results) => {
+              const allMembers: any[] = [];
+              results.forEach((result) => {
+                if (result.status === 'fulfilled') {
+                  result.value.forEach((m: any) => allMembers.push(m));
+                }
+              });
+              setSpondAllMembers(allMembers);
+              setSpondLoading(false);
+            });
           }
-        } catch (e) {
+        }).catch((e) => {
           console.log('Error loading Spond config:', e);
-        }
+        });
       }
-      setLoading(false);
     };
 
     loadProfile();
