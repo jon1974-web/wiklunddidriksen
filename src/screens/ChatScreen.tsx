@@ -127,6 +127,10 @@ export const ChatScreen: React.FC = () => {
       blob = await uriToBlob(uri);
     }
     const filename = `chat/${Date.now()}_${Math.random().toString(36).substr(2)}`;
+    if (Platform.OS === 'web') {
+      const { webUploadFile } = await import('../services/webStorage');
+      return await webUploadFile(filename, blob);
+    }
     const storageRef = ref(storage, filename);
     await uploadBytes(storageRef, blob);
     return await getDownloadURL(storageRef);
