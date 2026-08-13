@@ -104,10 +104,12 @@ export const ChatScreen: React.FC = () => {
       quality: IMAGE_QUALITY,
       maxWidth: IMAGE_MAX_DIMENSION,
       maxHeight: IMAGE_MAX_DIMENSION,
+      base64: true,
     });
 
     if (!result.canceled && result.assets[0]) {
       setSelectedImage(result.assets[0].uri);
+      setSelectedImageBase64(result.assets[0].base64 || null);
     }
   }, []);
 
