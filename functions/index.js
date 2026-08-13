@@ -1,6 +1,7 @@
 require("dotenv").config();
 const { onRequest } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getMessaging } = require("firebase-admin/messaging");
@@ -2010,5 +2011,28 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
 
   console.log(`checkMedicationReminders: ${totalSent} sent`);
   return { sent: totalSent };
+});
+
+// Chat message notification
+exports.notifyNewChatMessage = onDocumentCreated({ region: "us-central1", document: "chat/{chatId}" }, async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+  const data = snap.data();
+  const { senderId, senderName, text, familyId } = data;
+
+  if (!familyId || !senderId) return;
+
+  const preview = text ? (text.length > 50 ? text.substring(0, 50) + "..." : text) : "📷 bilde";
+
+  const sent = await sendNotification({
+    familyId,
+    title: senderName || "Noen",
+    body: preview,
+    notifKey: `chat_${snap.id}`,
+    excludeUid: senderId,
+  });
+
+  console.log(`onChatMessage: ${sent} sent`);
+  return { sent };
 });
 
