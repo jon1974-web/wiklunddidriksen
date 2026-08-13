@@ -205,6 +205,59 @@ Performance directly impacts user experience. Treat it as a feature, not an afte
 - Use `FlatList` with `getItemLayout` for fixed-height lists
 - Avoid re-creating functions on every render
 
+### Preventing Undefined Errors (CRITICAL)
+We've had recurring issues with `undefined` values causing blank screens. Follow these rules:
+
+**Rule 1: Always provide defaults when reading from Firestore**
+```typescript
+// ❌ BAD - crashes if timeSlots is undefined
+medForm.timeSlots.map(...)
+
+// ✅ GOOD - safe with fallback
+(medForm.timeSlots || []).map(...)
+```
+
+**Rule 2: Always default optional form fields in useState**
+```typescript
+// ❌ BAD - timeSlots could be undefined after editing old data
+const [medForm, setMedForm] = useState({ name: '', frequency: '', timeSlots: undefined });
+
+// ✅ GOOD - always provide safe defaults
+const [medForm, setMedForm] = useState({ name: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] });
+```
+
+**Rule 3: Always default in edit pre-fill useEffects**
+```typescript
+// ❌ BAD - crashes if item.timeSlots is undefined (old data)
+setMedForm({ ...item, timeSlots: item.timeSlots });
+
+// ✅ GOOD - safe fallback
+setMedForm({ ...item, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }] });
+```
+
+**Rule 4: Use optional chaining for nested access**
+```typescript
+// ❌ BAD
+medForm.timeSlots[0].time
+
+// ✅ GOOD
+medForm.timeSlots?.[0]?.time
+```
+
+**Rule 5: Guard array operations**
+```typescript
+// ❌ BAD
+medForm.timeSlots.map(...)
+
+// ✅ GOOD
+(medForm.timeSlots || []).map(...)
+```
+
+**Common culprits:**
+- Firestore data added before a schema change (missing new fields)
+- Edit forms that pre-fill from existing data
+- Array fields that might not exist on older documents
+
 ### Navigation Focus Listeners
 - **ALWAYS** add `navigation.addListener('focus', ...)` when a screen loads data on mount that can be modified on child screens
 - When navigating back from a detail/edit screen, the parent screen must refresh its data to reflect changes
