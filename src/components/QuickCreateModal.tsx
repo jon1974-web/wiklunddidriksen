@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { AppIcon } from './AppIcon';
@@ -10,6 +10,45 @@ interface QuickCreateModalProps {
   onClose: () => void;
   navigation: any;
 }
+
+const SECTIONS = [
+  {
+    key: 'events',
+    colorKey: 'accent' as const,
+    lockedColor: null,
+    items: [
+      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Events', { screen: 'AddEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.newEvent' },
+      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.voiceEvent' },
+      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Events', { screen: 'PhotoEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.photoEvent' },
+    ],
+  },
+  {
+    key: 'health',
+    colorKey: null,
+    lockedColor: MODULE_COLORS.health,
+    items: [
+      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }), labelKey: 'quickCreate.healthAppointment' },
+      { icon: 'vaccination' as const, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }), labelKey: 'quickCreate.healthVaccination' },
+    ],
+  },
+  {
+    key: 'pets',
+    colorKey: null,
+    lockedColor: MODULE_COLORS.pets,
+    items: [
+      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }), labelKey: 'quickCreate.petVetVisit' },
+      { icon: 'vaccination' as const, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }), labelKey: 'quickCreate.petVaccination' },
+    ],
+  },
+  {
+    key: 'trips',
+    colorKey: null,
+    lockedColor: MODULE_COLORS.trips,
+    items: [
+      { icon: 'transport' as const, nav: (n: any) => n.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }), labelKey: 'quickCreate.newTrip' },
+    ],
+  },
+];
 
 export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ visible, onClose, navigation }) => {
   const { colors } = useTheme();
@@ -33,105 +72,36 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                   <Text style={[styles.closeText, { color: colors.textSecondary }]}>✕</Text>
                 </TouchableOpacity>
               </View>
-              <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-
-                {/* Avtaler */}
-                <View style={styles.section}>
-                  <View style={styles.sectionHeader}>
-                    <AppIcon name="calendar" size={18} color={colors.accent} />
-                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('quickCreate.events')}</Text>
-                  </View>
-                  <OptionRow
-                    icon="calendar"
-                    iconColor={colors.accent}
-                    label={t('quickCreate.newEvent')}
-                    desc={t('quickCreate.newEventDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'AddEvent', params: { _t: Date.now() } }))}
-                    colors={colors}
-                  />
-                  <OptionRow
-                    icon="calendar"
-                    iconColor={colors.accent}
-                    label={t('quickCreate.voiceEvent')}
-                    desc={t('quickCreate.voiceEventDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } }))}
-                    colors={colors}
-                  />
-                  <OptionRow
-                    icon="calendar"
-                    iconColor={colors.accent}
-                    label={t('quickCreate.photoEvent')}
-                    desc={t('quickCreate.photoEventDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Events', { screen: 'PhotoEvent', params: { _t: Date.now() } }))}
-                    colors={colors}
-                  />
-                </View>
-
-                {/* Helse */}
-                <View style={styles.section}>
-                  <View style={styles.sectionHeader}>
-                    <AppIcon name="medication" size={18} color={MODULE_COLORS.health} />
-                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('quickCreate.health')}</Text>
-                  </View>
-                  <OptionRow
-                    icon="calendar"
-                    iconColor={MODULE_COLORS.health}
-                    label={t('quickCreate.healthAppointment')}
-                    desc={t('quickCreate.healthAppointmentDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }))}
-                    colors={colors}
-                  />
-                  <OptionRow
-                    icon="vaccination"
-                    iconColor={MODULE_COLORS.health}
-                    label={t('quickCreate.healthVaccination')}
-                    desc={t('quickCreate.healthVaccinationDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }))}
-                    colors={colors}
-                  />
-                </View>
-
-                {/* Kjæledyr */}
-                <View style={styles.section}>
-                  <View style={styles.sectionHeader}>
-                    <AppIcon name="pet" size={18} color={MODULE_COLORS.pets} />
-                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('quickCreate.pets')}</Text>
-                  </View>
-                  <OptionRow
-                    icon="calendar"
-                    iconColor={MODULE_COLORS.pets}
-                    label={t('quickCreate.petVetVisit')}
-                    desc={t('quickCreate.petVetVisitDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }))}
-                    colors={colors}
-                  />
-                  <OptionRow
-                    icon="vaccination"
-                    iconColor={MODULE_COLORS.pets}
-                    label={t('quickCreate.petVaccination')}
-                    desc={t('quickCreate.petVaccinationDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }))}
-                    colors={colors}
-                  />
-                </View>
-
-                {/* Reiser */}
-                <View style={styles.section}>
-                  <View style={styles.sectionHeader}>
-                    <AppIcon name="transport" size={18} color={MODULE_COLORS.trips} />
-                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('quickCreate.trips')}</Text>
-                  </View>
-                  <OptionRow
-                    icon="transport"
-                    iconColor={MODULE_COLORS.trips}
-                    label={t('quickCreate.newTrip')}
-                    desc={t('quickCreate.newTripDesc')}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }))}
-                    colors={colors}
-                  />
-                </View>
-
-              </ScrollView>
+              <View style={styles.content}>
+                {SECTIONS.map((section) => {
+                  const sectionColor = section.colorKey ? colors[section.colorKey] : section.lockedColor!;
+                  return (
+                    <View key={section.key} style={styles.card}>
+                      <View style={[styles.cardBorder, { backgroundColor: sectionColor }]} />
+                      <View style={styles.cardContent}>
+                        <Text style={[styles.cardTitle, { color: sectionColor }]}>
+                          {t(`quickCreate.${section.key}`)}
+                        </Text>
+                        <View style={styles.cardActions}>
+                          {section.items.map((item, idx) => (
+                            <TouchableOpacity
+                              key={idx}
+                              style={[styles.actionBtn, { backgroundColor: sectionColor }]}
+                              onPress={() => navigateAndClose(() => item.nav(navigation))}
+                              activeOpacity={0.8}
+                            >
+                              <View style={styles.actionIconWrap}>
+                                <AppIcon name={item.icon} size={18} color="#fff" />
+                              </View>
+                              <Text style={styles.actionLabel}>{t(item.labelKey)}</Text>
+                            </TouchableOpacity>
+                          ))}
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
             </View>
           </TouchableWithoutFeedback>
         </View>
@@ -139,26 +109,6 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
     </Modal>
   );
 });
-
-const OptionRow = ({ icon, iconColor, label, desc, onPress, colors }: {
-  icon: string;
-  iconColor: string;
-  label: string;
-  desc: string;
-  onPress: () => void;
-  colors: any;
-}) => (
-  <TouchableOpacity style={[styles.option, { backgroundColor: colors.surface }]} onPress={onPress} activeOpacity={0.7}>
-    <View style={[styles.optionIcon, { backgroundColor: iconColor + '18' }]}>
-      <AppIcon name={icon as any} size={20} color={iconColor} />
-    </View>
-    <View style={styles.optionText}>
-      <Text style={[styles.optionLabel, { color: colors.text }]}>{label}</Text>
-      <Text style={[styles.optionDesc, { color: colors.textSecondary }]}>{desc}</Text>
-    </View>
-    <Text style={[styles.optionArrow, { color: colors.textDisabled }]}>›</Text>
-  </TouchableOpacity>
-);
 
 const styles = StyleSheet.create({
   overlay: {
@@ -169,7 +119,6 @@ const styles = StyleSheet.create({
   sheet: {
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-    maxHeight: '75%',
   },
   handle: {
     width: 36,
@@ -184,72 +133,76 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 16,
-    paddingBottom: 12,
+    paddingBottom: 10,
   },
   title: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
   },
   closeBtn: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   closeText: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
   },
   content: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingBottom: 34,
   },
-  section: {
-    marginBottom: 20,
-  },
-  sectionHeader: {
+  card: {
     flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 8,
-    paddingBottom: 6,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  sectionTitle: {
-    fontSize: 13,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  option: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    padding: 12,
     borderRadius: 12,
+    marginBottom: 8,
+    backgroundColor: '#fff',
+    overflow: 'hidden',
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 3,
   },
-  optionIcon: {
-    width: 40,
-    height: 40,
+  cardBorder: {
+    width: 4,
+  },
+  cardContent: {
+    flex: 1,
+    padding: 10,
+    paddingLeft: 12,
+  },
+  cardTitle: {
+    fontSize: 12,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  cardActions: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  actionBtn: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 10,
+    paddingHorizontal: 6,
     borderRadius: 10,
+  },
+  actionIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255,255,255,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  optionText: {
-    flex: 1,
-  },
-  optionLabel: {
-    fontSize: 15,
-    fontWeight: '500',
-  },
-  optionDesc: {
-    fontSize: 12,
-    marginTop: 1,
-  },
-  optionArrow: {
-    fontSize: 18,
-    fontWeight: '300',
+  actionLabel: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#fff',
+    textAlign: 'center',
   },
 });
