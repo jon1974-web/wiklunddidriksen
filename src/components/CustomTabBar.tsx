@@ -67,7 +67,7 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
   const { t } = useTranslation();
 
   return (
-    <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+    <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.accent }]}>
       {state.routes.map((route: any, index: number) => {
         const isFocused = state.index === index;
         const icon = TAB_ICONS[route.name] || 'calendar';
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingTop: 6,
     paddingBottom: 4,
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderRadius: 28,
     height: 62,
     position: 'relative',
