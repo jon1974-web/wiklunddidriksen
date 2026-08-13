@@ -2065,7 +2065,7 @@ exports.decryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB
 exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
-  const fiveMinAgo = new Date(now.getTime() - 10 * 60 * 1000);
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
   const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000);
 
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
@@ -2107,7 +2107,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", reg
         const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slotH, slotM, 0, 0);
         const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
 
-        if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
+        if (reminderTime >= todayStart && reminderTime <= fiveMinFromNow) {
           const notifId = `med_${doc.id}_${slot.time}_${todayStr}`;
           const notifSnap = await db.collection("sentNotifications").doc(notifId).get();
           if (notifSnap.exists) continue;
