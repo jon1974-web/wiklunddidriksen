@@ -1611,12 +1611,14 @@ exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB"
           role: "system",
           content: `You are a recipe extraction assistant. Extract recipe data from the provided HTML content of a recipe webpage.
 
+IMPORTANT: The content is raw HTML. Ignore all HTML tags, scripts, CSS, navigation, ads, and non-recipe content. Focus ONLY on the actual recipe data.
+
 Return ONLY valid JSON with this exact structure:
 {
-  "name": "Recipe name",
-  "description": "Short 1-2 sentence description",
-  "ingredients": [{"name": "Ingredient name MUST be in ${responseLangName}", "amount": "Amount", "unit": "Unit"}],
-  "instructions": ["Step MUST be in ${responseLangName}", "Step MUST be in ${responseLangName}"],
+  "name": "Recipe name in ${responseLangName}",
+  "description": "Short 1-2 sentence description in ${responseLangName}",
+  "ingredients": [{"name": "Ingredient name in ${responseLangName}", "amount": "Amount", "unit": "Unit"}],
+  "instructions": ["Step 1 in ${responseLangName}", "Step 2 in ${responseLangName}"],
   "time": 30,
   "portions": 4,
   "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott",
@@ -1629,7 +1631,7 @@ If you cannot extract a recipe from the content, return {"error": "Could not ext
         },
         {
           role: "user",
-          content: `Extract the recipe from this webpage content:\n\n${html.substring(0, 8000)}`,
+          content: `Extract the recipe from this webpage content. Ignore all HTML tags, scripts, ads, navigation menus, and focus only on the recipe ingredients, instructions, and metadata:\n\n${html.substring(0, 12000)}`,
         },
       ],
       temperature: 0.3,
