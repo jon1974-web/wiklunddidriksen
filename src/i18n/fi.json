@@ -142,6 +142,8 @@
     "endTime60": "1 tunti",
     "endTime90": "1,5 tuntia",
     "endTime120": "2 tuntia",
+    "sortBy": "Järjestä",
+    "spondGroups": "Spond ryhmät",
     "addEndTime": "Lisää lopetusaika",
     "listView": "Lista",
     "calendarView": "Kalenteri",

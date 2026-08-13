@@ -142,6 +142,8 @@
     "endTime60": "1 timme",
     "endTime90": "1,5 timmar",
     "endTime120": "2 timmar",
+    "sortBy": "Sortera efter",
+    "spondGroups": "Spond grupper",
     "addEndTime": "Lägg till sluttid",
     "listView": "Lista",
     "calendarView": "Kalender",

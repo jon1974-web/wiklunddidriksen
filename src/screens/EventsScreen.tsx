@@ -23,6 +23,7 @@ import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { WeeklySummary } from '../components/WeeklySummary';
 import { MissedRemindersBanner } from '../components/MissedRemindersBanner';
+import Svg, { Circle, Line } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 
@@ -142,6 +143,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [filterSource, setFilterSource] = useState<string | null>(null);
+  const [filterModule, setFilterModule] = useState<string | null>(null);
+  const [showSortPanel, setShowSortPanel] = useState(false);
   const [selectedDate, setSelectedDate] = useState<string>(getTodayLocal());
   const [visibleDate, setVisibleDate] = useState<string>(getTodayLocal());
   const [showPastEvents, setShowPastEvents] = useState(false);
@@ -411,7 +414,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('health.vaccinations')}: ${v.name}`, date: v.date, description: v.person, icon: '💉',
       }));
       let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations];
-      if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
+      if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
+      else if (filterModule === 'health') dayItems = dayItems.filter((i) => i._type === 'healthAppointment');
+      else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && (i as any).icon === '🐾');
+      else if (filterModule === 'trip') dayItems = dayItems.filter((i) => i._type === 'trip');
+      else if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
       dayItems.sort(sortByDate);
       return dayItems;
@@ -441,17 +448,19 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         icon: '💉',
       })),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
-    const filtered = filterSource && filterSource !== 'app'
-      ? allItems.filter((i) => i._type === 'spond' && i.groupName === filterSource)
-      : filterSource === 'app'
-      ? allItems.filter((i) => i._type === 'event' || i._type === 'trip')
-      : allItems;
+    let filtered = allItems;
+    if (filterModule === 'event') filtered = allItems.filter((i) => i._type === 'event');
+    else if (filterModule === 'health') filtered = allItems.filter((i) => i._type === 'healthAppointment');
+    else if (filterModule === 'pet') filtered = allItems.filter((i) => i._type === 'healthAppointment' && (i as any).icon === '🐾');
+    else if (filterModule === 'trip') filtered = allItems.filter((i) => i._type === 'trip');
+    else if (filterSource && filterSource !== 'app') filtered = allItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
+    else if (filterSource === 'app') filtered = allItems.filter((i) => i._type === 'event' || i._type === 'trip');
     const upcoming = filtered.filter((i) => getDateStr(i) >= today);
     const past = filtered.filter((i) => getDateStr(i) < today);
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
-  }, [events, trips, spondEvents, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource]);
+  }, [events, trips, spondEvents, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource, filterModule]);
 
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
@@ -831,7 +840,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <TouchableOpacity
             style={[styles.minUkeButton, { borderColor: MODULE_COLORS.mealplan }]}
             onPress={() => {
-              // Re-fetch mealPlan and recipes
               if (familyId) {
                 const now = new Date();
                 const day = now.getDay();
@@ -859,24 +867,71 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             <AppIcon name="calendar" size={16} color={MODULE_COLORS.mealplan} />
             <Text style={[styles.minUkeText, { color: MODULE_COLORS.mealplan }]}>{t('events.weeklySummary')}</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.sortIconButton, { borderColor: colors.accent }, showSortPanel && { backgroundColor: colors.accent }]}
+            onPress={() => setShowSortPanel(!showSortPanel)}
+          >
+            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={showSortPanel ? '#fff' : colors.accent} strokeWidth="2.5" strokeLinecap="round">
+              <Line x1="4" y1="6" x2="20" y2="6"/>
+              <Line x1="4" y1="12" x2="20" y2="12"/>
+              <Line x1="4" y1="18" x2="20" y2="18"/>
+              <Circle cx="8" cy="6" r="2" fill={showSortPanel ? '#fff' : colors.accent}/>
+              <Circle cx="16" cy="12" r="2" fill={showSortPanel ? '#fff' : colors.accent}/>
+              <Circle cx="10" cy="18" r="2" fill={showSortPanel ? '#fff' : colors.accent}/>
+            </Svg>
+          </TouchableOpacity>
         </View>
-        {spondGroupLogos && Object.keys(spondGroupLogos).length > 0 && (
-          <View style={{ flexDirection: 'row', gap: 10, paddingTop: 8, paddingBottom: 4, paddingHorizontal: 16 }}>
-            <TouchableOpacity
-              style={[styles.filterIcon, filterSource === 'app' && { borderColor: colors.accent }]}
-              onPress={() => setFilterSource(filterSource === 'app' ? null : 'app')}
-            >
-              <View style={[styles.filterIconCircle, { backgroundColor: colors.accent }, filterSource === 'app' && styles.filterIconCircleActive]} />
-            </TouchableOpacity>
-            {Object.entries(spondGroupLogos).map(([groupName, logoUrl]) => (
+        {showSortPanel && (
+          <View style={[styles.sortPanel, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.sortSectionLabel, { color: colors.textSecondary }]}>{t('events.sortBy')}</Text>
+            <View style={styles.sortIconRow}>
               <TouchableOpacity
-                key={groupName}
-                style={[styles.filterIcon, filterSource === groupName && { borderColor: colors.accent }]}
-                onPress={() => setFilterSource(filterSource === groupName ? null : groupName)}
+                style={[styles.sortIconBtn, { borderColor: colors.border }, filterModule === 'event' && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                onPress={() => { const v = filterModule === 'event' ? null : 'event'; setFilterModule(v); setShowSortPanel(false); }}
               >
-                <Image source={{ uri: logoUrl }} style={[styles.filterIconImg, filterSource === groupName && styles.filterIconImgActive]} />
+                <AppIcon name="calendar" size={18} color={filterModule === 'event' ? '#fff' : colors.accent} />
               </TouchableOpacity>
-            ))}
+              <TouchableOpacity
+                style={[styles.sortIconBtn, { borderColor: colors.border }, filterModule === 'health' && { backgroundColor: MODULE_COLORS.health, borderColor: MODULE_COLORS.health }]}
+                onPress={() => { const v = filterModule === 'health' ? null : 'health'; setFilterModule(v); setShowSortPanel(false); }}
+              >
+                <Svg width={18} height={18} viewBox="0 0 24 24" fill={filterModule === 'health' ? '#fff' : MODULE_COLORS.health}><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></Svg>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sortIconBtn, { borderColor: colors.border }, filterModule === 'pet' && { backgroundColor: MODULE_COLORS.pets, borderColor: MODULE_COLORS.pets }]}
+                onPress={() => { const v = filterModule === 'pet' ? null : 'pet'; setFilterModule(v); setShowSortPanel(false); }}
+              >
+                <Svg width={18} height={18} viewBox="0 0 24 24" fill={filterModule === 'pet' ? '#fff' : MODULE_COLORS.pets}><circle cx="8" cy="7" r="2.5"/><circle cx="16" cy="7" r="2.5"/><circle cx="5" cy="13" r="2"/><circle cx="19" cy="13" r="2"/><ellipse cx="12" cy="18" rx="5" ry="3.5"/></Svg>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sortIconBtn, { borderColor: colors.border }, filterModule === 'trip' && { backgroundColor: MODULE_COLORS.trips, borderColor: MODULE_COLORS.trips }]}
+                onPress={() => { const v = filterModule === 'trip' ? null : 'trip'; setFilterModule(v); setShowSortPanel(false); }}
+              >
+                <AppIcon name="transport" size={18} color={filterModule === 'trip' ? '#fff' : MODULE_COLORS.trips} />
+              </TouchableOpacity>
+            </View>
+            {Object.keys(spondGroupLogos).length > 0 && (
+              <>
+                <Text style={[styles.sortSectionLabel, { color: colors.textSecondary, marginTop: 8 }]}>{t('events.spondGroups')}</Text>
+                <View style={styles.sortIconRow}>
+                  <TouchableOpacity
+                    style={[styles.sortIconBtn, { borderColor: colors.border }, filterSource === 'app' && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                    onPress={() => { const v = filterSource === 'app' ? null : 'app'; setFilterSource(v); setShowSortPanel(false); }}
+                  >
+                    <AppIcon name="calendar" size={18} color={filterSource === 'app' ? '#fff' : colors.accent} />
+                  </TouchableOpacity>
+                  {Object.entries(spondGroupLogos).map(([groupName, logoUrl]) => (
+                    <TouchableOpacity
+                      key={groupName}
+                      style={[styles.sortIconBtn, { borderColor: colors.border }, filterSource === groupName && { borderColor: colors.accent }]}
+                      onPress={() => { const v = filterSource === groupName ? null : groupName; setFilterSource(v); setShowSortPanel(false); }}
+                    >
+                      <Image source={{ uri: logoUrl }} style={{ width: 20, height: 20, borderRadius: 4 }} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            )}
           </View>
         )}
       </View>
@@ -1017,6 +1072,41 @@ const styles = StyleSheet.create({
   minUkeText: {
     fontSize: 13,
     fontWeight: '600',
+  },
+  sortIconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 'auto',
+  },
+  sortPanel: {
+    marginHorizontal: 16,
+    marginTop: 8,
+    borderRadius: 12,
+    padding: 12,
+  },
+  sortSectionLabel: {
+    fontSize: 10,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+    marginBottom: 8,
+  },
+  sortIconRow: {
+    flexDirection: 'row',
+    gap: 8,
+    flexWrap: 'wrap',
+  },
+  sortIconBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   filterIcon: {
     width: 28,
