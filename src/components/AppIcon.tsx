@@ -221,9 +221,8 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
   );
 
   if (name === 'medication') return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-6 9h6"/>
-      <Line x1="12" y1="10" x2="12" y2="18"/>
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
     </Svg>
   );
 
@@ -254,11 +253,12 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
   );
 
   if (name === 'pet') return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <Circle cx="12" cy="12" r="10"/>
-      <Path d="M8 14s1.5 2 4 2 4-2 4-2"/>
-      <Line x1="9" y1="9" x2="9.01" y2="9"/>
-      <Line x1="15" y1="9" x2="15.01" y2="9"/>
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Circle cx="8" cy="7" r="2.5"/>
+      <Circle cx="16" cy="7" r="2.5"/>
+      <Circle cx="5" cy="13" r="2"/>
+      <Circle cx="19" cy="13" r="2"/>
+      <Ellipse cx="12" cy="18" rx="5" ry="3.5"/>
     </Svg>
   );
 
