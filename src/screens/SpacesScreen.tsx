@@ -6,9 +6,12 @@ import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { getTrips } from '../services/tripService';
-import { getHealthAppointments } from '../services/healthService';
+import { getHealthAppointments, getHealthMedications, getHealthVaccinations } from '../services/healthService';
 import { getSchoolChildren } from '../services/schoolService';
+import { getPets, getAllVetVisits, getAllPetMedications, getAllPetVaccinations } from '../services/petService';
 import { MODULE_COLORS } from '../constants/moduleColors';
+import { collection, query, where, getDocs } from 'firebase/firestore';
+import { db } from '../services/firebase';
 
 interface Space {
   id: string;
@@ -31,20 +34,67 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
   const [tripCount, setTripCount] = useState(0);
   const [healthCount, setHealthCount] = useState(0);
   const [schoolCount, setSchoolCount] = useState(0);
+  const [petCount, setPetCount] = useState(0);
+  const [birthdayCount, setBirthdayCount] = useState(0);
 
   useEffect(() => {
     if (!familyId) return;
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+    const currentMonth = today.getMonth();
+
+    // Trips - active trips
     getTrips(familyId).then(trips => {
-      const active = trips.filter(trip => trip.endDate >= today);
+      const active = trips.filter(trip => trip.endDate >= todayStr);
       setTripCount(active.length);
     }).catch(() => {});
-    getHealthAppointments(familyId).then(appts => {
-      const future = appts.filter(a => a.date >= today);
-      setHealthCount(future.length);
+
+    // Health - active medications + upcoming appointments + vaccinations
+    Promise.all([
+      getHealthAppointments(familyId),
+      getHealthMedications(familyId),
+      getHealthVaccinations(familyId),
+    ]).then(([appts, meds, vaccs]) => {
+      const futureAppts = appts.filter(a => a.date >= todayStr);
+      const activeMeds = meds.filter(m => {
+        if (m.dateTo && m.dateTo < todayStr) return false;
+        if (m.dateFrom && m.dateFrom > todayStr) return false;
+        return true;
+      });
+      const futureVaccs = vaccs.filter(v => v.date >= todayStr);
+      setHealthCount(futureAppts.length + activeMeds.length + futureVaccs.length);
     }).catch(() => {});
+
+    // School - number of children
     getSchoolChildren(familyId).then(children => {
       setSchoolCount(children.length);
+    }).catch(() => {});
+
+    // Pets - active medications + vet visits + vaccinations
+    Promise.all([
+      getAllVetVisits(familyId),
+      getAllPetMedications(familyId),
+      getAllPetVaccinations(familyId),
+    ]).then(([vetVisits, meds, vaccs]) => {
+      const futureVetVisits = vetVisits.filter(v => v.date >= todayStr);
+      const activeMeds = meds.filter(m => {
+        if (m.dateTo && m.dateTo < todayStr) return false;
+        if (m.dateFrom && m.dateFrom > todayStr) return false;
+        return true;
+      });
+      const futureVaccs = vaccs.filter(v => v.date >= todayStr);
+      setPetCount(futureVetVisits.length + activeMeds.length + futureVaccs.length);
+    }).catch(() => {});
+
+    // Birthdays - birthdays this month
+    const q = query(collection(db, 'birthdays'), where('familyId', '==', familyId));
+    getDocs(q).then(snapshot => {
+      const monthBirthdays = snapshot.docs.filter(doc => {
+        const data = doc.data();
+        const bDate = new Date(data.date);
+        return bDate.getMonth() === currentMonth;
+      });
+      setBirthdayCount(monthBirthdays.length);
     }).catch(() => {});
   }, [familyId]);
 
@@ -54,7 +104,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       name: t('spaces.trips'),
       icon: 'compass',
       iconColor: MODULE_COLORS.trips,
-      count: t('spaces.tripsCount', { count: tripCount }),
+      count: tripCount > 0 ? t('spaces.tripsCount', { count: tripCount }) : '',
       screen: 'TripsList',
     },
     {
@@ -62,7 +112,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       name: t('spaces.health'),
       icon: 'medication',
       iconColor: MODULE_COLORS.health,
-      count: t('spaces.healthCount', { count: healthCount }),
+      count: healthCount > 0 ? t('spaces.healthCount', { count: healthCount }) : '',
       screen: 'HealthSpace',
     },
     {
@@ -70,7 +120,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       name: t('spaces.school'),
       icon: 'documents',
       iconColor: MODULE_COLORS.school,
-      count: t('spaces.schoolCount', { count: schoolCount }),
+      count: schoolCount > 0 ? t('spaces.schoolCount', { count: schoolCount }) : '',
       screen: 'SchoolSpace',
     },
     {
@@ -78,7 +128,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       name: t('spaces.birthdays'),
       icon: 'birthday',
       iconColor: MODULE_COLORS.birthdays,
-      count: t('spaces.birthdayCount', { count: 2 }),
+      count: birthdayCount > 0 ? t('spaces.birthdayCount', { count: birthdayCount }) : '',
       screen: 'BirthdaySpace',
     },
     {
@@ -86,7 +136,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       name: t('spaces.pets'),
       icon: 'activities',
       iconColor: MODULE_COLORS.pets,
-      count: t('spaces.petsCount', { count: 1 }),
+      count: petCount > 0 ? t('spaces.petsCount', { count: petCount }) : '',
       screen: 'PetSpace',
     },
     {
@@ -102,7 +152,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       name: t('spaces.home'),
       icon: 'hotel',
       iconColor: MODULE_COLORS.home,
-      count: t('spaces.homeCount', { count: 4 }),
+      count: '',
       screen: 'HomeSpace',
     },
   ];
