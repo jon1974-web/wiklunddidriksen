@@ -12,6 +12,7 @@ import { ActionModal } from '../components/ActionModal';
 import { InfoModal } from '../components/InfoModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
+import { generateId } from '../utils/generateId';
 
 interface Props {
   navigation: any;

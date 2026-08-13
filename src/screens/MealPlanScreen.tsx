@@ -478,6 +478,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setAiResults(data.recipes || []);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
+      setShowAiResults(false);
     } finally {
       setAiLoading(false);
     }
@@ -814,7 +815,6 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     placeholderTextColor={colors.textDisabled}
                     value={langSearchQuery}
                     onChangeText={setLangSearchQuery}
-                    autoFocus
                   />
                   <ScrollView style={{ maxHeight: 200 }} nestedScrollEnabled>
                     {languageOptions
@@ -938,7 +938,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       {/* AI Results */}
       {showAiResults && (
         <View style={[styles.card, { backgroundColor: colors.surface, margin: 8 }]}>
-          <Text style={[styles.cardTitle, { color: colors.text }]}>🤖 {t('mealPlanner.aiSuggest')}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+            <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>🤖 {t('mealPlanner.aiSuggest')}</Text>
+            <TouchableOpacity onPress={() => { setShowAiResults(false); setAiResults([]); setAiLoading(false); }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 18, fontWeight: '600' }}>✕</Text>
+            </TouchableOpacity>
+          </View>
           {aiLoading ? (
             <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('common.loading')}</Text>
           ) : aiResults.length === 0 ? (
@@ -1577,7 +1582,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         </TouchableWithoutFeedback>
       </Modal>
       {/* FAB for adding recipes */}
-      {activeTab === 'oppskrifter' && (
+      {activeTab === 'oppskrifter' && !showAiResults && (
         <>
           <TouchableOpacity
             style={[styles.fabUrl, { backgroundColor: colors.accent }]}
@@ -1636,7 +1641,7 @@ const styles = StyleSheet.create({
   aiSearchHint: { fontSize: 13, marginBottom: 10 },
   aiLangLabel: { fontSize: 12, fontWeight: '600', marginBottom: 6 },
   langDropdown: { borderRadius: 8, borderWidth: 1, marginBottom: 12, overflow: 'hidden' },
-  langSearchInput: { padding: 10, fontSize: 14, borderBottomWidth: 1, borderBottomColor: 'transparent' },
+  langSearchInput: { padding: 10, fontSize: 16, borderBottomWidth: 1, borderBottomColor: 'transparent' },
   langOption: { paddingVertical: 10, paddingHorizontal: 12, borderBottomWidth: 0.5 },
   urlImportBtn: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, padding: 14, marginTop: 12, borderWidth: 1 },
   urlImportTitle: { fontSize: 14, fontWeight: '600', marginBottom: 2 },
