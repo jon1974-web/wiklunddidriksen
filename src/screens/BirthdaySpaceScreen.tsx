@@ -32,6 +32,12 @@ function getDaysUntilBirthday(birthDate: string): number {
   const today = new Date();
   const birth = new Date(birthDate);
   const thisYear = new Date(today.getFullYear(), birth.getMonth(), birth.getDate());
+  
+  // Check if birthday is today
+  if (thisYear.toDateString() === today.toDateString()) {
+    return 0;
+  }
+  
   if (thisYear < today) {
     thisYear.setFullYear(thisYear.getFullYear() + 1);
   }

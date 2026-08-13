@@ -62,7 +62,7 @@ service cloud.firestore {
       allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
       match /{subcollection=**} {
-        allow read, write: if request.auth != null && isFamilyMember(/databases/$(database)/documents/trips/$(tripId)).data.familyId;
+        allow read, write: if request.auth != null;
       }
     }
 
