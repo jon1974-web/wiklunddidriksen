@@ -88,7 +88,7 @@ const statStyles = StyleSheet.create({
   label: { fontSize: 8, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.3 },
 });
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
