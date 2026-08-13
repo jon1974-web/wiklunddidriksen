@@ -2065,104 +2065,92 @@ exports.decryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB
 exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
-  const currentHour = now.getHours();
-  const currentMinute = now.getMinutes();
-  const currentTime = `${String(currentHour).padStart(2, '0')}:${String(currentMinute).padStart(2, '0')}`;
   const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000);
   const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000);
 
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
-  // Query health medications with timeSlots
-  const healthMedsSnap = await db.collectionGroup("medications")
-    .where("frequency", ">", 0)
-    .limit(500)
-    .get();
-
-  // Query pet medications with timeSlots
-  const petMedsSnap = await db.collectionGroup("medications")
-    .where("frequency", ">", 0)
-    .limit(500)
-    .get();
-
+  // Get all families
+  const familiesSnap = await db.collection("families").limit(100).get();
   const notifications = [];
   const familyMembersCache = {};
 
-  // Process health medications
-  for (const doc of healthMedsSnap.docs) {
-    const medData = doc.data();
-    if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) continue;
+  for (const familyDoc of familiesSnap.docs) {
+    const familyId = familyDoc.id;
 
-    // Get familyId from parent path: health/{familyId}/medications/{medId}
-    const parentPath = doc.ref.parent.parent;
-    if (!parentPath) continue;
-    const familyId = parentPath.id;
-    if (!familyId) continue;
+    // Query health medications for this family
+    const healthMedsSnap = await db.collection("health").doc(familyId).collection("medications")
+      .where("frequency", ">", 0)
+      .limit(50)
+      .get();
 
-    // Check date range
-    if (medData.dateTo && medData.dateTo < todayStr) continue;
-    if (medData.dateFrom && medData.dateFrom > todayStr) continue;
+    // Query pet medications for this family
+    const petMedsSnap = await db.collection("pets").doc(familyId).collection("medications")
+      .where("frequency", ">", 0)
+      .limit(50)
+      .get();
 
-    for (const slot of medData.timeSlots) {
-      if (!slot.time || !slot.reminderMinutes) continue;
+    // Process health medications
+    for (const doc of healthMedsSnap.docs) {
+      const medData = doc.data();
+      if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) continue;
+      if (medData.dateTo && medData.dateTo < todayStr) continue;
+      if (medData.dateFrom && medData.dateFrom > todayStr) continue;
 
-      const [slotH, slotM] = slot.time.split(":").map(Number);
-      const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slotH, slotM, 0, 0);
-      const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
+      for (const slot of medData.timeSlots) {
+        if (!slot.time || !slot.reminderMinutes) continue;
 
-      if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
-        const notifId = `med_${doc.id}_${slot.time}_${todayStr}`;
-        const notifSnap = await db.collection("sentNotifications").doc(notifId).get();
-        if (notifSnap.exists) continue;
+        const [slotH, slotM] = slot.time.split(":").map(Number);
+        const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slotH, slotM, 0, 0);
+        const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
 
-        // Get family members
-        if (!familyMembersCache[familyId]) {
-          const familySnap = await db.collection("families").doc(familyId).get();
-          if (!familySnap.exists) { familyMembersCache[familyId] = []; continue; }
-          const membersMap = familySnap.data().members || {};
-          const memberUids = Object.keys(membersMap);
-          const members = [];
-          for (let i = 0; i < memberUids.length; i += 10) {
-            const batch = memberUids.slice(i, i + 10);
-            const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
-            usersSnap.forEach((uDoc) => {
-              const uData = uDoc.data();
-              if (uData.fcmToken && uData.notificationsEnabled !== false) {
-                members.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
-              }
+        if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
+          const notifId = `med_${doc.id}_${slot.time}_${todayStr}`;
+          const notifSnap = await db.collection("sentNotifications").doc(notifId).get();
+          if (notifSnap.exists) continue;
+
+          // Get family members
+          if (!familyMembersCache[familyId]) {
+            const familySnap = await db.collection("families").doc(familyId).get();
+            if (!familySnap.exists) { familyMembersCache[familyId] = []; continue; }
+            const membersMap = familySnap.data().members || {};
+            const memberUids = Object.keys(membersMap);
+            const members = [];
+            for (let i = 0; i < memberUids.length; i += 10) {
+              const batch = memberUids.slice(i, i + 10);
+              const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
+              usersSnap.forEach((uDoc) => {
+                const uData = uDoc.data();
+                if (uData.fcmToken && uData.notificationsEnabled !== false) {
+                  members.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
+                }
+              });
+            }
+            familyMembersCache[familyId] = members;
+          }
+
+          const members = familyMembersCache[familyId];
+          for (const member of members) {
+            notifications.push({
+              notifId,
+              token: member.fcmToken,
+              title: `💊 ${medData.name}`,
+              body: `${medData.person}: ${slot.time} — ${medData.dosage || ''}`,
+              uid: member.uid,
             });
           }
-          familyMembersCache[familyId] = members;
-        }
-
-        const members = familyMembersCache[familyId];
-        for (const member of members) {
-          notifications.push({
-            notifId,
-            token: member.fcmToken,
-            title: `💊 ${medData.name}`,
-            body: `${medData.person}: ${slot.time} — ${medData.dosage || ''}`,
-            uid: member.uid,
-          });
         }
       }
     }
-  }
 
-  // Process pet medications (similar logic)
-  for (const doc of petMedsSnap.docs) {
-    const medData = doc.data();
-    if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) continue;
+    // Process pet medications
+    for (const doc of petMedsSnap.docs) {
+      const medData = doc.data();
+      if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) continue;
+      if (medData.dateTo && medData.dateTo < todayStr) continue;
+      if (medData.dateFrom && medData.dateFrom > todayStr) continue;
 
-    const parentPath = doc.ref.parent.parent;
-    if (!parentPath) continue;
-    const familyId = parentPath.id;
-    if (!familyId) continue;
-
-    if (medData.dateTo && medData.dateTo < todayStr) continue;
-    if (medData.dateFrom && medData.dateFrom > todayStr) continue;
-
-    for (const slot of medData.timeSlots) {
+      for (const slot of medData.timeSlots) {
       if (!slot.time || !slot.reminderMinutes) continue;
 
       const [slotH, slotM] = slot.time.split(":").map(Number);
@@ -2205,6 +2193,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", reg
         }
       }
     }
+  }
   }
 
   // Send notifications
