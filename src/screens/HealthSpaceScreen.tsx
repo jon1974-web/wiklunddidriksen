@@ -464,7 +464,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                               newSlots[i] = { ...newSlots[i], reminderMinutes: mins };
                               setMedForm(f => ({ ...f, timeSlots: newSlots }));
                             }}>
-                              <Text style={{ color: slot.reminderMinutes === mins ? '#fff' : colors.text, fontSize: 10 }}>{mins === 0 ? t('health.noReminder') : mins < 60 ? `${mins}m` : `${mins/60}t`}</Text>
+                              <Text style={{ color: slot.reminderMinutes === mins ? '#fff' : colors.text, fontSize: 12 }}>{mins === 0 ? t('health.noReminder') : mins < 60 ? `${mins}m` : `${mins/60}t`}</Text>
                             </TouchableOpacity>
                           ))}
                         </View>
@@ -1002,6 +1002,14 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         onSelect={(value) => {
           if (activePicker === 'medDateFrom') setMedForm(f => ({ ...f, dateFrom: value }));
           else if (activePicker === 'medDateTo') setMedForm(f => ({ ...f, dateTo: value }));
+          else if (activePicker?.startsWith('medTime')) {
+            const idx = parseInt(activePicker.replace('medTime', ''));
+            const newSlots = [...medForm.timeSlots];
+            if (newSlots[idx]) {
+              newSlots[idx] = { ...newSlots[idx], time: value };
+              setMedForm(f => ({ ...f, timeSlots: newSlots }));
+            }
+          }
           else if (activePicker === 'apptDate') setApptForm(f => ({ ...f, date: value }));
           else if (activePicker === 'apptStartTime') setApptForm(f => ({ ...f, startTime: value }));
           else if (activePicker === 'apptEndTime') setApptForm(f => ({ ...f, endTime: value }));
@@ -1042,12 +1050,12 @@ const styles = StyleSheet.create({
   input: { borderRadius: 10, padding: 14, fontSize: 16 },
   personRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   personChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16 },
-  timeSlot: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 10, borderRadius: 8, marginBottom: 8 },
-  timeSlotLabel: { fontSize: 12, fontWeight: '600', minWidth: 50 },
-  timeInput: { padding: 8, borderRadius: 8, minWidth: 80 },
-  reminderRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginLeft: 'auto' },
-  reminderLabel: { fontSize: 10 },
-  reminderChip: { paddingVertical: 3, paddingHorizontal: 6, borderRadius: 8 },
+  timeSlot: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 10, marginBottom: 10 },
+  timeSlotLabel: { fontSize: 14, fontWeight: '600', minWidth: 55 },
+  timeInput: { padding: 10, borderRadius: 8, minWidth: 90 },
+  reminderRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 'auto' },
+  reminderLabel: { fontSize: 12, fontWeight: '500' },
+  reminderChip: { paddingVertical: 5, paddingHorizontal: 10, borderRadius: 10 },
   modalActions: { flexDirection: 'row', gap: 12, marginTop: 8 },
   modalBtn: { flex: 1, padding: 14, borderRadius: 10, alignItems: 'center' },
   modalBtnText: { fontSize: 16, fontWeight: '600' },
