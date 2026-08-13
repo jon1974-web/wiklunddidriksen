@@ -1325,6 +1325,10 @@ export const ProfileScreen: React.FC = () => {
         { icon: '👤', title: t('profile.helpMembersMember'), text: t('profile.helpMembersMemberText') },
         { icon: '👉', title: t('profile.helpMembersHow'), text: t('profile.helpMembersHowText'), tip: t('profile.helpMembersTip') },
       ]} />
+      <HelpCenter visible={showHelpSpond} onClose={() => setShowHelpSpond(false)} title={t('profile.helpSpondTitle')} sections={[
+        { icon: '⚽', title: t('profile.helpSpondWhat'), text: t('profile.helpSpondWhatText') },
+        { icon: '👉', title: t('profile.helpSpondHow'), text: t('profile.helpSpondHowText'), tip: t('profile.helpSpondTip') },
+      ]} />
 
     </SafeAreaView>
   );
