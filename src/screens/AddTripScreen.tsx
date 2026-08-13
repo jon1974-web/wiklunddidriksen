@@ -62,14 +62,16 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   }, [title, city, country, startDate, endDate, icon, user, familyId, navigation]);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TouchableOpacity
-        onPress={() => navigation.goBack()}
-        style={[styles.backBtn, { borderColor: MODULE_COLORS.trips }]}
-      >
-        <Text style={[styles.backBtnText, { color: MODULE_COLORS.trips }]}>←</Text>
-      </TouchableOpacity>
-      <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.addTrip')}</Text>
+    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.tripsBg }]}>
+      <View style={[styles.header, { backgroundColor: colors.surface }]}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={[styles.backBtn, { borderColor: MODULE_COLORS.trips }]}
+        >
+          <Text style={[styles.backBtnText, { color: MODULE_COLORS.trips }]}>←</Text>
+        </TouchableOpacity>
+        <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.addTrip')}</Text>
+      </View>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
@@ -168,6 +170,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  header: {
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
   },
   backBtn: {
     width: 36,
