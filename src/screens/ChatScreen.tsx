@@ -14,6 +14,7 @@ import { getErrorMessage } from '../utils/validation';
 import { uriToBlob } from '../utils/upload';
 import { getUserProfile } from '../services/familyService';
 import { AppIcon } from '../components/AppIcon';
+import { AppIcon } from '../components/AppIcon';
 
 export const ChatScreen: React.FC = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -252,7 +253,7 @@ export const ChatScreen: React.FC = () => {
           onPress={handlePickImage}
           disabled={uploading}
         >
-          <Text style={[styles.iconText, { color: colors.text }]}>🖼</Text>
+          <AppIcon name="image" size={20} color={colors.text} />
         </TouchableOpacity>
         {Platform.OS !== 'web' && (
           <TouchableOpacity
@@ -260,7 +261,7 @@ export const ChatScreen: React.FC = () => {
             onPress={handleTakePhoto}
             disabled={uploading}
           >
-            <Text style={[styles.iconText, { color: colors.text }]}>📷</Text>
+            <AppIcon name="camera" size={20} color={colors.text} />
           </TouchableOpacity>
         )}
         <TextInput
@@ -346,11 +347,12 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   iconButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 2,
   },
   iconText: {
     fontSize: 18,
@@ -363,12 +365,12 @@ const styles = StyleSheet.create({
     maxHeight: 100,
   },
   sendButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
     borderRadius: 20,
     justifyContent: 'center',
-    minWidth: 60,
     alignItems: 'center',
+    marginBottom: 2,
   },
   sendButtonText: {
     color: '#fff',
