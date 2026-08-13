@@ -139,12 +139,12 @@ const styles = StyleSheet.create({
   },
   centerBtn: {
     position: 'absolute',
-    top: -18,
+    top: -14,
     left: '50%',
-    marginLeft: -24,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    marginLeft: -26,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -155,8 +155,8 @@ const styles = StyleSheet.create({
   },
   plus: {
     color: '#fff',
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: '300',
-    lineHeight: 30,
+    lineHeight: 32,
   },
 });
