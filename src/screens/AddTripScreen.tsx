@@ -63,13 +63,13 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.tripsBg }]}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={[styles.backBtn, { borderColor: MODULE_COLORS.trips }]}
+      >
+        <Text style={[styles.backBtnText, { color: MODULE_COLORS.trips }]}>←</Text>
+      </TouchableOpacity>
       <View style={[styles.header, { backgroundColor: colors.surface }]}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={[styles.backBtn, { borderColor: MODULE_COLORS.trips }]}
-        >
-          <Text style={[styles.backBtnText, { color: MODULE_COLORS.trips }]}>←</Text>
-        </TouchableOpacity>
         <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.addTrip')}</Text>
       </View>
 
