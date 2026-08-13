@@ -4,6 +4,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { AppIcon } from './AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
+import Svg, { Line } from 'react-native-svg';
 
 interface QuickCreateModalProps {
   visible: boolean;
@@ -72,8 +73,11 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
               <View style={styles.handle} />
               <View style={styles.header}>
                 <Text style={[styles.title, { color: colors.text }]}>{t('quickCreate.title')}</Text>
-                <TouchableOpacity style={[styles.closeBtn, { backgroundColor: colors.inputBackground }]} onPress={onClose}>
-                  <Text style={[styles.closeText, { color: colors.textSecondary }]}>✕</Text>
+                <TouchableOpacity style={[styles.closeBtn, { borderColor: colors.accent }]} onPress={onClose}>
+                  <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={colors.accent} strokeWidth="2.5" strokeLinecap="round">
+                    <Line x1="18" y1="6" x2="6" y2="18"/>
+                    <Line x1="6" y1="6" x2="18" y2="18"/>
+                  </Svg>
                 </TouchableOpacity>
               </View>
               <View style={styles.content}>
@@ -147,9 +151,10 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   closeBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
   },

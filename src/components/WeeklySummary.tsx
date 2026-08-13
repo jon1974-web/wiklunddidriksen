@@ -8,6 +8,7 @@ import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
 import { AppIcon } from './AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
+import Svg, { Line } from 'react-native-svg';
 
 interface WeeklySummaryProps {
   visible: boolean;
@@ -268,8 +269,11 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
               {t('weekdays.week')} {weekData.weekNum} · {weekData.startLabel} – {weekData.endLabel}
             </Text>
           </View>
-          <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { backgroundColor: colors.inputBackground }]}>
-            <Text style={[styles.closeBtnText, { color: colors.textSecondary }]}>✕</Text>
+          <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { borderColor: colors.accent }]}>
+            <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={colors.accent} strokeWidth="2.5" strokeLinecap="round">
+              <Line x1="18" y1="6" x2="6" y2="18"/>
+              <Line x1="6" y1="6" x2="18" y2="18"/>
+            </Svg>
           </TouchableOpacity>
         </View>
 
@@ -387,7 +391,7 @@ const styles = StyleSheet.create({
   headerContent: { flex: 1 },
   headerTitle: { fontSize: 18, fontWeight: '700' },
   headerSubtitle: { fontSize: 12, marginTop: 2 },
-  closeBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  closeBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   closeBtnText: { fontSize: 14, fontWeight: '600' },
   scrollView: { flex: 1 },
   scrollContent: { padding: 12 },
