@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     padding: 12,
+    paddingBottom: 50,
     borderTopWidth: 1,
     alignItems: 'flex-end',
     gap: 8,
