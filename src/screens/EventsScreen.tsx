@@ -414,15 +414,15 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('health.vaccinations')}: ${v.name}`, date: v.date, description: v.person, icon: '💉',
       }));
       const dayPetVetVisits = petVetVisits.filter((v) => v.date === selectedDate).map((v) => ({
-        ...v, _type: 'healthAppointment' as const, time: v.startTime || '09:00', address: v.location || '', title: v.title, date: v.date, description: v.petId, icon: '🐾',
+        ...v, _type: 'healthAppointment' as const, time: v.startTime || '09:00', address: v.location || '', title: v.title, date: v.date, description: v.petId, icon: 'pet-visit',
       }));
       const dayPetVaccinations = petVaccinations.filter((v) => v.date === selectedDate).map((v) => ({
-        ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('pets.vaccinations')}: ${v.name}`, date: v.date, description: v.petId, icon: '🐾',
+        ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('pets.vaccinations')}: ${v.name}`, date: v.date, description: v.petId, icon: 'pet-vaccination',
       }));
       let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
       else if (filterModule === 'health') dayItems = dayItems.filter((i) => i._type === 'healthAppointment');
-      else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && (i as any).icon === '🐾');
+      else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
       else if (filterModule === 'trip') dayItems = dayItems.filter((i) => i._type === 'trip');
       else if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
@@ -461,7 +461,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         title: v.title,
         date: v.date,
         description: v.petId,
-        icon: '🐾',
+        icon: 'pet-visit',
       })),
       ...petVaccinations.filter(v => v.date).map((v) => ({
         ...v,
@@ -471,13 +471,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         title: `${t('pets.vaccinations')}: ${v.name}`,
         date: v.date,
         description: v.petId,
-        icon: '🐾',
+        icon: 'pet-vaccination',
       })),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
     let filtered = allItems;
     if (filterModule === 'event') filtered = allItems.filter((i) => i._type === 'event');
     else if (filterModule === 'health') filtered = allItems.filter((i) => i._type === 'healthAppointment');
-    else if (filterModule === 'pet') filtered = allItems.filter((i) => i._type === 'healthAppointment' && (i as any).icon === '🐾');
+    else if (filterModule === 'pet') filtered = allItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
     else if (filterModule === 'trip') filtered = allItems.filter((i) => i._type === 'trip');
     else if (filterSource && filterSource !== 'app') filtered = allItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
     else if (filterSource === 'app') filtered = allItems.filter((i) => i._type === 'event' || i._type === 'trip');
@@ -792,7 +792,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             </View>
             <View style={styles.spondCardContent}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <AppIcon name={item.icon === '🐾' ? 'pet' : item.icon === '💉' ? 'vaccination' : 'medication'} size={14} color="#E53935" />
+                <AppIcon
+                  name={item.icon === 'vaccination' || item.icon === 'pet-vaccination' ? 'vaccination' : 'calendar'}
+                  size={14}
+                  color={(item.icon === 'pet-visit' || item.icon === 'pet-vaccination') ? '#8E24AA' : '#E53935'}
+                />
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
               </View>
               <View style={styles.spondTimeRow}>
