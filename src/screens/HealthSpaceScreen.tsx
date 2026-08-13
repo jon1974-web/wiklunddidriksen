@@ -125,7 +125,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         if (!medForm.name.trim()) { crossAlert('Error', t('health.enterName')); return; }
         if (isEditing) await updateHealthMedication(familyId, editingItem.id, medForm);
         else await addHealthMedication(familyId, medForm);
-        setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: '', dateFrom: '', dateTo: '', note: '' });
+        setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: '', dateTo: '', note: '' });
       } else if (activeSection === 'appointments') {
         if (!apptForm.title.trim() || !apptForm.date) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
         let savedAppt;
@@ -681,7 +681,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               )}
             </ScrollView>
             <View style={styles.modalActions}>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => setShowAddModal(false)}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: '', dateTo: '', note: '' }); setEditingItem(null); setShowAddModal(false); }}>
                 <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: MODULE_COLORS.health }]} onPress={handleAdd}>
