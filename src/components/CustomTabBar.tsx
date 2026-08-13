@@ -67,7 +67,7 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
   const { t } = useTranslation();
 
   return (
-    <View style={[styles.tabBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+    <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
       {state.routes.map((route: any, index: number) => {
         const isFocused = state.index === index;
         const icon = TAB_ICONS[route.name] || 'calendar';
@@ -106,22 +106,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingTop: 8,
-    paddingBottom: 8,
-    borderTopWidth: 1,
-    height: 82,
+    paddingBottom: 6,
+    borderWidth: 1,
+    borderRadius: 20,
+    height: 70,
     position: 'relative',
+    marginHorizontal: 10,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 4,
   },
   tabItem: {
     flex: 1,
     alignItems: 'center',
-    gap: 4,
+    gap: 3,
     paddingTop: 4,
   },
   tabItemLeft: {
-    paddingRight: 24,
+    paddingRight: 20,
   },
   tabItemRight: {
-    paddingLeft: 24,
+    paddingLeft: 20,
   },
   tabLabel: {
     fontSize: 10,
@@ -131,12 +139,12 @@ const styles = StyleSheet.create({
   },
   centerBtn: {
     position: 'absolute',
-    top: -28,
+    top: -18,
     left: '50%',
-    marginLeft: -28,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    marginLeft: -24,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
@@ -147,8 +155,8 @@ const styles = StyleSheet.create({
   },
   plus: {
     color: '#fff',
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: '300',
-    lineHeight: 34,
+    lineHeight: 30,
   },
 });
