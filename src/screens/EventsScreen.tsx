@@ -914,12 +914,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               <>
                 <Text style={[styles.sortSectionLabel, { color: colors.textSecondary, marginTop: 8 }]}>{t('events.spondGroups')}</Text>
                 <View style={styles.sortIconRow}>
-                  <TouchableOpacity
-                    style={[styles.sortIconBtn, { borderColor: colors.border }, filterSource === 'app' && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-                    onPress={() => { const v = filterSource === 'app' ? null : 'app'; setFilterSource(v); setShowSortPanel(false); }}
-                  >
-                    <AppIcon name="calendar" size={18} color={filterSource === 'app' ? '#fff' : colors.accent} />
-                  </TouchableOpacity>
                   {Object.entries(spondGroupLogos).map(([groupName, logoUrl]) => (
                     <TouchableOpacity
                       key={groupName}
