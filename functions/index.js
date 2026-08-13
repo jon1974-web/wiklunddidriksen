@@ -2062,7 +2062,7 @@ exports.decryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB
 
 // Scheduled function: check medication reminders every 5 minutes
 // Sends push notifications for medications with time slots and reminders
-exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", region: "us-central1" }, async (event) => {
+exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", timeZone: "Europe/Oslo", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
@@ -2110,7 +2110,8 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", reg
         if (reminderTime >= todayStart && reminderTime <= fiveMinFromNow) {
           const notifId = `med_${doc.id}_${slot.time}_${todayStr}`;
           const notifSnap = await db.collection("sentNotifications").doc(notifId).get();
-          if (notifSnap.exists) continue;
+          console.log(`  -> CHECK: notifId=${notifId} exists=${notifSnap.exists} reminderTime=${reminderTime.toISOString()} now=${now.toISOString()}`);
+          if (notifSnap.exists) { console.log(`  -> SKIP: already sent`); continue; }
 
           // Get family members
           if (!familyMembersCache[familyId]) {
