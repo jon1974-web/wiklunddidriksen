@@ -2093,10 +2093,10 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", reg
     const medData = doc.data();
     if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) continue;
 
-    // Get familyId from parent path
+    // Get familyId from parent path: health/{familyId}/medications/{medId}
     const parentPath = doc.ref.parent.parent;
     if (!parentPath) continue;
-    const familyId = parentPath.parent?.id;
+    const familyId = parentPath.id;
     if (!familyId) continue;
 
     // Check date range
@@ -2156,7 +2156,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", reg
 
     const parentPath = doc.ref.parent.parent;
     if (!parentPath) continue;
-    const familyId = parentPath.parent?.id;
+    const familyId = parentPath.id;
     if (!familyId) continue;
 
     if (medData.dateTo && medData.dateTo < todayStr) continue;
