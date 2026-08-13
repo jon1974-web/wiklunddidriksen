@@ -91,7 +91,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                               activeOpacity={0.8}
                             >
                               <View style={styles.actionIconWrap}>
-                                <AppIcon name={item.icon} size={18} color="#fff" />
+                                <AppIcon name={item.icon} size={22} color="#fff" />
                               </View>
                               <Text style={styles.actionLabel}>{t(item.labelKey)}</Text>
                             </TouchableOpacity>
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
   },
   title: {
-    fontSize: 17,
+    fontSize: 20,
     fontWeight: '700',
   },
   closeBtn: {
@@ -175,7 +175,7 @@ const styles = StyleSheet.create({
     paddingLeft: 12,
   },
   cardTitle: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '700',
     marginBottom: 8,
   },
@@ -192,16 +192,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   actionIconWrap: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
     backgroundColor: 'rgba(255,255,255,0.3)',
     alignItems: 'center',
     justifyContent: 'center',
   },
   actionLabel: {
-    fontSize: 10,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: '#fff',
     textAlign: 'center',
   },
