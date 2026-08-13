@@ -62,6 +62,12 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={[styles.backBtn, { borderColor: colors.accent }]}
+      >
+        <Text style={[styles.backBtnText, { color: colors.accent }]}>←</Text>
+      </TouchableOpacity>
       <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.addTrip')}</Text>
 
       <View style={styles.field}>
@@ -161,6 +167,18 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+  },
+  backBtnText: {
+    fontSize: 18,
   },
   screenTitle: {
     fontSize: 28,
