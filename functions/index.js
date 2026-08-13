@@ -123,6 +123,61 @@ async function logAuditEvent(uid, action, details = {}) {
   }
 }
 
+// Centralized notification helper - used by all notification functions
+async function sendNotification({ familyId, title, body, notifKey, excludeUid }) {
+  const db = getFirestore();
+
+  // Get family members with FCM tokens
+  const familySnap = await db.collection("families").doc(familyId).get();
+  if (!familySnap.exists) return 0;
+  const membersMap = familySnap.data().members || {};
+  const memberUids = Object.keys(membersMap).filter(uid => uid !== excludeUid);
+
+  const tokens = [];
+  for (let i = 0; i < memberUids.length; i += 10) {
+    const batch = memberUids.slice(i, i + 10);
+    const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
+    usersSnap.forEach((uDoc) => {
+      const uData = uDoc.data();
+      if (uData.fcmToken && uData.notificationsEnabled !== false) {
+        tokens.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
+      }
+    });
+  }
+
+  if (tokens.length === 0) return 0;
+
+  // Deduplication check
+  if (notifKey) {
+    const notifSnap = await db.collection("sentNotifications").doc(notifKey).get();
+    if (notifSnap.exists) return 0;
+  }
+
+  // Send to all family members
+  const results = await Promise.allSettled(
+    tokens.map(async (t) => {
+      await getMessaging().send({
+        token: t.fcmToken,
+        notification: { title, body },
+        webpush: {
+          notification: { icon: "/favicon.ico", badge: "/favicon.ico", tag: notifKey || title },
+          fcmOptions: { link: "/" },
+        },
+        data: { url: "/", type: "notification" },
+      });
+      if (notifKey) {
+        await db.collection("sentNotifications").doc(notifKey).set({
+          sentAt: new Date().toISOString(),
+          uid: t.uid,
+        });
+      }
+    })
+  );
+
+  const sent = results.filter(r => r.status === "fulfilled").length;
+  return sent;
+}
+
 exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
 
@@ -690,9 +745,7 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
 
   const eventsSnap = await db.collection("events").where("reminderMinutes", ">", 0).limit(500).get();
 
-  // Cache family members per familyId to avoid duplicate lookups
-  const familyMembersCache = {};
-  const notifications = [];
+  let totalSent = 0;
 
   for (const doc of eventsSnap.docs) {
     const eventData = doc.data();
@@ -712,100 +765,20 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
       const familyId = eventData.familyId;
       if (!familyId) continue;
 
-      // Look up family members (with cache)
-      if (!familyMembersCache[familyId]) {
-        const familySnap = await db.collection("families").doc(familyId).get();
-        if (!familySnap.exists) {
-          familyMembersCache[familyId] = [];
-          continue;
-        }
-        const familyData = familySnap.data();
-        const membersMap = familyData.members || {};
-        const memberUids = Object.keys(membersMap);
-        if (memberUids.length === 0) {
-          familyMembersCache[familyId] = [];
-          continue;
-        }
-
-        // Fetch user profiles in parallel (batch of up to 10 with 'in' query)
-        const members = [];
-        for (let i = 0; i < memberUids.length; i += 10) {
-          const batch = memberUids.slice(i, i + 10);
-          const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
-          usersSnap.forEach((uDoc) => {
-            const uData = uDoc.data();
-            if (uData.fcmToken && uData.notificationsEnabled !== false) {
-              members.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
-            }
-          });
-        }
-        familyMembersCache[familyId] = members;
-      }
-
-      const members = familyMembersCache[familyId];
-      for (const member of members) {
-        const notifId = `${doc.id}_${member.uid}`;
-        const notifSnap = await db.collection("sentNotifications").doc(notifId).get();
-        if (notifSnap.exists) continue;
-
-        notifications.push({
-          notifId,
-          token: member.fcmToken,
-          title: `📅 ${eventData.title}`,
-          body: `Påminnelse om ${eventData.reminderMinutes} minutter`,
-          eventId: doc.id,
-          uid: member.uid,
-        });
-      }
+      const sent = await sendNotification({
+        familyId,
+        title: `📅 ${eventData.title}`,
+        body: `Påminnelse om ${eventData.reminderMinutes} minutter`,
+        notifKey: doc.id,
+      });
+      totalSent += sent;
     }
   }
 
-  const results = await Promise.allSettled(
-    notifications.map(async (n) => {
-      try {
-        await getMessaging().send({
-          token: n.token,
-          notification: {
-            title: n.title,
-            body: n.body,
-          },
-          webpush: {
-            notification: {
-              icon: "/favicon.ico",
-              badge: "/favicon.ico",
-              tag: n.eventId,
-            },
-            fcmOptions: {
-              link: "/",
-            },
-          },
-          data: {
-            eventId: n.eventId,
-            url: "/",
-          },
-        });
-
-        await db.collection("sentNotifications").doc(n.notifId).set({
-          sentAt: new Date().toISOString(),
-          uid: n.uid,
-          eventId: n.eventId,
-        });
-
-        return { status: "sent", notifId: n.notifId };
-      } catch (error) {
-        if (error.code === "messaging/registration-token-not-registered") {
-          await db.collection("users").doc(n.uid).update({ fcmToken: null });
-        }
-        return { status: "error", notifId: n.notifId, error: error.message };
-      }
-    })
-  );
-
-  const sent = results.filter((r) => r.status === "fulfilled" && r.value?.status === "sent").length;
-  const failed = results.filter((r) => r.status === "fulfilled" && r.value?.status === "error").length;
-
-  console.log(`checkReminders: ${sent} sent, ${failed} failed, ${notifications.length} total`);
-  return { sent, failed, total: notifications.length };
+  console.log(`checkReminders: ${totalSent} sent`);
+  return { sent: totalSent };
+  console.log(`checkReminders: ${totalSent} sent`);
+  return { sent: totalSent };
 });
 
 exports.destinationTips = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
@@ -1232,53 +1205,15 @@ exports.notifyNewEvent = onRequest({ region: "us-central1", memory: "256MB" }, a
   const { familyId, eventTitle, eventDate, eventTime, creatorName } = req.body || {};
   if (!familyId || !eventTitle) return res.status(400).json({ error: "familyId og eventTitle er påkrevd" });
 
-  const db = getFirestore();
-  const familySnap = await db.collection("families").doc(familyId).get();
-  if (!familySnap.exists) return res.status(404).json({ error: "Familie ikke funnet" });
+  const dateLabel = eventDate && eventTime ? `${eventDate} ${eventTime}` : eventDate || "";
 
-  const membersMap = familySnap.data().members || {};
-  const memberUids = Object.keys(membersMap).filter((u) => u !== uid);
+  const sent = await sendNotification({
+    familyId,
+    title: `📅 ${creatorName || 'En i familien'} la til et arrangement`,
+    body: `${eventTitle}${dateLabel ? ` — ${dateLabel}` : ""}`,
+    excludeUid: uid,
+  });
 
-  const tokens = [];
-  for (let i = 0; i < memberUids.length; i += 10) {
-    const batch = memberUids.slice(i, i + 10);
-    const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
-    usersSnap.forEach((uDoc) => {
-      const uData = uDoc.data();
-      if (uData.fcmToken && uData.notificationsEnabled !== false) {
-        tokens.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
-      }
-    });
-  }
-
-  if (tokens.length === 0) return res.status(200).json({ sent: 0 });
-
-  const dateLabel = eventDate && eventTime
-    ? `${eventDate} ${eventTime}`
-    : eventDate || "";
-
-  const results = await Promise.allSettled(
-    tokens.map(async (t) => {
-      await getMessaging().send({
-        token: t.fcmToken,
-        notification: {
-          title: `📅 ${creatorName || 'En i familien'} la til et arrangement`,
-          body: `${eventTitle}${dateLabel ? ` — ${dateLabel}` : ""}`,
-        },
-        webpush: {
-          notification: {
-            icon: "/favicon.ico",
-            badge: "/favicon.ico",
-            tag: "new-event",
-          },
-          fcmOptions: { link: "/" },
-        },
-        data: { url: "/", type: "new-event" },
-      });
-    })
-  );
-
-  const sent = results.filter((r) => r.status === "fulfilled").length;
   return res.status(200).json({ sent });
 });
 
@@ -1299,53 +1234,17 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
   const { familyId, title, date, time, location, itemType, creatorName, personName } = req.body || {};
   if (!familyId || !title) return res.status(400).json({ error: "familyId and title are required" });
 
-  const db = getFirestore();
-  const familySnap = await db.collection("families").doc(familyId).get();
-  if (!familySnap.exists) return res.status(404).json({ error: "Family not found" });
-
-  const membersMap = familySnap.data().members || {};
-  const memberUids = Object.keys(membersMap).filter((u) => u !== uid);
-
-  const tokens = [];
-  for (let i = 0; i < memberUids.length; i += 10) {
-    const batch = memberUids.slice(i, i + 10);
-    const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
-    usersSnap.forEach((uDoc) => {
-      const uData = uDoc.data();
-      if (uData.fcmToken && uData.notificationsEnabled !== false) {
-        tokens.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
-      }
-    });
-  }
-
-  if (tokens.length === 0) return res.status(200).json({ sent: 0 });
-
   const icon = itemType === "vaccination" ? "💉" : "🏥";
   const typeLabel = itemType === "vaccination" ? "Vaksine" : "Time";
   const dateLabel = date && time ? `${date} ${time}` : date || "";
 
-  const results = await Promise.allSettled(
-    tokens.map(async (t) => {
-      await getMessaging().send({
-        token: t.fcmToken,
-        notification: {
-          title: `${icon} ${creatorName || "En i familien"} la til en ${typeLabel} for ${personName || "familien"}`,
-          body: `${title}${dateLabel ? ` — ${dateLabel}` : ""}${location ? ` (${location})` : ""}`,
-        },
-        webpush: {
-          notification: {
-            icon: "/favicon.ico",
-            badge: "/favicon.ico",
-            tag: "health-reminder",
-          },
-          fcmOptions: { link: "/Våre steder" },
-        },
-        data: { url: "/Våre steder", type: "health-reminder" },
-      });
-    })
-  );
+  const sent = await sendNotification({
+    familyId,
+    title: `${icon} ${creatorName || "En i familien"} la til en ${typeLabel} for ${personName || "familien"}`,
+    body: `${title}${dateLabel ? ` — ${dateLabel}` : ""}${location ? ` (${location})` : ""}`,
+    excludeUid: uid,
+  });
 
-  const sent = results.filter((r) => r.status === "fulfilled").length;
   return res.status(200).json({ sent });
 });
 
@@ -1353,7 +1252,6 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
 exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZone: "Europe/Oslo" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
-  const todayMonthDay = `${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 
   // Calculate dates for next 7 days
   const upcomingDates = [];
@@ -1367,7 +1265,7 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZ
   const sentNotifsSnap = await db.collection("sentNotifications").where("type", "==", "birthday").get();
   const sentNotifs = new Set(sentNotifsSnap.docs.map((d) => d.id));
 
-  const notificationsToSend = [];
+  let totalSent = 0;
 
   for (const doc of birthdaysSnap.docs) {
     const b = doc.data();
@@ -1388,57 +1286,25 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZ
     const notifKey = `birthday_${doc.id}_${year}`;
     if (sentNotifs.has(notifKey)) continue;
 
-    // Get family members
     if (!b.familyId) continue;
-    const familyDoc = await db.collection("families").doc(b.familyId).get();
-    if (!familyDoc.exists) continue;
-    const members = familyDoc.data().members || {};
 
-    const memberTokens = [];
-    for (const uid of Object.keys(members)) {
-      const userDoc = await db.collection("users").doc(uid).get();
-      if (!userDoc.exists) continue;
-      const userData = userDoc.data();
-      if (userData.notificationsEnabled === false) continue;
-      if (userData.fcmToken) {
-        memberTokens.push(userData.fcmToken);
-      }
-    }
+    const age = now.getFullYear() - bDate.getFullYear();
+    const title = `🎂 ${b.name} har bursdag!`;
+    const body = daysUntil === 0
+      ? `${b.name} har bursdag i dag! Fyller ${age} år.`
+      : `${b.name} har bursdag om ${daysUntil} dager. Fyller ${age} år.`;
 
-    if (memberTokens.length > 0) {
-      const age = now.getFullYear() - bDate.getFullYear();
-      const title = `🎂 ${b.name} har bursdag!`;
-      const body = daysUntil === 0
-        ? `${b.name} har bursdag i dag! Fyller ${age} år.`
-        : `${b.name} har bursdag om ${daysUntil} dager. Fyller ${age} år.`;
-
-      notificationsToSend.push({ tokens: memberTokens, title, body, notifKey });
-    }
-  }
-
-  // Send notifications
-  for (const notif of notificationsToSend) {
-    await Promise.allSettled(
-      notif.tokens.map(async (token) => {
-        await getMessaging().send({
-          token,
-          notification: { title: notif.title, body: notif.body },
-          webpush: {
-            notification: { icon: "/favicon.ico", badge: "/favicon.ico", tag: notif.notifKey },
-            fcmOptions: { link: "/" },
-          },
-          data: { url: "/", type: "birthday" },
-        });
-      })
-    );
-
-    // Record to prevent duplicates
-    await db.collection("sentNotifications").doc(notif.notifKey).set({
-      type: "birthday",
-      sentAt: FieldValue.serverTimestamp(),
+    const sent = await sendNotification({
+      familyId: b.familyId,
+      title,
+      body,
+      notifKey,
     });
+    totalSent += sent;
   }
-  return { sent: notificationsToSend.length };
+
+  console.log(`checkBirthdayReminders: ${totalSent} sent`);
+  return { sent: totalSent };
 });
 
 // AI Recipe Suggestions
@@ -2072,9 +1938,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
 
   // Get all families
   const familiesSnap = await db.collection("families").limit(100).get();
-  console.log(`checkMedicationReminders: Found ${familiesSnap.docs.length} families`);
-  const notifications = [];
-  const familyMembersCache = {};
+  let totalSent = 0;
 
   for (const familyDoc of familiesSnap.docs) {
     const familyId = familyDoc.id;
@@ -2092,13 +1956,11 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
       .get();
 
     // Process health medications
-    console.log(`checkMedicationReminders: Family ${familyId} has ${healthMedsSnap.docs.length} health meds, ${petMedsSnap.docs.length} pet meds`);
     for (const doc of healthMedsSnap.docs) {
       const medData = doc.data();
-      console.log(`checkMedicationReminders: Health med ${doc.id}: frequency=${medData.frequency} type=${typeof medData.frequency} timeSlots=${JSON.stringify(medData.timeSlots)} dateTo=${medData.dateTo} dateFrom=${medData.dateFrom}`);
-      if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) { console.log(`  -> SKIP: no timeSlots`); continue; }
-      if (medData.dateTo && medData.dateTo < todayStr) { console.log(`  -> SKIP: dateTo passed`); continue; }
-      if (medData.dateFrom && medData.dateFrom > todayStr) { console.log(`  -> SKIP: dateFrom not yet`); continue; }
+      if (!medData.timeSlots || !Array.isArray(medData.timeSlots)) continue;
+      if (medData.dateTo && medData.dateTo < todayStr) continue;
+      if (medData.dateFrom && medData.dateFrom > todayStr) continue;
 
       for (const slot of medData.timeSlots) {
         if (!slot.time || !slot.reminderMinutes) continue;
@@ -2108,41 +1970,13 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
         const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
 
         if (reminderTime >= todayStart && reminderTime <= fiveMinFromNow) {
-          const notifId = `med_${doc.id}_${slot.time}_${todayStr}`;
-          const notifSnap = await db.collection("sentNotifications").doc(notifId).get();
-          console.log(`  -> CHECK: notifId=${notifId} exists=${notifSnap.exists} reminderTime=${reminderTime.toISOString()} now=${now.toISOString()}`);
-          if (notifSnap.exists) { console.log(`  -> SKIP: already sent`); continue; }
-
-          // Get family members
-          if (!familyMembersCache[familyId]) {
-            const familySnap = await db.collection("families").doc(familyId).get();
-            if (!familySnap.exists) { familyMembersCache[familyId] = []; continue; }
-            const membersMap = familySnap.data().members || {};
-            const memberUids = Object.keys(membersMap);
-            const members = [];
-            for (let i = 0; i < memberUids.length; i += 10) {
-              const batch = memberUids.slice(i, i + 10);
-              const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
-              usersSnap.forEach((uDoc) => {
-                const uData = uDoc.data();
-                if (uData.fcmToken && uData.notificationsEnabled !== false) {
-                  members.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
-                }
-              });
-            }
-            familyMembersCache[familyId] = members;
-          }
-
-          const members = familyMembersCache[familyId];
-          for (const member of members) {
-            notifications.push({
-              notifId,
-              token: member.fcmToken,
-              title: `💊 ${medData.name}`,
-              body: `${medData.person}: ${slot.time} — ${medData.dosage || ''}`,
-              uid: member.uid,
-            });
-          }
+          const sent = await sendNotification({
+            familyId,
+            title: `💊 ${medData.name}`,
+            body: `${medData.person}: ${slot.time} — ${medData.dosage || ''}`,
+            notifKey: `med_${doc.id}_${slot.time}_${todayStr}`,
+          });
+          totalSent += sent;
         }
       }
     }
@@ -2155,74 +1989,26 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
       if (medData.dateFrom && medData.dateFrom > todayStr) continue;
 
       for (const slot of medData.timeSlots) {
-      if (!slot.time || !slot.reminderMinutes) continue;
+        if (!slot.time || !slot.reminderMinutes) continue;
 
-      const [slotH, slotM] = slot.time.split(":").map(Number);
-      const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slotH, slotM, 0, 0);
-      const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
+        const [slotH, slotM] = slot.time.split(":").map(Number);
+        const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slotH, slotM, 0, 0);
+        const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
 
-      if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
-        const notifId = `petmed_${doc.id}_${slot.time}_${todayStr}`;
-        const notifSnap = await db.collection("sentNotifications").doc(notifId).get();
-        if (notifSnap.exists) continue;
-
-        if (!familyMembersCache[familyId]) {
-          const familySnap = await db.collection("families").doc(familyId).get();
-          if (!familySnap.exists) { familyMembersCache[familyId] = []; continue; }
-          const membersMap = familySnap.data().members || {};
-          const memberUids = Object.keys(membersMap);
-          const members = [];
-          for (let i = 0; i < memberUids.length; i += 10) {
-            const batch = memberUids.slice(i, i + 10);
-            const usersSnap = await db.collection("users").where("__name__", "in", batch).get();
-            usersSnap.forEach((uDoc) => {
-              const uData = uDoc.data();
-              if (uData.fcmToken && uData.notificationsEnabled !== false) {
-                members.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
-              }
-            });
-          }
-          familyMembersCache[familyId] = members;
-        }
-
-        const members = familyMembersCache[familyId];
-        for (const member of members) {
-          notifications.push({
-            notifId,
-            token: member.fcmToken,
+        if (reminderTime >= todayStart && reminderTime <= fiveMinFromNow) {
+          const sent = await sendNotification({
+            familyId,
             title: `🐾 ${medData.name}`,
             body: `${slot.time} — ${medData.dosage || ''}`,
-            uid: member.uid,
+            notifKey: `petmed_${doc.id}_${slot.time}_${todayStr}`,
           });
+          totalSent += sent;
         }
       }
     }
   }
-  }
 
-  // Send notifications
-  const results = await Promise.allSettled(
-    notifications.map(async (n) => {
-      try {
-        await getMessaging().send({
-          token: n.token,
-          notification: { title: n.title, body: n.body },
-          webpush: { notification: { icon: "/favicon.ico", badge: "/favicon.ico", tag: n.notifId }, fcmOptions: { link: "/" } },
-          data: { url: "/", type: "medication-reminder" },
-        });
-        await db.collection("sentNotifications").doc(n.notifId).set({ sentAt: new Date().toISOString(), uid: n.uid });
-        return { status: "sent" };
-      } catch (error) {
-        if (error.code === "messaging/registration-token-not-registered") {
-          await db.collection("users").doc(n.uid).update({ fcmToken: null });
-        }
-        return { status: "error" };
-      }
-    })
-  );
-
-  const sent = results.filter((r) => r.status === "fulfilled" && r.value?.status === "sent").length;
-  console.log(`checkMedicationReminders: ${sent} sent, ${notifications.length} total`);
-  return { sent, total: notifications.length };
+  console.log(`checkMedicationReminders: ${totalSent} sent`);
+  return { sent: totalSent };
 });
 
