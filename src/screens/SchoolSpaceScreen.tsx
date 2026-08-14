@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { SearchableDropdown } from '../components/SearchableDropdown';
+import { SearchableMultiDropdown } from '../components/SearchableMultiDropdown';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import * as ImagePicker from 'expo-image-picker';
 import { crossAlert } from '../utils/alert';
@@ -68,7 +69,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [yearForm, setYearForm] = useState({ year: '', grade: '', school: '' });
 
   const [showAddContactModal, setShowAddContactModal] = useState(false);
-  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', teacherType: 'contact' as 'personal' | 'contact' | 'subject', adminType: '' as string, name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', teacherType: 'contact' as 'personal' | 'contact' | 'subject', adminType: [] as string[], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [contactActionModal, setContactActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
@@ -127,7 +128,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         setContactForm({
           role: contact.role || 'classmate',
           teacherType: (contact as any).teacherType || 'contact',
-          adminType: (contact as any).adminType || '',
+          adminType: Array.isArray((contact as any).adminType) ? (contact as any).adminType : (contact as any).adminType ? [(contact as any).adminType] : [],
           name: contact.name || '',
           subject: contact.subject || '',
           address: contact.address || '',
@@ -214,7 +215,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       const rawData: Record<string, any> = {
         role: contactForm.role,
         teacherType: contactForm.teacherType || '',
-        adminType: contactForm.adminType || '',
+        adminType: contactForm.adminType.length > 0 ? contactForm.adminType : [],
         name: contactForm.name,
         subject: contactForm.subject || '',
         address: contactForm.address || '',
@@ -241,7 +242,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       } else {
         await addSchoolContact(rawData as any);
       }
-      setContactForm({ role: 'teacher', teacherType: 'contact', adminType: '', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+      setContactForm({ role: 'teacher', teacherType: 'contact', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
       setEditingContactId(null);
       setShowAddContactModal(false);
       loadYearData();
@@ -350,8 +351,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     return (order[a.teacherType || 'contact'] ?? 1) - (order[b.teacherType || 'contact'] ?? 1);
   });
   const admins = contacts.filter(c => c.role === 'admin').sort((a, b) => {
-    const aType = ((a as any).adminType || 'zzz').toLowerCase();
-    const bType = ((b as any).adminType || 'zzz').toLowerCase();
+    const aType = (Array.isArray((a as any).adminType) ? (a as any).adminType[0] : (a as any).adminType || 'zzz').toLowerCase();
+    const bType = (Array.isArray((b as any).adminType) ? (b as any).adminType[0] : (b as any).adminType || 'zzz').toLowerCase();
     return bType.localeCompare(aType);
   });
   const classmates = contacts.filter(c => c.role === 'classmate');
@@ -523,7 +524,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.teachersAndSubjects')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({teachers.length})</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', teacherType: 'contact', adminType: '', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', teacherType: 'contact', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -559,7 +560,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.healthAdmin')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({admins.length})</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'admin', teacherType: 'contact', adminType: '', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'admin', teacherType: 'contact', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -568,11 +569,15 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
-                        {(c as any).adminType && (c as any).adminType !== '' && (
-                          <View style={[styles.teacherTypeBadge, { backgroundColor: getAdminRoleColor((c as any).adminType) + '20' }]}>
-                            <Text style={{ color: getAdminRoleColor((c as any).adminType), fontSize: 10, fontWeight: '600' }}>
-                              {getAdminRoleLabel((c as any).adminType)}
-                            </Text>
+                        {Array.isArray((c as any).adminType) && (c as any).adminType.length > 0 && (
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                            {(c as any).adminType.map((role: string) => (
+                              <View key={role} style={[styles.teacherTypeBadge, { backgroundColor: getAdminRoleColor(role) + '20' }]}>
+                                <Text style={{ color: getAdminRoleColor(role), fontSize: 10, fontWeight: '600' }}>
+                                  {getAdminRoleLabel(role)}
+                                </Text>
+                              </View>
+                            ))}
                           </View>
                         )}
                         {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>🏥 {c.subject}</Text> : null}
@@ -710,10 +715,10 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 {contactForm.role === 'admin' && (
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('school.adminRole')}</Text>
-                    <SearchableDropdown
+                    <SearchableMultiDropdown
                       options={Object.entries(ADMIN_ROLES).map(([key, val]) => ({ key, label: val.label, color: val.color }))}
                       value={contactForm.adminType}
-                      onSelect={(key) => setContactForm(f => ({ ...f, adminType: key }))}
+                      onChange={(keys) => setContactForm(f => ({ ...f, adminType: keys }))}
                       placeholder={t('school.adminRole')}
                     />
                   </View>

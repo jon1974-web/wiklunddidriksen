@@ -547,7 +547,7 @@ export interface SchoolContact {
   name: string;
   role: 'teacher' | 'classmate' | 'admin';
   teacherType?: 'personal' | 'contact' | 'subject';
-  adminType?: string;
+  adminType?: string[];
   subject?: string;
   phone?: string;
   email?: string;

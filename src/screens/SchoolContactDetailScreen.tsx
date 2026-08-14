@@ -67,9 +67,13 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
           </View>
         )}
 
-        {contact.role === 'admin' && (contact as any).adminType && (
-          <View style={[s.teacherTypeBadge, { backgroundColor: '#E3F2FD' }]}>
-            <Text style={{ color: '#1976D2', fontSize: 12, fontWeight: '600' }}>{(contact as any).adminType}</Text>
+        {contact.role === 'admin' && Array.isArray((contact as any).adminType) && (contact as any).adminType.length > 0 && (
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 6, marginBottom: 4 }}>
+            {(contact as any).adminType.map((role: string) => (
+              <View key={role} style={[s.teacherTypeBadge, { backgroundColor: '#E3F2FD' }]}>
+                <Text style={{ color: '#1976D2', fontSize: 12, fontWeight: '600' }}>{role}</Text>
+              </View>
+            ))}
           </View>
         )}
 
