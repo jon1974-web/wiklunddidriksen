@@ -71,8 +71,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
                     <TouchableOpacity
                       style={[styles.option, { borderBottomWidth: 0 }]}
                       onPress={() => {
-                        const customKey = `custom_${search.trim().replace(/\s+/g, '_')}`;
-                        onSelect(customKey);
+                        onSelect(search.trim());
                         setVisible(false);
                       }}
                     >

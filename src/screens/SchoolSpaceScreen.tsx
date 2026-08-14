@@ -43,10 +43,7 @@ const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
 };
 
 const getAdminRoleColor = (key: string) => ADMIN_ROLES[key]?.color || '#999';
-const getAdminRoleLabel = (key: string) => {
-  if (key.startsWith('custom_')) return key.replace('custom_', '').replace(/_/g, ' ');
-  return ADMIN_ROLES[key]?.label || key;
-};
+const getAdminRoleLabel = (key: string) => ADMIN_ROLES[key]?.label || key;
 
 export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();

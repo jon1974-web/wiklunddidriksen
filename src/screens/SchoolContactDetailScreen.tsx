@@ -56,8 +56,20 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
       </TouchableOpacity>
 
       <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
-        <Text style={s.viewIcon}>{isTeacher ? '👩‍🏫' : '👦'}</Text>
+        <Text style={s.viewIcon}>{isTeacher ? '👩‍🏫' : contact.role === 'admin' ? '🏥' : '👦'}</Text>
         <Text style={[s.viewTitle, { color: colors.text }]}>{contact.name}</Text>
+        {isTeacher && (contact as any).teacherType && (
+          <View style={[s.teacherTypeBadge, { backgroundColor: (contact as any).teacherType === 'personal' ? '#E8F5E9' : (contact as any).teacherType === 'contact' ? '#E3F2FD' : '#FFF3E0' }]}>
+            <Text style={{ color: (contact as any).teacherType === 'personal' ? '#43A047' : (contact as any).teacherType === 'contact' ? '#1976D2' : '#FB8C00', fontSize: 12, fontWeight: '600' }}>
+              {(contact as any).teacherType === 'personal' ? t('school.personalTeacher') : (contact as any).teacherType === 'contact' ? t('school.contactTeacher') : t('school.subjectTeacher')}
+            </Text>
+          </View>
+        )}
+        {contact.role === 'admin' && (contact as any).adminType && (
+          <View style={[s.teacherTypeBadge, { backgroundColor: '#E3F2FD' }]}>
+            <Text style={{ color: '#1976D2', fontSize: 12, fontWeight: '600' }}>{(contact as any).adminType}</Text>
+          </View>
+        )}
         {isTeacher && contact.subject && (
           <Text style={[s.viewDescription, { color: colors.textSecondary }]}>📚 {contact.subject}</Text>
         )}
@@ -177,6 +189,7 @@ const styles = StyleSheet.create({
 
 const s = StyleSheet.create({
   viewCard: { borderRadius: 12, padding: 20, marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
+  teacherTypeBadge: { alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8, marginTop: 6, marginBottom: 4 },
   viewIcon: { fontSize: 42, marginBottom: 10 },
   viewTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 8 },
   viewDescription: { fontSize: 15, lineHeight: 20, marginBottom: 4 },
