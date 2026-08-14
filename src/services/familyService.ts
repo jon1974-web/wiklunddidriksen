@@ -9,6 +9,9 @@ import {
   getDocs,
   query,
   where,
+  orderBy,
+  limit,
+  FieldValue,
 } from 'firebase/firestore';
 import { UserProfile, Family, FamilyMember } from '../types';
 
@@ -35,8 +38,18 @@ export const createOrUpdateUser = async (uid: string, data: Partial<UserProfile>
   const userRef = doc(db, 'users', uid);
   const existing = await getDoc(userRef);
 
+  // Convert null values to FieldValue.delete() for Firestore
+  const sanitizedData: Record<string, any> = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value === null) {
+      sanitizedData[key] = FieldValue.delete();
+    } else {
+      sanitizedData[key] = value;
+    }
+  }
+
   if (existing.exists()) {
-    await updateDoc(userRef, data);
+    await updateDoc(userRef, sanitizedData);
   } else {
     await setDoc(userRef, {
       uid,
@@ -51,7 +64,7 @@ export const createOrUpdateUser = async (uid: string, data: Partial<UserProfile>
       avatarUrl: null,
       notificationsEnabled: true,
       createdAt: Date.now(),
-      ...data,
+      ...sanitizedData,
     });
   }
 };
