@@ -507,7 +507,15 @@ export const ProfileScreen: React.FC = () => {
   const handleDisconnectCalendarEmail = useCallback(async () => {
     if (!user) return;
     try {
-      await createOrUpdateUser(user.uid, { calendarEmail: '', calendarProvider: '', calendarType: '' });
+      const { deleteField } = await import('firebase/firestore');
+      await createOrUpdateUser(user.uid, {
+        calendarEmail: deleteField(),
+        calendarProvider: deleteField(),
+        calendarType: deleteField(),
+        calendarAccessToken: deleteField(),
+        calendarRefreshToken: deleteField(),
+        calendarTokenExpiry: deleteField(),
+      });
       setCalendarEmail('');
       setCalendarProvider(null);
       setCalendarType(null);
