@@ -18,6 +18,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
   const searchRef = useRef<TextInput>(null);
 
   const selected = options.find(o => o.key === value);
+  const isCustom = value && !selected;
 
   const filtered = useMemo(() => {
     if (!search.trim()) return options;
@@ -28,12 +29,16 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
   return (
     <>
       <TouchableOpacity
-        style={[styles.trigger, { backgroundColor: colors.inputBackground, borderColor: selected ? selected.color : colors.border }]}
+        style={[styles.trigger, { backgroundColor: colors.inputBackground, borderColor: selected ? selected.color : isCustom ? '#999' : colors.border }]}
         onPress={() => { setSearch(''); setShowCustom(false); setCustomValue(''); setVisible(true); }}
       >
         {selected ? (
           <View style={[styles.selectedBadge, { backgroundColor: selected.color }]}>
             <Text style={styles.selectedText}>{selected.label}</Text>
+          </View>
+        ) : isCustom ? (
+          <View style={[styles.selectedBadge, { backgroundColor: '#999' }]}>
+            <Text style={styles.selectedText}>{value}</Text>
           </View>
         ) : (
           <Text style={[styles.placeholder, { color: colors.textDisabled }]}>{placeholder}</Text>
