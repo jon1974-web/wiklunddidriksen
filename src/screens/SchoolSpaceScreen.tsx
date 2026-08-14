@@ -349,7 +349,11 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     const order = { personal: 0, contact: 1, subject: 2 };
     return (order[a.teacherType || 'contact'] ?? 1) - (order[b.teacherType || 'contact'] ?? 1);
   });
-  const admins = contacts.filter(c => c.role === 'admin');
+  const admins = contacts.filter(c => c.role === 'admin').sort((a, b) => {
+    const aType = ((a as any).adminType || 'zzz').toLowerCase();
+    const bType = ((b as any).adminType || 'zzz').toLowerCase();
+    return bType.localeCompare(aType);
+  });
   const classmates = contacts.filter(c => c.role === 'classmate');
   const filteredClassmates = classmates.filter(c => {
     if (!contactSearch.trim()) return true;
