@@ -217,10 +217,19 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, event, navigation]);
 
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(eventData.title).then(() => {
-      crossAlert('Suksess', 'Tekst kopiert til utklippstavlen');
+    navigation.navigate('AddEvent', {
+      prefill: {
+        title: eventData.title,
+        description: eventData.description || '',
+        date: eventData.date,
+        time: eventData.time,
+        endDate: eventData.endDate || '',
+        endTime: eventData.endTime || '',
+        reminderMinutes: eventData.reminderMinutes || 120,
+        icon: eventData.icon || '',
+      },
     });
-  }, [eventData]);
+  }, [eventData, navigation]);
 
   const handleDelete = useCallback(() => {
     crossAlert(t('events.deleteTitle'), t('events.deleteConfirm'), [
