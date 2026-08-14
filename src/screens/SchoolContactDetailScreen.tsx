@@ -179,7 +179,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         </View>
       )}
 
-      {contact.notes && (
+      {contact.role === 'classmate' && contact.notes && (
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
           <View style={s.viewDetailRow}>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📝 {t('common.note')}</Text>
@@ -188,7 +188,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         </View>
       )}
 
-      {contact.address && (
+      {contact.role === 'classmate' && contact.address && (
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
           <View style={s.viewDetailRow}>
             <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📍 {t('school.address')}</Text>
