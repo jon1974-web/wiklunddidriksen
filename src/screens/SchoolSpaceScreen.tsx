@@ -402,7 +402,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
     const teacherType = (c as any).teacherType || '';
-    const typeLabel = teacherType === 'personal' ? t('school.personalTeacher') : teacherType === 'contact' ? t('school.contactTeacher') : teacherType === 'subject' ? t('school.subjectTeacher') : '';
+    const typeLabel = teacherType === 'personal' ? 'Klassekontaktlærer' : teacherType === 'contact' ? 'Kontaktlærer' : teacherType === 'subject' ? 'Faglærer' : '';
     return c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || typeLabel.toLowerCase().includes(q) || teacherType.toLowerCase().includes(q);
   });
   const filteredAdmins = admins.filter(c => {
