@@ -408,8 +408,10 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
     const teacherType = (c as any).teacherType || '';
-    const typeLabel = TEACHER_TYPES[teacherType]?.nb || '';
-    return c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || typeLabel.toLowerCase().includes(q) || teacherType.toLowerCase().includes(q);
+    const typeLabel = teacherType === 'personal' ? t('school.personalTeacher') : teacherType === 'contact' ? t('school.contactTeacher') : teacherType === 'subject' ? t('school.subjectTeacher') : '';
+    const found = c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || typeLabel.toLowerCase().includes(q) || teacherType.toLowerCase().includes(q);
+    if (!found) console.log('NOT FOUND:', c.name, '| teacherType:', teacherType, '| typeLabel:', typeLabel, '| search:', q);
+    return found;
   });
   const filteredAdmins = admins.filter(c => {
     if (!contactSearch.trim()) return true;
@@ -615,9 +617,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
                         {['personal', 'contact', 'subject'].includes(c.teacherType || '') && (
-                          <View style={[styles.teacherTypeBadge, { backgroundColor: TEACHER_TYPES[c.teacherType!]?.color + '20' }]}>
-                            <Text style={{ color: TEACHER_TYPES[c.teacherType!]?.color, fontSize: 10, fontWeight: '600' }}>
-                              {TEACHER_TYPES[c.teacherType!]?.nb}
+                          <View style={[styles.teacherTypeBadge, { backgroundColor: c.teacherType === 'personal' ? '#E8F5E9' : c.teacherType === 'contact' ? '#E3F2FD' : '#FFF3E0' }]}>
+                            <Text style={{ color: c.teacherType === 'personal' ? '#43A047' : c.teacherType === 'contact' ? '#1976D2' : '#FB8C00', fontSize: 10, fontWeight: '600' }}>
+                              {c.teacherType === 'personal' ? t('school.personalTeacher') : c.teacherType === 'contact' ? t('school.contactTeacher') : t('school.subjectTeacher')}
                             </Text>
                           </View>
                         )}
