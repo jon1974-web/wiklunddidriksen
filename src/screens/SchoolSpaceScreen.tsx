@@ -476,7 +476,6 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
               )}
               <Text style={[styles.gridName, { color: colors.text }]} numberOfLines={1}>{child.name}</Text>
               {child.school ? <Text style={[styles.gridSub, { color: colors.textSecondary }]} numberOfLines={1}>{child.school}</Text> : null}
-              {(child as any).grade ? <Text style={[styles.gridSub, { color: colors.textSecondary }]} numberOfLines={1}>{(child as any).grade}</Text> : null}
             </TouchableOpacity>
           ))}
           <TouchableOpacity
@@ -566,7 +565,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             )}
             <View>
               <Text style={[styles.screenTitle, { color: colors.text, fontSize: 22 }]}>{selectedChild.name}</Text>
-              {selectedChild.school ? <Text style={{ color: colors.textSecondary, fontSize: 14 }}>{selectedChild.school}{(selectedChild as any).grade ? ` — ${(selectedChild as any).grade}` : ''}</Text> : null}
+              {selectedYear?.school || selectedChild.school ? <Text style={{ color: colors.textSecondary, fontSize: 14 }}>{selectedYear?.school || selectedChild.school}</Text> : null}
+              {selectedYear?.grade || (selectedChild as any).grade ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{selectedYear?.grade || (selectedChild as any).grade}</Text> : null}
+              {selectedYear ? <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{selectedYear.year}</Text> : null}
               {selectedChild.phone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {selectedChild.phone}</Text> : null}
               {selectedChild.email ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {selectedChild.email}</Text> : null}
             </View>
