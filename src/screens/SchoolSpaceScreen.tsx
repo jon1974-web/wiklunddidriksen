@@ -327,7 +327,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         </TouchableOpacity>
       ) : null}
       {email ? (
-        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => Linking.openURL(`mailto:${email}`)}>
+        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${email}`)}>
           <Text style={{ fontSize: 12 }}>✉️ {t('school.email')}</Text>
         </TouchableOpacity>
       ) : null}
@@ -496,7 +496,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
                         {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>}
-                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><Text style={{ color: '#FB8C00', fontSize: 14 }}>✉️</Text></TouchableOpacity>}
+                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><Text style={{ color: '#1976D2', fontSize: 14 }}>✉️</Text></TouchableOpacity>}
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -525,7 +525,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
                         {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>}
-                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><Text style={{ color: '#FB8C00', fontSize: 14 }}>✉️</Text></TouchableOpacity>}
+                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><Text style={{ color: '#1976D2', fontSize: 14 }}>✉️</Text></TouchableOpacity>}
                       </View>
                     </View>
                   </TouchableOpacity>
