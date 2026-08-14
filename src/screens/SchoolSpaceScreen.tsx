@@ -276,7 +276,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const handleEditContact = () => {
     const contact = contacts.find(c => c.id === contactActionModal.id);
     if (!contact) return;
-    const isTeacher = contact.role === 'teacher';
+    const isTeacher = contact.role === 'teacher' || contact.role === 'admin';
     setContactForm({
       role: contact.role,
       teacherType: (contact as any).teacherType || 'contact',
