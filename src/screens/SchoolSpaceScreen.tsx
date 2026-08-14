@@ -194,27 +194,27 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     try {
       const rawData: Record<string, any> = {
         role: contactForm.role,
-        teacherType: contactForm.teacherType,
+        teacherType: contactForm.teacherType || null,
         name: contactForm.name,
-        subject: contactForm.subject,
-        address: contactForm.address,
-        phone: contactForm.phone || null,
-        email: contactForm.email || null,
-        parentName: contactForm.parentName || null,
-        parentPhone: contactForm.parentPhone || null,
-        parentEmail: contactForm.parentEmail || null,
-        parentName2: contactForm.parentName2 || null,
-        parentPhone2: contactForm.parentPhone2 || null,
-        parentEmail2: contactForm.parentEmail2 || null,
-        notes: contactForm.notes || null,
+        subject: contactForm.subject || '',
+        address: contactForm.address || '',
+        phone: contactForm.phone || '',
+        email: contactForm.email || '',
+        parentName: contactForm.parentName || '',
+        parentPhone: contactForm.parentPhone || '',
+        parentEmail: contactForm.parentEmail || '',
+        parentName2: contactForm.parentName2 || '',
+        parentPhone2: contactForm.parentPhone2 || '',
+        parentEmail2: contactForm.parentEmail2 || '',
+        notes: contactForm.notes || '',
         childId: selectedChild.id,
         yearId: selectedYear.id,
         familyId,
       };
       if (contactForm.role === 'classmate') {
         rawData.childName = contactForm.name;
-        rawData.childPhone = contactForm.phone || null;
-        rawData.childEmail = contactForm.email || null;
+        rawData.childPhone = contactForm.phone || '';
+        rawData.childEmail = contactForm.email || '';
       }
       if (editingContactId) {
         await updateSchoolContact(editingContactId, rawData as any);
