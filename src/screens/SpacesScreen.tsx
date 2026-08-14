@@ -8,6 +8,7 @@ import { AppIcon } from '../components/AppIcon';
 import { getTrips } from '../services/tripService';
 import { getHealthAppointments, getHealthMedications, getHealthVaccinations } from '../services/healthService';
 import { getSchoolChildren } from '../services/schoolService';
+import { getKindergartenChildren } from '../services/kindergartenService';
 import { getPets } from '../services/petService';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { collection, query, where, getDocs } from 'firebase/firestore';
@@ -34,6 +35,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
   const [tripCount, setTripCount] = useState(0);
   const [healthCount, setHealthCount] = useState(0);
   const [schoolCount, setSchoolCount] = useState(0);
+  const [kindergartenCount, setKindergartenCount] = useState(0);
   const [petCount, setPetCount] = useState(0);
   const [birthdayCount, setBirthdayCount] = useState(0);
 
@@ -68,6 +70,11 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
     // School - number of children
     getSchoolChildren(familyId).then(children => {
       setSchoolCount(children.length);
+    }).catch(() => {});
+
+    // Kindergarten - number of children
+    getKindergartenChildren(familyId).then(children => {
+      setKindergartenCount(children.length);
     }).catch(() => {});
 
     // Pets - number of pets
@@ -111,6 +118,14 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       iconColor: MODULE_COLORS.school,
       count: schoolCount > 0 ? t('spaces.schoolCount', { count: schoolCount }) : '',
       screen: 'SchoolSpace',
+    },
+    {
+      id: 'kindergarten',
+      name: t('spaces.kindergarten'),
+      icon: 'pet',
+      iconColor: MODULE_COLORS.kindergarten,
+      count: kindergartenCount > 0 ? t('spaces.kindergartenCount', { count: kindergartenCount }) : '',
+      screen: 'KindergartenSpace',
     },
     {
       id: 'birthdays',

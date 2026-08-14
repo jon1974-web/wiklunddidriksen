@@ -158,6 +158,30 @@ service cloud.firestore {
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
+    // Kindergarten Children: family-scoped
+    match /kindergartenChildren/{childId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
+    // Kindergarten Years: family-scoped
+    match /kindergartenYears/{yearId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
+    // Kindergarten Contacts: family-scoped
+    match /kindergartenContacts/{contactId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
+    // Kindergarten Schedules: family-scoped
+    match /kindergartenSchedules/{scheduleId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
     // Recipes: family-scoped
     match /recipes/{recipeId} {
       allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);

@@ -575,3 +575,60 @@ export interface SchoolSchedule {
   familyId: string;
   createdAt: number;
 }
+
+export interface KindergartenChild {
+  id: string;
+  name: string;
+  kindergarten?: string;
+  phone?: string;
+  email?: string;
+  photoUrl?: string;
+  familyId: string;
+  createdAt: number;
+}
+
+export interface KindergartenYear {
+  id: string;
+  childId: string;
+  year: string;
+  group: string;
+  kindergarten?: string;
+  familyId: string;
+  createdAt: number;
+}
+
+export interface KindergartenContact {
+  id: string;
+  yearId: string;
+  childId: string;
+  name: string;
+  role: 'teacher' | 'child' | 'admin';
+  teacherType?: 'personal' | 'contact' | 'subject';
+  adminType?: string[];
+  subject?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  childPhone?: string;
+  childEmail?: string;
+  parentName?: string;
+  parentPhone?: string;
+  parentEmail?: string;
+  parentName2?: string;
+  parentPhone2?: string;
+  parentEmail2?: string;
+  notes?: string;
+  familyId: string;
+  createdAt: number;
+}
+
+export interface KindergartenSchedule {
+  id: string;
+  yearId: string;
+  childId: string;
+  semester: 'høst' | 'vår';
+  imageUrl: string;
+  fileName: string;
+  familyId: string;
+  createdAt: number;
+}

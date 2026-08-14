@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Create Mockups D-F</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a1a;padding:20px}
+h1{color:#fff;text-align:center;font-size:20px;margin-bottom:8px}
+h2{color:#aaa;text-align:center;font-size:13px;margin-bottom:24px;font-weight:400}
+.options{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.label{font-size:11px;color:#888;text-align:center;margin-top:12px;margin-bottom:4px;font-weight:600}
+.phone-frame{width:320px;background:#f5f5f5;border-radius:28px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,0.4);flex-shrink:0}
+.sheet-header{background:#fff;padding:14px 16px 10px;border-bottom:1px solid #eee;border-top-left-radius:28px;display:flex;justify-content:space-between;align-items:center}
+.sheet-title{font-size:15px;font-weight:700;color:#333}
+.sheet-close{width:24px;height:24px;border-radius:12px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#666}
+.sheet-body{padding:12px}
+.section-label{font-size:10px;font-weight:700;color:#999;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;margin-top:2px}
+
+/* D: Tab bar */
+.tab-bar{display:flex;gap:4px;margin-bottom:12px;background:#f0f0f0;border-radius:10px;padding:3px}
+.tab{flex:1;padding:6px;border-radius:8px;text-align:center;font-size:11px;font-weight:600;cursor:pointer}
+.tab.active{background:#fff;color:#333;box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+.tab:not(.active){color:#999}
+.tab-icon{display:inline-block;margin-right:3px}
+
+/* E: Section cards */
+.card-section{background:#fff;border-radius:14px;margin-bottom:8px;overflow:hidden}
+.card-head{display:flex;align-items:center;gap:6px;padding:10px 12px 6px}
+.card-head-icon{width:16px;height:16px;border-radius:5px;display:flex;align-items:center;justify-content:center}
+.card-head-icon svg{width:12px;height:12px}
+.card-head-text{font-size:12px;font-weight:700}
+.card-actions{display:flex;gap:6px;padding:0 12px 10px}
+.card-action{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 6px;border-radius:10px;flex:1;cursor:pointer}
+.card-action:active{opacity:0.85}
+.card-action-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.card-action-icon svg{width:16px;height:16px}
+.card-action-label{font-size:9px;font-weight:600;text-align:center}
+
+/* F: Pill rows */
+.pill-btn{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;margin-bottom:6px;cursor:pointer}
+.pill-btn:active{opacity:0.85}
+.pill-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pill-icon svg{width:16px;height:16px}
+.pill-text{font-size:13px;font-weight:600;flex:1}
+.pill-arrow{color:#ccc;font-size:14px}
+</style>
+</head>
+<body>
+<h1>Quick Create — Options</h1>
+<h2>Less text, more icons, colors</h2>
+<div class="options">
+
+<!-- D: Tab view -->
+<div>
+<p class="label">D: Category Tabs</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="tab-bar">
+      <div class="tab active">📅 Avtaler</div>
+      <div class="tab">🩺 Helse</div>
+      <div class="tab">🐾 Kjæledyr</div>
+      <div class="tab">✈️ Reiser</div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div class="pill-btn" style="background:#E8F5E9"><div class="pill-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="pill-text" style="color:#43A047">Manuell</span><span class="pill-arrow">›</span></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px">
+      <div class="pill-btn" style="background:#E8F5E9"><div class="pill-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div><span class="pill-text" style="color:#43A047">Tale</span><span class="pill-arrow">›</span></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <div class="pill-btn" style="background:#E8F5E9"><div class="pill-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="pill-text" style="color:#43A047">Foto</span><span class="pill-arrow">›</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- E: Section cards -->
+<div>
+<p class="label">E: Section Cards</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="card-section">
+      <div class="card-head"><div class="card-head-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg></div><span class="card-head-text" style="color:#43A047">Avtaler</span></div>
+      <div class="card-actions">
+        <div class="card-action" style="background:#E8F5E9"><div class="card-action-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-action-label" style="color:#43A047">Manuell</span></div>
+        <div class="card-action" style="background:#E8F5E9"><div class="card-action-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div><span class="card-action-label" style="color:#43A047">Tale</span></div>
+        <div class="card-action" style="background:#E8F5E9"><div class="card-action-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="card-action-label" style="color:#43A047">Foto</span></div>
+      </div>
+    </div>
+    <div class="card-section">
+      <div class="card-head"><div class="card-head-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div><span class="card-head-text" style="color:#E53935">Helse</span></div>
+      <div class="card-actions">
+        <div class="card-action" style="background:#FFEBEE"><div class="card-action-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-action-label" style="color:#E53935">Time</span></div>
+        <div class="card-action" style="background:#FFEBEE"><div class="card-action-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-action-label" style="color:#E53935">Vaksine</span></div>
+      </div>
+    </div>
+    <div class="card-section">
+      <div class="card-head"><div class="card-head-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg></div><span class="card-head-text" style="color:#8E24AA">Kjæledyr</span></div>
+      <div class="card-actions">
+        <div class="card-action" style="background:#F3E5F5"><div class="card-action-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-action-label" style="color:#8E24AA">Vet.besøk</span></div>
+        <div class="card-action" style="background:#F3E5F5"><div class="card-action-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-action-label" style="color:#8E24AA">Vaksine</span></div>
+      </div>
+    </div>
+    <div class="card-section">
+      <div class="card-head"><div class="card-head-icon" style="background:#BBDEFB"><svg viewBox="0 0 24 24" fill="none" stroke="#42A5F5" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div><span class="card-head-text" style="color:#42A5F5">Reiser</span></div>
+      <div class="card-actions">
+        <div class="card-action" style="background:#E3F2FD"><div class="card-action-icon" style="background:#BBDEFB"><svg viewBox="0 0 24 24" fill="none" stroke="#42A5F5" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div><span class="card-action-label" style="color:#42A5F5">Ny reise</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- F: Pill rows -->
+<div>
+<p class="label">F: Pill Rows</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="section-label">Arrangementer</div>
+    <div class="pill-btn" style="background:#E8F5E9"><div class="pill-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="pill-text" style="color:#43A047">Manuell</span><span class="pill-arrow">›</span></div>
+    <div class="pill-btn" style="background:#E8F5E9"><div class="pill-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div><span class="pill-text" style="color:#43A047">Tale</span><span class="pill-arrow">›</span></div>
+    <div class="pill-btn" style="background:#E8F5E9"><div class="pill-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="pill-text" style="color:#43A047">Foto</span><span class="pill-arrow">›</span></div>
+    <div class="section-label">Helse</div>
+    <div class="pill-btn" style="background:#FFEBEE"><div class="pill-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="pill-text" style="color:#E53935">Time</span><span class="pill-arrow">›</span></div>
+    <div class="pill-btn" style="background:#FFEBEE"><div class="pill-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="pill-text" style="color:#E53935">Vaksine</span><span class="pill-arrow">›</span></div>
+    <div class="section-label">Kjæledyr</div>
+    <div class="pill-btn" style="background:#F3E5F5"><div class="pill-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="pill-text" style="color:#8E24AA">Vet.besøk</span><span class="pill-arrow">›</span></div>
+    <div class="pill-btn" style="background:#F3E5F5"><div class="pill-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="pill-text" style="color:#8E24AA">Vaksine</span><span class="pill-arrow">›</span></div>
+    <div class="section-label">Reiser</div>
+    <div class="pill-btn" style="background:#E3F2FD"><div class="pill-icon" style="background:#BBDEFB"><svg viewBox="0 0 24 24" fill="none" stroke="#42A5F5" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div><span class="pill-text" style="color:#42A5F5">Ny reise</span><span class="pill-arrow">›</span></div>
+  </div>
+</div>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quick Create — Section Card Variations</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a1a;padding:20px}
+h1{color:#fff;text-align:center;font-size:20px;margin-bottom:8px}
+h2{color:#aaa;text-align:center;font-size:13px;margin-bottom:24px;font-weight:400}
+.options{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.label{font-size:11px;color:#888;text-align:center;margin-top:12px;margin-bottom:4px;font-weight:600}
+.phone-frame{width:320px;background:#f5f5f5;border-radius:28px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,0.4);flex-shrink:0}
+.sheet-header{background:#fff;padding:14px 16px 10px;border-bottom:1px solid #eee;border-top-left-radius:28px;display:flex;justify-content:space-between;align-items:center}
+.sheet-title{font-size:15px;font-weight:700;color:#333}
+.sheet-close{width:24px;height:24px;border-radius:12px;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:12px;color:#666}
+.sheet-body{padding:10px}
+
+/* E1: Left border cards */
+.card-lb{background:#fff;border-radius:12px;margin-bottom:8px;display:flex;overflow:hidden}
+.card-lb-border{width:4px;flex-shrink:0}
+.card-lb-content{flex:1;padding:10px 12px}
+.card-lb-title{font-size:12px;font-weight:700;margin-bottom:8px}
+.card-lb-actions{display:flex;gap:6px}
+.card-lb-action{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border-radius:10px;flex:1;cursor:pointer;min-width:0}
+.card-lb-action:active{opacity:0.85}
+.card-lb-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.card-lb-icon svg{width:18px;height:18px}
+.card-lb-label{font-size:10px;font-weight:600;text-align:center;line-height:1.2}
+
+/* E2: Left border + rounded icons in circle */
+.card-lb2{background:#fff;border-radius:12px;margin-bottom:8px;display:flex;overflow:hidden}
+.card-lb2-border{width:4px;flex-shrink:0}
+.card-lb2-content{flex:1;padding:10px 12px;display:flex;align-items:center;gap:12px}
+.card-lb2-actions{display:flex;gap:8px;flex-shrink:0}
+.card-lb2-icon{width:40px;height:40px;border-radius:20px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.card-lb2-icon:active{opacity:0.85}
+.card-lb2-icon svg{width:18px;height:18px}
+.card-lb2-title{font-size:12px;font-weight:700}
+
+/* E3: Left border + horizontal scroll */
+.card-lb3{background:#fff;border-radius:12px;margin-bottom:8px;overflow:hidden}
+.card-lb3-top{display:flex;align-items:center;padding:10px 12px}
+.card-lb3-border{width:4px;height:100%;flex-shrink:0}
+.card-lb3-title{font-size:12px;font-weight:700;margin-left:8px}
+.card-lb3-actions{display:flex;gap:6px;padding:0 12px 10px;overflow-x:auto}
+.card-lb3-action{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;border-radius:10px;cursor:pointer;min-width:70px}
+.card-lb3-action:active{opacity:0.85}
+.card-lb3-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+.card-lb3-icon svg{width:20px;height:20px}
+.card-lb3-label{font-size:10px;font-weight:600;text-align:center}
+
+/* E4: Left border + large icon + text */
+.card-lb4{background:#fff;border-radius:12px;margin-bottom:8px;display:flex;overflow:hidden}
+.card-lb4-border{width:4px;flex-shrink:0}
+.card-lb4-content{flex:1;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.card-lb4-actions{display:flex;gap:8px;flex:1}
+.card-lb4-item{display:flex;align-items:center;gap:6px;cursor:pointer;padding:6px 8px;border-radius:8px}
+.card-lb4-item:active{opacity:0.85}
+.card-lb4-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.card-lb4-icon svg{width:16px;height:16px}
+.card-lb4-text{font-size:11px;font-weight:600}
+
+/* E5: Left border + action row */
+.card-lb5{background:#fff;border-radius:12px;margin-bottom:8px;display:flex;overflow:hidden}
+.card-lb5-border{width:4px;flex-shrink:0}
+.card-lb5-content{flex:1;padding:10px 12px}
+.card-lb5-title{font-size:12px;font-weight:700;margin-bottom:6px}
+.card-lb5-row{display:flex;gap:6px}
+.card-lb5-btn{display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:8px;cursor:pointer;flex:1}
+.card-lb5-btn:active{opacity:0.85}
+.card-lb5-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+.card-lb5-icon svg{width:14px;height:14px}
+.card-lb5-label{font-size:11px;font-weight:600}
+
+/* E6: Left border + big icon cards */
+.card-lb6{background:#fff;border-radius:12px;margin-bottom:8px;display:flex;overflow:hidden}
+.card-lb6-border{width:4px;flex-shrink:0}
+.card-lb6-content{flex:1;padding:10px 12px}
+.card-lb6-title{font-size:12px;font-weight:700;margin-bottom:8px}
+.card-lb6-actions{display:flex;gap:8px}
+.card-lb6-action{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;padding:8px;border-radius:10px;flex:1}
+.card-lb6-action:active{opacity:0.85}
+.card-lb6-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.card-lb6-icon svg{width:22px;height:22px}
+.card-lb6-label{font-size:10px;font-weight:600;text-align:center}
+.card-lb6-sub{font-size:8px;color:#999;text-align:center}
+</style>
+</head>
+<body>
+<h1>Quick Create — Left Border Variations</h1>
+<h2>Option E evolved — white cards, colored left borders</h2>
+<div class="options">
+
+<!-- E1: Classic left border + icon grid -->
+<div>
+<p class="label">E1: Classic Border + Grid</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#43A047"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#43A047">Avtaler</div>
+        <div class="card-lb-actions">
+          <div class="card-lb-action" style="background:#E8F5E9"><div class="card-lb-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb-label" style="color:#43A047">Manuell</span></div>
+          <div class="card-lb-action" style="background:#E8F5E9"><div class="card-lb-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div><span class="card-lb-label" style="color:#43A047">Tale</span></div>
+          <div class="card-lb-action" style="background:#E8F5E9"><div class="card-lb-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="card-lb-label" style="color:#43A047">Foto</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#E53935"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#E53935">Helse</div>
+        <div class="card-lb-actions">
+          <div class="card-lb-action" style="background:#FFEBEE"><div class="card-lb-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb-label" style="color:#E53935">Time</span></div>
+          <div class="card-lb-action" style="background:#FFEBEE"><div class="card-lb-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-lb-label" style="color:#E53935">Vaksine</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#8E24AA"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#8E24AA">Kjæledyr</div>
+        <div class="card-lb-actions">
+          <div class="card-lb-action" style="background:#F3E5F5"><div class="card-lb-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb-label" style="color:#8E24AA">Vet.besøk</span></div>
+          <div class="card-lb-action" style="background:#F3E5F5"><div class="card-lb-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-lb-label" style="color:#8E24AA">Vaksine</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#42A5F5"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#42A5F5">Reiser</div>
+        <div class="card-lb-actions">
+          <div class="card-lb-action" style="background:#E3F2FD"><div class="card-lb-icon" style="background:#BBDEFB"><svg viewBox="0 0 24 24" fill="none" stroke="#42A5F5" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div><span class="card-lb-label" style="color:#42A5F5">Ny reise</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- E2: Left border + circle icons -->
+<div>
+<p class="label">E2: Border + Circle Icons</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="card-lb2">
+      <div class="card-lb2-border" style="background:#43A047"></div>
+      <div class="card-lb2-content">
+        <div class="card-lb2-title" style="color:#43A047">Avtaler</div>
+        <div class="card-lb2-actions">
+          <div class="card-lb2-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div>
+          <div class="card-lb2-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div>
+          <div class="card-lb2-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb2">
+      <div class="card-lb2-border" style="background:#E53935"></div>
+      <div class="card-lb2-content">
+        <div class="card-lb2-title" style="color:#E53935">Helse</div>
+        <div class="card-lb2-actions">
+          <div class="card-lb2-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div>
+          <div class="card-lb2-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb2">
+      <div class="card-lb2-border" style="background:#8E24AA"></div>
+      <div class="card-lb2-content">
+        <div class="card-lb2-title" style="color:#8E24AA">Kjæledyr</div>
+        <div class="card-lb2-actions">
+          <div class="card-lb2-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div>
+          <div class="card-lb2-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb2">
+      <div class="card-lb2-border" style="background:#42A5F5"></div>
+      <div class="card-lb2-content">
+        <div class="card-lb2-title" style="color:#42A5F5">Reiser</div>
+        <div class="card-lb2-actions">
+          <div class="card-lb2-icon" style="background:#BBDEFB"><svg viewBox="0 0 24 24" fill="none" stroke="#42A5F5" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- E3: Left border + colored bg actions -->
+<div>
+<p class="label">E3: Border + Colored Bg</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#43A047"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#43A047">Avtaler</div>
+        <div class="card-lb-actions">
+          <div class="card-lb-action" style="background:#43A047"><div class="card-lb-icon" style="background:rgba(255,255,255,0.3)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb-label" style="color:#fff">Manuell</span></div>
+          <div class="card-lb-action" style="background:#43A047"><div class="card-lb-icon" style="background:rgba(255,255,255,0.3)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div><span class="card-lb-label" style="color:#fff">Tale</span></div>
+          <div class="card-lb-action" style="background:#43A047"><div class="card-lb-icon" style="background:rgba(255,255,255,0.3)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="card-lb-label" style="color:#fff">Foto</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#E53935"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#E53935">Helse</div>
+        <div class="card-lb-actions">
+          <div class="card-lb-action" style="background:#E53935"><div class="card-lb-icon" style="background:rgba(255,255,255,0.3)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb-label" style="color:#fff">Time</span></div>
+          <div class="card-lb-action" style="background:#E53935"><div class="card-lb-icon" style="background:rgba(255,255,255,0.3)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-lb-label" style="color:#fff">Vaksine</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#8E24AA"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#8E24AA">Kjæledyr</div>
+        <div class="card-lb-actions">
+          <div class="card-lb-action" style="background:#8E24AA"><div class="card-lb-icon" style="background:rgba(255,255,255,0.3)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb-label" style="color:#fff">Vet.besøk</span></div>
+          <div class="card-lb-action" style="background:#8E24AA"><div class="card-lb-icon" style="background:rgba(255,255,255,0.3)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-lb-label" style="color:#fff">Vaksine</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#42A5F5"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#42A5F5">Reiser</div>
+        <div class="card-lb-actions">
+          <div class="card-lb-action" style="background:#42A5F5"><div class="card-lb-icon" style="background:rgba(255,255,255,0.3)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div><span class="card-lb-label" style="color:#fff">Ny reise</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- E4: Left border + row buttons -->
+<div>
+<p class="label">E4: Border + Row Buttons</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="card-lb5">
+      <div class="card-lb5-border" style="background:#43A047"></div>
+      <div class="card-lb5-content">
+        <div class="card-lb5-title" style="color:#43A047">Avtaler</div>
+        <div class="card-lb5-row">
+          <div class="card-lb5-btn" style="background:#E8F5E9"><div class="card-lb5-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb5-label" style="color:#43A047">Manuell</span></div>
+          <div class="card-lb5-btn" style="background:#E8F5E9"><div class="card-lb5-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div><span class="card-lb5-label" style="color:#43A047">Tale</span></div>
+          <div class="card-lb5-btn" style="background:#E8F5E9"><div class="card-lb5-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="card-lb5-label" style="color:#43A047">Foto</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb5">
+      <div class="card-lb5-border" style="background:#E53935"></div>
+      <div class="card-lb5-content">
+        <div class="card-lb5-title" style="color:#E53935">Helse</div>
+        <div class="card-lb5-row">
+          <div class="card-lb5-btn" style="background:#FFEBEE"><div class="card-lb5-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb5-label" style="color:#E53935">Time</span></div>
+          <div class="card-lb5-btn" style="background:#FFEBEE"><div class="card-lb5-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-lb5-label" style="color:#E53935">Vaksine</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb5">
+      <div class="card-lb5-border" style="background:#8E24AA"></div>
+      <div class="card-lb5-content">
+        <div class="card-lb5-title" style="color:#8E24AA">Kjæledyr</div>
+        <div class="card-lb5-row">
+          <div class="card-lb5-btn" style="background:#F3E5F5"><div class="card-lb5-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb5-label" style="color:#8E24AA">Vet.besøk</span></div>
+          <div class="card-lb5-btn" style="background:#F3E5F5"><div class="card-lb5-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-lb5-label" style="color:#8E24AA">Vaksine</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb5">
+      <div class="card-lb5-border" style="background:#42A5F5"></div>
+      <div class="card-lb5-content">
+        <div class="card-lb5-title" style="color:#42A5F5">Reiser</div>
+        <div class="card-lb5-row">
+          <div class="card-lb5-btn" style="background:#E3F2FD"><div class="card-lb5-icon" style="background:#BBDEFB"><svg viewBox="0 0 24 24" fill="none" stroke="#42A5F5" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div><span class="card-lb5-label" style="color:#42A5F5">Ny reise</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- E5: Left border + big icons -->
+<div>
+<p class="label">E5: Border + Big Icons</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="card-lb6">
+      <div class="card-lb6-border" style="background:#43A047"></div>
+      <div class="card-lb6-content">
+        <div class="card-lb6-title" style="color:#43A047">Avtaler</div>
+        <div class="card-lb6-actions">
+          <div class="card-lb6-action"><div class="card-lb6-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb6-label" style="color:#43A047">Manuell</span><span class="card-lb6-sub">Fyll inn selv</span></div>
+          <div class="card-lb6-action"><div class="card-lb6-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div><span class="card-lb6-label" style="color:#43A047">Tale</span><span class="card-lb6-sub">Snakk</span></div>
+          <div class="card-lb6-action"><div class="card-lb6-icon" style="background:#C8E6C9"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span class="card-lb6-label" style="color:#43A047">Foto</span><span class="card-lb6-sub">Ta bilde</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb6">
+      <div class="card-lb6-border" style="background:#E53935"></div>
+      <div class="card-lb6-content">
+        <div class="card-lb6-title" style="color:#E53935">Helse</div>
+        <div class="card-lb6-actions">
+          <div class="card-lb6-action"><div class="card-lb6-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb6-label" style="color:#E53935">Time</span><span class="card-lb6-sub">Legg til</span></div>
+          <div class="card-lb6-action"><div class="card-lb6-icon" style="background:#FFCDD2"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-lb6-label" style="color:#E53935">Vaksine</span><span class="card-lb6-sub">Registrer</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb6">
+      <div class="card-lb6-border" style="background:#8E24AA"></div>
+      <div class="card-lb6-content">
+        <div class="card-lb6-title" style="color:#8E24AA">Kjæledyr</div>
+        <div class="card-lb6-actions">
+          <div class="card-lb6-action"><div class="card-lb6-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span class="card-lb6-label" style="color:#8E24AA">Vet.besøk</span><span class="card-lb6-sub">Besøk</span></div>
+          <div class="card-lb6-action"><div class="card-lb6-icon" style="background:#E1BEE7"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span class="card-lb6-label" style="color:#8E24AA">Vaksine</span><span class="card-lb6-sub">Registrer</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb6">
+      <div class="card-lb6-border" style="background:#42A5F5"></div>
+      <div class="card-lb6-content">
+        <div class="card-lb6-title" style="color:#42A5F5">Reiser</div>
+        <div class="card-lb6-actions">
+          <div class="card-lb6-action"><div class="card-lb6-icon" style="background:#BBDEFB"><svg viewBox="0 0 24 24" fill="none" stroke="#42A5F5" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div><span class="card-lb6-label" style="color:#42A5F5">Ny reise</span><span class="card-lb6-sub">Opprett</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- E6: Left border + pill row -->
+<div>
+<p class="label">E6: Border + Pill Row</p>
+<div class="phone-frame">
+  <div class="sheet-header"><span class="sheet-title">Hva vil du opprette?</span><div class="sheet-close">✕</div></div>
+  <div class="sheet-body">
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#43A047"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#43A047">Avtaler</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:4px;background:#E8F5E9;padding:6px 10px;border-radius:20px;cursor:pointer"><div style="width:24px;height:24px;border-radius:12px;background:#C8E6C9;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span style="font-size:11px;font-weight:600;color:#43A047">Manuell</span></div>
+          <div style="display:flex;align-items:center;gap:4px;background:#E8F5E9;padding:6px 10px;border-radius:20px;cursor:pointer"><div style="width:24px;height:24px;border-radius:12px;background:#C8E6C9;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2" width="12" height="12"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg></div><span style="font-size:11px;font-weight:600;color:#43A047">Tale</span></div>
+          <div style="display:flex;align-items:center;gap:4px;background:#E8F5E9;padding:6px 10px;border-radius:20px;cursor:pointer"><div style="width:24px;height:24px;border-radius:12px;background:#C8E6C9;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#43A047" stroke-width="2" width="12" height="12"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2l2-3h6l2 3h2a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div><span style="font-size:11px;font-weight:600;color:#43A047">Foto</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#E53935"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#E53935">Helse</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:4px;background:#FFEBEE;padding:6px 10px;border-radius:20px;cursor:pointer"><div style="width:24px;height:24px;border-radius:12px;background:#FFCDD2;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span style="font-size:11px;font-weight:600;color:#E53935">Time</span></div>
+          <div style="display:flex;align-items:center;gap:4px;background:#FFEBEE;padding:6px 10px;border-radius:20px;cursor:pointer"><div style="width:24px;height:24px;border-radius:12px;background:#FFCDD2;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#E53935" stroke-width="2" width="12" height="12"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span style="font-size:11px;font-weight:600;color:#E53935">Vaksine</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#8E24AA"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#8E24AA">Kjæledyr</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:4px;background:#F3E5F5;padding:6px 10px;border-radius:20px;cursor:pointer"><div style="width:24px;height:24px;border-radius:12px;background:#E1BEE7;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2" width="12" height="12"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="12" y1="7" x2="12" y2="15"/></svg></div><span style="font-size:11px;font-weight:600;color:#8E24AA">Vet.besøk</span></div>
+          <div style="display:flex;align-items:center;gap:4px;background:#F3E5F5;padding:6px 10px;border-radius:20px;cursor:pointer"><div style="width:24px;height:24px;border-radius:12px;background:#E1BEE7;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#8E24AA" stroke-width="2" width="12" height="12"><rect x="7" y="9" width="4" height="12" rx="1"/><path d="M12 9V3a1 1 0 0 0-1-1H9a1 1 0 0 0-1 1v6"/><line x1="12" y1="3" x2="12" y2="9"/></svg></div><span style="font-size:11px;font-weight:600;color:#8E24AA">Vaksine</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="card-lb">
+      <div class="card-lb-border" style="background:#42A5F5"></div>
+      <div class="card-lb-content">
+        <div class="card-lb-title" style="color:#42A5F5">Reiser</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:4px;background:#E3F2FD;padding:6px 10px;border-radius:20px;cursor:pointer"><div style="width:24px;height:24px;border-radius:12px;background:#BBDEFB;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#42A5F5" stroke-width="2" width="12" height="12"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88"/></svg></div><span style="font-size:11px;font-weight:600;color:#42A5F5">Ny reise</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+</body>
+</html>

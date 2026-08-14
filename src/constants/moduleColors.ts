@@ -13,4 +13,6 @@ export const MODULE_COLORS = {
   mealplanBg: '#E0F7FA',
   home: '#5C6BC0',
   homeBg: '#E8EAF6',
+  kindergarten: '#AB47BC',
+  kindergartenBg: '#F3E5F5',
 } as const;
