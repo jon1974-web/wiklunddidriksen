@@ -201,6 +201,27 @@ export const ProfileScreen: React.FC = () => {
     return () => unsub();
   }, [familyId, user?.uid]);
 
+  // Handle Google Calendar OAuth callback
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('calendar') === 'connected') {
+      crossAlert('Suksess', 'Google Kalender er koblet til!');
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname);
+      // Reload profile to get updated calendar data
+      if (user) {
+        getUserProfile(user.uid).then((profile) => {
+          if (profile) {
+            setCalendarType(profile.calendarType || 'google');
+            setCalendarEmail(profile.calendarEmail || '');
+            setCalendarProvider(profile.calendarProvider || 'google');
+            setProfile(profile);
+          }
+        });
+      }
+    }
+  }, [user]);
+
   const handleUpdateName = useCallback(async () => {
     if (!newName.trim() || !user) return;
     try {
@@ -460,7 +481,13 @@ export const ProfileScreen: React.FC = () => {
   };
 
   const handleSaveCalendarPreference = useCallback(async (provider: 'google' | 'outlook') => {
-    if (!user || !calendarEmail.trim()) return;
+    if (!user) return;
+    if (provider === 'google') {
+      // Redirect to Google OAuth
+      window.location.href = `https://us-central1-familiesenter-837bb.cloudfunctions.net/googleCalendarAuth?uid=${user.uid}`;
+      return;
+    }
+    if (!calendarEmail.trim()) return;
     try {
       await createOrUpdateUser(user.uid, {
         calendarEmail: calendarEmail.trim(),

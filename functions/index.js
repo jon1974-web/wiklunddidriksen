@@ -2036,3 +2036,328 @@ exports.notifyNewChatMessage = onDocumentCreated({ region: "us-central1", docume
   return { sent };
 });
 
+// ==================== GOOGLE CALENDAR ====================
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_REDIRECT_URI = "https://familiesenter-837bb.web.app/profile";
+
+// Step 1: Redirect to Google OAuth
+exports.googleCalendarAuth = onRequest({ region: "us-central1" }, async (req, res) => {
+  const uid = req.query.uid;
+  if (!uid) {
+    res.status(400).send("Missing uid parameter");
+    return;
+  }
+
+  const scopes = ["https://www.googleapis.com/auth/calendar.events"];
+  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+    `client_id=${GOOGLE_CLIENT_ID}` +
+    `&redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI)}` +
+    `&response_type=code` +
+    `&scope=${encodeURIComponent(scopes.join(" "))}` +
+    `&access_type=offline` +
+    `&prompt=consent` +
+    `&state=${uid}`;
+
+  res.redirect(authUrl);
+});
+
+// Step 2: Handle OAuth callback
+exports.googleCalendarCallback = onRequest({ region: "us-central1" }, async (req, res) => {
+  const code = req.query.code;
+  const uid = req.query.state;
+
+  if (!code || !uid) {
+    res.status(400).send("Missing code or state parameter");
+    return;
+  }
+
+  try {
+    // Exchange code for tokens
+    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        code,
+        client_id: GOOGLE_CLIENT_ID,
+        client_secret: GOOGLE_CLIENT_SECRET,
+        redirect_uri: GOOGLE_REDIRECT_URI,
+        grant_type: "authorization_code",
+      }),
+    });
+
+    const tokenData = await tokenResponse.json();
+
+    if (tokenData.error) {
+      console.error("Token exchange error:", tokenData);
+      res.status(400).send("Failed to exchange code for tokens");
+      return;
+    }
+
+    // Get user email
+    const userInfoResponse = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+      headers: { Authorization: `Bearer ${tokenData.access_token}` },
+    });
+    const userInfo = await userInfoResponse.json();
+
+    // Save tokens to Firestore
+    const db = getFirestore();
+    await db.collection("users").doc(uid).update({
+      calendarType: "google",
+      calendarEmail: userInfo.email,
+      calendarAccessToken: tokenData.access_token,
+      calendarRefreshToken: tokenData.refresh_token,
+      calendarTokenExpiry: Date.now() + (tokenData.expires_in * 1000),
+    });
+
+    // Redirect back to profile
+    res.redirect("https://familiesenter-837bb.web.app/profile?calendar=connected");
+  } catch (error) {
+    console.error("Google Calendar callback error:", error);
+    res.status(500).send("Failed to connect Google Calendar");
+  }
+});
+
+// Helper: Refresh Google access token
+async function refreshGoogleToken(uid) {
+  const db = getFirestore();
+  const userDoc = await db.collection("users").doc(uid).get();
+  const userData = userDoc.data();
+
+  if (!userData?.calendarRefreshToken) {
+    throw new Error("No refresh token found");
+  }
+
+  // Check if token is still valid
+  if (userData.calendarTokenExpiry && userData.calendarTokenExpiry > Date.now() + 60000) {
+    return userData.calendarAccessToken;
+  }
+
+  // Refresh the token
+  const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      refresh_token: userData.calendarRefreshToken,
+      grant_type: "refresh_token",
+    }),
+  });
+
+  const tokenData = await tokenResponse.json();
+
+  if (tokenData.error) {
+    throw new Error("Failed to refresh token: " + tokenData.error);
+  }
+
+  // Update tokens in Firestore
+  await db.collection("users").doc(uid).update({
+    calendarAccessToken: tokenData.access_token,
+    calendarTokenExpiry: Date.now() + (tokenData.expires_in * 1000),
+  });
+
+  return tokenData.access_token;
+}
+
+// Helper: Create Google Calendar event
+async function createGoogleCalendarEvent(uid, event) {
+  const accessToken = await refreshGoogleToken(uid);
+
+  const calendarEvent = {
+    summary: event.title,
+    description: event.description || "",
+    start: event.allDay
+      ? { date: event.startDate }
+      : { dateTime: event.startDateTime, timeZone: "Europe/Oslo" },
+    end: event.allDay
+      ? { date: event.endDate }
+      : { dateTime: event.endDateTime, timeZone: "Europe/Oslo" },
+  };
+
+  if (event.location) {
+    calendarEvent.location = event.location;
+  }
+
+  const response = await fetch(
+    "https://www.googleapis.com/calendar/v3/calendars/primary/events",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(calendarEvent),
+    }
+  );
+
+  const result = await response.json();
+
+  if (result.error) {
+    console.error("Create calendar event error:", result.error);
+    throw new Error("Failed to create calendar event: " + result.error.message);
+  }
+
+  return result.id;
+}
+
+// Cloud Function: Auto-sync events to Google Calendar
+exports.onEventCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "events/{eventId}" }, async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const data = snap.data();
+  const uid = data.createdBy;
+  if (!uid) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const startDateTime = `${data.date}T${data.time || "09:00"}:00`;
+    const endDateTime = data.endDate && data.endTime
+      ? `${data.endDate}T${data.endTime}:00`
+      : `${data.date}T${data.time ? incrementTime(data.time) : "10:00"}:00`;
+
+    const eventId = await createGoogleCalendarEvent(uid, {
+      title: data.title,
+      description: data.description || "",
+      startDateTime,
+      endDateTime,
+      location: data.address || "",
+    });
+
+    // Store the calendar event ID for future updates/deletions
+    await db.collection("events").doc(event.params.eventId).update({
+      googleCalendarEventId: eventId,
+    });
+
+    console.log(`onEventCreatedForCalendar: synced event ${event.params.eventId}`);
+  } catch (error) {
+    console.error(`onEventCreatedForCalendar error:`, error);
+  }
+});
+
+// Helper: increment time by 1 hour
+function incrementTime(time) {
+  const [hours, minutes] = time.split(":").map(Number);
+  const newHours = (hours + 1) % 24;
+  return `${String(newHours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+}
+
+// Cloud Function: Auto-sync trips to Google Calendar
+exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "trips/{tripId}" }, async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const data = snap.data();
+  const uid = data.createdBy;
+  if (!uid) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const eventId = await createGoogleCalendarEvent(uid, {
+      title: `✈️ ${data.title || data.city || "Reise"}`,
+      description: `${data.city || ""}${data.country ? ", " + data.country : ""}`,
+      allDay: true,
+      startDate: data.startDate,
+      endDate: data.endDate || data.startDate,
+    });
+
+    await db.collection("trips").doc(event.params.tripId).update({
+      googleCalendarEventId: eventId,
+    });
+
+    console.log(`onTripCreatedForCalendar: synced trip ${event.params.tripId}`);
+  } catch (error) {
+    console.error(`onTripCreatedForCalendar error:`, error);
+  }
+});
+
+// Cloud Function: Auto-sync health appointments to Google Calendar
+exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "healthAppointments/{docId}" }, async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const data = snap.data();
+  const uid = data.createdBy;
+  if (!uid) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
+    const endDateTime = data.endTime
+      ? `${data.date}T${data.endTime}:00`
+      : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+
+    const eventId = await createGoogleCalendarEvent(uid, {
+      title: `❤️ ${data.title}`,
+      description: data.person || "",
+      startDateTime,
+      endDateTime,
+      location: data.location || "",
+    });
+
+    await db.collection("healthAppointments").doc(event.params.docId).update({
+      googleCalendarEventId: eventId,
+    });
+
+    console.log(`onHealthAppointmentCreatedForCalendar: synced ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onHealthAppointmentCreatedForCalendar error:`, error);
+  }
+});
+
+// Cloud Function: Auto-sync pet vet visits to Google Calendar
+exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "petVetVisits/{docId}" }, async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const data = snap.data();
+  const uid = data.createdBy;
+  if (!uid) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
+    const endDateTime = data.endTime
+      ? `${data.date}T${data.endTime}:00`
+      : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+
+    const eventId = await createGoogleCalendarEvent(uid, {
+      title: `🐾 ${data.title}`,
+      description: data.petId || "",
+      startDateTime,
+      endDateTime,
+      location: data.location || "",
+    });
+
+    await db.collection("petVetVisits").doc(event.params.docId).update({
+      googleCalendarEventId: eventId,
+    });
+
+    console.log(`onPetVetVisitCreatedForCalendar: synced ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onPetVetVisitCreatedForCalendar error:`, error);
+  }
+});
+
