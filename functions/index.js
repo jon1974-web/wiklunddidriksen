@@ -2387,6 +2387,8 @@ async function updateGoogleCalendarEvent(uid, calendarEventId, event) {
     calendarEvent.location = event.location;
   }
 
+  console.log("Updating calendar event:", calendarEventId, JSON.stringify(calendarEvent));
+
   const response = await fetch(
     `https://www.googleapis.com/calendar/v3/calendars/primary/events/${calendarEventId}`,
     {
@@ -2442,9 +2444,11 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
     if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
 
     const startDateTime = `${after.date}T${after.time || "09:00"}:00`;
-    const endDateTime = after.endDate && after.endTime
-      ? `${after.endDate}T${after.endTime}:00`
-      : `${after.date}T${after.time ? incrementTime(after.time) : "10:00"}:00`;
+    const endDateTime = after.endTime
+      ? `${after.date}T${after.endTime}:00`
+      : after.endDate
+        ? `${after.endDate}T${after.time ? incrementTime(after.time) : "10:00"}:00`
+        : `${after.date}T${after.time ? incrementTime(after.time) : "10:00"}:00`;
 
     await updateGoogleCalendarEvent(uid, calendarEventId, {
       title: after.title,
@@ -2657,5 +2661,28 @@ exports.debugCheckUser = onRequest({ region: "us-central1" }, async (req, res) =
     calendarProvider: data.calendarProvider || "NOT SET",
     hasAccessToken: !!data.calendarAccessToken,
     hasRefreshToken: !!data.calendarRefreshToken,
+  });
+});
+
+// DEBUG: Check event calendar data
+exports.debugCheckEvent = onRequest({ region: "us-central1" }, async (req, res) => {
+  const eventId = req.query.eventId;
+  if (!eventId) {
+    res.json({ error: "Missing eventId" });
+    return;
+  }
+  const db = getFirestore();
+  const doc = await db.collection("events").doc(eventId).get();
+  if (!doc.exists) {
+    res.json({ error: "Event not found" });
+    return;
+  }
+  const data = doc.data();
+  res.json({
+    title: data.title,
+    date: data.date,
+    time: data.time,
+    googleCalendarEventId: data.googleCalendarEventId || "NOT SET",
+    createdBy: data.createdBy,
   });
 });

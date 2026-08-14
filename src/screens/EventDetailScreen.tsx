@@ -153,11 +153,14 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           updateData.endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
         } else if (customEndTime) {
           updateData.endTime = customEndTime;
-        } else {
-          updateData.endTime = deleteField();
         }
       } else {
-        updateData.endTime = deleteField();
+        // Always set a default endTime (1 hour after start)
+        const [hours, mins] = time.split(':').map(Number);
+        const totalMins = hours * 60 + mins + 60;
+        const endHour = Math.floor(totalMins / 60);
+        const endMin = totalMins % 60;
+        updateData.endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
       }
 
       await updateDoc(doc(db, 'events', event.id), updateData);
@@ -495,7 +498,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               <TouchableOpacity
                 key={option.value}
                 style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endTime === String(option.value) && !customEndTime && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-                onPress={() => { setEndTime(String(option.value)); setCustomEndTime(''); }}
+                onPress={() => { setShowEndTime(true); setEndTime(String(option.value)); setCustomEndTime(''); }}
               >
                 <Text style={[styles.reminderText, { color: endTime === String(option.value) && !customEndTime ? '#fff' : colors.textSecondary }]}>
                   {option.label}

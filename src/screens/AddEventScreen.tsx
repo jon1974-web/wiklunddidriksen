@@ -31,8 +31,8 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   const [customEndDate, setCustomEndDate] = useState(prefill?.endDate || '');
   const [showEndDate, setShowEndDate] = useState(!!prefill?.endDate);
   const [time, setTime] = useState(prefill?.time || '12:00');
-  const [endTime, setEndTime] = useState('');
-  const [showEndTime, setShowEndTime] = useState(!!prefill?.endTime);
+  const [endTime, setEndTime] = useState(prefill?.endTime ? String(Math.round((parseInt(prefill.endTime.split(':')[0]) * 60 + parseInt(prefill.endTime.split(':')[1]) - (parseInt(prefill.time?.split(':')[0] || '12') * 60 + parseInt(prefill.time?.split(':')[1] || '0'))) / 15) * 15) : '60');
+  const [showEndTime, setShowEndTime] = useState(true);
   const [customEndTime, setCustomEndTime] = useState(prefill?.endTime || '');
   const [reminderMinutes, setReminderMinutes] = useState(prefill?.reminderMinutes || 120);
   const [icon, setIcon] = useState(prefill?.icon || '');
@@ -113,6 +113,13 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         } else if (customEndTime) {
           eventData.endTime = customEndTime;
         }
+      } else {
+        // Always set a default endTime (1 hour after start)
+        const [hours, mins] = time.split(':').map(Number);
+        const totalMins = hours * 60 + mins + 60;
+        const endHour = Math.floor(totalMins / 60);
+        const endMin = totalMins % 60;
+        eventData.endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
       }
 
       const docRef = await addDoc(collection(db, 'events'), eventData);
