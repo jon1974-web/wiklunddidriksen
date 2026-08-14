@@ -572,6 +572,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                           </View>
                         )}
                         {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>🏥 {c.subject}</Text> : null}
+                        {c.notes ? <Text style={{ color: colors.textSecondary, fontSize: 11 }} numberOfLines={1}>📝 {c.notes}</Text> : null}
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
                         {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>}
