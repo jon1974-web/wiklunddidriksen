@@ -63,7 +63,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         {contact.role === 'teacher' && (contact as any).teacherType && (
           <View style={[s.teacherTypeBadge, { backgroundColor: (contact as any).teacherType === 'personal' ? '#E8F5E9' : (contact as any).teacherType === 'contact' ? '#E3F2FD' : '#FFF3E0' }]}>
             <Text style={{ color: (contact as any).teacherType === 'personal' ? '#43A047' : (contact as any).teacherType === 'contact' ? '#1976D2' : '#FB8C00', fontSize: 12, fontWeight: '600' }}>
-              {(contact as any).teacherType === 'personal' ? t('school.personalTeacher') : (contact as any).teacherType === 'contact' ? t('school.contactTeacher') : t('school.subjectTeacher')}
+              {(contact as any).teacherType === 'personal' ? 'Klassekontaktlærer' : (contact as any).teacherType === 'contact' ? 'Kontaktlærer' : 'Faglærer'}
             </Text>
           </View>
         )}
