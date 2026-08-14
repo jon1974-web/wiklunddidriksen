@@ -584,8 +584,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
             {years.map(y => (
               <TouchableOpacity key={y.id} style={[styles.yearTab, { backgroundColor: selectedYear?.id === y.id ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setSelectedYear(y)} onLongPress={() => setYearActionModal({ visible: true, id: y.id, title: y.year })}>
-                <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.text, fontSize: 14, fontWeight: '600' }}>{y.year}</Text>
-                {y.grade ? <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.textSecondary, fontSize: 12 }}>{y.grade}</Text> : null}
+                {y.school ? <Text style={{ color: selectedYear?.id === y.id ? 'rgba(255,255,255,0.7)' : colors.textSecondary, fontSize: 10 }}>{y.school}</Text> : null}
+                {y.grade ? <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>{y.grade}</Text> : null}
+                <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.text, fontSize: 14, fontWeight: '700' }}>{y.year}</Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
