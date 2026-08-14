@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Linking, Image } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { doc, updateDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
@@ -273,8 +274,15 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         </TouchableOpacity>
 
         <View style={[styles.viewCard, { backgroundColor: colors.surface }]}>
-          <Text style={styles.viewIcon}>{eventIcon}</Text>
-          <Text style={[styles.viewTitle, { color: colors.text }]}>{eventData.title}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Text style={[styles.viewTitle, { color: colors.text, flex: 1 }]}>{eventData.title}</Text>
+            <TouchableOpacity onPress={handleCopy} style={{ padding: 4 }}>
+              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <Path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h2"/>
+                <Rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
+              </Svg>
+            </TouchableOpacity>
+          </View>
           {eventData.description && (
             <Text style={[styles.viewDescription, { color: colors.textSecondary }]}>{eventData.description}</Text>
           )}
@@ -320,62 +328,6 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             <Text style={[styles.deleteButtonText, { color: colors.danger }]}>{t('detail.delete')}</Text>
           </TouchableOpacity>
         )}
-
-        <TouchableOpacity style={[styles.copyButton, { backgroundColor: colors.inputBackground }]} onPress={handleCopy}>
-          <Text style={[styles.copyButtonText, { color: colors.text }]}>{t('detail.copy')}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.avbrytLink} onPress={() => navigation.goBack()}>
-          <Text style={[styles.avbrytLinkText, { color: colors.accent }]}>{t('detail.cancel')}</Text>
-        </TouchableOpacity>
-
-        {Platform.OS === 'web' && (
-          <View style={{ marginTop: 16 }}>
-            {userCalendarProvider && userCalendarEmail ? (
-              <TouchableOpacity
-                style={[styles.calendarWebButton, { backgroundColor: userCalendarProvider === 'google' ? '#4285F4' : '#0078D4' }]}
-                onPress={() => {
-                  const [h, m] = eventData.time.split(':').map(Number);
-                  const start = new Date(eventData.date);
-                  start.setHours(h, m, 0, 0);
-                  let end: Date;
-                  if (eventData.endDate && eventData.endTime) {
-                    const [eh, em] = eventData.endTime.split(':').map(Number);
-                    end = new Date(eventData.endDate);
-                    end.setHours(eh, em, 0, 0);
-                  } else if (eventData.endTime) {
-                    const [eh, em] = eventData.endTime.split(':').map(Number);
-                    end = new Date(eventData.date);
-                    end.setHours(eh, em, 0, 0);
-                  } else if (eventData.endDate) {
-                    end = new Date(eventData.endDate);
-                    end.setHours(h, m, 0, 0);
-                  } else {
-                    end = new Date(start.getTime() + 60 * 60 * 1000);
-                  }
-                  if (userCalendarProvider === 'google') {
-                    const fmt = (d: Date) => d.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
-                    const url = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventData.title)}&dates=${fmt(start)}/${fmt(end)}&details=${encodeURIComponent(eventData.description || '')}&location=${encodeURIComponent(eventData.address || '')}`;
-                    Linking.openURL(url);
-                  } else {
-                    const fmt = (d: Date) => d.toISOString();
-                    const url = `https://outlook.live.com/calendar/0/action/compose?subject=${encodeURIComponent(eventData.title)}&startdt=${fmt(start)}&enddt=${fmt(end)}&body=${encodeURIComponent(eventData.description || '')}&location=${encodeURIComponent(eventData.address || '')}`;
-                    Linking.openURL(url);
-                  }
-                }}
-              >
-                <Text style={styles.calendarWebButtonText}>
-                  {userCalendarProvider === 'google' ? t('calendar.addToGoogle') : t('calendar.addToOutlook')}
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <Text style={[styles.sectionLabel, { color: colors.textDisabled, textAlign: 'center' }]}>
-                Lagre kalender-e-post i Profil for å legge til arrangementer direkte.
-              </Text>
-            )}
-          </View>
-        )}
-        <View style={{ height: 40 }} />
       </ScrollView>
     );
   }
