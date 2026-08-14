@@ -405,6 +405,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     return c.name.toLowerCase().includes(q) || c.parentName?.toLowerCase().includes(q);
   });
   const filteredTeachers = teachers.filter(c => {
+    console.log('FILTER RUNNING for:', c.name, '| search:', contactSearch);
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
     const teacherType = (c as any).teacherType || '';
