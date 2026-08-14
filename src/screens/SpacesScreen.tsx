@@ -227,6 +227,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   spaceCount: {
-    fontSize: 11,
+    fontSize: 13,
   },
 });
