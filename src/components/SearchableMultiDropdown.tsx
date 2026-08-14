@@ -9,13 +9,14 @@ interface SearchableMultiDropdownProps {
   placeholder?: string;
 }
 
-export const SearchableMultiDropdown: React.FC<SearchableMultiDropdownProps> = ({ options, value, onChange, placeholder = 'Velg roller...' }) => {
+export const SearchableMultiDropdown: React.FC<SearchableMultiDropdownProps> = ({ options, value = [], onChange, placeholder = 'Velg roller...' }) => {
   const { colors } = useTheme();
   const [visible, setVisible] = useState(false);
   const [search, setSearch] = useState('');
 
-  const selected = options.filter(o => value.includes(o.key));
-  const customItems = value.filter(v => !options.some(o => o.key === v));
+  const safeValue = Array.isArray(value) ? value : [];
+  const selected = options.filter(o => safeValue.includes(o.key));
+  const customItems = safeValue.filter(v => !options.some(o => o.key === v));
 
   const filtered = useMemo(() => {
     const base = search.trim()
@@ -25,7 +26,7 @@ export const SearchableMultiDropdown: React.FC<SearchableMultiDropdownProps> = (
   }, [options, search]);
 
   const toggle = (key: string) => {
-    const next = value.includes(key) ? value.filter(k => k !== key) : [...value, key];
+    const next = safeValue.includes(key) ? safeValue.filter(k => k !== key) : [...safeValue, key];
     onChange(next);
   };
 
@@ -35,7 +36,7 @@ export const SearchableMultiDropdown: React.FC<SearchableMultiDropdownProps> = (
         style={[styles.trigger, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
         onPress={() => { setSearch(''); setVisible(true); }}
       >
-        {selected.length > 0 || customItems.length > 0 ? (
+        {safeValue.length > 0 || customItems.length > 0 ? (
           <View style={styles.badgeRow}>
             {[...selected, ...customItems.map(k => ({ key: k, label: k, color: '#607D8B' }))].slice(0, 3).map((item) => (
               <View key={item.key} style={[styles.badge, { backgroundColor: item.color }]}>
@@ -43,8 +44,8 @@ export const SearchableMultiDropdown: React.FC<SearchableMultiDropdownProps> = (
                 <TouchableOpacity onPress={() => toggle(item.key)}><Text style={styles.badgeX}>×</Text></TouchableOpacity>
               </View>
             ))}
-            {(selected.length + customItems.length) > 3 && (
-              <Text style={{ color: colors.textSecondary, fontSize: 11 }}>+{(selected.length + customItems.length) - 3}</Text>
+            {(safeValue.length) > 3 && (
+              <Text style={{ color: colors.textSecondary, fontSize: 11 }}>+{safeValue.length - 3}</Text>
             )}
           </View>
         ) : (
@@ -69,12 +70,12 @@ export const SearchableMultiDropdown: React.FC<SearchableMultiDropdownProps> = (
                 keyExtractor={(item) => item.key}
                 renderItem={({ item }) => (
                   <TouchableOpacity
-                    style={[styles.option, value.includes(item.key) && { backgroundColor: item.color + '15' }]}
+                    style={[styles.option, safeValue.includes(item.key) && { backgroundColor: item.color + '15' }]}
                     onPress={() => toggle(item.key)}
                   >
-                    <View style={[styles.optionDot, { backgroundColor: value.includes(item.key) ? item.color : colors.border }]} />
+                    <View style={[styles.optionDot, { backgroundColor: safeValue.includes(item.key) ? item.color : colors.border }]} />
                     <Text style={[styles.optionText, { color: colors.text }]}>{item.label}</Text>
-                    {value.includes(item.key) && <Text style={{ color: item.color, fontWeight: '700' }}>✓</Text>}
+                    {safeValue.includes(item.key) && <Text style={{ color: item.color, fontWeight: '700' }}>✓</Text>}
                   </TouchableOpacity>
                 )}
                 ListFooterComponent={
