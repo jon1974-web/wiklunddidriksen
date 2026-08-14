@@ -56,51 +56,97 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
       </TouchableOpacity>
 
       <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
-        <Text style={s.viewIcon}>{isTeacher ? '👩‍🏫' : contact.role === 'admin' ? '🏥' : '👦'}</Text>
+        <Text style={s.viewIcon}>{contact.role === 'teacher' ? '👩‍🏫' : contact.role === 'admin' ? '🏥' : '👦'}</Text>
         <Text style={[s.viewTitle, { color: colors.text }]}>{contact.name}</Text>
-        {isTeacher && (contact as any).teacherType && (
+
+        {contact.role === 'teacher' && (contact as any).teacherType && (
           <View style={[s.teacherTypeBadge, { backgroundColor: (contact as any).teacherType === 'personal' ? '#E8F5E9' : (contact as any).teacherType === 'contact' ? '#E3F2FD' : '#FFF3E0' }]}>
             <Text style={{ color: (contact as any).teacherType === 'personal' ? '#43A047' : (contact as any).teacherType === 'contact' ? '#1976D2' : '#FB8C00', fontSize: 12, fontWeight: '600' }}>
               {(contact as any).teacherType === 'personal' ? t('school.personalTeacher') : (contact as any).teacherType === 'contact' ? t('school.contactTeacher') : t('school.subjectTeacher')}
             </Text>
           </View>
         )}
+
         {contact.role === 'admin' && (contact as any).adminType && (
           <View style={[s.teacherTypeBadge, { backgroundColor: '#E3F2FD' }]}>
             <Text style={{ color: '#1976D2', fontSize: 12, fontWeight: '600' }}>{(contact as any).adminType}</Text>
           </View>
         )}
-        {isTeacher && contact.subject && (
+
+        {contact.role === 'teacher' && contact.subject && (
           <Text style={[s.viewDescription, { color: colors.textSecondary }]}>📚 {contact.subject}</Text>
         )}
+
         <View style={[s.viewDivider, { backgroundColor: colors.border }]} />
 
-        {!isTeacher && contact.childPhone && (
-          <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.childPhone')}</Text>
-            <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.childPhone}</Text>
-          </View>
+        {/* Admin fields */}
+        {contact.role === 'admin' && (
+          <>
+            {contact.phone && (
+              <View style={s.viewDetailRow}>
+                <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.phone')}</Text>
+                <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.phone}</Text>
+              </View>
+            )}
+            {contact.email && (
+              <View style={s.viewDetailRow}>
+                <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.email')}</Text>
+                <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.email}</Text>
+              </View>
+            )}
+            {contact.address && (
+              <View style={s.viewDetailRow}>
+                <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.address')}</Text>
+                <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.address}</Text>
+              </View>
+            )}
+            {contact.notes && (
+              <View style={s.viewDetailRow}>
+                <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📝 {t('common.note')}</Text>
+                <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.notes}</Text>
+              </View>
+            )}
+            {(contact.phone || contact.email) && renderActionButtons(contact.phone, contact.email, contact.name)}
+          </>
         )}
-        {!isTeacher && contact.childEmail && (
-          <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.childEmail')}</Text>
-            <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.childEmail}</Text>
-          </View>
+
+        {/* Teacher fields */}
+        {contact.role === 'teacher' && (
+          <>
+            {contact.phone && (
+              <View style={s.viewDetailRow}>
+                <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.phone')}</Text>
+                <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.phone}</Text>
+              </View>
+            )}
+            {contact.email && (
+              <View style={s.viewDetailRow}>
+                <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.email')}</Text>
+                <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.email}</Text>
+              </View>
+            )}
+            {(contact.phone || contact.email) && renderActionButtons(contact.phone, contact.email, contact.name)}
+          </>
         )}
-        {!isTeacher && (contact.childPhone || contact.childEmail) && renderActionButtons(contact.childPhone, contact.childEmail, contact.name)}
-        {isTeacher && contact.phone && (
-          <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.phone')}</Text>
-            <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.phone}</Text>
-          </View>
+
+        {/* Classmate fields */}
+        {contact.role === 'classmate' && (
+          <>
+            {contact.childPhone && (
+              <View style={s.viewDetailRow}>
+                <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.childPhone')}</Text>
+                <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.childPhone}</Text>
+              </View>
+            )}
+            {contact.childEmail && (
+              <View style={s.viewDetailRow}>
+                <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.childEmail')}</Text>
+                <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.childEmail}</Text>
+              </View>
+            )}
+            {(contact.childPhone || contact.childEmail) && renderActionButtons(contact.childPhone, contact.childEmail, contact.name)}
+          </>
         )}
-        {isTeacher && contact.email && (
-          <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.email')}</Text>
-            <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.email}</Text>
-          </View>
-        )}
-        {isTeacher && (contact.phone || contact.email) && renderActionButtons(contact.phone, contact.email, contact.name)}
       </View>
 
       {!isTeacher && contact.parentName && (
