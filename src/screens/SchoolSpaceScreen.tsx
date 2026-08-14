@@ -797,11 +797,11 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                         { key: 'subject' as const, label: t('school.subjectTeacher') },
                       ].map((rt) => (
                         <TouchableOpacity
-                          key={t.key}
-                          style={[styles.personChip, { backgroundColor: contactForm.teacherType === t.key ? SCHOOL_THEME : colors.inputBackground, flex: 1 }]}
-                          onPress={() => setContactForm(f => ({ ...f, teacherType: t.key }))}
+                          key={rt.key}
+                          style={[styles.personChip, { backgroundColor: contactForm.teacherType === rt.key ? SCHOOL_THEME : colors.inputBackground, flex: 1 }]}
+                          onPress={() => setContactForm(f => ({ ...f, teacherType: rt.key }))}
                         >
-                          <Text style={{ color: contactForm.teacherType === t.key ? '#fff' : colors.text, fontSize: 12, fontWeight: '600', textAlign: 'center' }}>{t.label}</Text>
+                          <Text style={{ color: contactForm.teacherType === rt.key ? '#fff' : colors.text, fontSize: 12, fontWeight: '600', textAlign: 'center' }}>{rt.label}</Text>
                         </TouchableOpacity>
                       ))}
                     </View>
