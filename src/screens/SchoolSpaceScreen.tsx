@@ -256,13 +256,22 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const handleEditContact = () => {
     const contact = contacts.find(c => c.id === contactActionModal.id);
     if (!contact) return;
+    const isTeacher = contact.role === 'teacher';
     setContactForm({
-      role: contact.role, name: contact.name, subject: contact.subject || '',
-      childName: (contact as any).childName || '', parentName: contact.parentName || '',
-      parentPhone: contact.parentPhone || '', parentEmail: contact.parentEmail || '',
-      parentName2: contact.parentName2 || '', parentPhone2: contact.parentPhone2 || '', parentEmail2: contact.parentEmail2 || '',
+      role: contact.role,
+      teacherType: (contact as any).teacherType || 'contact',
+      name: contact.name,
+      subject: contact.subject || '',
+      childName: (contact as any).childName || '',
+      parentName: contact.parentName || '',
+      parentPhone: contact.parentPhone || '',
+      parentEmail: contact.parentEmail || '',
+      parentName2: contact.parentName2 || '',
+      parentPhone2: contact.parentPhone2 || '',
+      parentEmail2: contact.parentEmail2 || '',
       address: contact.address || '',
-      phone: contact.childPhone || contact.parentPhone || '', email: contact.childEmail || contact.parentEmail || '',
+      phone: isTeacher ? (contact.phone || '') : (contact.childPhone || ''),
+      email: isTeacher ? (contact.email || '') : (contact.childEmail || ''),
       notes: contact.notes || '',
     });
     setEditingContactId(contact.id);
