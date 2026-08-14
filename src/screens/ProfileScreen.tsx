@@ -79,6 +79,7 @@ export const ProfileScreen: React.FC = () => {
   const [calendarName, setCalendarName] = useState<string | null>(null);
   const [calendarEmail, setCalendarEmail] = useState('');
   const [calendarProvider, setCalendarProvider] = useState<'google' | 'outlook' | null>(null);
+  const [calendarType, setCalendarType] = useState<'phone' | 'google' | null>(null);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ meals: true });
   const [uploading, setUploading] = useState(false);
@@ -124,6 +125,9 @@ export const ProfileScreen: React.FC = () => {
       }
       if (userProfile?.calendarProvider) {
         setCalendarProvider(userProfile.calendarProvider);
+      }
+      if (userProfile?.calendarType) {
+        setCalendarType(userProfile.calendarType);
       }
       if (userProfile?.notificationsEnabled !== undefined) {
         setNotificationsEnabled(userProfile.notificationsEnabled);
@@ -750,79 +754,69 @@ export const ProfileScreen: React.FC = () => {
             </View>
           </TouchableOpacity>
         </View>
-        {calendarProvider && calendarEmail ? (
-          <View>
-            <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
-              <Text style={[styles.value, { color: colors.text }]}>
-                {calendarProvider === 'google' ? '📧 ' : '📧 '}{calendarEmail}
-              </Text>
-              <Text style={[styles.editIcon, { color: colors.accent }]}>
-                {calendarProvider === 'google' ? 'Google' : 'Outlook'}
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
-              onPress={handleDisconnectCalendarEmail}
-            >
-              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.disconnectCalendar')}</Text>
-            </TouchableOpacity>
-          </View>
-        ) : Platform.OS === 'web' ? (
-          <View>
-            <Text style={[styles.noFamily, { color: colors.textSecondary, marginBottom: 8 }]}>
-              Lagre kalender-e-post for rask tilgang på arrangementer.
-            </Text>
-            <TextInput
-              style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
-              value={calendarEmail}
-              onChangeText={setCalendarEmail}
-              placeholder="Din e-post (f.eks. navn@gmail.com)"
-              placeholderTextColor={colors.textDisabled}
-              keyboardType="email-address"
-              autoCapitalize="none"
-            />
-            <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-              <TouchableOpacity
-                style={[styles.calendarProviderButton, { backgroundColor: '#4285F4', opacity: calendarEmail.trim() ? 1 : 0.5 }]}
-                onPress={() => handleSaveCalendarPreference('google')}
-                disabled={!calendarEmail.trim()}
-              >
-                <Text style={styles.familyButtonText}>Google</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.calendarProviderButton, { backgroundColor: '#0078D4', opacity: calendarEmail.trim() ? 1 : 0.5 }]}
-                onPress={() => handleSaveCalendarPreference('outlook')}
-                disabled={!calendarEmail.trim()}
-              >
-                <Text style={styles.familyButtonText}>Outlook</Text>
-              </TouchableOpacity>
-            </View>
-            <View style={{ borderTopWidth: 1, borderTopColor: colors.border, paddingTop: 12, marginTop: 12 }}>
-              <Text style={[styles.noFamily, { color: colors.textSecondary }]}>
-                Du kan også laste ned .ics-fil fra hvert enkelt arrangement.
-              </Text>
-            </View>
-          </View>
-        ) : calendarName ? (
-          <View>
-            <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
-              <Text style={[styles.value, { color: colors.text }]}>{calendarName}</Text>
-              <Text style={[styles.editIcon, { color: colors.accent }]}>Koblet til</Text>
-            </View>
-            <TouchableOpacity
-              style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
-              onPress={handleDisconnectCalendar}
-            >
-              <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.leaveFamily')}</Text>
-            </TouchableOpacity>
-          </View>
-        ) : (
+
+        {/* Calendar Type Toggle */}
+        <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
           <TouchableOpacity
-            style={[styles.familyButton, { backgroundColor: colors.accent }]}
-            onPress={handleConnectCalendar}
+            style={[styles.calendarTypeBtn, { backgroundColor: calendarType === 'phone' ? '#0097A7' : colors.inputBackground, borderColor: calendarType === 'phone' ? '#0097A7' : colors.border }]}
+            onPress={() => { setCalendarType('phone'); createOrUpdateUser(user!.uid, { calendarType: 'phone' }); }}
           >
-            <Text style={styles.familyButtonText}>{t('profile.calendar')}</Text>
+            <Text style={{ color: calendarType === 'phone' ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>📱 Telefon-kalender</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.calendarTypeBtn, { backgroundColor: calendarType === 'google' ? '#4285F4' : colors.inputBackground, borderColor: calendarType === 'google' ? '#4285F4' : colors.border }]}
+            onPress={() => { setCalendarType('google'); createOrUpdateUser(user!.uid, { calendarType: 'google' }); }}
+          >
+            <Text style={{ color: calendarType === 'google' ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>📧 Google Kalender</Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Phone Calendar View */}
+        {calendarType === 'phone' && (
+          <View>
+            <Text style={[styles.noFamily, { color: colors.textSecondary }]}>
+              Arrangementer, timer, vaksiner og reiser legges automatisk til i telefonens kalender.
+            </Text>
+          </View>
+        )}
+
+        {/* Google Calendar View */}
+        {calendarType === 'google' && (
+          <View>
+            {calendarProvider && calendarEmail ? (
+              <View>
+                <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
+                  <Text style={[styles.value, { color: colors.text }]}>📧 {calendarEmail}</Text>
+                  <Text style={[styles.editIcon, { color: colors.accent }]}>Google</Text>
+                </View>
+                <TouchableOpacity
+                  style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
+                  onPress={handleDisconnectCalendarEmail}
+                >
+                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.disconnectCalendar')}</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View>
+                <TextInput
+                  style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+                  value={calendarEmail}
+                  onChangeText={setCalendarEmail}
+                  placeholder="Din e-post (f.eks. navn@gmail.com)"
+                  placeholderTextColor={colors.textDisabled}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity
+                  style={[styles.calendarProviderButton, { backgroundColor: '#4285F4', marginTop: 8, opacity: calendarEmail.trim() ? 1 : 0.5 }]}
+                  onPress={() => handleSaveCalendarPreference('google')}
+                  disabled={!calendarEmail.trim()}
+                >
+                  <Text style={styles.familyButtonText}>Koble til Google</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
         )}
       </View>
 
@@ -1629,6 +1623,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     fontSize: 16,
     borderWidth: 1,
+  },
+  calendarTypeBtn: {
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1.5,
+    alignItems: 'center',
   },
   calendarProviderButton: {
     flex: 1,
