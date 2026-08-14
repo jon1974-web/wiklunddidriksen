@@ -2,6 +2,8 @@ require("dotenv").config();
 const { onRequest } = require("firebase-functions/v2/https");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onDocumentDeleted } = require("firebase-functions/v2/firestore");
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getMessaging } = require("firebase-admin/messaging");
@@ -2358,6 +2360,280 @@ exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-centra
     console.log(`onPetVetVisitCreatedForCalendar: synced ${event.params.docId}`);
   } catch (error) {
     console.error(`onPetVetVisitCreatedForCalendar error:`, error);
+  }
+});
+
+// Helper: Update Google Calendar event
+async function updateGoogleCalendarEvent(uid, calendarEventId, event) {
+  const accessToken = await refreshGoogleToken(uid);
+
+  const calendarEvent = {
+    summary: event.title,
+    description: event.description || "",
+  };
+
+  if (event.allDay) {
+    calendarEvent.start = { date: event.startDate };
+    calendarEvent.end = { date: event.endDate };
+  } else {
+    calendarEvent.start = { dateTime: event.startDateTime, timeZone: "Europe/Oslo" };
+    calendarEvent.end = { dateTime: event.endDateTime, timeZone: "Europe/Oslo" };
+  }
+
+  if (event.location !== undefined) {
+    calendarEvent.location = event.location;
+  }
+
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/primary/events/${calendarEventId}`,
+    {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(calendarEvent),
+    }
+  );
+
+  if (!response.ok) {
+    const err = await response.json();
+    console.error("Update calendar event error:", err);
+    throw new Error("Failed to update calendar event");
+  }
+}
+
+// Helper: Delete Google Calendar event
+async function deleteGoogleCalendarEvent(uid, calendarEventId) {
+  const accessToken = await refreshGoogleToken(uid);
+
+  const response = await fetch(
+    `https://www.googleapis.com/calendar/v3/calendars/primary/events/${calendarEventId}`,
+    {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }
+  );
+
+  if (!response.ok && response.status !== 404) {
+    const err = await response.json();
+    console.error("Delete calendar event error:", err);
+  }
+}
+
+// ==================== UPDATE TRIGGERS ====================
+
+exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "events/{eventId}" }, async (event) => {
+  const before = event.data?.before?.data();
+  const after = event.data?.after?.data();
+  if (!after) return;
+
+  const uid = after.createdBy;
+  const calendarEventId = after.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const startDateTime = `${after.date}T${after.time || "09:00"}:00`;
+    const endDateTime = after.endDate && after.endTime
+      ? `${after.endDate}T${after.endTime}:00`
+      : `${after.date}T${after.time ? incrementTime(after.time) : "10:00"}:00`;
+
+    await updateGoogleCalendarEvent(uid, calendarEventId, {
+      title: after.title,
+      description: after.description || "",
+      startDateTime,
+      endDateTime,
+      location: after.address || "",
+    });
+
+    console.log(`onEventUpdatedForCalendar: updated event ${event.params.eventId}`);
+  } catch (error) {
+    console.error(`onEventUpdatedForCalendar error:`, error);
+  }
+});
+
+exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "trips/{tripId}" }, async (event) => {
+  const after = event.data?.after?.data();
+  if (!after) return;
+
+  const uid = after.createdBy;
+  const calendarEventId = after.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    await updateGoogleCalendarEvent(uid, calendarEventId, {
+      title: `✈️ ${after.title || after.city || "Reise"}`,
+      description: `${after.city || ""}${after.country ? ", " + after.country : ""}`,
+      allDay: true,
+      startDate: after.startDate,
+      endDate: after.endDate || after.startDate,
+    });
+
+    console.log(`onTripUpdatedForCalendar: updated trip ${event.params.tripId}`);
+  } catch (error) {
+    console.error(`onTripUpdatedForCalendar error:`, error);
+  }
+});
+
+exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "healthAppointments/{docId}" }, async (event) => {
+  const after = event.data?.after?.data();
+  if (!after) return;
+
+  const uid = after.createdBy;
+  const calendarEventId = after.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const startDateTime = `${after.date}T${after.startTime || "09:00"}:00`;
+    const endDateTime = after.endTime
+      ? `${after.date}T${after.endTime}:00`
+      : `${after.date}T${incrementTime(after.startTime || "09:00")}:00`;
+
+    await updateGoogleCalendarEvent(uid, calendarEventId, {
+      title: `❤️ ${after.title}`,
+      description: after.person || "",
+      startDateTime,
+      endDateTime,
+      location: after.location || "",
+    });
+
+    console.log(`onHealthAppointmentUpdatedForCalendar: updated ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onHealthAppointmentUpdatedForCalendar error:`, error);
+  }
+});
+
+exports.onPetVetVisitUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "petVetVisits/{docId}" }, async (event) => {
+  const after = event.data?.after?.data();
+  if (!after) return;
+
+  const uid = after.createdBy;
+  const calendarEventId = after.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const startDateTime = `${after.date}T${after.startTime || "09:00"}:00`;
+    const endDateTime = after.endTime
+      ? `${after.date}T${after.endTime}:00`
+      : `${after.date}T${incrementTime(after.startTime || "09:00")}:00`;
+
+    await updateGoogleCalendarEvent(uid, calendarEventId, {
+      title: `🐾 ${after.title}`,
+      description: after.petId || "",
+      startDateTime,
+      endDateTime,
+      location: after.location || "",
+    });
+
+    console.log(`onPetVetVisitUpdatedForCalendar: updated ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onPetVetVisitUpdatedForCalendar error:`, error);
+  }
+});
+
+// ==================== DELETE TRIGGERS ====================
+
+exports.onEventDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "events/{eventId}" }, async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+
+  const uid = data.createdBy;
+  const calendarEventId = data.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    await deleteGoogleCalendarEvent(uid, calendarEventId);
+    console.log(`onEventDeletedForCalendar: deleted event ${event.params.eventId}`);
+  } catch (error) {
+    console.error(`onEventDeletedForCalendar error:`, error);
+  }
+});
+
+exports.onTripDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "trips/{tripId}" }, async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+
+  const uid = data.createdBy;
+  const calendarEventId = data.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    await deleteGoogleCalendarEvent(uid, calendarEventId);
+    console.log(`onTripDeletedForCalendar: deleted trip ${event.params.tripId}`);
+  } catch (error) {
+    console.error(`onTripDeletedForCalendar error:`, error);
+  }
+});
+
+exports.onHealthAppointmentDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "healthAppointments/{docId}" }, async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+
+  const uid = data.createdBy;
+  const calendarEventId = data.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    await deleteGoogleCalendarEvent(uid, calendarEventId);
+    console.log(`onHealthAppointmentDeletedForCalendar: deleted ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onHealthAppointmentDeletedForCalendar error:`, error);
+  }
+});
+
+exports.onPetVetVisitDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "petVetVisits/{docId}" }, async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+
+  const uid = data.createdBy;
+  const calendarEventId = data.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    await deleteGoogleCalendarEvent(uid, calendarEventId);
+    console.log(`onPetVetVisitDeletedForCalendar: deleted ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onPetVetVisitDeletedForCalendar error:`, error);
   }
 });
 
