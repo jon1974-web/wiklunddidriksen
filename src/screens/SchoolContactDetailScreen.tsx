@@ -42,9 +42,9 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
     const personName = name?.split(' ')[0] || '';
     return (
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(phone)}><AppIcon name="phone" size={14} color="#43A047" /><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600', marginLeft: 6 }}>{t('school.call')} {personName}</Text></TouchableOpacity>}
-        {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleCopy(phone)}><Text style={{ color: '#1E88E5', fontSize: 12, fontWeight: '600' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
-        {email && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleEmail(email)}><AppIcon name="email" size={14} color="#1976D2" /><Text style={{ color: '#1976D2', fontSize: 12, fontWeight: '600', marginLeft: 6 }}>{t('school.sendEmail')}</Text></TouchableOpacity>}
+        {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(phone)}><AppIcon name="phone" size={14} color="#43A047" /><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600' }}>{t('school.call')} {personName}</Text></TouchableOpacity>}
+        {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD', justifyContent: 'center' }]} onPress={() => handleCopy(phone)}><Text style={{ color: '#1E88E5', fontSize: 12, fontWeight: '600', textAlign: 'center' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
+        {email && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleEmail(email)}><AppIcon name="email" size={14} color="#1976D2" /><Text style={{ color: '#1976D2', fontSize: 12, fontWeight: '600' }}>{t('school.sendEmail')}</Text></TouchableOpacity>}
       </View>
     );
   };
@@ -171,7 +171,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
 const styles = StyleSheet.create({
   container: { flex: 1 },
   backButton: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  actionBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 16 },
+  actionBtn: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 16, flexDirection: 'row', alignItems: 'center', gap: 6 },
   editButton: { padding: 14, borderRadius: 12, alignItems: 'center', marginTop: 8 },
 });
 
