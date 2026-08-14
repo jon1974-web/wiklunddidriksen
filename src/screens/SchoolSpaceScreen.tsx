@@ -127,6 +127,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         setContactForm({
           role: contact.role || 'classmate',
           teacherType: (contact as any).teacherType || 'contact',
+          adminType: (contact as any).adminType || '',
           name: contact.name || '',
           subject: contact.subject || '',
           address: contact.address || '',
