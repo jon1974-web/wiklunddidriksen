@@ -2357,19 +2357,29 @@ exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-centra
 
   const data = snap.data();
   const uid = data.createdBy;
-  if (!uid) return;
+  console.log(`onPetVetVisitCreatedForCalendar: triggered for doc ${event.params.docId}, uid: ${uid}`);
+
+  if (!uid) {
+    console.log("No createdBy field, skipping");
+    return;
+  }
 
   try {
     const db = getFirestore();
     const userDoc = await db.collection("users").doc(uid).get();
     const userData = userDoc.data();
 
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
+      console.log(`User ${uid} not connected to Google Calendar`);
+      return;
+    }
 
     const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
       ? `${data.date}T${data.endTime}:00`
       : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+
+    console.log(`Creating pet vet visit: ${data.title}, ${startDateTime} - ${endDateTime}`);
 
     const eventId = await createGoogleCalendarEvent(uid, {
       title: `🐾 ${data.title}`,
@@ -2754,6 +2764,26 @@ exports.debugCheckTrips = onRequest({ region: "us-central1" }, async (req, res) 
       startDate: data.startDate,
       endDate: data.endDate,
       createdBy: data.createdBy,
+    });
+  });
+  res.json(results);
+});
+
+// DEBUG: Check pet vet visits
+exports.debugCheckPetVet = onRequest({ region: "us-central1" }, async (req, res) => {
+  const db = getFirestore();
+  const snapshot = await db.collection("petVetVisits").orderBy("createdAt", "desc").limit(3).get();
+  const results = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    results.push({
+      id: doc.id,
+      title: data.title,
+      createdBy: data.createdBy,
+      date: data.date,
+      startTime: data.startTime,
+      endTime: data.endTime,
+      googleCalendarEventId: data.googleCalendarEventId || "NOT SET",
     });
   });
   res.json(results);

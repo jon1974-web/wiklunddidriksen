@@ -223,21 +223,6 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         if (!isEditing && vetForm.date) {
           const reminderMinutes = vetForm.reminder ? (vetForm.reminder.includes('1 d') ? 1440 : vetForm.reminder.includes('3') ? 4320 : 10080) : 0;
           const eventDate = new Date(`${vetForm.date}T${vetForm.startTime || '09:00'}:00`);
-          const eventData = {
-            title: `${PET_ICONS[selectedPet.type] || '🐾'} ${selectedPet.name}: ${vetForm.title}`,
-            description: vetForm.note || null,
-            address: vetForm.location || null,
-            date: vetForm.date,
-            time: vetForm.startTime || '09:00',
-            endTime: vetForm.endTime || null,
-            reminderMinutes,
-            reminderAt: reminderMinutes > 0 ? new Date(eventDate.getTime() - reminderMinutes * 60 * 1000).toISOString() : null,
-            createdBy: user?.uid,
-            familyId,
-            createdAt: Date.now(),
-            icon: 'pet',
-          };
-          const docRef = await addDoc(collection(db, 'events'), eventData);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.date, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
         setVetForm({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
