@@ -43,7 +43,10 @@ const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
 };
 
 const getAdminRoleColor = (key: string) => ADMIN_ROLES[key]?.color || '#999';
-const getAdminRoleLabel = (key: string) => ADMIN_ROLES[key]?.label || key;
+const getAdminRoleLabel = (key: string) => {
+  if (key.startsWith('custom_')) return key.replace('custom_', '').replace(/_/g, ' ');
+  return ADMIN_ROLES[key]?.label || key;
+};
 
 export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
@@ -732,12 +735,23 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     </View>
                   </View>
                 )}
-                {contactForm.role === 'teacher' || contactForm.role === 'admin' ? (
+                {contactForm.role === 'teacher' ? (
                   <>
                     <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{contactForm.role === 'admin' ? t('school.role') : t('school.subject')}</Text>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.subject')}</Text>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.subject} onChangeText={(v) => setContactForm(f => ({ ...f, subject: v }))} placeholderTextColor={colors.textDisabled} />
                     </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.phone')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.phone} onChangeText={(v) => setContactForm(f => ({ ...f, phone: v }))} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.email')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.email} onChangeText={(v) => setContactForm(f => ({ ...f, email: v }))} placeholderTextColor={colors.textDisabled} keyboardType="email-address" />
+                    </View>
+                  </>
+                ) : contactForm.role === 'admin' ? (
+                  <>
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('school.phone')}</Text>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.phone} onChangeText={(v) => setContactForm(f => ({ ...f, phone: v }))} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />

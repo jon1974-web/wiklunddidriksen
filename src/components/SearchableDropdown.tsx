@@ -1,5 +1,5 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Modal, StyleSheet } from 'react-native';
+import React, { useState, useMemo, useRef } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Modal, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 
 interface SearchableDropdownProps {
@@ -13,6 +13,9 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
   const { colors } = useTheme();
   const [visible, setVisible] = useState(false);
   const [search, setSearch] = useState('');
+  const [showCustom, setShowCustom] = useState(false);
+  const [customValue, setCustomValue] = useState('');
+  const searchRef = useRef<TextInput>(null);
 
   const selected = options.find(o => o.key === value);
 
@@ -26,7 +29,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
     <>
       <TouchableOpacity
         style={[styles.trigger, { backgroundColor: colors.inputBackground, borderColor: selected ? selected.color : colors.border }]}
-        onPress={() => { setSearch(''); setVisible(true); }}
+        onPress={() => { setSearch(''); setShowCustom(false); setCustomValue(''); setVisible(true); }}
       >
         {selected ? (
           <View style={[styles.selectedBadge, { backgroundColor: selected.color }]}>
@@ -39,33 +42,50 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
       </TouchableOpacity>
 
       <Modal visible={visible} transparent animationType="fade">
-        <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setVisible(false)}>
-          <View style={[styles.dropdown, { backgroundColor: colors.surface }]}>
-            <TextInput
-              style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
-              value={search}
-              onChangeText={setSearch}
-              placeholder="Søk..."
-              placeholderTextColor={colors.textDisabled}
-              autoFocus
-            />
-            <FlatList
-              data={filtered}
-              keyExtractor={(item) => item.key}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={[styles.option, value === item.key && { backgroundColor: item.color + '15' }]}
-                  onPress={() => { onSelect(item.key); setVisible(false); }}
-                >
-                  <View style={[styles.optionDot, { backgroundColor: item.color }]} />
-                  <Text style={[styles.optionText, { color: colors.text }]}>{item.label}</Text>
-                  {value === item.key && <Text style={{ color: item.color, fontWeight: '700' }}>✓</Text>}
-                </TouchableOpacity>
-              )}
-              ListEmptyComponent={<Text style={[styles.empty, { color: colors.textSecondary }]}>Ingen treff</Text>}
-            />
-          </View>
-        </TouchableOpacity>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+          <TouchableOpacity style={styles.overlay} activeOpacity={1} onPress={() => setVisible(false)}>
+            <TouchableOpacity activeOpacity={1} style={[styles.dropdown, { backgroundColor: colors.surface }]}>
+              <TextInput
+                ref={searchRef}
+                style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                value={search}
+                onChangeText={setSearch}
+                placeholder="Søk eller skriv ny rolle..."
+                placeholderTextColor={colors.textDisabled}
+              />
+              <FlatList
+                data={filtered}
+                keyExtractor={(item) => item.key}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={[styles.option, value === item.key && { backgroundColor: item.color + '15' }]}
+                    onPress={() => { onSelect(item.key); setVisible(false); }}
+                  >
+                    <View style={[styles.optionDot, { backgroundColor: item.color }]} />
+                    <Text style={[styles.optionText, { color: colors.text }]}>{item.label}</Text>
+                    {value === item.key && <Text style={{ color: item.color, fontWeight: '700' }}>✓</Text>}
+                  </TouchableOpacity>
+                )}
+                ListFooterComponent={
+                  search.trim() && !options.some(o => o.label.toLowerCase() === search.toLowerCase()) ? (
+                    <TouchableOpacity
+                      style={[styles.option, { borderBottomWidth: 0 }]}
+                      onPress={() => {
+                        const customKey = `custom_${Date.now()}`;
+                        onSelect(customKey);
+                        setVisible(false);
+                      }}
+                    >
+                      <View style={[styles.optionDot, { backgroundColor: colors.accent }]} />
+                      <Text style={[styles.optionText, { color: colors.accent, fontWeight: '600' }]}>+ Legg til "{search}"</Text>
+                    </TouchableOpacity>
+                  ) : null
+                }
+                ListEmptyComponent={<Text style={[styles.empty, { color: colors.textSecondary }]}>Ingen treff</Text>}
+              />
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
     </>
   );
