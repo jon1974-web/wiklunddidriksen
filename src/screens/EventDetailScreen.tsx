@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Linking, Image } from 'react-native';
-import Svg, { Path } from 'react-native-svg';
+import Svg, { Path, Rect } from 'react-native-svg';
 import { doc, updateDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
@@ -217,19 +217,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, event, navigation]);
 
   const handleCopy = useCallback(() => {
-    navigation.navigate('AddEvent', {
-      prefill: {
-        title: eventData.title,
-        description: eventData.description || '',
-        date: eventData.date,
-        time: eventData.time,
-        endDate: eventData.endDate || '',
-        endTime: eventData.endTime || '',
-        reminderMinutes: eventData.reminderMinutes || 120,
-        icon: eventData.icon || '',
-      },
+    navigator.clipboard.writeText(eventData.title).then(() => {
+      crossAlert('Suksess', 'Tekst kopiert til utklippstavlen');
     });
-  }, [eventData, navigation]);
+  }, [eventData]);
 
   const handleDelete = useCallback(() => {
     crossAlert(t('events.deleteTitle'), t('events.deleteConfirm'), [
