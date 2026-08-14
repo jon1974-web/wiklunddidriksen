@@ -291,6 +291,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
               </TouchableOpacity>
             ))}
           </View>
+          <Text style={[styles.hintText, { color: colors.textSecondary }]}>Standardvarighet er 1 time hvis ingen varighet velges</Text>
           <TouchableOpacity 
             style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, customEndTime && !endTime && { backgroundColor: colors.accent, borderColor: colors.accent }]}
             onPress={() => { setActivePicker('endTime'); setEndTime(''); }}
@@ -402,6 +403,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
     fontWeight: '600',
+  },
+  hintText: {
+    fontSize: 12,
+    marginBottom: 8,
+    fontStyle: 'italic',
   },
   removeLink: {
     fontSize: 14,
