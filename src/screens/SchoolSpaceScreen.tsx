@@ -193,20 +193,33 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!contactForm.name.trim()) { crossAlert('Error', t('school.enterContactName')); return; }
     try {
       const rawData: Record<string, any> = {
-        ...contactForm,
+        role: contactForm.role,
+        teacherType: contactForm.teacherType,
+        name: contactForm.name,
+        subject: contactForm.subject,
+        address: contactForm.address,
+        phone: contactForm.phone || null,
+        email: contactForm.email || null,
+        parentName: contactForm.parentName || null,
+        parentPhone: contactForm.parentPhone || null,
+        parentEmail: contactForm.parentEmail || null,
+        parentName2: contactForm.parentName2 || null,
+        parentPhone2: contactForm.parentPhone2 || null,
+        parentEmail2: contactForm.parentEmail2 || null,
+        notes: contactForm.notes || null,
         childId: selectedChild.id,
         yearId: selectedYear.id,
         familyId,
       };
       if (contactForm.role === 'classmate') {
+        rawData.childName = contactForm.name;
         rawData.childPhone = contactForm.phone || null;
         rawData.childEmail = contactForm.email || null;
       }
       if (editingContactId) {
         await updateSchoolContact(editingContactId, rawData as any);
       } else {
-        const data = Object.fromEntries(Object.entries(rawData).filter(([_, v]) => v !== '' && v != null));
-        await addSchoolContact(data as any);
+        await addSchoolContact(rawData as any);
       }
       setContactForm({ role: 'teacher', teacherType: 'contact', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
       setEditingContactId(null);
