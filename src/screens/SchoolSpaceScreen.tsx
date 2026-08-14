@@ -68,6 +68,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
   const [showAddYearModal, setShowAddYearModal] = useState(false);
   const [yearForm, setYearForm] = useState({ year: '', grade: '', school: '' });
+  const [editingYearId, setEditingYearId] = useState<string | null>(null);
 
   const [showAddContactModal, setShowAddContactModal] = useState(false);
   const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', teacherType: 'contact' as 'personal' | 'contact' | 'subject', adminType: [] as string[], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
@@ -160,11 +161,31 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!familyId) return;
     if (!childForm.name.trim()) { crossAlert('Error', t('school.enterChildName')); return; }
     try {
-      const cleanData = Object.fromEntries(Object.entries({ ...childForm, familyId }).filter(([_, v]) => v !== '' && v != null));
+      let photoUrl = childForm.photoUrl;
+      if (photoUrl && !photoUrl.startsWith('http')) {
+        const { webUploadFile } = await import('../services/webStorage');
+        const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.5, base64: true });
+        if (!result.canceled && result.assets[0]) {
+          const asset = result.assets[0];
+          let blob: Blob;
+          if (asset.base64) {
+            const byteString = atob(asset.base64);
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+            blob = new Blob([ab], { type: 'image/jpeg' });
+          } else {
+            const response = await fetch(asset.uri);
+            blob = await response.blob();
+          }
+          photoUrl = await webUploadFile(`school-children/${familyId}_${Date.now()}.jpg`, blob);
+        }
+      }
+      const data = { ...childForm, photoUrl, familyId };
       if (editingChildId) {
-        await updateSchoolChild(editingChildId, cleanData as any);
+        await updateSchoolChild(editingChildId, data as any);
       } else {
-        await addSchoolChild(cleanData as any);
+        await addSchoolChild(data as any);
       }
       setChildForm({ name: '', school: '', phone: '', email: '', photoUrl: '' });
       setEditingChildId(null);
@@ -200,8 +221,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!familyId || !selectedChild) return;
     if (!yearForm.year.trim()) { crossAlert('Error', t('school.enterYear')); return; }
     try {
-      await addSchoolYear({ ...yearForm, childId: selectedChild.id, familyId });
+      if (editingYearId) {
+        await updateSchoolYear(editingYearId, yearForm);
+      } else {
+        await addSchoolYear({ ...yearForm, childId: selectedChild.id, familyId });
+      }
       setYearForm({ year: '', grade: '', school: '' });
+      setEditingYearId(null);
       setShowAddYearModal(false);
       loadYears();
     } catch (error) {
@@ -273,6 +299,15 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
+  };
+
+  const handleEditYear = () => {
+    const year = years.find(y => y.id === yearActionModal.id);
+    if (!year) return;
+    setYearForm({ year: year.year, grade: year.grade || '', school: year.school || '' });
+    setEditingYearId(year.id);
+    setYearActionModal({ visible: false, id: '', title: '' });
+    setShowAddYearModal(true);
   };
 
   const handleEditContact = () => {
@@ -361,6 +396,17 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
     return c.name.toLowerCase().includes(q) || c.parentName?.toLowerCase().includes(q);
+  });
+  const filteredTeachers = teachers.filter(c => {
+    if (!contactSearch.trim()) return true;
+    const q = contactSearch.toLowerCase();
+    return c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || (c as any).teacherType?.toLowerCase().includes(q);
+  });
+  const filteredAdmins = admins.filter(c => {
+    if (!contactSearch.trim()) return true;
+    const q = contactSearch.toLowerCase();
+    const adminTypes = Array.isArray((c as any).adminType) ? (c as any).adminType : [(c as any).adminType || ''];
+    return c.name.toLowerCase().includes(q) || adminTypes.some((t: string) => t.toLowerCase().includes(q));
   });
 
   const renderContactActions = (phone?: string, email?: string) => (
@@ -454,6 +500,27 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 <Text style={[styles.label, { color: colors.text }]}>{t('school.email')}</Text>
                 <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={childForm.email} onChangeText={(v) => setChildForm(f => ({ ...f, email: v }))} placeholderTextColor={colors.textDisabled} keyboardType="email-address" />
               </View>
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('school.photo')}</Text>
+                <TouchableOpacity
+                  style={[styles.input, { backgroundColor: colors.inputBackground, flexDirection: 'row', alignItems: 'center', gap: 10 }]}
+                  onPress={async () => {
+                    const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.5, base64: true });
+                    if (!result.canceled && result.assets[0]) {
+                      setChildForm(f => ({ ...f, photoUrl: result.assets[0].uri }));
+                    }
+                  }}
+                >
+                  {childForm.photoUrl ? (
+                    <Image source={{ uri: childForm.photoUrl }} style={{ width: 40, height: 40, borderRadius: 20 }} />
+                  ) : (
+                    <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.inputBackground, alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ fontSize: 20 }}>📷</Text>
+                    </View>
+                  )}
+                  <Text style={{ color: colors.text, fontSize: 14 }}>{childForm.photoUrl ? 'Endre bilde' : 'Velg bilde'}</Text>
+                </TouchableOpacity>
+              </View>
             </ScrollView>
             <View style={styles.modalActions}>
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddChildModal(false); setEditingChildId(null); }}>
@@ -517,19 +584,22 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
           {selectedYear && (
             <>
               {/* Contacts Section */}
+              <View style={[styles.section, { backgroundColor: colors.surface, marginBottom: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
+                <TextInput style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text }]} placeholder={t('school.searchContacts')} placeholderTextColor={colors.textDisabled} value={contactSearch} onChangeText={setContactSearch} />
+              </View>
               {/* Teachers Section */}
               <View style={[styles.section, { backgroundColor: colors.surface }]}>
                 <View style={styles.sectionHeader}>
                   <View style={styles.sectionTitleRow}>
                     <Text style={styles.sectionIcon}>👩‍🏫</Text>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.teachersAndSubjects')}</Text>
-                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({teachers.length})</Text>
+                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({filteredTeachers.length})</Text>
                   </View>
                   <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', teacherType: 'contact', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </View>
-                {teachers.map(c => (
+                {filteredTeachers.map(c => (
                   <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
@@ -550,7 +620,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     </View>
                   </TouchableOpacity>
                 ))}
-                {teachers.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
+                {filteredTeachers.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
               </View>
 
               {/* Helse og administrasjon Section */}
@@ -559,13 +629,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   <View style={styles.sectionTitleRow}>
                     <Text style={styles.sectionIcon}>🏥</Text>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.healthAdmin')}</Text>
-                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({admins.length})</Text>
+                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({filteredAdmins.length})</Text>
                   </View>
                   <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'admin', teacherType: 'contact', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </View>
-                {admins.map(c => (
+                {filteredAdmins.map(c => (
                   <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
@@ -591,7 +661,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     </View>
                   </TouchableOpacity>
                 ))}
-                {admins.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
+                {filteredAdmins.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
               </View>
 
               {/* Schedule Section */}
@@ -637,17 +707,6 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     </TouchableOpacity>
                   </View>
                 </View>
-                <TextInput style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text }]} placeholder={t('school.searchContacts')} placeholderTextColor={colors.textDisabled} value={contactSearch} onChangeText={setContactSearch} />
-
-                {/* AI Import Card */}
-                <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#F3E5F5' }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
-                  <Text style={{ fontSize: 20 }}>📸</Text>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: '#6A1B9A', fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
-                    <Text style={{ color: '#8E24AA', fontSize: 12 }}>{t('school.aiDescription')}</Text>
-                  </View>
-                </TouchableOpacity>
-
                 {filteredClassmates.map(c => (
                   <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <Text style={[styles.contactName, { color: colors.text, marginBottom: 6 }]}>{c.name}</Text>
@@ -675,7 +734,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         <Modal visible={showAddYearModal} transparent animationType="slide">
           <View style={styles.modalOverlay}>
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.modalTitle, { color: colors.text }]}>{t('school.addYear')}</Text>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{editingYearId ? t('school.editYear') : t('school.addYear')}</Text>
               <ScrollView>
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('school.year')}</Text>
@@ -838,7 +897,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
         <ActionModal visible={contactActionModal.visible} title={contactActionModal.title} onEdit={handleEditContact} onDelete={handleDeleteContact} onCancel={() => setContactActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
 
-        <ActionModal visible={yearActionModal.visible} title={yearActionModal.title} onDelete={handleDeleteYear} onCancel={() => setYearActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
+        <ActionModal visible={yearActionModal.visible} title={yearActionModal.title} onEdit={handleEditYear} onDelete={handleDeleteYear} onCancel={() => setYearActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
         <ActionModal visible={scheduleActionModal.visible} title={scheduleActionModal.title} onDelete={() => { handleDeleteSchedule(scheduleActionModal.id); setScheduleActionModal({ visible: false, id: '', title: '' }); }} onCancel={() => setScheduleActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
       </>
     );
