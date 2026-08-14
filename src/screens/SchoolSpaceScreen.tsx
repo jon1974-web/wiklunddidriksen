@@ -400,7 +400,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const filteredTeachers = teachers.filter(c => {
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
-    const typeLabel = c.teacherType === 'personal' ? t('school.personalTeacher') : c.teacherType === 'contact' ? t('school.contactTeacher') : c.teacherType === 'subject' ? t('school.subjectTeacher') : '';
+    const teacherType = (c as any).teacherType || '';
+    const typeLabel = teacherType === 'personal' ? t('school.personalTeacher') : teacherType === 'contact' ? t('school.contactTeacher') : teacherType === 'subject' ? t('school.subjectTeacher') : teacherType;
     return c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || typeLabel.toLowerCase().includes(q);
   });
   const filteredAdmins = admins.filter(c => {
