@@ -514,6 +514,13 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   };
 
   useEffect(() => {
+    if (route.params?.openTripEdit) {
+      setActiveModal('tripEdit');
+      navigation.setParams({ openTripEdit: undefined });
+    }
+  }, [route.params?.openTripEdit]);
+
+  useEffect(() => {
     const editId = route.params?.openFlightEditId;
     if (editId && flights.length > 0) {
       const flight = flights.find(f => f.id === editId);

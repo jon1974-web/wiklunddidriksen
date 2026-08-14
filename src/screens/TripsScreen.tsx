@@ -118,7 +118,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
               visible: true,
               title: item.title,
               onEdit: () => {
-                navigation.navigate('TripDetail', { trip: item });
+                navigation.navigate('TripDetail', { trip: item, openTripEdit: true });
                 setTripActionModal({ visible: false, title: '' });
               },
               onDelete: async () => {
