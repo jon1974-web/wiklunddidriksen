@@ -5,6 +5,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
+import { SearchableDropdown } from '../components/SearchableDropdown';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import * as ImagePicker from 'expo-image-picker';
 import { crossAlert } from '../utils/alert';
@@ -703,29 +704,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 {contactForm.role === 'admin' && (
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('school.adminRole')}</Text>
-                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-                      {[
-                        { key: 'rektor', label: t('school.roleRektor'), color: '#E53935' },
-                        { key: 'assisterende_rektor', label: t('school.roleAssisterendeRektor'), color: '#E57373' },
-                        { key: 'undervisningsinspektør', label: t('school.roleUndervisningsinspektør'), color: '#FB8C00' },
-                        { key: 'rådgivere', label: t('school.roleRådgivere'), color: '#FDD835' },
-                        { key: 'leder_aks_sfo', label: t('school.roleLederAksSfo'), color: '#66BB6A' },
-                        { key: 'baseleder_aks_sfo', label: t('school.roleBaselederAksSfo'), color: '#81C784' },
-                        { key: 'kontorleder', label: t('school.roleKontorleder'), color: '#42A5F5' },
-                        { key: 'driftsleder', label: t('school.roleDriftsleder'), color: '#5C6BC0' },
-                        { key: 'ikt_ansvarlig', label: t('school.roleIktAnsvarlig'), color: '#7E57C2' },
-                        { key: 'helsesykepleier', label: t('school.roleHelsesykepleier'), color: '#EC407A' },
-                        { key: 'sosiallærer', label: t('school.roleSosiallærer'), color: '#26A69A' },
-                      ].map((r) => (
-                        <TouchableOpacity
-                          key={r.key}
-                          style={[styles.personChip, { backgroundColor: contactForm.adminType === r.key ? r.color : colors.inputBackground }]}
-                          onPress={() => setContactForm(f => ({ ...f, adminType: r.key }))}
-                        >
-                          <Text style={{ color: contactForm.adminType === r.key ? '#fff' : colors.text, fontSize: 11, fontWeight: '600' }}>{r.label}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
+                    <SearchableDropdown
+                      options={Object.entries(ADMIN_ROLES).map(([key, val]) => ({ key, label: val.label, color: val.color }))}
+                      value={contactForm.adminType}
+                      onSelect={(key) => setContactForm(f => ({ ...f, adminType: key }))}
+                      placeholder={t('school.adminRole')}
+                    />
                   </View>
                 )}
                 {contactForm.role === 'teacher' && (
