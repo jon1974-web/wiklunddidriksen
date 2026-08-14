@@ -401,8 +401,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
     const teacherType = (c as any).teacherType || '';
-    console.log('Teacher:', c.name, 'teacherType:', teacherType);
-    const typeLabel = teacherType === 'personal' ? t('school.personalTeacher') : teacherType === 'contact' ? t('school.contactTeacher') : teacherType === 'subject' ? t('school.subjectTeacher') : teacherType;
+    const typeLabel = teacherType === 'personal' ? t('school.personalTeacher') : teacherType === 'contact' ? t('school.contactTeacher') : teacherType === 'subject' ? t('school.subjectTeacher') : '';
     return c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || typeLabel.toLowerCase().includes(q) || teacherType.toLowerCase().includes(q);
   });
   const filteredAdmins = admins.filter(c => {
