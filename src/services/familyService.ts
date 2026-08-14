@@ -11,7 +11,7 @@ import {
   where,
   orderBy,
   limit,
-  FieldValue,
+  deleteField,
 } from 'firebase/firestore';
 import { UserProfile, Family, FamilyMember } from '../types';
 
@@ -38,11 +38,11 @@ export const createOrUpdateUser = async (uid: string, data: Partial<UserProfile>
   const userRef = doc(db, 'users', uid);
   const existing = await getDoc(userRef);
 
-  // Convert null values to FieldValue.delete() for Firestore
+  // Convert null values to deleteField() for Firestore
   const sanitizedData: Record<string, any> = {};
   for (const [key, value] of Object.entries(data)) {
     if (value === null) {
-      sanitizedData[key] = FieldValue.delete();
+      sanitizedData[key] = deleteField();
     } else {
       sanitizedData[key] = value;
     }
