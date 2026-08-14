@@ -1479,7 +1479,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
 
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>{t('common.city')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('trips.city')}</Text>
                     <GooglePlacesInput
                       value={tripCity}
                       onChangeText={setTripCity}
@@ -1496,7 +1496,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
 
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>{t('common.country')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('trips.country')}</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={tripCountry}
