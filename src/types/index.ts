@@ -546,7 +546,10 @@ export interface SchoolContact {
   childId: string;
   name: string;
   role: 'teacher' | 'classmate' | 'admin';
+  teacherType?: 'personal' | 'contact' | 'subject';
   subject?: string;
+  phone?: string;
+  email?: string;
   address?: string;
   childPhone?: string;
   childEmail?: string;

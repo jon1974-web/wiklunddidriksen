@@ -50,7 +50,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [yearForm, setYearForm] = useState({ year: '', grade: '', school: '' });
 
   const [showAddContactModal, setShowAddContactModal] = useState(false);
-  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', teacherType: 'contact' as 'personal' | 'contact' | 'subject', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [contactActionModal, setContactActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
@@ -108,6 +108,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         setEditingContactId(contact.id);
         setContactForm({
           role: contact.role || 'classmate',
+          teacherType: (contact as any).teacherType || 'contact',
           name: contact.name || '',
           subject: contact.subject || '',
           address: contact.address || '',
@@ -207,7 +208,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         const data = Object.fromEntries(Object.entries(rawData).filter(([_, v]) => v !== '' && v != null));
         await addSchoolContact(data as any);
       }
-      setContactForm({ role: 'teacher', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+      setContactForm({ role: 'teacher', teacherType: 'contact', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
       setEditingContactId(null);
       setShowAddContactModal(false);
       loadYearData();
@@ -301,7 +302,10 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     }
   };
 
-  const teachers = contacts.filter(c => c.role === 'teacher');
+  const teachers = contacts.filter(c => c.role === 'teacher').sort((a, b) => {
+    const order = { personal: 0, contact: 1, subject: 2 };
+    return (order[a.teacherType || 'contact'] ?? 1) - (order[b.teacherType || 'contact'] ?? 1);
+  });
   const admins = contacts.filter(c => c.role === 'admin');
   const classmates = contacts.filter(c => c.role === 'classmate');
   const filteredClassmates = classmates.filter(c => {
@@ -469,10 +473,10 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 <View style={styles.sectionHeader}>
                   <View style={styles.sectionTitleRow}>
                     <Text style={styles.sectionIcon}>👩‍🏫</Text>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.classContacts')}</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.teachersAndSubjects')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({teachers.length})</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', teacherType: 'contact', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -481,6 +485,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
+                        {c.teacherType && (
+                          <View style={[styles.teacherTypeBadge, { backgroundColor: c.teacherType === 'personal' ? '#E8F5E9' : c.teacherType === 'contact' ? '#E3F2FD' : '#FFF3E0' }]}>
+                            <Text style={{ color: c.teacherType === 'personal' ? '#43A047' : c.teacherType === 'contact' ? '#1976D2' : '#FB8C00', fontSize: 10, fontWeight: '600' }}>
+                              {c.teacherType === 'personal' ? t('school.personalTeacher') : c.teacherType === 'contact' ? t('school.contactTeacher') : t('school.subjectTeacher')}
+                            </Text>
+                          </View>
+                        )}
                         {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📚 {c.subject}</Text> : null}
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
@@ -641,6 +652,26 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   <Text style={[styles.label, { color: colors.text }]}>{contactForm.role === 'teacher' ? t('school.teacherName') : contactForm.role === 'admin' ? t('school.name') : t('school.childName')}</Text>
                   <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={contactForm.name} onChangeText={(v) => setContactForm(f => ({ ...f, name: v }))} placeholderTextColor={colors.textDisabled} />
                 </View>
+                {contactForm.role === 'teacher' && (
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('school.teacherType')}</Text>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                      {[
+                        { key: 'personal' as const, label: t('school.personalTeacher') },
+                        { key: 'contact' as const, label: t('school.contactTeacher') },
+                        { key: 'subject' as const, label: t('school.subjectTeacher') },
+                      ].map((t) => (
+                        <TouchableOpacity
+                          key={t.key}
+                          style={[styles.personChip, { backgroundColor: contactForm.teacherType === t.key ? SCHOOL_THEME : colors.inputBackground, flex: 1 }]}
+                          onPress={() => setContactForm(f => ({ ...f, teacherType: t.key }))}
+                        >
+                          <Text style={{ color: contactForm.teacherType === t.key ? '#fff' : colors.text, fontSize: 12, fontWeight: '600', textAlign: 'center' }}>{t.label}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
                 {contactForm.role === 'teacher' || contactForm.role === 'admin' ? (
                   <>
                     <View style={styles.field}>
@@ -782,6 +813,7 @@ const styles = StyleSheet.create({
   aiCard: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: 12, marginBottom: 12 },
   contactGroupTitle: { fontSize: 13, fontWeight: '600', marginBottom: 8, marginTop: 4 },
   contactCard: { padding: 12, borderRadius: 10, marginBottom: 8 },
+  teacherTypeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, marginTop: 4, marginBottom: 2 },
   contactName: { fontSize: 15, fontWeight: '600' },
   contactActionBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   contactActionBtn: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12 },
