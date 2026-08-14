@@ -126,6 +126,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       iconColor: MODULE_COLORS.kindergarten,
       count: kindergartenCount > 0 ? t('spaces.kindergartenCount', { count: kindergartenCount }) : '',
       screen: 'KindergartenSpace',
+      disabled: true,
     },
     {
       id: 'birthdays',
@@ -158,17 +159,20 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       iconColor: MODULE_COLORS.home,
       count: '',
       screen: 'HomeSpace',
+      disabled: true,
     },
   ];
 
   const renderSpace = useCallback(({ item }: { item: Space }) => (
     <TouchableOpacity
-      style={[styles.spaceCard, { backgroundColor: colors.surface, borderLeftColor: item.iconColor }]}
-      onPress={() => navigation.navigate(item.screen)}
+      style={[styles.spaceCard, { backgroundColor: colors.surface, borderLeftColor: item.disabled ? '#ccc' : item.iconColor, opacity: item.disabled ? 0.5 : 1 }]}
+      onPress={() => !item.disabled && navigation.navigate(item.screen)}
+      disabled={item.disabled}
     >
-      <AppIcon name={item.icon as any} size={36} color={item.iconColor} />
-      <Text style={[styles.spaceName, { color: colors.text }]}>{item.name}</Text>
-      <Text style={[styles.spaceCount, { color: colors.textSecondary }]}>{item.count}</Text>
+      <AppIcon name={item.icon as any} size={36} color={item.disabled ? '#ccc' : item.iconColor} />
+      <Text style={[styles.spaceName, { color: item.disabled ? '#aaa' : colors.text }]}>{item.name}</Text>
+      <Text style={[styles.spaceCount, { color: item.disabled ? '#ccc' : colors.textSecondary }]}>{item.count}</Text>
+      {item.disabled && <Text style={{ color: '#E53935', fontSize: 10, fontWeight: '600', marginTop: 4 }}>Kommer snart</Text>}
     </TouchableOpacity>
   ), [colors, navigation]);
 
