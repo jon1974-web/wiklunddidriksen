@@ -128,6 +128,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: '', dateTo: '', note: '' });
       } else if (activeSection === 'appointments') {
         if (!apptForm.title.trim() || !apptForm.date) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
+        const user = useUserStore.getState().user;
         let savedAppt;
         if (isEditing) {
           await updateHealthAppointment(familyId, editingItem.id, apptForm);
@@ -138,7 +139,6 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         }
         // Send push notification to family members
         if (!isEditing) {
-          const user = useUserStore.getState().user;
           notifyHealthItem(familyId, apptForm.title, apptForm.date, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
         }
         setApptForm({ title: '', person: persons[0] || '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
@@ -154,7 +154,6 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         }
         // Send push notification to family members
         if (!isEditing) {
-          const user = useUserStore.getState().user;
           notifyHealthItem(familyId, vaccForm.name, vaccForm.date, '', vaccForm.location || '', 'vaccination', user?.displayName || '', vaccForm.person).catch(() => {});
         }
         setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', location: '', note: '' });
