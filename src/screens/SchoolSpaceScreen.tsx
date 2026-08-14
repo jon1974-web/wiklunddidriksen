@@ -14,7 +14,7 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
 import {
   getSchoolChildren, addSchoolChild, updateSchoolChild, deleteSchoolChild,
-  getSchoolYears, addSchoolYear, deleteSchoolYear,
+  getSchoolYears, addSchoolYear, updateSchoolYear, deleteSchoolYear,
   getSchoolContacts, addSchoolContact, updateSchoolContact, deleteSchoolContact,
   getSchoolSchedules, addSchoolSchedule, deleteSchoolSchedule,
 } from '../services/schoolService';
