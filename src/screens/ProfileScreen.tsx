@@ -507,10 +507,11 @@ export const ProfileScreen: React.FC = () => {
   const handleDisconnectCalendarEmail = useCallback(async () => {
     if (!user) return;
     try {
-      await createOrUpdateUser(user.uid, { calendarEmail: null, calendarProvider: null });
+      await createOrUpdateUser(user.uid, { calendarEmail: null, calendarProvider: null, calendarType: null });
       setCalendarEmail('');
       setCalendarProvider(null);
-      setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarEmail: null, calendarProvider: null } : prev);
+      setCalendarType(null);
+      setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarEmail: null, calendarProvider: null, calendarType: null } : prev);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
