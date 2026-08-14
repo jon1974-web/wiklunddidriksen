@@ -2042,7 +2042,7 @@ exports.notifyNewChatMessage = onDocumentCreated({ region: "us-central1", docume
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_REDIRECT_URI = "https://familiesenter-837bb.web.app";
+const GOOGLE_REDIRECT_URI = "https://us-central1-familiesenter-837bb.cloudfunctions.net/googleCalendarCallback";
 
 // Step 1: Redirect to Google OAuth
 exports.googleCalendarAuth = onRequest({ region: "us-central1" }, async (req, res) => {
@@ -2105,13 +2105,16 @@ exports.googleCalendarCallback = onRequest({ region: "us-central1" }, async (req
 
     // Save tokens to Firestore
     const db = getFirestore();
-    await db.collection("users").doc(uid).update({
+    const calendarData = {
       calendarType: "google",
-      calendarEmail: userInfo.email,
       calendarAccessToken: tokenData.access_token,
       calendarRefreshToken: tokenData.refresh_token,
       calendarTokenExpiry: Date.now() + (tokenData.expires_in * 1000),
-    });
+    };
+    if (userInfo.email) {
+      calendarData.calendarEmail = userInfo.email;
+    }
+    await db.collection("users").doc(uid).set(calendarData, { merge: true });
 
     // Redirect back to profile
     res.redirect("https://familiesenter-837bb.web.app/profile?calendar=connected");
@@ -2637,3 +2640,22 @@ exports.onPetVetVisitDeletedForCalendar = onDocumentDeleted({ region: "us-centra
   }
 });
 
+
+// DEBUG: Check user calendar data
+exports.debugCheckUser = onRequest({ region: "us-central1" }, async (req, res) => {
+  const uid = req.query.uid || "jon@wiklunddidriksen.com";
+  const db = getFirestore();
+  const doc = await db.collection("users").doc(uid).get();
+  if (!doc.exists) {
+    res.json({ error: "User not found" });
+    return;
+  }
+  const data = doc.data();
+  res.json({
+    calendarType: data.calendarType || "NOT SET",
+    calendarEmail: data.calendarEmail || "NOT SET",
+    calendarProvider: data.calendarProvider || "NOT SET",
+    hasAccessToken: !!data.calendarAccessToken,
+    hasRefreshToken: !!data.calendarRefreshToken,
+  });
+});

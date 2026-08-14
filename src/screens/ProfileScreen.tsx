@@ -205,20 +205,23 @@ export const ProfileScreen: React.FC = () => {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('calendar') === 'connected') {
-      crossAlert('Suksess', 'Google Kalender er koblet til!');
       // Clean up URL
       window.history.replaceState({}, '', window.location.pathname);
-      // Reload profile to get updated calendar data
-      if (user) {
-        getUserProfile(user.uid).then((profile) => {
-          if (profile) {
-            setCalendarType(profile.calendarType || 'google');
-            setCalendarEmail(profile.calendarEmail || '');
-            setCalendarProvider(profile.calendarProvider || 'google');
-            setProfile(profile);
-          }
-        });
-      }
+      // Wait a bit for user to be loaded, then reload profile
+      const timer = setTimeout(() => {
+        if (user) {
+          getUserProfile(user.uid).then((profile) => {
+            if (profile) {
+              setCalendarType(profile.calendarType || 'google');
+              setCalendarEmail(profile.calendarEmail || '');
+              setCalendarProvider(profile.calendarProvider || 'google');
+              setProfile(profile);
+              crossAlert('Suksess', 'Google Kalender er koblet til!');
+            }
+          });
+        }
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [user]);
 
@@ -810,11 +813,11 @@ export const ProfileScreen: React.FC = () => {
         {/* Google Calendar View */}
         {calendarType === 'google' && (
           <View>
-            {calendarProvider && calendarEmail ? (
+            {profile?.calendarAccessToken ? (
               <View>
                 <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
-                  <Text style={[styles.value, { color: colors.text }]}>📧 {calendarEmail}</Text>
-                  <Text style={[styles.editIcon, { color: colors.accent }]}>Google</Text>
+                  <Text style={[styles.value, { color: colors.text }]}>📧 {calendarEmail || 'Google Kalender'}</Text>
+                  <Text style={[styles.editIcon, { color: colors.accent }]}>Koblet til ✓</Text>
                 </View>
                 <TouchableOpacity
                   style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
