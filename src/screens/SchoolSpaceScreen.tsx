@@ -40,6 +40,7 @@ const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
   driftsleder: { label: 'Driftsleder', color: '#5C6BC0' },
   ikt_ansvarlig: { label: 'IKT ansvarlig', color: '#7E57C2' },
   helsesykepleier: { label: 'Helsesykepleier', color: '#EC407A' },
+  karriereveileder: { label: 'Karriereveileder', color: '#FF7043' },
   sosiallærer: { label: 'Sosiallærer', color: '#26A69A' },
 };
 
