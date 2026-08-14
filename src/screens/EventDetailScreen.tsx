@@ -137,10 +137,12 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           start.setDate(start.getDate() + endDateDays);
           updateData.endDate = start.toISOString().split('T')[0];
         } else {
-          updateData.endDate = null;
+          // Samme dag - end date equals start date
+          updateData.endDate = date;
         }
       } else {
-        updateData.endDate = null;
+        // Default to same day
+        updateData.endDate = date;
       }
 
       if (showEndTime) {

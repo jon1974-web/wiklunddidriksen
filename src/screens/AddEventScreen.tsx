@@ -99,7 +99,13 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
           const start = new Date(date);
           start.setDate(start.getDate() + endDateDays);
           eventData.endDate = start.toISOString().split('T')[0];
+        } else {
+          // Samme dag - end date equals start date
+          eventData.endDate = date;
         }
+      } else {
+        // No end date selected - default to same day
+        eventData.endDate = date;
       }
 
       if (showEndTime) {
@@ -233,15 +239,23 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         </TouchableOpacity>
       ) : (
         <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>Varighet</Text>
+          <Text style={[styles.label, { color: colors.text }]}>Sluttdato</Text>
           <View style={styles.reminderOptions}>
+            <TouchableOpacity
+              style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, !endDateDays && !customEndDate && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+              onPress={() => { setEndDateDays(null); setCustomEndDate(''); }}
+            >
+              <Text style={[styles.reminderText, { color: !endDateDays && !customEndDate ? '#fff' : colors.textSecondary }]}>
+                Samme dag
+              </Text>
+            </TouchableOpacity>
             {getEndDateOptions().map((option) => (
               <TouchableOpacity
                 key={option.value}
-                style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endDateDays === option.value && !customEndDate && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endDateDays === option.value && { backgroundColor: colors.accent, borderColor: colors.accent }]}
                 onPress={() => { setEndDateDays(option.value); setCustomEndDate(''); }}
               >
-                <Text style={[styles.reminderText, { color: endDateDays === option.value && !customEndDate ? '#fff' : colors.textSecondary }]}>
+                <Text style={[styles.reminderText, { color: endDateDays === option.value ? '#fff' : colors.textSecondary }]}>
                   {option.label}
                 </Text>
               </TouchableOpacity>
