@@ -587,7 +587,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             <>
               {/* Contacts Section */}
               <View style={[styles.section, { backgroundColor: colors.surface, marginBottom: 0, borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }]}>
-                <TextInput style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text }]} placeholder={t('school.searchContacts')} placeholderTextColor={colors.textDisabled} value={contactSearch} onChangeText={setContactSearch} />
+                <TextInput style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text }]} placeholder={t('school.searchHint')} placeholderTextColor={colors.textDisabled} value={contactSearch} onChangeText={setContactSearch} />
               </View>
               {/* Teachers Section */}
               <View style={[styles.section, { backgroundColor: colors.surface }]}>
@@ -666,6 +666,40 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 {filteredAdmins.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
               </View>
 
+              {/* Classmates Section */}
+              <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <View style={styles.sectionHeader}>
+                  <View style={styles.sectionTitleRow}>
+                    <Text style={styles.sectionIcon}>👥</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.classmates')}</Text>
+                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({filteredClassmates.length})</Text>
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 8 }}>
+                    <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'classmate', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                      <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                {filteredClassmates.map(c => (
+                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
+                    <Text style={[styles.contactName, { color: colors.text, marginBottom: 6 }]}>{c.name}</Text>
+                    {c.parentName ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName}</Text>
+                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>
+                      </View>
+                    ) : null}
+                    {c.parentName2 ? (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
+                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName2}</Text>
+                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone2?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>
+                      </View>
+                    ) : null}
+                  </TouchableOpacity>
+                ))}
+                {filteredClassmates.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
+              </View>
+
               {/* Schedule Section */}
               <View style={[styles.section, { backgroundColor: colors.surface }]}>
                 <View style={styles.sectionHeader}>
@@ -693,40 +727,6 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   ))}
                 </View>
                 {schedules.filter(s => s.semester === activeSemester).length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noSchedule')}</Text>}
-              </View>
-
-              {/* Classmates Section */}
-              <View style={[styles.section, { backgroundColor: colors.surface }]}>
-                <View style={styles.sectionHeader}>
-                  <View style={styles.sectionTitleRow}>
-                    <Text style={styles.sectionIcon}>👥</Text>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.classmates')}</Text>
-                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({classmates.length})</Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', gap: 8 }}>
-                    <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'classmate', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
-                      <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-                {filteredClassmates.map(c => (
-                  <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
-                    <Text style={[styles.contactName, { color: colors.text, marginBottom: 6 }]}>{c.name}</Text>
-                    {c.parentName ? (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName}</Text>
-                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>
-                      </View>
-                    ) : null}
-                    {c.parentName2 ? (
-                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
-                        <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName2}</Text>
-                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone2?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>
-                      </View>
-                    ) : null}
-                  </TouchableOpacity>
-                ))}
-                {filteredClassmates.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noContacts')}</Text>}
               </View>
             </>
           )}
