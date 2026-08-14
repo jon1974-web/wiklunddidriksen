@@ -31,7 +31,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const user = useUserStore((state) => state.user);
   const familyRole = useUserStore((state) => state.familyRole);
   const { colors } = useTheme();
-  const [tripActionModal, setTripActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void }>({ visible: false, title: '' });
+  const [tripActionModal, setTripActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void; onEdit?: () => void }>({ visible: false, title: '' });
 
   const today = getTodayLocal();
 
@@ -117,6 +117,10 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
             setTripActionModal({
               visible: true,
               title: item.title,
+              onEdit: () => {
+                navigation.navigate('TripDetail', { trip: item });
+                setTripActionModal({ visible: false, title: '' });
+              },
               onDelete: async () => {
                 try {
                   await deleteTrip(item.id);
@@ -223,6 +227,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       <ActionModal
         visible={tripActionModal.visible}
         title={tripActionModal.title}
+        onEdit={tripActionModal.onEdit}
         onDelete={tripActionModal.onDelete}
         onCancel={() => setTripActionModal({ visible: false, title: '' })}
       />
