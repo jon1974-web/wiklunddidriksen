@@ -2261,21 +2261,33 @@ exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", do
 
   const data = snap.data();
   const uid = data.createdBy;
-  if (!uid) return;
+  console.log(`onTripCreatedForCalendar: triggered for trip ${event.params.tripId}, uid: ${uid}`);
+
+  if (!uid) {
+    console.log("No createdBy field, skipping");
+    return;
+  }
 
   try {
     const db = getFirestore();
     const userDoc = await db.collection("users").doc(uid).get();
     const userData = userDoc.data();
 
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
+      console.log(`User ${uid} not connected to Google Calendar`);
+      return;
+    }
+
+    const startDate = data.startDate;
+    const endDate = data.endDate || data.startDate;
+    console.log(`Creating trip: ${data.title}, start: ${startDate}, end: ${endDate}`);
 
     const eventId = await createGoogleCalendarEvent(uid, {
       title: `✈️ ${data.title || data.city || "Reise"}`,
       description: `${data.city || ""}${data.country ? ", " + data.country : ""}`,
       allDay: true,
-      startDate: data.startDate,
-      endDate: data.endDate || data.startDate,
+      startDate,
+      endDate,
     });
 
     await db.collection("trips").doc(event.params.tripId).update({
@@ -2289,25 +2301,36 @@ exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", do
 });
 
 // Cloud Function: Auto-sync health appointments to Google Calendar
-exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "healthAppointments/{docId}" }, async (event) => {
+exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
   const data = snap.data();
+  const familyId = event.params.familyId;
   const uid = data.createdBy;
-  if (!uid) return;
+  console.log(`onHealthAppointmentCreatedForCalendar: triggered for family ${familyId}, doc ${event.params.docId}, uid: ${uid}`);
+
+  if (!uid) {
+    console.log("No createdBy field, skipping");
+    return;
+  }
 
   try {
     const db = getFirestore();
     const userDoc = await db.collection("users").doc(uid).get();
     const userData = userDoc.data();
 
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
+      console.log(`User ${uid} not connected to Google Calendar. calendarType: ${userData?.calendarType}`);
+      return;
+    }
 
     const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
       ? `${data.date}T${data.endTime}:00`
       : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+
+    console.log(`Creating calendar event: ${data.title}, ${startDateTime} - ${endDateTime}`);
 
     const eventId = await createGoogleCalendarEvent(uid, {
       title: `❤️ ${data.title}`,
@@ -2317,7 +2340,7 @@ exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-
       location: data.location || "",
     });
 
-    await db.collection("healthAppointments").doc(event.params.docId).update({
+    await db.collection("health").doc(familyId).collection("appointments").doc(event.params.docId).update({
       googleCalendarEventId: eventId,
     });
 
@@ -2492,7 +2515,7 @@ exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", do
   }
 });
 
-exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "healthAppointments/{docId}" }, async (event) => {
+exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
   const after = event.data?.after?.data();
   if (!after) return;
 
@@ -2602,7 +2625,7 @@ exports.onTripDeletedForCalendar = onDocumentDeleted({ region: "us-central1", do
   }
 });
 
-exports.onHealthAppointmentDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "healthAppointments/{docId}" }, async (event) => {
+exports.onHealthAppointmentDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
 
@@ -2685,4 +2708,53 @@ exports.debugCheckEvent = onRequest({ region: "us-central1" }, async (req, res) 
     googleCalendarEventId: data.googleCalendarEventId || "NOT SET",
     createdBy: data.createdBy,
   });
+});
+
+// DEBUG: Check health appointments
+exports.debugCheckHealth = onRequest({ region: "us-central1" }, async (req, res) => {
+  const db = getFirestore();
+  const snapshot = await db.collection("healthAppointments").orderBy("createdAt", "desc").limit(3).get();
+  const results = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    results.push({
+      id: doc.id,
+      title: data.title,
+      createdBy: data.createdBy,
+      date: data.date,
+      startTime: data.startTime,
+      endTime: data.endTime,
+    });
+  });
+  res.json(results);
+});
+
+// DEBUG: Check collections
+exports.debugCheckCollections = onRequest({ region: "us-central1" }, async (req, res) => {
+  const db = getFirestore();
+  const collections = ["healthAppointments", "health", "healthVaccinations", "petVetVisits", "petVaccinations"];
+  const results = {};
+  for (const col of collections) {
+    const snapshot = await db.collection(col).limit(1).get();
+    results[col] = snapshot.size > 0 ? "has data" : "empty";
+  }
+  res.json(results);
+});
+
+// DEBUG: Check trips
+exports.debugCheckTrips = onRequest({ region: "us-central1" }, async (req, res) => {
+  const db = getFirestore();
+  const snapshot = await db.collection("trips").orderBy("createdAt", "desc").limit(3).get();
+  const results = [];
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    results.push({
+      id: doc.id,
+      title: data.title,
+      startDate: data.startDate,
+      endDate: data.endDate,
+      createdBy: data.createdBy,
+    });
+  });
+  res.json(results);
 });

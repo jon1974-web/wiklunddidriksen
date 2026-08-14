@@ -218,7 +218,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         if (isEditing) {
           await updateVetVisit(editingItem.id, vetForm);
         } else {
-          await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId });
+          await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId }, user?.uid);
         }
         if (!isEditing && vetForm.date) {
           const reminderMinutes = vetForm.reminder ? (vetForm.reminder.includes('1 d') ? 1440 : vetForm.reminder.includes('3') ? 4320 : 10080) : 0;

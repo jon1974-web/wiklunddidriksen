@@ -37,8 +37,8 @@ export async function getHealthAppointments(familyId: string): Promise<HealthApp
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HealthAppointment));
 }
 
-export async function addHealthAppointment(familyId: string, data: Omit<HealthAppointment, 'id' | 'createdAt'>): Promise<string> {
-  const docRef = await addDoc(getHealthCollection(familyId, 'appointments'), { ...data, createdAt: Date.now() });
+export async function addHealthAppointment(familyId: string, data: Omit<HealthAppointment, 'id' | 'createdAt'>, createdBy?: string): Promise<string> {
+  const docRef = await addDoc(getHealthCollection(familyId, 'appointments'), { ...data, createdBy: createdBy || null, createdAt: Date.now() });
   return docRef.id;
 }
 

@@ -31,8 +31,8 @@ export async function getVetVisits(familyId: string, petId: string): Promise<Pet
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetVetVisit));
 }
 
-export async function addVetVisit(data: Omit<PetVetVisit, 'id' | 'createdAt'>): Promise<string> {
-  const docRef = await addDoc(collection(db, 'petVetVisits'), { ...data, createdAt: Date.now() });
+export async function addVetVisit(data: Omit<PetVetVisit, 'id' | 'createdAt'>, createdBy?: string): Promise<string> {
+  const docRef = await addDoc(collection(db, 'petVetVisits'), { ...data, createdBy: createdBy || null, createdAt: Date.now() });
   return docRef.id;
 }
 

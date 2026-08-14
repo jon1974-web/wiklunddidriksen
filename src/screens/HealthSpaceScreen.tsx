@@ -133,7 +133,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           await updateHealthAppointment(familyId, editingItem.id, apptForm);
           savedAppt = { ...apptForm, id: editingItem.id };
         } else {
-          const id = await addHealthAppointment(familyId, apptForm);
+          const id = await addHealthAppointment(familyId, apptForm, user?.uid);
           savedAppt = { ...apptForm, id };
         }
         // Send push notification to family members
