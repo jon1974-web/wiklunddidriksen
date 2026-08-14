@@ -565,9 +565,24 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             )}
             <View>
               <Text style={[styles.screenTitle, { color: colors.text, fontSize: 22 }]}>{selectedChild.name}</Text>
-              {selectedYear?.school || selectedChild.school ? <Text style={{ color: colors.textSecondary, fontSize: 14 }}>{selectedYear?.school || selectedChild.school}</Text> : null}
-              {selectedYear?.grade || (selectedChild as any).grade ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{selectedYear?.grade || (selectedChild as any).grade}</Text> : null}
-              {selectedYear ? <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{selectedYear.year}</Text> : null}
+              {(selectedYear?.school || selectedChild.school) && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <AppIcon name="house" size={12} color={colors.textSecondary} />
+                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{selectedYear?.school || selectedChild.school}</Text>
+                </View>
+              )}
+              {(selectedYear?.grade || (selectedChild as any).grade) && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <AppIcon name="person" size={12} color={colors.textSecondary} />
+                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{selectedYear?.grade || (selectedChild as any).grade}</Text>
+                </View>
+              )}
+              {selectedYear && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <AppIcon name="calendar" size={12} color={colors.textSecondary} />
+                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{selectedYear.year}</Text>
+                </View>
+              )}
               {selectedChild.phone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {selectedChild.phone}</Text> : null}
               {selectedChild.email ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {selectedChild.email}</Text> : null}
             </View>
