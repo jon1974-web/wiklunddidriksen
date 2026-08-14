@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Linking, Image } from 'react-native';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { doc, updateDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
 import { Event } from '../types';
@@ -154,10 +154,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         } else if (customEndTime) {
           updateData.endTime = customEndTime;
         } else {
-          updateData.endTime = null;
+          updateData.endTime = deleteField();
         }
       } else {
-        updateData.endTime = null;
+        updateData.endTime = deleteField();
       }
 
       await updateDoc(doc(db, 'events', event.id), updateData);
