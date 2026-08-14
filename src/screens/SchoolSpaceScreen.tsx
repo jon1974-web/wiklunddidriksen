@@ -583,8 +583,18 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{selectedYear.year}</Text>
                 </View>
               )}
-              {selectedChild.phone ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📞 {selectedChild.phone}</Text> : null}
-              {selectedChild.email ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>✉️ {selectedChild.email}</Text> : null}
+              {selectedChild.phone ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <AppIcon name="phone" size={12} color={colors.textSecondary} />
+                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{selectedChild.phone}</Text>
+                </View>
+              ) : null}
+              {selectedChild.email ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                  <AppIcon name="email" size={12} color={colors.textSecondary} />
+                  <Text style={{ color: colors.textSecondary, fontSize: 13 }}>{selectedChild.email}</Text>
+                </View>
+              ) : null}
             </View>
           </View>
         </View>
