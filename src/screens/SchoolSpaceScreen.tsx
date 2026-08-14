@@ -281,7 +281,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     setContactForm({
       role: contact.role,
       teacherType: (contact as any).teacherType || 'contact',
-      adminType: (contact as any).adminType || '',
+      adminType: Array.isArray((contact as any).adminType) ? (contact as any).adminType : (contact as any).adminType ? [(contact as any).adminType] : [],
       name: contact.name,
       subject: contact.subject || '',
       childName: (contact as any).childName || '',

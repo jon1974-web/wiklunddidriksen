@@ -91,6 +91,9 @@ export const SearchableMultiDropdown: React.FC<SearchableMultiDropdownProps> = (
                 }
                 ListEmptyComponent={<Text style={[styles.empty, { color: colors.textSecondary }]}>Ingen treff</Text>}
               />
+              <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: colors.accent }]} onPress={() => setVisible(false)}>
+                <Text style={styles.confirmText}>Ferdig ({safeValue.length})</Text>
+              </TouchableOpacity>
             </TouchableOpacity>
           </TouchableOpacity>
         </KeyboardAvoidingView>
@@ -174,5 +177,16 @@ const styles = StyleSheet.create({
     padding: 16,
     textAlign: 'center',
     fontSize: 14,
+  },
+  confirmBtn: {
+    padding: 14,
+    alignItems: 'center',
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  confirmText: {
+    color: '#fff',
+    fontSize: 15,
+    fontWeight: '600',
   },
 });
