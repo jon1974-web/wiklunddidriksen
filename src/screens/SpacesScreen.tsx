@@ -8,7 +8,7 @@ import { AppIcon } from '../components/AppIcon';
 import { getTrips } from '../services/tripService';
 import { getHealthAppointments, getHealthMedications, getHealthVaccinations } from '../services/healthService';
 import { getSchoolChildren } from '../services/schoolService';
-import { getPets, getAllVetVisits, getAllPetMedications, getAllPetVaccinations } from '../services/petService';
+import { getPets } from '../services/petService';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -70,20 +70,9 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       setSchoolCount(children.length);
     }).catch(() => {});
 
-    // Pets - active medications + vet visits + vaccinations
-    Promise.all([
-      getAllVetVisits(familyId),
-      getAllPetMedications(familyId),
-      getAllPetVaccinations(familyId),
-    ]).then(([vetVisits, meds, vaccs]) => {
-      const futureVetVisits = vetVisits.filter(v => v.date >= todayStr);
-      const activeMeds = meds.filter(m => {
-        if (m.dateTo && m.dateTo < todayStr) return false;
-        if (m.dateFrom && m.dateFrom > todayStr) return false;
-        return true;
-      });
-      const futureVaccs = vaccs.filter(v => v.date >= todayStr);
-      setPetCount(futureVetVisits.length + activeMeds.length + futureVaccs.length);
+    // Pets - number of pets
+    getPets(familyId).then(pets => {
+      setPetCount(pets.length);
     }).catch(() => {});
 
     // Birthdays - birthdays this month
