@@ -400,13 +400,15 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const filteredTeachers = teachers.filter(c => {
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
-    return c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || (c as any).teacherType?.toLowerCase().includes(q);
+    const typeLabel = c.teacherType === 'personal' ? t('school.personalTeacher') : c.teacherType === 'contact' ? t('school.contactTeacher') : c.teacherType === 'subject' ? t('school.subjectTeacher') : '';
+    return c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || typeLabel.toLowerCase().includes(q);
   });
   const filteredAdmins = admins.filter(c => {
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
     const adminTypes = Array.isArray((c as any).adminType) ? (c as any).adminType : [(c as any).adminType || ''];
-    return c.name.toLowerCase().includes(q) || adminTypes.some((t: string) => t.toLowerCase().includes(q));
+    const roleLabels = adminTypes.map((t: string) => getAdminRoleLabel(t).toLowerCase());
+    return c.name.toLowerCase().includes(q) || roleLabels.some((l: string) => l.includes(q));
   });
 
   const renderContactActions = (phone?: string, email?: string) => (
