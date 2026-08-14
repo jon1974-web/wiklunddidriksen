@@ -39,6 +39,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
   const firstName = contact.name.split(' ')[0];
 
   const renderActionButtons = (phone?: string, email?: string, name?: string) => {
+    if (!phone && !email) return null;
     const personName = name?.split(' ')[0] || '';
     return (
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
