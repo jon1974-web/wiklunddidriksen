@@ -405,13 +405,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     return c.name.toLowerCase().includes(q) || c.parentName?.toLowerCase().includes(q);
   });
   const filteredTeachers = teachers.filter(c => {
-    console.log('FILTER RUNNING for:', c.name, '| search:', contactSearch);
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
     const teacherType = (c as any).teacherType || '';
     const typeLabel = teacherType === 'personal' ? t('school.personalTeacher') : teacherType === 'contact' ? t('school.contactTeacher') : teacherType === 'subject' ? t('school.subjectTeacher') : '';
     const found = c.name.toLowerCase().includes(q) || c.subject?.toLowerCase().includes(q) || typeLabel.toLowerCase().includes(q) || teacherType.toLowerCase().includes(q);
-    if (!found) console.log('NOT FOUND:', c.name, '| teacherType:', teacherType, '| typeLabel:', typeLabel, '| search:', q);
+    console.log(c.name, '| teacherType:', JSON.stringify(teacherType), '| typeLabel:', JSON.stringify(typeLabel), '| found:', found);
     return found;
   });
   const filteredAdmins = admins.filter(c => {
