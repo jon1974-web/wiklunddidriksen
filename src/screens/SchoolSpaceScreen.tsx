@@ -42,7 +42,7 @@ const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
   sosiallærer: { label: 'Sosiallærer', color: '#26A69A' },
 };
 
-const getAdminRoleColor = (key: string) => ADMIN_ROLES[key]?.color || '#999';
+const getAdminRoleColor = (key: string) => ADMIN_ROLES[key]?.color || '#607D8B';
 const getAdminRoleLabel = (key: string) => ADMIN_ROLES[key]?.label || key;
 
 export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation, route }) => {
