@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { SchoolContact } from '../types';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { MODULE_COLORS } from '../constants/moduleColors';
+import { AppIcon } from '../components/AppIcon';
 
 interface SchoolContactDetailScreenProps {
   navigation: any;
@@ -41,9 +42,9 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
     const personName = name?.split(' ')[0] || '';
     return (
       <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-        {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(phone)}><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600' }}>📞 {t('school.call')} {personName}</Text></TouchableOpacity>}
+        {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => handleCall(phone)}><AppIcon name="phone" size={14} color="#43A047" /><Text style={{ color: '#43A047', fontSize: 12, fontWeight: '600', marginLeft: 6 }}>{t('school.call')} {personName}</Text></TouchableOpacity>}
         {phone && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleCopy(phone)}><Text style={{ color: '#1E88E5', fontSize: 12, fontWeight: '600' }}>📋 {t('school.copy')}</Text></TouchableOpacity>}
-        {email && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#FFF3E0' }]} onPress={() => handleEmail(email)}><Text style={{ color: '#FB8C00', fontSize: 12, fontWeight: '600' }}>✉️ {t('school.sendEmail')}</Text></TouchableOpacity>}
+        {email && <TouchableOpacity style={[styles.actionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => handleEmail(email)}><AppIcon name="email" size={14} color="#1976D2" /><Text style={{ color: '#1976D2', fontSize: 12, fontWeight: '600', marginLeft: 6 }}>{t('school.sendEmail')}</Text></TouchableOpacity>}
       </View>
     );
   };
@@ -64,26 +65,26 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
 
         {!isTeacher && contact.childPhone && (
           <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.childPhone')}</Text>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.childPhone')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.childPhone}</Text>
           </View>
         )}
         {!isTeacher && contact.childEmail && (
           <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>✉️ {t('school.childEmail')}</Text>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.childEmail')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.childEmail}</Text>
           </View>
         )}
         {!isTeacher && (contact.childPhone || contact.childEmail) && renderActionButtons(contact.childPhone, contact.childEmail, contact.name)}
         {isTeacher && contact.phone && (
           <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.phone')}</Text>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.phone')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.phone}</Text>
           </View>
         )}
         {isTeacher && contact.email && (
           <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>✉️ {t('school.email')}</Text>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.email')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.email}</Text>
           </View>
         )}
@@ -94,11 +95,11 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
           <Text style={[s.viewDescription, { color: MODULE_COLORS.school, fontWeight: '700', marginBottom: 8 }]}>👤 {contact.parentName}</Text>
           <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.phone')}</Text>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.phone')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentPhone || '—'}</Text>
           </View>
           <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>✉️ {t('school.email')}</Text>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.email')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentEmail || '—'}</Text>
           </View>
           {renderActionButtons(contact.parentPhone, contact.parentEmail, contact.parentName)}
@@ -109,11 +110,11 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
         <View style={[s.viewCard, { backgroundColor: colors.surface }]}>
           <Text style={[s.viewDescription, { color: MODULE_COLORS.school, fontWeight: '700', marginBottom: 8 }]}>👤 {contact.parentName2}</Text>
           <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>📞 {t('school.phone')}</Text>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.phone')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentPhone2 || '—'}</Text>
           </View>
           <View style={s.viewDetailRow}>
-            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>✉️ {t('school.email')}</Text>
+            <Text style={[s.viewDetailLabel, { color: colors.textSecondary }]}>{t('school.email')}</Text>
             <Text style={[s.viewDetailValue, { color: colors.text }]}>{contact.parentEmail2 || '—'}</Text>
           </View>
           {renderActionButtons(contact.parentPhone2, contact.parentEmail2, contact.parentName2)}
