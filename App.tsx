@@ -500,6 +500,15 @@ const AppContent = () => {
     }
   }, [loading]);
 
+  // Navigate to Profile after Google Calendar OAuth
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('calendar') === 'connected' && navigationRef.isReady()) {
+      navigationRef.navigate('Profile');
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
+
   if (showSplash) {
     return (
       <Animated.View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', opacity: splashOpacity }}>

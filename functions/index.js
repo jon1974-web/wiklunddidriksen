@@ -2042,7 +2042,7 @@ exports.notifyNewChatMessage = onDocumentCreated({ region: "us-central1", docume
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_REDIRECT_URI = "https://familiesenter-837bb.web.app/profile";
+const GOOGLE_REDIRECT_URI = "https://familiesenter-837bb.web.app";
 
 // Step 1: Redirect to Google OAuth
 exports.googleCalendarAuth = onRequest({ region: "us-central1" }, async (req, res) => {
