@@ -215,8 +215,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     try {
       const rawData: Record<string, any> = {
         role: contactForm.role,
-        teacherType: contactForm.teacherType || null,
-        adminType: contactForm.role === 'admin' ? contactForm.adminType || '' : null,
+        teacherType: contactForm.teacherType || '',
+        adminType: contactForm.adminType || '',
         name: contactForm.name,
         subject: contactForm.subject || '',
         address: contactForm.address || '',
@@ -566,7 +566,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
-                        {(c as any).adminType && (
+                        {(c as any).adminType && (c as any).adminType !== '' && (
                           <View style={[styles.teacherTypeBadge, { backgroundColor: getAdminRoleColor((c as any).adminType) + '20' }]}>
                             <Text style={{ color: getAdminRoleColor((c as any).adminType), fontSize: 10, fontWeight: '600' }}>
                               {getAdminRoleLabel((c as any).adminType)}
