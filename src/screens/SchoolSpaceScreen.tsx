@@ -71,7 +71,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [editingYearId, setEditingYearId] = useState<string | null>(null);
 
   const [showAddContactModal, setShowAddContactModal] = useState(false);
-  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', teacherType: 'contact' as 'personal' | 'contact' | 'subject', adminType: [] as string[], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', teacherType: '' as string, adminType: [] as string[], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [contactActionModal, setContactActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
@@ -238,6 +238,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const handleSaveContact = async () => {
     if (!familyId || !selectedChild || !selectedYear) return;
     if (!contactForm.name.trim()) { crossAlert('Error', t('school.enterContactName')); return; }
+    if (contactForm.role === 'teacher' && !contactForm.teacherType) { crossAlert('Error', 'Velg en lærertype'); return; }
     try {
       const rawData: Record<string, any> = {
         role: contactForm.role,
@@ -269,7 +270,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       } else {
         await addSchoolContact(rawData as any);
       }
-      setContactForm({ role: 'teacher', teacherType: 'contact', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+      setContactForm({ role: 'teacher', teacherType: '', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
       setEditingContactId(null);
       setShowAddContactModal(false);
       loadYearData();
@@ -598,7 +599,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.teachersAndSubjects')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({filteredTeachers.length})</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', teacherType: 'contact', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', teacherType: '', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -634,7 +635,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.healthAdmin')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({filteredAdmins.length})</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'admin', teacherType: 'contact', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'admin', teacherType: '', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </View>
@@ -788,13 +789,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 )}
                 {contactForm.role === 'teacher' && (
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>{t('school.teacherType')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('school.teacherType')} *</Text>
                     <View style={{ flexDirection: 'row', gap: 8 }}>
                       {[
                         { key: 'personal' as const, label: t('school.personalTeacher') },
                         { key: 'contact' as const, label: t('school.contactTeacher') },
                         { key: 'subject' as const, label: t('school.subjectTeacher') },
-                      ].map((t) => (
+                      ].map((rt) => (
                         <TouchableOpacity
                           key={t.key}
                           style={[styles.personChip, { backgroundColor: contactForm.teacherType === t.key ? SCHOOL_THEME : colors.inputBackground, flex: 1 }]}
