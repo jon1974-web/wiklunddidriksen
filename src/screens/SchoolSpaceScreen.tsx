@@ -460,7 +460,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         </View>
       </View>
       <ScrollView style={styles.content}>
-        <Text style={[styles.gridSubtitle, { color: colors.textSecondary }]}>{t('school.ourChildren')}</Text>
+        <Text style={[styles.gridSubtitle, { color: colors.textSecondary }]}>{children.length > 0 ? `${children.length} ${children.length === 1 ? 'barn' : 'barn'} på skole` : t('school.ourChildren')}</Text>
         <View style={styles.grid}>
           {children.map((child) => (
             <TouchableOpacity
