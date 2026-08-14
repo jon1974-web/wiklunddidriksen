@@ -1408,7 +1408,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 14, fontWeight: '700' },
   sectionCount: { fontSize: 12 },
   addButton: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-  item: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#f0f0f0', gap: 10 },
+  item: { flexDirection: 'row', alignItems: 'center', paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#ddd', gap: 10 },
   itemText: { flex: 1 },
   itemTitle: { fontSize: 14, fontWeight: '600' },
   itemSub: { fontSize: 12 },

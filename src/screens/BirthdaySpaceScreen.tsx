@@ -224,7 +224,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
     const previousGifts = getPreviousGifts(b.id, currentYear);
 
     return (
-      <View key={b.id} style={{ borderBottomWidth: 1, borderBottomColor: '#f0f0f0' }}>
+      <View key={b.id} style={{ borderBottomWidth: 1, borderBottomColor: '#ddd' }}>
         <TouchableOpacity 
           style={styles.birthdayItem} 
           onPress={() => showGifts && toggleExpand(b.id)}
