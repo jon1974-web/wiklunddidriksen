@@ -495,8 +495,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                         {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📚 {c.subject}</Text> : null}
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
-                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>}
-                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><Text style={{ color: '#1976D2', fontSize: 14 }}>✉️</Text></TouchableOpacity>}
+                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>}
+                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><AppIcon name="email" size={16} color="#1976D2" /></TouchableOpacity>}
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -524,8 +524,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                         {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>🏥 {c.subject}</Text> : null}
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
-                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>}
-                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><Text style={{ color: '#1976D2', fontSize: 14 }}>✉️</Text></TouchableOpacity>}
+                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>}
+                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><AppIcon name="email" size={16} color="#1976D2" /></TouchableOpacity>}
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -593,13 +593,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     {c.parentName ? (
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName}</Text>
-                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone?.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>
+                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>
                       </View>
                     ) : null}
                     {c.parentName2 ? (
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
                         <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName2}</Text>
-                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone2?.replace(/\s/g, '')}`)}><Text style={{ color: '#43A047', fontSize: 14 }}>📞</Text></TouchableOpacity>
+                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone2?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>
                       </View>
                     ) : null}
                   </TouchableOpacity>

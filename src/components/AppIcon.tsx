@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline, Ellipse } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email';
   size?: number;
   color?: string;
 }
@@ -274,6 +274,19 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
       <Rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
       <Circle cx="8.5" cy="8.5" r="1.5"/>
       <Polyline points="21 15 16 10 5 21"/>
+    </Svg>
+  );
+
+  if (name === 'phone') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+    </Svg>
+  );
+
+  if (name === 'email') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+      <Polyline points="22,6 12,13 2,6"/>
     </Svg>
   );
 
