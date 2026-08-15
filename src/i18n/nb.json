@@ -764,7 +764,9 @@
   "chat": {
     "title": "Vår chat",
     "noMessages": "Ingen meldinger ennå",
-    "sendMessage": "Skriv en melding..."
+    "sendMessage": "Skriv en melding...",
+    "today": "I dag",
+    "yesterday": "I går"
   },
   "actionModal": {
     "edit": "Rediger",

@@ -703,7 +703,9 @@
   "chat": {
     "title": "Familjechatt",
     "noMessages": "Inga meddelanden ännu",
-    "sendMessage": "Skriv ett meddelande..."
+    "sendMessage": "Skriv ett meddelande...",
+    "today": "Idag",
+    "yesterday": "Igår"
   },
   "actionModal": {
     "edit": "Redigera",

@@ -703,7 +703,9 @@
   "chat": {
     "title": "Perhekeskustelu",
     "noMessages": "Ei viestejä vielä",
-    "sendMessage": "Kirjoita viesti..."
+    "sendMessage": "Kirjoita viesti...",
+    "today": "Tänään",
+    "yesterday": "Eilen"
   },
   "actionModal": {
     "edit": "Muokkaa",

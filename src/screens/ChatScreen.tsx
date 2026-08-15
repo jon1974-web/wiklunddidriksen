@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image, Alert, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, query, where, orderBy, limit, onSnapshot, addDoc, updateDoc, doc, runTransaction } from 'firebase/firestore';
@@ -202,15 +202,55 @@ export const ChatScreen: React.FC = () => {
     }
   }, [user]);
 
-  const renderMessage = useCallback(({ item }: { item: ChatMessage }) => (
-    <MessageBubble
-      message={item}
-      isOwnMessage={item.senderId === user?.uid}
-      currentUserId={user?.uid}
-      onReaction={handleReaction}
-      liveAvatarUrl={item.senderId ? userAvatars[item.senderId] : undefined}
-    />
-  ), [user?.uid, handleReaction, userAvatars]);
+  const formatDateSeparator = useCallback((timestamp: number): string => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const diffDays = Math.floor((today.getTime() - messageDate.getTime()) / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return t('chat.today', 'I dag');
+    if (diffDays === 1) return t('chat.yesterday', 'I går');
+    return date.toLocaleDateString(LOCALE, { day: 'numeric', month: 'long', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+  }, [t]);
+
+  type ChatListItem = { type: 'message'; message: ChatMessage } | { type: 'date'; date: string; key: string };
+
+  const chatData = useMemo<ChatListItem[]>(() => {
+    const items: ChatListItem[] = [];
+    let lastDateKey = '';
+    for (const msg of messages) {
+      const d = new Date(msg.timestamp);
+      const dateKey = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+      if (dateKey !== lastDateKey) {
+        lastDateKey = dateKey;
+        items.push({ type: 'date', date: formatDateSeparator(msg.timestamp), key: `date-${dateKey}` });
+      }
+      items.push({ type: 'message', message: msg, key: msg.id });
+    }
+    return items;
+  }, [messages, formatDateSeparator]);
+
+  const renderMessage = useCallback(({ item }: { item: ChatListItem }) => {
+    if (item.type === 'date') {
+      return (
+        <View style={styles.dateSeparator}>
+          <View style={[styles.datePill, { backgroundColor: colors.surfaceVariant }]}>
+            <Text style={[styles.datePillText, { color: colors.textSecondary }]}>{item.date}</Text>
+          </View>
+        </View>
+      );
+    }
+    return (
+      <MessageBubble
+        message={item.message}
+        isOwnMessage={item.message.senderId === user?.uid}
+        currentUserId={user?.uid}
+        onReaction={handleReaction}
+        liveAvatarUrl={item.message.senderId ? userAvatars[item.message.senderId] : undefined}
+      />
+    );
+  }, [user?.uid, handleReaction, userAvatars, colors]);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -232,9 +272,9 @@ export const ChatScreen: React.FC = () => {
 
       <FlatList
         ref={flatListRef}
-        data={messages}
+        data={chatData}
         renderItem={renderMessage}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.key}
         contentContainerStyle={styles.messagesList}
         onContentSizeChange={() => flatListRef.current?.scrollToEnd({ animated: true })}
         removeClippedSubviews={true}
@@ -380,6 +420,19 @@ const styles = StyleSheet.create({
   sendButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontWeight: '600',
+  },
+  dateSeparator: {
+    alignItems: 'center',
+    marginVertical: 12,
+  },
+  datePill: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  datePillText: {
+    fontSize: 12,
     fontWeight: '600',
   },
 });

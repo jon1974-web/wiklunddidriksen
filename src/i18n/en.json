@@ -764,7 +764,9 @@
   "chat": {
     "title": "Family chat",
     "noMessages": "No messages yet",
-    "sendMessage": "Type a message..."
+    "sendMessage": "Type a message...",
+    "today": "Today",
+    "yesterday": "Yesterday"
   },
   "actionModal": {
     "edit": "Edit",
