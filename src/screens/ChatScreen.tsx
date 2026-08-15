@@ -313,7 +313,7 @@ export const ChatScreen: React.FC = () => {
         >
           <AppIcon name="camera" size={20} color="#fff" />
         </TouchableOpacity>
-        <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground }, inputFocused && styles.inputWrapperFocused]}>
+        <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground }, inputFocused && { backgroundColor: '#fff', boxShadow: `0 0 0 2px ${colors.accent}` }]}>
           <TextInput
             style={[styles.input, { color: colors.text }]}
             value={newMessage}
@@ -325,7 +325,7 @@ export const ChatScreen: React.FC = () => {
             onBlur={() => { if (!newMessage.trim()) setInputFocused(false); }}
           />
           <TouchableOpacity
-            style={[styles.sendBtn, (!canSend || uploading) && styles.sendBtnHidden]}
+            style={[styles.sendBtn, { backgroundColor: colors.accent }, (!canSend || uploading) && styles.sendBtnHidden]}
             onPress={handleSend}
             disabled={!canSend || uploading}
           >
@@ -415,12 +415,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     maxWidth: 160,
   },
-  inputWrapperFocused: {
-    flex: 1,
-    maxWidth: '100%',
-    backgroundColor: '#fff',
-    boxShadow: '0 0 0 2px #0097A7',
-  },
   input: {
     flex: 1,
     fontSize: 16,
@@ -430,7 +424,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: '#0097A7',
     justifyContent: 'center',
     alignItems: 'center',
     marginLeft: 6,
