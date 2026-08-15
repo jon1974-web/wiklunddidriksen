@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Linking, Image } from 'react-native';
-import Svg, { Path, Rect } from 'react-native-svg';
 import { doc, updateDoc, deleteDoc, deleteField } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
@@ -277,10 +276,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
             <Text style={[styles.viewTitle, { color: colors.text, flex: 1 }]}>{eventData.title}</Text>
             <TouchableOpacity onPress={handleCopy} style={{ padding: 4 }}>
-              <Svg width={20} height={20} viewBox="0 0 24 24" fill="none" stroke={colors.accent} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <Path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h2"/>
-                <Rect x="8" y="2" width="8" height="4" rx="1" ry="1"/>
-              </Svg>
+              <AppIcon name="links" size={20} color={colors.accent} />
             </TouchableOpacity>
           </View>
           {eventData.description && (
