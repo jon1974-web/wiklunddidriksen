@@ -17,6 +17,7 @@ import { getUserProfile } from '../services/familyService';
 import { AppIcon } from '../components/AppIcon';
 
 export const ChatScreen: React.FC = () => {
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
