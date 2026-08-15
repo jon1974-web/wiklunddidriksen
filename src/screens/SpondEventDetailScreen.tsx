@@ -181,21 +181,15 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
         <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Svar fra alle {event.groupName ? `— ${event.groupName}` : ''}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
-            {acceptedNames.length > 0 && (
-              <View style={{ flex: 1, backgroundColor: '#43A047', borderRadius: 10, padding: 10, alignItems: 'center' }}>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{acceptedNames.length} Ja</Text>
-              </View>
-            )}
-            {declinedNames.length > 0 && (
-              <View style={{ flex: 1, backgroundColor: '#E53935', borderRadius: 10, padding: 10, alignItems: 'center' }}>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{declinedNames.length} Nei</Text>
-              </View>
-            )}
-            {unansweredNames.length > 0 && (
-              <View style={{ flex: 1, backgroundColor: '#f0f0f0', borderRadius: 10, padding: 10, alignItems: 'center' }}>
-                <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>{unansweredNames.length} Vent</Text>
-              </View>
-            )}
+            <View style={{ flex: 1, backgroundColor: '#43A047', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{acceptedNames.length} Ja</Text>
+            </View>
+            <View style={{ flex: 1, backgroundColor: '#E53935', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{declinedNames.length} Nei</Text>
+            </View>
+            <View style={{ flex: 1, backgroundColor: '#f0f0f0', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>{unansweredNames.length} Vent</Text>
+            </View>
           </View>
         </View>
       )}
