@@ -430,8 +430,9 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 16,
-    paddingVertical: 10,
     maxHeight: 100,
+    paddingTop: 7,
+    paddingBottom: 7,
   },
   sendBtn: {
     width: 28,
