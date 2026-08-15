@@ -94,6 +94,17 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const declinedAllNames = useMemo(() => resolveNames(event.responses?.declinedIds || []), [resolveNames, event.responses]);
   const unansweredAllNames = useMemo(() => resolveNames(event.responses?.unansweredIds || []), [resolveNames, event.responses]);
 
+  const myStatus = useMemo(() => {
+    if (!event.responses) return null;
+    for (const r of spondRespondents) {
+      const ids = [r.spondId, r.profileId, r.childId].filter(Boolean);
+      if (ids.some((id) => event.responses!.acceptedIds?.includes(id))) return 'accepted';
+      if (ids.some((id) => event.responses!.declinedIds?.includes(id))) return 'declined';
+      if (ids.some((id) => event.responses!.unansweredIds?.includes(id))) return 'unanswered';
+    }
+    return null;
+  }, [event.responses, spondRespondents]);
+
   const modalMembers = useMemo(() =>
     getModalRespondents(event, spondRespondents)
       .map((r) => ({ id: r.spondId, firstName: r.firstName, lastName: r.lastName })),
@@ -143,6 +154,18 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
         <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Detaljer</Text>
+        {myStatus && (
+          <View style={styles.viewDetailRow}>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📋</Text>
+            <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+              <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: myStatus === 'accepted' ? '#E8F5E9' : myStatus === 'declined' ? '#FFEBEE' : '#FFF8E1' }}>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: myStatus === 'accepted' ? '#43A047' : myStatus === 'declined' ? '#E53935' : '#F9A825' }}>
+                  {myStatus === 'accepted' ? 'Akseptert' : myStatus === 'declined' ? 'Avslått' : 'Ikke svart'}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
         {event.address && (
           <View style={styles.viewDetailRow}>
             <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍</Text>
