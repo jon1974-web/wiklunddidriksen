@@ -325,7 +325,7 @@ export const ChatScreen: React.FC = () => {
           {uploading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.sendButtonText}>{t('chat.send')}</Text>
+            <AppIcon name="send" size={20} color={canSend ? '#fff' : colors.textDisabled} />
           )}
         </TouchableOpacity>
       </View>
