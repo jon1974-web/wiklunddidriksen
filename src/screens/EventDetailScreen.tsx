@@ -72,6 +72,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [icon, setIcon] = useState(event.icon || '');
+  const [showFullNote, setShowFullNote] = useState(false);
 
   type DetailPickerField = 'date' | 'time' | 'endDate' | 'endTime' | null;
   const [activePicker, setActivePicker] = useState<DetailPickerField>(null);
@@ -298,10 +299,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text }}>{eventData.title}</Text>
-              <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>{dateText}</Text>
+              <Text style={{ fontSize: 14, fontWeight: '700', color: '#333', marginTop: 2 }}>{timeText}</Text>
               <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
                 <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: '#E8F5E9' }}>
-                  <Text style={{ fontSize: 10, fontWeight: '600', color: '#43A047' }}>📅 Arrangement</Text>
+                  <Text style={{ fontSize: 10, fontWeight: '600', color: '#43A047' }}>Avtale</Text>
                 </View>
               </View>
             </View>
@@ -311,20 +312,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         {/* Detail card */}
         <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#0097A7' }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#0097A7', marginBottom: 8 }}>Detaljer</Text>
-          <View style={styles.viewDetailRow}>
-            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐</Text>
-            <Text style={[styles.viewDetailValue, { color: colors.text }]}>{timeText}</Text>
-          </View>
           {eventData.address && (
             <View style={styles.viewDetailRow}>
               <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍</Text>
               <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{eventData.address}</Text>
-            </View>
-          )}
-          {eventData.description && (
-            <View style={styles.viewDetailRow}>
-              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📝</Text>
-              <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={3}>{eventData.description}</Text>
             </View>
           )}
           <View style={styles.viewDetailRow}>
@@ -333,6 +324,26 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               {getReminderOptions().find((o) => o.value === reminderMinutes)?.label || `${reminderMinutes} min`}
             </Text>
           </View>
+          {eventData.description && (
+            <View style={{ marginBottom: 12 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <Text style={{ fontSize: 14 }}>📝</Text>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#0097A7' }}>Notat</Text>
+              </View>
+              <View style={{ paddingLeft: 22 }}>
+                <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
+                  {eventData.description}
+                </Text>
+                {eventData.description.length > 60 && (
+                  <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
+                    <Text style={{ fontSize: 12, color: '#0097A7', fontWeight: '600', marginTop: 4 }}>
+                      {showFullNote ? 'Vis mindre' : 'Les mer'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+          )}
         </View>
 
         {/* Map */}
