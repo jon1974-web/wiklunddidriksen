@@ -165,13 +165,19 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const headerTranslate = scrollY.interpolate({
     inputRange: [0, 80],
-    outputRange: [0, -60],
+    outputRange: [0, -70],
     extrapolate: 'clamp',
   });
 
   const headerOpacity = scrollY.interpolate({
     inputRange: [0, 60],
     outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const headerPadding = scrollY.interpolate({
+    inputRange: [0, 80],
+    outputRange: [8, 0],
     extrapolate: 'clamp',
   });
   const familyId = useUserStore((state) => state.familyId);
@@ -867,7 +873,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+      <Animated.View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, paddingBottom: headerPadding, marginBottom: headerTranslate }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <AppIcon name="calendar" size={28} color={colors.accent} />
@@ -875,8 +881,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
-        {familyName ? <Animated.Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2, transform: [{ translateY: headerTranslate }], opacity: headerOpacity }]}>{familyName}</Animated.Text> : null}
-        <Animated.View style={[styles.viewToggle, { transform: [{ translateY: headerTranslate }], opacity: headerOpacity, zIndex: 10 }]}>
+        <Animated.View style={{ opacity: headerOpacity, overflow: 'hidden', height: headerTranslate.interpolate({ inputRange: [-70, 0], outputRange: [0, 80], extrapolate: 'clamp' }) }}>
+          {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}
+          <View style={styles.viewToggle}>
           <TouchableOpacity
             style={[styles.toggleButton, viewMode === 'list' && { backgroundColor: colors.accent }]}
             onPress={() => setViewMode('list')}
@@ -932,7 +939,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               <Circle cx="10" cy="18" r="2" fill={showSortPanel ? '#fff' : colors.accent}/>
             </Svg>
           </TouchableOpacity>
+          </View>
         </Animated.View>
+      </Animated.View>
         {showSortPanel && (
           <View style={[styles.sortPanel, { backgroundColor: colors.surface }]}>
             <Text style={[styles.sortSectionLabel, { color: colors.textSecondary }]}>{t('events.sortBy')}</Text>
@@ -980,7 +989,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             )}
           </View>
         )}
-      </View>
 
       <MissedRemindersBanner navigation={navigation} />
 
