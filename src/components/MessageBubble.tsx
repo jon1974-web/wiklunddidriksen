@@ -76,25 +76,25 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
           )}
           <Text style={[styles.senderName, { color: colors.textSecondary }]}>{message.senderName}</Text>
         </View>
-        <View style={[styles.bubble, isOwnMessage ? { backgroundColor: colors.chatBubbleOwn } : { backgroundColor: colors.chatBubbleOther }]}>
-          {message.imageUrl && (
-            <TouchableOpacity onPress={() => setShowFullImage(true)}>
-              <Image
-                source={{ uri: message.imageUrl }}
-                style={styles.image}
-                resizeMode="cover"
-              />
-            </TouchableOpacity>
-          )}
-          {message.text && message.text.length > 0 ? (
-            <Text style={[styles.text, { color: isOwnMessage ? colors.chatTextOwn : colors.chatTextOther }]}>
-              {message.text}
-            </Text>
-          ) : null}
-        </View>
-        <View style={[styles.bubbleFooter, isOwnMessage && styles.bubbleFooterOwn]}>
+        <View style={styles.bubbleWrapper}>
+          <View style={[styles.bubble, isOwnMessage ? { backgroundColor: colors.chatBubbleOwn } : { backgroundColor: colors.chatBubbleOther }]}>
+            {message.imageUrl && (
+              <TouchableOpacity onPress={() => setShowFullImage(true)}>
+                <Image
+                  source={{ uri: message.imageUrl }}
+                  style={styles.image}
+                  resizeMode="cover"
+                />
+              </TouchableOpacity>
+            )}
+            {message.text && message.text.length > 0 ? (
+              <Text style={[styles.text, { color: isOwnMessage ? colors.chatTextOwn : colors.chatTextOther }]}>
+                {message.text}
+              </Text>
+            ) : null}
+          </View>
           {(reactionCounts.like || reactionCounts.smile || reactionCounts.heart) ? (
-            <View style={styles.reactionsInline}>
+            <View style={[styles.reactionsOverlay, isOwnMessage ? styles.reactionsOverlayOwn : styles.reactionsOverlayOther]}>
               {REACTIONS.map(({ type, emoji }) => {
                 const count = reactionCounts[type];
                 const isActive = userReactions.has(type);
@@ -106,16 +106,18 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
                     onPress={() => handleReactionPress(type)}
                   >
                     <Text style={styles.reactionEmoji}>{emoji}</Text>
-                    <Text style={[styles.reactionCount, { color: isActive ? colors.accent : colors.textSecondary }]}>
-                      {count}
-                    </Text>
+                    {count > 1 && (
+                      <Text style={[styles.reactionCount, { color: isActive ? colors.accent : colors.textSecondary }]}>
+                        {count}
+                      </Text>
+                    )}
                   </TouchableOpacity>
                 );
               })}
             </View>
-          ) : <View />}
+          ) : null}
           <TouchableOpacity
-            style={styles.addReactionBtn}
+            style={[styles.addReactionBtn, isOwnMessage ? styles.addReactionBtnOwn : styles.addReactionBtnOther]}
             onPress={() => setShowReactionPicker(!showReactionPicker)}
           >
             <Text style={[styles.addReactionText, { color: colors.textDisabled }]}>+</Text>
@@ -196,6 +198,23 @@ const styles = StyleSheet.create({
     padding: 12,
     borderRadius: 16,
   },
+  bubbleWrapper: {
+    position: 'relative',
+    alignSelf: 'flex-start',
+    maxWidth: '100%',
+  },
+  reactionsOverlay: {
+    position: 'absolute',
+    top: -10,
+    flexDirection: 'row',
+    gap: 4,
+  },
+  reactionsOverlayOther: {
+    right: -4,
+  },
+  reactionsOverlayOwn: {
+    left: -4,
+  },
   image: {
     width: 200,
     height: 150,
@@ -206,32 +225,24 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   addReactionBtn: {
+    position: 'absolute',
+    top: -10,
     width: 24,
     height: 24,
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    opacity: 0,
+  },
+  addReactionBtnOther: {
+    right: -28,
+  },
+  addReactionBtnOwn: {
+    left: -28,
   },
   addReactionText: {
     fontSize: 16,
     fontWeight: 'bold',
-  },
-  bubbleFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 4,
-    marginLeft: 4,
-    gap: 4,
-  },
-  bubbleFooterOwn: {
-    marginLeft: 0,
-    marginRight: 4,
-  },
-  reactionsInline: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 4,
   },
   reactionBadge: {
     flexDirection: 'row',
