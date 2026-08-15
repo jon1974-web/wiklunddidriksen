@@ -313,9 +313,9 @@ export const ChatScreen: React.FC = () => {
         >
           <AppIcon name="camera" size={20} color="#fff" />
         </TouchableOpacity>
-        <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground }, inputFocused && { backgroundColor: '#fff' }]}>
+        <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground }, inputFocused && styles.inputWrapperFocused]}>
           <TextInput
-            style={[styles.input, { color: colors.text }]}
+            style={[styles.input, { color: colors.text, outlineStyle: 'none' }]}
             value={newMessage}
             onChangeText={setNewMessage}
             placeholder={t('chat.sendMessage')}
@@ -414,6 +414,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 4,
     maxWidth: 160,
+  },
+  inputWrapperFocused: {
+    flex: 1,
+    maxWidth: '100%',
+    backgroundColor: '#fff',
   },
   input: {
     flex: 1,
