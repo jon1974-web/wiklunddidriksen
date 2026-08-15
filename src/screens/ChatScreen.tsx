@@ -432,6 +432,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     padding: 0,
     maxHeight: 100,
+    lineHeight: 20,
   },
   sendBtn: {
     width: 28,
