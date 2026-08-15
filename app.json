@@ -24,7 +24,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/icon.png",
+      "favicon": "./assets/favicon.png",
       "bundler": "metro",
       "name": "Familiesenter",
       "shortName": "Familiesenter",
