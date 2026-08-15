@@ -91,7 +91,11 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
             <Text style={{ fontSize: 14, fontWeight: '700', color: '#333', marginTop: 2 }}>{timeText}</Text>
             <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, backgroundColor: '#E53935' }}>
-                <Text style={{ fontSize: 11 }}>⚽</Text>
+                {groupLogo ? (
+                  <Image source={{ uri: groupLogo }} style={{ width: 14, height: 14, borderRadius: 7 }} />
+                ) : (
+                  <Text style={{ fontSize: 11 }}>⚽</Text>
+                )}
                 <Text style={{ fontSize: 11, fontWeight: '600', color: '#fff' }}>Spond</Text>
               </View>
             </View>
