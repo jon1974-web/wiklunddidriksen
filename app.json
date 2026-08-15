@@ -24,7 +24,7 @@
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "favicon": "./assets/favicon.png",
+      "favicon": "./assets/icon.png",
       "bundler": "metro",
       "name": "Familiesenter",
       "shortName": "Familiesenter",
@@ -33,7 +33,7 @@
       "startUrl": "/",
       "display": "standalone",
       "backgroundColor": "#f5f5f5",
-      "themeColor": "#4CAF50"
+      "themeColor": "#0097A7"
     },
     "plugins": [
       [
