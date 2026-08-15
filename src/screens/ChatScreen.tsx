@@ -9,6 +9,7 @@ import { useUserStore } from '../store/userStore';
 import { ChatMessage, MessageReaction } from '../types';
 import { MessageBubble } from '../components/MessageBubble';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_MAX_DIMENSION, IMAGE_QUALITY, SCROLL_DELAY_MS } from '../constants/limits';
 import { getErrorMessage } from '../utils/validation';
 import { uriToBlob } from '../utils/upload';
