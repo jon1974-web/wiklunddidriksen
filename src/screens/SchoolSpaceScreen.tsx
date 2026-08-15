@@ -170,22 +170,18 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       let photoUrl = childForm.photoUrl;
       if (photoUrl && !photoUrl.startsWith('http')) {
         const { webUploadFile } = await import('../services/webStorage');
-        const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.5, base64: true });
-        if (!result.canceled && result.assets[0]) {
-          const asset = result.assets[0];
-          let blob: Blob;
-          if (asset.base64) {
-            const byteString = atob(asset.base64);
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-            blob = new Blob([ab], { type: 'image/jpeg' });
-          } else {
-            const response = await fetch(asset.uri);
-            blob = await response.blob();
-          }
-          photoUrl = await webUploadFile(`school-children/${familyId}_${Date.now()}.jpg`, blob);
+        let blob: Blob;
+        if (photoUrl.startsWith('data:')) {
+          const byteString = atob(photoUrl.split(',')[1]);
+          const ab = new ArrayBuffer(byteString.length);
+          const ia = new Uint8Array(ab);
+          for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+          blob = new Blob([ab], { type: 'image/jpeg' });
+        } else {
+          const response = await fetch(photoUrl);
+          blob = await response.blob();
         }
+        photoUrl = await webUploadFile(`school-children/${familyId}_${Date.now()}.jpg`, blob);
       }
       const data = { ...childForm, photoUrl, familyId };
       if (editingChildId) {
