@@ -875,7 +875,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
-        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}
+        {familyName ? <Animated.Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2, transform: [{ translateY: headerTranslate }], opacity: headerOpacity }]}>{familyName}</Animated.Text> : null}
         <Animated.View style={[styles.viewToggle, { transform: [{ translateY: headerTranslate }], opacity: headerOpacity, zIndex: 10 }]}>
           <TouchableOpacity
             style={[styles.toggleButton, viewMode === 'list' && { backgroundColor: colors.accent }]}
