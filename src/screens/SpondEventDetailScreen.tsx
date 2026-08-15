@@ -4,7 +4,7 @@ import { SpondEvent, SpondRespondent } from '../types';
 import { SpondResponseModal } from '../components/SpondResponseModal';
 import { changeSpondResponse } from '../services/spondService';
 import { useTheme } from '../theme/ThemeContext';
-import { formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
+import { formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { getEventRespondents, getModalRespondents, getSpondStampStatus } from './EventsScreen';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 
@@ -19,6 +19,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const { event, spondRespondents, spondConfig, groupLogos = {} } = route.params as SpondEventDetailParams;
   const { colors } = useTheme();
   const [responseModal, setResponseModal] = useState<{ type: 'accept' | 'decline' } | null>(null);
+  const [showFullNote, setShowFullNote] = useState(false);
 
   const dateText = useMemo(() => {
     const startStr = formatSpondDate(event.startTimestamp);
@@ -62,110 +63,157 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
     [event, spondRespondents]
   );
 
+  const d = event.startTimestamp ? new Date(event.startTimestamp) : null;
+  const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
+  const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
+  const dayName = d ? DAY_NAMES[d.getDay()] : '';
+  const dayNum = d ? d.getDate() : '';
+  const monthStr = d ? MONTHS[d.getMonth()] : '';
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
         <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
-      <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <View style={styles.titleRow}>
-          {groupLogo ? (
-            <Image source={{ uri: groupLogo }} style={styles.groupLogo} />
-          ) : (
-            <Text style={styles.groupIcon}>🏟️</Text>
-          )}
-          <Text style={[styles.title, { color: colors.text }]} numberOfLines={3}>{event.heading}</Text>
+      {/* Top card with calendar icon */}
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
+        <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
+          <View style={{ width: 52, borderRadius: 12, overflow: 'hidden', flexShrink: 0, backgroundColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }}>
+            <View style={{ height: 14, backgroundColor: '#E53935', alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ fontSize: 8, fontWeight: '700', color: '#fff' }}>{dayName}</Text>
+            </View>
+            <Text style={{ fontSize: 22, fontWeight: '800', textAlign: 'center', lineHeight: 26, marginTop: 1, color: colors.text }}>{dayNum}</Text>
+            <Text style={{ fontSize: 9, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', color: colors.textSecondary, marginBottom: 2 }}>{monthStr}</Text>
+          </View>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text }} numberOfLines={3}>{event.heading}</Text>
+            <Text style={{ fontSize: 14, fontWeight: '700', color: '#333', marginTop: 2 }}>{timeText}</Text>
+            <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
+              <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: '#FFEBEE' }}>
+                <Text style={{ fontSize: 10, fontWeight: '600', color: '#E53935' }}>Spond</Text>
+              </View>
+            </View>
+          </View>
         </View>
+      </View>
 
-        {event.description && (
-          <Text style={[styles.description, { color: colors.textSecondary }]}>{event.description}</Text>
-        )}
-
-        <View style={[styles.divider, { backgroundColor: colors.border }]} />
-
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📅 Dato</Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>{dateText}</Text>
-        </View>
-
-        <View style={styles.detailRow}>
-          <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>🕐 Tid</Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>{timeText}</Text>
-        </View>
-
-        {event.groupName && (
-          <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👥 Lag</Text>
-            <Text style={[styles.detailValue, { color: colors.text }]}>{event.groupName}</Text>
+      {/* Detail card */}
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
+        <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Detaljer</Text>
+        {event.address && (
+          <View style={styles.viewDetailRow}>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍</Text>
+            <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{event.address}</Text>
           </View>
         )}
-
-        {event.address && (
-          <View style={styles.detailRow}>
-            <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📍 Adresse</Text>
-            <Text style={[styles.detailValue, { color: colors.text }]} numberOfLines={2}>{event.address}</Text>
+        {event.groupName && (
+          <View style={styles.viewDetailRow}>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>👥</Text>
+            <Text style={[styles.viewDetailValue, { color: colors.text }]}>{event.groupName}</Text>
+          </View>
+        )}
+        {event.description && (
+          <View style={{ marginBottom: 12 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+              <Text style={{ fontSize: 14 }}>📝</Text>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935' }}>Notat</Text>
+            </View>
+            <View style={{ paddingLeft: 22 }}>
+              <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
+                {event.description}
+              </Text>
+              {event.description.length > 60 && (
+                <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
+                  <Text style={{ fontSize: 12, color: '#E53935', fontWeight: '600', marginTop: 4 }}>
+                    {showFullNote ? 'Vis mindre' : 'Les mer'}
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
         )}
       </View>
 
+      {/* Map */}
       {event.address && mapUrl && (
-        <TouchableOpacity
-          style={[styles.mapContainer, { backgroundColor: colors.surface }]}
-          onPress={() => Linking.openURL(getGoogleMapsUrl(event.address!))}
-        >
-          <Image source={{ uri: mapUrl }} style={styles.mapImage} />
-          <Text style={[styles.mapLabel, { color: colors.accent }]}>Åpne i Google Maps →</Text>
-        </TouchableOpacity>
-      )}
-
-      {stampStatus && (
-        <View style={[styles.card, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>📋 Status</Text>
-
-          {acceptedNames.length > 0 && (
-            <View style={styles.statusSection}>
-              <Text style={[styles.statusHeader, { color: '#4CAF50' }]}>✓ Akseptert ({acceptedNames.length})</Text>
-              {acceptedNames.map((d, i) => (
-                <Text key={i} style={[styles.statusName, { color: colors.text }]}>{d.name}</Text>
-              ))}
-            </View>
-          )}
-
-          {declinedNames.length > 0 && (
-            <View style={styles.statusSection}>
-              <Text style={[styles.statusHeader, { color: '#E53935' }]}>✕ Avslått ({declinedNames.length})</Text>
-              {declinedNames.map((d, i) => (
-                <Text key={i} style={[styles.statusName, { color: colors.text }]}>{d.name}</Text>
-              ))}
-            </View>
-          )}
-
-          {unansweredNames.length > 0 && (
-            <View style={styles.statusSection}>
-              <Text style={[styles.statusHeader, { color: '#C8A96E' }]}>? Ikke svart ({unansweredNames.length})</Text>
-              {unansweredNames.map((d, i) => (
-                <Text key={i} style={[styles.statusName, { color: colors.text }]}>{d.name}</Text>
-              ))}
-            </View>
-          )}
+        <View style={[styles.card, { padding: 0, overflow: 'hidden', borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
+          <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(event.address!))} style={{ width: '100%', height: 140, backgroundColor: '#FFEBEE', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 6 }}>
+            <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 140, borderRadius: 0 }} resizeMode="cover" />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(event.address!))} style={{ padding: 12, alignItems: 'center' }}>
+            <Text style={{ fontSize: 12, color: '#E53935', fontWeight: '600' }}>Åpne i Google Maps →</Text>
+          </TouchableOpacity>
         </View>
       )}
 
-      {event.groupId && (
-        <View style={styles.actionRow}>
-          <TouchableOpacity
-            style={[styles.acceptButton, { backgroundColor: colors.accent }]}
-            onPress={() => setResponseModal({ type: 'accept' })}
-          >
-            <Text style={styles.acceptButtonText}>✓ Aksepter</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.declineButton, { borderColor: colors.danger }]}
-            onPress={() => setResponseModal({ type: 'decline' })}
-          >
-            <Text style={[styles.declineButtonText, { color: colors.danger }]}>✕ Avslå</Text>
-          </TouchableOpacity>
+      {/* Din status */}
+      {stampStatus && event.groupId && (
+        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Din status</Text>
+          <View style={{ flexDirection: 'row', gap: 12 }}>
+            <TouchableOpacity
+              style={[styles.responseButton, { backgroundColor: colors.accent, flex: 1 }]}
+              onPress={() => setResponseModal({ type: 'accept' })}
+            >
+              <Text style={styles.responseButtonText}>✓ Aksepter</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.responseButton, { borderColor: '#E53935', borderWidth: 2, backgroundColor: 'transparent', flex: 1 }]}
+              onPress={() => setResponseModal({ type: 'decline' })}
+            >
+              <Text style={[styles.responseButtonText, { color: '#E53935' }]}>✕ Avslå</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
+
+      {/* Svar fra alle */}
+      {stampStatus && (
+        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Svar fra alle</Text>
+          <View style={{ flexDirection: 'row', gap: 16, marginBottom: 12 }}>
+            {acceptedNames.length > 0 && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Text style={{ fontSize: 22, fontWeight: '800', color: '#4CAF50' }}>{acceptedNames.length}</Text>
+                <Text style={{ fontSize: 12, color: '#4CAF50', fontWeight: '600' }}>Ja</Text>
+              </View>
+            )}
+            {declinedNames.length > 0 && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Text style={{ fontSize: 22, fontWeight: '800', color: '#E53935' }}>{declinedNames.length}</Text>
+                <Text style={{ fontSize: 12, color: '#E53935', fontWeight: '600' }}>Nei</Text>
+              </View>
+            )}
+            {unansweredNames.length > 0 && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <Text style={{ fontSize: 22, fontWeight: '800', color: '#C8A96E' }}>{unansweredNames.length}</Text>
+                <Text style={{ fontSize: 12, color: '#C8A96E', fontWeight: '600' }}>Vent</Text>
+              </View>
+            )}
+          </View>
+
+          {acceptedNames.length > 0 && (
+            <View style={{ marginBottom: 8 }}>
+              {acceptedNames.map((d, i) => (
+                <Text key={i} style={{ fontSize: 13, color: '#4CAF50', marginLeft: 4, marginBottom: 2 }}>✓ {d.name}</Text>
+              ))}
+            </View>
+          )}
+          {declinedNames.length > 0 && (
+            <View style={{ marginBottom: 8 }}>
+              {declinedNames.map((d, i) => (
+                <Text key={i} style={{ fontSize: 13, color: '#E53935', marginLeft: 4, marginBottom: 2 }}>✕ {d.name}</Text>
+              ))}
+            </View>
+          )}
+          {unansweredNames.length > 0 && (
+            <View>
+              {unansweredNames.map((d, i) => (
+                <Text key={i} style={{ fontSize: 13, color: '#C8A96E', marginLeft: 4, marginBottom: 2 }}>? {d.name}</Text>
+              ))}
+            </View>
+          )}
         </View>
       )}
 
@@ -187,25 +235,9 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   card: { borderRadius: 12, padding: 24, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
-  titleRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12, gap: 12 },
-  groupLogo: { width: 40, height: 40, borderRadius: 8 },
-  groupIcon: { fontSize: 40 },
-  title: { fontSize: 22, fontWeight: 'bold', flex: 1 },
-  description: { fontSize: 16, lineHeight: 22, marginBottom: 16 },
-  divider: { height: 1, marginBottom: 16 },
-  detailRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 },
-  detailLabel: { fontSize: 14, flex: 1 },
-  detailValue: { fontSize: 14, fontWeight: '500', flex: 2, textAlign: 'right' },
-  mapContainer: { borderRadius: 12, overflow: 'hidden', marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
-  mapImage: { width: '100%', height: 200 },
-  mapLabel: { fontSize: 14, fontWeight: '600', textAlign: 'center', padding: 12 },
-  sectionTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 16 },
-  statusSection: { marginBottom: 12 },
-  statusHeader: { fontSize: 14, fontWeight: '600', marginBottom: 4 },
-  statusName: { fontSize: 14, marginLeft: 8, marginBottom: 2 },
-  actionRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
-  acceptButton: { flex: 1, padding: 16, borderRadius: 12, alignItems: 'center' },
-  acceptButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  declineButton: { flex: 1, padding: 16, borderRadius: 12, alignItems: 'center', borderWidth: 2, backgroundColor: 'transparent' },
-  declineButtonText: { fontSize: 16, fontWeight: '600' },
+  viewDetailRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, gap: 8 },
+  viewDetailLabel: { fontSize: 16, width: 24, textAlign: 'center' },
+  viewDetailValue: { fontSize: 14, flex: 1 },
+  responseButton: { padding: 16, borderRadius: 12, alignItems: 'center' },
+  responseButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

@@ -349,10 +349,11 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         {/* Map */}
         {mapUrl && (
           <View style={[styles.detailCard, { padding: 0, overflow: 'hidden', borderLeftWidth: 4, borderLeftColor: '#0097A7' }]}>
-            <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))} style={{ width: '100%', height: 140, backgroundColor: '#E8F5E9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 6 }}>
-              <Text style={{ fontSize: 24 }}>📍</Text>
-              <Text style={{ fontSize: 12, color: '#43A047', fontWeight: '600' }}>Kart — {eventData.address?.split(',')[0]}</Text>
-              <Text style={{ fontSize: 11, color: '#81C784' }}>Trykk for å åpne i Google Maps</Text>
+            <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))} style={{ width: '100%', height: 140 }}>
+              <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 140, borderRadius: 0 }} resizeMode="cover" />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))} style={{ padding: 12, alignItems: 'center' }}>
+              <Text style={{ fontSize: 12, color: '#0097A7', fontWeight: '600' }}>Åpne i Google Maps →</Text>
             </TouchableOpacity>
           </View>
         )}
