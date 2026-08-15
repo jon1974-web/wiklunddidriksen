@@ -13,6 +13,7 @@ import { getReminderOptions, getEndDateOptions, getEndTimeOptions } from '../con
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { EVENT_ICONS } from '../constants/eventIcons';
+import { AppIcon } from '../components/AppIcon';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { formatDate, formatTime } from '../utils/dateUtils';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
