@@ -21,8 +21,8 @@
 | Gap | Severity | ISO 27001 | GDPR |
 |-----|----------|-----------|------|
 | Spond password key rotation needed | HIGH | A.9.2.4 | — |
-| No MFA/2FA | HIGH | A.9.4.2 | Art. 32 |
-| No backup/recovery | HIGH | A.12.3.1 | Art. 5(1)(e) |
+| ~~No MFA/2FA~~ | ~~HIGH~~ | ~~A.9.4.2~~ | ~~Art. 32~~ |
+| ~~No backup/recovery~~ | ~~HIGH~~ | ~~A.12.3.1~~ | ~~Art. 5(1)(e)~~ |
 | No GDPR features (export, deletion) | HIGH | — | Art. 15, 17, 20 |
 | No health data encryption | MEDIUM | A.9.4.1 | Art. 9 |
 | No DPIA for health data | MEDIUM | — | Art. 35 |
@@ -64,7 +64,9 @@
 | Art. 32 - Security of processing | PARTIAL |
 | Art. 35 - DPIA | NOT MET |
 
-## ISO 27001 Readiness: ~55%
+## ISO 27001 Readiness: ~70%
 - Strong on authentication, data isolation, and rate limiting
 - Good progress on encryption and audit logging
-- Still need MFA, backups, and health data encryption
+- ✅ MFA with phone number and Google sign-in enabled
+- ✅ Scheduled backups configured in GCP
+- ❌ Health/children data encryption at rest — not yet implemented
