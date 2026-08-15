@@ -90,8 +90,9 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
             <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text }} numberOfLines={3}>{event.heading}</Text>
             <Text style={{ fontSize: 14, fontWeight: '700', color: '#333', marginTop: 2 }}>{timeText}</Text>
             <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
-              <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: '#FFEBEE' }}>
-                <Text style={{ fontSize: 10, fontWeight: '600', color: '#E53935' }}>Spond</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 8, paddingVertical: 3, borderRadius: 10, backgroundColor: '#E53935' }}>
+                <Text style={{ fontSize: 11 }}>⚽</Text>
+                <Text style={{ fontSize: 11, fontWeight: '600', color: '#fff' }}>Spond</Text>
               </View>
             </View>
           </View>
@@ -108,22 +109,19 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
           </View>
         )}
         {event.groupName && (
-          <View style={styles.groupRow}>
+          <View style={styles.viewDetailRow}>
             {groupLogo ? (
               <Image source={{ uri: groupLogo }} style={styles.groupLogo} />
             ) : (
-              <Text style={{ fontSize: 14 }}>👥</Text>
+              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>👥</Text>
             )}
-            <Text style={[styles.groupName, { color: colors.textSecondary }]} numberOfLines={1}>{event.groupName}</Text>
+            <Text style={[styles.viewDetailValue, { color: colors.textSecondary }]} numberOfLines={1}>{event.groupName}</Text>
           </View>
         )}
         {event.description && (
-          <View style={{ marginBottom: 12 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-              <Text style={{ fontSize: 14 }}>📝</Text>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935' }}>Notat</Text>
-            </View>
-            <View style={{ paddingLeft: 22 }}>
+          <View style={styles.viewDetailRow}>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📝</Text>
+            <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
                 {event.description}
               </Text>
@@ -142,7 +140,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       {/* Map */}
       {event.address && mapUrl && (
         <View style={[styles.card, { padding: 0, overflow: 'hidden', borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
-          <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(event.address!))} style={{ width: '100%', height: 140, backgroundColor: '#FFEBEE', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 6 }}>
+          <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(event.address!))} style={{ width: '100%', height: 140 }}>
             <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 140, borderRadius: 0 }} resizeMode="cover" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(event.address!))} style={{ padding: 12, alignItems: 'center' }}>
@@ -155,18 +153,18 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       {stampStatus && event.groupId && (
         <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Din status</Text>
-          <View style={{ flexDirection: 'row', gap: 12 }}>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity
-              style={[styles.responseButton, { backgroundColor: colors.accent, flex: 1 }]}
+              style={[styles.responseButton, { backgroundColor: '#43A047', flex: 1 }]}
               onPress={() => setResponseModal({ type: 'accept' })}
             >
               <Text style={styles.responseButtonText}>✓ Aksepter</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.responseButton, { borderColor: '#E53935', borderWidth: 2, backgroundColor: 'transparent', flex: 1 }]}
+              style={[styles.responseButton, { backgroundColor: '#E53935', flex: 1 }]}
               onPress={() => setResponseModal({ type: 'decline' })}
             >
-              <Text style={[styles.responseButtonText, { color: '#E53935' }]}>✕ Avslå</Text>
+              <Text style={styles.responseButtonText}>✕ Avslå</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -175,49 +173,24 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       {/* Svar fra alle */}
       {stampStatus && (
         <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Svar fra alle</Text>
-          <View style={{ flexDirection: 'row', gap: 16, marginBottom: 12 }}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Svar fra alle {event.groupName ? `— ${event.groupName}` : ''}</Text>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
             {acceptedNames.length > 0 && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Text style={{ fontSize: 22, fontWeight: '800', color: '#4CAF50' }}>{acceptedNames.length}</Text>
-                <Text style={{ fontSize: 12, color: '#4CAF50', fontWeight: '600' }}>Ja</Text>
+              <View style={{ flex: 1, backgroundColor: '#43A047', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{acceptedNames.length} Ja</Text>
               </View>
             )}
             {declinedNames.length > 0 && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Text style={{ fontSize: 22, fontWeight: '800', color: '#E53935' }}>{declinedNames.length}</Text>
-                <Text style={{ fontSize: 12, color: '#E53935', fontWeight: '600' }}>Nei</Text>
+              <View style={{ flex: 1, backgroundColor: '#E53935', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{declinedNames.length} Nei</Text>
               </View>
             )}
             {unansweredNames.length > 0 && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
-                <Text style={{ fontSize: 22, fontWeight: '800', color: '#C8A96E' }}>{unansweredNames.length}</Text>
-                <Text style={{ fontSize: 12, color: '#C8A96E', fontWeight: '600' }}>Vent</Text>
+              <View style={{ flex: 1, backgroundColor: '#f0f0f0', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>{unansweredNames.length} Vent</Text>
               </View>
             )}
           </View>
-
-          {acceptedNames.length > 0 && (
-            <View style={{ marginBottom: 8 }}>
-              {acceptedNames.map((d, i) => (
-                <Text key={i} style={{ fontSize: 13, color: '#4CAF50', marginLeft: 4, marginBottom: 2 }}>✓ {d.name}</Text>
-              ))}
-            </View>
-          )}
-          {declinedNames.length > 0 && (
-            <View style={{ marginBottom: 8 }}>
-              {declinedNames.map((d, i) => (
-                <Text key={i} style={{ fontSize: 13, color: '#E53935', marginLeft: 4, marginBottom: 2 }}>✕ {d.name}</Text>
-              ))}
-            </View>
-          )}
-          {unansweredNames.length > 0 && (
-            <View>
-              {unansweredNames.map((d, i) => (
-                <Text key={i} style={{ fontSize: 13, color: '#C8A96E', marginLeft: 4, marginBottom: 2 }}>? {d.name}</Text>
-              ))}
-            </View>
-          )}
         </View>
       )}
 
@@ -239,12 +212,10 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   card: { borderRadius: 12, padding: 24, marginBottom: 16, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 3 },
-  viewDetailRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, gap: 8 },
-  viewDetailLabel: { fontSize: 16, width: 24, textAlign: 'center' },
+  viewDetailRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
+  viewDetailLabel: { fontSize: 12, color: '#888', width: 24, textAlign: 'center' },
   viewDetailValue: { fontSize: 14, flex: 1 },
-  groupRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
   groupLogo: { width: 18, height: 18, borderRadius: 9 },
-  groupName: { fontSize: 14 },
-  responseButton: { padding: 16, borderRadius: 12, alignItems: 'center' },
-  responseButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  responseButton: { padding: 10, borderRadius: 10, alignItems: 'center' },
+  responseButtonText: { color: '#fff', fontSize: 13, fontWeight: '600' },
 });
