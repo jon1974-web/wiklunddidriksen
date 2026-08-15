@@ -438,6 +438,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 8,
     maxHeight: 100,
+    paddingHorizontal: 0,
+    margin: 0,
   },
   sendBtn: {
     width: 28,
