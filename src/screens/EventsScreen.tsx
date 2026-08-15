@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication } from '../types';
 import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
@@ -15,7 +15,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { getTrips, getTripTransport, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
-import { getSpondConfig, getSpondEvents, changeSpondResponse, clearSpondToken } from '../services/spondService';
+import { getSpondConfig, getSpondEvents, getSpondMembers, changeSpondResponse, clearSpondToken } from '../services/spondService';
 import { getHealthAppointments, getHealthMedications, getHealthVaccinations } from '../services/healthService';
 import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications } from '../services/petService';
 import { getUserProfile } from '../services/familyService';
@@ -140,6 +140,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [petMedications, setPetMedications] = useState<PetMedication[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
+  const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [filterSource, setFilterSource] = useState<string | null>(null);
@@ -302,6 +303,17 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         if (config.respondents && config.respondents.length > 0) {
           setSpondRespondents(config.respondents);
         }
+
+        const allMembers: SpondGroupMember[] = [];
+        for (const group of config.groups) {
+          try {
+            const members = await getSpondMembers(config.email, config.password, group.id);
+            members.forEach((m) => allMembers.push({ ...m, groupId: group.id, groupName: group.name }));
+          } catch {
+            // Continue
+          }
+        }
+        setSpondAllMembers(allMembers);
       }
     } catch (e) {
       console.error('Spond load error:', e);
@@ -727,6 +739,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
             spondRespondents,
             spondConfig,
             groupLogos: spondGroupLogos,
+            spondAllMembers,
           })}
         >
           <View style={styles.spondCardRow}>

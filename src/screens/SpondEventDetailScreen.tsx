@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native';
-import { SpondEvent, SpondRespondent } from '../types';
+import { SpondEvent, SpondRespondent, SpondGroupMember } from '../types';
 import { SpondResponseModal } from '../components/SpondResponseModal';
 import { changeSpondResponse } from '../services/spondService';
 import { useTheme } from '../theme/ThemeContext';
@@ -13,13 +13,15 @@ interface SpondEventDetailParams {
   spondRespondents: SpondRespondent[];
   spondConfig: { email: string; password: string } | null;
   groupLogos?: Record<string, string>;
+  spondAllMembers?: SpondGroupMember[];
 }
 
 export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
-  const { event, spondRespondents, spondConfig, groupLogos = {} } = route.params as SpondEventDetailParams;
+  const { event, spondRespondents, spondConfig, groupLogos = {}, spondAllMembers = [] } = route.params as SpondEventDetailParams;
   const { colors } = useTheme();
   const [responseModal, setResponseModal] = useState<{ type: 'accept' | 'decline' } | null>(null);
   const [showFullNote, setShowFullNote] = useState(false);
+  const [expandedResponse, setExpandedResponse] = useState<'accepted' | 'declined' | 'unanswered' | null>(null);
 
   const dateText = useMemo(() => {
     const startStr = formatSpondDate(event.startTimestamp);
@@ -56,6 +58,17 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const acceptedNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'accepted') || [], [stampStatus]);
   const declinedNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'declined') || [], [stampStatus]);
   const unansweredNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'unanswered') || [], [stampStatus]);
+
+  const resolveNames = useCallback((ids: string[]) => {
+    return ids.map((id) => {
+      const member = spondAllMembers.find((m) => m.id === id || m.profileId === id || m.childId === id);
+      return member ? `${member.firstName} ${member.lastName}` : id;
+    });
+  }, [spondAllMembers]);
+
+  const acceptedAllNames = useMemo(() => resolveNames(event.responses?.acceptedIds || []), [resolveNames, event.responses]);
+  const declinedAllNames = useMemo(() => resolveNames(event.responses?.declinedIds || []), [resolveNames, event.responses]);
+  const unansweredAllNames = useMemo(() => resolveNames(event.responses?.unansweredIds || []), [resolveNames, event.responses]);
 
   const modalMembers = useMemo(() =>
     getModalRespondents(event, spondRespondents)
@@ -181,16 +194,46 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
         <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Svar fra alle {event.groupName ? `— ${event.groupName}` : ''}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
-            <View style={{ flex: 1, backgroundColor: '#43A047', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+            <TouchableOpacity
+              style={{ flex: 1, backgroundColor: '#43A047', borderRadius: 10, padding: 10, alignItems: 'center' }}
+              onPress={() => setExpandedResponse(expandedResponse === 'accepted' ? null : 'accepted')}
+            >
               <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{event.responses?.acceptedIds?.length || 0} Ja</Text>
-            </View>
-            <View style={{ flex: 1, backgroundColor: '#E53935', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ flex: 1, backgroundColor: '#E53935', borderRadius: 10, padding: 10, alignItems: 'center' }}
+              onPress={() => setExpandedResponse(expandedResponse === 'declined' ? null : 'declined')}
+            >
               <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{event.responses?.declinedIds?.length || 0} Nei</Text>
-            </View>
-            <View style={{ flex: 1, backgroundColor: '#f0f0f0', borderRadius: 10, padding: 10, alignItems: 'center' }}>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{ flex: 1, backgroundColor: '#f0f0f0', borderRadius: 10, padding: 10, alignItems: 'center' }}
+              onPress={() => setExpandedResponse(expandedResponse === 'unanswered' ? null : 'unanswered')}
+            >
               <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>{event.responses?.unansweredIds?.length || 0} Vent</Text>
-            </View>
+            </TouchableOpacity>
           </View>
+          {expandedResponse === 'accepted' && acceptedAllNames.length > 0 && (
+            <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#f0f0f0' }}>
+              {acceptedAllNames.map((name, i) => (
+                <Text key={i} style={{ fontSize: 13, color: '#43A047', paddingVertical: 2 }}>✓ {name}</Text>
+              ))}
+            </View>
+          )}
+          {expandedResponse === 'declined' && declinedAllNames.length > 0 && (
+            <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#f0f0f0' }}>
+              {declinedAllNames.map((name, i) => (
+                <Text key={i} style={{ fontSize: 13, color: '#E53935', paddingVertical: 2 }}>✕ {name}</Text>
+              ))}
+            </View>
+          )}
+          {expandedResponse === 'unanswered' && unansweredAllNames.length > 0 && (
+            <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: '#f0f0f0' }}>
+              {unansweredAllNames.map((name, i) => (
+                <Text key={i} style={{ fontSize: 13, color: '#C8A96E', paddingVertical: 2 }}>? {name}</Text>
+              ))}
+            </View>
+          )}
         </View>
       )}
 
