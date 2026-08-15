@@ -27,7 +27,7 @@ function getStoredMode(): ThemeMode {
       return stored as ThemeMode;
     }
   } catch {}
-  return 'system';
+  return 'teal';
 }
 
 function storeMode(mode: ThemeMode) {
