@@ -313,7 +313,7 @@ export const ChatScreen: React.FC = () => {
         >
           <AppIcon name="camera" size={20} color="#fff" />
         </TouchableOpacity>
-        <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground }, inputFocused && styles.inputWrapperFocused]}>
+        <View style={[styles.inputWrapper, inputFocused && styles.inputWrapperFocused]}>
           <TextInput
             style={[styles.input, { color: colors.text, outlineStyle: 'none' }]}
             value={newMessage}
@@ -414,11 +414,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 4,
     maxWidth: 160,
+    backgroundColor: '#fff',
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   inputWrapperFocused: {
     flex: 1,
     maxWidth: '100%',
-    backgroundColor: '#fff',
   },
   input: {
     flex: 1,
