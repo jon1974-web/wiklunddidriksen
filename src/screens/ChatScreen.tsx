@@ -433,6 +433,7 @@ const styles = StyleSheet.create({
     padding: 0,
     maxHeight: 100,
     lineHeight: 20,
+    textAlign: 'center',
   },
   sendBtn: {
     width: 28,
