@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Svg, { Rect, Line, Path, Circle, Polyline } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { useChatStore } from '../store/chatStore';
 
 interface TabBarProps {
   state: any;
@@ -65,6 +66,7 @@ const TAB_KEYS: Record<string, string> = {
 export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descriptors, navigation, onCreatePress }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
+  const chatInputFocused = useChatStore((s) => s.inputFocused);
 
   return (
     <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.accent }]}>
@@ -94,7 +96,12 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
         );
       })}
 
-      <TouchableOpacity style={[styles.centerBtn, { backgroundColor: colors.accent }]} onPress={onCreatePress} activeOpacity={0.8}>
+      <TouchableOpacity
+        style={[styles.centerBtn, { backgroundColor: colors.accent }, chatInputFocused && styles.centerBtnHidden]}
+        onPress={onCreatePress}
+        activeOpacity={0.8}
+        disabled={chatInputFocused}
+      >
         <Text style={styles.plus}>+</Text>
       </TouchableOpacity>
     </View>
@@ -152,6 +159,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 6,
+    opacity: 1,
+    transform: [{ scale: 1 }],
+  },
+  centerBtnHidden: {
+    opacity: 0,
+    transform: [{ scale: 0.5 }],
+    pointerEvents: 'none' as const,
   },
   plus: {
     color: '#fff',

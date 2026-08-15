@@ -15,6 +15,7 @@ import { getErrorMessage } from '../utils/validation';
 import { uriToBlob } from '../utils/upload';
 import { getUserProfile } from '../services/familyService';
 import { AppIcon } from '../components/AppIcon';
+import { useChatStore } from '../store/chatStore';
 
 export const ChatScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -29,6 +30,8 @@ export const ChatScreen: React.FC = () => {
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
+  const setInputFocused = useChatStore((state) => state.setInputFocused);
+  const inputFocused = useChatStore((state) => state.inputFocused);
 
   useEffect(() => {
     if (!familyId) return;
@@ -162,6 +165,7 @@ export const ChatScreen: React.FC = () => {
       setNewMessage('');
       setSelectedImage(null);
       setSelectedImageBase64(null);
+      setInputFocused(false);
       setTimeout(() => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, SCROLL_DELAY_MS);
@@ -309,25 +313,29 @@ export const ChatScreen: React.FC = () => {
         >
           <AppIcon name="camera" size={20} color="#fff" />
         </TouchableOpacity>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-          value={newMessage}
-          onChangeText={setNewMessage}
-          placeholder={t('chat.sendMessage')}
-          placeholderTextColor={colors.textDisabled}
-          maxLength={500}
-        />
-        <TouchableOpacity
-          style={[styles.sendButton, { backgroundColor: colors.accent }, !canSend && { backgroundColor: colors.textDisabled }]}
-          onPress={handleSend}
-          disabled={!canSend || uploading}
-        >
-          {uploading ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <AppIcon name="send" size={20} color={canSend ? '#fff' : colors.textDisabled} />
-          )}
-        </TouchableOpacity>
+        <View style={[styles.inputWrapper, { backgroundColor: colors.inputBackground }, inputFocused && styles.inputWrapperFocused]}>
+          <TextInput
+            style={[styles.input, { color: colors.text }]}
+            value={newMessage}
+            onChangeText={setNewMessage}
+            placeholder={t('chat.sendMessage')}
+            placeholderTextColor={colors.textDisabled}
+            maxLength={500}
+            onFocus={() => setInputFocused(true)}
+            onBlur={() => { if (!newMessage.trim()) setInputFocused(false); }}
+          />
+          <TouchableOpacity
+            style={[styles.sendBtn, (!canSend || uploading) && styles.sendBtnHidden]}
+            onPress={handleSend}
+            disabled={!canSend || uploading}
+          >
+            {uploading ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <AppIcon name="send" size={16} color="#fff" />
+            )}
+          </TouchableOpacity>
+        </View>
       </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -399,25 +407,37 @@ const styles = StyleSheet.create({
   iconText: {
     fontSize: 18,
   },
+  inputWrapper: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 4,
+  },
+  inputWrapperFocused: {
+    backgroundColor: '#fff',
+    boxShadow: '0 0 0 2px #0097A7',
+  },
   input: {
     flex: 1,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
     fontSize: 16,
-    maxHeight: 36,
+    paddingVertical: 4,
   },
-  sendButton: {
-    height: 36,
-    paddingHorizontal: 16,
-    borderRadius: 18,
+  sendBtn: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: '#0097A7',
     justifyContent: 'center',
     alignItems: 'center',
+    marginLeft: 6,
   },
-  sendButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  sendBtnHidden: {
+    opacity: 0,
+    width: 0,
+    margin: 0,
+    overflow: 'hidden',
   },
   dateSeparator: {
     alignItems: 'center',
