@@ -956,7 +956,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <View style={[styles.card, { backgroundColor: colors.surface, margin: 8 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
             <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>🤖 {t('mealPlanner.aiSuggest')}</Text>
-            <TouchableOpacity onPress={() => { setShowAiResults(false); setAiResults([]); setAiLoading(false); }} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.inputBackground, alignItems: 'center', justifyContent: 'center' }}>
+            <TouchableOpacity onPress={() => { setShowAiResults(false); setAiResults([]); setAiLoading(false); }} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={{ color: colors.textSecondary, fontSize: 16, fontWeight: '700' }}>✕</Text>
             </TouchableOpacity>
           </View>
