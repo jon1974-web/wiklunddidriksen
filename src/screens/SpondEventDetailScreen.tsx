@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { SpondEvent, SpondRespondent, SpondGroupMember } from '../types';
 import { SpondResponseModal } from '../components/SpondResponseModal';
-import { changeSpondResponse } from '../services/spondService';
+import { changeSpondResponse, getSpondMembers } from '../services/spondService';
 import { useTheme } from '../theme/ThemeContext';
 import { formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { getEventRespondents, getModalRespondents, getSpondStampStatus } from './EventsScreen';
@@ -22,6 +22,21 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const [responseModal, setResponseModal] = useState<{ type: 'accept' | 'decline' } | null>(null);
   const [showFullNote, setShowFullNote] = useState(false);
   const [expandedResponse, setExpandedResponse] = useState<'accepted' | 'declined' | 'unanswered' | null>(null);
+  const [localMembers, setLocalMembers] = useState<SpondGroupMember[]>([]);
+
+  useEffect(() => {
+    if (spondAllMembers.length > 0 || !event.groupId || !spondConfig) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const members = await getSpondMembers(spondConfig.email, spondConfig.password, event.groupId);
+        if (!cancelled) {
+          setLocalMembers(members.map((m) => ({ ...m, groupId: event.groupId!, groupName: event.groupName || '' })));
+        }
+      } catch {}
+    })();
+    return () => { cancelled = true; };
+  }, [spondAllMembers, event.groupId, event.groupName, spondConfig]);
 
   const dateText = useMemo(() => {
     const startStr = formatSpondDate(event.startTimestamp);
@@ -59,12 +74,21 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const declinedNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'declined') || [], [stampStatus]);
   const unansweredNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'unanswered') || [], [stampStatus]);
 
+  const allMembers = useMemo(() => {
+    if (spondAllMembers.length > 0) return spondAllMembers;
+    return localMembers;
+  }, [spondAllMembers, localMembers]);
+
   const resolveNames = useCallback((ids: string[]) => {
     return ids.map((id) => {
-      const member = spondAllMembers.find((m) => m.id === id || m.profileId === id || m.childId === id);
-      return member ? `${member.firstName} ${member.lastName}` : id;
+      const idStr = String(id);
+      const member = allMembers.find((m) => String(m.id) === idStr || String(m.profileId) === idStr || String(m.childId) === idStr);
+      if (member) return `${member.firstName} ${member.lastName}`;
+      const respondent = spondRespondents.find((r) => String(r.spondId) === idStr || String(r.profileId) === idStr || String(r.childId) === idStr);
+      if (respondent) return `${respondent.firstName} ${respondent.lastName}`;
+      return id;
     });
-  }, [spondAllMembers]);
+  }, [allMembers, spondRespondents]);
 
   const acceptedAllNames = useMemo(() => resolveNames(event.responses?.acceptedIds || []), [resolveNames, event.responses]);
   const declinedAllNames = useMemo(() => resolveNames(event.responses?.declinedIds || []), [resolveNames, event.responses]);
