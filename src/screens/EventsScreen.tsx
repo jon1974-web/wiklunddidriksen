@@ -865,7 +865,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <Animated.View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, opacity: headerAnim, transform: [{ translateY: headerAnim.interpolate({ inputRange: [0, 1], outputRange: [-100, 0] }) }] }]}>
+      <Animated.View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, opacity: headerAnim, transform: [{ translateY: headerAnim.interpolate({ inputRange: [0, 1], outputRange: [-100, 0] }) }], overflow: 'hidden', maxHeight: headerAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 200] }) }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <AppIcon name="calendar" size={28} color={colors.accent} />
