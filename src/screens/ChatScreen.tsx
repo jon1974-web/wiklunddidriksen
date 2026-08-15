@@ -408,14 +408,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   inputWrapper: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 4,
+    maxWidth: 120,
   },
   inputWrapperFocused: {
+    flex: 1,
+    maxWidth: '100%',
     backgroundColor: '#fff',
     boxShadow: '0 0 0 2px #0097A7',
   },
