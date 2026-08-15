@@ -290,12 +290,12 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         {/* Top card with calendar icon */}
         <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#0097A7', marginBottom: 10 }]}>
           <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
-            <View style={{ width: 52, borderRadius: 12, overflow: 'hidden', flexShrink: 0, backgroundColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }}>
-              <View style={{ height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: '700', color: '#fff', backgroundColor: '#0097A7' }}>
-                <Text style={{ fontSize: 8, fontWeight: '700', color: '#fff' }}>{dayName}</Text>
+            <View style={{ width: 64, borderRadius: 12, overflow: 'hidden', flexShrink: 0, backgroundColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }}>
+              <View style={{ height: 16, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 9, fontWeight: '700', color: '#fff' }}>{dayName}</Text>
               </View>
-              <Text style={{ fontSize: 22, fontWeight: '800', textAlign: 'center', lineHeight: 26, marginTop: 1, color: colors.text }}>{dayNum}</Text>
-              <Text style={{ fontSize: 9, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', color: colors.textSecondary, marginBottom: 2 }}>{monthStr}</Text>
+              <Text style={{ fontSize: 26, fontWeight: '800', textAlign: 'center', lineHeight: 30, marginTop: 2, color: colors.text }}>{dayNum}</Text>
+              <Text style={{ fontSize: 10, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', color: colors.textSecondary, marginBottom: 4 }}>{monthStr}</Text>
             </View>
             <View style={{ flex: 1 }}>
               <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text }}>{eventData.title}</Text>
