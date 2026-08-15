@@ -414,7 +414,7 @@ const styles = StyleSheet.create({
   },
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     borderRadius: 20,
     paddingHorizontal: 14,
     maxWidth: 200,
@@ -427,15 +427,17 @@ const styles = StyleSheet.create({
     flex: 1,
     maxWidth: '100%',
     height: 'auto',
+    minHeight: 36,
     maxHeight: 120,
     overflow: 'visible',
   },
   input: {
     flex: 1,
     fontSize: 16,
+    lineHeight: 20,
+    paddingTop: 8,
+    paddingBottom: 8,
     maxHeight: 100,
-    margin: 0,
-    borderWidth: 0,
   },
   sendBtn: {
     width: 28,
