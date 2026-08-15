@@ -33,7 +33,18 @@
       "startUrl": "/",
       "display": "standalone",
       "backgroundColor": "#f5f5f5",
-      "themeColor": "#0097A7"
+      "themeColor": "#0097A7",
+      "manifest": "./public/manifest.json",
+      "headTags": {
+        "meta": [
+          { "name": "apple-mobile-web-app-capable", "content": "yes" },
+          { "name": "apple-mobile-web-app-status-bar-style", "content": "default" },
+          { "name": "apple-mobile-web-app-title", "content": "Familiesenter" }
+        ],
+        "link": [
+          { "rel": "manifest", "href": "/manifest.json" }
+        ]
+      }
     },
     "plugins": [
       [
