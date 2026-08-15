@@ -956,14 +956,20 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <View style={[styles.card, { backgroundColor: colors.surface, margin: 8 }]}>
           <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
             <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>🤖 {t('mealPlanner.aiSuggest')}</Text>
-            <TouchableOpacity onPress={() => { setShowAiResults(false); setAiResults([]); setAiLoading(false); }}>
-              <Text style={{ color: colors.textSecondary, fontSize: 18, fontWeight: '600' }}>✕</Text>
+            <TouchableOpacity onPress={() => { setShowAiResults(false); setAiResults([]); setAiLoading(false); }} style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.inputBackground, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: colors.textSecondary, fontSize: 16, fontWeight: '700' }}>✕</Text>
             </TouchableOpacity>
           </View>
           {aiLoading ? (
-            <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('common.loading')}</Text>
+            <View style={{ alignItems: 'center', paddingVertical: 20 }}>
+              <ActivityIndicator size="large" color={colors.accent} />
+              <Text style={[styles.emptyText, { color: colors.textDisabled, marginTop: 8 }]}>{t('common.loading')}</Text>
+            </View>
           ) : aiResults.length === 0 ? (
-            <Text style={[styles.emptyText, { color: colors.textDisabled }]}>{t('mealPlanner.noSuggestions')}</Text>
+            <View style={{ alignItems: 'center', paddingVertical: 16 }}>
+              <Text style={{ fontSize: 28, marginBottom: 8 }}>🍽️</Text>
+              <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center' }}>{t('mealPlanner.noSuggestions')}</Text>
+            </View>
           ) : (
             aiResults.map((recipe, i) => (
               <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
@@ -1611,7 +1617,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     />
                     <ScrollView style={{ maxHeight: 300 }}>
                       {recipes.filter(r => !pickerSearch || r.name.toLowerCase().includes(pickerSearch.toLowerCase())).length === 0 ? (
-                        <Text style={[styles.emptyText, { color: colors.textDisabled, textAlign: 'center', padding: 20 }]}>{pickerSearch ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
+                        <View style={{ alignItems: 'center', paddingVertical: 16 }}>
+                          <Text style={{ fontSize: 28, marginBottom: 8 }}>🍽️</Text>
+                          <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center' }}>{pickerSearch ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
+                        </View>
                       ) : (
                         recipes.filter(r => !pickerSearch || r.name.toLowerCase().includes(pickerSearch.toLowerCase())).map(recipe => (
                           <TouchableOpacity
