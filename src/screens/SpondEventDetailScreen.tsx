@@ -108,9 +108,13 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
           </View>
         )}
         {event.groupName && (
-          <View style={styles.viewDetailRow}>
-            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>👥</Text>
-            <Text style={[styles.viewDetailValue, { color: colors.text }]}>{event.groupName}</Text>
+          <View style={styles.groupRow}>
+            {groupLogo ? (
+              <Image source={{ uri: groupLogo }} style={styles.groupLogo} />
+            ) : (
+              <Text style={{ fontSize: 14 }}>👥</Text>
+            )}
+            <Text style={[styles.groupName, { color: colors.textSecondary }]} numberOfLines={1}>{event.groupName}</Text>
           </View>
         )}
         {event.description && (
@@ -238,6 +242,9 @@ const styles = StyleSheet.create({
   viewDetailRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, gap: 8 },
   viewDetailLabel: { fontSize: 16, width: 24, textAlign: 'center' },
   viewDetailValue: { fontSize: 14, flex: 1 },
+  groupRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+  groupLogo: { width: 18, height: 18, borderRadius: 9 },
+  groupName: { fontSize: 14 },
   responseButton: { padding: 16, borderRadius: 12, alignItems: 'center' },
   responseButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });
