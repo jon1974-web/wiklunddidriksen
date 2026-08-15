@@ -6,7 +6,7 @@
 <h2 align="center">Vilkår for bruk / Terms of Service</h2>
 
 <p align="center">
-  <em>Sist oppdatert / Last updated: August 12, 2026</em>
+  <em>Sist oppdatert / Last updated: August 15, 2026</em>
 </p>
 
 ---
@@ -47,7 +47,7 @@ Familiesenter is a family coordination application that helps families organize 
 - **Event Coordination**: Share family events, appointments, and schedules with reminders.
 - **Health Tracking**: Track medications, vaccinations, allergies, and growth for family members.
 - **Pet Management**: Manage pet profiles, vet visits, medications, vaccinations, and grooming.
-- **School Information**: Organize school contacts, schedules, and academic information.
+- **School and Kindergarten Information**: Organize school/kindergarten contacts, schedules, and academic information.
 - **Travel Planning**: Plan trips with accommodation, transport, activities, and packing lists.
 - **Meal Planning**: Create recipes, meal plans, and shopping lists.
 - **Family Chat**: Communicate with family members through in-app messaging.
@@ -174,6 +174,7 @@ Familiesenter relies on the following third-party services:
 - **Google Firebase**: Authentication, database, storage, and cloud functions.
 - **OpenAI**: AI features (voice transcription, text generation, image analysis).
 - **Spond** (optional): Sports team event synchronization.
+- **Google Calendar** (optional): Automatic calendar synchronization via OAuth.
 - **Google Maps**: Location services and address autocomplete.
 - **Open-Meteo**: Weather forecasts and historical weather data.
 - **Frankfurter API**: Currency exchange rates.
@@ -193,6 +194,15 @@ If you choose to enable Spond integration:
 - Your Spond credentials are encrypted before storage.
 - We only access data necessary for the integration (groups, events, responses).
 - You can disconnect the integration at any time.
+
+### 7.5 Google Calendar Integration (Optional)
+
+If you choose to enable Google Calendar integration:
+- You authorize Familiesenter to access your Google Calendar on your behalf via OAuth 2.0.
+- OAuth access and refresh tokens are stored securely in Firestore.
+- We create, update, and delete calendar events for: app events, health appointments, pet vet visits, and trips.
+- You can disconnect the integration at any time, which revokes the tokens.
+- Spond events are NOT synced (handled by Spond's own calendar integration).
 
 ---
 

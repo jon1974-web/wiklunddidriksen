@@ -6,7 +6,7 @@
 <h2 align="center">Personvernpolicy / Privacy Policy</h2>
 
 <p align="center">
-  <em>Sist oppdatert / Last updated: August 12, 2026</em>
+  <em>Sist oppdatert / Last updated: August 15, 2026</em>
 </p>
 
 ---
@@ -75,6 +75,7 @@ When you create an account, we collect:
 | Reminder settings | Notification scheduling |
 | Calendar integration settings | External calendar sync |
 | Voice recordings (for event creation) | Transcription via AI services |
+| Google Calendar OAuth tokens (if enabled) | Automatic calendar synchronization |
 
 ### 3.4 Health Information (Health Space)
 
@@ -98,15 +99,16 @@ When you create an account, we collect:
 | Pet grooming schedules | Grooming management |
 | Pet insurance details | Insurance management |
 
-### 3.6 School Information
+### 3.6 School and Kindergarten Information
 
 | Data Field | Purpose |
 |------------|---------|
-| Child profiles (name, school, contact info) | School coordination |
-| School years and grades | Academic tracking |
-| Teacher and classmate contacts | Communication |
+| Child profiles (name, school/kindergarten, contact info) | School/kindergarten coordination |
+| Child photos | Visual identification |
+| School years, grades, and groups | Academic tracking |
+| Teacher and staff contacts | Communication |
 | Parent contact information | Parent communication |
-| School schedules (images) | Schedule reference |
+| School/kindergarten schedules (images) | Schedule reference |
 
 ### 3.7 Travel Information (Trips)
 
@@ -206,7 +208,15 @@ We use the following third-party services to provide Familiesenter:
 - **Purpose**: Sports team event synchronization
 - **Privacy policy**: [https://spond.com/privacy](https://spond.com/privacy)
 
-### 5.4 Google Maps / Google Places
+### 5.4 Google Calendar (Optional)
+
+- **Services used**: Google Calendar API (via OAuth 2.0)
+- **Data sent**: OAuth access and refresh tokens, calendar event data
+- **Purpose**: Automatic synchronization of events, health appointments, and trips to Google Calendar
+- **Data stored**: OAuth tokens stored encrypted in Firestore, can be revoked via disconnect
+- **Privacy policy**: [https://policies.google.com/privacy](https://policies.google.com/privacy)
+
+### 5.5 Google Maps / Google Places
 
 - **Services used**: Static Maps API, Places Autocomplete API
 - **Data sent**: Address strings for geocoding and map display
