@@ -114,11 +114,13 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
         )}
         {event.groupName && (
           <View style={styles.viewDetailRow}>
-            {groupLogo ? (
-              <Image source={{ uri: groupLogo }} style={styles.groupLogo} />
-            ) : (
-              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>👥</Text>
-            )}
+            <View style={{ width: 24, alignItems: 'center', justifyContent: 'center' }}>
+              {groupLogo ? (
+                <Image source={{ uri: groupLogo }} style={styles.groupLogo} />
+              ) : (
+                <Text style={[styles.viewDetailLabel, { color: colors.textSecondary, width: 'auto' }]}>👥</Text>
+              )}
+            </View>
             <Text style={[styles.viewDetailValue, { color: colors.textSecondary }]} numberOfLines={1}>{event.groupName}</Text>
           </View>
         )}
