@@ -315,7 +315,6 @@ export const ChatScreen: React.FC = () => {
           onChangeText={setNewMessage}
           placeholder={t('chat.sendMessage')}
           placeholderTextColor={colors.textDisabled}
-          multiline
           maxLength={500}
         />
         <TouchableOpacity
@@ -385,10 +384,9 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     flexDirection: 'row',
-    padding: 12,
-    paddingBottom: 50,
+    padding: 8,
     borderTopWidth: 1,
-    alignItems: 'flex-end',
+    alignItems: 'center',
     gap: 8,
   },
   iconButton: {
@@ -397,25 +395,24 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 2,
   },
   iconText: {
     fontSize: 18,
   },
   input: {
     flex: 1,
-    padding: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
     borderRadius: 20,
     fontSize: 16,
-    maxHeight: 100,
+    maxHeight: 36,
   },
   sendButton: {
-    paddingVertical: 10,
+    height: 36,
     paddingHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 2,
   },
   sendButtonText: {
     color: '#fff',
