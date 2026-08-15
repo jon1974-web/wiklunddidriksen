@@ -413,7 +413,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 4,
-    maxWidth: 120,
+    maxWidth: 160,
   },
   inputWrapperFocused: {
     flex: 1,
