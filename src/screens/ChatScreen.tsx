@@ -417,7 +417,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 20,
     paddingHorizontal: 14,
-    height: 36,
+    paddingVertical: 0,
     maxWidth: 200,
     backgroundColor: '#fff',
     borderWidth: 1,
@@ -425,12 +425,12 @@ const styles = StyleSheet.create({
   inputWrapperFocused: {
     flex: 1,
     maxWidth: '100%',
-    height: 36,
   },
   input: {
     flex: 1,
     fontSize: 16,
-    lineHeight: 36,
+    height: 34,
+    lineHeight: 34,
     maxHeight: 100,
   },
   sendBtn: {
