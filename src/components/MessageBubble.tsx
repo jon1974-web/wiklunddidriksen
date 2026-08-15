@@ -64,20 +64,24 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
   return (
     <>
       <View style={[styles.container, isOwnMessage ? styles.ownContainer : styles.otherContainer]}>
-        <View style={styles.senderRow}>
-          {avatarUrl && avatarUrl.length > 0 && !avatarFailed ? (
-            <Image source={{ uri: avatarUrl }} style={styles.avatar} onError={() => setAvatarFailed(true)} />
-          ) : (
-            <View style={[styles.avatar, styles.avatarPlaceholder, { backgroundColor: colors.accent + '40' }]}>
-              <Text style={[styles.avatarInitial, { color: colors.accent }]}>
-                {getInitials(message.senderName)}
-              </Text>
-            </View>
-          )}
-          <Text style={[styles.senderName, { color: colors.textSecondary }]}>{message.senderName}</Text>
-        </View>
-        <View style={styles.bubbleWrapper}>
+        {!isOwnMessage && (
+          <View style={styles.avatarColumn}>
+            {avatarUrl && avatarUrl.length > 0 && !avatarFailed ? (
+              <Image source={{ uri: avatarUrl }} style={styles.avatar} onError={() => setAvatarFailed(true)} />
+            ) : (
+              <View style={[styles.avatar, styles.avatarPlaceholder, { backgroundColor: colors.accent + '40' }]}>
+                <Text style={[styles.avatarInitial, { color: colors.accent }]}>
+                  {getInitials(message.senderName)}
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
+        <View style={[styles.bubbleWrapper, isOwnMessage && styles.bubbleWrapperOwn]}>
           <View style={[styles.bubble, isOwnMessage ? { backgroundColor: colors.chatBubbleOwn } : { backgroundColor: colors.chatBubbleOther }]}>
+            {!isOwnMessage && (
+              <Text style={[styles.senderName, { color: colors.textSecondary }]}>{message.senderName}</Text>
+            )}
             {message.imageUrl && (
               <TouchableOpacity onPress={() => setShowFullImage(true)}>
                 <Image
@@ -167,16 +171,17 @@ const styles = StyleSheet.create({
   },
   ownContainer: {
     alignSelf: 'flex-end',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
   },
   otherContainer: {
     alignSelf: 'flex-start',
-  },
-  senderRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-    marginLeft: 4,
-    gap: 6,
+    alignItems: 'flex-end',
+  },
+  avatarColumn: {
+    marginRight: 6,
+    justifyContent: 'flex-end',
   },
   avatar: {
     width: 24,
@@ -193,6 +198,7 @@ const styles = StyleSheet.create({
   },
   senderName: {
     fontSize: 12,
+    marginBottom: 2,
   },
   bubble: {
     padding: 12,
@@ -202,6 +208,9 @@ const styles = StyleSheet.create({
     position: 'relative',
     alignSelf: 'flex-start',
     maxWidth: '100%',
+  },
+  bubbleWrapperOwn: {
+    alignSelf: 'flex-end',
   },
   reactionsOverlay: {
     position: 'absolute',
