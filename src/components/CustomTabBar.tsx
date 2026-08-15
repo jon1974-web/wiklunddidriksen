@@ -97,10 +97,9 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
       })}
 
       <TouchableOpacity
-        style={[styles.centerBtn, { backgroundColor: colors.accent }, chatInputFocused && styles.centerBtnHidden]}
+        style={[styles.centerBtn, { backgroundColor: colors.accent }]}
         onPress={onCreatePress}
         activeOpacity={0.8}
-        disabled={chatInputFocused}
       >
         <Text style={styles.plus}>+</Text>
       </TouchableOpacity>

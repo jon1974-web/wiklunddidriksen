@@ -298,7 +298,7 @@ export const ChatScreen: React.FC = () => {
         </View>
       )}
 
-      <View style={[styles.inputContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+      <View style={[styles.inputContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }, inputFocused && styles.inputContainerFocused]}>
         <TouchableOpacity
           style={[styles.iconButton, { backgroundColor: colors.accent }]}
           onPress={handlePickImage}
@@ -396,6 +396,10 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     alignItems: 'center',
     gap: 8,
+  },
+  inputContainerFocused: {
+    zIndex: 10,
+    marginBottom: 38,
   },
   iconButton: {
     width: 36,
