@@ -102,6 +102,10 @@ When adding new features, making security changes, or any work that affects user
 
 **Rule of thumb:** If a document is read by end users, it must be in all 5 languages. If it's read by developers/admins, English is sufficient.
 
+**IMPORTANT:** When updating privacy/terms documents, always update BOTH:
+- The markdown source files (`docs/privacy/privacy-policy.md`, `docs/privacy/terms-of-service.md`)
+- The HTML files in `public/docs/` for ALL 5 languages (nb, en, sv, da, fi)
+
 ### Help Center (Info Modal)
 When adding help to a feature, follow this pattern:
 
