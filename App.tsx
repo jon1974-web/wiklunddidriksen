@@ -15,6 +15,7 @@ import i18n from './src/i18n';
 
 import { auth } from './src/services/firebase';
 import { useUserStore } from './src/store/userStore';
+import { useChatStore } from './src/store/chatStore';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { getUserProfile, createOrUpdateUser } from './src/services/familyService';
 import { configureNotifications, requestNotificationPermission } from './src/services/notificationService';
@@ -402,6 +403,12 @@ const TabIcon = ({ icon, focused, accentColor }: { icon: string; focused: boolea
 
 const navigationRef = createNavigationContainerRef();
 
+const ChatTabBarWrapper = (props: any) => {
+  const chatInputFocused = useChatStore((s) => s.inputFocused);
+  if (chatInputFocused) return null;
+  return <CustomTabBar {...props} onCreatePress={props.onCreatePress} />;
+};
+
 const AppContent = () => {
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
@@ -525,7 +532,7 @@ const AppContent = () => {
         {user ? (
           <>
             <Tab.Navigator
-              tabBar={(props) => <CustomTabBar {...props} onCreatePress={() => setShowQuickCreate(true)} />}
+              tabBar={(props) => <ChatTabBarWrapper {...props} onCreatePress={() => setShowQuickCreate(true)} />}
               screenOptions={{
                 headerShown: false,
               }}
