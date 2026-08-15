@@ -182,13 +182,13 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Svar fra alle {event.groupName ? `— ${event.groupName}` : ''}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <View style={{ flex: 1, backgroundColor: '#43A047', borderRadius: 10, padding: 10, alignItems: 'center' }}>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{acceptedNames.length} Ja</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{event.responses?.acceptedIds?.length || 0} Ja</Text>
             </View>
             <View style={{ flex: 1, backgroundColor: '#E53935', borderRadius: 10, padding: 10, alignItems: 'center' }}>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{declinedNames.length} Nei</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#fff' }}>{event.responses?.declinedIds?.length || 0} Nei</Text>
             </View>
             <View style={{ flex: 1, backgroundColor: '#f0f0f0', borderRadius: 10, padding: 10, alignItems: 'center' }}>
-              <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>{unansweredNames.length} Vent</Text>
+              <Text style={{ fontSize: 13, fontWeight: '600', color: '#333' }}>{event.responses?.unansweredIds?.length || 0} Vent</Text>
             </View>
           </View>
         </View>
