@@ -267,64 +267,98 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     : null;
 
   if (!isEditing) {
+    const d = eventData.date ? new Date(eventData.date) : null;
+    const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
+    const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
+    const dayName = d ? DAY_NAMES[d.getDay()] : '';
+    const dayNum = d ? d.getDate() : '';
+    const monthStr = d ? MONTHS[d.getMonth()] : '';
+
     return (
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ color: colors.accent, fontSize: 16 }}>←</Text>
+          </TouchableOpacity>
+          <View style={{ flex: 1 }} />
+          <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+            <AppIcon name="links" size={16} color={colors.accent} />
+          </TouchableOpacity>
+        </View>
 
-        <View style={[styles.viewCard, { backgroundColor: colors.surface }]}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Text style={[styles.viewTitle, { color: colors.text, flex: 1 }]}>{eventData.title}</Text>
-            <TouchableOpacity onPress={handleCopy} style={{ padding: 4 }}>
-              <AppIcon name="links" size={20} color={colors.accent} />
-            </TouchableOpacity>
+        {/* Top card with calendar icon */}
+        <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#0097A7', marginBottom: 10 }]}>
+          <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
+            <View style={{ width: 52, borderRadius: 12, overflow: 'hidden', flexShrink: 0, backgroundColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }}>
+              <View style={{ height: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: '700', color: '#fff', backgroundColor: '#0097A7' }}>
+                <Text style={{ fontSize: 8, fontWeight: '700', color: '#fff' }}>{dayName}</Text>
+              </View>
+              <Text style={{ fontSize: 22, fontWeight: '800', textAlign: 'center', lineHeight: 26, marginTop: 1, color: colors.text }}>{dayNum}</Text>
+              <Text style={{ fontSize: 9, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', color: colors.textSecondary, marginBottom: 2 }}>{monthStr}</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text }}>{eventData.title}</Text>
+              <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>{dateText}</Text>
+              <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
+                <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: '#E8F5E9' }}>
+                  <Text style={{ fontSize: 10, fontWeight: '600', color: '#43A047' }}>📅 Arrangement</Text>
+                </View>
+              </View>
+            </View>
           </View>
-          {eventData.description && (
-            <Text style={[styles.viewDescription, { color: colors.textSecondary }]}>{eventData.description}</Text>
-          )}
-          <View style={[styles.viewDivider, { backgroundColor: colors.border }]} />
+        </View>
+
+        {/* Detail card */}
+        <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#0097A7' }]}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#0097A7', marginBottom: 8 }}>Detaljer</Text>
           <View style={styles.viewDetailRow}>
-            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅 {t('common.date')}</Text>
-            <Text style={[styles.viewDetailValue, { color: colors.text }]}>{dateText}</Text>
-          </View>
-          <View style={styles.viewDetailRow}>
-            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐 {t('common.time')}</Text>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>{timeText}</Text>
           </View>
           {eventData.address && (
             <View style={styles.viewDetailRow}>
-              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍 {t('common.address')}</Text>
+              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍</Text>
               <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{eventData.address}</Text>
             </View>
           )}
+          {eventData.description && (
+            <View style={styles.viewDetailRow}>
+              <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📝</Text>
+              <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={3}>{eventData.description}</Text>
+            </View>
+          )}
           <View style={styles.viewDetailRow}>
-            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔 {t('events.reminder')}</Text>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>
               {getReminderOptions().find((o) => o.value === reminderMinutes)?.label || `${reminderMinutes} min`}
             </Text>
           </View>
         </View>
 
+        {/* Map */}
         {mapUrl && (
-          <TouchableOpacity
-            style={[styles.viewMapContainer, { backgroundColor: colors.surface }]}
-            onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))}
-          >
-            <Image source={{ uri: mapUrl }} style={styles.viewMapImage} />
-            <Text style={[styles.viewMapLabel, { color: colors.accent }]}>{t('tips.openGoogleMaps')}</Text>
-          </TouchableOpacity>
+          <View style={[styles.detailCard, { padding: 0, overflow: 'hidden', borderLeftWidth: 4, borderLeftColor: '#0097A7' }]}>
+            <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))} style={{ width: '100%', height: 140, backgroundColor: '#E8F5E9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 6 }}>
+              <Text style={{ fontSize: 24 }}>📍</Text>
+              <Text style={{ fontSize: 12, color: '#43A047', fontWeight: '600' }}>Kart — {eventData.address?.split(',')[0]}</Text>
+              <Text style={{ fontSize: 11, color: '#81C784' }}>Trykk for å åpne i Google Maps</Text>
+            </TouchableOpacity>
+          </View>
         )}
 
-        <TouchableOpacity style={[styles.editButton, { backgroundColor: colors.accent }]} onPress={() => setIsEditing(true)}>
-          <Text style={styles.editButtonText}>{t('detail.edit')}</Text>
-        </TouchableOpacity>
-
-        {canDelete && (
-          <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.surface, borderColor: colors.danger }]} onPress={handleDelete}>
-            <Text style={[styles.deleteButtonText, { color: colors.danger }]}>{t('detail.delete')}</Text>
-          </TouchableOpacity>
-        )}
+        {/* Button box */}
+        <View style={[styles.detailCard, { marginTop: 10 }]}>
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent, flex: 1 }]} onPress={() => setIsEditing(true)}>
+              <Text style={[styles.actionButtonText, { color: '#fff' }]}>Rediger</Text>
+            </TouchableOpacity>
+            {canDelete && (
+              <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#fff', borderColor: colors.danger, borderWidth: 1.5, flex: 1 }]} onPress={handleDelete}>
+                <Text style={[styles.actionButtonText, { color: colors.danger }]}>Slett</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
       </ScrollView>
     );
   }
@@ -516,7 +550,22 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
+    padding: 12,
+  },
+  detailCard: {
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 14,
+    marginBottom: 10,
+  },
+  actionButton: {
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
   title: {
     fontSize: 28,
