@@ -299,20 +299,24 @@ export const ChatScreen: React.FC = () => {
       )}
 
       <View style={[styles.inputContainer, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-        <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: colors.accent }]}
-          onPress={handlePickImage}
-          disabled={uploading}
-        >
-          <AppIcon name="image" size={20} color="#fff" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.iconButton, { backgroundColor: colors.accent }]}
-          onPress={handleTakePhoto}
-          disabled={uploading}
-        >
-          <AppIcon name="camera" size={20} color="#fff" />
-        </TouchableOpacity>
+        {inputFocused && (
+          <>
+            <TouchableOpacity
+              style={[styles.iconButton, { backgroundColor: colors.accent }]}
+              onPress={handlePickImage}
+              disabled={uploading}
+            >
+              <AppIcon name="image" size={20} color="#fff" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.iconButton, { backgroundColor: colors.accent }]}
+              onPress={handleTakePhoto}
+              disabled={uploading}
+            >
+              <AppIcon name="camera" size={20} color="#fff" />
+            </TouchableOpacity>
+          </>
+        )}
         <View style={[styles.inputWrapper, { borderColor: colors.border }, inputFocused && styles.inputWrapperFocused]}>
           <TextInput
             style={[styles.input, { color: colors.text, outlineStyle: 'none' }]}
@@ -321,6 +325,7 @@ export const ChatScreen: React.FC = () => {
             placeholder={t('chat.sendMessage')}
             placeholderTextColor={colors.textDisabled}
             maxLength={500}
+            multiline
             onFocus={() => setInputFocused(true)}
             onBlur={() => { if (!newMessage.trim()) setInputFocused(false); }}
           />
