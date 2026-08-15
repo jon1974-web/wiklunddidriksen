@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Platform, Linking } from 'react-native';
+import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Platform, Linking, Animated } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
@@ -142,6 +142,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
   const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const scrollY = new Animated.Value(0);
+  const lastScrollY = useRef(0);
   const [filterSource, setFilterSource] = useState<string | null>(null);
   const [filterModule, setFilterModule] = useState<string | null>(null);
   const [showSortPanel, setShowSortPanel] = useState(false);
@@ -155,6 +157,23 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ meals: true });
   const [tripSubcollections, setTripSubcollections] = useState<Record<string, any>>({});
   const user = useUserStore((state) => state.user);
+
+  const handleScroll = Animated.event(
+    [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+    { useNativeDriver: true }
+  );
+
+  const headerTranslate = scrollY.interpolate({
+    inputRange: [0, 80],
+    outputRange: [0, -60],
+    extrapolate: 'clamp',
+  });
+
+  const headerOpacity = scrollY.interpolate({
+    inputRange: [0, 60],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const familyRole = useUserStore((state) => state.familyRole);
@@ -857,7 +876,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
         {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}
-        <View style={styles.viewToggle}>
+        <Animated.View style={[styles.viewToggle, { transform: [{ translateY: headerTranslate }], opacity: headerOpacity, zIndex: 10 }]}>
           <TouchableOpacity
             style={[styles.toggleButton, viewMode === 'list' && { backgroundColor: colors.accent }]}
             onPress={() => setViewMode('list')}
@@ -913,7 +932,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               <Circle cx="10" cy="18" r="2" fill={showSortPanel ? '#fff' : colors.accent}/>
             </Svg>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
         {showSortPanel && (
           <View style={[styles.sortPanel, { backgroundColor: colors.surface }]}>
             <Text style={[styles.sortSectionLabel, { color: colors.textSecondary }]}>{t('events.sortBy')}</Text>
@@ -992,6 +1011,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         removeClippedSubviews={true}
         maxToRenderPerBatch={10}
         windowSize={10}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
         ListEmptyComponent={
           <Text style={[styles.emptyText, { color: colors.textDisabled }]}>
             {viewMode === 'calendar'
