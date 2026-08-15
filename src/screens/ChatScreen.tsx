@@ -52,7 +52,7 @@ export const ChatScreen: React.FC = () => {
         flatListRef.current?.scrollToEnd({ animated: false });
       }, SCROLL_DELAY_MS);
     }, (error) => {
-      Alert.alert('Error', getErrorMessage(error));
+      Alert.alert(t('common.error'), getErrorMessage(error));
     });
 
     return () => unsubscribe();
@@ -166,7 +166,7 @@ export const ChatScreen: React.FC = () => {
         flatListRef.current?.scrollToEnd({ animated: true });
       }, SCROLL_DELAY_MS);
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      Alert.alert(t('common.error'), getErrorMessage(error));
     } finally {
       setUploading(false);
     }
@@ -313,7 +313,7 @@ export const ChatScreen: React.FC = () => {
           style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
           value={newMessage}
           onChangeText={setNewMessage}
-          placeholder="Skriv en melding..."
+          placeholder={t('chat.sendMessage')}
           placeholderTextColor={colors.textDisabled}
           multiline
           maxLength={500}
@@ -326,7 +326,7 @@ export const ChatScreen: React.FC = () => {
           {uploading ? (
             <ActivityIndicator color="#fff" size="small" />
           ) : (
-            <Text style={styles.sendButtonText}>Send</Text>
+            <Text style={styles.sendButtonText}>{t('chat.send')}</Text>
           )}
         </TouchableOpacity>
       </View>

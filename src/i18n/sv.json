@@ -705,7 +705,8 @@
     "noMessages": "Inga meddelanden ännu",
     "sendMessage": "Skriv ett meddelande...",
     "today": "Idag",
-    "yesterday": "Igår"
+    "yesterday": "Igår",
+    "send": "Skicka"
   },
   "actionModal": {
     "edit": "Redigera",

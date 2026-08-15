@@ -705,7 +705,8 @@
     "noMessages": "Ingen beskeder endnu",
     "sendMessage": "Skriv en besked...",
     "today": "I dag",
-    "yesterday": "I går"
+    "yesterday": "I går",
+    "send": "Send"
   },
   "actionModal": {
     "edit": "Rediger",

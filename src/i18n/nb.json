@@ -766,7 +766,8 @@
     "noMessages": "Ingen meldinger ennå",
     "sendMessage": "Skriv en melding...",
     "today": "I dag",
-    "yesterday": "I går"
+    "yesterday": "I går",
+    "send": "Send"
   },
   "actionModal": {
     "edit": "Rediger",

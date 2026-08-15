@@ -766,7 +766,8 @@
     "noMessages": "No messages yet",
     "sendMessage": "Type a message...",
     "today": "Today",
-    "yesterday": "Yesterday"
+    "yesterday": "Yesterday",
+    "send": "Send"
   },
   "actionModal": {
     "edit": "Edit",
