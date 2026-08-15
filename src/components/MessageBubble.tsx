@@ -96,6 +96,9 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
                 {message.text}
               </Text>
             ) : null}
+            <Text style={[styles.timestamp, { color: isOwnMessage ? colors.textSecondary : colors.textDisabled }]}>
+              {formatTimestamp(message.timestamp)}
+            </Text>
           </View>
           {(reactionCounts.like || reactionCounts.smile || reactionCounts.heart) ? (
             <View style={[styles.reactionsOverlay, isOwnMessage ? styles.reactionsOverlayOwn : styles.reactionsOverlayOther]}>
@@ -127,9 +130,6 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
             <Text style={[styles.addReactionText, { color: colors.textDisabled }]}>+</Text>
           </TouchableOpacity>
         </View>
-        <Text style={[styles.timestamp, { color: colors.textDisabled }, isOwnMessage && styles.ownTimestamp]}>
-          {formatTimestamp(message.timestamp)}
-        </Text>
       </View>
 
       {showReactionPicker && (
@@ -301,9 +301,7 @@ const styles = StyleSheet.create({
   },
   timestamp: {
     fontSize: 10,
-    marginTop: 2,
-  },
-  ownTimestamp: {
+    marginTop: 4,
     textAlign: 'right',
   },
   fullImageOverlay: {
