@@ -117,7 +117,7 @@
     "privacyLink": "personvernerklæring"
   },
   "events": {
-    "title": "Avtaler",
+    "title": "Våre avtaler",
     "addEvent": "Nytt arrangement",
     "noEvents": "Ingen kommende arrangementer. Legg til et nytt!",
     "noEventsDay": "Ingen arrangementer på denne dagen",
@@ -607,7 +607,7 @@
     "pickTime": "Velg tidspunkt"
   },
   "profile": {
-    "title": "Profil",
+    "title": "Min profil",
     "displayName": "Visningsnavn",
     "changePhoto": "Ta bilde",
     "email": "E-post",
@@ -762,7 +762,7 @@
     "error": "Kunne ikke lese oppskrift fra bildet"
   },
   "chat": {
-    "title": "Familiechat",
+    "title": "Vår chat",
     "noMessages": "Ingen meldinger ennå",
     "sendMessage": "Skriv en melding..."
   },
