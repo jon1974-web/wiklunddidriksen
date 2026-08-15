@@ -13,7 +13,7 @@
 ### Spond Events (v5 - Final)
 - **Left border**: Red (#E53935)
 - **Top box**: Calendar icon (date/day/month) + title + **times in bold** + Spond badge
-- **Detail card**: 📍 Location + 👥 Spond group + 📝 Notat with example text
+- **Detail card**: 📍 Location + 👥 Spond group + 📝 Notat with "Les mer" expansion
 - **Map card**: Red gradient, opens Google Maps
 - **Din status box** (red border): ✓ Aksepter (green) + ✕ Avslå (red)
 - **Svar fra alle** (red border): 12 Ja (green) + 3 Nei (red) + 1 Vent (gray)
