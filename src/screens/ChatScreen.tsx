@@ -221,7 +221,7 @@ export const ChatScreen: React.FC = () => {
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <AppIcon name="chat" size={28} color={colors.accent} />
-            <Text style={[styles.title, { color: colors.text }]}>Familiechat</Text>
+            <Text style={[styles.title, { color: colors.text }]}>{t('chat.title')}</Text>
           </View>
           <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
         </View>
