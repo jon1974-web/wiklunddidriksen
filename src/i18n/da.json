@@ -157,7 +157,8 @@
     "city": "By",
     "country": "Land",
     "startDate": "Startdato",
-    "endDate": "Slutdato"
+    "endDate": "Slutdato",
+    "allYears": "Alle"
   },
   "spaces": {
     "title": "Vores steder",

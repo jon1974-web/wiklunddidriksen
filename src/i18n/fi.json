@@ -157,7 +157,8 @@
     "city": "Kaupunki",
     "country": "Maa",
     "startDate": "Aloituspäivä",
-    "endDate": "Lopetuspäivä"
+    "endDate": "Lopetuspäivä",
+    "allYears": "Kaikki"
   },
   "spaces": {
     "title": "Paikkamme",

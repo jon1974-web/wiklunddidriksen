@@ -157,7 +157,8 @@
     "city": "City",
     "country": "Country",
     "startDate": "Start date",
-    "endDate": "End date"
+    "endDate": "End date",
+    "allYears": "All"
   },
   "spaces": {
     "title": "Our Places",

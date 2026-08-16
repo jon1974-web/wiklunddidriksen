@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { View, Text, Image, FlatList, TouchableOpacity, StyleSheet, Alert, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
@@ -32,8 +32,19 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
   const familyRole = useUserStore((state) => state.familyRole);
   const { colors } = useTheme();
   const [tripActionModal, setTripActionModal] = useState<{ visible: boolean; title: string; onDelete?: () => void; onEdit?: () => void }>({ visible: false, title: '' });
+  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
 
   const today = getTodayLocal();
+
+  const availableYears = useMemo(() => {
+    const years = new Set(trips.map((t) => new Date(t.startDate).getFullYear()));
+    return Array.from(years).sort((a, b) => b - a);
+  }, [trips]);
+
+  const filteredTrips = useMemo(() => {
+    if (selectedYear === 0) return trips;
+    return trips.filter((t) => new Date(t.startDate).getFullYear() === selectedYear);
+  }, [trips, selectedYear]);
 
   const isUpcomingOrActive = useCallback((trip: Trip) => {
     return trip.endDate >= today;
@@ -210,12 +221,31 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
           </Text>
         </View>
       ) : (
-        <FlatList
-          data={trips}
-          renderItem={renderTrip}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={styles.list}
-        />
+        <>
+          <View style={styles.yearSelector}>
+            <TouchableOpacity
+              style={[styles.yearPill, { borderColor: colors.border }, selectedYear === 0 && { backgroundColor: MODULE_COLORS.trips, borderColor: MODULE_COLORS.trips }]}
+              onPress={() => setSelectedYear(0)}
+            >
+              <Text style={[styles.yearPillText, { color: selectedYear === 0 ? '#fff' : colors.text }]}>{t('trips.allYears')}</Text>
+            </TouchableOpacity>
+            {availableYears.map((year) => (
+              <TouchableOpacity
+                key={year}
+                style={[styles.yearPill, { borderColor: colors.border }, selectedYear === year && { backgroundColor: MODULE_COLORS.trips, borderColor: MODULE_COLORS.trips }]}
+                onPress={() => setSelectedYear(year)}
+              >
+                <Text style={[styles.yearPillText, { color: selectedYear === year ? '#fff' : colors.text }]}>{year}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+          <FlatList
+            data={filteredTrips}
+            renderItem={renderTrip}
+            keyExtractor={(item) => item.id}
+            contentContainerStyle={styles.list}
+          />
+        </>
       )}
 
       <TouchableOpacity
@@ -258,6 +288,23 @@ const styles = StyleSheet.create({
   list: {
     padding: 16,
     paddingTop: 8,
+  },
+  yearSelector: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  yearPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  yearPillText: {
+    fontSize: 13,
+    fontWeight: '600',
   },
   card: {
     borderRadius: 12,
