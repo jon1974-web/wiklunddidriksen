@@ -109,6 +109,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [tripCountry, setTripCountry] = useState(trip.country);
   const [tripStartDate, setTripStartDate] = useState(trip.startDate);
   const [tripEndDate, setTripEndDate] = useState(trip.endDate);
+  const [tripStartTime, setTripStartTime] = useState(trip.startTime || '');
+  const [tripEndTime, setTripEndTime] = useState(trip.endTime || '');
   const [tripIcon, setTripIcon] = useState(trip.icon || '✈️');
 
   // Form state (consolidated)
@@ -429,6 +431,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         country: sanitizeInput(tripCountry),
         startDate: tripStartDate,
         endDate: tripEndDate,
+        startTime: tripStartTime || null,
+        endTime: tripEndTime || null,
         icon: tripIcon,
       };
       if (coords) {
@@ -441,7 +445,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip, tripTitle, tripCity, tripCountry, tripStartDate, tripEndDate, tripIcon]);
+  }, [trip, tripTitle, tripCity, tripCountry, tripStartDate, tripEndDate, tripStartTime, tripEndTime, tripIcon]);
 
   const openAddModal = (modal: ModalType, transportType?: 'fly' | 'tog' | 'bil' | 'boat' | 'ferry' | 'taxi') => {
     resetForms();
@@ -981,6 +985,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           setTripCountry(trip.country);
           setTripStartDate(trip.startDate);
           setTripEndDate(trip.endDate);
+          setTripStartTime(trip.startTime || '');
+          setTripEndTime(trip.endTime || '');
           setTripIcon(trip.icon || '✈️');
           setActiveModal('tripEdit');
         }}
@@ -1543,6 +1549,28 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                         {tripEndDate || t('common.selectEndDate')}
                       </Text>
                     </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.startTime')} ({t('trips.optional')})</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
+                      value={tripStartTime}
+                      onChangeText={setTripStartTime}
+                      placeholder="HH:MM"
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                  </View>
+
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.endTime')} ({t('trips.optional')})</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
+                      value={tripEndTime}
+                      onChangeText={setTripEndTime}
+                      placeholder="HH:MM"
+                      placeholderTextColor={colors.textDisabled}
+                    />
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>
