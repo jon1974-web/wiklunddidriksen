@@ -64,7 +64,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       </TouchableOpacity>
 
       {/* Top card with calendar icon */}
-      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, marginBottom: 10, backgroundColor: colors.surface }]}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, marginBottom: 10, backgroundColor: PET_COLOR + '10' }]}>
         <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
           <View style={styles.calIcon}>
             <View style={[styles.calTopBar, { backgroundColor: PET_COLOR }]}>

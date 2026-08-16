@@ -49,7 +49,7 @@ export const PetMedDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       </TouchableOpacity>
 
       {/* Top card */}
-      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, marginBottom: 10, backgroundColor: colors.surface }]}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, marginBottom: 10, backgroundColor: PET_COLOR + '10' }]}>
         <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
           <View style={[styles.iconCircle, { backgroundColor: PET_COLOR + '20' }]}>
             <Text style={{ fontSize: 28 }}>💊</Text>
