@@ -33,6 +33,7 @@ import { HealthSpaceScreen } from './src/screens/HealthSpaceScreen';
 import { BirthdaySpaceScreen } from './src/screens/BirthdaySpaceScreen';
 import { PetSpaceScreen } from './src/screens/PetSpaceScreen';
 import { PetVetDetailScreen } from './src/screens/PetVetDetailScreen';
+import { PetVaccDetailScreen } from './src/screens/PetVaccDetailScreen';
 import { SchoolSpaceScreen } from './src/screens/SchoolSpaceScreen';
 import { KindergartenSpaceScreen } from './src/screens/KindergartenSpaceScreen';
 import { SchoolContactDetailScreen } from './src/screens/SchoolContactDetailScreen';
@@ -82,6 +83,7 @@ type RootStackParamList = {
   BirthdaySpace: undefined;
   PetSpace: undefined;
   PetVetDetail: { visit: import('./src/types').PetVetVisit; petName?: string };
+  PetVaccDetail: { vaccination: import('./src/types').PetVaccination; petName?: string };
   SchoolSpace: undefined;
   KindergartenSpace: undefined;
   SchoolAI: { childId: string; yearId: string; familyId: string };
@@ -250,6 +252,11 @@ const TripsStack = () => {
         <Stack.Screen
           name="PetVetDetail"
           component={PetVetDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PetVaccDetail"
+          component={PetVaccDetailScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
