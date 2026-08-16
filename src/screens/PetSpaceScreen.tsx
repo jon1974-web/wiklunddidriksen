@@ -686,7 +686,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('pets.noGrooming')}</Text>
             ) : (
               grooming.map(g => (
-                <TouchableOpacity key={g.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: g, section: 'grooming' })} onLongPress={() => setItemActionModal({ visible: true, id: g.id, title: g.name, section: 'grooming' })}>
+                <TouchableOpacity key={g.id} style={styles.item} onPress={() => navigation.navigate('PetGroomDetail', { grooming: g, petName: pets.find(p => p.id === g.petId)?.name })} onLongPress={() => setItemActionModal({ visible: true, id: g.id, title: g.name, section: 'grooming' })}>
                   <AppIcon name="person" size={20} color={PET_THEME} />
                   <View style={styles.itemText}>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{g.name}</Text>
