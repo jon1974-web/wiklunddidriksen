@@ -49,13 +49,13 @@ export const PetVaccDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView style={[styles.container, { backgroundColor: PET_COLOR + '10' }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: PET_COLOR }]}>
         <Text style={{ color: PET_COLOR, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       {/* Top card with calendar icon */}
-      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, marginBottom: 10, backgroundColor: PET_COLOR + '10' }]}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, marginBottom: 10, backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
           <View style={styles.calIcon}>
             <View style={[styles.calTopBar, { backgroundColor: PET_COLOR }]}>

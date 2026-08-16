@@ -50,13 +50,13 @@ export const HealthVaccDetailScreen: React.FC<Props> = ({ navigation, route }) =
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+    <ScrollView style={[styles.container, { backgroundColor: HEALTH_COLOR + '10' }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: HEALTH_COLOR }]}>
         <Text style={{ color: HEALTH_COLOR, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       {/* Top card with calendar icon */}
-      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, marginBottom: 10, backgroundColor: HEALTH_COLOR + '10' }]}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, marginBottom: 10, backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
           <View style={styles.calIcon}>
             <View style={[styles.calTopBar, { backgroundColor: HEALTH_COLOR }]}>
