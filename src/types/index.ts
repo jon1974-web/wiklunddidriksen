@@ -99,6 +99,8 @@ export interface Trip {
   country: string;
   startDate: string;
   endDate: string;
+  startTime?: string;
+  endTime?: string;
   icon?: string;
   latitude?: number;
   longitude?: number;

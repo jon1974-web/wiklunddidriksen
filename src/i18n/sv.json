@@ -158,7 +158,10 @@
     "country": "Land",
     "startDate": "Startdatum",
     "endDate": "Slutdatum",
-    "allYears": "Alla"
+    "allYears": "Alla",
+    "startTime": "Starttid",
+    "endTime": "Sluttid",
+    "optional": "valfritt"
   },
   "spaces": {
     "title": "Våra platser",

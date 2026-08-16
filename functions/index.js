@@ -2280,14 +2280,18 @@ exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", do
 
     const startDate = data.startDate;
     const endDate = data.endDate || data.startDate;
-    console.log(`Creating trip: ${data.title}, start: ${startDate}, end: ${endDate}`);
+    const startTime = data.startTime;
+    const endTime = data.endTime;
+    console.log(`Creating trip: ${data.title}, start: ${startDate}, end: ${endDate}, startTime: ${startTime || 'allDay'}, endTime: ${endTime || 'allDay'}`);
 
     const eventId = await createGoogleCalendarEvent(uid, {
       title: `✈️ ${data.title || data.city || "Reise"}`,
       description: `${data.city || ""}${data.country ? ", " + data.country : ""}`,
-      allDay: true,
+      allDay: !startTime,
       startDate,
       endDate,
+      ...(startTime ? { startDateTime: `${startDate}T${startTime}:00` } : {}),
+      ...(endTime ? { endDateTime: `${endDate}T${endTime}:00` } : {}),
     });
 
     await db.collection("trips").doc(event.params.tripId).update({
@@ -2514,9 +2518,11 @@ exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", do
     await updateGoogleCalendarEvent(uid, calendarEventId, {
       title: `✈️ ${after.title || after.city || "Reise"}`,
       description: `${after.city || ""}${after.country ? ", " + after.country : ""}`,
-      allDay: true,
+      allDay: !after.startTime,
       startDate: after.startDate,
       endDate: after.endDate || after.startDate,
+      ...(after.startTime ? { startDateTime: `${after.startDate}T${after.startTime}:00` } : {}),
+      ...(after.endTime ? { endDateTime: `${after.endDate || after.startDate}T${after.endTime}:00` } : {}),
     });
 
     console.log(`onTripUpdatedForCalendar: updated trip ${event.params.tripId}`);

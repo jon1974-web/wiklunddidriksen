@@ -158,7 +158,10 @@
     "country": "Land",
     "startDate": "Startdato",
     "endDate": "Sluttdato",
-    "allYears": "Alle"
+    "allYears": "Alle",
+    "startTime": "Starttid",
+    "endTime": "Sluttid",
+    "optional": "valgfritt"
   },
   "spaces": {
     "title": "Våre steder",

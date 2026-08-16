@@ -158,7 +158,10 @@
     "country": "Country",
     "startDate": "Start date",
     "endDate": "End date",
-    "allYears": "All"
+    "allYears": "All",
+    "startTime": "Start time",
+    "endTime": "End time",
+    "optional": "optional"
   },
   "spaces": {
     "title": "Our Places",

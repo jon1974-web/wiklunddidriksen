@@ -23,6 +23,8 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   const [country, setCountry] = useState('Norge');
   const [startDate, setStartDate] = useState(getTodayLocal());
   const [endDate, setEndDate] = useState(getTodayLocal());
+  const [startTime, setStartTime] = useState('');
+  const [endTime, setEndTime] = useState('');
   const [icon, setIcon] = useState('✈️');
   const [activePicker, setActivePicker] = useState<'start' | 'end' | null>(null);
   const user = useUserStore((state) => state.user);
@@ -51,6 +53,8 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         country: sanitizeInput(country),
         startDate,
         endDate,
+        ...(startTime ? { startTime } : {}),
+        ...(endTime ? { endTime } : {}),
         icon,
         ...(coords ? { latitude: coords.latitude, longitude: coords.longitude } : {}),
         createdBy: user?.uid || '',
@@ -59,7 +63,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [title, city, country, startDate, endDate, icon, user, familyId, navigation]);
+  }, [title, city, country, startDate, endDate, startTime, endTime, icon, user, familyId, navigation]);
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.tripsBg }]}>
@@ -146,6 +150,28 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         >
           <Text style={[styles.dateText, { color: colors.text }]}>{endDate}</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.startTime')} ({t('trips.optional')})</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+          value={startTime}
+          onChangeText={setStartTime}
+          placeholder="HH:MM"
+          placeholderTextColor={colors.textDisabled}
+        />
+      </View>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.endTime')} ({t('trips.optional')})</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+          value={endTime}
+          onChangeText={setEndTime}
+          placeholder="HH:MM"
+          placeholderTextColor={colors.textDisabled}
+        />
       </View>
 
       <TouchableOpacity style={[styles.button, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSave}>

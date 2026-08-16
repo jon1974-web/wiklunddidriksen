@@ -158,7 +158,10 @@
     "country": "Maa",
     "startDate": "Aloituspäivä",
     "endDate": "Lopetuspäivä",
-    "allYears": "Kaikki"
+    "allYears": "Kaikki",
+    "startTime": "Aloitusaika",
+    "endTime": "Lopetusaika",
+    "optional": "valinnainen"
   },
   "spaces": {
     "title": "Paikkamme",
