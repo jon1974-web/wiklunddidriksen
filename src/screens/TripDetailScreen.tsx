@@ -172,12 +172,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [showHelpDocuments, setShowHelpDocuments] = useState(false);
 
   // Unified picker state
-  type PickerField = 'tripStart' | 'tripEnd' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDepDate' | 'taxiDepTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
+  type PickerField = 'tripStart' | 'tripEnd' | 'tripStartTime' | 'tripEndTime' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDepDate' | 'taxiDepTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
   const [activePicker, setActivePicker] = useState<PickerField>(null);
 
   const handlePickerSelect = (value: string) => {
     if (activePicker === 'tripStart') setTripStartDate(value);
     else if (activePicker === 'tripEnd') setTripEndDate(value);
+    else if (activePicker === 'tripStartTime') setTripStartTime(value);
+    else if (activePicker === 'tripEndTime') setTripEndTime(value);
     else if (activePicker === 'flightDepDate') handleTransportFormChange(f => ({ ...f, departureDate: value }));
     else if (activePicker === 'flightArrDate') handleTransportFormChange(f => ({ ...f, arrivalDate: value }));
     else if (activePicker === 'flightDepTime') handleTransportFormChange(f => ({ ...f, departureTime: value }));
@@ -212,6 +214,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const getPickerTitle = () => {
     const titles: Record<string, string> = {
       tripStart: t('pickers.startDate'), tripEnd: t('pickers.endDate'),
+      tripStartTime: t('pickers.startTime'), tripEndTime: t('pickers.endTime'),
       flightDepDate: t('pickers.departureDate'), flightArrDate: t('pickers.arrivalDate'),
       flightDepTime: t('pickers.departureTime'), flightArrTime: t('pickers.arrivalTime'),
       actStartDate: t('pickers.startDate'), actEndDate: t('pickers.endDate'), actStartTime: t('pickers.startTime'), actEndTime: t('pickers.endTime'),
@@ -228,6 +231,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const getPickerValue = () => {
     const values: Record<string, string> = {
       tripStart: tripStartDate, tripEnd: tripEndDate,
+      tripStartTime: tripStartTime, tripEndTime: tripEndTime,
       flightDepDate: transportForm.departureDate, flightArrDate: transportForm.arrivalDate,
       flightDepTime: transportForm.departureTime, flightArrTime: transportForm.arrivalTime,
       actStartDate: actForm.startDate, actEndDate: actForm.endDate, actStartTime: actForm.startTime, actEndTime: actForm.endTime,
@@ -241,7 +245,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   };
 
   const isDatePicker = activePicker && activePicker.includes('Date') || activePicker === 'tripStart' || activePicker === 'tripEnd';
-  const isTimePicker = activePicker && (activePicker.includes('Time') || activePicker === 'hotelCheckIn' || activePicker === 'hotelCheckOut');
+  const isTimePicker = activePicker && (activePicker.includes('Time') || activePicker === 'hotelCheckIn' || activePicker === 'hotelCheckOut' || activePicker === 'tripStartTime' || activePicker === 'tripEndTime');
 
   const loadSubData = useCallback(async () => {
     try {
@@ -1553,24 +1557,26 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.startTime')} ({t('trips.optional')})</Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
-                      value={tripStartTime}
-                      onChangeText={setTripStartTime}
-                      placeholder="HH:MM"
-                      placeholderTextColor={colors.textDisabled}
-                    />
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
+                      onPress={() => setActivePicker('tripStartTime')}
+                    >
+                      <Text style={{ color: tripStartTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {tripStartTime || t('common.pickTime')}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
 
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.endTime')} ({t('trips.optional')})</Text>
-                    <TextInput
-                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
-                      value={tripEndTime}
-                      onChangeText={setTripEndTime}
-                      placeholder="HH:MM"
-                      placeholderTextColor={colors.textDisabled}
-                    />
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
+                      onPress={() => setActivePicker('tripEndTime')}
+                    >
+                      <Text style={{ color: tripEndTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {tripEndTime || t('common.pickTime')}
+                      </Text>
+                    </TouchableOpacity>
                   </View>
                 </ScrollView>
                 <View style={styles.modalActions}>

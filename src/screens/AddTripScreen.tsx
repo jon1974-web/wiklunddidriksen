@@ -26,7 +26,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const [icon, setIcon] = useState('✈️');
-  const [activePicker, setActivePicker] = useState<'start' | 'end' | null>(null);
+  const [activePicker, setActivePicker] = useState<'start' | 'end' | 'startTime' | 'endTime' | null>(null);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
@@ -154,24 +154,26 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('common.startTime')} ({t('trips.optional')})</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-          value={startTime}
-          onChangeText={setStartTime}
-          placeholder="HH:MM"
-          placeholderTextColor={colors.textDisabled}
-        />
+        <TouchableOpacity
+          style={[styles.input, { backgroundColor: colors.surface }]}
+          onPress={() => setActivePicker('startTime')}
+        >
+          <Text style={[styles.dateText, { color: startTime ? colors.text : colors.textDisabled }]}>
+            {startTime || t('common.pickTime')}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('common.endTime')} ({t('trips.optional')})</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-          value={endTime}
-          onChangeText={setEndTime}
-          placeholder="HH:MM"
-          placeholderTextColor={colors.textDisabled}
-        />
+        <TouchableOpacity
+          style={[styles.input, { backgroundColor: colors.surface }]}
+          onPress={() => setActivePicker('endTime')}
+        >
+          <Text style={[styles.dateText, { color: endTime ? colors.text : colors.textDisabled }]}>
+            {endTime || t('common.pickTime')}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <TouchableOpacity style={[styles.button, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSave}>
@@ -180,12 +182,17 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
       <DatePickerModal
         visible={activePicker !== null}
-        title={activePicker === 'start' ? 'Velg startdato' : 'Velg sluttdato'}
-        mode="date"
-        dateOffset={-365}
-        dateCount={730}
-        selectedValue={activePicker === 'start' ? startDate : endDate}
-        onSelect={(value) => activePicker === 'start' ? setStartDate(value) : setEndDate(value)}
+        title={activePicker === 'start' ? 'Velg startdato' : activePicker === 'end' ? 'Velg sluttdato' : activePicker === 'startTime' ? 'Velg starttid' : 'Velg sluttid'}
+        mode={activePicker === 'startTime' || activePicker === 'endTime' ? 'time' : 'date'}
+        dateOffset={activePicker === 'startTime' || activePicker === 'endTime' ? 0 : -365}
+        dateCount={activePicker === 'startTime' || activePicker === 'endTime' ? 48 : 730}
+        selectedValue={activePicker === 'start' ? startDate : activePicker === 'end' ? endDate : activePicker === 'startTime' ? startTime : endTime}
+        onSelect={(value) => {
+          if (activePicker === 'start') setStartDate(value);
+          else if (activePicker === 'end') setEndDate(value);
+          else if (activePicker === 'startTime') setStartTime(value);
+          else if (activePicker === 'endTime') setEndTime(value);
+        }}
         onClose={() => setActivePicker(null)}
       />
     </ScrollView>
