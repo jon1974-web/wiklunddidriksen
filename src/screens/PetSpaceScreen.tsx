@@ -620,7 +620,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 if (!aPast && bPast) return -1;
                 return a.date.localeCompare(b.date);
               }).map(v => (
-                <TouchableOpacity key={v.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: v, section: 'vetVisits' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.title, section: 'vetVisits' })}>
+                <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVetDetail', { visit: v, petName: pets.find(p => p.id === v.petId)?.name })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.title, section: 'vetVisits' })}>
                   <AppIcon name="calendar" size={20} color={PET_THEME} />
                   <View style={styles.itemText}>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{v.title}</Text>
