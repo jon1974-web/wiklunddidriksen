@@ -41,6 +41,8 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     return visit.startTime || '';
   }, [visit.startTime, visit.endTime]);
 
+  const isCompleted = visit.status === 'completed' || (visit.date && visit.date < new Date().toISOString().slice(0, 10));
+
   const mapUrl = useMemo(() => visit.location ? getStaticMapUrl(visit.location, 15, '600x300') : null, [visit.location]);
 
   const canDelete = visit.petId && (visit as any).createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
@@ -77,9 +79,9 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
               <Text style={[styles.timeText, { color: '#333' }]}>{timeText}</Text>
             ) : null}
             <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
-              <View style={[styles.badge, { backgroundColor: visit.status === 'completed' ? '#E8F5E9' : '#FFF3E0' }]}>
-                <Text style={{ fontSize: 10, fontWeight: '600', color: visit.status === 'completed' ? '#43A047' : '#FB8C00' }}>
-                  {visit.status === 'completed' ? t('health.completed') : t('health.pending')}
+              <View style={[styles.badge, { backgroundColor: isCompleted ? '#E8F5E9' : '#FFF3E0' }]}>
+                <Text style={{ fontSize: 10, fontWeight: '600', color: isCompleted ? '#43A047' : '#FB8C00' }}>
+                  {isCompleted ? t('health.completed') : t('health.pending')}
                 </Text>
               </View>
             </View>
