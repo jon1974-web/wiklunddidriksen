@@ -49,7 +49,7 @@ export const PetVaccDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: PET_COLOR + '10' }]}>
+    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.petsBg }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: PET_COLOR }]}>
         <Text style={{ color: PET_COLOR, fontSize: 18 }}>←</Text>
       </TouchableOpacity>

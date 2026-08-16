@@ -50,7 +50,7 @@ export const HealthVaccDetailScreen: React.FC<Props> = ({ navigation, route }) =
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: HEALTH_COLOR + '10' }]}>
+    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.healthBg }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: HEALTH_COLOR }]}>
         <Text style={{ color: HEALTH_COLOR, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
