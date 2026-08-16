@@ -404,7 +404,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const filteredItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
-      if (item._type === 'trip') return item.endDate || item.startDate;
+      if (item._type === 'trip') return item.startDate;
       if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
       return item.endDate || item.date;
     };
@@ -519,7 +519,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
 
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
-      if (item._type === 'trip') return item.endDate || item.startDate;
+      if (item._type === 'trip') return item.startDate;
       if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
       return item.endDate || item.date;
     };
