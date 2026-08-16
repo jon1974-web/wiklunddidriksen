@@ -283,7 +283,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               if (!aPast && bPast) return -1;
               return a.date.localeCompare(b.date);
             }).map(appt => (
-              <TouchableOpacity key={appt.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: appt, section: 'appointments' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
+              <TouchableOpacity key={appt.id} style={styles.item} onPress={() => navigation.navigate('HealthApptDetail', { appointment: appt })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
                 <AppIcon name="calendar" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
