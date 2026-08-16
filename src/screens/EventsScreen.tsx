@@ -810,7 +810,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       return (
         <TouchableOpacity
           style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: '#E53935' }]}
-          onPress={() => navigation.navigate('Trips', { screen: 'HealthSpace' })}
+          onPress={() => navigation.navigate('Trips', { screen: 'HealthApptDetail', params: { appointment: item } })}
         >
           <View style={styles.spondCardRow}>
             <View style={styles.spondCalIcon}>
