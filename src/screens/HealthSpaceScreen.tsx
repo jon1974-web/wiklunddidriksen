@@ -314,7 +314,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               const isFinished = med.dateTo && med.dateTo < today;
               const isActive = med.dateFrom && (!med.dateTo || med.dateTo >= today);
               return (
-                <TouchableOpacity key={med.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: med, section: 'medications' })} onLongPress={() => setActionModal({ visible: true, id: med.id, title: med.name, section: 'medications' })}>
+                <TouchableOpacity key={med.id} style={styles.item} onPress={() => navigation.navigate('HealthMedDetail', { medication: med })} onLongPress={() => setActionModal({ visible: true, id: med.id, title: med.name, section: 'medications' })}>
                   <AppIcon name="medication" size={20} color={MODULE_COLORS.health} />
                   <View style={styles.itemText}>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{med.name}</Text>
