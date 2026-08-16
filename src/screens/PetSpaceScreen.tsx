@@ -648,7 +648,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 const isFinished = m.dateTo && isDatePast(m.dateTo);
                 const isActive = m.dateFrom && (!m.dateTo || !isDatePast(m.dateTo));
                 return (
-                  <TouchableOpacity key={m.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: m, section: 'medications' })} onLongPress={() => setItemActionModal({ visible: true, id: m.id, title: m.name, section: 'medications' })}>
+                  <TouchableOpacity key={m.id} style={styles.item} onPress={() => navigation.navigate('PetMedDetail', { medication: m, petName: pets.find(p => p.id === m.petId)?.name })} onLongPress={() => setItemActionModal({ visible: true, id: m.id, title: m.name, section: 'medications' })}>
                     <AppIcon name="medication" size={20} color={PET_THEME} />
                     <View style={styles.itemText}>
                       <Text style={[styles.itemTitle, { color: colors.text }]}>{m.name}</Text>
