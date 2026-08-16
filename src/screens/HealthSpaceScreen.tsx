@@ -271,6 +271,34 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       </View>
 
       <ScrollView style={styles.content}>
+        {/* Appointments */}
+        {renderSection(t('health.appointments'), 'calendar', appointments.length, 'appointments', (
+          appointments.length === 0 ? (
+            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAppointments')}</Text>
+          ) : (
+            [...appointments].sort((a, b) => {
+              const aPast = a.date < today;
+              const bPast = b.date < today;
+              if (aPast && !bPast) return 1;
+              if (!aPast && bPast) return -1;
+              return a.date.localeCompare(b.date);
+            }).map(appt => (
+              <TouchableOpacity key={appt.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: appt, section: 'appointments' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
+                <AppIcon name="calendar" size={20} color={MODULE_COLORS.health} />
+                <View style={styles.itemText}>
+                  <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
+                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{appt.date} {appt.startTime} — {appt.location || appt.person}</Text>
+                </View>
+                {appt.date >= today ? (
+                  <Text style={[styles.badge, { backgroundColor: '#FFF3E0', color: '#FB8C00' }]}>{getDaysUntil(appt.date)}</Text>
+                ) : (
+                  <Text style={[styles.badge, { backgroundColor: '#E8F5E9', color: '#43A047' }]}>{t('health.completed')}</Text>
+                )}
+              </TouchableOpacity>
+            ))
+          )
+        ))}
+
         {/* Medications */}
         {renderSection(t('health.medications'), 'medication', medications.length, 'medications', (
           medications.length === 0 ? (
@@ -300,34 +328,6 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                 </TouchableOpacity>
               );
             })
-          )
-        ))}
-
-        {/* Appointments */}
-        {renderSection(t('health.appointments'), 'calendar', appointments.length, 'appointments', (
-          appointments.length === 0 ? (
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAppointments')}</Text>
-          ) : (
-            [...appointments].sort((a, b) => {
-              const aPast = a.date < today;
-              const bPast = b.date < today;
-              if (aPast && !bPast) return 1;
-              if (!aPast && bPast) return -1;
-              return a.date.localeCompare(b.date);
-            }).map(appt => (
-              <TouchableOpacity key={appt.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: appt, section: 'appointments' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
-                <AppIcon name="calendar" size={20} color={MODULE_COLORS.health} />
-                <View style={styles.itemText}>
-                  <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
-                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{appt.date} {appt.startTime} — {appt.location || appt.person}</Text>
-                </View>
-                {appt.date >= today ? (
-                  <Text style={[styles.badge, { backgroundColor: '#FFF3E0', color: '#FB8C00' }]}>{getDaysUntil(appt.date)}</Text>
-                ) : (
-                  <Text style={[styles.badge, { backgroundColor: '#E8F5E9', color: '#43A047' }]}>{t('health.completed')}</Text>
-                )}
-              </TouchableOpacity>
-            ))
           )
         ))}
 
