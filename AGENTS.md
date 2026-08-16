@@ -174,6 +174,15 @@ const [showHelp, setShowHelp] = useState(false);
 - Cloud Functions verify auth + role server-side before any mutation
 - Client reads direct Firestore; client writes call Cloud Functions via `callFunction()` helper
 
+## Calendar Sync (CRITICAL)
+
+When adding or modifying calendar sync for any module (events, trips, health, pet), **both** Google Calendar (Cloud Functions) AND Phone Calendar (`CalendarSync`) must be updated. Never implement one without the other.
+
+- **Google Calendar**: Cloud Functions (`onXxxCreatedForCalendar`, `onXxxUpdatedForCalendar`, `onXxxDeletedForCalendar`) — triggers on Firestore write
+- **Phone Calendar**: `CalendarSync.native.tsx` (expo-calendar) + `CalendarSync.web.tsx` (no-op) — called from screens on create/edit/delete
+- Modules: Events ✅, Trips ✅, Health ✅, Pet vet visits ✅
+- See `docs/PLAN-phone-calendar-sync.md` for details
+
 ## PWA / iOS (CRITICAL)
 
 - **All `TextInput` components MUST use `fontSize: 16` or higher** — iOS Safari auto-zooms on inputs with font-size below 16px when focused. This breaks the PWA experience.
