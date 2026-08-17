@@ -856,14 +856,15 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
       {filteredRecipes.length === 0 ? (
         <View style={styles.emptyState}>
-          <Text style={{ fontSize: 40, marginBottom: 12, textAlign: 'center' }}>📖</Text>
-          <Text style={[styles.emptyText, { color: colors.textDisabled, textAlign: 'center' }]}>{searchQuery ? t('mealPlanner.noRecipesSearch') : t('mealPlanner.noRecipes')}</Text>
-
           {/* AI Search Section */}
           {searchQuery && (
-            <View style={[styles.aiSearchCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                <Text style={[styles.aiSearchTitle, { color: colors.text, marginBottom: 0 }]}>🤖 {t('mealPlanner.searchWithAI')}</Text>
+            <View style={[styles.aiSearchCard, { backgroundColor: colors.surface, borderColor: colors.border, padding: 20 }]}>
+              <Text style={{ fontSize: 32, textAlign: 'center', marginBottom: 8 }}>🔍</Text>
+              <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textSecondary, textAlign: 'center', marginBottom: 12 }}>
+                Ingen treff i oppskriftsboken
+              </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                <Text style={[styles.aiSearchTitle, { color: colors.text, marginBottom: 0, fontSize: 16 }]}>🤖 {t('mealPlanner.searchWithAI')}</Text>
                 <TouchableOpacity
                   style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
                   onPress={() => setShowHelpAiSearch(true)}
@@ -875,7 +876,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   </View>
                 </TouchableOpacity>
               </View>
-              <Text style={[styles.aiSearchHint, { color: colors.textSecondary }]}>
+              <Text style={[styles.aiSearchHint, { color: colors.textSecondary, fontSize: 14 }]}>
                 {t('mealPlanner.searchWithAI')} "{searchQuery}"
               </Text>
 
