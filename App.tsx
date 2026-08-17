@@ -530,9 +530,14 @@ const AppContent = () => {
             return;
           }
 
-          setUser({ ...userData, avatarUrl: profile?.avatarUrl || undefined, timezone: profile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone });
+          const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          setUser({ ...userData, avatarUrl: profile?.avatarUrl || undefined, timezone: profile?.timezone || detectedTimezone });
           if (profile?.familyId) {
             setFamily(profile.familyId, profile.familyName, profile.familyRole || null);
+          }
+          // Auto-save timezone if not set in profile
+          if (!profile?.timezone && detectedTimezone) {
+            createOrUpdateUser(userData.uid, { timezone: detectedTimezone }).catch(() => {});
           }
         } catch (error) {
           console.log('Error loading profile:', error);
