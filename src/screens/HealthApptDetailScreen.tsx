@@ -105,6 +105,12 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
             <Text style={[styles.detailValue, { color: colors.text }]} numberOfLines={2}>{appointment.location}</Text>
           </View>
         )}
+        {appointment.doctor && (
+          <View style={styles.detailRow}>
+            <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👩‍⚕️</Text>
+            <Text style={[styles.detailValue, { color: colors.text }]}>{appointment.doctor}</Text>
+          </View>
+        )}
         {appointment.note && (
           <View style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
