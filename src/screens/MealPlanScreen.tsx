@@ -77,6 +77,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [showRecipeDetail, setShowRecipeDetail] = useState<Recipe | null>(null);
   const [showDeleteRecipe, setShowDeleteRecipe] = useState<Recipe | null>(null);
   const [editingRecipe, setEditingRecipe] = useState<Recipe | null>(null);
+  const [recipeSaving, setRecipeSaving] = useState(false);
   const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
   const [infoModal, setInfoModal] = useState<{ visible: boolean; title: string; message?: string }>({ visible: false, title: '' });
   const [showAddList, setShowAddList] = useState(false);
@@ -276,6 +277,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       return;
     }
     if (!familyId) return;
+    setRecipeSaving(true);
     try {
       const recipeData: any = {
         name: recipeForm.name.trim(),
@@ -335,6 +337,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     } catch (error) {
       console.error('Failed to save recipe:', error);
       crossAlert('Error', getErrorMessage(error));
+    } finally {
+      setRecipeSaving(false);
     }
   };
 
@@ -1357,8 +1361,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddRecipe(false); setEditingRecipe(null); resetRecipeForm(); }}>
                     <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleSaveRecipe}>
-                    <Text style={[styles.modalBtnText, { color: '#fff' }]}>{editingRecipe ? t('common.save') : t('mealPlanner.saveRecipe')}</Text>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }, recipeSaving && { opacity: 0.6 }]} onPress={handleSaveRecipe} disabled={recipeSaving}>
+                    {recipeSaving ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>{editingRecipe ? t('common.save') : t('mealPlanner.saveRecipe')}</Text>
+                    )}
                   </TouchableOpacity>
                 </View>
               </View>
