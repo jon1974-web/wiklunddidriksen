@@ -89,7 +89,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     name: '', description: '', time: '', portions: '', category: 'kjoett',
     ingredients: [{ name: '', amount: '', unit: '' }],
     instructions: [''],
-    variation: '', cuisine: '',
+    variation: '', cuisine: '', caloriesPerServing: '',
   });
 
   const categories = [
@@ -242,7 +242,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     }
     if (!familyId) return;
     try {
-      const recipeData = {
+      const recipeData: any = {
         name: recipeForm.name.trim(),
         description: recipeForm.description.trim(),
         ingredients: recipeForm.ingredients.filter(i => i.name.trim()),
@@ -253,6 +253,31 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         variation: recipeForm.variation || '',
         cuisine: recipeForm.cuisine || '',
       };
+
+      // Auto-estimate calories if not provided
+      if (recipeForm.caloriesPerServing) {
+        recipeData.caloriesPerServing = parseInt(recipeForm.caloriesPerServing);
+        recipeData.totalCalories = recipeData.caloriesPerServing * recipeData.portions;
+      } else if (recipeData.ingredients.length > 0) {
+        try {
+          const currentUser = (await import('firebase/auth')).getAuth().currentUser;
+          if (currentUser) {
+            const token = await currentUser.getIdToken();
+            const calRes = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/estimateRecipeCalories', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+              body: JSON.stringify({ ingredients: recipeData.ingredients, portions: recipeData.portions, name: recipeData.name }),
+            });
+            if (calRes.ok) {
+              const calData = await calRes.json();
+              recipeData.caloriesPerServing = calData.caloriesPerServing;
+              recipeData.totalCalories = calData.totalCalories;
+            }
+          }
+        } catch {
+          // Continue without calories
+        }
+      }
       if (editingRecipe) {
         const { updateDoc, doc } = await import('firebase/firestore');
         await updateDoc(doc(db, 'recipes', editingRecipe.id), { ...recipeData, translations: {} });
@@ -489,16 +514,18 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const handleSaveAiRecipe = async (aiRecipe: any) => {
     if (!familyId) return;
     try {
+      const portions = aiRecipe.portions || 4;
       const docRef = await addDoc(collection(db, 'recipes'), {
         name: aiRecipe.name,
         description: aiRecipe.description || '',
         ingredients: aiRecipe.ingredients || [],
         instructions: aiRecipe.instructions || [],
         time: aiRecipe.time || 0,
-        portions: aiRecipe.portions || 4,
+        portions,
         category: aiRecipe.category || 'kjoett',
         variation: aiRecipe.variation || '',
         cuisine: aiRecipe.cuisine || '',
+        ...(aiRecipe.caloriesPerServing ? { caloriesPerServing: aiRecipe.caloriesPerServing, totalCalories: aiRecipe.caloriesPerServing * portions } : {}),
         isFavorite: false,
         createdBy: user?.uid || '',
         familyId,
@@ -546,16 +573,18 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const handleSaveImportedRecipe = async () => {
     if (!importedRecipe || !user) return;
     try {
+      const portions = importedRecipe.portions || 4;
       const docRef = await addDoc(collection(db, 'recipes'), {
         name: importedRecipe.name,
         description: importedRecipe.description || '',
         ingredients: importedRecipe.ingredients || [],
         instructions: importedRecipe.instructions || [],
         time: importedRecipe.time || 0,
-        portions: importedRecipe.portions || 4,
+        portions,
         category: importedRecipe.category || 'kjoett',
         variation: importedRecipe.variation || '',
         cuisine: importedRecipe.cuisine || '',
+        ...(importedRecipe.caloriesPerServing ? { caloriesPerServing: importedRecipe.caloriesPerServing, totalCalories: importedRecipe.caloriesPerServing * portions } : {}),
         isFavorite: false,
         createdBy: user.uid,
         familyId: familyId || '',
@@ -601,7 +630,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               {randomRecipe.category === 'kylling' ? '🍗' : randomRecipe.category === 'kjoett' ? '🥩' : randomRecipe.category === 'fisk' ? '🐟' : randomRecipe.category === 'vegetar' ? '🥗' : randomRecipe.category === 'pasta' ? '🍝' : randomRecipe.category === 'gryte' ? '🥘' : randomRecipe.category === 'suppe' ? '🍲' : randomRecipe.category === 'frokost' ? '🥞' : randomRecipe.category === 'sott' ? '🍰' : '🍽️'}
             </Text>
             <Text style={[styles.randomName, { color: colors.text }]}>{getRecipeText(randomRecipe, 'name')}</Text>
-            <Text style={[styles.randomMeta, { color: colors.textSecondary }]}>{randomRecipe.time} {t('mealPlanner.minutes')} · {randomRecipe.portions} {t('mealPlanner.servings')}</Text>
+            <Text style={[styles.randomMeta, { color: colors.textSecondary }]}>{randomRecipe.time} {t('mealPlanner.minutes')} · {randomRecipe.portions} {t('mealPlanner.servings')}{randomRecipe.caloriesPerServing ? ` · ${randomRecipe.caloriesPerServing} kcal` : ''}</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
               <TouchableOpacity
                 style={[styles.randomActionBtn, { backgroundColor: colors.accent }]}
@@ -911,6 +940,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                               ingredients: item.ingredients.length > 0 ? item.ingredients : [{ name: '', amount: '', unit: '' }],
                               instructions: item.instructions.length > 0 ? item.instructions : [''],
                               variation: item.variation || '', cuisine: item.cuisine || '',
+                              caloriesPerServing: item.caloriesPerServing ? String(item.caloriesPerServing) : '',
                             });
                             setShowAddRecipe(true);
                           }, onDelete: async () => {
@@ -937,7 +967,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                               </View>
                             </View>
                             <Text style={[styles.recipeMeta, { color: colors.textSecondary, marginTop: 4 }]}>
-                              {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}
+                              {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}{item.caloriesPerServing ? ` · ${item.caloriesPerServing} ${t('mealPlanner.kcal')}` : ''}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -987,7 +1017,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                       </View>
                     )}
                   </View>
-                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner · {t(`mealPlanner.${recipe.category || 'kjoett'}`)}</Text>
+                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner · {t(`mealPlanner.${recipe.category || 'kjoett'}`)}{recipe.caloriesPerServing ? ` · ${recipe.caloriesPerServing} kcal` : ''}</Text>
                   {recipe.description ? <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }} numberOfLines={2}>{recipe.description}</Text> : null}
                 </View>
                 <View style={{ flexDirection: 'row', gap: 6 }}>
@@ -1160,6 +1190,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     </View>
                   </View>
 
+                  {/* Calories */}
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.caloriesPerServing')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.caloriesPerServing} onChangeText={v => setRecipeForm(f => ({ ...f, caloriesPerServing: v }))} keyboardType="numeric" placeholder={t('mealPlanner.autoEstimate')} placeholderTextColor={colors.textDisabled} />
+                  </View>
+
                   {/* Category */}
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.category')}</Text>
@@ -1312,7 +1348,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   </View>
                 <ScrollView>
                   {showRecipeDetail?.description ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{getRecipeText(showRecipeDetail, 'description')}</Text> : null}
-                  {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}</Text> : null}
+                  {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}{showRecipeDetail.caloriesPerServing ? ` · ${showRecipeDetail.caloriesPerServing} ${t('mealPlanner.kcal')}` : ''}</Text> : null}
                   {showRecipeDetail?.ingredients && showRecipeDetail.ingredients.length > 0 && (
                     <Text style={[styles.cardTitle, { color: colors.text }]}>{t('mealPlanner.ingredientsList')}</Text>
                   )}
@@ -1546,7 +1582,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8 }}>{importedRecipe.description}</Text>
                   )}
                   {importedRecipe?.time > 0 && (
-                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>⏱️ {importedRecipe.time} min · 🍽️ {importedRecipe.portions || 4} porsjoner</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>⏱️ {importedRecipe.time} min · 🍽️ {importedRecipe.portions || 4} porsjoner{importedRecipe.caloriesPerServing ? ` · ${importedRecipe.caloriesPerServing} kcal` : ''}</Text>
                   )}
                   {importedRecipe?.ingredients?.length > 0 && (
                     <View style={{ marginTop: 8 }}>

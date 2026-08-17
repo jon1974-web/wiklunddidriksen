@@ -161,7 +161,11 @@
     "allYears": "Alle",
     "startTime": "Starttid",
     "endTime": "Sluttid",
-    "optional": "valgfritt"
+    "optional": "valgfritt",
+    "caloriesPerServing": "Kalorier per porsjon",
+    "totalCalories": "Totalt",
+    "kcal": "kcal",
+    "autoEstimate": "AI estimerer automatisk"
   },
   "spaces": {
     "title": "Våre steder",

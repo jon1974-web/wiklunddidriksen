@@ -27,6 +27,7 @@ interface ParsedRecipe {
   category: string;
   variation: string;
   cuisine: string;
+  caloriesPerServing?: number;
 }
 
 interface EditableRecipe extends ParsedRecipe {
@@ -164,16 +165,18 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
     if (!user || !familyId || creating) return;
     setCreating(true);
     try {
+      const portions = recipe.portions || 4;
       const recipeData = {
         name: sanitizeInput(recipe.name),
         description: recipe.description ? sanitizeInput(recipe.description) : '',
         ingredients: recipe.ingredients.filter((i) => i.name.trim()),
         instructions: recipe.instructions.filter((i) => i.trim()),
         time: recipe.time || 0,
-        portions: recipe.portions || 4,
+        portions,
         category: recipe.category || 'kjoett',
         variation: recipe.variation || '',
         cuisine: recipe.cuisine || '',
+        ...(recipe.caloriesPerServing ? { caloriesPerServing: recipe.caloriesPerServing, totalCalories: recipe.caloriesPerServing * portions } : {}),
         isFavorite: false,
         createdBy: user.uid,
         familyId,

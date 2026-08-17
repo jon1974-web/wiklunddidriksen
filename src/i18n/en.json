@@ -161,7 +161,11 @@
     "allYears": "All",
     "startTime": "Start time",
     "endTime": "End time",
-    "optional": "optional"
+    "optional": "optional",
+    "caloriesPerServing": "Calories per serving",
+    "totalCalories": "Total",
+    "kcal": "kcal",
+    "autoEstimate": "AI estimates automatically"
   },
   "spaces": {
     "title": "Our Places",

@@ -629,6 +629,7 @@ For each recipe found, extract:
 - category: One of "kylling", "kjoett", "fisk", "vegetar", "pasta", "gryte", "suppe", "frokost", "sott" (guess from the recipe content)
 - variation: "Klassisk", "Raskere", "Med en vri", or empty string
 - cuisine: Country/cuisine name or empty string
+- caloriesPerServing: Estimated calories per serving as a number (based on ingredients and portions). If unsure, estimate as best you can.
 
 If only one recipe is found, return an array with one element.
 If multiple recipes are found (e.g. a cookbook page), return ALL of them.
@@ -648,7 +649,8 @@ Return ONLY valid JSON with this exact structure:
       "portions": 4,
       "category": "category key",
       "variation": "",
-      "cuisine": ""
+      "cuisine": "",
+      "caloriesPerServing": 350
     }
   ]
 }`;
@@ -1400,12 +1402,14 @@ CRITICAL: You MUST respond entirely in ${responseLangName}. The dish name stays 
     "instructions": ["Step MUST be in ${responseLangName}", "Step MUST be in ${responseLangName}"],
     "time": 30,
     "portions": 4,
-    "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott"
+    "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott",
+    "caloriesPerServing": 350
   }
 ]
 
 Make each dish practical for everyday family cooking. Each dish must have a unique, authentic name from ${searchLangName} cuisine.
-Focus on making the 3 dishes meaningfully different from each other — different ingredients, techniques, or complexity levels.`,
+Focus on making the 3 dishes meaningfully different from each other — different ingredients, techniques, or complexity levels.
+Estimate caloriesPerServing based on ingredients and portions.`,
         },
         {
           role: "user",
@@ -1496,10 +1500,12 @@ Return ONLY valid JSON with this exact structure:
   "portions": 4,
   "category": "kylling|kjoett|fisk|vegetar|pasta|gryte|suppe|frokost|sott",
   "variation": "",
-  "cuisine": ""
+  "cuisine": "",
+  "caloriesPerServing": 350
 }
 
 Extract the recipe name, ingredients with amounts and units, step-by-step instructions (EXACTLY as written, no shortening), estimated cooking time in minutes, number of servings, and categorize the dish.
+Estimate caloriesPerServing based on ingredients and portions.
 If you cannot extract a recipe from the content, return {"error": "Could not extract recipe from URL"}.`,
         },
         {
@@ -1530,6 +1536,69 @@ If you cannot extract a recipe from the content, return {"error": "Could not ext
   } catch (error) {
     console.error("Import recipe error:", error);
     return res.status(500).json({ error: "Failed to import recipe" });
+  }
+});
+
+// Estimate calories for a recipe
+exports.estimateRecipeCalories = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await checkRateLimit(uid, "estimateRecipeCalories"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  const { ingredients, portions, name } = req.body;
+  if (!ingredients || !Array.isArray(ingredients)) {
+    return res.status(400).json({ error: "Missing ingredients array" });
+  }
+
+  try {
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a nutrition estimator. Given a list of ingredients and portions, estimate the calories per serving.
+
+Return ONLY valid JSON with this exact structure:
+{
+  "caloriesPerServing": 350
+}
+
+Estimate based on typical nutritional values for the ingredients listed. Be realistic - a main course is typically 400-800 kcal per serving, a side dish 150-300 kcal, a dessert 200-400 kcal.`,
+        },
+        {
+          role: "user",
+          content: `Estimate calories per serving for "${name || 'this recipe'}" with ${portions || 4} servings.\n\nIngredients:\n${ingredients.map((i) => `- ${i.amount || ''} ${i.unit || ''} ${i.name}`).join('\n')}`,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 100,
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return res.status(500).json({ error: "No response from AI" });
+    }
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return res.status(500).json({ error: "Invalid AI response" });
+    }
+
+    const result = JSON.parse(jsonMatch[0]);
+    const caloriesPerServing = Math.round(result.caloriesPerServing || 0);
+
+    return res.status(200).json({ caloriesPerServing, totalCalories: caloriesPerServing * (portions || 4) });
+  } catch (error) {
+    console.error("Estimate calories error:", error);
+    return res.status(500).json({ error: "Failed to estimate calories" });
   }
 });
 

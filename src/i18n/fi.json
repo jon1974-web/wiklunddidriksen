@@ -161,7 +161,11 @@
     "allYears": "Kaikki",
     "startTime": "Aloitusaika",
     "endTime": "Lopetusaika",
-    "optional": "valinnainen"
+    "optional": "valinnainen",
+    "caloriesPerServing": "Kalorit annosta kohti",
+    "totalCalories": "Yhteensä",
+    "kcal": "kcal",
+    "autoEstimate": "AI arvioi automaattisesti"
   },
   "spaces": {
     "title": "Paikkamme",

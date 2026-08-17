@@ -412,6 +412,8 @@ export interface Recipe {
   category: string;
   variation?: string;
   cuisine?: string;
+  caloriesPerServing?: number;
+  totalCalories?: number;
   isFavorite: boolean;
   createdBy: string;
   familyId: string;
