@@ -123,7 +123,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       else if (section === 'allergies') item = allergies.find(a => a.id === id);
       else if (section === 'growth') item = growth.find(g => g.id === id);
       if (item) {
-        setEditingItem(item);
+        setEditingItem({ id: item.id, section });
         setShowAddModal(true);
         navigation.setParams({ editId: undefined, editSection: undefined });
       }

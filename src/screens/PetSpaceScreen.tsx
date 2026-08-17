@@ -154,7 +154,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         const pet = pets.find(p => p.id === item.petId);
         if (pet) setSelectedPet(pet);
         setActiveSection(section);
-        setEditingItem(item);
+        setEditingItem({ id: item.id, section });
         resetItemForms();
         setShowItemModal(true);
         navigation.setParams({ editId: undefined, editSection: undefined });
