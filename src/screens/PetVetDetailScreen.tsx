@@ -151,11 +151,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
             style={[styles.actionButton, { backgroundColor: PET_COLOR, flex: 1 }]}
             onPress={() => {
               const source = route.params?.source || 'pets';
-              if (source === 'events') {
-                navigation.navigate('Events');
-              } else {
-                navigation.navigate('PetSpace', { editId: visit.id, editSection: 'vetVisits' });
-              }
+              navigation.navigate('PetSpace', { editId: visit.id, editSection: 'vetVisits', returnToEvents: source === 'events' });
             }}
           >
             <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.edit')}</Text>

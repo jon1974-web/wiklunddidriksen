@@ -146,11 +146,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
             style={[styles.actionButton, { backgroundColor: HEALTH_COLOR, flex: 1 }]}
             onPress={() => {
               const source = route.params?.source || 'health';
-              if (source === 'events') {
-                navigation.navigate('Events');
-              } else {
-                navigation.navigate('HealthSpace', { editId: appointment.id, editSection: 'appointments' });
-              }
+              navigation.navigate('HealthSpace', { editId: appointment.id, editSection: 'appointments', returnToEvents: source === 'events' });
             }}
           >
             <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.edit')}</Text>

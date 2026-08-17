@@ -188,6 +188,10 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       setEditingItem(null);
       setShowAddModal(false);
       loadData();
+      if (route?.params?.returnToEvents) {
+        navigation.navigate('Events');
+        navigation.setParams({ returnToEvents: undefined });
+      }
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }

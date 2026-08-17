@@ -299,6 +299,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
       setEditingItem(null);
       setShowItemModal(false);
       loadPetData();
+      if (route?.params?.returnToEvents) {
+        navigation.navigate('Events');
+        navigation.setParams({ returnToEvents: undefined });
+      }
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
