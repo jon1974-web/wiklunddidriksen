@@ -301,6 +301,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               const bPast = b.date < today;
               if (aPast && !bPast) return 1;
               if (!aPast && bPast) return -1;
+              if (aPast && bPast) return b.date.localeCompare(a.date);
               return a.date.localeCompare(b.date);
             }).map(appt => (
                 <TouchableOpacity key={appt.id} style={styles.item} onPress={() => navigation.navigate('HealthApptDetail', { appointment: appt, source: 'health' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
@@ -361,6 +362,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               const bPast = b.date < today;
               if (aPast && !bPast) return 1;
               if (!aPast && bPast) return -1;
+              if (aPast && bPast) return b.date.localeCompare(a.date);
               return a.date.localeCompare(b.date);
             }).map(vacc => (
               <TouchableOpacity key={vacc.id} style={styles.item} onPress={() => navigation.navigate('HealthVaccDetail', { vaccination: vacc, source: 'health' })} onLongPress={() => setActionModal({ visible: true, id: vacc.id, title: vacc.name, section: 'vaccinations' })}>

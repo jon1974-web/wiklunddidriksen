@@ -640,6 +640,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 const bPast = isDatePast(b.date);
                 if (aPast && !bPast) return 1;
                 if (!aPast && bPast) return -1;
+                if (aPast && bPast) return b.date.localeCompare(a.date);
                 return a.date.localeCompare(b.date);
               }).map(v => (
                 <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVetDetail', { visit: v, petName: pets.find(p => p.id === v.petId)?.name, source: 'pets' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.title, section: 'vetVisits' })}>
@@ -728,6 +729,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 const bPast = isDatePast(b.date);
                 if (aPast && !bPast) return 1;
                 if (!aPast && bPast) return -1;
+                if (aPast && bPast) return b.date.localeCompare(a.date);
                 return a.date.localeCompare(b.date);
               }).map(v => (
                 <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVaccDetail', { vaccination: v, petName: pets.find(p => p.id === v.petId)?.name, source: 'pets' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.name, section: 'vaccinations' })}>
