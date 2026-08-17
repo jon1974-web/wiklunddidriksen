@@ -22,6 +22,41 @@ import { generateId } from '../utils/generateId';
 type SubTab = 'ukemeny' | 'oppskrifter' | 'handleliste';
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const DAY_LABELS = ['mealPlanner.monday', 'mealPlanner.tuesday', 'mealPlanner.wednesday', 'mealPlanner.thursday', 'mealPlanner.friday', 'mealPlanner.saturday', 'mealPlanner.sunday'];
+
+const COUNTRY_FLAGS: Record<string, string> = {
+  norge: '🇳🇴', norge: '🇳🇴', norway: '🇳🇴', norsk: '🇳🇴',
+  sverige: '🇸🇪', sweden: '🇸🇪', svensk: '🇸🇪',
+  danmark: '🇩🇰', denmark: '🇩🇰', dansk: '🇩🇰',
+  finland: '🇫🇮', finland: '🇫🇮', finsk: '🇫🇮',
+  italia: '🇮🇹', italy: '🇮🇹', italiensk: '🇮🇹',
+  spania: '🇪🇸', spain: '🇪🇸', spansk: '🇪🇸',
+  frankrike: '🇫🇷', france: '🇫🇷', fransk: '🇫🇷',
+  tyskland: '🇩🇪', germany: '🇩🇪', tysk: '🇩🇪',
+  hellas: '🇬🇷', greece: '🇬🇷', gresk: '🇬🇷',
+  tyrkia: '🇹🇷', turkey: '🇹🇷', tyrkisk: '🇹🇷',
+  india: '🇮🇳', indisk: '🇮🇳',
+  japan: '🇯🇵', japansk: '🇯🇵',
+  thailand: '🇹🇭', thailandsk: '🇹🇭',
+  mexico: '🇲🇽', meksikansk: '🇲🇽',
+  kina: '🇨🇳', china: '🇨🇳', kinesisk: '🇨🇳',
+  korea: '🇰🇷', koreansk: '🇰🇷',
+  kroatia: '🇭🇷', croatia: '🇭🇷', kroatisk: '🇭🇷',
+  portugal: '🇵🇹', portugisisk: '🇵🇹',
+  usa: '🇺🇸', amerikansk: '🇺🇸',
+  argentina: '🇦🇷', argentinsk: '🇦🇷',
+  brasil: '🇧🇷', brasiliansk: '🇧🇷',
+  england: '🇬🇧', uk: '🇬🇧', britisk: '🇬🇧',
+  russland: '🇷🇺', russia: '🇷🇺', russisk: '🇷🇺',
+  marokko: '🇲🇦', morocco: '🇲🇦', marokkansk: '🇲🇦',
+  libanon: '🇱🇧', lebanon: '🇱🇧', libanesisk: '🇱🇧',
+  Vietnam: '🇻🇳', vietnamesisk: '🇻🇳',
+};
+
+const getCountryFlag = (cuisine: string): string => {
+  if (!cuisine) return '';
+  const key = cuisine.toLowerCase().trim();
+  return COUNTRY_FLAGS[key] || '';
+};
 const MEAL_SLOTS = ['frokost', 'lunsj', 'middag'] as const;
 
 export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
@@ -957,7 +992,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                                   </View>
                                 )}
                                 {item.cuisine && (
-                                  <View style={{ paddingHorizontal: 5, paddingVertical: 2, borderRadius: 6, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+                                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, paddingHorizontal: 5, paddingVertical: 2, borderRadius: 6, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}>
+                                    <Text style={{ fontSize: 10 }}>{getCountryFlag(item.cuisine)}</Text>
                                     <Text style={{ fontSize: 9, fontWeight: '600', color: colors.textSecondary }}>{item.cuisine}</Text>
                                   </View>
                                 )}
@@ -967,7 +1003,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                               </View>
                             </View>
                             <Text style={[styles.recipeMeta, { color: colors.textSecondary, marginTop: 4 }]}>
-                              {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}{item.caloriesPerServing ? ` · ${item.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${item.totalCalories || item.caloriesPerServing * item.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''}
+                              <Text style={{ fontWeight: '700', color: colors.text }}>{item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}</Text>
+                              {item.caloriesPerServing ? `\n${item.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${item.totalCalories || item.caloriesPerServing * item.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -1004,19 +1041,22 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             aiResults.map((recipe, i) => (
               <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
                 <View style={{ flex: 1 }}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2, flexWrap: 'wrap' }}>
-                    <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
-                    {recipe.variation && (
-                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
-                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{recipe.variation}</Text>
-                      </View>
-                    )}
-                    {recipe.cuisine && (
-                      <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
-                        <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{recipe.cuisine}</Text>
-                      </View>
-                    )}
-                  </View>
+                  <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
+                  {(recipe.variation || recipe.cuisine) && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2, flexWrap: 'wrap' }}>
+                      {recipe.variation && (
+                        <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+                          <Text style={{ fontSize: 10, fontWeight: '600', color: colors.accent }}>{recipe.variation}</Text>
+                        </View>
+                      )}
+                      {recipe.cuisine && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
+                          <Text style={{ fontSize: 10 }}>{getCountryFlag(recipe.cuisine)}</Text>
+                          <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textSecondary }}>{recipe.cuisine}</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
                   <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner · {t(`mealPlanner.${recipe.category || 'kjoett'}`)}{recipe.caloriesPerServing ? ` · ${recipe.caloriesPerServing} kcal/porsjon · ${recipe.caloriesPerServing * (recipe.portions || 4)} kcal totalt` : ''}</Text>
                   {recipe.description ? <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }} numberOfLines={2}>{recipe.description}</Text> : null}
                 </View>
@@ -1333,22 +1373,25 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
-                  <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail ? getRecipeText(showRecipeDetail, 'name') : ''}</Text>
-                    {showRecipeDetail?.variation && (
-                      <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9', alignSelf: 'center' }}>
-                        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.accent }}>{showRecipeDetail.variation}</Text>
-                      </View>
-                    )}
-                    {showRecipeDetail?.cuisine && (
-                      <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border, alignSelf: 'center' }}>
-                        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>{showRecipeDetail.cuisine}</Text>
-                      </View>
-                    )}
-                  </View>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>{showRecipeDetail ? getRecipeText(showRecipeDetail, 'name') : ''}</Text>
+                  {(showRecipeDetail?.variation || showRecipeDetail?.cuisine) && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+                      {showRecipeDetail?.variation && (
+                        <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+                          <Text style={{ fontSize: 12, fontWeight: '600', color: colors.accent }}>{showRecipeDetail.variation}</Text>
+                        </View>
+                      )}
+                      {showRecipeDetail?.cuisine && (
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
+                          <Text style={{ fontSize: 12 }}>{getCountryFlag(showRecipeDetail.cuisine)}</Text>
+                          <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>{showRecipeDetail.cuisine}</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
                 <ScrollView>
                   {showRecipeDetail?.description ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{getRecipeText(showRecipeDetail, 'description')}</Text> : null}
-                  {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}{showRecipeDetail.caloriesPerServing ? ` · ${showRecipeDetail.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${showRecipeDetail.totalCalories || showRecipeDetail.caloriesPerServing * showRecipeDetail.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''}</Text> : null}
+                  {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}><Text style={{ fontWeight: '700', color: colors.text }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}</Text>{showRecipeDetail.caloriesPerServing ? `\n${showRecipeDetail.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${showRecipeDetail.totalCalories || showRecipeDetail.caloriesPerServing * showRecipeDetail.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''}</Text> : null}
                   {showRecipeDetail?.ingredients && showRecipeDetail.ingredients.length > 0 && (
                     <Text style={[styles.cardTitle, { color: colors.text }]}>{t('mealPlanner.ingredientsList')}</Text>
                   )}

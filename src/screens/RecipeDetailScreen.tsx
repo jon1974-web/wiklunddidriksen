@@ -14,6 +14,41 @@ import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { generateId } from '../utils/generateId';
 
+const COUNTRY_FLAGS: Record<string, string> = {
+  norge: '🇳🇴', norge: '🇳🇴', norway: '🇳🇴', norsk: '🇳🇴',
+  sverige: '🇸🇪', sweden: '🇸🇪', svensk: '🇸🇪',
+  danmark: '🇩🇰', denmark: '🇩🇰', dansk: '🇩🇰',
+  finland: '🇫🇮', finland: '🇫🇮', finsk: '🇫🇮',
+  italia: '🇮🇹', italy: '🇮🇹', italiensk: '🇮🇹',
+  spania: '🇪🇸', spain: '🇪🇸', spansk: '🇪🇸',
+  frankrike: '🇫🇷', france: '🇫🇷', fransk: '🇫🇷',
+  tyskland: '🇩🇪', germany: '🇩🇪', tysk: '🇩🇪',
+  hellas: '🇬🇷', greece: '🇬🇷', gresk: '🇬🇷',
+  tyrkia: '🇹🇷', turkey: '🇹🇷', tyrkisk: '🇹🇷',
+  india: '🇮🇳', indisk: '🇮🇳',
+  japan: '🇯🇵', japansk: '🇯🇵',
+  thailand: '🇹🇭', thailandsk: '🇹🇭',
+  mexico: '🇲🇽', meksikansk: '🇲🇽',
+  kina: '🇨🇳', china: '🇨🇳', kinesisk: '🇨🇳',
+  korea: '🇰🇷', koreansk: '🇰🇷',
+  kroatia: '🇭🇷', croatia: '🇭🇷', kroatisk: '🇭🇷',
+  portugal: '🇵🇹', portugisisk: '🇵🇹',
+  usa: '🇺🇸', amerikansk: '🇺🇸',
+  argentina: '🇦🇷', argentinsk: '🇦🇷',
+  brasil: '🇧🇷', brasiliansk: '🇧🇷',
+  england: '🇬🇧', uk: '🇬🇧', britisk: '🇬🇧',
+  russland: '🇷🇺', russia: '🇷🇺', russisk: '🇷🇺',
+  marokko: '🇲🇦', morocco: '🇲🇦', marokkansk: '🇲🇦',
+  libanon: '🇱🇧', lebanon: '🇱🇧', libanesisk: '🇱🇧',
+  Vietnam: '🇻🇳', vietnamesisk: '🇻🇳',
+};
+
+const getCountryFlag = (cuisine: string): string => {
+  if (!cuisine) return '';
+  const key = cuisine.toLowerCase().trim();
+  return COUNTRY_FLAGS[key] || '';
+};
+
 interface Props {
   navigation: any;
   route: { params: { recipe: Recipe } };
@@ -101,21 +136,24 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
-        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
-          <Text style={[styles.recipeTitle, { color: colors.text }]}>{getRecipeText('name')}</Text>
-          {recipe.variation && (
-            <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9', alignSelf: 'center' }}>
-              <Text style={{ fontSize: 12, fontWeight: '600', color: colors.accent }}>{recipe.variation}</Text>
-            </View>
-          )}
-          {recipe.cuisine && (
-            <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border, alignSelf: 'center' }}>
-              <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>{recipe.cuisine}</Text>
-            </View>
-          )}
-        </View>
+        <Text style={[styles.recipeTitle, { color: colors.text }]}>{getRecipeText('name')}</Text>
+        {(recipe.variation || recipe.cuisine) && (
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+            {recipe.variation && (
+              <View style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.accentLight || '#E8F5E9' }}>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.accent }}>{recipe.variation}</Text>
+              </View>
+            )}
+            {recipe.cuisine && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8, backgroundColor: colors.inputBackground, borderWidth: 1, borderColor: colors.border }}>
+                <Text style={{ fontSize: 12 }}>{getCountryFlag(recipe.cuisine)}</Text>
+                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>{recipe.cuisine}</Text>
+              </View>
+            )}
+          </View>
+        )}
         <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>
-          {getCategoryEmoji(recipe.category)} {recipe.time} {t('mealPlanner.minutes')} · {recipe.portions} {t('mealPlanner.servings')}{recipe.caloriesPerServing ? ` · ${recipe.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${recipe.totalCalories || recipe.caloriesPerServing * recipe.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''} · {recipe.category ? t(`mealPlanner.${recipe.category}`) : ''}
+          {getCategoryEmoji(recipe.category)} <Text style={{ fontWeight: '700', color: colors.text }}>{recipe.time} {t('mealPlanner.minutes')} · {recipe.portions} {t('mealPlanner.servings')}</Text>{recipe.caloriesPerServing ? `\n${recipe.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${recipe.totalCalories || recipe.caloriesPerServing * recipe.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''} · {recipe.category ? t(`mealPlanner.${recipe.category}`) : ''}
         </Text>
 
         {recipe.description ? (
