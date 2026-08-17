@@ -1043,7 +1043,8 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center' }}>{t('mealPlanner.noSuggestions')}</Text>
             </View>
           ) : (
-            aiResults.map((recipe, i) => (
+            <ScrollView style={{ maxHeight: 400 }} nestedScrollEnabled>
+              {aiResults.map((recipe, i) => (
               <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
                 <View style={{ flex: 1 }}>
                   <Text style={[styles.recipePickerName, { color: colors.text }]}>{recipe.name}</Text>
@@ -1079,8 +1080,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>+ {t('mealPlanner.saveRecipe')}</Text>
                   </TouchableOpacity>
                 </View>
-              </View>
-            ))
+                </View>
+              ))}
+            </ScrollView>
           )}
           <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.inputBackground, marginTop: 8 }]} onPress={() => { setShowAiResults(false); setAiResults([]); }}>
             <Text style={[styles.aiBtnText, { color: colors.text }]}>{t('mealPlanner.close')}</Text>
