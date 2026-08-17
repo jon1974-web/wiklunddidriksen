@@ -101,7 +101,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     return () => i18nInstance.off('languageChanged', handler);
   }, [i18nInstance]);
 
-  const today = useMemo(() => new Date(), []);
+  const today = useMemo(() => new Date(), [visible]);
   const todayStr = toLocalDateStr(today);
 
   const weekData = useMemo(() => {
@@ -291,9 +291,9 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           {weekData.days.map((day, idx) => {
             const isToday = toLocalDateStr(day.date) === todayStr;
             return (
-              <View key={idx} style={[styles.dayCard, isToday && { borderColor: MODULE_COLORS.mealplan, borderWidth: 2 }]}>
+              <View key={idx} style={[styles.dayCard, isToday && { borderColor: colors.accent, borderWidth: 2 }]}>
                 <View style={styles.dayCardHeader}>
-                  <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={MODULE_COLORS.mealplan} />
+                  <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={colors.accent} />
                   <View style={styles.dayCardItems}>
                     {day.items.length > 0 ? day.items.map((item, i) => {
                       const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : MODULE_COLORS.birthdays;
