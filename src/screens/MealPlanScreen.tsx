@@ -857,7 +857,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       {filteredRecipes.length === 0 ? (
         <View style={styles.emptyState}>
           {/* AI Search Section */}
-          {searchQuery && (
+          {searchQuery && !showAiResults && (
             <View style={[styles.aiSearchCard, { backgroundColor: colors.surface, borderColor: colors.border, padding: 20 }]}>
               <Text style={{ fontSize: 32, textAlign: 'center', marginBottom: 8 }}>🔍</Text>
               <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textSecondary, textAlign: 'center', marginBottom: 12 }}>
