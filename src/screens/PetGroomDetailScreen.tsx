@@ -110,8 +110,18 @@ export const PetGroomDetailScreen: React.FC<Props> = ({ navigation, route }) => 
       {/* Button box */}
       <View style={[styles.card, { marginTop: 10, backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', gap: 8 }}>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: PET_COLOR, flex: 1 }]} onPress={() => navigation.goBack()}>
-            <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.close')}</Text>
+          <TouchableOpacity
+            style={[styles.actionButton, { backgroundColor: PET_COLOR, flex: 1 }]}
+            onPress={() => {
+              const source = route.params?.source || 'pets';
+              if (source === 'events') {
+                navigation.navigate('Events');
+              } else {
+                navigation.navigate('PetSpace', { editId: grooming.id, editSection: 'grooming' });
+              }
+            }}
+          >
+            <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.edit')}</Text>
           </TouchableOpacity>
           {canDelete && (
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#fff', borderColor: colors.danger, borderWidth: 1.5, flex: 1 }]} onPress={() => setShowDeleteModal(true)}>

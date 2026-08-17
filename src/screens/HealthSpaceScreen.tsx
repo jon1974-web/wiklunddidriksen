@@ -112,7 +112,23 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       setShowAddModal(true);
       navigation.setParams({ openAddSection: undefined });
     }
-  }, [route?.params?.openAddSection]);
+    if (route?.params?.editId && route?.params?.editSection) {
+      const section = route.params.editSection as SectionType;
+      setActiveSection(section);
+      const id = route.params.editId;
+      let item: any = null;
+      if (section === 'appointments') item = appointments.find(a => a.id === id);
+      else if (section === 'medications') item = medications.find(m => m.id === id);
+      else if (section === 'vaccinations') item = vaccinations.find(v => v.id === id);
+      else if (section === 'allergies') item = allergies.find(a => a.id === id);
+      else if (section === 'growth') item = growth.find(g => g.id === id);
+      if (item) {
+        setEditingItem(item);
+        setShowAddModal(true);
+      }
+      navigation.setParams({ editId: undefined, editSection: undefined });
+    }
+  }, [route?.params?.openAddSection, route?.params?.editId, route?.params?.editSection, appointments, medications, vaccinations, allergies, growth]);
 
   const today = new Date().toISOString().split('T')[0];
   const upcomingAppointments = appointments.filter(a => a.date >= today).slice(0, 3);
@@ -283,7 +299,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               if (!aPast && bPast) return -1;
               return a.date.localeCompare(b.date);
             }).map(appt => (
-              <TouchableOpacity key={appt.id} style={styles.item} onPress={() => navigation.navigate('HealthApptDetail', { appointment: appt })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
+                <TouchableOpacity key={appt.id} style={styles.item} onPress={() => navigation.navigate('HealthApptDetail', { appointment: appt, source: 'health' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
                 <AppIcon name="calendar" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
@@ -314,7 +330,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               const isFinished = med.dateTo && med.dateTo < today;
               const isActive = med.dateFrom && (!med.dateTo || med.dateTo >= today);
               return (
-                <TouchableOpacity key={med.id} style={styles.item} onPress={() => navigation.navigate('HealthMedDetail', { medication: med })} onLongPress={() => setActionModal({ visible: true, id: med.id, title: med.name, section: 'medications' })}>
+                <TouchableOpacity key={med.id} style={styles.item} onPress={() => navigation.navigate('HealthMedDetail', { medication: med, source: 'health' })} onLongPress={() => setActionModal({ visible: true, id: med.id, title: med.name, section: 'medications' })}>
                   <AppIcon name="medication" size={20} color={MODULE_COLORS.health} />
                   <View style={styles.itemText}>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{med.name}</Text>
@@ -343,7 +359,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               if (!aPast && bPast) return -1;
               return a.date.localeCompare(b.date);
             }).map(vacc => (
-              <TouchableOpacity key={vacc.id} style={styles.item} onPress={() => navigation.navigate('HealthVaccDetail', { vaccination: vacc })} onLongPress={() => setActionModal({ visible: true, id: vacc.id, title: vacc.name, section: 'vaccinations' })}>
+              <TouchableOpacity key={vacc.id} style={styles.item} onPress={() => navigation.navigate('HealthVaccDetail', { vaccination: vacc, source: 'health' })} onLongPress={() => setActionModal({ visible: true, id: vacc.id, title: vacc.name, section: 'vaccinations' })}>
                 <AppIcon name="vaccination" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{vacc.name}</Text>

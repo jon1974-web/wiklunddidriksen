@@ -130,7 +130,6 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   useEffect(() => {
     if (route?.params?.openAddSection && pets.length > 0 && !selectedPet) {
       if (pets.length === 1) {
-        // Only one pet — auto-select and open modal
         setSelectedPet(pets[0]);
         setTimeout(() => {
           setActiveSection(route.params!.openAddSection!);
@@ -140,9 +139,28 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           navigation.setParams({ openAddSection: undefined });
         }, 500);
       }
-      // Multiple pets — user sees the grid and selects manually
     }
-  }, [route?.params?.openAddSection, pets, selectedPet]);
+    if (route?.params?.editId && route?.params?.editSection && pets.length > 0) {
+      const section = route.params.editSection as PetSectionType;
+      const id = route.params.editId;
+      let item: any = null;
+      if (section === 'vetVisits') item = vetVisits.find(v => v.id === id);
+      else if (section === 'medications') item = medications.find(m => m.id === id);
+      else if (section === 'food') item = food.find(f => f.id === id);
+      else if (section === 'grooming') item = grooming.find(g => g.id === id);
+      else if (section === 'vaccinations') item = vaccinations.find(v => v.id === id);
+      else if (section === 'insurance') item = insurance.find(i => i.id === id);
+      if (item) {
+        const pet = pets.find(p => p.id === item.petId);
+        if (pet) setSelectedPet(pet);
+        setActiveSection(section);
+        setEditingItem(item);
+        resetItemForms();
+        setShowItemModal(true);
+      }
+      navigation.setParams({ editId: undefined, editSection: undefined });
+    }
+  }, [route?.params?.openAddSection, route?.params?.editId, route?.params?.editSection, pets, selectedPet, vetVisits, medications, food, grooming, vaccinations, insurance]);
 
   useEffect(() => {
     if (!editingItem) return;
@@ -620,7 +638,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 if (!aPast && bPast) return -1;
                 return a.date.localeCompare(b.date);
               }).map(v => (
-                <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVetDetail', { visit: v, petName: pets.find(p => p.id === v.petId)?.name })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.title, section: 'vetVisits' })}>
+                <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVetDetail', { visit: v, petName: pets.find(p => p.id === v.petId)?.name, source: 'pets' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.title, section: 'vetVisits' })}>
                   <AppIcon name="calendar" size={20} color={PET_THEME} />
                   <View style={styles.itemText}>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{v.title}</Text>
@@ -648,7 +666,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 const isFinished = m.dateTo && isDatePast(m.dateTo);
                 const isActive = m.dateFrom && (!m.dateTo || !isDatePast(m.dateTo));
                 return (
-                  <TouchableOpacity key={m.id} style={styles.item} onPress={() => navigation.navigate('PetMedDetail', { medication: m, petName: pets.find(p => p.id === m.petId)?.name })} onLongPress={() => setItemActionModal({ visible: true, id: m.id, title: m.name, section: 'medications' })}>
+                  <TouchableOpacity key={m.id} style={styles.item} onPress={() => navigation.navigate('PetMedDetail', { medication: m, petName: pets.find(p => p.id === m.petId)?.name, source: 'pets' })} onLongPress={() => setItemActionModal({ visible: true, id: m.id, title: m.name, section: 'medications' })}>
                     <AppIcon name="medication" size={20} color={PET_THEME} />
                     <View style={styles.itemText}>
                       <Text style={[styles.itemTitle, { color: colors.text }]}>{m.name}</Text>
@@ -686,7 +704,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('pets.noGrooming')}</Text>
             ) : (
               grooming.map(g => (
-                <TouchableOpacity key={g.id} style={styles.item} onPress={() => navigation.navigate('PetGroomDetail', { grooming: g, petName: pets.find(p => p.id === g.petId)?.name })} onLongPress={() => setItemActionModal({ visible: true, id: g.id, title: g.name, section: 'grooming' })}>
+                <TouchableOpacity key={g.id} style={styles.item} onPress={() => navigation.navigate('PetGroomDetail', { grooming: g, petName: pets.find(p => p.id === g.petId)?.name, source: 'pets' })} onLongPress={() => setItemActionModal({ visible: true, id: g.id, title: g.name, section: 'grooming' })}>
                   <AppIcon name="person" size={20} color={PET_THEME} />
                   <View style={styles.itemText}>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{g.name}</Text>
@@ -708,7 +726,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 if (!aPast && bPast) return -1;
                 return a.date.localeCompare(b.date);
               }).map(v => (
-                <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVaccDetail', { vaccination: v, petName: pets.find(p => p.id === v.petId)?.name })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.name, section: 'vaccinations' })}>
+                <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVaccDetail', { vaccination: v, petName: pets.find(p => p.id === v.petId)?.name, source: 'pets' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.name, section: 'vaccinations' })}>
                   <AppIcon name="vaccination" size={20} color={PET_THEME} />
                   <View style={styles.itemText}>
                     <Text style={[styles.itemTitle, { color: colors.text }]}>{v.name}</Text>
