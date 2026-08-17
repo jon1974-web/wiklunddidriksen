@@ -161,11 +161,7 @@
     "allYears": "Alle",
     "startTime": "Starttid",
     "endTime": "Sluttid",
-    "optional": "valgfrit",
-    "caloriesPerServing": "Kalorier per portion",
-    "totalCalories": "Totalt",
-    "kcal": "kcal",
-    "autoEstimate": "AI estimerer automatisk"
+    "optional": "valgfrit"
   },
   "spaces": {
     "title": "Vores steder",
@@ -1034,7 +1030,11 @@
     "countryBrasil": "Brasilien",
     "varClassic": "Klassisk",
     "varFaster": "Hurtigere",
-    "varTwist": "Med et twist"
+    "varTwist": "Med et twist",
+    "caloriesPerServing": "Kalorier per portion",
+    "totalCalories": "Totalt",
+    "kcal": "kcal",
+    "autoEstimate": "AI estimerer automatisk"
   },
   "pets": {
     "title": "Kæledyr",

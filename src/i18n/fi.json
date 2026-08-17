@@ -161,11 +161,7 @@
     "allYears": "Kaikki",
     "startTime": "Aloitusaika",
     "endTime": "Lopetusaika",
-    "optional": "valinnainen",
-    "caloriesPerServing": "Kalorit annosta kohti",
-    "totalCalories": "Yhteensä",
-    "kcal": "kcal",
-    "autoEstimate": "AI arvioi automaattisesti"
+    "optional": "valinnainen"
   },
   "spaces": {
     "title": "Paikkamme",
@@ -1034,7 +1030,11 @@
     "countryBrasil": "Brasilia",
     "varClassic": "Klassinen",
     "varFaster": "Nopea",
-    "varTwist": "Twist"
+    "varTwist": "Twist",
+    "caloriesPerServing": "Kalorit annosta kohti",
+    "totalCalories": "Yhteensä",
+    "kcal": "kcal",
+    "autoEstimate": "AI arvioi automaattisesti"
   },
   "pets": {
     "title": "Lemmikit",

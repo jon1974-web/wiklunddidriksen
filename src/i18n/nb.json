@@ -161,11 +161,7 @@
     "allYears": "Alle",
     "startTime": "Starttid",
     "endTime": "Sluttid",
-    "optional": "valgfritt",
-    "caloriesPerServing": "Kalorier per porsjon",
-    "totalCalories": "Totalt",
-    "kcal": "kcal",
-    "autoEstimate": "AI estimerer automatisk"
+    "optional": "valgfritt"
   },
   "spaces": {
     "title": "Våre steder",
@@ -1034,7 +1030,11 @@
     "countryBrasil": "Brasil",
     "varClassic": "Klassisk",
     "varFaster": "Raskere",
-    "varTwist": "Med en vri"
+    "varTwist": "Med en vri",
+    "caloriesPerServing": "Kalorier per porsjon",
+    "totalCalories": "Totalt",
+    "kcal": "kcal",
+    "autoEstimate": "AI estimerer automatisk"
   },
   "pets": {
     "title": "Kjæledyr",

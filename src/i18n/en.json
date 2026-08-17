@@ -161,11 +161,7 @@
     "allYears": "All",
     "startTime": "Start time",
     "endTime": "End time",
-    "optional": "optional",
-    "caloriesPerServing": "Calories per serving",
-    "totalCalories": "Total",
-    "kcal": "kcal",
-    "autoEstimate": "AI estimates automatically"
+    "optional": "optional"
   },
   "spaces": {
     "title": "Our Places",
@@ -1034,7 +1030,11 @@
     "countryBrasil": "Brazil",
     "varClassic": "Classic",
     "varFaster": "Faster",
-    "varTwist": "With a twist"
+    "varTwist": "With a twist",
+    "caloriesPerServing": "Calories per serving",
+    "totalCalories": "Total",
+    "kcal": "kcal",
+    "autoEstimate": "AI estimates automatically"
   },
   "pets": {
     "title": "Pets",
