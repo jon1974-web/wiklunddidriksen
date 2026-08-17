@@ -115,7 +115,7 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           )}
         </View>
         <Text style={[styles.recipeMeta, { color: colors.textSecondary }]}>
-          {getCategoryEmoji(recipe.category)} {recipe.time} {t('mealPlanner.minutes')} · {recipe.portions} {t('mealPlanner.servings')}{recipe.caloriesPerServing ? ` · ${recipe.caloriesPerServing} ${t('mealPlanner.kcal')}` : ''} · {recipe.category ? t(`mealPlanner.${recipe.category}`) : ''}
+          {getCategoryEmoji(recipe.category)} {recipe.time} {t('mealPlanner.minutes')} · {recipe.portions} {t('mealPlanner.servings')}{recipe.caloriesPerServing ? ` · ${recipe.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${recipe.totalCalories || recipe.caloriesPerServing * recipe.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''} · {recipe.category ? t(`mealPlanner.${recipe.category}`) : ''}
         </Text>
 
         {recipe.description ? (

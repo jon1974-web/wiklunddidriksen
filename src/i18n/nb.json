@@ -1034,6 +1034,8 @@
     "caloriesPerServing": "Kalorier per porsjon",
     "totalCalories": "Totalt",
     "kcal": "kcal",
+    "portionsAbbr": "pors",
+    "total": "totalt",
     "autoEstimate": "AI estimerer automatisk"
   },
   "pets": {

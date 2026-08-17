@@ -1034,6 +1034,8 @@
     "caloriesPerServing": "Kalorit annosta kohti",
     "totalCalories": "Yhteensä",
     "kcal": "kcal",
+    "portionsAbbr": "annos",
+    "total": "yhteensä",
     "autoEstimate": "AI arvioi automaattisesti"
   },
   "pets": {

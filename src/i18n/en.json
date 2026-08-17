@@ -1034,6 +1034,8 @@
     "caloriesPerServing": "Calories per serving",
     "totalCalories": "Total",
     "kcal": "kcal",
+    "portionsAbbr": "serving",
+    "total": "total",
     "autoEstimate": "AI estimates automatically"
   },
   "pets": {

@@ -630,7 +630,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               {randomRecipe.category === 'kylling' ? '🍗' : randomRecipe.category === 'kjoett' ? '🥩' : randomRecipe.category === 'fisk' ? '🐟' : randomRecipe.category === 'vegetar' ? '🥗' : randomRecipe.category === 'pasta' ? '🍝' : randomRecipe.category === 'gryte' ? '🥘' : randomRecipe.category === 'suppe' ? '🍲' : randomRecipe.category === 'frokost' ? '🥞' : randomRecipe.category === 'sott' ? '🍰' : '🍽️'}
             </Text>
             <Text style={[styles.randomName, { color: colors.text }]}>{getRecipeText(randomRecipe, 'name')}</Text>
-            <Text style={[styles.randomMeta, { color: colors.textSecondary }]}>{randomRecipe.time} {t('mealPlanner.minutes')} · {randomRecipe.portions} {t('mealPlanner.servings')}{randomRecipe.caloriesPerServing ? ` · ${randomRecipe.caloriesPerServing} kcal` : ''}</Text>
+            <Text style={[styles.randomMeta, { color: colors.textSecondary }]}>{randomRecipe.time} {t('mealPlanner.minutes')} · {randomRecipe.portions} {t('mealPlanner.servings')}{randomRecipe.caloriesPerServing ? ` · ${randomRecipe.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${randomRecipe.totalCalories || randomRecipe.caloriesPerServing * randomRecipe.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''}</Text>
             <View style={{ flexDirection: 'row', gap: 8, marginTop: 10 }}>
               <TouchableOpacity
                 style={[styles.randomActionBtn, { backgroundColor: colors.accent }]}
@@ -967,7 +967,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                               </View>
                             </View>
                             <Text style={[styles.recipeMeta, { color: colors.textSecondary, marginTop: 4 }]}>
-                              {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}{item.caloriesPerServing ? ` · ${item.caloriesPerServing} ${t('mealPlanner.kcal')}` : ''}
+                              {item.time} {t('mealPlanner.minutes')} · {item.portions} {t('mealPlanner.servings')}{item.caloriesPerServing ? ` · ${item.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${item.totalCalories || item.caloriesPerServing * item.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''}
                             </Text>
                           </View>
                         </TouchableOpacity>
@@ -1017,7 +1017,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                       </View>
                     )}
                   </View>
-                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner · {t(`mealPlanner.${recipe.category || 'kjoett'}`)}{recipe.caloriesPerServing ? ` · ${recipe.caloriesPerServing} kcal` : ''}</Text>
+                  <Text style={[styles.recipePickerMeta, { color: colors.textSecondary }]}>{recipe.time} min · {recipe.portions} porsjoner · {t(`mealPlanner.${recipe.category || 'kjoett'}`)}{recipe.caloriesPerServing ? ` · ${recipe.caloriesPerServing} kcal/porsjon · ${recipe.caloriesPerServing * (recipe.portions || 4)} kcal totalt` : ''}</Text>
                   {recipe.description ? <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }} numberOfLines={2}>{recipe.description}</Text> : null}
                 </View>
                 <View style={{ flexDirection: 'row', gap: 6 }}>
@@ -1348,7 +1348,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   </View>
                 <ScrollView>
                   {showRecipeDetail?.description ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{getRecipeText(showRecipeDetail, 'description')}</Text> : null}
-                  {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}{showRecipeDetail.caloriesPerServing ? ` · ${showRecipeDetail.caloriesPerServing} ${t('mealPlanner.kcal')}` : ''}</Text> : null}
+                  {showRecipeDetail?.time ? <Text style={{ color: colors.textSecondary, marginBottom: 12 }}>{showRecipeDetail.time} {t('mealPlanner.minutes')} · {showRecipeDetail.portions} {t('mealPlanner.servings')}{showRecipeDetail.caloriesPerServing ? ` · ${showRecipeDetail.caloriesPerServing} ${t('mealPlanner.kcal')}/${t('mealPlanner.portionsAbbr')} · ${showRecipeDetail.totalCalories || showRecipeDetail.caloriesPerServing * showRecipeDetail.portions} ${t('mealPlanner.kcal')} ${t('mealPlanner.total')}` : ''}</Text> : null}
                   {showRecipeDetail?.ingredients && showRecipeDetail.ingredients.length > 0 && (
                     <Text style={[styles.cardTitle, { color: colors.text }]}>{t('mealPlanner.ingredientsList')}</Text>
                   )}
@@ -1582,7 +1582,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 8 }}>{importedRecipe.description}</Text>
                   )}
                   {importedRecipe?.time > 0 && (
-                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>⏱️ {importedRecipe.time} min · 🍽️ {importedRecipe.portions || 4} porsjoner{importedRecipe.caloriesPerServing ? ` · ${importedRecipe.caloriesPerServing} kcal` : ''}</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginBottom: 4 }}>⏱️ {importedRecipe.time} min · 🍽️ {importedRecipe.portions || 4} porsjoner{importedRecipe.caloriesPerServing ? ` · ${importedRecipe.caloriesPerServing} kcal/porsjon · ${(importedRecipe.caloriesPerServing || 0) * (importedRecipe.portions || 4)} kcal totalt` : ''}</Text>
                   )}
                   {importedRecipe?.ingredients?.length > 0 && (
                     <View style={{ marginTop: 8 }}>
