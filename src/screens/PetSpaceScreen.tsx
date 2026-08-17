@@ -157,8 +157,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         setEditingItem(item);
         resetItemForms();
         setShowItemModal(true);
+        navigation.setParams({ editId: undefined, editSection: undefined });
       }
-      navigation.setParams({ editId: undefined, editSection: undefined });
     }
   }, [route?.params?.openAddSection, route?.params?.editId, route?.params?.editSection, pets, selectedPet, vetVisits, medications, food, grooming, vaccinations, insurance]);
 

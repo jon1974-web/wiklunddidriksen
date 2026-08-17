@@ -125,8 +125,8 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) {
         setEditingItem(item);
         setShowAddModal(true);
+        navigation.setParams({ editId: undefined, editSection: undefined });
       }
-      navigation.setParams({ editId: undefined, editSection: undefined });
     }
   }, [route?.params?.openAddSection, route?.params?.editId, route?.params?.editSection, appointments, medications, vaccinations, allergies, growth]);
 
