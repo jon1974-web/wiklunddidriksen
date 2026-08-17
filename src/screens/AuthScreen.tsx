@@ -88,11 +88,13 @@ export const AuthScreen: React.FC = () => {
           const result = await createUserWithEmailAndPassword(auth, email, password);
           const uid = result.user.uid;
           const userEmail = result.user.email || '';
+          const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
           await updateProfile(result.user, { displayName: name });
           await createOrUpdateUser(uid, {
             uid,
             email: userEmail,
             displayName: name,
+            timezone,
           });
 
           setAuthUser(result.user);
@@ -107,12 +109,17 @@ export const AuthScreen: React.FC = () => {
             const result = await signInWithEmailAndPassword(auth, email, password);
             const userProfile = await getUserProfile(result.user.uid);
             const displayName = userProfile?.displayName || result.user.displayName || name;
+            const timezone = userProfile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+            if (!userProfile?.timezone) {
+              await createOrUpdateUser(result.user.uid, { timezone });
+            }
             setAuthUser(result.user);
             setUser({
               uid: result.user.uid,
               email: result.user.email || '',
               displayName,
               avatarUrl: userProfile?.avatarUrl || undefined,
+              timezone,
             });
 
             if (hasInvite) {

@@ -1253,8 +1253,8 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
   return res.status(200).json({ sent });
 });
 
-// Birthday reminders — runs daily at 08:00
-exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZone: "Europe/Oslo" }, async (event) => {
+// Birthday reminders — runs daily at 08:00 UTC
+exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZone: "UTC" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
 
@@ -1998,9 +1998,25 @@ exports.decryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB
   }
 });
 
+// Helper: Create a Date object from a time string (HH:MM) in a specific timezone
+function createDateInTimezone(dateStr, timeStr, timezone) {
+  const [h, m] = timeStr.split(":").map(Number);
+  // Create a date string and parse it in the target timezone
+  const dateParts = dateStr.split("-");
+  const dtStr = `${dateParts[0]}-${dateParts[1]}-${dateParts[2]}T${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`;
+  // Use toLocaleString to get the UTC offset for the timezone
+  const tempDate = new Date(dtStr);
+  const utcStr = tempDate.toLocaleString("en-US", { timeZone: "UTC" });
+  const tzStr = tempDate.toLocaleString("en-US", { timeZone: timezone });
+  const utcDate = new Date(utcStr);
+  const tzDate = new Date(tzStr);
+  const offsetMs = utcDate.getTime() - tzDate.getTime();
+  return new Date(tempDate.getTime() + offsetMs);
+}
+
 // Scheduled function: check medication reminders every 5 minutes
 // Sends push notifications for medications with time slots and reminders
-exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", timeZone: "Europe/Oslo", region: "us-central1" }, async (event) => {
+exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", timeZone: "UTC", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
@@ -2014,6 +2030,18 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
 
   for (const familyDoc of familiesSnap.docs) {
     const familyId = familyDoc.id;
+
+    // Get timezone from the family owner's profile
+    let familyTimezone = "Europe/Oslo"; // default
+    try {
+      const familyData = familyDoc.data();
+      const ownerUid = familyData.members ? Object.keys(familyData.members)[0] : null;
+      if (ownerUid) {
+        const userDoc = await db.collection("users").doc(ownerUid).get();
+        const userData = userDoc.data();
+        if (userData?.timezone) familyTimezone = userData.timezone;
+      }
+    } catch {}
 
     // Query health medications for this family
     const healthMedsSnap = await db.collection("health").doc(familyId).collection("medications")
@@ -2037,8 +2065,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
       for (const slot of medData.timeSlots) {
         if (!slot.time || !slot.reminderMinutes) continue;
 
-        const [slotH, slotM] = slot.time.split(":").map(Number);
-        const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slotH, slotM, 0, 0);
+        const slotTime = createDateInTimezone(todayStr, slot.time, familyTimezone);
         const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
 
         if (reminderTime >= todayStart && reminderTime <= fiveMinFromNow) {
@@ -2063,8 +2090,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
       for (const slot of medData.timeSlots) {
         if (!slot.time || !slot.reminderMinutes) continue;
 
-        const [slotH, slotM] = slot.time.split(":").map(Number);
-        const slotTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), slotH, slotM, 0, 0);
+        const slotTime = createDateInTimezone(todayStr, slot.time, familyTimezone);
         const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
 
         if (reminderTime >= todayStart && reminderTime <= fiveMinFromNow) {
@@ -2239,15 +2265,24 @@ async function refreshGoogleToken(uid) {
 async function createGoogleCalendarEvent(uid, event) {
   const accessToken = await refreshGoogleToken(uid);
 
+  // Get user timezone
+  let userTimezone = "Europe/Oslo";
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (userData?.timezone) userTimezone = userData.timezone;
+  } catch {}
+
   const calendarEvent = {
     summary: event.title,
     description: event.description || "",
     start: event.allDay
       ? { date: event.startDate }
-      : { dateTime: event.startDateTime, timeZone: "Europe/Oslo" },
+      : { dateTime: event.startDateTime, timeZone: userTimezone },
     end: event.allDay
       ? { date: event.endDate }
-      : { dateTime: event.endDateTime, timeZone: "Europe/Oslo" },
+      : { dateTime: event.endDateTime, timeZone: userTimezone },
   };
 
   if (event.location) {
@@ -2476,6 +2511,15 @@ exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-centra
 async function updateGoogleCalendarEvent(uid, calendarEventId, event) {
   const accessToken = await refreshGoogleToken(uid);
 
+  // Get user timezone
+  let userTimezone = "Europe/Oslo";
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (userData?.timezone) userTimezone = userData.timezone;
+  } catch {}
+
   const calendarEvent = {
     summary: event.title,
     description: event.description || "",
@@ -2485,8 +2529,8 @@ async function updateGoogleCalendarEvent(uid, calendarEventId, event) {
     calendarEvent.start = { date: event.startDate };
     calendarEvent.end = { date: event.endDate };
   } else {
-    calendarEvent.start = { dateTime: event.startDateTime, timeZone: "Europe/Oslo" };
-    calendarEvent.end = { dateTime: event.endDateTime, timeZone: "Europe/Oslo" };
+    calendarEvent.start = { dateTime: event.startDateTime, timeZone: userTimezone };
+    calendarEvent.end = { dateTime: event.endDateTime, timeZone: userTimezone };
   }
 
   if (event.location !== undefined) {

@@ -4,6 +4,7 @@ export interface User {
   displayName: string;
   avatarUrl?: string;
   role?: 'admin' | 'member';
+  timezone?: string;
 }
 
 export interface Event {

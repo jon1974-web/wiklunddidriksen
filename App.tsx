@@ -530,7 +530,7 @@ const AppContent = () => {
             return;
           }
 
-          setUser({ ...userData, avatarUrl: profile?.avatarUrl || undefined });
+          setUser({ ...userData, avatarUrl: profile?.avatarUrl || undefined, timezone: profile?.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone });
           if (profile?.familyId) {
             setFamily(profile.familyId, profile.familyName, profile.familyRole || null);
           }
