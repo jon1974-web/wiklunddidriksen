@@ -742,7 +742,7 @@ Return ONLY valid JSON with this exact structure:
 
 // Scheduled function: check reminders every minute and send FCM push notifications
 // Notifies ALL family members, not just the event creator
-exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-central1" }, async (event) => {
+exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UTC", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
   const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000);
@@ -750,26 +750,42 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
 
   const eventsSnap = await db.collection("events").where("reminderMinutes", ">", 0).limit(500).get();
 
+  // Cache timezones per family to avoid repeated lookups
+  const familyTimezones = {};
+
   let totalSent = 0;
 
   for (const doc of eventsSnap.docs) {
     const eventData = doc.data();
     if (!eventData.date || !eventData.time) continue;
 
+    const familyId = eventData.familyId;
+    if (!familyId) continue;
+
+    // Get family timezone (cached)
+    if (!familyTimezones[familyId]) {
+      familyTimezones[familyId] = "Europe/Oslo"; // default
+      try {
+        const familyDoc = await db.collection("families").doc(familyId).get();
+        const familyData = familyDoc.data();
+        const ownerUid = familyData?.members ? Object.keys(familyData.members)[0] : null;
+        if (ownerUid) {
+          const userDoc = await db.collection("users").doc(ownerUid).get();
+          const userData = userDoc.data();
+          if (userData?.timezone) familyTimezones[familyId] = userData.timezone;
+        }
+      } catch {}
+    }
+
     let reminderTime;
     if (eventData.reminderAt) {
       reminderTime = new Date(eventData.reminderAt);
     } else {
-      const [h, m] = eventData.time.split(":").map(Number);
-      const [year, month, day] = eventData.date.split("-").map(Number);
-      const eventDate = new Date(year, month - 1, day, h, m, 0, 0);
+      const eventDate = createDateInTimezone(eventData.date, eventData.time, familyTimezones[familyId]);
       reminderTime = new Date(eventDate.getTime() - (eventData.reminderMinutes || 0) * 60 * 1000);
     }
 
     if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
-      const familyId = eventData.familyId;
-      if (!familyId) continue;
-
       const sent = await sendNotification({
         familyId,
         title: `📅 ${eventData.title}`,
@@ -780,8 +796,6 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", region: "us-c
     }
   }
 
-  console.log(`checkReminders: ${totalSent} sent`);
-  return { sent: totalSent };
   console.log(`checkReminders: ${totalSent} sent`);
   return { sent: totalSent };
 });
@@ -1253,12 +1267,13 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
   return res.status(200).json({ sent });
 });
 
-// Birthday reminders — runs daily at 08:00 UTC
-exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZone: "UTC" }, async (event) => {
+// Birthday reminders — runs every 5 minutes at 08:00 UTC
+// For each family, check if it's 08:00 in their timezone
+exports.checkBirthdayReminders = onSchedule({ schedule: "every 5 minutes", timeZone: "UTC" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
 
-  // Calculate dates for next 7 days
+  // Calculate dates for next 7 days (in UTC)
   const upcomingDates = [];
   for (let i = 0; i <= 7; i++) {
     const d = new Date(now);
@@ -1286,6 +1301,26 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every day 08:00", timeZ
       }
     }
     if (daysUntil === -1) continue;
+
+    if (!b.familyId) continue;
+
+    // Check if it's 08:00 in the family owner's timezone
+    let familyTimezone = "Europe/Oslo";
+    try {
+      const familyDoc = await db.collection("families").doc(b.familyId).get();
+      const familyData = familyDoc.data();
+      const ownerUid = familyData?.members ? Object.keys(familyData.members)[0] : null;
+      if (ownerUid) {
+        const userDoc = await db.collection("users").doc(ownerUid).get();
+        const userData = userDoc.data();
+        if (userData?.timezone) familyTimezone = userData.timezone;
+      }
+    } catch {}
+
+    const localTimeStr = now.toLocaleString("en-US", { timeZone: familyTimezone, hour: "numeric", minute: "numeric", hour12: false });
+    const [localHour] = localTimeStr.split(":").map(Number);
+    // Only send between 08:00 and 08:04 in user's timezone
+    if (localHour !== 8) continue;
 
     const year = now.getFullYear();
     const notifKey = `birthday_${doc.id}_${year}`;
