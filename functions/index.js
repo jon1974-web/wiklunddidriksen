@@ -754,6 +754,7 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
   const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000);
 
   const eventsSnap = await db.collection("events").limit(500).get();
+  console.log(`checkReminders: found ${eventsSnap.docs.length} total events`);
 
   // Cache timezones per family to avoid repeated lookups
   const familyTimezones = {};
