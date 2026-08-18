@@ -424,7 +424,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     return c.name.toLowerCase().includes(q) || roleLabels.some((l: string) => l.includes(q));
   });
 
-  // Auto-expand sections when searching and they have hits
+  // Auto-expand sections when searching, collapse when search is cleared
   useEffect(() => {
     if (contactSearch.trim()) {
       setExpandedSections({
@@ -432,6 +432,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         admins: filteredAdmins.length > 0,
         classmates: filteredClassmates.length > 0,
       });
+    } else {
+      setExpandedSections({ teachers: false, admins: false, classmates: false });
     }
   }, [contactSearch, filteredTeachers.length, filteredAdmins.length, filteredClassmates.length]);
 
