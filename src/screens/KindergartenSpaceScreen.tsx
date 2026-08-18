@@ -58,6 +58,15 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   const [contacts, setContacts] = useState<KindergartenContact[]>([]);
   const [schedules, setSchedules] = useState<KindergartenSchedule[]>([]);
   const [contactSearch, setContactSearch] = useState('');
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    staff: false,
+    members: false,
+  });
+
+  const toggleSection = (key: string) => {
+    setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
   const [activeSemester, setActiveSemester] = useState<'høst' | 'vår'>('høst');
 
   const [showAddChildModal, setShowAddChildModal] = useState(false);
@@ -400,6 +409,18 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     return c.name.toLowerCase().includes(q) || typeLabel.toLowerCase().includes(q);
   });
 
+  // Auto-expand sections when searching, collapse when search is cleared
+  useEffect(() => {
+    if (contactSearch.trim()) {
+      setExpandedSections({
+        staff: filteredTeachers.length > 0,
+        members: filteredClassmates.length > 0,
+      });
+    } else {
+      setExpandedSections({ staff: false, members: false });
+    }
+  }, [contactSearch, filteredTeachers.length, filteredClassmates.length]);
+
   const renderContactActions = (phone?: string, email?: string) => (
     <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
       {phone ? (
@@ -607,17 +628,18 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
               </View>
               {/* Teachers Section */}
               <View style={[styles.section, { backgroundColor: colors.surface }]}>
-                <View style={styles.sectionHeader}>
+                <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('staff')}>
                   <View style={styles.sectionTitleRow}>
                     <Text style={styles.sectionIcon}>👩‍🏫</Text>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('kindergarten.staff')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({filteredTeachers.length})</Text>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.staff ? '▼' : '▶'}</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'teacher', teacherType: '', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingContactId(null); setContactForm({ role: 'teacher', teacherType: '', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
-                </View>
-                {filteredTeachers.map(c => (
+                </TouchableOpacity>
+                {expandedSections.staff && filteredTeachers.map(c => (
                   <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('KindergartenContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
@@ -643,19 +665,20 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
 
               {/* Children Section */}
               <View style={[styles.section, { backgroundColor: colors.surface }]}>
-                <View style={styles.sectionHeader}>
+                <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('members')}>
                   <View style={styles.sectionTitleRow}>
                     <Text style={styles.sectionIcon}>👥</Text>
                     <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('kindergarten.members')}</Text>
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({filteredClassmates.length})</Text>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.members ? '▼' : '▶'}</Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 8 }}>
-                    <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={() => { setEditingContactId(null); setContactForm({ role: 'child', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                    <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingContactId(null); setContactForm({ role: 'child', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                       <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                     </TouchableOpacity>
                   </View>
-                </View>
-                {filteredClassmates.map(c => (
+                </TouchableOpacity>
+                {expandedSections.members && filteredClassmates.map(c => (
                   <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('KindergartenContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <Text style={[styles.contactName, { color: colors.text, marginBottom: 6 }]}>{c.name}</Text>
                     {c.parentName ? (
