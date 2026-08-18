@@ -10,46 +10,46 @@
   <rect x="0" y="0" width="1024" height="1024" rx="220" ry="220" fill="url(#bg)"/>
   
   <!-- House body -->
-  <rect x="280" y="405" width="464" height="320" rx="12" fill="white"/>
+  <rect x="280" y="325" width="464" height="320" rx="12" fill="white"/>
   
   <!-- House roof -->
-  <polygon points="240,425 512,185 784,425" fill="white"/>
+  <polygon points="240,345 512,105 784,345" fill="white"/>
   
   <!-- Door -->
-  <rect x="440" y="525" width="144" height="200" rx="12" fill="#0097A7"/>
+  <rect x="440" y="445" width="144" height="200" rx="12" fill="#0097A7"/>
   
   <!-- Door knob -->
-  <circle cx="560" cy="625" r="12" fill="white"/>
+  <circle cx="560" cy="545" r="12" fill="white"/>
   
   <!-- Heart above door -->
-  <path d="M512,455 L488,431 C468,411 448,395 448,375 C448,355 464,341 484,341 C496,341 508,349 512,357 C516,349 528,341 540,341 C560,341 576,355 576,375 C576,395 556,411 536,431 Z" fill="#E53935"/>
+  <path d="M512,375 L488,351 C468,331 448,315 448,295 C448,275 464,261 484,261 C496,261 508,269 512,277 C516,269 528,261 540,261 C560,261 576,275 576,295 C576,315 556,331 536,351 Z" fill="#E53935"/>
   
   <!-- FS text in heart -->
-  <text x="512" y="397" text-anchor="middle" dominant-baseline="central" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white">FS</text>
+  <text x="512" y="317" text-anchor="middle" dominant-baseline="central" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white">FS</text>
   
   <!-- Window left -->
-  <rect x="310" y="455" width="100" height="100" rx="8" fill="#0097A7"/>
-  <line x1="310" y1="505" x2="410" y2="505" stroke="white" stroke-width="4"/>
-  <line x1="360" y1="455" x2="360" y2="555" stroke="white" stroke-width="4"/>
+  <rect x="310" y="375" width="100" height="100" rx="8" fill="#0097A7"/>
+  <line x1="310" y1="425" x2="410" y2="425" stroke="white" stroke-width="4"/>
+  <line x1="360" y1="375" x2="360" y2="475" stroke="white" stroke-width="4"/>
   
   <!-- Window right -->
-  <rect x="614" y="455" width="100" height="100" rx="8" fill="#0097A7"/>
-  <line x1="614" y1="505" x2="714" y2="505" stroke="white" stroke-width="4"/>
-  <line x1="664" y1="455" x2="664" y2="555" stroke="white" stroke-width="4"/>
+  <rect x="614" y="375" width="100" height="100" rx="8" fill="#0097A7"/>
+  <line x1="614" y1="425" x2="714" y2="425" stroke="white" stroke-width="4"/>
+  <line x1="664" y1="375" x2="664" y2="475" stroke="white" stroke-width="4"/>
   
   <!-- Person 1 (far left, adult) -->
-  <circle cx="350" cy="745" r="28" fill="white"/>
-  <rect x="326" y="773" width="48" height="70" rx="16" fill="white"/>
+  <circle cx="350" cy="685" r="28" fill="white"/>
+  <rect x="326" y="713" width="48" height="70" rx="16" fill="white"/>
   
   <!-- Person 2 (left center, child) -->
-  <circle cx="450" cy="765" r="22" fill="white"/>
-  <rect x="432" y="787" width="36" height="56" rx="12" fill="white"/>
+  <circle cx="450" cy="705" r="22" fill="white"/>
+  <rect x="432" y="727" width="36" height="56" rx="12" fill="white"/>
   
   <!-- Person 3 (right center, child) -->
-  <circle cx="574" cy="765" r="22" fill="white"/>
-  <rect x="556" y="787" width="36" height="56" rx="12" fill="white"/>
+  <circle cx="574" cy="705" r="22" fill="white"/>
+  <rect x="556" y="727" width="36" height="56" rx="12" fill="white"/>
   
   <!-- Person 4 (far right, adult) -->
-  <circle cx="674" cy="745" r="28" fill="white"/>
-  <rect x="650" y="773" width="48" height="70" rx="16" fill="white"/>
+  <circle cx="674" cy="685" r="28" fill="white"/>
+  <rect x="650" y="713" width="48" height="70" rx="16" fill="white"/>
 </svg>
