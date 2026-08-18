@@ -61,9 +61,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [children, setChildren] = useState<SchoolChild[]>([]);
   const [selectedChild, setSelectedChild] = useState<SchoolChild | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
-    teachers: true,
-    admins: true,
-    classmates: true,
+    teachers: false,
+    admins: false,
+    classmates: false,
   });
 
   const toggleSection = (key: string) => {
@@ -423,6 +423,17 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     const roleLabels = adminTypes.map((t: string) => getAdminRoleLabel(t).toLowerCase());
     return c.name.toLowerCase().includes(q) || roleLabels.some((l: string) => l.includes(q));
   });
+
+  // Auto-expand sections when searching and they have hits
+  useEffect(() => {
+    if (contactSearch.trim()) {
+      setExpandedSections({
+        teachers: filteredTeachers.length > 0,
+        admins: filteredAdmins.length > 0,
+        classmates: filteredClassmates.length > 0,
+      });
+    }
+  }, [contactSearch, filteredTeachers.length, filteredAdmins.length, filteredClassmates.length]);
 
   const renderContactActions = (phone?: string, email?: string) => (
     <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
