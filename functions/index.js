@@ -165,15 +165,20 @@ async function sendNotification({ familyId, title, body, notifKey, excludeUid })
   // Send to all family members
   const results = await Promise.allSettled(
     tokens.map(async (t) => {
-      await getMessaging().send({
-        token: t.fcmToken,
-        notification: { title, body },
-        webpush: {
-          notification: { icon: "/favicon.ico", badge: "/favicon.ico", tag: notifKey || title },
-          fcmOptions: { link: "/" },
-        },
-        data: { url: "/", type: "notification" },
-      });
+      try {
+        await getMessaging().send({
+          token: t.fcmToken,
+          notification: { title, body },
+          webpush: {
+            notification: { icon: "/favicon.ico", badge: "/favicon.ico", tag: notifKey || title },
+            fcmOptions: { link: "/" },
+          },
+          data: { url: "/", type: "notification" },
+        });
+        console.log(`sendNotification: sent to ${t.uid}`);
+      } catch (err) {
+        console.log(`sendNotification: FAILED for ${t.uid} - ${err.message}`);
+      }
       if (notifKey) {
         await db.collection("sentNotifications").doc(notifKey).set({
           sentAt: new Date().toISOString(),
