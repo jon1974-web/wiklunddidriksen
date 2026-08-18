@@ -135,6 +135,7 @@ async function sendNotification({ familyId, title, body, notifKey, excludeUid })
   if (!familySnap.exists) return 0;
   const membersMap = familySnap.data().members || {};
   const memberUids = Object.keys(membersMap).filter(uid => uid !== excludeUid);
+  console.log(`sendNotification: family ${familyId} has ${memberUids.length} members (excluded: ${excludeUid || 'none'})`);
 
   const tokens = [];
   for (let i = 0; i < memberUids.length; i += 10) {
