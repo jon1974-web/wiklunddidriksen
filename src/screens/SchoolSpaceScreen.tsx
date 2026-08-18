@@ -711,6 +711,15 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     </TouchableOpacity>
                   </View>
                 </View>
+                {selectedChild && (
+                  <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#F3E5F5' }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
+                    <Text style={{ fontSize: 20 }}>📸</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ color: '#6A1B9A', fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
+                      <Text style={{ color: '#8E24AA', fontSize: 12 }}>{t('school.aiDescription')}</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
                 {filteredClassmates.map(c => (
                   <TouchableOpacity key={c.id} style={[styles.contactCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('SchoolContactDetail', { contact: c, childId: selectedChild?.id, yearId: selectedYear?.id })} onLongPress={() => setContactActionModal({ visible: true, id: c.id, title: c.name })}>
                     <Text style={[styles.contactName, { color: colors.text, marginBottom: 6 }]}>{c.name}</Text>
