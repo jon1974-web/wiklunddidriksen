@@ -144,11 +144,16 @@ async function sendNotification({ familyId, title, body, notifKey, excludeUid })
       const uData = uDoc.data();
       if (uData.fcmToken && uData.notificationsEnabled !== false) {
         tokens.push({ uid: uDoc.id, fcmToken: uData.fcmToken });
+      } else {
+        console.log(`sendNotification: skipping ${uDoc.id} - fcmToken: ${!!uData.fcmToken}, notificationsEnabled: ${uData.notificationsEnabled}`);
       }
     });
   }
 
-  if (tokens.length === 0) return 0;
+  if (tokens.length === 0) {
+    console.log(`sendNotification: no valid tokens found for family ${familyId}`);
+    return 0;
+  }
 
   // Deduplication check
   if (notifKey) {
