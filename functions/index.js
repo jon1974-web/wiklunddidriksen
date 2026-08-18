@@ -749,14 +749,6 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
   const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000);
 
   const eventsSnap = await db.collection("events").limit(500).get();
-  console.log(`checkReminders: found ${eventsSnap.docs.length} total events`);
-
-  // Also check all events to see what fields they have
-  const allEventsSnap = await db.collection("events").limit(10).get();
-  for (const doc of allEventsSnap.docs) {
-    const d = doc.data();
-    console.log(`checkReminders debug event: ${d.title}, reminderMinutes: ${d.reminderMinutes}, type: ${typeof d.reminderMinutes}`);
-  }
 
   // Cache timezones per family to avoid repeated lookups
   const familyTimezones = {};
@@ -800,6 +792,42 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
         title: `📅 ${eventData.title}`,
         body: `Påminnelse om ${eventData.reminderMinutes} minutter`,
         notifKey: doc.id,
+      });
+      totalSent += sent;
+    }
+  }
+
+  // Process pet vet visit reminders
+  const petVetVisitsSnap = await db.collectionGroup("petVetVisits").limit(200).get();
+  for (const doc of petVetVisitsSnap.docs) {
+    const vetData = doc.data();
+    if (!vetData.reminderAt || !vetData.familyId) continue;
+
+    const reminderTime = new Date(vetData.reminderAt);
+    if (reminderTime >= thirtyMinAgo && reminderTime <= fiveMinFromNow) {
+      const sent = await sendNotification({
+        familyId: vetData.familyId,
+        title: `🐾 ${vetData.title}`,
+        body: `Påminnelse om veterinærbesøk`,
+        notifKey: `vetvisit_${doc.id}`,
+      });
+      totalSent += sent;
+    }
+  }
+
+  // Process pet vaccination reminders
+  const petVaccinationsSnap = await db.collectionGroup("petVaccinations").limit(200).get();
+  for (const doc of petVaccinationsSnap.docs) {
+    const vaccData = doc.data();
+    if (!vaccData.reminderAt || !vaccData.familyId) continue;
+
+    const reminderTime = new Date(vaccData.reminderAt);
+    if (reminderTime >= thirtyMinAgo && reminderTime <= fiveMinFromNow) {
+      const sent = await sendNotification({
+        familyId: vaccData.familyId,
+        title: `💉 ${vaccData.name}`,
+        body: `Påminnelse om vaksine`,
+        notifKey: `petvacc_${doc.id}`,
       });
       totalSent += sent;
     }
