@@ -745,10 +745,18 @@ Return ONLY valid JSON with this exact structure:
 exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UTC", region: "us-central1" }, async (event) => {
   const db = getFirestore();
   const now = new Date();
-  const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000);
+  const thirtyMinAgo = new Date(now.getTime() - 30 * 60 * 1000);
   const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000);
 
-  const eventsSnap = await db.collection("events").where("reminderMinutes", ">", 0).limit(500).get();
+  const eventsSnap = await db.collection("events").limit(500).get();
+  console.log(`checkReminders: found ${eventsSnap.docs.length} total events`);
+
+  // Also check all events to see what fields they have
+  const allEventsSnap = await db.collection("events").limit(10).get();
+  for (const doc of allEventsSnap.docs) {
+    const d = doc.data();
+    console.log(`checkReminders debug event: ${d.title}, reminderMinutes: ${d.reminderMinutes}, type: ${typeof d.reminderMinutes}`);
+  }
 
   // Cache timezones per family to avoid repeated lookups
   const familyTimezones = {};
@@ -758,6 +766,7 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
   for (const doc of eventsSnap.docs) {
     const eventData = doc.data();
     if (!eventData.date || !eventData.time) continue;
+    if (!eventData.reminderMinutes || eventData.reminderMinutes <= 0) continue;
 
     const familyId = eventData.familyId;
     if (!familyId) continue;
@@ -785,7 +794,7 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
       reminderTime = new Date(eventDate.getTime() - (eventData.reminderMinutes || 0) * 60 * 1000);
     }
 
-    if (reminderTime >= fiveMinAgo && reminderTime <= fiveMinFromNow) {
+    if (reminderTime >= thirtyMinAgo && reminderTime <= fiveMinFromNow) {
       const sent = await sendNotification({
         familyId,
         title: `📅 ${eventData.title}`,
@@ -2059,7 +2068,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
   const db = getFirestore();
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
-  const fiveMinFromNow = new Date(now.getTime() + 5 * 60 * 1000);
+  const thirtyMinFromNow = new Date(now.getTime() + 30 * 60 * 1000);
 
   const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
 
@@ -2107,7 +2116,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
         const slotTime = createDateInTimezone(todayStr, slot.time, familyTimezone);
         const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
 
-        if (reminderTime >= todayStart && reminderTime <= fiveMinFromNow) {
+        if (reminderTime >= todayStart && reminderTime <= thirtyMinFromNow) {
           const sent = await sendNotification({
             familyId,
             title: `💊 ${medData.name}`,
@@ -2132,7 +2141,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
         const slotTime = createDateInTimezone(todayStr, slot.time, familyTimezone);
         const reminderTime = new Date(slotTime.getTime() - slot.reminderMinutes * 60 * 1000);
 
-        if (reminderTime >= todayStart && reminderTime <= fiveMinFromNow) {
+        if (reminderTime >= todayStart && reminderTime <= thirtyMinFromNow) {
           const sent = await sendNotification({
             familyId,
             title: `🐾 ${medData.name}`,
