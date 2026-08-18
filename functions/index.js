@@ -1286,6 +1286,7 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every 5 minutes", timeZ
   const sentNotifs = new Set(sentNotifsSnap.docs.map((d) => d.id));
 
   let totalSent = 0;
+  const debugLog = [];
 
   for (const doc of birthdaysSnap.docs) {
     const b = doc.data();
@@ -1319,6 +1320,8 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every 5 minutes", timeZ
 
     const localTimeStr = now.toLocaleString("en-US", { timeZone: familyTimezone, hour: "numeric", minute: "numeric", hour12: false });
     const [localHour] = localTimeStr.split(":").map(Number);
+    debugLog.push({ name: b.name, bMonthDay, familyTimezone, localTimeStr, localHour, daysUntil });
+
     // Only send between 08:00 and 08:04 in user's timezone
     if (localHour !== 8) continue;
 
@@ -1344,6 +1347,7 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every 5 minutes", timeZ
   }
 
   console.log(`checkBirthdayReminders: ${totalSent} sent`);
+  console.log(`checkBirthdayReminders debug:`, JSON.stringify(debugLog));
   return { sent: totalSent };
 });
 
