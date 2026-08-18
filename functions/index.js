@@ -159,7 +159,10 @@ async function sendNotification({ familyId, title, body, notifKey, excludeUid })
   // Deduplication check
   if (notifKey) {
     const notifSnap = await db.collection("sentNotifications").doc(notifKey).get();
-    if (notifSnap.exists) return 0;
+    if (notifSnap.exists) {
+      console.log(`sendNotification: dedup blocked for ${notifKey}`);
+      return 0;
+    }
   }
 
   // Send to all family members
