@@ -818,6 +818,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   const renderOppskrifter = () => (
     <View style={styles.tabContent}>
+      {!showAiResults && (
       <View style={[styles.card, { backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <View style={[styles.searchBar, { flex: 1 }]}>
@@ -853,9 +854,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         ))}
       </ScrollView>
       </View>
+      )}
 
       {filteredRecipes.length === 0 ? (
-        <View style={styles.emptyState}>
+        <View style={showAiResults ? {} : styles.emptyState}>
           {/* AI Search Section */}
           {searchQuery && !showAiResults && (
             <View style={[styles.aiSearchCard, { backgroundColor: colors.surface, borderColor: colors.border, padding: 20 }]}>
@@ -1043,7 +1045,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center' }}>{t('mealPlanner.noSuggestions')}</Text>
             </View>
           ) : (
-            <View style={{ maxHeight: 400, overflow: 'scroll' }}>
+            <View style={{ maxHeight: 500, overflowY: 'auto' }}>
               {aiResults.map((recipe, i) => (
               <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
                 <View style={{ flex: 1 }}>
