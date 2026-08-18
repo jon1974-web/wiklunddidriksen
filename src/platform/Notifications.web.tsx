@@ -1,6 +1,6 @@
 import { initializeApp, getApp } from 'firebase/app';
 import { getMessaging, getToken, onMessage } from 'firebase/messaging';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
 let messaging: any = null;
@@ -62,7 +62,13 @@ const registerFcmToken = async () => {
       const { auth } = await import('../services/firebase');
       const user = auth.currentUser;
       if (user) {
-        await updateDoc(doc(db, 'users', user.uid), { fcmToken: token });
+        // Check if token has changed
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const currentToken = userDoc.data()?.fcmToken;
+        if (currentToken !== token) {
+          await updateDoc(doc(db, 'users', user.uid), { fcmToken: token });
+          console.log('[Notifications] FCM token updated');
+        }
       }
     }
   } catch (error) {
