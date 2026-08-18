@@ -1275,6 +1275,7 @@ exports.notifyNewEvent = onRequest({ region: "us-central1", memory: "256MB" }, a
     excludeUid: uid,
   });
 
+  console.log(`notifyNewEvent: sent ${sent} notifications for ${eventTitle}`);
   return res.status(200).json({ sent });
 });
 
