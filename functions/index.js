@@ -1524,7 +1524,12 @@ Estimate caloriesPerServing based on ingredients and portions.`,
     }
 
     const recipes = JSON.parse(jsonMatch[0]);
-    return res.status(200).json({ recipes });
+    const validCategories = ["kylling", "kjoett", "fisk", "vegetar", "pasta", "gryte", "suppe", "frokost", "sott"];
+    const validatedRecipes = recipes.map(r => ({
+      ...r,
+      category: validCategories.includes(r.category) ? r.category : "kjoett",
+    }));
+    return res.status(200).json({ recipes: validatedRecipes });
   } catch (error) {
     console.error("AI recipe suggestion error:", error);
     return res.status(500).json({ error: "Failed to generate suggestions" });
