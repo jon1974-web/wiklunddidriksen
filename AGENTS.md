@@ -494,7 +494,7 @@ npx expo start --web
 npx expo run:ios --device B851A586-1F58-4DFA-B38C-A547885777F1
 
 # Web build + deploy
-npx expo export --platform web --output-dir dist/web && npx firebase-tools deploy --only hosting --project familiesenter-837bb
+npx expo export --platform web --output-dir dist/web && node scripts/inject-manifest.js && npx firebase-tools deploy --only hosting --project familiesenter-837bb
 
 # Cloud Functions deploy
 npx firebase-tools deploy --only functions --project familiesenter-837bb
