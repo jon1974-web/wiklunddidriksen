@@ -182,6 +182,18 @@ service cloud.firestore {
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
+    // School Holidays: family-scoped
+    match /schoolHolidays/{holidayId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
+    // Kindergarten Holidays: family-scoped
+    match /kindergartenHolidays/{holidayId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
     // Recipes: family-scoped
     match /recipes/{recipeId} {
       allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
