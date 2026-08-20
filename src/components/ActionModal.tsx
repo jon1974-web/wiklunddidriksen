@@ -12,10 +12,11 @@ interface ActionModalProps {
   onCancel: () => void;
   accentColor?: string;
   editColor?: string;
+  cancelText?: string;
 }
 
 export const ActionModal: React.FC<ActionModalProps> = React.memo(({
-  visible, title, subtitle, onEdit, onDelete, onCancel, accentColor, editColor,
+  visible, title, subtitle, onEdit, onDelete, onCancel, accentColor, editColor, cancelText,
 }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
@@ -54,7 +55,7 @@ export const ActionModal: React.FC<ActionModalProps> = React.memo(({
                 style={[styles.button, { backgroundColor: colors.inputBackground }]}
                 onPress={onCancel}
               >
-                <Text style={[styles.buttonText, { color: colors.textSecondary }]}>{t('actionModal.cancel')}</Text>
+                <Text style={[styles.buttonText, { color: colors.textSecondary }]}>{cancelText || t('actionModal.cancel')}</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>

@@ -223,6 +223,7 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
         visible={successModal.visible}
         title={successModal.title}
         subtitle={successModal.subtitle}
+        cancelText={t('common.ok')}
         onCancel={() => { setSuccessModal({ visible: false, title: '', subtitle: '' }); navigation.goBack(); }}
       />
     </SafeAreaView>

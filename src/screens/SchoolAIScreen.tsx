@@ -238,7 +238,7 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
           </View>
         )}
       </ScrollView>
-      <ActionModal visible={successModal.visible} title={successModal.title} subtitle={successModal.subtitle} onCancel={() => { setSuccessModal({ visible: false, title: '', subtitle: '' }); navigation.goBack(); }} />
+      <ActionModal visible={successModal.visible} title={successModal.title} subtitle={successModal.subtitle} cancelText={t('common.ok')} onCancel={() => { setSuccessModal({ visible: false, title: '', subtitle: '' }); navigation.goBack(); }} />
     </SafeAreaView>
   );
 };
