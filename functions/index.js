@@ -1611,6 +1611,20 @@ exports.importHolidaysFromUrl = onRequest({ region: "us-central1", memory: "256M
     const html = await response.text();
     console.log(`importHolidaysFromUrl: fetched ${html.length} chars from ${url}`);
 
+    // Strip HTML tags and collapse whitespace for cleaner AI input
+    const plainText = html
+      .replace(/<script[\s\S]*?<\/script>/gi, '')
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&#\d+;/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    console.log(`importHolidaysFromUrl: stripped to ${plainText.length} chars of plain text`);
+
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -1645,7 +1659,7 @@ If no holidays found, return {"holidays": []}.`,
         },
         {
           role: "user",
-          content: `Extract all holidays and days off from this school/kindergarten calendar page:\n\n${html.substring(0, 100000)}`,
+          content: `Extract all holidays and days off from this school/kindergarten calendar page:\n\n${plainText.substring(0, 100000)}`,
         },
       ],
       temperature: 0.3,
