@@ -99,7 +99,7 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
       setSaving(true);
       try {
         for (const h of selected) {
-          await addSchoolHoliday({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo || h.dateFrom, timeFrom: h.timeFrom || undefined, timeTo: h.timeTo || undefined, childId, yearId, familyId });
+          await addSchoolHoliday({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo || h.dateFrom, ...(h.timeFrom ? { timeFrom: h.timeFrom } : {}), ...(h.timeTo ? { timeTo: h.timeTo } : {}), childId, yearId, familyId });
         }
         setSuccessModal({ visible: true, title: t('common.success'), subtitle: `${selected.length} ${t('schoolAI.contactsAdded')}` });
       } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); } finally { setSaving(false); }
