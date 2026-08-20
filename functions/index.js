@@ -1628,6 +1628,7 @@ If no holidays can be identified, return {"holidays": []}.`,
     }
 
     const result = JSON.parse(jsonMatch[0]);
+    console.log(`importHolidaysFromUrl: found ${(result.holidays || []).length} holidays`);
     return res.status(200).json({ holidays: result.holidays || [] });
   } catch (error) {
     console.error("Import holidays from URL error:", error);
