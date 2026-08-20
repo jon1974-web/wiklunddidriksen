@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fridager Mockup</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a1a;padding:20px}
+h1{color:#fff;text-align:center;font-size:20px;margin-bottom:8px}
+h2{color:#aaa;text-align:center;font-size:13px;margin-bottom:24px;font-weight:400}
+.states{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+.label{font-size:11px;color:#888;text-align:center;margin-top:12px;margin-bottom:4px;font-weight:600}
+.phone{width:320px;background:#f5f5f5;border-radius:28px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,0.4);flex-shrink:0;display:flex;flex-direction:column}
+.status-bar{height:44px;background:#fff}
+.header{padding:12px 16px;background:#fff;border-bottom:1px solid #eee;display:flex;align-items:center;gap:8px}
+.content{flex:1;padding:12px;overflow-y:auto}
+.section{background:#fff;border-radius:12px;padding:14px;margin-bottom:10px}
+.section-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer}
+.section-title{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700}
+.section-icon{font-size:16px}
+.section-count{font-size:12px;color:#888}
+.holiday-card{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;border-left:3px solid #43A047}
+.holiday-title{font-size:14px;font-weight:600;margin-bottom:4px}
+.holiday-dates{font-size:12px;color:#666}
+.holiday-badge{display:inline-block;padding:2px 6px;border-radius:6px;font-size:10px;font-weight:600}
+</style>
+</head>
+<body>
+<h1>Fridager — School & Kindergarten</h1>
+<h2>New section with AI import, manual add/edit, weekly summary</h2>
+<div class="states">
+
+<div>
+<p class="label">School — Fridager section</p>
+<div class="phone">
+  <div class="status-bar"></div>
+  <div class="header"><span style="font-size:16px">←</span><span style="font-weight:700;font-size:16px">Emma (5. klasse)</span></div>
+  <div class="content" style="padding-bottom:40px">
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title"><span class="section-icon">🎉</span> Fridager <span class="section-count">(3)</span> <span style="font-size:12px;color:#888">▼</span></div>
+        <button style="background:#43A047;color:#fff;border:none;border-radius:8px;padding:4px 10px;font-size:14px;font-weight:600">+</button>
+      </div>
+
+      <!-- AI Import Card -->
+      <div style="background:#E8F5E9;border-radius:10px;padding:12px;margin-top:8px;cursor:pointer;display:flex;align-items:center;gap:12px">
+        <span style="font-size:20px">📸</span>
+        <div>
+          <div style="font-weight:600;color:#2E7D32;font-size:14px">Importer fridager fra bilde</div>
+          <div style="color:#388E3C;font-size:12px">Skolekatalog • AI leser datoer og fridager</div>
+        </div>
+      </div>
+
+      <!-- Holiday cards -->
+      <div class="holiday-card" style="margin-top:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="holiday-title">🎄 Juleferie</div>
+          <span class="holiday-badge" style="background:#E8F5E9;color:#43A047">1 uke</span>
+        </div>
+        <div class="holiday-dates">23. des — 1. jan 2026</div>
+      </div>
+
+      <div class="holiday-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="holiday-title">🍂 Høstferie</div>
+          <span class="holiday-badge" style="background:#FFF3E0;color:#FB8C00">1 uke</span>
+        </div>
+        <div class="holiday-dates">13. okt — 17. okt 2026</div>
+      </div>
+
+      <div class="holiday-card">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="holiday-title">📋 Planleggingsdag</div>
+          <span class="holiday-badge" style="background:#E3F2FD;color:#1976D2">1 dag</span>
+        </div>
+        <div class="holiday-dates">6. jan 2026 • 08:00 — 15:00</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div>
+<p class="label">Add/Edit modal</p>
+<div class="phone">
+  <div class="status-bar"></div>
+  <div class="header"><span style="font-size:16px">←</span><span style="font-weight:700;font-size:16px">Legg til fridag</span></div>
+  <div class="content" style="padding-bottom:40px">
+    <div class="section">
+      <div style="margin-bottom:12px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">Tittel</div>
+        <input style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;font-size:14px" value="Juleferie" />
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Fra dato</div>
+          <input type="date" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;font-size:14px" value="2026-12-23" />
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Til dato</div>
+          <input type="date" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;font-size:14px" value="2027-01-01" />
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Fra tid <span style="color:#888">(valgfritt)</span></div>
+          <input type="time" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;font-size:14px" />
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600;margin-bottom:4px">Til tid <span style="color:#888">(valgfritt)</span></div>
+          <input type="time" style="width:100%;padding:10px;border-radius:8px;border:1px solid #ddd;font-size:14px" />
+        </div>
+      </div>
+      <button style="width:100%;padding:14px;background:#43A047;color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:600;cursor:pointer">Lagre</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div>
+<p class="label">Weekly Summary — Fridager</p>
+<div class="phone">
+  <div class="status-bar"></div>
+  <div class="header"><span style="font-size:16px">←</span><span style="font-weight:700;font-size:16px">Ukesoppsummering</span></div>
+  <div class="content" style="padding-bottom:40px">
+    <div class="section">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+        <span style="font-size:16px">🎉</span>
+        <span style="font-weight:700;font-size:14px">Fridager</span>
+        <span style="font-size:12px;color:#888">(2 denne uken)</span>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #eee">
+        <div style="width:28px;height:28px;border-radius:6px;background:#E8F5E9;display:flex;align-items:center;justify-content:center"><span style="font-size:14px">🎉</span></div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600">Planleggingsdag — Emma</div>
+          <div style="font-size:11px;color:#888">6. jan • 08:00 — 15:00</div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 0">
+        <div style="width:28px;height:28px;border-radius:6px;background:#E8F5E9;display:flex;align-items:center;justify-content:center"><span style="font-size:14px">🎉</span></div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600">Høstferie — Mina</div>
+          <div style="font-size:11px;color:#888">13. okt — 17. okt</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+</body>
+</html>

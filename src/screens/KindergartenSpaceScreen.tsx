@@ -24,7 +24,7 @@ import { KindergartenChild, KindergartenYear, KindergartenContact, KindergartenS
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 
-const KINDERGARTEN_THEME = '#AB47BC';
+const KINDERGARTEN_THEME = '#FF7043';
 
 interface KindergartenSpaceScreenProps {
   navigation: any;

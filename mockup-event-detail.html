@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Event Detail Mockups</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#1a1a1a;padding:20px}
+h1{color:#fff;text-align:center;font-size:20px;margin-bottom:8px}
+h2{color:#aaa;text-align:center;font-size:13px;margin-bottom:24px;font-weight:400}
+.options{display:flex;gap:20px;justify-content:center;flex-wrap:wrap}
+.label{font-size:11px;color:#888;text-align:center;margin-top:12px;margin-bottom:4px;font-weight:600}
+.phone{width:320px;background:#f5f5f5;border-radius:28px;overflow:hidden;box-shadow:0 16px 50px rgba(0,0,0,0.4);flex-shrink:0}
+.status-bar{height:44px;background:#fff}
+.content{padding:12px}
+.card{background:#fff;border-radius:16px;padding:16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.card-header{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.card-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.card-title{font-size:17px;font-weight:700;flex:1}
+.card-subtitle{font-size:12px;color:#888;margin-top:2px}
+.row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid #f0f0f0}
+.row:last-child{border-bottom:none}
+.row-label{font-size:12px;color:#888;width:60px}
+.row-value{font-size:14px;font-weight:500;flex:1}
+.badge{display:inline-flex;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600}
+.btn{padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;text-align:center;cursor:pointer}
+.btn-primary{background:#0097A7;color:#fff}
+.btn-secondary{background:#f0f0f0;color:#333}
+.btn-danger{background:#FFEBEE;color:#E53935;border:1px solid #E53935}
+.btn-row{display:flex;gap:8px}
+</style>
+</head>
+<body>
+<h1>Event Detail — Mockups</h1>
+<h2>Cards, sections, and Spond integration</h2>
+<div class="options">
+
+<!-- A: Clean card layout -->
+<div>
+<p class="label">A: Clean Card Layout</p>
+<div class="phone">
+  <div class="status-bar"></div>
+  <div class="content">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <div style="width:32px;height:32px;border-radius:16px;border:1.5px solid #0097A7;display:flex;align-items:center;justify-content:center;color:#0097A7;font-size:16px">←</div>
+      <div style="flex:1"></div>
+      <div style="width:32px;height:32px;border-radius:16px;border:1.5px solid #0097A7;display:flex;align-items:center;justify-content:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/></svg>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon" style="background:#E8F5E9">⚽</div>
+        <div>
+          <div class="card-title">Trening G14</div>
+          <div class="card-subtitle">Søndag 17. aug · 17:00 - 18:30</div>
+        </div>
+      </div>
+      <div class="row"><span class="row-label">📍 Sted</span><span class="row-value">Kunstgressbanen</span></div>
+      <div class="row"><span class="row-label">📝 Notat</span><span class="row-value">Ta med drikkeflaske</span></div>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <div class="btn btn-secondary" style="flex:1">Rediger</div>
+        <div class="btn btn-danger" style="flex:1">Slett</div>
+      </div>
+    </div>
+    <div class="card" style="background:#F3E5F5">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="font-size:16px">⚽</div>
+        <span style="font-size:13px;font-weight:600;color:#8E24AA">Spond</span>
+        <span style="font-size:11px;color:#888;margin-left:auto">G14</span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="btn" style="flex:1;background:#8E24AA;color:#fff">12 Ja</div>
+        <div class="btn" style="flex:1;background:#f0f0f0;color:#333">3 Nei</div>
+        <div class="btn" style="flex:1;background:#f0f0f0;color:#333">1 Vent</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- B: Section-based layout -->
+<div>
+<p class="label">B: Section Cards</p>
+<div class="phone">
+  <div class="status-bar"></div>
+  <div class="content">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <div style="width:32px;height:32px;border-radius:16px;border:1.5px solid #0097A7;display:flex;align-items:center;justify-content:center;color:#0097A7;font-size:16px">←</div>
+      <div style="flex:1"></div>
+      <div style="width:32px;height:32px;border-radius:16px;border:1.5px solid #0097A7;display:flex;align-items:center;justify-content:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/></svg>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div style="width:48px;height:48px;border-radius:12px;background:#E8F5E9;display:flex;align-items:center;justify-content:center;font-size:24px">⚽</div>
+      <div>
+        <div style="font-size:18px;font-weight:700">Trening G14</div>
+        <div style="font-size:13px;color:#888">Søndag 17. aug · 17:00 - 18:30</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:#0097A7;margin-bottom:8px">Detaljer</div>
+      <div class="row"><span class="row-label">📍</span><span class="row-value">Kunstgressbanen</span></div>
+      <div class="row"><span class="row-label">📝</span><span class="row-value">Ta med drikkeflaske og sko</span></div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:#0097A7;margin-bottom:8px">Spond</div>
+      <div style="display:flex;gap:8px">
+        <div class="btn" style="flex:1;background:#8E24AA;color:#fff">12 Ja</div>
+        <div class="btn" style="flex:1;background:#f0f0f0;color:#333">3 Nei</div>
+        <div class="btn" style="flex:1;background:#f0f0f0;color:#333">1 Vent</div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="font-size:12px;font-weight:700;color:#0097A7;margin-bottom:8px">Handlinger</div>
+      <div class="btn-row">
+        <div class="btn btn-primary" style="flex:1">Rediger</div>
+        <div class="btn btn-danger" style="flex:1">Slett</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- C: Compact with borders -->
+<div>
+<p class="label">C: Compact with Borders</p>
+<div class="phone">
+  <div class="status-bar"></div>
+  <div class="content">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+      <div style="width:32px;height:32px;border-radius:16px;border:1.5px solid #0097A7;display:flex;align-items:center;justify-content:center;color:#0097A7;font-size:16px">←</div>
+      <div style="flex:1"></div>
+      <div style="width:32px;height:32px;border-radius:16px;border:1.5px solid #0097A7;display:flex;align-items:center;justify-content:center">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0097A7" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v1"/></svg>
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:16px;padding:16px;margin-bottom:10px;border-left:4px solid #0097A7">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="font-size:24px">⚽</div>
+        <div>
+          <div style="font-size:17px;font-weight:700">Trening G14</div>
+          <div style="font-size:12px;color:#888">Søndag 17. aug · 17:00 - 18:30</div>
+        </div>
+      </div>
+      <div style="border-top:1px solid #f0f0f0;padding-top:8px;margin-top:4px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:#888">📍 Sted</span><span style="font-size:13px">Kunstgressbanen</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:12px;color:#888">📝 Notat</span><span style="font-size:13px">Ta med drikkeflaske</span></div>
+      </div>
+      <div style="border-top:1px solid #f0f0f0;padding-top:8px;margin-top:8px">
+        <div style="display:flex;gap:8px">
+          <div class="btn btn-primary" style="flex:1">Rediger</div>
+          <div class="btn btn-danger" style="flex:1">Slett</div>
+        </div>
+      </div>
+    </div>
+    <div style="background:#F3E5F5;border-radius:12px;padding:12px;border-left:4px solid #8E24AA">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <div style="font-size:16px">⚽</div>
+        <span style="font-size:13px;font-weight:600;color:#8E24AA">Spond — G14</span>
+      </div>
+      <div style="display:flex;gap:6px">
+        <div class="btn" style="flex:1;background:#8E24AA;color:#fff;font-size:12px">12 Ja</div>
+        <div class="btn" style="flex:1;background:#f0f0f0;color:#333;font-size:12px">3 Nei</div>
+        <div class="btn" style="flex:1;background:#f0f0f0;color:#333;font-size:12px">1 Vent</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+</body>
+</html>
