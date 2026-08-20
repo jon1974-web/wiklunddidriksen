@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline, Ellipse } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email' | 'send' | 'school';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email' | 'send' | 'school' | 'kindergarten';
   size?: number;
   color?: string;
 }
@@ -302,6 +302,17 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#009
       <Polygon points="12,3 2,9 12,15 22,9" fill={color} fillOpacity="0.15"/>
       <Polyline points="5,11 5,17 12,21 19,17"/>
       <Line x1="22" y1="9" x2="22" y2="17"/>
+    </Svg>
+  );
+
+  if (name === 'kindergarten') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="5" r="3" fill={color} fillOpacity="0.15"/>
+      <Line x1="12" y1="8" x2="12" y2="17"/>
+      <Line x1="12" y1="12" x2="6" y2="8"/>
+      <Line x1="12" y1="12" x2="18" y2="8"/>
+      <Line x1="12" y1="17" x2="8" y2="22"/>
+      <Line x1="12" y1="17" x2="16" y2="22"/>
     </Svg>
   );
 

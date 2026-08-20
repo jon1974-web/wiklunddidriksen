@@ -244,7 +244,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           const child = kindergartenChildren.find(c => c.id === h.childId);
           const firstName = child ? child.name.split(' ')[0] : '';
           const time = h.timeFrom ? `${h.timeFrom} – ${h.timeTo || ''}` : '';
-          items.push({ type: 'kindergartenHoliday', icon: '🎉', iconBg: MODULE_COLORS.kindergarten, title: `${h.title}${firstName ? ` — ${firstName}` : ''}`, time });
+          items.push({ type: 'kindergartenHoliday', icon: 'kindergarten', iconBg: MODULE_COLORS.kindergarten, title: `${h.title}${firstName ? ` — ${firstName}` : ''}`, time });
           holidayCount++;
         }
       });
