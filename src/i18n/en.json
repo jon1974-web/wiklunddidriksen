@@ -321,6 +321,7 @@
     "importFromUrl": "Import from URL",
     "urlDescription": "Paste link to days off page",
     "aiFridagDescription": "AI reads the school calendar and finds days off",
+    "aiFridagDescriptionKg": "AI reads the kindergarten calendar and finds days off",
     "teacher": "Staff",
     "child": "Child",
     "addContact": "Add Contact",

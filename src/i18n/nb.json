@@ -321,6 +321,7 @@
     "importFromUrl": "Importer fra URL",
     "urlDescription": "Lim inn lenke til fridager-side",
     "aiFridagDescription": "AI leser skolekatalogen og finner fridager",
+    "aiFridagDescriptionKg": "AI leser barnehagens kalender og finner fridager",
     "teacher": "Ansatt",
     "child": "Barn",
     "addContact": "Legg til kontakt",
