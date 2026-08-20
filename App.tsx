@@ -42,6 +42,7 @@ import { HealthVaccDetailScreen } from './src/screens/HealthVaccDetailScreen';
 import { SchoolSpaceScreen } from './src/screens/SchoolSpaceScreen';
 import { KindergartenSpaceScreen } from './src/screens/KindergartenSpaceScreen';
 import { KindergartenContactDetailScreen } from './src/screens/KindergartenContactDetailScreen';
+import { KindergartenAIScreen } from './src/screens/KindergartenAIScreen';
 import { SchoolContactDetailScreen } from './src/screens/SchoolContactDetailScreen';
 import { MealPlanScreen } from './src/screens/MealPlanScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
@@ -91,6 +92,7 @@ type RootStackParamList = {
   PetVetDetail: { visit: import('./src/types').PetVetVisit; petName?: string };
   PetVaccDetail: { vaccination: import('./src/types').PetVaccination; petName?: string };
   KindergartenContactDetail: { contact: import('./src/types').KindergartenContact; childId?: string; yearId?: string };
+  KindergartenAI: { childId: string; yearId: string; familyId: string };
   PetMedDetail: { medication: import('./src/types').PetMedication; petName?: string };
   PetGroomDetail: { grooming: import('./src/types').PetGrooming; petName?: string };
   HealthApptDetail: { appointment: import('./src/types').HealthAppointment };
@@ -314,6 +316,11 @@ const TripsStack = () => {
         <Stack.Screen
           name="KindergartenContactDetail"
           component={KindergartenContactDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="KindergartenAI"
+          component={KindergartenAIScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
