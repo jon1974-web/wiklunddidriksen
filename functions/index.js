@@ -1581,17 +1581,22 @@ exports.importHolidaysFromUrl = onRequest({ region: "us-central1", memory: "256M
           role: "system",
           content: `You are a school calendar extraction assistant. Extract holidays and days off (fridager) from the provided HTML content.
 
-Look for:
-- School holidays (høstferie, juleferie, vinterferie, påskeferie, sommerferie)
+Look for ANY dates that represent:
+- School holidays (høstferie, juleferie, vinterferie, påskeferie, sommerferie, etc.)
 - Planning days (planleggingsdager)
 - Other days off from school/kindergarten
+- Study free days, exam days off
+- Any date ranges that are NOT regular school days
+- Dates marked as "Stengt" (closed), "Fri" (free), "Ledig" (available)
 
 For each holiday found, extract:
-- title: Name of the holiday (e.g. "Høstferie", "Juleferie", "Planleggingsdag")
+- title: Name/description of the holiday (e.g. "Høstferie", "Juleferie", "Planleggingsdag", "Stengt")
 - dateFrom: Start date in YYYY-MM-DD format
 - dateTo: End date in YYYY-MM-DD format
 - timeFrom: Start time in HH:MM format if available (empty string if not)
 - timeTo: End time in HH:MM format if available (empty string if not)
+
+IMPORTANT: If you see date ranges that are NOT regular school days, include them as holidays. Look for patterns like "Uke 40: Høstferie" or colored/blocked dates.
 
 Return ONLY valid JSON with this exact structure:
 {
