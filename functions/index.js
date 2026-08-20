@@ -545,8 +545,8 @@ exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       return res.status(400).json({ error: "No image data received" });
     }
 
-    if (type !== "event" && type !== "recipe" && type !== "classlist") {
-      return res.status(400).json({ error: "Invalid type. Only 'event', 'recipe', and 'classlist' are supported." });
+    if (type !== "event" && type !== "recipe" && type !== "classlist" && type !== "holidays") {
+      return res.status(400).json({ error: "Invalid type. Only 'event', 'recipe', 'classlist', and 'holidays' are supported." });
     }
 
     const today = new Date().toISOString().split("T")[0];
@@ -630,6 +630,33 @@ Return ONLY valid JSON with this exact structure:
   ]
 }`;
       userText = "Extract all classmates and their parent contact information visible in this image.";
+    } else if (type === "holidays") {
+      systemPrompt = `You are a school calendar extraction assistant. Extract holidays and days off (fridager) from this image. The content may be a calendar, table, or plain text.
+
+Look for ANY dates or date ranges that represent:
+- School holidays (høstferie, juleferie, vinterferie, påskeferie, sommerferie, etc.)
+- Planning days (planleggingsdager)
+- Study free days, exam days off
+- Dates marked as "Stengt" (closed), "Fri" (free), "Ledig" (available)
+- Any date range that is NOT a regular school day
+- Week numbers with holiday names (e.g. "Uke 40: Høstferie")
+- Dates in tables or lists that represent non-school days
+
+For each holiday found, extract:
+- title: Name/description (e.g. "Høstferie", "Juleferie", "Planleggingsdag", "Stengt")
+- dateFrom: Start date in YYYY-MM-DD format
+- dateTo: End date in YYYY-MM-DD format
+- timeFrom: Start time in HH:MM format if available (empty string if not)
+- timeTo: End time in HH:MM format if available (empty string if not)
+
+If dates are given as week numbers (e.g. "Uke 40"), calculate the actual dates from the week number.
+If only a start date is given with no end date, set dateTo equal to dateFrom.
+
+Return ONLY valid JSON:
+{"holidays": [{"title": "...", "dateFrom": "YYYY-MM-DD", "dateTo": "YYYY-MM-DD", "timeFrom": "", "timeTo": ""}]}
+
+If no holidays found, return {"holidays": []}.`;
+      userText = "Extract all holidays and days off visible in this image.";
     } else {
       systemPrompt = `You are a recipe parser. Extract ALL recipes visible in this image and return structured data.
 
@@ -747,6 +774,16 @@ Return ONLY valid JSON with this exact structure:
         address: c.address || "",
       }));
       return res.status(200).json({ contacts: normalized });
+    } else if (type === "holidays") {
+      const holidays = Array.isArray(result.holidays) ? result.holidays : [];
+      const normalized = holidays.map((h) => ({
+        title: h.title || "",
+        dateFrom: h.dateFrom || "",
+        dateTo: h.dateTo || h.dateFrom || "",
+        timeFrom: h.timeFrom || "",
+        timeTo: h.timeTo || "",
+      }));
+      return res.status(200).json({ holidays: normalized });
     }
   } catch (error) {
     console.error("Photo to data error:", error.message, error.stack);
