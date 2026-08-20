@@ -170,14 +170,14 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
   const selectedCount = mode === 'holidays' ? holidays.filter(h => h.checked).length : contacts.filter(c => c.checked).length;
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: MODULE_COLORS.schoolBg, borderBottomColor: colors.border }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.schoolBg }]}>
+      <View style={[styles.header, { backgroundColor: '#fff', borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: MODULE_COLORS.school }]}>
           <Text style={{ color: MODULE_COLORS.school, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>{mode === 'holidays' ? t('schoolAI.titleHolidays') : t('schoolAI.title')}</Text>
       </View>
-      <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+      <View style={[styles.helperSection, { backgroundColor: MODULE_COLORS.schoolBg, borderBottomColor: colors.border }]}>
         <Text style={{ color: colors.textSecondary, fontSize: 14 }}>{mode === 'holidays' ? t('kindergarten.aiFridagDescription') : t('schoolAI.instruction')}</Text>
       </View>
       <ScrollView style={styles.content}>

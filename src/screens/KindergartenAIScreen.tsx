@@ -138,7 +138,7 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.kindergartenBg }]} edges={['top']}>
-      <View style={[styles.header, { backgroundColor: MODULE_COLORS.kindergartenBg, borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { backgroundColor: '#fff', borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: MODULE_COLORS.kindergarten }]}>
           <Text style={{ color: MODULE_COLORS.kindergarten, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
