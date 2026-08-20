@@ -581,6 +581,19 @@ export interface SchoolSchedule {
   createdAt: number;
 }
 
+export interface SchoolHoliday {
+  id: string;
+  yearId: string;
+  childId: string;
+  familyId: string;
+  title: string;
+  dateFrom: string;
+  dateTo: string;
+  timeFrom?: string;
+  timeTo?: string;
+  createdAt: number;
+}
+
 export interface KindergartenChild {
   id: string;
   name: string;
