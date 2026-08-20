@@ -450,7 +450,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     setUrlLoading(true);
     setUrlResults([]);
     try {
-      const { auth } = await import('firebase/auth');
+      const { auth } = await import('../services/firebase');
       const currentUser = auth.currentUser;
       if (!currentUser) return;
       const token = await currentUser.getIdToken();
