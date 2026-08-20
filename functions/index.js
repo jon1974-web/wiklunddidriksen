@@ -1659,11 +1659,12 @@ If no holidays found, return {"holidays": []}.`,
 
     const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
+      console.log(`importHolidaysFromUrl: no JSON found in AI response: ${content.substring(0, 200)}`);
       return res.status(500).json({ error: "Invalid AI response format" });
     }
 
     const result = JSON.parse(jsonMatch[0]);
-    console.log(`importHolidaysFromUrl: found ${(result.holidays || []).length} holidays`);
+    console.log(`importHolidaysFromUrl: AI result keys: ${Object.keys(result)}, holidays count: ${(result.holidays || []).length}`);
     return res.status(200).json({ holidays: result.holidays || [] });
   } catch (error) {
     console.error("Import holidays from URL error:", error);
