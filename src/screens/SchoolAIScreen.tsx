@@ -126,7 +126,7 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
       }
       setSuccessModal({ visible: true, title: t('common.success'), subtitle: `${selected.length} ${t('schoolAI.contactsAdded')}` });
     } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); } finally { setSaving(false); }
-  }, [contacts, childId, yearId, familyId, t]);
+  }, [mode, contacts, holidays, childId, yearId, familyId, t]);
 
   const updateContact = useCallback((index: number, updates: Partial<EditableContact>) => {
     setContacts(prev => prev.map((c, i) => i === index ? { ...c, ...updates } : c));
