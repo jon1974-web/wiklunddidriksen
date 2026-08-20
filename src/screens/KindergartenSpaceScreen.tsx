@@ -63,6 +63,10 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   const [holidayForm, setHolidayForm] = useState({ title: '', dateFrom: '', dateTo: '', timeFrom: '', timeTo: '' });
   const [editingHolidayId, setEditingHolidayId] = useState<string | null>(null);
   const [holidayActionModal, setHolidayActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [showUrlImportModal, setShowUrlImportModal] = useState(false);
+  const [urlInput, setUrlInput] = useState('');
+  const [urlLoading, setUrlLoading] = useState(false);
+  const [urlResults, setUrlResults] = useState<{ title: string; dateFrom: string; dateTo: string; timeFrom: string; timeTo: string; checked: boolean }[]>([]);
   const [contactSearch, setContactSearch] = useState('');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     staff: false,
@@ -434,6 +438,56 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     try {
       await deleteKindergartenHoliday(holidayActionModal.id);
       setHolidayActionModal({ visible: false, id: '', title: '' });
+      loadYearData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleUrlImport = async () => {
+    if (!urlInput.trim()) return;
+    if (!familyId || !selectedYear || !selectedChild) return;
+    setUrlLoading(true);
+    setUrlResults([]);
+    try {
+      const { auth } = await import('firebase/auth');
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const token = await currentUser.getIdToken();
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/importHolidaysFromUrl', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ url: urlInput, language: 'norsk' }),
+      });
+      if (!res.ok) throw new Error('Failed to import');
+      const data = await res.json();
+      setUrlResults((data.holidays || []).map((h: any) => ({ ...h, checked: true })));
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    } finally {
+      setUrlLoading(false);
+    }
+  };
+
+  const handleSaveUrlImport = async () => {
+    const selected = urlResults.filter(h => h.checked);
+    if (selected.length === 0 || !familyId || !selectedYear || !selectedChild) return;
+    try {
+      for (const h of selected) {
+        await addKindergartenHoliday({
+          title: h.title,
+          dateFrom: h.dateFrom,
+          dateTo: h.dateTo,
+          timeFrom: h.timeFrom || '',
+          timeTo: h.timeTo || '',
+          yearId: selectedYear.id,
+          childId: selectedChild.id,
+          familyId,
+        });
+      }
+      setShowUrlImportModal(false);
+      setUrlInput('');
+      setUrlResults([]);
       loadYearData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -813,7 +867,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                         <Text style={{ color: '#8E24AA', fontSize: 12 }}>{t('kindergarten.aiFridagDescriptionKg')}</Text>
                       </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E3F2FD', flex: 1 }]} onPress={() => crossAlert('Coming soon', 'URL import will be available soon')}>
+                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E3F2FD', flex: 1 }]} onPress={() => { setUrlInput(''); setUrlResults([]); setShowUrlImportModal(true); }}>
                       <Text style={{ fontSize: 20 }}>🔗</Text>
                       <View style={{ flex: 1 }}>
                         <Text style={{ color: '#1565C0', fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromUrl')}</Text>
@@ -1047,6 +1101,50 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.modalBtn, { backgroundColor: KINDERGARTEN_THEME }]} onPress={handleSaveHoliday}>
                       <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.save')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        {/* URL Import Modal */}
+        <Modal visible={showUrlImportModal} transparent animationType="slide">
+          <TouchableWithoutFeedback onPress={() => { setShowUrlImportModal(false); setUrlInput(''); setUrlResults([]); }}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>{t('kindergarten.importFromUrl')}</Text>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.urlDescription')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={urlInput} onChangeText={setUrlInput} placeholder="https://..." placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: KINDERGARTEN_THEME, marginBottom: 12 }]} onPress={handleUrlImport} disabled={urlLoading || !urlInput.trim()}>
+                    {urlLoading ? <ActivityIndicator color="#fff" size="small" /> : <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.searchWithAI')}</Text>}
+                  </TouchableOpacity>
+                  {urlResults.length > 0 && (
+                    <ScrollView style={{ maxHeight: 300 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text, marginBottom: 8 }}>{urlResults.length} {t('kindergarten.holidays')} {t('common.found')}</Text>
+                      {urlResults.map((h, i) => (
+                        <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 8, borderBottomWidth: 1, borderBottomColor: colors.border }} onPress={() => setUrlResults(prev => prev.map((r, j) => j === i ? { ...r, checked: !r.checked } : r))}>
+                          <View style={{ width: 20, height: 20, borderRadius: 4, borderWidth: 2, borderColor: h.checked ? KINDERGARTEN_THEME : colors.textDisabled, backgroundColor: h.checked ? KINDERGARTEN_THEME : 'transparent', justifyContent: 'center', alignItems: 'center' }}>
+                            {h.checked && <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>{h.title}</Text>
+                            <Text style={{ fontSize: 11, color: colors.textSecondary }}>{h.dateFrom} — {h.dateTo}</Text>
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </ScrollView>
+                  )}
+                  <View style={{ flexDirection: 'row', gap: 12, marginTop: 12 }}>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowUrlImportModal(false); setUrlInput(''); setUrlResults([]); }}>
+                      <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: KINDERGARTEN_THEME }]} onPress={handleSaveUrlImport} disabled={urlResults.filter(h => h.checked).length === 0}>
+                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('mealPlanner.saveRecipe')} ({urlResults.filter(h => h.checked).length})</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
