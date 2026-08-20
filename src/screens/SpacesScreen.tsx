@@ -114,7 +114,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
     {
       id: 'school',
       name: t('spaces.school'),
-      icon: 'documents',
+      icon: 'school',
       iconColor: MODULE_COLORS.school,
       count: schoolCount > 0 ? t('spaces.schoolCount', { count: schoolCount }) : '',
       screen: 'SchoolSpace',
