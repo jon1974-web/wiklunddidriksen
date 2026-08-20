@@ -8,6 +8,7 @@ import { AppIcon } from '../components/AppIcon';
 import { SearchableDropdown } from '../components/SearchableDropdown';
 import { SearchableMultiDropdown } from '../components/SearchableMultiDropdown';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
+import { DatePickerModal } from '../components/DatePickerModal';
 import * as ImagePicker from 'expo-image-picker';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
@@ -63,6 +64,8 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   const [holidayForm, setHolidayForm] = useState({ title: '', dateFrom: '', dateTo: '', timeFrom: '', timeTo: '' });
   const [editingHolidayId, setEditingHolidayId] = useState<string | null>(null);
   const [holidayActionModal, setHolidayActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  type HolidayPickerField = 'dateFrom' | 'dateTo' | 'timeFrom' | 'timeTo' | null;
+  const [activeHolidayPicker, setActiveHolidayPicker] = useState<HolidayPickerField>(null);
   const [showUrlImportModal, setShowUrlImportModal] = useState(false);
   const [urlInput, setUrlInput] = useState('');
   const [urlLoading, setUrlLoading] = useState(false);
@@ -1139,21 +1142,29 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     <View style={{ flexDirection: 'row', gap: 8 }}>
                       <View style={[styles.field, { flex: 1 }]}>
                         <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateFrom')}</Text>
-                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.dateFrom} onChangeText={(v) => setHolidayForm(f => ({ ...f, dateFrom: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, justifyContent: 'center' }]} onPress={() => setActiveHolidayPicker('dateFrom')}>
+                          <Text style={{ color: holidayForm.dateFrom ? colors.text : colors.textDisabled, fontSize: 16 }}>{holidayForm.dateFrom || 'YYYY-MM-DD'}</Text>
+                        </TouchableOpacity>
                       </View>
                       <View style={[styles.field, { flex: 1 }]}>
                         <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateTo')}</Text>
-                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.dateTo} onChangeText={(v) => setHolidayForm(f => ({ ...f, dateTo: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, justifyContent: 'center' }]} onPress={() => setActiveHolidayPicker('dateTo')}>
+                          <Text style={{ color: holidayForm.dateTo ? colors.text : colors.textDisabled, fontSize: 16 }}>{holidayForm.dateTo || 'YYYY-MM-DD'}</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
                     <View style={{ flexDirection: 'row', gap: 8 }}>
                       <View style={[styles.field, { flex: 1 }]}>
                         <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeFrom')}</Text>
-                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.timeFrom} onChangeText={(v) => setHolidayForm(f => ({ ...f, timeFrom: v }))} placeholder="HH:MM" placeholderTextColor={colors.textDisabled} />
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, justifyContent: 'center' }]} onPress={() => setActiveHolidayPicker('timeFrom')}>
+                          <Text style={{ color: holidayForm.timeFrom ? colors.text : colors.textDisabled, fontSize: 16 }}>{holidayForm.timeFrom || 'HH:MM'}</Text>
+                        </TouchableOpacity>
                       </View>
                       <View style={[styles.field, { flex: 1 }]}>
                         <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeTo')}</Text>
-                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.timeTo} onChangeText={(v) => setHolidayForm(f => ({ ...f, timeTo: v }))} placeholder="HH:MM" placeholderTextColor={colors.textDisabled} />
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, justifyContent: 'center' }]} onPress={() => setActiveHolidayPicker('timeTo')}>
+                          <Text style={{ color: holidayForm.timeTo ? colors.text : colors.textDisabled, fontSize: 16 }}>{holidayForm.timeTo || 'HH:MM'}</Text>
+                        </TouchableOpacity>
                       </View>
                     </View>
                   </ScrollView>
@@ -1214,6 +1225,17 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
             </View>
           </TouchableWithoutFeedback>
         </Modal>
+
+        <DatePickerModal
+          visible={activeHolidayPicker !== null}
+          title={activeHolidayPicker === 'dateFrom' ? t('kindergarten.holidayDateFrom') : activeHolidayPicker === 'dateTo' ? t('kindergarten.holidayDateTo') : activeHolidayPicker === 'timeFrom' ? t('kindergarten.holidayTimeFrom') : t('kindergarten.holidayTimeTo')}
+          mode={activeHolidayPicker === 'timeFrom' || activeHolidayPicker === 'timeTo' ? 'time' : 'date'}
+          dateOffset={-365}
+          dateCount={730}
+          selectedValue={activeHolidayPicker ? holidayForm[activeHolidayPicker] || '' : ''}
+          onSelect={(v) => { if (activeHolidayPicker) setHolidayForm(f => ({ ...f, [activeHolidayPicker]: v })); setActiveHolidayPicker(null); }}
+          onClose={() => setActiveHolidayPicker(null)}
+        />
       </>
     );
   };
