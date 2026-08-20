@@ -371,7 +371,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
       </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <AppIcon name="activities" size={28} color={PET_THEME} />
+          <AppIcon name="pet" size={28} color={PET_THEME} />
           <Text style={[styles.screenTitle, { color: colors.text }]}>{t('spaces.pets')}</Text>
           <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>

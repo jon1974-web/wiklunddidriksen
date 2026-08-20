@@ -139,7 +139,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
     {
       id: 'pets',
       name: t('spaces.pets'),
-      icon: 'activities',
+      icon: 'pet',
       iconColor: MODULE_COLORS.pets,
       count: petCount > 0 ? t('spaces.petsCount', { count: petCount }) : '',
       screen: 'PetSpace',
