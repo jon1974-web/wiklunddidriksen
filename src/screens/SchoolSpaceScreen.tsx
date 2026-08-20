@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, Linking } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, Linking, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -16,9 +16,10 @@ import {
   getSchoolChildren, addSchoolChild, updateSchoolChild, deleteSchoolChild,
   getSchoolYears, addSchoolYear, updateSchoolYear, deleteSchoolYear,
   getSchoolContacts, addSchoolContact, updateSchoolContact, deleteSchoolContact,
-  getSchoolSchedules, addSchoolSchedule, deleteSchoolSchedule,
+  getSchoolSchedules, addSchoolSchedule, updateSchoolSchedule, deleteSchoolSchedule,
+  getSchoolHolidays, addSchoolHoliday, updateSchoolHoliday, deleteSchoolHoliday,
 } from '../services/schoolService';
-import { SchoolChild, SchoolYear, SchoolContact, SchoolSchedule } from '../types';
+import { SchoolChild, SchoolYear, SchoolContact, SchoolSchedule, SchoolHoliday } from '../types';
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 
@@ -64,6 +65,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     teachers: false,
     admins: false,
     classmates: false,
+    holidays: false,
   });
 
   const toggleSection = (key: string) => {
@@ -73,6 +75,11 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [selectedYear, setSelectedYear] = useState<SchoolYear | null>(null);
   const [contacts, setContacts] = useState<SchoolContact[]>([]);
   const [schedules, setSchedules] = useState<SchoolSchedule[]>([]);
+  const [holidays, setHolidays] = useState<SchoolHoliday[]>([]);
+  const [showAddHolidayModal, setShowAddHolidayModal] = useState(false);
+  const [holidayForm, setHolidayForm] = useState({ title: '', dateFrom: '', dateTo: '', timeFrom: '', timeTo: '' });
+  const [editingHolidayId, setEditingHolidayId] = useState<string | null>(null);
+  const [holidayActionModal, setHolidayActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [contactSearch, setContactSearch] = useState('');
   const [activeSemester, setActiveSemester] = useState<'høst' | 'vår'>('høst');
 
@@ -120,14 +127,16 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   }, [selectedChild, familyId]);
 
   const loadYearData = useCallback(async () => {
-    if (!selectedYear || !familyId) { setContacts([]); setSchedules([]); return; }
+    if (!selectedYear || !familyId) { setContacts([]); setSchedules([]); setHolidays([]); return; }
     try {
-      const [c, s] = await Promise.all([
+      const [c, s, h] = await Promise.all([
         getSchoolContacts(familyId, selectedYear.id, selectedChild?.id),
         getSchoolSchedules(familyId, selectedYear.id),
+        getSchoolHolidays(familyId, selectedYear.id, selectedChild?.id),
       ]);
       setContacts(c);
       setSchedules(s);
+      setHolidays(h);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -394,6 +403,46 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     }
   };
 
+  const handleSaveHoliday = async () => {
+    if (!familyId || !selectedYear || !selectedChild) return;
+    if (!holidayForm.title.trim()) { crossAlert('Error', t('kindergarten.enterContactName')); return; }
+    if (!holidayForm.dateFrom || !holidayForm.dateTo) { crossAlert('Error', 'Velg fra og til dato'); return; }
+    try {
+      const data = {
+        title: holidayForm.title.trim(),
+        dateFrom: holidayForm.dateFrom,
+        dateTo: holidayForm.dateTo,
+        timeFrom: holidayForm.timeFrom || '',
+        timeTo: holidayForm.timeTo || '',
+        yearId: selectedYear.id,
+        childId: selectedChild.id,
+        familyId,
+      };
+      if (editingHolidayId) {
+        await updateSchoolHoliday(editingHolidayId, data);
+      } else {
+        await addSchoolHoliday(data);
+      }
+      setHolidayForm({ title: '', dateFrom: '', dateTo: '', timeFrom: '', timeTo: '' });
+      setEditingHolidayId(null);
+      setShowAddHolidayModal(false);
+      loadYearData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleDeleteHoliday = async () => {
+    if (!holidayActionModal.id) return;
+    try {
+      await deleteSchoolHoliday(holidayActionModal.id);
+      setHolidayActionModal({ visible: false, id: '', title: '' });
+      loadYearData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
   const teachers = contacts.filter(c => c.role === 'teacher').sort((a, b) => {
     const order = { personal: 0, contact: 1, subject: 2 };
     return (order[a.teacherType || 'contact'] ?? 1) - (order[b.teacherType || 'contact'] ?? 1);
@@ -423,6 +472,11 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     const roleLabels = adminTypes.map((t: string) => getAdminRoleLabel(t).toLowerCase());
     return c.name.toLowerCase().includes(q) || roleLabels.some((l: string) => l.includes(q));
   });
+  const filteredHolidays = holidays.filter(h => {
+    if (!contactSearch.trim()) return true;
+    const q = contactSearch.toLowerCase();
+    return h.title.toLowerCase().includes(q);
+  });
 
   // Auto-expand sections when searching, collapse when search is cleared
   useEffect(() => {
@@ -431,11 +485,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         teachers: filteredTeachers.length > 0,
         admins: filteredAdmins.length > 0,
         classmates: filteredClassmates.length > 0,
+        holidays: filteredHolidays.length > 0,
       });
     } else {
-      setExpandedSections({ teachers: false, admins: false, classmates: false });
+      setExpandedSections({ teachers: false, admins: false, classmates: false, holidays: false });
     }
-  }, [contactSearch, filteredTeachers.length, filteredAdmins.length, filteredClassmates.length]);
+  }, [contactSearch, filteredTeachers.length, filteredAdmins.length, filteredClassmates.length, filteredHolidays.length]);
 
   const renderContactActions = (phone?: string, email?: string) => (
     <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
@@ -793,6 +848,40 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </View>
                 {schedules.filter(s => s.semester === activeSemester).length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noSchedule')}</Text>}
               </View>
+
+              {/* Fridager Section */}
+              <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('holidays')}>
+                  <View style={styles.sectionTitleRow}>
+                    <Text style={styles.sectionIcon}>🎉</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('kindergarten.holidays')}</Text>
+                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({filteredHolidays.length})</Text>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.holidays ? '▼' : '▶'}</Text>
+                  </View>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingHolidayId(null); setHolidayForm({ title: '', dateFrom: '', dateTo: '', timeFrom: '', timeTo: '' }); setShowAddHolidayModal(true); }}>
+                    <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+                  </TouchableOpacity>
+                </TouchableOpacity>
+                {selectedChild && (
+                  <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E8F5E9' }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
+                    <Text style={{ fontSize: 20 }}>📸</Text>
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ color: '#2E7D32', fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
+                      <Text style={{ color: '#388E3C', fontSize: 12 }}>{t('school.aiDescription')}</Text>
+                    </View>
+                  </TouchableOpacity>
+                )}
+                {expandedSections.holidays && filteredHolidays.map(h => (
+                  <TouchableOpacity key={h.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: '#43A047' }]} onPress={() => { setEditingHolidayId(h.id); setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); }} onLongPress={() => setHolidayActionModal({ visible: true, id: h.id, title: h.title })}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={[styles.contactName, { color: colors.text }]}>{h.title}</Text>
+                      <Text style={{ fontSize: 12, color: '#43A047', fontWeight: '600' }}>{h.timeFrom ? `${h.timeFrom} — ${h.timeTo}` : `${h.dateFrom} — ${h.dateTo}`}</Text>
+                    </View>
+                    {!h.timeFrom && <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{h.dateFrom} — {h.dateTo}</Text>}
+                  </TouchableOpacity>
+                ))}
+                {expandedSections.holidays && filteredHolidays.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('kindergarten.noHolidays')}</Text>}
+              </View>
             </>
           )}
         </ScrollView>
@@ -966,6 +1055,54 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
         <ActionModal visible={yearActionModal.visible} title={yearActionModal.title} onEdit={handleEditYear} onDelete={handleDeleteYear} onCancel={() => setYearActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
         <ActionModal visible={scheduleActionModal.visible} title={scheduleActionModal.title} onDelete={() => { handleDeleteSchedule(scheduleActionModal.id); setScheduleActionModal({ visible: false, id: '', title: '' }); }} onCancel={() => setScheduleActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
+        <ActionModal visible={holidayActionModal.visible} title={holidayActionModal.title} onEdit={() => { setEditingHolidayId(holidayActionModal.id); const h = holidays.find(h => h.id === holidayActionModal.id); if (h) setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); setHolidayActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteHoliday} onCancel={() => setHolidayActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
+
+        {/* Add/Edit Holiday Modal */}
+        <Modal visible={showAddHolidayModal} transparent animationType="slide">
+          <TouchableWithoutFeedback onPress={() => { setShowAddHolidayModal(false); setEditingHolidayId(null); }}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>{editingHolidayId ? t('kindergarten.editHoliday') : t('kindergarten.addHoliday')}</Text>
+                  <ScrollView>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTitle')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.title} onChangeText={(v) => setHolidayForm(f => ({ ...f, title: v }))} placeholder={t('kindergarten.holidayTitlePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateFrom')}</Text>
+                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.dateFrom} onChangeText={(v) => setHolidayForm(f => ({ ...f, dateFrom: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                      </View>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateTo')}</Text>
+                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.dateTo} onChangeText={(v) => setHolidayForm(f => ({ ...f, dateTo: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
+                      </View>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeFrom')}</Text>
+                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.timeFrom} onChangeText={(v) => setHolidayForm(f => ({ ...f, timeFrom: v }))} placeholder="HH:MM" placeholderTextColor={colors.textDisabled} />
+                      </View>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeTo')}</Text>
+                        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={holidayForm.timeTo} onChangeText={(v) => setHolidayForm(f => ({ ...f, timeTo: v }))} placeholder="HH:MM" placeholderTextColor={colors.textDisabled} />
+                      </View>
+                    </View>
+                  </ScrollView>
+                  <View style={{ flexDirection: 'row', gap: 12, marginTop: 12 }}>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddHolidayModal(false); setEditingHolidayId(null); }}>
+                      <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: SCHOOL_THEME }]} onPress={handleSaveHoliday}>
+                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.save')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
       </>
     );
   };
