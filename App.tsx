@@ -41,6 +41,7 @@ import { HealthMedDetailScreen } from './src/screens/HealthMedDetailScreen';
 import { HealthVaccDetailScreen } from './src/screens/HealthVaccDetailScreen';
 import { SchoolSpaceScreen } from './src/screens/SchoolSpaceScreen';
 import { KindergartenSpaceScreen } from './src/screens/KindergartenSpaceScreen';
+import { KindergartenContactDetailScreen } from './src/screens/KindergartenContactDetailScreen';
 import { SchoolContactDetailScreen } from './src/screens/SchoolContactDetailScreen';
 import { MealPlanScreen } from './src/screens/MealPlanScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
