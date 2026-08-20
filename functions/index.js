@@ -1645,7 +1645,7 @@ If no holidays found, return {"holidays": []}.`,
         },
         {
           role: "user",
-          content: `Extract all holidays and days off from this school/kindergarten calendar page:\n\n${html.substring(0, 12000)}`,
+          content: `Extract all holidays and days off from this school/kindergarten calendar page:\n\n${html.substring(0, 50000)}`,
         },
       ],
       temperature: 0.3,
