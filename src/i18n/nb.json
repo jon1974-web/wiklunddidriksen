@@ -75,7 +75,10 @@
     "pickEndDate": "Velg sluttdato",
     "pickStartTime": "Velg starttid",
     "pickEndTime": "Velg sluttid",
-    "continue": "Fortsett"
+    "continue": "Fortsett",
+    "day": "Dag",
+    "days": "dager",
+    "weeks": "uker"
   },
   "auth": {
     "title": "Familiesenter",
@@ -565,9 +568,7 @@
     "uv": "UV",
     "water": "Vann",
     "previous": "Forrige",
-    "next": "Neste",
-    "days": "dager",
-    "weeks": "uker"
+    "next": "Neste"
   },
   "tips": {
     "title": "Destinasjonstips",

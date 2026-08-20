@@ -75,7 +75,10 @@
     "pickEndDate": "Valitse lopetuspäivä",
     "pickStartTime": "Valitse aloitusaika",
     "pickEndTime": "Valitse lopetusaika",
-    "continue": "Jatka"
+    "continue": "Jatka",
+    "day": "Päivä",
+    "days": "päivää",
+    "weeks": "viikkoa"
   },
   "auth": {
     "title": "Perhekeskus",
@@ -565,8 +568,6 @@
     "water": "Vesi",
     "previous": "Edellinen",
     "next": "Seuraava",
-    "days": "päivää",
-    "weeks": "viikkoa",
     "refreshing": "Päivitetään..."
   },
   "tips": {

@@ -75,7 +75,10 @@
     "pickEndDate": "Välj slutdatum",
     "pickStartTime": "Välj starttid",
     "pickEndTime": "Välj sluttid",
-    "continue": "Fortsätt"
+    "continue": "Fortsätt",
+    "day": "Dag",
+    "days": "dagar",
+    "weeks": "veckor"
   },
   "auth": {
     "title": "Familjecenter",
@@ -565,8 +568,6 @@
     "water": "Vatten",
     "previous": "Föregående",
     "next": "Nästa",
-    "days": "dagar",
-    "weeks": "veckor",
     "refreshing": "Uppdaterar..."
   },
   "tips": {

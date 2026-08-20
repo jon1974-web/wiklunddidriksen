@@ -75,7 +75,10 @@
     "pickEndDate": "Pick end date",
     "pickStartTime": "Pick start time",
     "pickEndTime": "Pick end time",
-    "continue": "Continue"
+    "continue": "Continue",
+    "day": "Day",
+    "days": "days",
+    "weeks": "weeks"
   },
   "auth": {
     "title": "Family Center",
@@ -565,9 +568,7 @@
     "uv": "UV",
     "water": "Water",
     "previous": "Previous",
-    "next": "Next",
-    "days": "days",
-    "weeks": "weeks"
+    "next": "Next"
   },
   "tips": {
     "title": "Destination tips",
