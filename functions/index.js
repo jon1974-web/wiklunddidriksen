@@ -1609,6 +1609,7 @@ exports.importHolidaysFromUrl = onRequest({ region: "us-central1", memory: "256M
       return res.status(400).json({ error: `Kunne ikke hente siden: ${response.status}` });
     }
     const html = await response.text();
+    console.log(`importHolidaysFromUrl: fetched ${html.length} chars from ${url}`);
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
     const completion = await openai.chat.completions.create({
@@ -1616,25 +1617,25 @@ exports.importHolidaysFromUrl = onRequest({ region: "us-central1", memory: "256M
       messages: [
         {
           role: "system",
-          content: `You are a school calendar extraction assistant. Extract holidays and days off (fridager) from the provided content. The content may be a calendar page OR plain text listing holidays.
+          content: `You are a school calendar extraction assistant. Extract holidays and days off (fridager) from the provided content. The page likely ONLY contains holidays/free days — no regular school days.
 
-Look for ANY dates or date ranges that represent:
-- School holidays (høstferie, juleferie, vinterferie, påskeferie, sommerferie, etc.)
-- Planning days (planleggingsdager)
-- Study free days, exam days off
-- Dates marked as "Stengt" (closed), "Fri" (free), "Ledig" (available)
-- Any date range that is NOT a regular school day
-- Week numbers with holiday names (e.g. "Uke 40: Høstferie")
-- Dates in tables or lists that represent non-school days
+Look for:
+- Month names in text (januar, februar, mars, april, mai, juni, juli, august, september, oktober, november, desember)
+- Year numbers
+- Day names or dates
+- Times (HH:MM format)
+- Titles describing the type of free day (e.g. "Høstferie", "Planleggingsdag", "Juleferie", "Vinterferie")
+- Week numbers
+- Any date ranges that represent days off
 
 For each holiday found, extract:
-- title: Name/description (e.g. "Høstferie", "Juleferie", "Planleggingsdag", "Stengt")
+- title: Name/description (e.g. "Høstferie", "Juleferie", "Planleggingsdag")
 - dateFrom: Start date in YYYY-MM-DD format
 - dateTo: End date in YYYY-MM-DD format
 - timeFrom: Start time in HH:MM format if available (empty string if not)
 - timeTo: End time in HH:MM format if available (empty string if not)
 
-If dates are given as week numbers (e.g. "Uke 40"), calculate the actual dates from the week number.
+If dates are given as week numbers, calculate the actual dates from the week number.
 If only a start date is given with no end date, set dateTo equal to dateFrom.
 
 Return ONLY valid JSON:
