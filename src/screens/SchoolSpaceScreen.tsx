@@ -863,13 +863,22 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   </TouchableOpacity>
                 </TouchableOpacity>
                 {selectedChild && (
-                  <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E8F5E9' }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
-                    <Text style={{ fontSize: 20 }}>📸</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ color: '#2E7D32', fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
-                      <Text style={{ color: '#388E3C', fontSize: 12 }}>{t('school.aiDescription')}</Text>
-                    </View>
-                  </TouchableOpacity>
+                  <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
+                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E8F5E9', flex: 1 }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
+                      <Text style={{ fontSize: 20 }}>📸</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: '#2E7D32', fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromImage')}</Text>
+                        <Text style={{ color: '#388E3C', fontSize: 12 }}>{t('school.aiDescription')}</Text>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E3F2FD', flex: 1 }]} onPress={() => crossAlert('Coming soon', 'URL import will be available soon')}>
+                      <Text style={{ fontSize: 20 }}>🔗</Text>
+                      <View style={{ flex: 1 }}>
+                        <Text style={{ color: '#1565C0', fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromUrl')}</Text>
+                        <Text style={{ color: '#1976D2', fontSize: 12 }}>{t('kindergarten.urlDescription')}</Text>
+                      </View>
+                    </TouchableOpacity>
+                  </View>
                 )}
                 {expandedSections.holidays && filteredHolidays.map(h => (
                   <TouchableOpacity key={h.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: '#43A047' }]} onPress={() => { setEditingHolidayId(h.id); setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); }} onLongPress={() => setHolidayActionModal({ visible: true, id: h.id, title: h.title })}>
