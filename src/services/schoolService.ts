@@ -98,6 +98,12 @@ export async function getSchoolHolidays(familyId: string, yearId: string, childI
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolHoliday));
 }
 
+export async function getAllSchoolHolidays(familyId: string): Promise<SchoolHoliday[]> {
+  const q = query(collection(db, 'schoolHolidays'), where('familyId', '==', familyId));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolHoliday));
+}
+
 export async function addSchoolHoliday(data: Omit<SchoolHoliday, 'id' | 'createdAt'>): Promise<string> {
   const docRef = await addDoc(collection(db, 'schoolHolidays'), { ...data, createdAt: Date.now() });
   return docRef.id;

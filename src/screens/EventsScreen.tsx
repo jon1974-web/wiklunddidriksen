@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild } from '../types';
 import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
@@ -19,6 +19,8 @@ import { getSpondConfig, getSpondEvents, getSpondMembers, changeSpondResponse, c
 import { getHealthAppointments, getHealthMedications, getHealthVaccinations } from '../services/healthService';
 import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications } from '../services/petService';
 import { getUserProfile } from '../services/familyService';
+import { getAllSchoolHolidays, getSchoolChildren } from '../services/schoolService';
+import { getAllKindergartenHolidays, getKindergartenChildren } from '../services/kindergartenService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { WeeklySummary } from '../components/WeeklySummary';
@@ -138,6 +140,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [petVetVisits, setPetVetVisits] = useState<PetVetVisit[]>([]);
   const [petVaccinations, setPetVaccinations] = useState<PetVaccination[]>([]);
   const [petMedications, setPetMedications] = useState<PetMedication[]>([]);
+  const [schoolHolidays, setSchoolHolidays] = useState<SchoolHoliday[]>([]);
+  const [kindergartenHolidays, setKindergartenHolidays] = useState<SchoolHoliday[]>([]);
+  const [schoolChildren, setSchoolChildren] = useState<SchoolChild[]>([]);
+  const [kindergartenChildren, setKindergartenChildren] = useState<KindergartenChild[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
@@ -235,13 +241,32 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     }
   }, [familyId]);
 
+  const loadHolidays = useCallback(async () => {
+    if (!familyId) return;
+    try {
+      const [sh, kh, sc, kc] = await Promise.all([
+        getAllSchoolHolidays(familyId),
+        getAllKindergartenHolidays(familyId),
+        getSchoolChildren(familyId),
+        getKindergartenChildren(familyId),
+      ]);
+      setSchoolHolidays(sh);
+      setKindergartenHolidays(kh);
+      setSchoolChildren(sc);
+      setKindergartenChildren(kc);
+    } catch (error) {
+      // Silently fail for holidays
+    }
+  }, [familyId]);
+
   useEffect(() => {
     loadTrips();
     loadHealth();
     loadPets();
-    const unsubscribe = navigation.addListener('focus', () => { loadTrips(); loadHealth(); loadPets(); });
+    loadHolidays();
+    const unsubscribe = navigation.addListener('focus', () => { loadTrips(); loadHealth(); loadPets(); loadHolidays(); });
     return unsubscribe;
-  }, [navigation, loadTrips, loadHealth]);
+  }, [navigation, loadTrips, loadHealth, loadHolidays]);
 
   useEffect(() => {
     if (!familyId) return;
@@ -1075,6 +1100,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         petVetVisits={petVetVisits}
         petVaccinations={petVaccinations}
         petMedications={petMedications}
+        schoolHolidays={schoolHolidays}
+        kindergartenHolidays={kindergartenHolidays}
+        schoolChildren={schoolChildren}
+        kindergartenChildren={kindergartenChildren}
       />
 
       <ActionModal
