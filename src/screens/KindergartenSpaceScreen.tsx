@@ -673,7 +673,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.members ? '▼' : '▶'}</Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 8 }}>
-                    <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingContactId(null); setContactForm({ role: 'child', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                    <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingContactId(null); setContactForm({ role: 'child', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                       <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                     </TouchableOpacity>
                   </View>
