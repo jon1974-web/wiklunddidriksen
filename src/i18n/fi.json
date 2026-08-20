@@ -280,12 +280,15 @@
     "deleteScheduleConfirm": "Haluatko varmasti poistaa tämän aikataulun?",
     "helpTitle": "Koulu",
     "helpWhat": "Mikä on Koulu?",
-    "helpWhatText": "Koulu-moduuli auttaa sinua pitämään silmällä lastesi kouluelämää. Tallenna opettajat, luokkatoverit ja aikataulut jokaiselle kouluvuodelle.",
+    "helpWhatText": "Koulu-moduuli auttaa sinua pitämään silmällä lastesi kouluelämää. Tallenna opettajat, luokkatoverit, aikataulut ja lomapäivät jokaiselle kouluvuodelle. Käytä hakukenttää suodattaaksesi yhteystietoja.",
     "helpHow": "Käyttöohje",
-    "helpHowText": "Lisää lapsi, valitse kouluvuosi ja lisää opettajat ja luokkatoverit. Ota kuva yhteystietoluettelosta tuodaksesi sen automaattisesti.",
-    "helpTip": "Jokaisella kouluvuodella voi omat yhteystietonsa ja aikataulunsa. Vanhat tiedot säilytetään historiana.",
+    "helpHowText": "1. Lisää lapsi nimellä ja koululla.\n2. Valitse tai luo kouluvuosi.\n3. Lisää opettajat, vanhemmat ja luokkatoverit.\n4. Ota kuva yhteystietoluettelosta tuodaksesi sen automaattisesti.\n5. Lataa aikataulukuvat syksylle ja keväälle.",
+    "helpTip": "Jokaisella kouluvuodella on omat yhteystietonsa, aikataulunsa ja lomapäivänsä. Vanhat tiedot säilytetään historiana.Pidä kohdetta painavana muokataksesi tai poistaaksesi.",
+    "helpHolidays": "Lomapäivät",
+    "helpHolidaysText": "Lomapäivät näyttävät koululomat ja suunnittelupäivät lapselle. Jokainen lomapäivä näyttää kuvakeen, otsikon, päivämäärät ja kuinka kaukana se on.\n\nVoit:\n• Lisätä lomapäiviä manuaalisesti\n• Tuoda kuvasta tekoälyllä\n• Tuoda URL-osoitteesta (linkki koulun verkkosivustolle)\n\nLomapäivät näkyvät myös viikkoenväyhteenvetoon (Oma viikko) muiden tapahtumien kanssa.",
+    "helpHolidaysTip": "Lomapäivät järjestetään tulevat ensin. Merkki näyttää onko lomapäivä tänään, X päivän päästä vai X päivää sitten.",
     "helpSettings": "Asetukset",
-    "helpSettingsText": "Voit muokata ja poistaa lapsia, yhteystietoja ja aikatauluja pitämällä painavana kohteesta."
+    "helpSettingsText": "Voit muokata ja poistaa lapsia, yhteystietoja, aikatauluja ja lomapäiviä pitämällä painavana kohteesta."
   },
   "kindergarten": {
     "title": "Päiväkotimme",
@@ -377,11 +380,15 @@
     "photo": "Valokuva",
     "helpTitle": "Päiväkoti",
     "helpWhat": "Mikä on Päiväkoti?",
-    "helpWhatText": "Päiväkoti näyttää tietoja lapsen päiväkodista, mukaan lukien henkilökunta, jäsenet ja aikataulut.",
+    "helpWhatText": "Päiväkoti-moduuli auttaa sinua pitämään silmällä lastesi päiväkotielämää. Tallenna henkilökunta, jäsenet, aikataulut ja lomapäivät jokaiselle päiväkotivuodelle. Käytä hakukenttää suodattaaksesi yhteystietoja.",
     "helpHow": "Käyttöohje",
-    "helpHowText": "Lisää lapsi, valitse vuosi/ryhmä ja lisää yhteystiedot ja aikataulut.",
+    "helpHowText": "1. Lisää lapsi nimellä ja päiväkodilla.\n2. Valitse tai luo vuosi ryhmällä.\n3. Lisää henkilökunta ja jäsenet yhteystiedoilla.\n4. Ota kuva yhteystietoluettelosta tuodaksesi sen automaattisesti.\n5. Lataa aikataulukuvat syksylle ja keväälle.",
+    "helpTip": "Jokaisella päiväkotivuodella on omat yhteystietonsa, aikataulunsa ja lomapäivänsä. Vanhat tiedot säilytetään historiana. Pidä kohdetta painavana muokataksesi tai poistaaksesi.",
+    "helpHolidays": "Lomapäivät",
+    "helpHolidaysText": "Lomapäivät näyttävät lomat ja suunnittelupäivät lapselle päiväkodissa. Jokainen lomapäivä näyttää kuvakeen, otsikon, päivämäärät ja kuinka kaukana se on.\n\nVoit:\n• Lisätä lomapäiviä manuaalisesti\n• Tuoda kuvasta tekoälyllä\n• Tuoda URL-osoitteesta (linkki päiväkodin verkkosivustolle)\n\nLomapäivät näkyvät myös viikkoenväyhteenvetoon (Oma viikko) muiden tapahtumien kanssa.",
+    "helpHolidaysTip": "Lomapäivät järjestetään tulevat ensin. Merkki näyttää onko lomapäivä tänään, X päivän päästä vai X päivää sitten.",
     "helpSettings": "Asetukset",
-    "helpSettingsText": "Voit muokata ja poistaa lapsia, yhteystietoja ja aikatauluja pitämällä painavana kohteesta."
+    "helpSettingsText": "Voit muokata ja poistaa lapsia, yhteystietoja, aikatauluja ja lomapäiviä pitämällä painavana kohteesta."
   },
   "health": {
     "title": "Terveys",

@@ -280,12 +280,15 @@
     "deleteScheduleConfirm": "Är du säker på att du vill ta bort detta schema?",
     "helpTitle": "Skola",
     "helpWhat": "Vad är Skola?",
-    "helpWhatText": "Skolmodulen hjälper dig håra reda på dina barns skolliv. Spara lärare, klasskamrater och scheman för varje skolår.",
+    "helpWhatText": "Skolmodulen hjälper dig hålla reda på dina barns skolliv. Spara lärare, klasskamrater, scheman och helger för varje skolår. Använd sökfältet för att filtrera kontakter.",
     "helpHow": "Så här gör du",
-    "helpHowText": "Lägg till ett barn, välj skolår, och lägg till lärare och klasskamrater. Ta en bild av kontaktlistan för att importera automatiskt.",
-    "helpTip": "Varje skolår kan ha egna kontakter och scheman. Gamla data bevaras som historik.",
+    "helpHowText": "1. Lägg till ett barn med namn och skola.\n2. Välj eller skapa ett skolår.\n3. Lägg till lärare, föräldrar och klasskamrater.\n4. Ta en bild av kontaktlistan för att importera automatiskt.\n5. Ladda upp schemabilder för höst och vår.",
+    "helpTip": "Varje skolår har egna kontakter, scheman och helger. Gamla data bevaras som historik. Håll inne ett objekt för att redigera eller ta bort.",
+    "helpHolidays": "Helger",
+    "helpHolidaysText": "Helger visar skollov och planeringsdagar för barnet. Varje helg visar en ikon, titel, datum och hur långt borta den är.\n\nDu kan:\n• Lägga till helger manuellt\n• Importera från bild med AI\n• Importera från en URL (länk till skolans webbplats)\n\nHelgerna visas också i den veckovisa sammanfattningen (Min vecka) tillsammans med andra händelser.",
+    "helpHolidaysTip": "Helger sorteras med kommande först. Badgen visar om helgen är idag, om X dagar, eller X dagar sedan.",
     "helpSettings": "Inställningar",
-    "helpSettingsText": "Du kan redigera och ta bort barn, kontakter och scheman genom att hålla inne på objektet."
+    "helpSettingsText": "Du kan redigera och ta bort barn, kontakter, scheman och helger genom att hålla inne på objektet."
   },
   "kindergarten": {
     "title": "Vår förskola",
@@ -377,11 +380,15 @@
     "photo": "Foto",
     "helpTitle": "Förskola",
     "helpWhat": "Vad är Förskola?",
-    "helpWhatText": "Förskolan visar information om barnets förskola, inklusive anställda, medlemmar och scheman.",
+    "helpWhatText": "Förskolemodulen hjälper dig hålla reda på dina barns förskolliv. Spara anställda, medlemmar, scheman och helger för varje förskoleår. Använd sökfältet för att filtrera kontakter.",
     "helpHow": "Så här gör du",
-    "helpHowText": "Lägg till barn, välj år/avdelning, och lägg till kontakter och scheman.",
+    "helpHowText": "1. Lägg till ett barn med namn och förskola.\n2. Välj eller skapa ett år med avdelning.\n3. Lägg till anställda och medlemmar med kontaktinfo.\n4. Ta en bild av kontaktlistan för att importera automatiskt.\n5. Ladda upp schemabilder för höst och vår.",
+    "helpTip": "Varje förskoleår har egna kontakter, scheman och helger. Gamla data bevaras som historik. Håll inne ett objekt för att redigera eller ta bort.",
+    "helpHolidays": "Helger",
+    "helpHolidaysText": "Helger visar lov och planeringsdagar för barnet i förskolan. Varje helg visar en ikon, titel, datum och hur långt borta den är.\n\nDu kan:\n• Lägga till helger manuellt\n• Importera från bild med AI\n• Importera från en URL (länk till förskolans webbplats)\n\nHelgerna visas också i den veckovisa sammanfattningen (Min vecka) tillsammans med andra händelser.",
+    "helpHolidaysTip": "Helger sorteras med kommande först. Badgen visar om helgen är idag, om X dagar, eller X dagar sedan.",
     "helpSettings": "Inställningar",
-    "helpSettingsText": "Du kan redigera och ta bort barn, kontakter och scheman genom att hålla inne på objektet."
+    "helpSettingsText": "Du kan redigera och ta bort barn, kontakter, scheman och helger genom att hålla inne på objektet."
   },
   "health": {
     "title": "Hälsa",

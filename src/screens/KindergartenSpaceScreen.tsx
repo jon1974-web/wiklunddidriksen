@@ -1260,6 +1260,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
         sections={[
           { icon: '📋', title: t('kindergarten.helpWhat'), text: t('kindergarten.helpWhatText') },
           { icon: '👉', title: t('kindergarten.helpHow'), text: t('kindergarten.helpHowText'), tip: t('kindergarten.helpTip') },
+          { icon: '🎉', title: t('kindergarten.helpHolidays'), text: t('kindergarten.helpHolidaysText'), tip: t('kindergarten.helpHolidaysTip') },
           { icon: '⚙️', title: t('kindergarten.helpSettings'), text: t('kindergarten.helpSettingsText') },
         ]}
       />

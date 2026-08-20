@@ -1318,6 +1318,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         sections={[
           { icon: '📋', title: t('school.helpWhat'), text: t('school.helpWhatText') },
           { icon: '👉', title: t('school.helpHow'), text: t('school.helpHowText'), tip: t('school.helpTip') },
+          { icon: '🎉', title: t('school.helpHolidays'), text: t('school.helpHolidaysText'), tip: t('school.helpHolidaysTip') },
           { icon: '⚙️', title: t('school.helpSettings'), text: t('school.helpSettingsText') },
         ]}
       />

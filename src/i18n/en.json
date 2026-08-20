@@ -280,12 +280,15 @@
     "deleteScheduleConfirm": "Are you sure you want to delete this schedule?",
     "helpTitle": "School",
     "helpWhat": "What is School?",
-    "helpWhatText": "The School module helps you keep track of your children's school life. Save teachers, classmates and schedules for each school year.",
+    "helpWhatText": "The School module helps you keep track of your children's school life. Save teachers, classmates, schedules and holidays for each school year. Use the search bar to filter contacts.",
     "helpHow": "How to use",
-    "helpHowText": "Add a child, select a school year, and add teachers and classmates. Take a photo of the contact list to import automatically.",
-    "helpTip": "Each school year can have its own contacts and schedules. Old data is preserved as history.",
+    "helpHowText": "1. Add a child with name and school.\n2. Select or create a school year.\n3. Add teachers, parents and classmates.\n4. Take a photo of the contact list to import automatically.\n5. Upload schedule images for autumn and spring.",
+    "helpTip": "Each school year has its own contacts, schedules and holidays. Old data is preserved as history. Long-press an item to edit or delete.",
+    "helpHolidays": "Holidays",
+    "helpHolidaysText": "Holidays show school vacations and planning days for the child. Each holiday displays an icon, title, dates and how far away it is.\n\nYou can:\n• Add holidays manually\n• Import from photo with AI\n• Import from a URL (link to school website)\n\nHolidays also appear in the weekly summary (My week) along with other events.",
+    "helpHolidaysTip": "Holidays are sorted with upcoming first. The badge shows whether the holiday is today, in X days, or X days ago.",
     "helpSettings": "Settings",
-    "helpSettingsText": "You can edit and delete children, contacts and schedules by long-pressing on the item."
+    "helpSettingsText": "You can edit and delete children, contacts, schedules and holidays by long-pressing on the item."
   },
   "kindergarten": {
     "title": "Our Kindergarten",
@@ -377,11 +380,15 @@
     "photo": "Photo",
     "helpTitle": "Kindergarten",
     "helpWhat": "What is Kindergarten?",
-    "helpWhatText": "Kindergarten shows information about the child's kindergarten, including staff, members and schedules.",
+    "helpWhatText": "The Kindergarten module helps you keep track of your children's kindergarten life. Save staff, members, schedules and holidays for each kindergarten year. Use the search bar to filter contacts.",
     "helpHow": "How to use it",
-    "helpHowText": "Add children, select year/group, and add contacts and schedules.",
+    "helpHowText": "1. Add a child with name and kindergarten.\n2. Select or create a year with group.\n3. Add staff and members with contact info.\n4. Take a photo of the contact list to import automatically.\n5. Upload schedule images for autumn and spring.",
+    "helpTip": "Each kindergarten year has its own contacts, schedules and holidays. Old data is preserved as history. Long-press an item to edit or delete.",
+    "helpHolidays": "Holidays",
+    "helpHolidaysText": "Holidays show vacations and planning days for the child in kindergarten. Each holiday displays an icon, title, dates and how far away it is.\n\nYou can:\n• Add holidays manually\n• Import from photo with AI\n• Import from a URL (link to kindergarten website)\n\nHolidays also appear in the weekly summary (My week) along with other events.",
+    "helpHolidaysTip": "Holidays are sorted with upcoming first. The badge shows whether the holiday is today, in X days, or X days ago.",
     "helpSettings": "Settings",
-    "helpSettingsText": "You can edit and delete children, contacts and schedules by long-pressing on the item."
+    "helpSettingsText": "You can edit and delete children, contacts, schedules and holidays by long-pressing on the item."
   },
   "health": {
     "title": "Health",

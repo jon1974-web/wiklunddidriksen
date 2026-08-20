@@ -280,12 +280,15 @@
     "deleteScheduleConfirm": "Er du sikker på at du vil slette denne timeplanen?",
     "helpTitle": "Skole",
     "helpWhat": "Hva er Skole?",
-    "helpWhatText": "Skole-modulen lar deg holde orden på barnas skolehverdag. Lagre lærere, klassekamerater og timeplaner for hvert skoleår.",
+    "helpWhatText": "Skole-modulen lar deg holde orden på barnas skolehverdag. Her kan du lagre lærere, klassekamerater, timeplaner og fridager for hvert skoleår. Bruk søkefeltet for å filtrere kontakter.",
     "helpHow": "Slik gjør du",
-    "helpHowText": "Legg til et barn, velg skoleår, og legg til lærere og klassekamerater. Ta bilde av kontaktlisten for å importere automatisk.",
-    "helpTip": "Hvert skoleår kan ha egne kontakter og timeplaner. Gamle data bevares som historikk.",
+    "helpHowText": "1. Legg til et barn med navn og skole.\n2. Velg eller opprett et skoleår.\n3. Legg til lærere, foresatte og klassekamerater.\n4. Ta bilde av kontaktlisten for å importere automatisk.\n5. Last opp timeplanbilder for høst og vår.",
+    "helpTip": "Hvert skoleår har egne kontakter, timeplaner og fridager. Gamle data bevares som historikk. Hold inne et element for å redigere eller slette.",
+    "helpHolidays": "Fridager",
+    "helpHolidaysText": "Fridager viser skoleferier og planleggingsdager for barnet. Hver fridag vises med ikon, tittel, datoer og hvor langt unna den er.\n\nDu kan:\n• Legge til fridager manuelt\n• Importere fra bilde med AI\n• Importere fra en URL (lenke til skolens nettside)\n\nFridagene vises også i den ukentlige oppsummeringen (Min uke) sammen med andre avtaler.",
+    "helpHolidaysTip": "Fridager sorteres med kommende først. Badge-visningen viser om fridagen er i dag, om X dager, eller X dager siden.",
     "helpSettings": "Innstillinger",
-    "helpSettingsText": "Du kan redigere og slette barn, kontakter og timeplaner ved å holde inne på elementet."
+    "helpSettingsText": "Du kan redigere og slette barn, kontakter, timeplaner og fridager ved å holde inne på elementet."
   },
   "kindergarten": {
     "title": "Vår barnehage",
@@ -377,11 +380,15 @@
     "photo": "Bilde",
     "helpTitle": "Barnehage",
     "helpWhat": "Hva er Barnehage?",
-    "helpWhatText": "Barnehage viser informasjon om barnets barnehage, inkludert ansatte, medlemmer og timeplaner.",
+    "helpWhatText": "Barnehage-modulen lar deg holde orden på barnas barnehagehverdag. Her kan du lagre ansatte, medlemmer, timeplaner og fridager for hvert barnehageår. Bruk søkefeltet for å filtrere kontakter.",
     "helpHow": "Slik gjør du",
-    "helpHowText": "Legg til barn, velg år/avdeling, og legg til kontakter og timeplaner.",
+    "helpHowText": "1. Legg til et barn med navn og barnehage.\n2. Velg eller opprett et år med avdeling.\n3. Legg til ansatte og medlemmer med kontaktinfo.\n4. Ta bilde av kontaktlisten for å importere automatisk.\n5. Last opp timeplanbilder for høst og vår.",
+    "helpTip": "Hvert barnehageår har egne kontakter, timeplaner og fridager. Gamle data bevares som historikk. Hold inne et element for å redigere eller slette.",
+    "helpHolidays": "Fridager",
+    "helpHolidaysText": "Fridager viser ferier og planleggingsdager for barnet i barnehagen. Hver fridag vises med ikon, tittel, datoer og hvor langt unna den er.\n\nDu kan:\n• Legge til fridager manuelt\n• Importere fra bilde med AI\n• Importere fra en URL (lenke til barnehagens nettside)\n\nFridagene vises også i den ukentlige oppsummeringen (Min uke) sammen med andre avtaler.",
+    "helpHolidaysTip": "Fridager sorteres med kommende først. Badge-visningen viser om fridagen er i dag, om X dager, eller X dager siden.",
     "helpSettings": "Innstillinger",
-    "helpSettingsText": "Du kan redigere og slette barn, kontakter og timeplaner ved å holde inne på elementet."
+    "helpSettingsText": "Du kan redigere og slette barn, kontakter, timeplaner og fridager ved å holde inne på elementet."
   },
   "health": {
     "title": "Helse",

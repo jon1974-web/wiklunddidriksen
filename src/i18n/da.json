@@ -280,12 +280,15 @@
     "deleteScheduleConfirm": "Er du sikker på, at du vil slette dette skema?",
     "helpTitle": "Skole",
     "helpWhat": "Hvad er Skole?",
-    "helpWhatText": "Skolemodulet hjælper dig med at holde styr på dine børns skoleliv. Gem lærere, klassekammerater og skemaer for hvert skoleår.",
+    "helpWhatText": "Skolemodulet hjælper dig med at holde styr på dine børns skoleliv. Gem lærere, klassekammerater, skemaer og fridage for hvert skoleår. Brug søgefeltet til at filtrere kontakter.",
     "helpHow": "Sådan gør du",
-    "helpHowText": "Tilføj et barn, vælg skoleår, og tilføj lærere og klassekammerater. Tag et billede af kontaktlisten for at importere automatisk.",
-    "helpTip": "Hvert skoleår kan have egne kontakter og skemaer. Gamle data bevares som historik.",
+    "helpHowText": "1. Tilføj et barn med navn og skole.\n2. Vælg eller opret et skoleår.\n3. Tilføj lærere, forældre og klassekammerater.\n4. Tag et billede af kontaktlisten for at importere automatisk.\n5. Upload skemabilleder for efterår og forår.",
+    "helpTip": "Hvert skoleår har egne kontakter, skemaer og fridage. Gamle data bevares som historik. Hold et element nede for at redigere eller slette.",
+    "helpHolidays": "Fridage",
+    "helpHolidaysText": "Fridage viser skoleferier og planlægningsdage for barnet. Hver fridag viser et ikon, titel, datoer og hvor langt væk den er.\n\nDu kan:\n• Tilføje fridage manuelt\n• Importere fra billede med AI\n• Importere fra en URL (link til skolens hjemmeside)\n\nFridagene vises også i den ugentlige opsummering (Min uge) sammen med andre begivenheder.",
+    "helpHolidaysTip": "Fridage sorteres med kommende først. Badge-visningen viser om fridagen er i dag, om X dage, eller X dage siden.",
     "helpSettings": "Indstillinger",
-    "helpSettingsText": "Du kan redigere og slette børn, kontakter og skemaer ved at trykke længe på elementet."
+    "helpSettingsText": "Du kan redigere og slette børn, kontakter, skemaer og fridage ved at trykke længe på elementet."
   },
   "kindergarten": {
     "title": "Vores børnehave",
@@ -377,11 +380,15 @@
     "photo": "Billede",
     "helpTitle": "Børnehave",
     "helpWhat": "Hvad er Børnehave?",
-    "helpWhatText": "Børnehaven viser information om barnets børnehave, herunder ansatte, medlemmer og skemaer.",
+    "helpWhatText": "Børnehavemodulet hjælper dig med at holde styr på dine børns børnehaveliv. Gem ansatte, medlemmer, skemaer og fridage for hvert børnehaveår. Brug søgefeltet til at filtrere kontakter.",
     "helpHow": "Sådan gør du",
-    "helpHowText": "Tilføj barn, vælg år/gruppe, og tilføj kontakter og skemaer.",
+    "helpHowText": "1. Tilføj et barn med navn og børnehave.\n2. Vælg eller opret et år med gruppe.\n3. Tilføj ansatte og medlemmer med kontaktinfo.\n4. Tag et billede af kontaktlisten for at importere automatisk.\n5. Upload skemabilleder for efterår og forår.",
+    "helpTip": "Hvert børnehaveår har egne kontakter, skemaer og fridage. Gamle data bevares som historik. Hold et element nede for at redigere eller slette.",
+    "helpHolidays": "Fridage",
+    "helpHolidaysText": "Fridage viser ferier og planlægningsdage for barnet i børnehaven. Hver fridag viser et ikon, titel, datoer og hvor langt væk den er.\n\nDu kan:\n• Tilføje fridage manuelt\n• Importere fra billede med AI\n• Importere fra en URL (link til børnehavens hjemmeside)\n\nFridagene vises også i den ugentlige opsummering (Min uge) sammen med andre begivenheder.",
+    "helpHolidaysTip": "Fridage sorteres med kommende først. Badge-visningen viser om fridagen er i dag, om X dage, eller X dage siden.",
     "helpSettings": "Indstillinger",
-    "helpSettingsText": "Du kan redigere og slette børn, kontakter og skemaer ved at trykke længe på elementet."
+    "helpSettingsText": "Du kan redigere og slette børn, kontakter, skemaer og fridage ved at trykke længe på elementet."
   },
   "health": {
     "title": "Sundhed",
