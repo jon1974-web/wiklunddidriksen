@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { auth } from '../services/firebase';
 import { useTheme } from '../theme/ThemeContext';
-import { addKindergartenContact } from '../services/kindergartenService';
+import { addKindergartenContact, addKindergartenHoliday } from '../services/kindergartenService';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
@@ -14,7 +14,7 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface Props {
   navigation: any;
-  route: { params: { childId: string; yearId: string; familyId: string } };
+  route: { params: { childId: string; yearId: string; familyId: string; mode?: 'classlist' | 'holidays' } };
 }
 
 interface ParsedContact {
@@ -39,10 +39,11 @@ const CLOUD_FUNCTION_URL = 'https://us-central1-familiesenter-837bb.cloudfunctio
 export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { childId, yearId, familyId } = route.params;
+  const { childId, yearId, familyId, mode = 'classlist' } = route.params;
 
   const [processing, setProcessing] = useState(false);
   const [contacts, setContacts] = useState<EditableContact[]>([]);
+  const [holidays, setHolidays] = useState<{ title: string; dateFrom: string; dateTo: string; timeFrom: string; timeTo: string; checked: boolean }[]>([]);
   const [saving, setSaving] = useState(false);
   const [successModal, setSuccessModal] = useState<{ visible: boolean; title: string; subtitle: string }>({ visible: false, title: '', subtitle: '' });
 
@@ -64,19 +65,26 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
     if (!base64) { crossAlert(t('common.error'), t('photoEvent.error')); return; }
     setProcessing(true);
     setContacts([]);
+    setHolidays([]);
     try {
       const headers: Record<string, string> = { 'Content-Type': 'application/json' };
       const currentUser = auth.currentUser;
       if (currentUser) { const idToken = await currentUser.getIdToken(); headers['Authorization'] = `Bearer ${idToken}`; }
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 60000);
-      const res = await fetch(CLOUD_FUNCTION_URL, { method: 'POST', headers, body: JSON.stringify({ imageBase64: base64, type: 'classlist' }), signal: controller.signal });
+      const res = await fetch(CLOUD_FUNCTION_URL, { method: 'POST', headers, body: JSON.stringify({ imageBase64: base64, type: mode }), signal: controller.signal });
       clearTimeout(timeout);
       if (!res.ok) { const err = await res.json(); throw new Error(err.error || 'Server error'); }
       const data = await res.json();
-      const parsed: ParsedContact[] = data.contacts || [];
-      if (parsed.length === 0) { crossAlert(t('schoolAI.title'), t('schoolAI.noContacts')); return; }
-      setContacts(parsed.map(toEditable));
+      if (mode === 'holidays') {
+        const parsed = (data.holidays || []).map((h: any) => ({ title: h.title || '', dateFrom: h.dateFrom || '', dateTo: h.dateTo || h.dateFrom || '', timeFrom: h.timeFrom || '', timeTo: h.timeTo || '', checked: true }));
+        if (parsed.length === 0) { crossAlert(t('schoolAI.title'), t('schoolAI.noContacts')); return; }
+        setHolidays(parsed);
+      } else {
+        const parsed: ParsedContact[] = data.contacts || [];
+        if (parsed.length === 0) { crossAlert(t('schoolAI.title'), t('schoolAI.noContacts')); return; }
+        setContacts(parsed.map(toEditable));
+      }
     } catch (error: any) {
       const msg = error?.name === 'AbortError' ? t('schoolAI.timeout') : error?.message?.includes('Failed to fetch') ? t('schoolAI.serverError') : getErrorMessage(error);
       crossAlert(t('common.error'), msg);
@@ -84,6 +92,18 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
   }, [t]);
 
   const handleSave = useCallback(async () => {
+    if (mode === 'holidays') {
+      const selected = holidays.filter(h => h.checked);
+      if (selected.length === 0) return;
+      setSaving(true);
+      try {
+        for (const h of selected) {
+          await addKindergartenHoliday({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo || h.dateFrom, timeFrom: h.timeFrom || undefined, timeTo: h.timeTo || undefined, childId, yearId, familyId });
+        }
+        setSuccessModal({ visible: true, title: t('common.success'), subtitle: `${selected.length} ${t('schoolAI.contactsAdded')}` });
+      } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); } finally { setSaving(false); }
+      return;
+    }
     const selected = contacts.filter(c => c.checked);
     if (selected.length === 0) return;
     setSaving(true);
@@ -122,13 +142,13 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: MODULE_COLORS.kindergarten }]}>
           <Text style={{ color: MODULE_COLORS.kindergarten, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>{t('schoolAI.title')}</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>{mode === 'holidays' ? t('schoolAI.titleHolidays') : t('schoolAI.title')}</Text>
       </View>
 
       <ScrollView contentContainerStyle={{ padding: 16 }}>
-        <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 16 }}>{t('schoolAI.instruction')}</Text>
+        <Text style={{ color: colors.textSecondary, fontSize: 14, marginBottom: 16 }}>{mode === 'holidays' ? t('kindergarten.aiFridagDescriptionKg') : t('schoolAI.instruction')}</Text>
 
-        {!processing && contacts.length === 0 && (
+        {!processing && contacts.length === 0 && holidays.length === 0 && (
           <View style={{ gap: 12 }}>
             <TouchableOpacity style={[styles.pickBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={takePhoto}>
               <Text style={{ fontSize: 16 }}>📷</Text>
@@ -148,7 +168,32 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
           </View>
         )}
 
-        {contacts.length > 0 && (
+        {mode === 'holidays' && holidays.length > 0 && !processing && (
+          <View>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+              <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{holidays.length} {t('kindergarten.holidays')}</Text>
+              <TouchableOpacity onPress={() => { const allChecked = holidays.every(h => h.checked); setHolidays(prev => prev.map(h => ({ ...h, checked: !allChecked }))); }}><Text style={{ color: MODULE_COLORS.kindergarten, fontWeight: '600', fontSize: 14 }}>{holidays.every(h => h.checked) ? t('schoolAI.deselectAll') : t('schoolAI.selectAll')}</Text></TouchableOpacity>
+            </View>
+            {holidays.map((h, i) => (
+              <View key={i} style={[styles.card, { backgroundColor: colors.surface }]}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                  <TouchableOpacity style={[styles.checkbox, { borderColor: h.checked ? MODULE_COLORS.kindergarten : colors.textDisabled, backgroundColor: h.checked ? MODULE_COLORS.kindergarten : 'transparent' }]} onPress={() => setHolidays(prev => prev.map((item, idx) => idx === i ? { ...item, checked: !item.checked } : item))}>
+                    {h.checked && <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+                  </TouchableOpacity>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: colors.text, fontWeight: '600' }}>{h.title}</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{h.dateFrom} — {h.dateTo}{h.timeFrom ? ` • ${h.timeFrom} — ${h.timeTo}` : ''}</Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+            <TouchableOpacity style={[styles.saveBtn, { backgroundColor: MODULE_COLORS.kindergarten, marginTop: 16 }]} onPress={handleSave} disabled={saving || holidays.filter(h => h.checked).length === 0}>
+              {saving ? <ActivityIndicator color="#fff" /> : <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>{t('schoolAI.addSelected')} ({holidays.filter(h => h.checked).length})</Text>}
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {mode !== 'holidays' && contacts.length > 0 && (
           <View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
               <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{contacts.length} {t('schoolAI.contactsFound')}</Text>

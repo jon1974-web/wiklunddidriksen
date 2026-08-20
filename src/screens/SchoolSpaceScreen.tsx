@@ -970,7 +970,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </TouchableOpacity>
                 {selectedChild && (
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E8F5E9', flex: 1 }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
+                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E8F5E9', flex: 1 }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '', mode: 'holidays' })}>
                       <Text style={{ fontSize: 20 }}>📸</Text>
                       <View style={{ flex: 1 }}>
                         <Text style={{ color: '#2E7D32', fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromImage')}</Text>

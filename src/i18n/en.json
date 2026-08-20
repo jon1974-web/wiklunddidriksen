@@ -1145,6 +1145,7 @@
   },
   "schoolAI": {
     "title": "AI Import Classmates",
+    "titleHolidays": "AI Import Holidays",
     "instruction": "Take or choose a photo of the contact list — AI reads names and info automatically",
     "takePhoto": "Take photo",
     "pickImage": "Choose image",

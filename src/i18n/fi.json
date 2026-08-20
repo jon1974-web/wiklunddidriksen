@@ -1145,6 +1145,7 @@
   },
   "schoolAI": {
     "title": "AI-tuonti luokkatoverit",
+    "titleHolidays": "AI-tuonti vapaapäivät",
     "instruction": "Ota tai valitse kuva yhteystietoluettelosta — AI lukee nimet ja tiedot automaattisesti",
     "takePhoto": "Ota kuva",
     "pickImage": "Valitse kuva",

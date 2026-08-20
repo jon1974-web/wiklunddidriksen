@@ -1145,6 +1145,7 @@
   },
   "schoolAI": {
     "title": "AI-import af klassekammerater",
+    "titleHolidays": "AI-import af fridage",
     "instruction": "Tag eller vælg et billede af kontaktlisten — AI læser navne og info automatisk",
     "takePhoto": "Tag billede",
     "pickImage": "Vælg billede",

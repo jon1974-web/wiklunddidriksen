@@ -1145,6 +1145,7 @@
   },
   "schoolAI": {
     "title": "AI-import av klassekamrater",
+    "titleHolidays": "AI-import av helger",
     "instruction": "Ta eller välj en bild av kontaktlistan — AI läser ut namn och info automatiskt",
     "takePhoto": "Ta bild",
     "pickImage": "Välj bild",
