@@ -535,18 +535,14 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       const q = contactSearch.toLowerCase();
       return h.title.toLowerCase().includes(q);
     });
-    const now = Date.now();
+    const today = new Date().toISOString().split('T')[0];
     return filtered.sort((a, b) => {
-      const aStart = new Date(a.dateFrom + 'T00:00:00').getTime();
-      const bStart = new Date(b.dateFrom + 'T00:00:00').getTime();
-      const aMs = aStart - now;
-      const bMs = bStart - now;
-      const aFuture = aMs >= 0;
-      const bFuture = bMs >= 0;
+      const aFuture = a.dateFrom >= today;
+      const bFuture = b.dateFrom >= today;
       if (aFuture && !bFuture) return -1;
       if (!aFuture && bFuture) return 1;
-      if (aFuture && bFuture) return aMs - bMs;
-      return bMs - aMs;
+      if (aFuture && bFuture) return a.dateFrom.localeCompare(b.dateFrom);
+      return b.dateFrom.localeCompare(a.dateFrom);
     });
   }, [holidays, contactSearch]);
 
@@ -573,23 +569,19 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   };
 
   const getHolidayBadge = (h: SchoolHoliday): { text: string; bg: string; color: string } => {
-    const now = Date.now();
-    const startMs = new Date(h.dateFrom + 'T00:00:00').getTime();
-    const diffMs = startMs - now;
-    if (diffMs >= 0) {
-      const days = Math.round(diffMs / 86400000);
-      if (days === 0) return { text: t('common.today'), bg: '#FCE4EC', color: '#C62828' };
-      if (days === 1) return { text: t('common.tomorrow'), bg: '#FFF3E0', color: '#FB8C00' };
-      if (days < 7) return { text: `${days} ${t('common.days')}`, bg: '#E3F2FD', color: '#1976D2' };
-      const weeks = Math.round(days / 7);
-      return { text: `${weeks} ${t('common.weeks')}`, bg: '#E8F5E9', color: '#43A047' };
-    } else {
-      const days = Math.round(Math.abs(diffMs) / 86400000);
-      if (days === 0) return { text: t('common.today'), bg: '#FCE4EC', color: '#C62828' };
-      if (days < 7) return { text: `${days} ${t('common.daysAgo')}`, bg: '#F5F5F5', color: '#9E9E9E' };
-      const weeks = Math.round(days / 7);
-      return { text: `${weeks} ${t('common.weeksAgo')}`, bg: '#F5F5F5', color: '#9E9E9E' };
-    }
+    const today = new Date().toISOString().split('T')[0];
+    const dateFrom = h.dateFrom;
+    if (dateFrom === today) return { text: t('common.today'), bg: '#FCE4EC', color: '#C62828' };
+    const diffMs = new Date(dateFrom + 'T12:00:00').getTime() - new Date(today + 'T12:00:00').getTime();
+    const days = Math.round(diffMs / 86400000);
+    if (days === 1) return { text: t('common.tomorrow'), bg: '#FFF3E0', color: '#FB8C00' };
+    if (days > 0 && days < 7) return { text: `${days} ${t('common.days')}`, bg: '#E3F2FD', color: '#1976D2' };
+    if (days >= 7) { const weeks = Math.round(days / 7); return { text: `${weeks} ${t('common.weeks')}`, bg: '#E8F5E9', color: '#43A047' }; }
+    if (days === -1) return { text: `1 ${t('common.day')} ${t('common.daysAgo')}`, bg: '#F5F5F5', color: '#9E9E9E' };
+    const absDays = Math.abs(days);
+    if (absDays < 7) return { text: `${absDays} ${t('common.daysAgo')}`, bg: '#F5F5F5', color: '#9E9E9E' };
+    const weeks = Math.round(absDays / 7);
+    return { text: `${weeks} ${t('common.weeksAgo')}`, bg: '#F5F5F5', color: '#9E9E9E' };
   };
 
   // Auto-expand sections when searching, collapse when search is cleared
