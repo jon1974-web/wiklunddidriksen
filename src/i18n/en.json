@@ -565,7 +565,9 @@
     "uv": "UV",
     "water": "Water",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "days": "days",
+    "weeks": "weeks"
   },
   "tips": {
     "title": "Destination tips",

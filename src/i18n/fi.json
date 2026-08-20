@@ -565,6 +565,8 @@
     "water": "Vesi",
     "previous": "Edellinen",
     "next": "Seuraava",
+    "days": "päivää",
+    "weeks": "viikkoa",
     "refreshing": "Päivitetään..."
   },
   "tips": {

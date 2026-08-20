@@ -515,7 +515,25 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     if (!contactSearch.trim()) return true;
     const q = contactSearch.toLowerCase();
     return h.title.toLowerCase().includes(q);
+  }).sort((a, b) => {
+    const today = new Date().toISOString().split('T')[0];
+    const aUpcoming = a.dateFrom >= today;
+    const bUpcoming = b.dateFrom >= today;
+    if (aUpcoming && !bUpcoming) return -1;
+    if (!aUpcoming && bUpcoming) return 1;
+    return a.dateFrom.localeCompare(b.dateFrom);
   });
+
+  const getHolidayBadge = (h: SchoolHoliday): { text: string; bg: string; color: string } => {
+    if (h.timeFrom) return { text: t('common.day'), bg: '#E3F2FD', color: '#1976D2' };
+    const from = new Date(h.dateFrom);
+    const to = new Date(h.dateTo || h.dateFrom);
+    const days = Math.round((to.getTime() - from.getTime()) / 86400000) + 1;
+    if (days <= 1) return { text: t('common.day'), bg: '#E3F2FD', color: '#1976D2' };
+    const weeks = Math.round(days / 7 * 10) / 10;
+    if (weeks >= 1) return { text: `${Math.round(weeks)} ${t('common.weeks')}`, bg: '#E8F5E9', color: '#43A047' };
+    return { text: `${days} ${t('common.days')}`, bg: '#FFF3E0', color: '#FB8C00' };
+  };
 
   // Auto-expand sections when searching, collapse when search is cleared
   useEffect(() => {
@@ -876,15 +894,22 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     </TouchableOpacity>
                   </View>
                 )}
-                {expandedSections.holidays && filteredHolidays.map(h => (
-                  <TouchableOpacity key={h.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: '#43A047' }]} onPress={() => { setEditingHolidayId(h.id); setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); }} onLongPress={() => setHolidayActionModal({ visible: true, id: h.id, title: h.title })}>
-                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text style={[styles.contactName, { color: colors.text }]}>{h.title}</Text>
-                      <Text style={{ fontSize: 12, color: '#43A047', fontWeight: '600' }}>{h.timeFrom ? `${h.timeFrom} — ${h.timeTo}` : `${h.dateFrom} — ${h.dateTo}`}</Text>
-                    </View>
-                    {!h.timeFrom && <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{h.dateFrom} — {h.dateTo}</Text>}
-                  </TouchableOpacity>
-                ))}
+                {expandedSections.holidays && filteredHolidays.map(h => {
+                  const badge = getHolidayBadge(h);
+                  return (
+                    <TouchableOpacity key={h.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: '#43A047' }]} onPress={() => { setEditingHolidayId(h.id); setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); }} onLongPress={() => setHolidayActionModal({ visible: true, id: h.id, title: h.title })}>
+                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Text style={[styles.contactName, { color: colors.text }]}>{h.title}</Text>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                          <View style={{ backgroundColor: badge.bg, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                            <Text style={{ color: badge.color, fontSize: 10, fontWeight: '600' }}>{badge.text}</Text>
+                          </View>
+                        </View>
+                      </View>
+                      <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{h.timeFrom ? `${h.dateFrom} • ${h.timeFrom} — ${h.timeTo}` : `${h.dateFrom} — ${h.dateTo}`}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
                 {expandedSections.holidays && filteredHolidays.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('kindergarten.noHolidays')}</Text>}
               </View>
             </>

@@ -565,7 +565,9 @@
     "uv": "UV",
     "water": "Vann",
     "previous": "Forrige",
-    "next": "Neste"
+    "next": "Neste",
+    "days": "dager",
+    "weeks": "uker"
   },
   "tips": {
     "title": "Destinasjonstips",
