@@ -78,7 +78,11 @@
     "continue": "Fortsett",
     "day": "Dag",
     "days": "dager",
-    "weeks": "uker"
+    "weeks": "uker",
+    "today": "I dag",
+    "tomorrow": "I morgen",
+    "daysAgo": "dager siden",
+    "weeksAgo": "uker siden"
   },
   "auth": {
     "title": "Familiesenter",

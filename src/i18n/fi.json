@@ -78,7 +78,11 @@
     "continue": "Jatka",
     "day": "Päivä",
     "days": "päivää",
-    "weeks": "viikkoa"
+    "weeks": "viikkoa",
+    "today": "Tänään",
+    "tomorrow": "Huomenna",
+    "daysAgo": "päivää sitten",
+    "weeksAgo": "viikkoa sitten"
   },
   "auth": {
     "title": "Perhekeskus",

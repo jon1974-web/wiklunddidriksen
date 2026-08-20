@@ -78,7 +78,11 @@
     "continue": "Continue",
     "day": "Day",
     "days": "days",
-    "weeks": "weeks"
+    "weeks": "weeks",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "daysAgo": "days ago",
+    "weeksAgo": "weeks ago"
   },
   "auth": {
     "title": "Family Center",

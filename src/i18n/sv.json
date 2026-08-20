@@ -78,7 +78,11 @@
     "continue": "Fortsätt",
     "day": "Dag",
     "days": "dagar",
-    "weeks": "veckor"
+    "weeks": "veckor",
+    "today": "Idag",
+    "tomorrow": "Imorgon",
+    "daysAgo": "dagar sedan",
+    "weeksAgo": "veckor sedan"
   },
   "auth": {
     "title": "Familjecenter",

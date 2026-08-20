@@ -78,7 +78,11 @@
     "continue": "Fortsæt",
     "day": "Dag",
     "days": "dage",
-    "weeks": "uger"
+    "weeks": "uger",
+    "today": "I dag",
+    "tomorrow": "I morgen",
+    "daysAgo": "dage siden",
+    "weeksAgo": "uger siden"
   },
   "auth": {
     "title": "Familiecenter",
