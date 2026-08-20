@@ -89,6 +89,7 @@ type RootStackParamList = {
   PetSpace: undefined;
   PetVetDetail: { visit: import('./src/types').PetVetVisit; petName?: string };
   PetVaccDetail: { vaccination: import('./src/types').PetVaccination; petName?: string };
+  KindergartenContactDetail: { contact: import('./src/types').KindergartenContact; childId?: string; yearId?: string };
   PetMedDetail: { medication: import('./src/types').PetMedication; petName?: string };
   PetGroomDetail: { grooming: import('./src/types').PetGrooming; petName?: string };
   HealthApptDetail: { appointment: import('./src/types').HealthAppointment };
@@ -307,6 +308,11 @@ const TripsStack = () => {
         <Stack.Screen
           name="KindergartenSpace"
           component={KindergartenSpaceScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="KindergartenContactDetail"
+          component={KindergartenContactDetailScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
