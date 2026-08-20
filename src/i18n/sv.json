@@ -320,6 +320,7 @@
     "importFromImage": "Importera från bild",
     "importFromUrl": "Importera från URL",
     "urlDescription": "Klistra in länk till lediga dagar-sida",
+    "aiFridagDescription": "AI läser skolkalendern och hittar lediga dagar",
     "teacher": "Anställd",
     "child": "Barn",
     "addContact": "Lägg till kontakt",

@@ -810,7 +810,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                       <Text style={{ fontSize: 20 }}>📸</Text>
                       <View style={{ flex: 1 }}>
                         <Text style={{ color: '#6A1B9A', fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromImage')}</Text>
-                        <Text style={{ color: '#8E24AA', fontSize: 12 }}>{t('school.aiDescription')}</Text>
+                        <Text style={{ color: '#8E24AA', fontSize: 12 }}>{t('kindergarten.aiFridagDescription')}</Text>
                       </View>
                     </TouchableOpacity>
                     <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E3F2FD', flex: 1 }]} onPress={() => crossAlert('Coming soon', 'URL import will be available soon')}>

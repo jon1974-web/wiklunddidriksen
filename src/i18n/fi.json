@@ -320,6 +320,7 @@
     "importFromImage": "Tuo kuvasta",
     "importFromUrl": "Tuo URL-osoitteesta",
     "urlDescription": "Liitä linkki vapaapäivä-sivulle",
+    "aiFridagDescription": "AI lukee koulun kalenterin ja etsii vapaapäiviä",
     "teacher": "Henkilökunta",
     "child": "Lapsi",
     "addContact": "Lisää yhteystieto",

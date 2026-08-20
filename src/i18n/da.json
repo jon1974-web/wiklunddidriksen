@@ -320,6 +320,7 @@
     "importFromImage": "Importer fra billede",
     "importFromUrl": "Importer fra URL",
     "urlDescription": "Indsæt link til fridage-side",
+    "aiFridagDescription": "AI læser skolekalenderen og finder fridage",
     "teacher": "Ansat",
     "child": "Barn",
     "addContact": "Tilføj kontakt",
