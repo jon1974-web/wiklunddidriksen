@@ -138,7 +138,7 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.kindergartenBg }]} edges={['top']}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { backgroundColor: MODULE_COLORS.kindergartenBg, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: MODULE_COLORS.kindergarten }]}>
           <Text style={{ color: MODULE_COLORS.kindergarten, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
@@ -150,13 +150,13 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
 
         {!processing && contacts.length === 0 && holidays.length === 0 && (
           <View style={{ gap: 12 }}>
-            <TouchableOpacity style={[styles.pickBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={takePhoto}>
+            <TouchableOpacity style={[styles.pickBtn, { backgroundColor: MODULE_COLORS.kindergarten, borderColor: MODULE_COLORS.kindergarten }]} onPress={takePhoto}>
               <Text style={{ fontSize: 16 }}>📷</Text>
-              <Text style={styles.pickBtnText}>{t('schoolAI.takePhoto')}</Text>
+              <Text style={[styles.pickBtnText, { color: '#fff' }]}>{t('schoolAI.takePhoto')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.pickBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={pickImage}>
+            <TouchableOpacity style={[styles.pickBtn, { backgroundColor: MODULE_COLORS.kindergartenBg, borderColor: MODULE_COLORS.kindergarten }]} onPress={pickImage}>
               <Text style={{ fontSize: 16 }}>🖼️</Text>
-              <Text style={[styles.pickBtnText, { color: colors.text }]}>{t('schoolAI.pickImage')}</Text>
+              <Text style={[styles.pickBtnText, { color: MODULE_COLORS.kindergarten }]}>{t('schoolAI.pickImage')}</Text>
             </TouchableOpacity>
           </View>
         )}

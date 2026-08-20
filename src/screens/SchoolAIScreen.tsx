@@ -171,7 +171,7 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { backgroundColor: MODULE_COLORS.schoolBg, borderBottomColor: colors.border }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: MODULE_COLORS.school }]}>
           <Text style={{ color: MODULE_COLORS.school, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
@@ -187,7 +187,7 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
               <Text style={styles.pickIcon}>📷</Text>
               <Text style={styles.pickButtonText}>{t('schoolAI.takePhoto')}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.pickButton, { backgroundColor: colors.inputBackground, borderColor: colors.border, borderWidth: 1 }]} onPress={pickImage}>
+            <TouchableOpacity style={[styles.pickButton, { backgroundColor: MODULE_COLORS.schoolBg, borderColor: MODULE_COLORS.school, borderWidth: 1 }]} onPress={pickImage}>
               <Text style={styles.pickIcon}>🖼️</Text>
               <Text style={[styles.pickButtonText, { color: colors.text }]}>{t('schoolAI.pickImage')}</Text>
             </TouchableOpacity>
