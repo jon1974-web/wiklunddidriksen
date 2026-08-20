@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, Linking, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
@@ -547,6 +547,28 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     });
   }, [holidays, contactSearch]);
 
+  const getHolidayIcon = (title: string): string => {
+    const t = title.toLowerCase();
+    if (t.includes('jule') || t.includes('christmas')) return '🎄';
+    if (t.includes('høst') || t.includes('autumn')) return '🍂';
+    if (t.includes('vinter') || t.includes('winter')) return '❄️';
+    if (t.includes('påske') || t.includes('easter')) return '🐣';
+    if (t.includes('sommer') || t.includes('summer')) return '☀️';
+    if (t.includes('planlegging')) return '📋';
+    if (t.includes('krist') || t.includes('pinse')) return '⛪';
+    if (t.includes('grunnlovs') || t.includes('17.')) return '🇳🇴';
+    if (t.includes('siste')) return '🎓';
+    if (t.includes('fri') || t.includes('ledig')) return '🎉';
+    return '📅';
+  };
+
+  const formatHolidayDate = (dateStr: string): string => {
+    const d = new Date(dateStr + 'T00:00:00');
+    const dayNames = ['søn.', 'man.', 'tir.', 'ons.', 'tor.', 'fre.', 'lør.'];
+    const monthNames = ['jan.', 'feb.', 'mars', 'april', 'mai', 'juni', 'juli', 'aug.', 'sep.', 'okt.', 'nov.', 'des.'];
+    return `${dayNames[d.getDay()]} ${d.getDate()}.${monthNames[d.getMonth()]}`;
+  };
+
   const getHolidayBadge = (h: SchoolHoliday): { text: string; bg: string; color: string } => {
     const now = Date.now();
     const startMs = new Date(h.dateFrom + 'T00:00:00').getTime();
@@ -974,14 +996,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   return (
                     <TouchableOpacity key={h.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: '#43A047' }]} onPress={() => { setEditingHolidayId(h.id); setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); }} onLongPress={() => setHolidayActionModal({ visible: true, id: h.id, title: h.title })}>
                       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={[styles.contactName, { color: colors.text }]}>{h.title}</Text>
-                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                          <View style={{ backgroundColor: badge.bg, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
-                            <Text style={{ color: badge.color, fontSize: 10, fontWeight: '600' }}>{badge.text}</Text>
-                          </View>
+                        <Text style={[styles.contactName, { color: colors.text }]}>{getHolidayIcon(h.title)} {h.title}</Text>
+                        <View style={{ backgroundColor: badge.bg, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                          <Text style={{ color: badge.color, fontSize: 10, fontWeight: '600' }}>{badge.text}</Text>
                         </View>
                       </View>
-                      <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{h.timeFrom ? `${h.dateFrom} • ${h.timeFrom} — ${h.timeTo}` : `${h.dateFrom} — ${h.dateTo}`}</Text>
+                      <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{h.timeFrom ? `${formatHolidayDate(h.dateFrom)} • ${h.timeFrom} — ${h.timeTo}` : `${formatHolidayDate(h.dateFrom)} — ${formatHolidayDate(h.dateTo || h.dateFrom)}`}</Text>
                     </TouchableOpacity>
                   );
                 })}
