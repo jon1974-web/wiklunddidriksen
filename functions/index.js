@@ -1536,6 +1536,105 @@ Estimate caloriesPerServing based on ingredients and portions.`,
   }
 });
 
+// Import holidays (fridager) from URL
+exports.importHolidaysFromUrl = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await checkRateLimit(uid, "importHolidaysFromUrl"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  const { url, language } = req.body || {};
+  if (!url || typeof url !== "string") {
+    return res.status(400).json({ error: "url is required" });
+  }
+
+  const languageNames = {
+    norsk: "Norwegian", svensk: "Swedish", engelsk: "English",
+    dansk: "Danish", finsk: "Finnish",
+  };
+  const responseLangName = languageNames[language] || "Norwegian";
+
+  try {
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; Familiesenter/1.0)',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      },
+      redirect: 'follow',
+    });
+    if (!response.ok) {
+      return res.status(400).json({ error: `Kunne ikke hente siden: ${response.status}` });
+    }
+    const html = await response.text();
+
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `You are a school calendar extraction assistant. Extract holidays and days off (fridager) from the provided HTML content.
+
+Look for:
+- School holidays (høstferie, juleferie, vinterferie, påskeferie, sommerferie)
+- Planning days (planleggingsdager)
+- Other days off from school/kindergarten
+
+For each holiday found, extract:
+- title: Name of the holiday (e.g. "Høstferie", "Juleferie", "Planleggingsdag")
+- dateFrom: Start date in YYYY-MM-DD format
+- dateTo: End date in YYYY-MM-DD format
+- timeFrom: Start time in HH:MM format if available (empty string if not)
+- timeTo: End time in HH:MM format if available (empty string if not)
+
+Return ONLY valid JSON with this exact structure:
+{
+  "holidays": [
+    {
+      "title": "Holiday name",
+      "dateFrom": "2024-10-14",
+      "dateTo": "2024-10-18",
+      "timeFrom": "",
+      "timeTo": ""
+    }
+  ]
+}
+
+If no holidays can be identified, return {"holidays": []}.`,
+        },
+        {
+          role: "user",
+          content: `Extract all holidays and days off from this school/kindergarten calendar page:\n\n${html.substring(0, 12000)}`,
+        },
+      ],
+      temperature: 0.3,
+      max_tokens: 2000,
+    });
+
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return res.status(500).json({ error: "No response from AI" });
+    }
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      return res.status(500).json({ error: "Invalid AI response format" });
+    }
+
+    const result = JSON.parse(jsonMatch[0]);
+    return res.status(200).json({ holidays: result.holidays || [] });
+  } catch (error) {
+    console.error("Import holidays from URL error:", error);
+    return res.status(500).json({ error: "Failed to import holidays from URL" });
+  }
+});
+
 // Import recipe from URL
 exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
