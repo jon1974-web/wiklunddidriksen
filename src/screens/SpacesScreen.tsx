@@ -126,7 +126,6 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       iconColor: MODULE_COLORS.kindergarten,
       count: kindergartenCount > 0 ? t('spaces.kindergartenCount', { count: kindergartenCount }) : '',
       screen: 'KindergartenSpace',
-      disabled: familyId !== 'AVCUsb8X6GdRM3f0EBf0',
     },
     {
       id: 'birthdays',
