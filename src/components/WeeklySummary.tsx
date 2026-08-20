@@ -232,9 +232,9 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       schoolHolidays.forEach((h) => {
         if (dateStr >= h.dateFrom && dateStr <= (h.dateTo || h.dateFrom)) {
           const child = schoolChildren.find(c => c.id === h.childId);
-          const childLabel = child ? child.name : '';
+          const firstName = child ? child.name.split(' ')[0] : '';
           const time = h.timeFrom ? `${h.timeFrom} – ${h.timeTo || ''}` : '';
-          items.push({ type: 'schoolHoliday', icon: '🎓', iconBg: MODULE_COLORS.school, title: `${h.title}${childLabel ? ` — ${childLabel}` : ''}`, time });
+          items.push({ type: 'schoolHoliday', icon: '🎓', iconBg: MODULE_COLORS.school, title: `${h.title}${firstName ? ` — ${firstName}` : ''}`, time });
           holidayCount++;
         }
       });
@@ -242,9 +242,9 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       kindergartenHolidays.forEach((h) => {
         if (dateStr >= h.dateFrom && dateStr <= (h.dateTo || h.dateFrom)) {
           const child = kindergartenChildren.find(c => c.id === h.childId);
-          const childLabel = child ? child.name : '';
+          const firstName = child ? child.name.split(' ')[0] : '';
           const time = h.timeFrom ? `${h.timeFrom} – ${h.timeTo || ''}` : '';
-          items.push({ type: 'kindergartenHoliday', icon: '🎉', iconBg: MODULE_COLORS.kindergarten, title: `${h.title}${childLabel ? ` — ${childLabel}` : ''}`, time });
+          items.push({ type: 'kindergartenHoliday', icon: '🎉', iconBg: MODULE_COLORS.kindergarten, title: `${h.title}${firstName ? ` — ${firstName}` : ''}`, time });
           holidayCount++;
         }
       });
@@ -324,7 +324,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                   <View style={styles.dayCardItems}>
                     {day.items.length > 0 ? day.items.map((item, i) => {
                       const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : MODULE_COLORS.birthdays;
-                      const isEmoji = item.type === 'event' && item.icon && item.icon.length <= 2 && /[\u{1F000}-\u{1FFFF}]/u.test(item.icon);
+                      const isEmoji = item.icon && item.icon.length <= 2 && /[\u{1F000}-\u{1FFFF}]/u.test(item.icon);
                       return (
                         <View key={i} style={styles.itemRow}>
                           {item.logoUrl ? (

@@ -932,13 +932,20 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                   const badge = getHolidayBadge(h);
                   return (
                     <TouchableOpacity key={h.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: '#43A047' }]} onPress={() => { setEditingHolidayId(h.id); setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); }} onLongPress={() => setHolidayActionModal({ visible: true, id: h.id, title: h.title })}>
-                      <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text style={[styles.contactName, { color: colors.text }]}>{getHolidayIcon(h.title)} {h.title}</Text>
-                        <View style={{ backgroundColor: badge.bg, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
-                          <Text style={{ color: badge.color, fontSize: 10, fontWeight: '600' }}>{badge.text}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                        <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#E8F5E9', alignItems: 'center', justifyContent: 'center' }}>
+                          <Text style={{ fontSize: 14 }}>{getHolidayIcon(h.title)}</Text>
+                        </View>
+                        <View style={{ flex: 1 }}>
+                          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <Text style={[styles.contactName, { color: colors.text }]}>{h.title}</Text>
+                            <View style={{ backgroundColor: badge.bg, paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                              <Text style={{ color: badge.color, fontSize: 10, fontWeight: '600' }}>{badge.text}</Text>
+                            </View>
+                          </View>
+                          <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{h.timeFrom ? `${formatHolidayDate(h.dateFrom)} • ${h.timeFrom} — ${h.timeTo}` : `${formatHolidayDate(h.dateFrom)} — ${formatHolidayDate(h.dateTo || h.dateFrom)}`}</Text>
                         </View>
                       </View>
-                      <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{h.timeFrom ? `${formatHolidayDate(h.dateFrom)} • ${h.timeFrom} — ${h.timeTo}` : `${formatHolidayDate(h.dateFrom)} — ${formatHolidayDate(h.dateTo || h.dateFrom)}`}</Text>
                     </TouchableOpacity>
                   );
                 })}
