@@ -18,8 +18,10 @@ interface HelpCenterProps {
   sections: HelpSection[];
 }
 
+const ACCENT = '#3b5a75';
+const ACCENT_LIGHT = '#D6EDED';
+
 export const HelpCenter: React.FC<HelpCenterProps> = React.memo(({ visible, onClose, title, subtitle, sections }) => {
-  const { colors } = useTheme();
   const { t } = useTranslation();
 
   return (
@@ -27,8 +29,8 @@ export const HelpCenter: React.FC<HelpCenterProps> = React.memo(({ visible, onCl
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={[styles.container, { backgroundColor: colors.surface }]}>
-              <View style={styles.header}>
+            <View style={[styles.container, { backgroundColor: '#fff' }]}>
+              <View style={[styles.header, { backgroundColor: ACCENT }]}>
                 <Image source={require('../../assets/icon.png')} style={styles.logo} />
                 <Text style={styles.headerTitle}>Hjelpesenter</Text>
                 <Text style={styles.headerSubtitle}>{title}</Text>
@@ -37,14 +39,14 @@ export const HelpCenter: React.FC<HelpCenterProps> = React.memo(({ visible, onCl
               <ScrollView style={styles.body}>
                 <View style={styles.bodyContent}>
                   {sections.map((section, i) => (
-                    <View key={i} style={[styles.section, i < sections.length - 1 && { borderBottomWidth: 1, borderBottomColor: colors.border, paddingBottom: 16 }]}>
-                      <Text style={[styles.sectionTitle, { color: '#0097A7' }]}>
+                    <View key={i} style={[styles.section, i < sections.length - 1 && { borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 16 }]}>
+                      <Text style={[styles.sectionTitle, { color: ACCENT }]}>
                         {section.icon} {section.title}
                       </Text>
-                      <Text style={[styles.sectionText, { color: colors.text }]}>{section.text}</Text>
+                      <Text style={[styles.sectionText, { color: '#333' }]}>{section.text}</Text>
                       {section.tip && (
-                        <View style={[styles.tip, { backgroundColor: '#E0F7FA', borderLeftColor: '#0097A7' }]}>
-                          <Text style={[styles.tipText, { color: '#006064' }]}>💡 <Text style={{ fontWeight: '600' }}>Tips:</Text> {section.tip}</Text>
+                        <View style={[styles.tip, { backgroundColor: ACCENT_LIGHT, borderLeftColor: ACCENT }]}>
+                          <Text style={[styles.tipText, { color: '#1a3a4a' }]}>💡 <Text style={{ fontWeight: '600' }}>Tips:</Text> {section.tip}</Text>
                         </View>
                       )}
                     </View>
@@ -52,7 +54,7 @@ export const HelpCenter: React.FC<HelpCenterProps> = React.memo(({ visible, onCl
                 </View>
               </ScrollView>
 
-              <TouchableOpacity style={styles.closeBtn} onPress={onClose}>
+              <TouchableOpacity style={[styles.closeBtn, { backgroundColor: ACCENT }]} onPress={onClose}>
                 <Text style={styles.closeBtnText}>{t('common.close')}</Text>
               </TouchableOpacity>
             </View>
@@ -78,7 +80,6 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   header: {
-    backgroundColor: '#0097A7',
     padding: 24,
     alignItems: 'center',
   },
@@ -131,7 +132,6 @@ const styles = StyleSheet.create({
   closeBtn: {
     width: '100%',
     paddingVertical: 14,
-    backgroundColor: '#0097A7',
     alignItems: 'center',
   },
   closeBtnText: {

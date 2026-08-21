@@ -647,11 +647,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>🎲 {t('mealPlanner.whatToEat')}</Text>
           <TouchableOpacity
-            style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}
             onPress={() => setShowHelpRandom(true)}
           >
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
               </View>
             </View>
@@ -742,11 +742,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <AppIcon name="menu" size={18} color={colors.accent} />
           <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}>{t('mealPlanner.weekMenu')}</Text>
           <TouchableOpacity
-            style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}
             onPress={() => setShowHelpWeekMenu(true)}
           >
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
               </View>
             </View>
@@ -831,11 +831,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
             />
           </View>
           <TouchableOpacity
-            style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}
             onPress={() => setShowHelpSearch(true)}
           >
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
               </View>
             </View>
@@ -868,11 +868,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                 <Text style={[styles.aiSearchTitle, { color: colors.text, marginBottom: 0, fontSize: 16 }]}>🤖 {t('mealPlanner.searchWithAI')}</Text>
                 <TouchableOpacity
-                  style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+                  style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}
                   onPress={() => setShowHelpAiSearch(true)}
                 >
                   <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-                    <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
                       <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
                     </View>
                   </View>
@@ -1100,11 +1100,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 0 }]}><AppIcon name="shopping" size={18} color={colors.accent} /> {t('mealPlanner.shoppingLists')}</Text>
           <TouchableOpacity
-            style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}
+            style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}
             onPress={() => setShowHelpHandleliste(true)}
           >
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
               </View>
             </View>

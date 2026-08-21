@@ -288,10 +288,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         </View>
 
         {/* Top card with calendar icon */}
-        <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#0097A7', marginBottom: 10 }]}>
+        <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#3b5a75', marginBottom: 10 }]}>
           <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
             <View style={{ width: 64, borderRadius: 12, overflow: 'hidden', flexShrink: 0, backgroundColor: '#fff', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 }}>
-              <View style={{ height: 16, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ height: 16, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ fontSize: 9, fontWeight: '700', color: '#fff' }}>{dayName}</Text>
               </View>
               <Text style={{ fontSize: 26, fontWeight: '800', textAlign: 'center', lineHeight: 30, marginTop: 2, color: colors.text }}>{dayNum}</Text>
@@ -310,8 +310,8 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         </View>
 
         {/* Detail card */}
-        <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#0097A7' }]}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#0097A7', marginBottom: 8 }}>Detaljer</Text>
+        <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#3b5a75' }]}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>Detaljer</Text>
           {eventData.address && (
             <View style={styles.viewDetailRow}>
               <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍</Text>
@@ -328,7 +328,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             <View style={{ marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <Text style={{ fontSize: 14 }}>📝</Text>
-                <Text style={{ fontSize: 12, fontWeight: '700', color: '#0097A7' }}>Notat</Text>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75' }}>Notat</Text>
               </View>
               <View style={{ paddingLeft: 22 }}>
                 <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
@@ -336,7 +336,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                 </Text>
                 {eventData.description.length > 60 && (
                   <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
-                    <Text style={{ fontSize: 12, color: '#0097A7', fontWeight: '600', marginTop: 4 }}>
+                    <Text style={{ fontSize: 12, color: '#3b5a75', fontWeight: '600', marginTop: 4 }}>
                       {showFullNote ? 'Vis mindre' : 'Les mer'}
                     </Text>
                   </TouchableOpacity>
@@ -348,12 +348,12 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 
         {/* Map */}
         {mapUrl && (
-          <View style={[styles.detailCard, { padding: 0, overflow: 'hidden', borderLeftWidth: 4, borderLeftColor: '#0097A7' }]}>
+          <View style={[styles.detailCard, { padding: 0, overflow: 'hidden', borderLeftWidth: 4, borderLeftColor: '#3b5a75' }]}>
             <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))} style={{ width: '100%', height: 140 }}>
               <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 140, borderRadius: 0 }} resizeMode="cover" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))} style={{ padding: 12, alignItems: 'center' }}>
-              <Text style={{ fontSize: 12, color: '#0097A7', fontWeight: '600' }}>Åpne i Google Maps →</Text>
+              <Text style={{ fontSize: 12, color: '#3b5a75', fontWeight: '600' }}>Åpne i Google Maps →</Text>
             </TouchableOpacity>
           </View>
         )}

@@ -7,7 +7,7 @@ interface AppIconProps {
   color?: string;
 }
 
-export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#0097A7' }) => {
+export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5a75' }) => {
   if (name === 'calendar') return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <Rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
