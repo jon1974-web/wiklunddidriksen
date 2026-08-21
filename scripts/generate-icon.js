@@ -21,10 +21,10 @@ function generateIcon(size, outputPath) {
   ctx.closePath();
   ctx.clip();
   
-  // Gradient background: #020D0E (bottom-left) to #0D7377 (top-right)
+  // Gradient background: #2D485E (bottom-left) to #517494 (top-right)
   const gradient = ctx.createLinearGradient(0, size, size, 0);
-  gradient.addColorStop(0, '#020D0E');
-  gradient.addColorStop(1, '#0D7377');
+  gradient.addColorStop(0, '#2D485E');
+  gradient.addColorStop(1, '#517494');
   ctx.fillStyle = gradient;
   ctx.fillRect(0, 0, size, size);
   
