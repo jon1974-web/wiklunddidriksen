@@ -1,21 +1,56 @@
-export const lightColors = {
-  background: '#f5f5f5',
-  surface: '#fff',
-  surfaceVariant: '#f0f0f0',
-  text: '#333',
-  textSecondary: '#666',
-  textDisabled: '#999',
-  border: '#eee',
-  accent: '#4CAF50',
-  accentLight: '#E8F5E9',
-  danger: '#ff4444',
-  chatBubbleOwn: '#4CAF50',
-  chatBubbleOther: '#e5e5ea',
-  chatTextOwn: '#fff',
-  chatTextOther: '#000',
-  inputBackground: '#f5f5f5',
-  statusBar: 'dark',
-} as const;
+// Helper to generate a theme from an accent color
+function makeTheme(accent: string) {
+  // Generate a light background tint from the accent color
+  const r = parseInt(accent.slice(1, 3), 16);
+  const g = parseInt(accent.slice(3, 5), 16);
+  const b = parseInt(accent.slice(5, 7), 16);
+  const bgR = Math.round(r * 0.06 + 245 * 0.94);
+  const bgG = Math.round(g * 0.06 + 247 * 0.94);
+  const bgB = Math.round(b * 0.06 + 249 * 0.94);
+  const bg = `#${Math.round(bgR).toString(16).padStart(2, '0')}${Math.round(bgG).toString(16).padStart(2, '0')}${Math.round(bgB).toString(16).padStart(2, '0')}`;
+  const lightR = Math.round(r * 0.15 + 255 * 0.85);
+  const lightG = Math.round(g * 0.15 + 255 * 0.85);
+  const lightB = Math.round(b * 0.15 + 255 * 0.85);
+  const accentLight = `#${Math.round(lightR).toString(16).padStart(2, '0')}${Math.round(lightG).toString(16).padStart(2, '0')}${Math.round(lightB).toString(16).padStart(2, '0')}`;
+  const borderR = Math.round(r * 0.3 + 200 * 0.7);
+  const borderG = Math.round(g * 0.3 + 200 * 0.7);
+  const borderB = Math.round(b * 0.3 + 200 * 0.7);
+  const border = `#${Math.round(borderR).toString(16).padStart(2, '0')}${Math.round(borderG).toString(16).padStart(2, '0')}${Math.round(borderB).toString(16).padStart(2, '0')}`;
+  const chatBgR = Math.round(r * 0.25 + 220 * 0.75);
+  const chatBgG = Math.round(g * 0.25 + 220 * 0.75);
+  const chatBgB = Math.round(b * 0.25 + 220 * 0.75);
+  const chatBg = `#${Math.round(chatBgR).toString(16).padStart(2, '0')}${Math.round(chatBgG).toString(16).padStart(2, '0')}${Math.round(chatBgB).toString(16).padStart(2, '0')}`;
+
+  return {
+    background: bg,
+    surface: '#fff',
+    surfaceVariant: accentLight,
+    text: '#333',
+    textSecondary: '#666',
+    textDisabled: '#999',
+    border,
+    accent,
+    accentLight,
+    danger: '#ff4444',
+    chatBubbleOwn: accent,
+    chatBubbleOther: chatBg,
+    chatTextOwn: '#fff',
+    chatTextOther: '#333',
+    inputBackground: bg,
+    statusBar: 'dark' as const,
+  };
+}
+
+export const lightColors = makeTheme('#3b5a75');
+export const slateGrayColors = makeTheme('#3b5a75');
+export const dustyRoseColors = makeTheme('#A37B85');
+export const schoolColors = makeTheme('#6B8F71');
+export const kindergartenColors = makeTheme('#E8836A');
+export const tripsColors = makeTheme('#7EC8E3');
+export const birthdaysColors = makeTheme('#E6A817');
+export const petsColors = makeTheme('#9B7DB8');
+export const mealsColors = makeTheme('#E8906C');
+export const healthColors = makeTheme('#C67B5C');
 
 export const darkColors = {
   background: '#121212',
@@ -25,148 +60,15 @@ export const darkColors = {
   textSecondary: '#a0a0a0',
   textDisabled: '#666',
   border: '#333',
-  accent: '#4CAF50',
-  accentLight: '#1b3a1e',
+  accent: '#3b5a75',
+  accentLight: '#1b3a4a',
   danger: '#ff6b6b',
-  chatBubbleOwn: '#4CAF50',
+  chatBubbleOwn: '#3b5a75',
   chatBubbleOther: '#2c2c2e',
   chatTextOwn: '#fff',
   chatTextOther: '#e0e0e0',
   inputBackground: '#2c2c2e',
-  statusBar: 'light',
-} as const;
-
-export const orangeColors = {
-  background: '#faf6f3',
-  surface: '#fff',
-  surfaceVariant: '#f5ede8',
-  text: '#333',
-  textSecondary: '#666',
-  textDisabled: '#999',
-  border: '#f0e0d4',
-  accent: '#E87C3E',
-  accentLight: '#FBE9D7',
-  danger: '#ff4444',
-  chatBubbleOwn: '#E87C3E',
-  chatBubbleOther: '#f0e0d4',
-  chatTextOwn: '#fff',
-  chatTextOther: '#333',
-  inputBackground: '#faf6f3',
-  statusBar: 'dark',
-} as const;
-
-export const deepBlueColors = {
-  background: '#f2f5f8',
-  surface: '#fff',
-  surfaceVariant: '#e8eef4',
-  text: '#333',
-  textSecondary: '#666',
-  textDisabled: '#999',
-  border: '#d4e0ed',
-  accent: '#1A3A5C',
-  accentLight: '#D6E4F0',
-  danger: '#ff4444',
-  chatBubbleOwn: '#1A3A5C',
-  chatBubbleOther: '#d4e0ed',
-  chatTextOwn: '#fff',
-  chatTextOther: '#333',
-  inputBackground: '#f2f5f8',
-  statusBar: 'dark',
-} as const;
-
-export const silverColors = {
-  background: '#f5f5f5',
-  surface: '#fff',
-  surfaceVariant: '#ebebeb',
-  text: '#333',
-  textSecondary: '#666',
-  textDisabled: '#999',
-  border: '#ddd',
-  accent: '#8E8E93',
-  accentLight: '#E8E8EA',
-  danger: '#ff4444',
-  chatBubbleOwn: '#8E8E93',
-  chatBubbleOther: '#e5e5ea',
-  chatTextOwn: '#fff',
-  chatTextOther: '#333',
-  inputBackground: '#f5f5f5',
-  statusBar: 'dark',
-} as const;
-
-export const purpleColors = {
-  background: '#f7f2fa',
-  surface: '#fff',
-  surfaceVariant: '#f0e8f5',
-  text: '#333',
-  textSecondary: '#666',
-  textDisabled: '#999',
-  border: '#e4d4f0',
-  accent: '#9C27B0',
-  accentLight: '#F3E5F5',
-  danger: '#ff4444',
-  chatBubbleOwn: '#9C27B0',
-  chatBubbleOther: '#e4d4f0',
-  chatTextOwn: '#fff',
-  chatTextOther: '#333',
-  inputBackground: '#f7f2fa',
-  statusBar: 'dark',
-} as const;
-
-export const pinkColors = {
-  background: '#fdf5f7',
-  surface: '#fff',
-  surfaceVariant: '#f9edf1',
-  text: '#333',
-  textSecondary: '#666',
-  textDisabled: '#999',
-  border: '#f3dde4',
-  accent: '#F48FB1',
-  accentLight: '#FDE4EC',
-  danger: '#ff4444',
-  chatBubbleOwn: '#F48FB1',
-  chatBubbleOther: '#f3dde4',
-  chatTextOwn: '#fff',
-  chatTextOther: '#333',
-  inputBackground: '#fdf5f7',
-  statusBar: 'dark',
-} as const;
-
-export const tealColors = {
-  background: '#f2f8f9',
-  surface: '#fff',
-  surfaceVariant: '#e5f0f2',
-  text: '#333',
-  textSecondary: '#666',
-  textDisabled: '#999',
-  border: '#d0e4e8',
-  accent: '#0097A7',
-  accentLight: '#E0F2F1',
-  danger: '#ff4444',
-  chatBubbleOwn: '#0097A7',
-  chatBubbleOther: '#d0e4e8',
-  chatTextOwn: '#fff',
-  chatTextOther: '#333',
-  inputBackground: '#f2f8f9',
-  statusBar: 'dark',
-} as const;
-
-export const darkTealColors = {
-  background: '#F6F7F9',
-  surface: '#fff',
-  surfaceVariant: '#e8edf2',
-  text: '#1a1a1a',
-  textSecondary: '#555',
-  textDisabled: '#999',
-  border: '#c8e0e0',
-  accent: '#3b5a75',
-  accentLight: '#D6EDED',
-  danger: '#ff4444',
-  chatBubbleOwn: '#3b5a75',
-  chatBubbleOther: '#c8e0e0',
-  chatTextOwn: '#fff',
-  chatTextOther: '#1a1a1a',
-  inputBackground: '#F6F7F9',
-  statusBar: 'dark',
-} as const;
+  statusBar: 'light' as const,
+};
 
 export type Colors = typeof lightColors;

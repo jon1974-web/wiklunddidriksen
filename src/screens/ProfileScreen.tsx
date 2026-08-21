@@ -861,17 +861,62 @@ export const ProfileScreen: React.FC = () => {
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.theme')}</Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 12, paddingVertical: 8, alignItems: 'center' }}>
+        {/* Row 1: Module colors */}
+        <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 6, textAlign: 'center' }}>Modulfarger</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
+          {([
+            { key: 'school' as const, color: '#6B8F71' },
+            { key: 'kindergarten' as const, color: '#E8836A' },
+            { key: 'trips' as const, color: '#7EC8E3' },
+            { key: 'birthdays' as const, color: '#E6A817' },
+            { key: 'pets' as const, color: '#9B7DB8' },
+            { key: 'meals' as const, color: '#E8906C' },
+            { key: 'health' as const, color: '#C67B5C' },
+          ]).map((t) => (
+            <TouchableOpacity
+              key={t.key}
+              onPress={() => setMode(t.key)}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: t.color,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {mode === t.key && <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>✓</Text>}
+            </TouchableOpacity>
+          ))}
+        </View>
+        {/* Row 2: App accent colors */}
+        <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 6, textAlign: 'center' }}>App-farger</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
+          {([
+            { key: 'slategray' as const, color: '#3b5a75' },
+            { key: 'dustyrose' as const, color: '#A37B85' },
+          ]).map((t) => (
+            <TouchableOpacity
+              key={t.key}
+              onPress={() => setMode(t.key)}
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: 16,
+                backgroundColor: t.color,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {mode === t.key && <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>✓</Text>}
+            </TouchableOpacity>
+          ))}
+        </View>
+        {/* Row 3: System and dark mode */}
+        <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
           {([
             { key: 'light' as const, color: '#4CAF50' },
             { key: 'dark' as const, color: '#333' },
-            { key: 'orange' as const, color: '#E87C3E' },
-            { key: 'deepblue' as const, color: '#1A3A5C' },
-            { key: 'silver' as const, color: '#8E8E93' },
-            { key: 'purple' as const, color: '#9C27B0' },
-            { key: 'pink' as const, color: '#F48FB1' },
-            { key: 'teal' as const, color: '#0097A7' },
-            { key: 'darkteal' as const, color: '#3b5a75' },
             { key: 'system' as const, color: '#999' },
           ]).map((t) => (
             <TouchableOpacity
@@ -889,6 +934,7 @@ export const ProfileScreen: React.FC = () => {
               {mode === t.key && <Text style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}>✓</Text>}
             </TouchableOpacity>
           ))}
+        </View>
         </View>
       </View>
 

@@ -1,8 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
-import { lightColors, darkColors, orangeColors, deepBlueColors, silverColors, purpleColors, pinkColors, tealColors, darkTealColors, Colors } from './colors';
+import {
+  lightColors, slateGrayColors, dustyRoseColors,
+  schoolColors, kindergartenColors, tripsColors, birthdaysColors,
+  petsColors, mealsColors, healthColors, darkColors, Colors
+} from './colors';
 
-type ThemeMode = 'light' | 'dark' | 'system' | 'orange' | 'deepblue' | 'silver' | 'purple' | 'pink' | 'teal' | 'darkteal';
+type ThemeMode = 'light' | 'dark' | 'system' | 'slategray' | 'dustyrose' | 'school' | 'kindergarten' | 'trips' | 'birthdays' | 'pets' | 'meals' | 'health';
 
 interface ThemeContextValue {
   colors: Colors;
@@ -20,14 +24,16 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 export const useTheme = () => useContext(ThemeContext);
 
+const VALID_MODES: ThemeMode[] = ['light', 'dark', 'system', 'slategray', 'dustyrose', 'school', 'kindergarten', 'trips', 'birthdays', 'pets', 'meals', 'health'];
+
 function getStoredMode(): ThemeMode {
   try {
     const stored = localStorage.getItem('themeMode');
-    if (stored && ['light', 'dark', 'system', 'orange', 'deepblue', 'silver', 'purple', 'pink', 'teal', 'darkteal'].includes(stored)) {
+    if (stored && VALID_MODES.includes(stored as ThemeMode)) {
       return stored as ThemeMode;
     }
   } catch {}
-  return 'teal';
+  return 'slategray';
 }
 
 function storeMode(mode: ThemeMode) {
@@ -35,13 +41,15 @@ function storeMode(mode: ThemeMode) {
 }
 
 function resolveColors(mode: ThemeMode, systemScheme: string | null | undefined): { colors: Colors; isDark: boolean } {
-  if (mode === 'orange') return { colors: orangeColors, isDark: false };
-  if (mode === 'deepblue') return { colors: deepBlueColors, isDark: false };
-  if (mode === 'silver') return { colors: silverColors, isDark: false };
-  if (mode === 'purple') return { colors: purpleColors, isDark: false };
-  if (mode === 'pink') return { colors: pinkColors, isDark: false };
-  if (mode === 'teal') return { colors: tealColors, isDark: false };
-  if (mode === 'darkteal') return { colors: darkTealColors, isDark: false };
+  if (mode === 'slategray') return { colors: slateGrayColors, isDark: false };
+  if (mode === 'dustyrose') return { colors: dustyRoseColors, isDark: false };
+  if (mode === 'school') return { colors: schoolColors, isDark: false };
+  if (mode === 'kindergarten') return { colors: kindergartenColors, isDark: false };
+  if (mode === 'trips') return { colors: tripsColors, isDark: false };
+  if (mode === 'birthdays') return { colors: birthdaysColors, isDark: false };
+  if (mode === 'pets') return { colors: petsColors, isDark: false };
+  if (mode === 'meals') return { colors: mealsColors, isDark: false };
+  if (mode === 'health') return { colors: healthColors, isDark: false };
   if (mode === 'dark') return { colors: darkColors, isDark: true };
   if (mode === 'light') return { colors: lightColors, isDark: false };
   // system
