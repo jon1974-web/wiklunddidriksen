@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { LANGUAGES } from '../constants/languages';
 import { setLanguage } from '../i18n';
 
-const TEAL = '#0097A7';
+const ACCENT = '#3b5a75';
 
 type Step = 'account' | 'language' | 'family';
 
@@ -219,7 +219,7 @@ export const AuthScreen: React.FC = () => {
       />
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: TEAL, opacity: loading ? 0.6 : 1 }]}
+        style={[styles.button, { backgroundColor: ACCENT, opacity: loading ? 0.6 : 1 }]}
         onPress={handleAuth}
         disabled={loading}
       >
@@ -230,7 +230,7 @@ export const AuthScreen: React.FC = () => {
 
       {!hasInvite && (
         <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-          <Text style={[styles.switchText, { color: TEAL }]}>
+          <Text style={[styles.switchText, { color: ACCENT }]}>
             {isLogin ? t('auth.noAccount') : t('auth.hasAccount')}
           </Text>
         </TouchableOpacity>
@@ -246,8 +246,8 @@ export const AuthScreen: React.FC = () => {
 
   const renderLanguageStep = () => (
     <>
-      <TouchableOpacity onPress={() => setStep('account')} style={[styles.backBtn, { borderColor: TEAL }]}>
-        <Text style={{ color: TEAL, fontSize: 18 }}>←</Text>
+      <TouchableOpacity onPress={() => setStep('account')} style={[styles.backBtn, { borderColor: ACCENT }]}>
+        <Text style={{ color: ACCENT, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
@@ -261,8 +261,8 @@ export const AuthScreen: React.FC = () => {
             style={[
               styles.langChip,
               {
-                backgroundColor: selectedLanguage === lang.code ? TEAL : colors.surface,
-                borderColor: selectedLanguage === lang.code ? TEAL : colors.border,
+                backgroundColor: selectedLanguage === lang.code ? ACCENT : colors.surface,
+                borderColor: selectedLanguage === lang.code ? ACCENT : colors.border,
               },
             ]}
             onPress={() => setSelectedLanguage(lang.code)}
@@ -276,7 +276,7 @@ export const AuthScreen: React.FC = () => {
       </View>
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: TEAL, opacity: loading ? 0.6 : 1 }]}
+        style={[styles.button, { backgroundColor: ACCENT, opacity: loading ? 0.6 : 1 }]}
         onPress={handleLanguageSelect}
         disabled={loading}
       >
@@ -287,8 +287,8 @@ export const AuthScreen: React.FC = () => {
 
   const renderFamilyStep = () => (
     <>
-      <TouchableOpacity onPress={() => setStep('language')} style={[styles.backBtn, { borderColor: TEAL }]}>
-        <Text style={{ color: TEAL, fontSize: 18 }}>←</Text>
+      <TouchableOpacity onPress={() => setStep('language')} style={[styles.backBtn, { borderColor: ACCENT }]}>
+        <Text style={{ color: ACCENT, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
       <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
@@ -305,7 +305,7 @@ export const AuthScreen: React.FC = () => {
       />
 
       <TouchableOpacity
-        style={[styles.button, { backgroundColor: TEAL, opacity: loading ? 0.6 : 1 }]}
+        style={[styles.button, { backgroundColor: ACCENT, opacity: loading ? 0.6 : 1 }]}
         onPress={handleCreateFamily}
         disabled={loading}
       >
@@ -318,12 +318,12 @@ export const AuthScreen: React.FC = () => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Image source={require('../../assets/icon.png')} style={{ width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }} />
-        <Text style={[styles.title, { color: TEAL }]}>{t('auth.title')}</Text>
+        <Text style={[styles.title, { color: ACCENT }]}>{t('auth.title')}</Text>
 
         {step !== 'account' && (
           <View style={styles.progressRow}>
             {['account', 'language', 'family'].map((s, i) => (
-              <View key={s} style={[styles.progressDot, { backgroundColor: i <= ['account', 'language', 'family'].indexOf(step) ? TEAL : colors.border }]} />
+              <View key={s} style={[styles.progressDot, { backgroundColor: i <= ['account', 'language', 'family'].indexOf(step) ? ACCENT : colors.border }]} />
             ))}
           </View>
         )}
@@ -341,8 +341,8 @@ export const AuthScreen: React.FC = () => {
                 style={[
                   styles.loginLangChip,
                   {
-                    backgroundColor: selectedLanguage === lang.code ? TEAL : colors.surface,
-                    borderColor: selectedLanguage === lang.code ? TEAL : colors.border,
+                    backgroundColor: selectedLanguage === lang.code ? ACCENT : colors.surface,
+                    borderColor: selectedLanguage === lang.code ? ACCENT : colors.border,
                   },
                 ]}
                 onPress={() => {
@@ -362,9 +362,9 @@ export const AuthScreen: React.FC = () => {
         {/* Legal text */}
         <Text style={[styles.legalText, { color: colors.textDisabled }]}>
           {t('auth.legalPrefix')}{' '}
-          <Text style={[styles.legalLink, { color: TEAL }]} onPress={() => Linking.openURL(`/docs/terms-${selectedLanguage}.html`)}>{t('auth.termsLink')}</Text>
+          <Text style={[styles.legalLink, { color: ACCENT }]} onPress={() => Linking.openURL(`/docs/terms-${selectedLanguage}.html`)}>{t('auth.termsLink')}</Text>
           {' '}{t('auth.legalAnd')}{' '}
-          <Text style={[styles.legalLink, { color: TEAL }]} onPress={() => Linking.openURL(`/docs/privacy-${selectedLanguage}.html`)}>{t('auth.privacyLink')}</Text>
+          <Text style={[styles.legalLink, { color: ACCENT }]} onPress={() => Linking.openURL(`/docs/privacy-${selectedLanguage}.html`)}>{t('auth.privacyLink')}</Text>
         </Text>
       </ScrollView>
     </SafeAreaView>
