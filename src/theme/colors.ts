@@ -151,21 +151,21 @@ export const tealColors = {
 } as const;
 
 export const darkTealColors = {
-  background: '#F5F7FA',
+  background: '#F4F8FA',
   surface: '#fff',
   surfaceVariant: '#e8edf2',
   text: '#1a1a1a',
   textSecondary: '#555',
   textDisabled: '#999',
   border: '#c8e0e0',
-  accent: '#1e2a38',
+  accent: '#2d5a7b',
   accentLight: '#D6EDED',
   danger: '#ff4444',
-  chatBubbleOwn: '#1e2a38',
+  chatBubbleOwn: '#2d5a7b',
   chatBubbleOther: '#c8e0e0',
   chatTextOwn: '#fff',
   chatTextOther: '#1a1a1a',
-  inputBackground: '#F5F7FA',
+  inputBackground: '#F4F8FA',
   statusBar: 'dark',
 } as const;
 
