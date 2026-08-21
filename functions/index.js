@@ -22,6 +22,7 @@ const SPOND_API_BASE = "https://api.spond.com/core/v1";
 const ALLOWED_ORIGINS = [
   "https://familiesenter-837bb.web.app",
   "https://familiesenter-837bb.firebaseapp.com",
+  "https://fampad.app",
   "http://localhost:8081",
   "http://localhost:19006",
 ];
