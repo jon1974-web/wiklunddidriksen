@@ -174,7 +174,7 @@ async function sendNotification({ familyId, title, body, notifKey, excludeUid })
           token: t.fcmToken,
           notification: { title, body },
           webpush: {
-            notification: { icon: "/favicon.ico", badge: "/favicon.ico", tag: notifKey || title },
+            notification: { icon: "/icon.png", badge: "/icon.png", tag: notifKey || title },
             fcmOptions: { link: "/" },
           },
           data: { url: "/", type: "notification" },
@@ -1601,7 +1601,7 @@ exports.importHolidaysFromUrl = onRequest({ region: "us-central1", memory: "256M
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Familiesenter/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible; Fampad/1.0)',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
       redirect: 'follow',
@@ -1714,7 +1714,7 @@ exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB"
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; Familiesenter/1.0)',
+        'User-Agent': 'Mozilla/5.0 (compatible; Fampad/1.0)',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
       },
       redirect: 'follow',
@@ -2460,7 +2460,7 @@ exports.googleCalendarCallback = onRequest({ region: "us-central1" }, async (req
     await db.collection("users").doc(uid).set(calendarData, { merge: true });
 
     // Redirect back to profile
-    res.redirect("https://familiesenter-837bb.web.app/profile?calendar=connected");
+    res.redirect("https://fampad.app/profile?calendar=connected");
   } catch (error) {
     console.error("Google Calendar callback error:", error);
     res.status(500).send("Failed to connect Google Calendar");
