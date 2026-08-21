@@ -1,20 +1,20 @@
 {
-  "name": "Familiesenter",
-  "short_name": "Familiesenter",
-  "description": "Familie arrangement administrasjon",
+  "name": "fampad",
+  "short_name": "fampad",
+  "description": "The family organizer that keeps everyone on the same page",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f5f5f5",
-  "theme_color": "#0097A7",
-  "lang": "no",
+  "background_color": "#F6F7F9",
+  "theme_color": "#3b5a75",
+  "lang": "en",
   "icons": [
     {
-      "src": "/favicon.png",
+      "src": "/icon.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/favicon.png",
+      "src": "/icon.png",
       "sizes": "512x512",
       "type": "image/png"
     }
