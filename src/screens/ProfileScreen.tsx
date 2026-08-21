@@ -912,12 +912,10 @@ export const ProfileScreen: React.FC = () => {
             </TouchableOpacity>
           ))}
         </View>
-        {/* Row 3: System and dark mode */}
+        {/* Row 3: Dark mode */}
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10 }}>
           {([
-            { key: 'light' as const, color: '#4CAF50' },
             { key: 'dark' as const, color: '#333' },
-            { key: 'system' as const, color: '#999' },
           ]).map((t) => (
             <TouchableOpacity
               key={t.key}
