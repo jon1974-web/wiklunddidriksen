@@ -871,7 +871,7 @@ export const ProfileScreen: React.FC = () => {
             { key: 'purple' as const, color: '#9C27B0' },
             { key: 'pink' as const, color: '#F48FB1' },
             { key: 'teal' as const, color: '#0097A7' },
-            { key: 'darkteal' as const, color: '#0D7377' },
+            { key: 'darkteal' as const, color: '#096061' },
             { key: 'system' as const, color: '#999' },
           ]).map((t) => (
             <TouchableOpacity
