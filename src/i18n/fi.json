@@ -86,7 +86,7 @@
   },
   "auth": {
     "title": "Fampad",
-    "welcomeText": "Yksi sovellus kaikesta perheeseen liittyvästä. Tapahtumat, terveys, koulu, aikataulut ja yhteinen perhenäkymä — kaunis yksinkertaisuus.",
+    "welcomeText": "Yksi sovellus kaikesta perheeseen liittyvästä. Tapahtumat, terveys, koulu, päiväkoti, matkat, aikataulut, keskustelu ja syntymäpäivät — kaunis ja yksinkertainen.",
     "login": "Kirjaudu sisään",
     "register": "Rekisteröidy",
     "logout": "Kirjaudu ulos",

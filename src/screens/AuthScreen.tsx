@@ -173,9 +173,6 @@ export const AuthScreen: React.FC = () => {
 
   const renderAccountStep = () => (
     <>
-        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-          {isLogin ? t('auth.login') : t('auth.register')}
-        </Text>
         <Text style={[styles.welcomeText, { color: colors.textSecondary }]}>
           {t('auth.welcomeText')}
         </Text>
