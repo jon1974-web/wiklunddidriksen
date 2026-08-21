@@ -33,6 +33,7 @@ function getStoredMode(): ThemeMode {
       return stored as ThemeMode;
     }
   } catch {}
+  try { localStorage.removeItem('themeMode'); } catch {}
   return 'slategray';
 }
 
@@ -64,8 +65,14 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   const { colors, isDark } = resolveColors(mode, systemScheme);
 
   const handleSetMode = (newMode: ThemeMode) => {
-    setMode(newMode);
-    storeMode(newMode);
+    try {
+      setMode(newMode);
+      storeMode(newMode);
+    } catch (e) {
+      console.warn('Failed to set theme:', e);
+      setMode('slategray');
+      storeMode('slategray');
+    }
   };
 
   return (
