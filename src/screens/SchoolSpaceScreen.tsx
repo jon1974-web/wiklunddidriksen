@@ -47,9 +47,9 @@ const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
 };
 
 const TEACHER_TYPES: Record<string, { nb: string; color: string }> = {
-  personal: { nb: 'Klassekontaktlærer', color: '#43A047' },
-  contact: { nb: 'Kontaktlærer', color: '#1976D2' },
-  subject: { nb: 'Faglærer', color: '#FB8C00' },
+  personal: { nb: 'Klassekontaktlærer', color: MODULE_COLORS.school },
+  contact: { nb: 'Kontaktlærer', color: MODULE_COLORS.trips },
+  subject: { nb: 'Faglærer', color: MODULE_COLORS.birthdays },
 };
 
 const getAdminRoleColor = (key: string) => ADMIN_ROLES[key]?.color || '#607D8B';
@@ -571,12 +571,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const getHolidayBadge = (h: SchoolHoliday): { text: string; bg: string; color: string } => {
     const today = new Date().toISOString().split('T')[0];
     const dateFrom = h.dateFrom;
-    if (dateFrom === today) return { text: t('common.today'), bg: '#FCE4EC', color: '#C62828' };
+    if (dateFrom === today) return { text: t('common.today'), bg: MODULE_COLORS.healthBg, color: MODULE_COLORS.health };
     const diffMs = new Date(dateFrom + 'T12:00:00').getTime() - new Date(today + 'T12:00:00').getTime();
     const days = Math.round(diffMs / 86400000);
-    if (days === 1) return { text: t('common.tomorrow'), bg: '#FFF3E0', color: '#FB8C00' };
-    if (days > 0 && days < 7) return { text: `${days} ${t('common.days')}`, bg: '#E3F2FD', color: '#1976D2' };
-    if (days >= 7) { const weeks = Math.round(days / 7); return { text: `${weeks} ${t('common.weeks')}`, bg: '#E8F5E9', color: '#43A047' }; }
+    if (days === 1) return { text: t('common.tomorrow'), bg: MODULE_COLORS.birthdaysBg, color: MODULE_COLORS.birthdays };
+    if (days > 0 && days < 7) return { text: `${days} ${t('common.days')}`, bg: MODULE_COLORS.tripsBg, color: MODULE_COLORS.trips };
+    if (days >= 7) { const weeks = Math.round(days / 7); return { text: `${weeks} ${t('common.weeks')}`, bg: MODULE_COLORS.schoolBg, color: MODULE_COLORS.school }; }
     if (days === -1) return { text: `1 ${t('common.day')} ${t('common.daysAgo')}`, bg: '#F5F5F5', color: '#9E9E9E' };
     const absDays = Math.abs(days);
     if (absDays < 7) return { text: `${absDays} ${t('common.daysAgo')}`, bg: '#F5F5F5', color: '#9E9E9E' };
@@ -601,17 +601,17 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const renderContactActions = (phone?: string, email?: string) => (
     <View style={{ flexDirection: 'row', gap: 6, marginTop: 4 }}>
       {phone ? (
-        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${phone}`)}>
+        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.schoolBg }]} onPress={() => Linking.openURL(`tel:${phone}`)}>
           <Text style={{ fontSize: 12 }}>📞 {t('school.call')}</Text>
         </TouchableOpacity>
       ) : null}
       {phone ? (
-        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => { navigator.clipboard?.writeText(phone); }}>
+        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => { navigator.clipboard?.writeText(phone); }}>
           <Text style={{ fontSize: 12 }}>📋 {t('school.copy')}</Text>
         </TouchableOpacity>
       ) : null}
       {email ? (
-        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${email}`)}>
+        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => Linking.openURL(`mailto:${email}`)}>
           <Text style={{ fontSize: 12 }}>✉️ {t('school.email')}</Text>
         </TouchableOpacity>
       ) : null}
@@ -822,8 +822,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
                         {['personal', 'contact', 'subject'].includes(c.teacherType || '') && (
-                          <View style={[styles.teacherTypeBadge, { backgroundColor: c.teacherType === 'personal' ? '#E8F5E9' : c.teacherType === 'contact' ? '#E3F2FD' : '#FFF3E0' }]}>
-                            <Text style={{ color: c.teacherType === 'personal' ? '#43A047' : c.teacherType === 'contact' ? '#1976D2' : '#FB8C00', fontSize: 10, fontWeight: '600' }}>
+                          <View style={[styles.teacherTypeBadge, { backgroundColor: c.teacherType === 'personal' ? MODULE_COLORS.schoolBg : c.teacherType === 'contact' ? MODULE_COLORS.tripsBg : MODULE_COLORS.birthdaysBg }]}>
+                            <Text style={{ color: c.teacherType === 'personal' ? MODULE_COLORS.school : c.teacherType === 'contact' ? MODULE_COLORS.trips : MODULE_COLORS.birthdays, fontSize: 10, fontWeight: '600' }}>
                               {c.teacherType === 'personal' ? t('school.personalTeacher') : c.teacherType === 'contact' ? t('school.contactTeacher') : t('school.subjectTeacher')}
                             </Text>
                           </View>
@@ -831,8 +831,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                         {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📚 {c.subject}</Text> : null}
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
-                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>}
-                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><AppIcon name="email" size={16} color="#1976D2" /></TouchableOpacity>}
+                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.schoolBg }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color={MODULE_COLORS.school} /></TouchableOpacity>}
+                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><AppIcon name="email" size={16} color={MODULE_COLORS.trips} /></TouchableOpacity>}
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -873,8 +873,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                         {c.notes ? <Text style={{ color: colors.textSecondary, fontSize: 13 }} numberOfLines={1}>📝 {c.notes}</Text> : null}
                       </View>
                       <View style={{ flexDirection: 'row', gap: 6 }}>
-                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>}
-                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E3F2FD' }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><AppIcon name="email" size={16} color="#1976D2" /></TouchableOpacity>}
+                        {c.phone && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.schoolBg }]} onPress={() => Linking.openURL(`tel:${c.phone!.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color={MODULE_COLORS.school} /></TouchableOpacity>}
+                        {c.email && <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => Linking.openURL(`mailto:${c.email}`)}><AppIcon name="email" size={16} color={MODULE_COLORS.trips} /></TouchableOpacity>}
                       </View>
                     </View>
                   </TouchableOpacity>
@@ -898,11 +898,11 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                   </View>
                 </TouchableOpacity>
                 {selectedChild && (
-                  <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#F3E5F5' }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
+                  <TouchableOpacity style={[styles.aiCard, { backgroundColor: MODULE_COLORS.petsBg }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
                     <Text style={{ fontSize: 20 }}>📸</Text>
                     <View style={{ flex: 1 }}>
-                      <Text style={{ color: '#6A1B9A', fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
-                      <Text style={{ color: '#8E24AA', fontSize: 12 }}>{t('school.aiDescription')}</Text>
+                      <Text style={{ color: MODULE_COLORS.pets, fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
+                      <Text style={{ color: MODULE_COLORS.pets, fontSize: 12 }}>{t('school.aiDescription')}</Text>
                     </View>
                   </TouchableOpacity>
                 )}
@@ -912,13 +912,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     {c.parentName ? (
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName}</Text>
-                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>
+                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.schoolBg }]} onPress={() => Linking.openURL(`tel:${c.parentPhone?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color={MODULE_COLORS.school} /></TouchableOpacity>
                       </View>
                     ) : null}
                     {c.parentName2 ? (
                       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginTop: 4 }}>
                         <Text style={{ color: colors.textSecondary, fontSize: 13 }}>👤 {c.parentName2}</Text>
-                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: '#E8F5E9' }]} onPress={() => Linking.openURL(`tel:${c.parentPhone2?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color="#43A047" /></TouchableOpacity>
+                        <TouchableOpacity style={[styles.contactActionBtn, { backgroundColor: MODULE_COLORS.schoolBg }]} onPress={() => Linking.openURL(`tel:${c.parentPhone2?.replace(/\s/g, '')}`)}><AppIcon name="phone" size={16} color={MODULE_COLORS.school} /></TouchableOpacity>
                       </View>
                     ) : null}
                   </TouchableOpacity>
@@ -970,18 +970,18 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </TouchableOpacity>
                 {selectedChild && (
                   <View style={{ flexDirection: 'row', gap: 8, marginTop: 8 }}>
-                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E8F5E9', flex: 1 }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '', mode: 'holidays' })}>
+                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: MODULE_COLORS.schoolBg, flex: 1 }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '', mode: 'holidays' })}>
                       <Text style={{ fontSize: 20 }}>📸</Text>
                       <View style={{ flex: 1 }}>
-                        <Text style={{ color: '#2E7D32', fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromImage')}</Text>
-                        <Text style={{ color: '#388E3C', fontSize: 12 }}>{t('kindergarten.aiFridagDescription')}</Text>
+                        <Text style={{ color: MODULE_COLORS.school, fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromImage')}</Text>
+                        <Text style={{ color: MODULE_COLORS.school, fontSize: 12 }}>{t('kindergarten.aiFridagDescription')}</Text>
                       </View>
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: '#E3F2FD', flex: 1 }]} onPress={() => { setUrlInput(''); setUrlResults([]); setShowUrlImportModal(true); }}>
+                    <TouchableOpacity style={[styles.aiCard, { backgroundColor: MODULE_COLORS.tripsBg, flex: 1 }]} onPress={() => { setUrlInput(''); setUrlResults([]); setShowUrlImportModal(true); }}>
                       <Text style={{ fontSize: 20 }}>🔗</Text>
                       <View style={{ flex: 1 }}>
-                        <Text style={{ color: '#1565C0', fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromUrl')}</Text>
-                        <Text style={{ color: '#1976D2', fontSize: 12 }}>{t('kindergarten.urlDescription')}</Text>
+                        <Text style={{ color: MODULE_COLORS.trips, fontWeight: '600', fontSize: 14 }}>{t('kindergarten.importFromUrl')}</Text>
+                        <Text style={{ color: MODULE_COLORS.trips, fontSize: 12 }}>{t('kindergarten.urlDescription')}</Text>
                       </View>
                     </TouchableOpacity>
                   </View>
@@ -989,9 +989,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 {expandedSections.holidays && filteredHolidays.map(h => {
                   const badge = getHolidayBadge(h);
                   return (
-                    <TouchableOpacity key={h.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: '#43A047' }]} onPress={() => { setEditingHolidayId(h.id); setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); }} onLongPress={() => setHolidayActionModal({ visible: true, id: h.id, title: h.title })}>
+                    <TouchableOpacity key={h.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: MODULE_COLORS.school }]} onPress={() => { setEditingHolidayId(h.id); setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); }} onLongPress={() => setHolidayActionModal({ visible: true, id: h.id, title: h.title })}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                        <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#E8F5E9', alignItems: 'center', justifyContent: 'center' }}>
+                        <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: MODULE_COLORS.schoolBg, alignItems: 'center', justifyContent: 'center' }}>
                           <Text style={{ fontSize: 14 }}>{getHolidayIcon(h.title)}</Text>
                         </View>
                         <View style={{ flex: 1 }}>
