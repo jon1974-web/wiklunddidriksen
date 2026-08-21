@@ -834,12 +834,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: '#E53935' }]}
+          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.health }]}
           onPress={() => navigation.navigate('Trips', { screen: 'HealthApptDetail', params: { appointment: item, source: 'events' } })}
         >
           <View style={styles.spondCardRow}>
             <View style={styles.spondCalIcon}>
-              <View style={[styles.spondCalTopBar, { backgroundColor: '#E53935' }]}>
+              <View style={[styles.spondCalTopBar, { backgroundColor: MODULE_COLORS.health }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
               <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
@@ -850,7 +850,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
                 <AppIcon
                   name={item.icon === 'vaccination' || item.icon === 'pet-vaccination' ? 'vaccination' : 'calendar'}
                   size={14}
-                  color={(item.icon === 'pet-visit' || item.icon === 'pet-vaccination') ? '#8E24AA' : '#E53935'}
+                  color={(item.icon === 'pet-visit' || item.icon === 'pet-vaccination') ? '#8E24AA' : MODULE_COLORS.health}
                 />
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
               </View>
