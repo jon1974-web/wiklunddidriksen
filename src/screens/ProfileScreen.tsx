@@ -935,7 +935,6 @@ export const ProfileScreen: React.FC = () => {
             </TouchableOpacity>
           ))}
         </View>
-        </View>
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
