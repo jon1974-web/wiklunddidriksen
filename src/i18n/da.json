@@ -85,7 +85,8 @@
     "weeksAgo": "uger siden"
   },
   "auth": {
-    "title": "Familiecenter",
+    "title": "Fampad",
+    "welcomeText": "En app for alt, der handler om familien. Begivenheder, sundhed, skole, madplaner og en fælles familieoversigt — smukt enkelt.",
     "login": "Log ind",
     "register": "Registrer dig",
     "logout": "Log ud",

@@ -85,7 +85,8 @@
     "weeksAgo": "weeks ago"
   },
   "auth": {
-    "title": "Family Center",
+    "title": "Fampad",
+    "welcomeText": "One app for everything family. Events, health tracking, school info, meal plans, and a shared family view — beautifully simple.",
     "login": "Log in",
     "register": "Sign up",
     "logout": "Log out",

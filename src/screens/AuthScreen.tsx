@@ -173,9 +173,12 @@ export const AuthScreen: React.FC = () => {
 
   const renderAccountStep = () => (
     <>
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-        {isLogin ? t('auth.login') : t('auth.register')}
-      </Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+          {isLogin ? t('auth.login') : t('auth.register')}
+        </Text>
+        <Text style={[styles.welcomeText, { color: colors.textSecondary }]}>
+          {t('auth.welcomeText')}
+        </Text>
 
       {hasInvite && (
         <View style={[styles.inviteBanner, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
@@ -318,7 +321,7 @@ export const AuthScreen: React.FC = () => {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Image source={require('../../assets/icon.png')} style={{ width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }} />
-        <Text style={[styles.title, { color: ACCENT }]}>{t('auth.title')}</Text>
+        <Text style={[styles.title, { color: ACCENT }]}>fampad</Text>
 
         {step !== 'account' && (
           <View style={styles.progressRow}>
@@ -382,10 +385,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
+    fontSize: 38,
+    fontWeight: '300',
+    fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif',
     textAlign: 'center',
     marginBottom: 8,
+    letterSpacing: -1,
   },
   backBtn: {
     width: 36,
@@ -399,7 +404,13 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 20,
     textAlign: 'center',
+    marginBottom: 12,
+  },
+  welcomeText: {
+    fontSize: 15,
+    textAlign: 'center',
     marginBottom: 32,
+    lineHeight: 22,
   },
   progressRow: {
     flexDirection: 'row',

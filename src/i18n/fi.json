@@ -85,7 +85,8 @@
     "weeksAgo": "viikkoa sitten"
   },
   "auth": {
-    "title": "Perhekeskus",
+    "title": "Fampad",
+    "welcomeText": "Yksi sovellus kaikesta perheeseen liittyvästä. Tapahtumat, terveys, koulu, aikataulut ja yhteinen perhenäkymä — kaunis yksinkertaisuus.",
     "login": "Kirjaudu sisään",
     "register": "Rekisteröidy",
     "logout": "Kirjaudu ulos",
