@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fampad — Icon Concepts v2</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; padding: 40px 20px; }
+h1 { text-align: center; font-size: 28px; margin-bottom: 8px; }
+.subtitle { text-align: center; color: #555; font-size: 14px; margin-bottom: 48px; }
+.row { display: flex; justify-content: center; gap: 28px; flex-wrap: wrap; margin-bottom: 48px; }
+.label { text-align: center; font-size: 11px; color: #666; margin-top: 10px; font-weight: 600; letter-spacing: 0.5px; }
+.icon-wrap { display: flex; flex-direction: column; align-items: center; }
+.icon { width: 140px; height: 140px; border-radius: 32px; overflow: hidden; position: relative; flex-shrink: 0; }
+.icon.small { width: 70px; height: 70px; border-radius: 16px; }
+.section-title { text-align: center; font-size: 14px; color: #444; margin-bottom: 24px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; }
+.row-label { text-align: center; font-size: 12px; color: #0D7377; margin-bottom: 16px; font-weight: 600; }
+svg { width: 100%; height: 100%; display: block; }
+.spacer { height: 32px; }
+</style>
+</head>
+<body>
+
+<h1>Fampad — Icon v2</h1>
+<p class="subtitle">Deep dark teal focus • Creative "fp" monograms</p>
+
+<!-- ===== ROW 1: SMASHED TOGETHER — Tight Overlap ===== -->
+<div class="section-title">Smashed — Tight Overlap</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v1" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#061E20"/>
+            <stop offset="40%" stop-color="#0A3D40"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v1)"/>
+        <!-- f and p smashed, sharing the vertical stem -->
+        <path d="M40 26 C40 26 48 26 48 26 L48 26 M48 26 L48 92 M42 42 L54 42 M48 92 C48 92 48 50 48 50 C48 40 56 34 64 34 C74 34 80 42 80 52 C80 62 74 68 64 68 L48 68"
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Shared stem</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#05191B"/>
+            <stop offset="50%" stop-color="#0A3D40"/>
+            <stop offset="100%" stop-color="#118A6E"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v2)"/>
+        <!-- f merges into p, single flowing line -->
+        <path d="M38 28 L38 90 M38 44 L50 44 M38 90 C38 90 38 52 38 52 Q38 38 52 38 L66 38 Q80 38 80 52 Q80 66 66 66 L38 66"
+              fill="none" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Highlight where they merge -->
+        <circle cx="38" cy="66" r="3" fill="rgba(255,255,255,0.2)"/>
+      </svg>
+    </div>
+    <div class="label">Merge point glow</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v3" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#041214"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v3)"/>
+        <!-- Bold smashed fp, thick strokes -->
+        <path d="M42 24 L42 96 M42 46 L56 46 M42 96 C42 96 42 54 42 54 C42 42 52 34 62 34 C74 34 82 42 82 54 C82 64 74 70 62 70 L42 70"
+              fill="none" stroke="white" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Bold thick strokes</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v4" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#05191B"/>
+            <stop offset="60%" stop-color="#0A4A4D"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v4)"/>
+        <!-- f and p as one glyph, p loop covers f crossbar area -->
+        <path d="M40 30 L40 90 M40 46 L52 46 M40 90 C40 90 40 50 40 50 C40 38 50 30 62 30 C76 30 84 40 84 52 C84 64 76 72 62 72 L40 72"
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Subtle leaf shape at intersection -->
+        <path d="M40 50 Q36 46 40 42 Q44 46 40 50" fill="rgba(255,255,255,0.12)"/>
+      </svg>
+    </div>
+    <div class="label">Leaf intersection</div>
+  </div>
+</div>
+
+<!-- ===== ROW 2: SMASHED — Interlocking ===== -->
+<div class="section-title">Smashed — Interlocking</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v5" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#041214"/>
+            <stop offset="50%" stop-color="#0A3D40"/>
+            <stop offset="100%" stop-color="#14B88C"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v5)"/>
+        <!-- f overlaps p, p loop sits on f crossbar -->
+        <path d="M36 28 L36 92 M36 44 L50 44" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M50 92 L50 50 C50 38 58 32 68 32 C80 32 86 40 86 52 C86 64 80 70 68 70 L50 70"
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Connection -->
+        <line x1="36" y1="44" x2="50" y2="44" stroke="white" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="label">Side by side linked</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v6" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#031012"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v6)"/>
+        <!-- Vertical interlock: f descender goes through p loop -->
+        <path d="M44 24 L44 96 M44 42 L56 42" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M44 96 L44 52 M56 52 Q56 36 68 36 Q80 36 80 52 Q80 68 68 68 L44 68" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Vertical interlock</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v7" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#05191B"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v7)"/>
+        <!-- f and p share a curved baseline -->
+        <path d="M34 30 L34 88 M34 46 L48 46" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M56 88 L56 50 C56 36 64 30 74 30 C86 30 92 40 92 52 C92 64 86 72 74 72 L56 72" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Shared baseline curve -->
+        <path d="M34 88 Q56 94 74 88" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="label">Shared baseline</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v8" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#041214"/>
+            <stop offset="100%" stop-color="#0F8B6F"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v8)"/>
+        <!-- Monoline: f and p in one continuous line, no lifting -->
+        <path d="M38 30 L38 90 M38 46 L50 46 M38 90 C38 90 38 54 42 44 C46 34 56 30 64 30 C76 30 84 40 84 52 C84 64 76 72 64 72 L42 72"
+              fill="none" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Monoline flow</div>
+  </div>
+</div>
+
+<!-- ===== ROW 3: SEPARATED — Clean Distance ===== -->
+<div class="section-title">Separated — Clean Distance</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v9" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#05191B"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v9)"/>
+        <!-- Clean separated f and p -->
+        <path d="M32 28 L32 90 M32 44 L44 44" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M60 90 L60 50 C60 38 68 32 78 32 C90 32 96 40 96 52 C96 64 90 70 78 70 L60 70" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Clean gap</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v10" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#041214"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v10)"/>
+        <!-- Separated with subtle connecting line -->
+        <path d="M30 28 L30 90 M30 44 L42 44" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M62 90 L62 50 C62 38 70 32 80 32 C92 32 98 40 98 52 C98 64 92 70 80 70 L62 70" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Thin connecting bridge -->
+        <line x1="42" y1="44" x2="62" y2="44" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="label">Subtle bridge</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v11" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#05191B"/>
+            <stop offset="50%" stop-color="#0A4A4D"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v11)"/>
+        <!-- Bold separated, different weights -->
+        <path d="M30 26 L30 92 M30 44 L44 44" fill="none" stroke="white" stroke-width="6" stroke-linecap="round"/>
+        <path d="M64 92 L64 50 C64 36 72 28 84 28 C98 28 104 38 104 52 C104 64 98 72 84 72 L64 72" fill="none" stroke="white" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Weight contrast</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v12" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#041214"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v12)"/>
+        <!-- Separated serif style -->
+        <text x="38" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="56" font-weight="700" fill="white">f</text>
+        <text x="82" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="56" font-weight="700" fill="white">p</text>
+      </svg>
+    </div>
+    <div class="label">Serif separated</div>
+  </div>
+</div>
+
+<!-- ===== ROW 4: SEPARATED — With Accent ===== -->
+<div class="section-title">Separated — With Accent Dot</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v13" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#05191B"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v13)"/>
+        <path d="M32 28 L32 90 M32 44 L44 44" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M60 90 L60 50 C60 38 68 32 78 32 C90 32 96 40 96 52 C96 64 90 70 78 70 L60 70" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Accent dot between -->
+        <circle cx="52" cy="60" r="3" fill="#2DD4A8"/>
+      </svg>
+    </div>
+    <div class="label">Mint accent dot</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v14" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#041214"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v14)"/>
+        <path d="M32 30 L32 88 M32 46 L44 46" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M58 88 L58 50 C58 38 66 32 76 32 C88 32 94 40 94 52 C94 64 88 70 76 70 L58 70" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Accent line between -->
+        <line x1="44" y1="46" x2="58" y2="46" stroke="#2DD4A8" stroke-width="2.5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="label">Mint connector</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v15" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#05191B"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v15)"/>
+        <path d="M30 28 L30 90 M30 44 L42 44" fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M60 90 L60 50 C60 38 68 32 78 32 C90 32 96 40 96 52 C96 64 90 70 78 70 L60 70" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Home silhouette inside p loop -->
+        <path d="M72 38 L72 34 L80 38" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <rect x="73" y="38" width="6" height="5" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="1"/>
+      </svg>
+    </div>
+    <div class="label">Home in p-loop</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v16" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#041214"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v16)"/>
+        <!-- Stylized f, separated p with rounded square p-loop -->
+        <text x="36" y="76" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white">f</text>
+        <text x="82" y="76" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white">p</text>
+        <!-- Small square dot -->
+        <rect x="56" y="56" width="8" height="8" rx="2" fill="#2DD4A8"/>
+      </svg>
+    </div>
+    <div class="label">Serif + mint square</div>
+  </div>
+</div>
+
+<!-- ===== ROW 5: DEEPEST DARK ===== -->
+<div class="section-title">Deepest Dark — Premium Feel</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v17" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#020D0E"/>
+            <stop offset="100%" stop-color="#0A4A4D"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v17)"/>
+        <path d="M40 28 L40 92 M40 46 L52 46 M40 92 C40 92 40 52 40 52 C40 40 50 34 60 34 C72 34 80 42 80 52 C80 62 72 68 60 68 L40 68"
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Near-black gradient</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v18" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#010A0B"/>
+            <stop offset="100%" stop-color="#08383A"/>
+          </linearGradient>
+          <radialGradient id="v18g" cx="75%" cy="30%" r="60%">
+            <stop offset="0%" stop-color="rgba(13,115,119,0.3)"/>
+            <stop offset="100%" stop-color="rgba(13,115,119,0)"/>
+          </radialGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v17)"/>
+        <rect width="120" height="120" rx="28" fill="url(#v18g)"/>
+        <text x="60" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="700" fill="white" letter-spacing="-3">fp</text>
+      </svg>
+    </div>
+    <div class="label">Glow spotlight</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v19" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#020D0E"/>
+            <stop offset="100%" stop-color="#0A4A4D"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v19)"/>
+        <!-- Thin elegant fp -->
+        <text x="60" y="80" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="52" font-weight="200" fill="white" letter-spacing="-2">fp</text>
+      </svg>
+    </div>
+    <div class="label">Ultra thin</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v20" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#020D0E"/>
+            <stop offset="100%" stop-color="#0A4A4D"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v20)"/>
+        <!-- Outlined fp -->
+        <text x="60" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="700" fill="none" stroke="white" stroke-width="1.5" letter-spacing="-3">fp</text>
+      </svg>
+    </div>
+    <div class="label">Outlined only</div>
+  </div>
+</div>
+
+<!-- ===== ROW 6: WITH ACCENT COLORS ===== -->
+<div class="section-title">Accent Color Variations</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v21" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#020D0E"/>
+            <stop offset="100%" stop-color="#0A4A4D"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v21)"/>
+        <path d="M38 28 L38 92 M38 46 L50 46 M38 92 C38 92 38 52 38 52 C38 40 48 34 58 34 C70 34 78 42 78 52 C78 62 70 68 58 68 L38 68"
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Mint accent on crossbar -->
+        <line x1="38" y1="46" x2="50" y2="46" stroke="#2DD4A8" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="label">Mint crossbar</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v22" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#020D0E"/>
+            <stop offset="100%" stop-color="#0A4A4D"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v22)"/>
+        <path d="M38 28 L38 92 M38 46 L50 46 M38 92 C38 92 38 52 38 52 C38 40 48 34 58 34 C70 34 78 42 78 52 C78 62 70 68 58 68 L38 68"
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Mint accent on p-loop -->
+        <path d="M48 34 C48 34 58 34 58 34 C70 34 78 42 78 52 C78 62 70 68 58 68" fill="none" stroke="#2DD4A8" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Mint p-loop</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v23" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#020D0E"/>
+            <stop offset="100%" stop-color="#0A4A4D"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v23)"/>
+        <text x="60" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="700" fill="white" letter-spacing="-3">fp</text>
+        <!-- Mint dot below -->
+        <circle cx="60" cy="96" r="3" fill="#2DD4A8"/>
+      </svg>
+    </div>
+    <div class="label">Mint dot below</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="v24" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#020D0E"/>
+            <stop offset="100%" stop-color="#0A4A4D"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="28" fill="url(#v24)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="700" fill="white" letter-spacing="-3">fp</text>
+        <!-- Mint underline -->
+        <line x1="30" y1="90" x2="90" y2="90" stroke="#2DD4A8" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="label">Mint underline</div>
+  </div>
+</div>
+
+<!-- ===== SIZE TEST ===== -->
+<div class="section-title" style="margin-top: 32px;">Size Scalability Test</div>
+<div class="row" style="align-items: flex-end; gap: 16px;">
+  <div class="icon-wrap">
+    <div style="width:160px;height:160px;border-radius:36px;overflow:hidden;">
+      <svg viewBox="0 0 120 120"><defs><linearGradient id="zs" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#020D0E"/><stop offset="100%" stop-color="#0A4A4D"/></linearGradient></defs><rect width="120" height="120" rx="28" fill="url(#zs)"/><path d="M40 28 L40 92 M40 46 L52 46 M40 92 C40 92 40 52 40 52 C40 40 50 34 60 34 C72 34 80 42 80 52 C80 62 72 68 60 68 L40 68" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="label">160px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:100px;height:100px;border-radius:22px;overflow:hidden;">
+      <svg viewBox="0 0 120 120"><rect width="120" height="120" rx="28" fill="url(#zs)"/><path d="M40 28 L40 92 M40 46 L52 46 M40 92 C40 92 40 52 40 52 C40 40 50 34 60 34 C72 34 80 42 80 52 C80 62 72 68 60 68 L40 68" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="label">100px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:64px;height:64px;border-radius:14px;overflow:hidden;">
+      <svg viewBox="0 0 120 120"><rect width="120" height="120" rx="28" fill="url(#zs)"/><path d="M40 28 L40 92 M40 46 L52 46 M40 92 C40 92 40 52 40 52 C40 40 50 34 60 34 C72 34 80 42 80 52 C80 62 72 68 60 68 L40 68" fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="label">64px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:40px;height:40px;border-radius:9px;overflow:hidden;">
+      <svg viewBox="0 0 120 120"><rect width="120" height="120" rx="28" fill="url(#zs)"/><path d="M40 28 L40 92 M40 46 L52 46 M40 92 C40 92 40 52 40 52 C40 40 50 34 60 34 C72 34 80 42 80 52 C80 62 72 68 60 68 L40 68" fill="none" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="label">40px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:24px;height:24px;border-radius:5px;overflow:hidden;">
+      <svg viewBox="0 0 120 120"><rect width="120" height="120" rx="28" fill="url(#zs)"/><text x="60" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="60" font-weight="700" fill="white">fp</text></svg>
+    </div>
+    <div class="label">24px</div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fampad — Icon Concepts</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #111; color: #fff; padding: 40px 20px; }
+h1 { text-align: center; font-size: 28px; margin-bottom: 8px; }
+.subtitle { text-align: center; color: #888; font-size: 14px; margin-bottom: 40px; }
+.row { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-bottom: 48px; }
+.label { text-align: center; font-size: 12px; color: #aaa; margin-top: 12px; font-weight: 600; }
+.icon-wrap { display: flex; flex-direction: column; align-items: center; }
+.icon { width: 120px; height: 120px; border-radius: 26px; overflow: hidden; position: relative; }
+.icon.small { width: 60px; height: 60px; border-radius: 13px; }
+.icon.tiny { width: 32px; height: 32px; border-radius: 7px; }
+.section-title { text-align: center; font-size: 18px; color: #666; margin-bottom: 20px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+
+/* SVG icons */
+svg { width: 100%; height: 100%; display: block; }
+
+/* Phone mockup */
+.phone { width: 320px; background: #222; border-radius: 32px; overflow: hidden; padding: 12px; flex-shrink: 0; }
+.phone-screen { background: #f5f5f5; border-radius: 22px; height: 580px; overflow: hidden; position: relative; }
+.phone-status { height: 44px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #333; }
+.phone-header { background: #fff; padding: 12px 16px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid #eee; }
+.phone-header-icon { width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0; }
+.phone-header-text { font-size: 16px; font-weight: 700; color: #1a1a1a; }
+.phone-content { padding: 16px; }
+.phone-nav { position: absolute; bottom: 0; left: 0; right: 0; height: 80px; background: #fff; border-top: 1px solid #eee; display: flex; align-items: flex-start; justify-content: space-around; padding-top: 8px; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 10px; color: #999; }
+.nav-item.active { color: #0D7377; }
+.nav-icon { width: 24px; height: 24px; border-radius: 6px; }
+.spacer { height: 20px; }
+</style>
+</head>
+<body>
+
+<h1>Fampad — Icon Concepts</h1>
+<p class="subtitle">"fp" monogram variations for the app icon</p>
+
+<!-- ===== CONCEPT 1: Connected Flow ===== -->
+<div class="section-title">Concept 1 — Connected Flow</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g1" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g1)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">Serif connected</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g2" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0D4F52"/>
+            <stop offset="50%" stop-color="#0D7377"/>
+            <stop offset="100%" stop-color="#34D399"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g2)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="54" font-weight="300" fill="white" letter-spacing="-6">fp</text>
+      </svg>
+    </div>
+    <div class="label">Light sans-serif</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g3" x1="0" y1="1" x2="1" y2="0">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g3)"/>
+        <text x="60" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="56" font-weight="700" fill="white" letter-spacing="-3" font-style="italic">fp</text>
+      </svg>
+    </div>
+    <div class="label">Italic serif</div>
+  </div>
+</div>
+
+<!-- ===== CONCEPT 2: Monogram Circle ===== -->
+<div class="section-title">Concept 2 — Circular Monogram</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g4" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g4)"/>
+        <circle cx="60" cy="60" r="38" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2"/>
+        <text x="60" y="74" text-anchor="middle" font-family="Georgia, serif" font-size="38" font-weight="700" fill="white" letter-spacing="-2">fp</text>
+      </svg>
+    </div>
+    <div class="label">Circle border</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g5" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g5)"/>
+        <circle cx="60" cy="60" r="32" fill="rgba(255,255,255,0.12)"/>
+        <text x="60" y="74" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="36" font-weight="600" fill="white" letter-spacing="-1">fp</text>
+      </svg>
+    </div>
+    <div class="label">Circle fill</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g6" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g6)"/>
+        <text x="60" y="72" text-anchor="middle" font-family="Georgia, serif" font-size="32" font-weight="700" fill="white" letter-spacing="1">FP</text>
+        <line x1="30" y1="80" x2="90" y2="80" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+      </svg>
+    </div>
+    <div class="label">Uppercase + line</div>
+  </div>
+</div>
+
+<!-- ===== CONCEPT 3: SVG Path (Custom Drawn) ===== -->
+<div class="section-title">Concept 3 — Custom SVG Path</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g7" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g7)"/>
+        <!-- Custom fp path: f stem flows into p -->
+        <path d="M38 32 C38 32 42 32 42 32 L42 85 M38 48 L48 48 M42 85 C42 85 42 52 42 52 C42 42 50 36 58 36 C66 36 72 42 72 52 C72 62 66 68 58 68 L42 68" 
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">Hand-drawn connected</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g8" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0D4F52"/>
+            <stop offset="100%" stop-color="#34D399"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g8)"/>
+        <!-- fp with house-shaped p loop -->
+        <path d="M36 30 L36 88 M36 46 L46 46 M36 88 L36 54 C36 44 44 38 52 38 L62 38 C70 38 76 44 76 52 C76 60 70 66 62 66 L36 66" 
+              fill="none" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Small house roof hint on p loop -->
+        <path d="M52 38 L58 32 L64 38" fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="label">House hint on p-loop</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g9" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g9)"/>
+        <!-- fp with leaf/heart intersection -->
+        <path d="M38 34 L38 86 M38 48 L48 48" 
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round"/>
+        <path d="M38 86 C38 86 38 56 38 56 C38 44 48 36 58 36 C70 36 76 44 76 54 C76 64 68 70 58 70 L38 70" 
+              fill="none" stroke="white" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- Heart loop at intersection -->
+        <ellipse cx="43" cy="56" rx="6" ry="5" fill="rgba(255,255,255,0.15)" transform="rotate(-15 43 56)"/>
+      </svg>
+    </div>
+    <div class="label">Heart intersection</div>
+  </div>
+</div>
+
+<!-- ===== CONCEPT 4: Minimal & Modern ===== -->
+<div class="section-title">Concept 4 — Minimal & Modern</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g10" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g10)"/>
+        <!-- Bold geometric fp -->
+        <text x="60" y="82" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="60" font-weight="800" fill="white" letter-spacing="-8">fp</text>
+      </svg>
+    </div>
+    <div class="label">Bold geometric</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g11" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g11)"/>
+        <!-- Overlapping f and p -->
+        <text x="48" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="58" font-weight="700" fill="rgba(255,255,255,0.4)" letter-spacing="-2">f</text>
+        <text x="72" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="58" font-weight="700" fill="white" letter-spacing="-2">p</text>
+      </svg>
+    </div>
+    <div class="label">Overlapping letters</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g12" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A5C5F"/>
+            <stop offset="100%" stop-color="#2DD4A8"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g12)"/>
+        <!-- fp with rounded square outline -->
+        <rect x="24" y="24" width="72" height="72" rx="16" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2"/>
+        <text x="60" y="78" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="42" font-weight="600" fill="white" letter-spacing="-2">fp</text>
+      </svg>
+    </div>
+    <div class="label">Rounded frame</div>
+  </div>
+</div>
+
+<!-- ===== CONCEPT 5: Dark Variations ===== -->
+<div class="section-title">Concept 5 — Dark & Deep</div>
+<div class="row">
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g13" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#062B2D"/>
+            <stop offset="100%" stop-color="#0D7377"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g13)"/>
+        <text x="60" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">Deep dark teal</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <linearGradient id="g14" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0A3D40"/>
+            <stop offset="100%" stop-color="#1BA88C"/>
+          </linearGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g14)"/>
+        <text x="60" y="80" text-anchor="middle" font-family="'Helvetica Neue', Arial, sans-serif" font-size="48" font-weight="200" fill="white" letter-spacing="-2">fp</text>
+      </svg>
+    </div>
+    <div class="label">Dark + thin weight</div>
+  </div>
+  <div class="icon-wrap">
+    <div class="icon">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="g15" cx="30%" cy="70%" r="80%">
+            <stop offset="0%" stop-color="#0D7377"/>
+            <stop offset="100%" stop-color="#062B2D"/>
+          </radialGradient>
+        </defs>
+        <rect width="120" height="120" rx="26" fill="url(#g15)"/>
+        <text x="60" y="80" text-anchor="middle" font-family="Georgia, serif" font-size="54" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">Radial glow</div>
+  </div>
+</div>
+
+<!-- ===== PHONE MOCKUPS ===== -->
+<div class="section-title" style="margin-top: 40px;">Phone Preview — Icon in Context</div>
+<div class="row">
+  <!-- Phone 1: Home screen -->
+  <div class="phone">
+    <div class="phone-screen">
+      <div class="phone-status">9:41</div>
+      <div class="phone-header">
+        <svg width="36" height="36" viewBox="0 0 120 120" style="border-radius:10px;">
+          <defs>
+            <linearGradient id="pg1" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0A5C5F"/>
+              <stop offset="100%" stop-color="#2DD4A8"/>
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#pg1)"/>
+          <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+        </svg>
+        <div class="phone-header-text">Fampad</div>
+      </div>
+      <div class="phone-content">
+        <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:700;color:#1a1a1a;">📅 Today</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;">Family meeting at 17:00</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:14px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:700;color:#1a1a1a;">🎉 Fridager</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;">Høstferie — in 5 weeks</div>
+        </div>
+        <div style="background:#fff;border-radius:12px;padding:14px;">
+          <div style="font-size:13px;font-weight:700;color:#1a1a1a;">🍽️ Matplan</div>
+          <div style="font-size:12px;color:#666;margin-top:4px;">Tacos i dag</div>
+        </div>
+      </div>
+      <div class="phone-nav">
+        <div class="nav-item active">
+          <svg width="24" height="24" viewBox="0 0 120 120" style="border-radius:6px;"><rect width="120" height="120" rx="26" fill="url(#pg1)"/><text x="60" y="78" text-anchor="middle" font-family="serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text></svg>
+          <span>Hjem</span>
+        </div>
+        <div class="nav-item"><span style="font-size:18px;">📅</span><span>Kalender</span></div>
+        <div class="nav-item"><span style="font-size:18px;">💬</span><span>Chat</span></div>
+        <div class="nav-item"><span style="font-size:18px;">🍽️</span><span>Mat</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Phone 2: Dark theme -->
+  <div class="phone">
+    <div class="phone-screen" style="background:#1a1a1a;">
+      <div class="phone-status" style="background:#222;color:#fff;">9:41</div>
+      <div class="phone-header" style="background:#222;border-color:#333;">
+        <svg width="36" height="36" viewBox="0 0 120 120" style="border-radius:10px;">
+          <defs>
+            <linearGradient id="pg2" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#0A5C5F"/>
+              <stop offset="100%" stop-color="#2DD4A8"/>
+            </linearGradient>
+          </defs>
+          <rect width="120" height="120" rx="26" fill="url(#pg2)"/>
+          <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+        </svg>
+        <div class="phone-header-text" style="color:#fff;">Fampad</div>
+      </div>
+      <div class="phone-content">
+        <div style="background:#2a2a2a;border-radius:12px;padding:14px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:700;color:#fff;">📅 Today</div>
+          <div style="font-size:12px;color:#999;margin-top:4px;">Family meeting at 17:00</div>
+        </div>
+        <div style="background:#2a2a2a;border-radius:12px;padding:14px;margin-bottom:10px;">
+          <div style="font-size:13px;font-weight:700;color:#fff;">🎉 Fridager</div>
+          <div style="font-size:12px;color:#999;margin-top:4px;">Høstferie — in 5 weeks</div>
+        </div>
+        <div style="background:#2a2a2a;border-radius:12px;padding:14px;">
+          <div style="font-size:13px;font-weight:700;color:#fff;">🍽️ Matplan</div>
+          <div style="font-size:12px;color:#999;margin-top:4px;">Tacos i dag</div>
+        </div>
+      </div>
+      <div class="phone-nav" style="background:#222;border-color:#333;">
+        <div class="nav-item active">
+          <svg width="24" height="24" viewBox="0 0 120 120" style="border-radius:6px;"><rect width="120" height="120" rx="26" fill="url(#pg2)"/><text x="60" y="78" text-anchor="middle" font-family="serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text></svg>
+          <span>Hjem</span>
+        </div>
+        <div class="nav-item" style="color:#666;"><span style="font-size:18px;">📅</span><span>Kalender</span></div>
+        <div class="nav-item" style="color:#666;"><span style="font-size:18px;">💬</span><span>Chat</span></div>
+        <div class="nav-item" style="color:#666;"><span style="font-size:18px;">🍽️</span><span>Mat</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SIZE TEST ===== -->
+<div class="section-title" style="margin-top: 40px;">Size Test — Does it scale?</div>
+<div class="row" style="align-items: flex-end; gap: 16px;">
+  <div class="icon-wrap">
+    <div style="width:180px;height:180px;border-radius:40px;overflow:hidden;">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="gz1" x1="0%" y1="100%" x2="100%" y2="0%"><stop offset="0%" stop-color="#0A5C5F"/><stop offset="100%" stop-color="#2DD4A8"/></linearGradient></defs>
+        <rect width="120" height="120" rx="26" fill="url(#gz1)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">180px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:120px;height:120px;border-radius:26px;overflow:hidden;">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect width="120" height="120" rx="26" fill="url(#gz1)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">120px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:80px;height:80px;border-radius:18px;overflow:hidden;">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect width="120" height="120" rx="26" fill="url(#gz1)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">80px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:60px;height:60px;border-radius:13px;overflow:hidden;">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect width="120" height="120" rx="26" fill="url(#gz1)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">60px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:40px;height:40px;border-radius:9px;overflow:hidden;">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect width="120" height="120" rx="26" fill="url(#gz1)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">40px</div>
+  </div>
+  <div class="icon-wrap">
+    <div style="width:24px;height:24px;border-radius:5px;overflow:hidden;">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <rect width="120" height="120" rx="26" fill="url(#gz1)"/>
+        <text x="60" y="78" text-anchor="middle" font-family="Georgia, serif" font-size="52" font-weight="700" fill="white" letter-spacing="-4">fp</text>
+      </svg>
+    </div>
+    <div class="label">24px</div>
+  </div>
+</div>
+
+</body>
+</html>
