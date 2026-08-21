@@ -173,7 +173,7 @@ export const AuthScreen: React.FC = () => {
 
   const renderAccountStep = () => (
     <>
-        <Text style={[styles.welcomeText, { color: colors.textSecondary }]}>
+        <Text style={[styles.welcomeText, { color: ACCENT }]}>
           {t('auth.welcomeText')}
         </Text>
 
@@ -360,7 +360,7 @@ export const AuthScreen: React.FC = () => {
         )}
 
         {/* Legal text */}
-        <Text style={[styles.legalText, { color: colors.textDisabled }]}>
+        <Text style={[styles.legalText, { color: ACCENT, opacity: 0.6 }]}>
           {t('auth.legalPrefix')}{' '}
           <Text style={[styles.legalLink, { color: ACCENT }]} onPress={() => Linking.openURL(`/docs/terms-${selectedLanguage}.html`)}>{t('auth.termsLink')}</Text>
           {' '}{t('auth.legalAnd')}{' '}
