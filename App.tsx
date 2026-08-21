@@ -586,9 +586,9 @@ const AppContent = () => {
 
   if (showSplash) {
     return (
-      <Animated.View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center', opacity: splashOpacity }}>
+      <Animated.View style={{ flex: 1, backgroundColor: '#F6F7F9', justifyContent: 'center', alignItems: 'center', opacity: splashOpacity }}>
         <Image source={require('./assets/icon.png')} style={{ width: 120, height: 120, borderRadius: 28, marginBottom: 24 }} />
-        <Text style={{ fontSize: 22, fontWeight: '600', color: colors.text }}>Velkommen til Familiesenter</Text>
+        <Text style={{ fontSize: 28, fontWeight: '300', fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif', color: '#3b5a75', letterSpacing: -1 }}>fampad</Text>
       </Animated.View>
     );
   }
