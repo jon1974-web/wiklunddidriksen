@@ -89,7 +89,7 @@ export const TransportFormModal: React.FC<TransportFormModalProps> = React.memo(
           <TouchableWithoutFeedback>
             <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
               <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, marginBottom: 12 }}>
-                <AppIcon name={transportForm.transportType === 'fly' ? 'fly' : transportForm.transportType === 'tog' ? 'train' : transportForm.transportType === 'boat' ? 'boat' : transportForm.transportType === 'ferry' ? 'ferry' : transportForm.transportType === 'taxi' ? 'taxi' : 'car'} size={28} color="#0097A7" />
+                <AppIcon name={transportForm.transportType === 'fly' ? 'fly' : transportForm.transportType === 'tog' ? 'train' : transportForm.transportType === 'boat' ? 'boat' : transportForm.transportType === 'ferry' ? 'ferry' : transportForm.transportType === 'taxi' ? 'taxi' : 'car'} size={28} color="#3b5a75" />
                 <Text style={[styles.modalTitle, { color: colors.text, borderBottomColor: 'transparent' }]}>
                   {editingId ? t('detail.edit') : t('common.add')} {t('transport.title')}
                 </Text>
