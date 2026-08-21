@@ -278,7 +278,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <AppIcon name="transport" size={28} color="#E53935" />
+          <AppIcon name="transport" size={28} color={MODULE_COLORS.health} />
           <Text style={[styles.screenTitle, { color: colors.text }]}>{t('spaces.health')}</Text>
           <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
@@ -386,12 +386,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
           ) : (
             allergies.map(allergy => (
               <TouchableOpacity key={allergy.id} style={styles.item} onPress={() => setDetailModal({ visible: true, item: allergy, section: 'allergies' })} onLongPress={() => setActionModal({ visible: true, id: allergy.id, title: allergy.allergen, section: 'allergies' })}>
-                        <AppIcon name="allergy" size={20} color={allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : '#43A047'} />
+                        <AppIcon name="allergy" size={20} color={allergy.severity === 'severe' ? MODULE_COLORS.health : allergy.severity === 'moderate' ? '#FB8C00' : '#43A047'} />
                 <View style={styles.itemText}>
                   <Text style={[styles.itemTitle, { color: colors.text }]}>{allergy.allergen}</Text>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{allergy.person}</Text>
                 </View>
-                <Text style={[styles.badge, { backgroundColor: allergy.severity === 'severe' ? '#FFEBEE' : allergy.severity === 'moderate' ? '#FFF3E0' : '#E8F5E9', color: allergy.severity === 'severe' ? '#E53935' : allergy.severity === 'moderate' ? '#FB8C00' : '#43A047' }]}>
+                <Text style={[styles.badge, { backgroundColor: allergy.severity === 'severe' ? MODULE_COLORS.healthBg : allergy.severity === 'moderate' ? '#FFF3E0' : '#E8F5E9', color: allergy.severity === 'severe' ? MODULE_COLORS.health : allergy.severity === 'moderate' ? '#FB8C00' : '#43A047' }]}>
                   {allergy.severity === 'severe' ? t('health.severe') : allergy.severity === 'moderate' ? t('health.moderate') : t('health.mild')}
                 </Text>
               </TouchableOpacity>
@@ -660,7 +660,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.severity')}</Text>
                     <View style={styles.personRow}>
                       {(['mild', 'moderate', 'severe'] as const).map(s => (
-                        <TouchableOpacity key={s} style={[styles.personChip, { backgroundColor: allergyForm.severity === s ? (s === 'severe' ? '#E53935' : s === 'moderate' ? '#FB8C00' : '#43A047') : colors.inputBackground }]} onPress={() => setAllergyForm(f => ({ ...f, severity: s }))}>
+                        <TouchableOpacity key={s} style={[styles.personChip, { backgroundColor: allergyForm.severity === s ? (s === 'severe' ? MODULE_COLORS.health : s === 'moderate' ? '#FB8C00' : '#43A047') : colors.inputBackground }]} onPress={() => setAllergyForm(f => ({ ...f, severity: s }))}>
                           <Text style={{ color: allergyForm.severity === s ? '#fff' : colors.text, fontSize: 13 }}>{t(`health.${s}`)}</Text>
                         </TouchableOpacity>
                       ))}
@@ -923,7 +923,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   </View>
                   <View style={styles.detailRow}>
                     <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>{t('health.severity')}</Text>
-                    <Text style={[styles.detailValue, { color: detailModal.item.severity === 'severe' ? '#E53935' : detailModal.item.severity === 'moderate' ? '#FB8C00' : '#43A047' }]}>{detailModal.item.severity === 'severe' ? t('health.severe') : detailModal.item.severity === 'moderate' ? t('health.moderate') : t('health.mild')}</Text>
+                    <Text style={[styles.detailValue, { color: detailModal.item.severity === 'severe' ? MODULE_COLORS.health : detailModal.item.severity === 'moderate' ? '#FB8C00' : '#43A047' }]}>{detailModal.item.severity === 'severe' ? t('health.severe') : detailModal.item.severity === 'moderate' ? t('health.moderate') : t('health.mild')}</Text>
                   </View>
                   {detailModal.item.note && (
                     <View style={styles.detailRow}>

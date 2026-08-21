@@ -1,8 +1,8 @@
 export const MODULE_COLORS = {
   trips: '#42A5F5',
   tripsBg: '#E3F2FD',
-  health: '#E53935',
-  healthBg: '#FFEBEE',
+  health: '#C67B5C',
+  healthBg: '#F5E6E0',
   school: '#43A047',
   schoolBg: '#E8F5E9',
   birthdays: '#FB8C00',
