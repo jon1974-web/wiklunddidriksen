@@ -151,9 +151,9 @@ export const tealColors = {
 } as const;
 
 export const darkTealColors = {
-  background: '#f0f7f7',
+  background: '#F5F7FA',
   surface: '#fff',
-  surfaceVariant: '#e2efef',
+  surfaceVariant: '#e8edf2',
   text: '#1a1a1a',
   textSecondary: '#555',
   textDisabled: '#999',
@@ -165,7 +165,7 @@ export const darkTealColors = {
   chatBubbleOther: '#c8e0e0',
   chatTextOwn: '#fff',
   chatTextOther: '#1a1a1a',
-  inputBackground: '#f0f7f7',
+  inputBackground: '#F5F7FA',
   statusBar: 'dark',
 } as const;
 
