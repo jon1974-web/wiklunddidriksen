@@ -150,4 +150,23 @@ export const tealColors = {
   statusBar: 'dark',
 } as const;
 
+export const darkTealColors = {
+  background: '#f0f7f7',
+  surface: '#fff',
+  surfaceVariant: '#e2efef',
+  text: '#1a1a1a',
+  textSecondary: '#555',
+  textDisabled: '#999',
+  border: '#c8e0e0',
+  accent: '#0D7377',
+  accentLight: '#D6EDED',
+  danger: '#ff4444',
+  chatBubbleOwn: '#0D7377',
+  chatBubbleOther: '#c8e0e0',
+  chatTextOwn: '#fff',
+  chatTextOther: '#1a1a1a',
+  inputBackground: '#f0f7f7',
+  statusBar: 'dark',
+} as const;
+
 export type Colors = typeof lightColors;

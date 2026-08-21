@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
-import { lightColors, darkColors, orangeColors, deepBlueColors, silverColors, purpleColors, pinkColors, tealColors, Colors } from './colors';
+import { lightColors, darkColors, orangeColors, deepBlueColors, silverColors, purpleColors, pinkColors, tealColors, darkTealColors, Colors } from './colors';
 
-type ThemeMode = 'light' | 'dark' | 'system' | 'orange' | 'deepblue' | 'silver' | 'purple' | 'pink' | 'teal';
+type ThemeMode = 'light' | 'dark' | 'system' | 'orange' | 'deepblue' | 'silver' | 'purple' | 'pink' | 'teal' | 'darkteal';
 
 interface ThemeContextValue {
   colors: Colors;
@@ -23,7 +23,7 @@ export const useTheme = () => useContext(ThemeContext);
 function getStoredMode(): ThemeMode {
   try {
     const stored = localStorage.getItem('themeMode');
-    if (stored && ['light', 'dark', 'system', 'orange', 'deepblue', 'silver', 'purple', 'pink', 'teal'].includes(stored)) {
+    if (stored && ['light', 'dark', 'system', 'orange', 'deepblue', 'silver', 'purple', 'pink', 'teal', 'darkteal'].includes(stored)) {
       return stored as ThemeMode;
     }
   } catch {}
@@ -41,6 +41,7 @@ function resolveColors(mode: ThemeMode, systemScheme: string | null | undefined)
   if (mode === 'purple') return { colors: purpleColors, isDark: false };
   if (mode === 'pink') return { colors: pinkColors, isDark: false };
   if (mode === 'teal') return { colors: tealColors, isDark: false };
+  if (mode === 'darkteal') return { colors: darkTealColors, isDark: false };
   if (mode === 'dark') return { colors: darkColors, isDark: true };
   if (mode === 'light') return { colors: lightColors, isDark: false };
   // system
