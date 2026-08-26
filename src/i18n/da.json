@@ -406,7 +406,11 @@
     "helpHolidaysText": "Fridage viser ferier og planlægningsdage for barnet i børnehaven. Hver fridag viser et ikon, titel, datoer og hvor langt væk den er.\n\nDu kan:\n• Tilføje fridage manuelt\n• Importere fra billede med AI\n• Importere fra en URL (link til børnehavens hjemmeside)\n\nFridagene vises også i den ugentlige opsummering (Min uge) sammen med andre begivenheder.",
     "helpHolidaysTip": "Fridage sorteres med kommende først. Badge-visningen viser om fridagen er i dag, om X dage, eller X dage siden.",
     "helpSettings": "Indstillinger",
-    "helpSettingsText": "Du kan redigere og slette børn, kontakter, skemaer og fridage ved at trykke længe på elementet."
+    "helpSettingsText": "Du kan redigere og slette børn, kontakter, skemaer og fridage ved at trykke længe på elementet.",
+    "activities": "Aktiviteter",
+    "addActivity": "Tilføj aktivitet",
+    "editActivity": "Rediger aktivitet",
+    "noActivities": "Ingen aktiviteter tilføjet"
   },
   "health": {
     "title": "Sundhed",
@@ -1210,7 +1214,9 @@
     "newTripDesc": "Opret en ny rejse",
     "school": "Skole",
     "schoolActivity": "Tur, aktivitet, møde",
-    "schoolActivityDesc": "Tilføj en aktivitet til Skole"
+    "schoolActivityDesc": "Tilføj en aktivitet til Skole",
+    "kindergartenActivity": "Tur, aktivitet, møde",
+    "kindergartenActivityDesc": "Tilføj en aktivitet til Børnehave"
   },
   "tabs": {
     "events": "Begivenheder",

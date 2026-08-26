@@ -2,7 +2,7 @@ import {
   collection, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, doc, where, limit,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { KindergartenChild, KindergartenYear, KindergartenContact, KindergartenSchedule, SchoolHoliday } from '../types';
+import { KindergartenChild, KindergartenYear, KindergartenContact, KindergartenSchedule, SchoolHoliday, KindergartenActivity } from '../types';
 
 // Children
 export async function getKindergartenChildren(familyId: string): Promise<KindergartenChild[]> {
@@ -115,4 +115,28 @@ export async function updateKindergartenHoliday(holidayId: string, data: Partial
 
 export async function deleteKindergartenHoliday(holidayId: string): Promise<void> {
   await deleteDoc(doc(db, 'kindergartenHolidays', holidayId));
+}
+
+// Activities (family-scoped subcollection)
+function getActivitiesCollection(familyId: string) {
+  return collection(db, 'kindergartenActivities', familyId, 'activities');
+}
+
+export async function getKindergartenActivities(familyId: string): Promise<KindergartenActivity[]> {
+  const q = query(getActivitiesCollection(familyId), orderBy('date', 'desc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as KindergartenActivity));
+}
+
+export async function addKindergartenActivity(data: Omit<KindergartenActivity, 'id' | 'createdAt'>): Promise<string> {
+  const docRef = await addDoc(getActivitiesCollection(data.familyId), { ...data, createdAt: Date.now() });
+  return docRef.id;
+}
+
+export async function updateKindergartenActivity(familyId: string, id: string, data: Partial<KindergartenActivity>): Promise<void> {
+  await updateDoc(doc(db, 'kindergartenActivities', familyId, 'activities', id), data);
+}
+
+export async function deleteKindergartenActivity(familyId: string, id: string): Promise<void> {
+  await deleteDoc(doc(db, 'kindergartenActivities', familyId, 'activities', id));
 }

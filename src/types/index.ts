@@ -620,6 +620,26 @@ export interface SchoolActivity {
   createdAt: number;
 }
 
+export interface KindergartenActivity {
+  id: string;
+  familyId: string;
+  childId: string;
+  yearId: string;
+  title: string;
+  activityType: 'tur' | 'aktivitet' | 'møte';
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  note?: string;
+  reminder?: string;
+  reminderAt?: string;
+  documents?: SchoolActivityDocument[];
+  createdBy?: string;
+  googleCalendarEventId?: string;
+  createdAt: number;
+}
+
 export interface KindergartenChild {
   id: string;
   name: string;

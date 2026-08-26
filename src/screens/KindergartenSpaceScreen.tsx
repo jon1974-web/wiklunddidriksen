@@ -19,16 +19,18 @@ import {
   getKindergartenContacts, addKindergartenContact, updateKindergartenContact, deleteKindergartenContact,
   getKindergartenSchedules, addKindergartenSchedule, updateKindergartenSchedule, deleteKindergartenSchedule,
   getKindergartenHolidays, addKindergartenHoliday, updateKindergartenHoliday, deleteKindergartenHoliday,
+  getKindergartenActivities, addKindergartenActivity, updateKindergartenActivity, deleteKindergartenActivity,
 } from '../services/kindergartenService';
-import { KindergartenChild, KindergartenYear, KindergartenContact, KindergartenSchedule, SchoolHoliday } from '../types';
+import { KindergartenChild, KindergartenYear, KindergartenContact, KindergartenSchedule, SchoolHoliday, KindergartenActivity } from '../types';
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
+import { DocumentUpload } from '../components/DocumentUpload';
 
 const KINDERGARTEN_THEME = '#FF7043';
 
 interface KindergartenSpaceScreenProps {
   navigation: any;
-  route?: { params?: { editContactId?: string } };
+  route?: { params?: { editContactId?: string; openAddSection?: string; editActivityId?: string } };
 }
 
 const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
@@ -71,10 +73,19 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   const [urlLoading, setUrlLoading] = useState(false);
   const [urlResults, setUrlResults] = useState<{ title: string; dateFrom: string; dateTo: string; timeFrom: string; timeTo: string; checked: boolean }[]>([]);
   const [contactSearch, setContactSearch] = useState('');
+  // Activities state
+  const [activities, setActivities] = useState<KindergartenActivity[]>([]);
+  const [showAddActivityModal, setShowAddActivityModal] = useState(false);
+  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
+  const [activityActionModal, setActivityActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  type ActivityPickerField = 'date' | 'startTime' | 'endTime' | null;
+  const [activeActivityPicker, setActiveActivityPicker] = useState<ActivityPickerField>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     staff: false,
     members: false,
     holidays: false,
+    activities: false,
   });
 
   const toggleSection = (key: string) => {
@@ -127,16 +138,18 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   }, [selectedChild, familyId]);
 
   const loadYearData = useCallback(async () => {
-    if (!selectedYear || !familyId) { setContacts([]); setSchedules([]); setHolidays([]); return; }
+    if (!selectedYear || !familyId) { setContacts([]); setSchedules([]); setHolidays([]); setActivities([]); return; }
     try {
-      const [c, s, h] = await Promise.all([
+      const [c, s, h, a] = await Promise.all([
         getKindergartenContacts(familyId, selectedYear.id, selectedChild?.id),
         getKindergartenSchedules(familyId, selectedYear.id),
         getKindergartenHolidays(familyId, selectedYear.id, selectedChild?.id),
+        getKindergartenActivities(familyId),
       ]);
       setContacts(c);
       setSchedules(s);
       setHolidays(h);
+      setActivities(a);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -174,6 +187,24 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
       }
     }
   }, [route?.params?.editContactId, contacts]);
+
+  useEffect(() => {
+    if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild) {
+      setEditingActivityId(null);
+      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+      setShowAddActivityModal(true);
+      navigation.setParams({ openAddSection: undefined });
+    }
+    if (route?.params?.editActivityId && activities.length > 0) {
+      const activity = activities.find(a => a.id === route.params!.editActivityId);
+      if (activity) {
+        setEditingActivityId(activity.id);
+        setActivityForm({ title: activity.title, activityType: activity.activityType, date: activity.date, startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [] });
+        setShowAddActivityModal(true);
+        navigation.setParams({ editActivityId: undefined });
+      }
+    }
+  }, [route?.params?.openAddSection, route?.params?.editActivityId, familyId, selectedYear, selectedChild, activities]);
 
   useEffect(() => {
     if (selectedChild && years.length > 0 && !selectedYear) {
@@ -441,6 +472,52 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     try {
       await deleteKindergartenHoliday(holidayActionModal.id);
       setHolidayActionModal({ visible: false, id: '', title: '' });
+      loadYearData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleSaveActivity = async () => {
+    if (!familyId || !selectedYear || !selectedChild) return;
+    if (!activityForm.title.trim() || !activityForm.date) {
+      crossAlert(t('common.error'), t('health.enterTitleAndDate'));
+      return;
+    }
+    try {
+      const user = useUserStore.getState().user;
+      const activityData: any = { ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId, createdBy: user?.uid || '' };
+      if (activityForm.reminder && activityForm.date) {
+        const time = activityForm.startTime || '09:00';
+        const eventTime = new Date(`${activityForm.date}T${time}:00`);
+        let reminderMs = 0;
+        if (activityForm.reminder === '1 time før') reminderMs = 60 * 60 * 1000;
+        else if (activityForm.reminder === '1 dag før') reminderMs = 24 * 60 * 60 * 1000;
+        else if (activityForm.reminder === '3 dager før') reminderMs = 3 * 24 * 60 * 60 * 1000;
+        else if (activityForm.reminder === '1 uke før') reminderMs = 7 * 24 * 60 * 60 * 1000;
+        if (reminderMs > 0) {
+          activityData.reminderAt = new Date(eventTime.getTime() - reminderMs).toISOString();
+        }
+      }
+      if (editingActivityId) {
+        await updateKindergartenActivity(familyId, editingActivityId, activityData);
+      } else {
+        await addKindergartenActivity(activityData);
+      }
+      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+      setEditingActivityId(null);
+      setShowAddActivityModal(false);
+      loadYearData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleDeleteActivity = async () => {
+    if (!activityActionModal.id || !familyId) return;
+    try {
+      await deleteKindergartenActivity(familyId, activityActionModal.id);
+      setActivityActionModal({ visible: false, id: '', title: '' });
       loadYearData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -953,6 +1030,39 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
               </View>
             </>
           )}
+
+          {/* Activities Section */}
+          {selectedYear && selectedChild && (
+            <>
+              <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('activities')}>
+                  <View style={styles.sectionTitleRow}>
+                    <Text style={styles.sectionIcon}>📋</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('kindergarten.activities')}</Text>
+                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({activities.length})</Text>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.activities ? '▼' : '▶'}</Text>
+                  </View>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] }); setShowAddActivityModal(true); }}>
+                    <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+                  </TouchableOpacity>
+                </TouchableOpacity>
+                {expandedSections.activities && activities.map(a => (
+                  <TouchableOpacity key={a.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: KINDERGARTEN_THEME }]} onPress={() => navigation.navigate('KindergartenActivityDetail', { activity: a, source: 'kindergarten' })} onLongPress={() => setActivityActionModal({ visible: true, id: a.id, title: a.title })}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={[styles.contactName, { color: colors.text }]}>{a.title}</Text>
+                      <View style={{ backgroundColor: KINDERGARTEN_THEME + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
+                        <Text style={{ color: KINDERGARTEN_THEME, fontSize: 10, fontWeight: '600' }}>{a.activityType === 'tur' ? t('school.activityTypeTur') : a.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}</Text>
+                      </View>
+                    </View>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{a.date}{a.startTime ? ` • ${a.startTime}${a.endTime ? ` – ${a.endTime}` : ''}` : ''}</Text>
+                    {a.location ? <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>📍 {a.location}</Text> : null}
+                    {a.documents && a.documents.length > 0 && <Text style={{ color: KINDERGARTEN_THEME, fontSize: 12, marginTop: 2 }}>📎 {a.documents.length} {t('school.activityDocuments')}</Text>}
+                  </TouchableOpacity>
+                ))}
+                {expandedSections.activities && activities.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('kindergarten.noActivities')}</Text>}
+              </View>
+            </>
+          )}
         </ScrollView>
 
         {/* Add Year Modal */}
@@ -1126,6 +1236,8 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
         <ActionModal visible={scheduleActionModal.visible} title={scheduleActionModal.title} onDelete={() => { handleDeleteSchedule(scheduleActionModal.id); setScheduleActionModal({ visible: false, id: '', title: '' }); }} onCancel={() => setScheduleActionModal({ visible: false, id: '', title: '' })} accentColor={KINDERGARTEN_THEME} />
         <ActionModal visible={holidayActionModal.visible} title={holidayActionModal.title} onEdit={() => { setEditingHolidayId(holidayActionModal.id); const h = holidays.find(h => h.id === holidayActionModal.id); if (h) setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); setHolidayActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteHoliday} onCancel={() => setHolidayActionModal({ visible: false, id: '', title: '' })} accentColor={KINDERGARTEN_THEME} />
 
+        <ActionModal visible={activityActionModal.visible} title={activityActionModal.title} onEdit={() => { const a = activities.find(a => a.id === activityActionModal.id); if (a) { setEditingActivityId(a.id); setActivityForm({ title: a.title, activityType: a.activityType, date: a.date, startTime: a.startTime || '', endTime: a.endTime || '', location: a.location || '', note: a.note || '', reminder: a.reminder || '', documents: a.documents || [] }); setShowAddActivityModal(true); } setActivityActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteActivity} onCancel={() => setActivityActionModal({ visible: false, id: '', title: '' })} accentColor={KINDERGARTEN_THEME} />
+
         {/* Add/Edit Holiday Modal */}
         <Modal visible={showAddHolidayModal} transparent animationType="slide">
           <TouchableWithoutFeedback onPress={() => { setShowAddHolidayModal(false); setEditingHolidayId(null); }}>
@@ -1234,6 +1346,120 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
           selectedValue={activeHolidayPicker ? holidayForm[activeHolidayPicker] || '' : ''}
           onSelect={(v) => { if (activeHolidayPicker) setHolidayForm(f => ({ ...f, [activeHolidayPicker]: v })); setActiveHolidayPicker(null); }}
           onClose={() => setActiveHolidayPicker(null)}
+        />
+
+        {/* Add/Edit Activity Modal */}
+        <Modal visible={showAddActivityModal} transparent animationType="slide">
+          <TouchableWithoutFeedback onPress={() => { setShowAddActivityModal(false); setEditingActivityId(null); }}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '85%' }]}>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>{editingActivityId ? t('kindergarten.editActivity') : t('kindergarten.addActivity')}</Text>
+                  <ScrollView>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityType')}</Text>
+                      <View style={{ flexDirection: 'row', gap: 8 }}>
+                        {(['tur', 'aktivitet', 'møte'] as const).map((type) => (
+                          <TouchableOpacity key={type} style={[styles.personChip, { backgroundColor: activityForm.activityType === type ? KINDERGARTEN_THEME : colors.inputBackground }]} onPress={() => setActivityForm(f => ({ ...f, activityType: type }))}>
+                            <Text style={{ color: activityForm.activityType === type ? '#fff' : colors.text, fontSize: 13 }}>{type === 'tur' ? t('school.activityTypeTur') : type === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityTitle')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.title} onChangeText={(v) => setActivityForm(f => ({ ...f, title: v }))} placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDate')}</Text>
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('date')}>
+                        <Text style={{ color: activityForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.date || 'Velg dato'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 12 }}>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityStartTime')}</Text>
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('startTime')}>
+                          <Text style={{ color: activityForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.startTime || 'Velg tid'}</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityEndTime')}</Text>
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('endTime')}>
+                          <Text style={{ color: activityForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.endTime || 'Velg tid'}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityLocation')}</Text>
+                      <GooglePlacesInput
+                        value={activityForm.location}
+                        onChangeText={(v) => setActivityForm(f => ({ ...f, location: v }))}
+                        placeholder="Søk etter adresse..."
+                        onSelect={(v) => setActivityForm(f => ({ ...f, location: v }))}
+                      />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityNote')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.note} onChangeText={(v) => setActivityForm(f => ({ ...f, note: v }))} placeholderTextColor={colors.textDisabled} multiline numberOfLines={3} />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                        {['', '1 time før', '1 dag før', '3 dager før', '1 uke før'].map((r, i) => (
+                          <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: activityForm.reminder === r ? KINDERGARTEN_THEME : colors.inputBackground }]} onPress={() => setActivityForm(f => ({ ...f, reminder: r }))}>
+                            <Text style={{ color: activityForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                    {familyId && selectedChild && selectedYear && (
+                      <View style={styles.field}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
+                        <DocumentUpload
+                          storagePath={`kindergarten-activities/${familyId}/${Date.now()}`}
+                          onUploaded={(doc) => setActivityForm(f => ({ ...f, documents: [...f.documents, doc] }))}
+                          accentColor={KINDERGARTEN_THEME}
+                        />
+                        {activityForm.documents.length > 0 && (
+                          <View style={{ marginTop: 8 }}>
+                            {activityForm.documents.map((doc, i) => (
+                              <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                                <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
+                                <TouchableOpacity onPress={() => setActivityForm(f => ({ ...f, documents: f.documents.filter((_, idx) => idx !== i) }))}>
+                                  <Text style={{ color: '#ff4444', fontSize: 12 }}>{t('common.delete')}</Text>
+                                </TouchableOpacity>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    )}
+                  </ScrollView>
+                  <View style={{ flexDirection: 'row', gap: 12, marginTop: 12 }}>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddActivityModal(false); setEditingActivityId(null); }}>
+                      <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: KINDERGARTEN_THEME }]} onPress={handleSaveActivity}>
+                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.save')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        {/* Activity DatePickerModal */}
+        <DatePickerModal
+          visible={activeActivityPicker !== null}
+          title={activeActivityPicker === 'date' ? t('school.activityDate') : activeActivityPicker === 'startTime' ? t('school.activityStartTime') : t('school.activityEndTime')}
+          mode={activeActivityPicker === 'startTime' || activeActivityPicker === 'endTime' ? 'time' : 'date'}
+          dateOffset={-365}
+          dateCount={730}
+          selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
+          onSelect={(v) => { if (activeActivityPicker) setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); setActiveActivityPicker(null); }}
+          onClose={() => setActiveActivityPicker(null)}
         />
       </>
     );

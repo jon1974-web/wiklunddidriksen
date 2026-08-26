@@ -406,7 +406,11 @@
     "helpHolidaysText": "Holidays show vacations and planning days for the child in kindergarten. Each holiday displays an icon, title, dates and how far away it is.\n\nYou can:\n• Add holidays manually\n• Import from photo with AI\n• Import from a URL (link to kindergarten website)\n\nHolidays also appear in the weekly summary (My week) along with other events.",
     "helpHolidaysTip": "Holidays are sorted with upcoming first. The badge shows whether the holiday is today, in X days, or X days ago.",
     "helpSettings": "Settings",
-    "helpSettingsText": "You can edit and delete children, contacts, schedules and holidays by long-pressing on the item."
+    "helpSettingsText": "You can edit and delete children, contacts, schedules and holidays by long-pressing on the item.",
+    "activities": "Activities",
+    "addActivity": "Add activity",
+    "editActivity": "Edit activity",
+    "noActivities": "No activities added"
   },
   "health": {
     "title": "Health",
@@ -1210,7 +1214,9 @@
     "newTripDesc": "Create a new trip",
     "school": "School",
     "schoolActivity": "Trip, activity, meeting",
-    "schoolActivityDesc": "Add an activity to School"
+    "schoolActivityDesc": "Add an activity to School",
+    "kindergartenActivity": "Trip, activity, meeting",
+    "kindergartenActivityDesc": "Add an activity to Kindergarten"
   },
   "tabs": {
     "events": "Events",

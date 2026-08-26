@@ -31,6 +31,7 @@ interface WeeklySummaryProps {
   schoolHolidays?: SchoolHoliday[];
   kindergartenHolidays?: SchoolHoliday[];
   schoolActivities?: SchoolActivity[];
+  kindergartenActivities?: KindergartenActivity[];
   schoolChildren?: SchoolChild[];
   kindergartenChildren?: KindergartenChild[];
 }
@@ -95,7 +96,7 @@ const statStyles = StyleSheet.create({
   label: { fontSize: 8, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.3 },
 });
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {}, schoolHolidays = [], kindergartenHolidays = [], schoolChildren = [], kindergartenChildren = [], schoolActivities = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {}, schoolHolidays = [], kindergartenHolidays = [], schoolChildren = [], kindergartenChildren = [], schoolActivities = [], kindergartenActivities = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -259,6 +260,15 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         }
       });
 
+      // Kindergarten activities
+      kindergartenActivities.forEach((a) => {
+        if (a.date === dateStr) {
+          const typeLabel = a.activityType === 'tur' ? t('school.activityTypeTur') : a.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
+          const time = a.startTime ? (a.endTime ? `${a.startTime} – ${a.endTime}` : a.startTime) : '';
+          items.push({ type: 'kindergartenActivity', icon: 'kindergarten', iconBg: MODULE_COLORS.kindergarten, title: `${a.title} (${typeLabel})`, time });
+        }
+      });
+
       days.push({
         date: d,
         dayName: DAY_NAMES_NB[i],
@@ -270,7 +280,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     }
 
     return { weekNum, days, eventCount, healthCount, petCount, tripCount, birthdayCount, holidayCount, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
-  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolHolidays, kindergartenHolidays, schoolChildren, kindergartenChildren, schoolActivities, t, i18nInstance, langKey]);
+  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolHolidays, kindergartenHolidays, schoolChildren, kindergartenChildren, schoolActivities, kindergartenActivities, t, i18nInstance, langKey]);
 
   // Meal plan data
   const mealData = useMemo(() => {
@@ -333,7 +343,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                   <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={colors.accent} />
                   <View style={styles.dayCardItems}>
                     {day.items.length > 0 ? day.items.map((item, i) => {
-                      const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'schoolActivity' ? MODULE_COLORS.school : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : MODULE_COLORS.birthdays;
+                      const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'schoolActivity' ? MODULE_COLORS.school : item.type === 'kindergartenActivity' ? MODULE_COLORS.kindergarten : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : MODULE_COLORS.birthdays;
                       const isEmoji = item.icon && item.icon.length <= 2 && /[\u{1F000}-\u{1FFFF}]/u.test(item.icon);
                       return (
                         <View key={i} style={styles.itemRow}>

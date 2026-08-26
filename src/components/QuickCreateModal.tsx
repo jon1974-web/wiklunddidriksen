@@ -62,6 +62,15 @@ const SECTIONS = [
       { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.schoolActivity' },
     ],
   },
+  {
+    key: 'kindergarten',
+    colorKey: null,
+    lockedColor: MODULE_COLORS.kindergarten,
+    headerIcon: 'kindergarten' as const,
+    items: [
+      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.kindergartenActivity' },
+    ],
+  },
 ];
 
 export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ visible, onClose, navigation }) => {

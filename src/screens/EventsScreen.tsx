@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity } from '../types';
 import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
@@ -20,6 +20,7 @@ import { getHealthAppointments, getHealthMedications, getHealthVaccinations } fr
 import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications } from '../services/petService';
 import { getUserProfile } from '../services/familyService';
 import { getSchoolActivities } from '../services/schoolService';
+import { getKindergartenActivities } from '../services/kindergartenService';
 import { getAllSchoolHolidays, getSchoolChildren } from '../services/schoolService';
 import { getAllKindergartenHolidays, getKindergartenChildren } from '../services/kindergartenService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -127,7 +128,8 @@ type UnifiedItem =
   | (HealthAppointment & { _type: 'healthAppointment' })
   | (PetVetVisit & { _type: 'petVetVisit'; title: string; address?: string; time: string; icon?: string })
   | (PetVaccination & { _type: 'petVaccination'; title: string; address?: string; time: string; icon?: string })
-  | (SchoolActivity & { _type: 'schoolActivity'; time: string; address?: string; icon?: string });
+  | (SchoolActivity & { _type: 'schoolActivity'; time: string; address?: string; icon?: string })
+  | (KindergartenActivity & { _type: 'kindergartenActivity'; time: string; address?: string; icon?: string });
 
 export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
@@ -147,6 +149,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [schoolChildren, setSchoolChildren] = useState<SchoolChild[]>([]);
   const [kindergartenChildren, setKindergartenChildren] = useState<KindergartenChild[]>([]);
   const [schoolActivities, setSchoolActivities] = useState<SchoolActivity[]>([]);
+  const [kindergartenActivities, setKindergartenActivities] = useState<KindergartenActivity[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
@@ -247,18 +250,20 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const loadHolidays = useCallback(async () => {
     if (!familyId) return;
     try {
-      const [sh, kh, sc, kc, sa] = await Promise.all([
+      const [sh, kh, sc, kc, sa, ka] = await Promise.all([
         getAllSchoolHolidays(familyId),
         getAllKindergartenHolidays(familyId),
         getSchoolChildren(familyId),
         getKindergartenChildren(familyId),
         getSchoolActivities(familyId),
+        getKindergartenActivities(familyId),
       ]);
       setSchoolHolidays(sh);
       setKindergartenHolidays(kh);
       setSchoolChildren(sc);
       setKindergartenChildren(kc);
       setSchoolActivities(sa);
+      setKindergartenActivities(ka);
     } catch (error) {
       // Silently fail for holidays
     }
@@ -481,12 +486,16 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       const daySchoolActivities = schoolActivities.filter((a) => a.date === selectedDate).map((a) => ({
         ...a, _type: 'schoolActivity' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.date, description: a.activityType, icon: 'school',
       }));
-      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities];
+      const dayKindergartenActivities = kindergartenActivities.filter((a) => a.date === selectedDate).map((a) => ({
+        ...a, _type: 'kindergartenActivity' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.date, description: a.activityType, icon: 'kindergarten',
+      }));
+      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
       else if (filterModule === 'health') dayItems = dayItems.filter((i) => i._type === 'healthAppointment');
       else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
       else if (filterModule === 'trip') dayItems = dayItems.filter((i) => i._type === 'trip');
       else if (filterModule === 'school') dayItems = dayItems.filter((i) => i._type === 'schoolActivity');
+      else if (filterModule === 'kindergarten') dayItems = dayItems.filter((i) => i._type === 'kindergartenActivity');
       else if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
       dayItems.sort(sortByDate);
@@ -546,6 +555,16 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         description: a.activityType,
         icon: 'school',
       })),
+      ...kindergartenActivities.filter(a => a.date).map((a) => ({
+        ...a,
+        _type: 'kindergartenActivity' as const,
+        time: a.startTime || '09:00',
+        address: a.location || '',
+        title: a.title,
+        date: a.date,
+        description: a.activityType,
+        icon: 'kindergarten',
+      })),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
     let filtered = allItems;
     if (filterModule === 'event') filtered = allItems.filter((i) => i._type === 'event');
@@ -553,6 +572,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     else if (filterModule === 'pet') filtered = allItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
     else if (filterModule === 'trip') filtered = allItems.filter((i) => i._type === 'trip');
     else if (filterModule === 'school') filtered = allItems.filter((i) => i._type === 'schoolActivity');
+    else if (filterModule === 'kindergarten') filtered = allItems.filter((i) => i._type === 'kindergartenActivity');
     else if (filterSource && filterSource !== 'app') filtered = allItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
     else if (filterSource === 'app') filtered = allItems.filter((i) => i._type === 'event' || i._type === 'trip');
     const upcoming = filtered.filter((i) => getDateStr(i) >= today);
@@ -952,6 +972,61 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         </TouchableOpacity>
       );
     }
+    if (item._type === 'kindergartenActivity') {
+      const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
+      const d = item.date ? new Date(item.date) : null;
+      const calDay = d ? d.getDate() : '?';
+      const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
+      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
+      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
+      const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
+      const typeLabel = (item as any).activityType === 'tur' ? t('school.activityTypeTur') : (item as any).activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
+      return (
+        <TouchableOpacity
+          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.kindergarten }]}
+          onPress={() => navigation.navigate('Trips', { screen: 'KindergartenActivityDetail', params: { activity: item, source: 'events' } })}
+        >
+          <View style={styles.spondCardRow}>
+            <View style={styles.spondCalIcon}>
+              <View style={[styles.spondCalTopBar, { backgroundColor: MODULE_COLORS.kindergarten }]}>
+                <Text style={styles.spondCalYear}>{calDayName}</Text>
+              </View>
+              <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
+              <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
+            </View>
+            <View style={styles.spondCardContent}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <AppIcon name="kindergarten" size={14} color={MODULE_COLORS.kindergarten} />
+                <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={styles.spondTimeRow}>
+                  <View style={styles.spondClockOuter}>
+                    <View style={styles.spondClockHandV} />
+                    <View style={styles.spondClockHandH} />
+                  </View>
+                  <Text style={[styles.spondCardTime, { color: colors.text }]}>{timeText}</Text>
+                </View>
+                <View style={{ backgroundColor: MODULE_COLORS.kindergarten + '20', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                  <Text style={{ color: MODULE_COLORS.kindergarten, fontSize: 10, fontWeight: '600' }}>{typeLabel}</Text>
+                </View>
+              </View>
+              {item.address && (
+                <Text style={[styles.spondCardAddress, { color: colors.accent }]} numberOfLines={1}>📍 {item.address}</Text>
+              )}
+            </View>
+            {mapUrl && (
+              <TouchableOpacity
+                style={styles.spondMapContainer}
+                onPress={() => Linking.openURL(getGoogleMapsUrl(item.address))}
+              >
+                <Image source={{ uri: mapUrl }} style={styles.spondMapImage} />
+              </TouchableOpacity>
+            )}
+          </View>
+        </TouchableOpacity>
+      );
+    }
     return (
       <EventCard
         event={item}
@@ -1079,6 +1154,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               >
                 <AppIcon name="school" size={18} color={filterModule === 'school' ? '#fff' : MODULE_COLORS.school} />
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sortIconBtn, { borderColor: colors.border }, filterModule === 'kindergarten' && { backgroundColor: MODULE_COLORS.kindergarten, borderColor: MODULE_COLORS.kindergarten }]}
+                onPress={() => { const v = filterModule === 'kindergarten' ? null : 'kindergarten'; setFilterModule(v); setShowSortPanel(false); }}
+              >
+                <AppIcon name="kindergarten" size={18} color={filterModule === 'kindergarten' ? '#fff' : MODULE_COLORS.kindergarten} />
+              </TouchableOpacity>
             </View>
             {Object.keys(spondGroupLogos).length > 0 && (
               <>
@@ -1184,6 +1265,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         schoolHolidays={schoolHolidays}
         kindergartenHolidays={kindergartenHolidays}
         schoolActivities={schoolActivities}
+        kindergartenActivities={kindergartenActivities}
         schoolChildren={schoolChildren}
         kindergartenChildren={kindergartenChildren}
       />

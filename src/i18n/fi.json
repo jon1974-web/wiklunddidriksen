@@ -406,7 +406,11 @@
     "helpHolidaysText": "Lomapäivät näyttävät lomat ja suunnittelupäivät lapselle päiväkodissa. Jokainen lomapäivä näyttää kuvakeen, otsikon, päivämäärät ja kuinka kaukana se on.\n\nVoit:\n• Lisätä lomapäiviä manuaalisesti\n• Tuoda kuvasta tekoälyllä\n• Tuoda URL-osoitteesta (linkki päiväkodin verkkosivustolle)\n\nLomapäivät näkyvät myös viikkoenväyhteenvetoon (Oma viikko) muiden tapahtumien kanssa.",
     "helpHolidaysTip": "Lomapäivät järjestetään tulevat ensin. Merkki näyttää onko lomapäivä tänään, X päivän päästä vai X päivää sitten.",
     "helpSettings": "Asetukset",
-    "helpSettingsText": "Voit muokata ja poistaa lapsia, yhteystietoja, aikatauluja ja lomapäiviä pitämällä painavana kohteesta."
+    "helpSettingsText": "Voit muokata ja poistaa lapsia, yhteystietoja, aikatauluja ja lomapäiviä pitämällä painavana kohteesta.",
+    "activities": "Toiminnat",
+    "addActivity": "Lisää toiminto",
+    "editActivity": "Muokkaa toimintoa",
+    "noActivities": "Ei toimintoja lisätty"
   },
   "health": {
     "title": "Terveys",
@@ -1210,7 +1214,9 @@
     "newTripDesc": "Luo uusi matka",
     "school": "Koulu",
     "schoolActivity": "Retki, toiminta, kokous",
-    "schoolActivityDesc": "Lisää toiminto kouluun"
+    "schoolActivityDesc": "Lisää toiminto kouluun",
+    "kindergartenActivity": "Retki, toiminta, kokous",
+    "kindergartenActivityDesc": "Lisää toiminto päiväkotiin"
   },
   "tabs": {
     "events": "Tapahtumat",
