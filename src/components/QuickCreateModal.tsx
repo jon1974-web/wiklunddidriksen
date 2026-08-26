@@ -28,6 +28,16 @@ interface Section {
   items: SectionItem[];
 }
 
+const lightenColor = (hex: string, factor: number = 0.35): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  const lr = Math.round(r + (255 - r) * factor);
+  const lg = Math.round(g + (255 - g) * factor);
+  const lb = Math.round(b + (255 - b) * factor);
+  return `#${lr.toString(16).padStart(2, '0')}${lg.toString(16).padStart(2, '0')}${lb.toString(16).padStart(2, '0')}`;
+};
+
 const SECTIONS: Section[] = [
   {
     key: 'events',
@@ -125,7 +135,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                       <View style={styles.iconWrap}>
                         <AppIcon name={item.icon} size={22} color={eventsSection.color} />
                       </View>
-                      <Text style={styles.actionTitle}>{t(item.labelKey)}</Text>
+                      <Text style={[styles.actionTitle, { color: lightenColor(eventsSection.color) }]}>{t(item.labelKey)}</Text>
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -137,14 +147,14 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     <View style={styles.iconWrap}>
                       <AppIcon name={healthSection.items[0].icon} size={28} color={healthSection.color} />
                     </View>
-                    <Text style={styles.actionTitle}>{t(healthSection.items[0].labelKey)}</Text>
+                    <Text style={[styles.actionTitle, { color: lightenColor(healthSection.color) }]}>{t(healthSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => petsSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: petsSection.color }]}>{t(petsSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={petsSection.items[0].icon} size={28} color={petsSection.color} />
                     </View>
-                    <Text style={styles.actionTitle}>{t(petsSection.items[0].labelKey)}</Text>
+                    <Text style={[styles.actionTitle, { color: lightenColor(petsSection.color) }]}>{t(petsSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -155,14 +165,14 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     <View style={styles.iconWrap}>
                       <AppIcon name={schoolSection.items[0].icon} size={28} color={schoolSection.color} />
                     </View>
-                    <Text style={styles.actionTitle}>{t(schoolSection.items[0].labelKey)}</Text>
+                    <Text style={[styles.actionTitle, { color: lightenColor(schoolSection.color) }]}>{t(schoolSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => kindergartenSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: kindergartenSection.color }]}>{t(kindergartenSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={kindergartenSection.items[0].icon} size={28} color={kindergartenSection.color} />
                     </View>
-                    <Text style={styles.actionTitle}>{t(kindergartenSection.items[0].labelKey)}</Text>
+                    <Text style={[styles.actionTitle, { color: lightenColor(kindergartenSection.color) }]}>{t(kindergartenSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -175,7 +185,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     <View style={styles.iconWrap}>
                       <AppIcon name={tripsSection.items[0].icon} size={28} color={tripsSection.color} />
                     </View>
-                    <Text style={styles.actionTitle}>{t(tripsSection.items[0].labelKey)}</Text>
+                    <Text style={[styles.actionTitle, { color: lightenColor(tripsSection.color) }]}>{t(tripsSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -251,7 +261,7 @@ const styles = StyleSheet.create({
   moduleCol: {
     flex: 1,
     alignItems: 'center',
-    gap: 6,
+    gap: 2,
     paddingVertical: 10,
     paddingHorizontal: 8,
     borderRadius: 12,
@@ -265,7 +275,6 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#1a1a1a',
     textAlign: 'center',
   },
   actionItem: {
