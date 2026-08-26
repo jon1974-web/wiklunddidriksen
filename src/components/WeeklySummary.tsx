@@ -333,7 +333,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                   <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={colors.accent} />
                   <View style={styles.dayCardItems}>
                     {day.items.length > 0 ? day.items.map((item, i) => {
-                      const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : MODULE_COLORS.birthdays;
+                      const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'schoolActivity' ? MODULE_COLORS.school : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : MODULE_COLORS.birthdays;
                       const isEmoji = item.icon && item.icon.length <= 2 && /[\u{1F000}-\u{1FFFF}]/u.test(item.icon);
                       return (
                         <View key={i} style={styles.itemRow}>
