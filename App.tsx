@@ -290,14 +290,17 @@ const TripsStack = () => {
         <Stack.Screen
           name="HealthApptDetail"
           component={HealthApptDetailScreen}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="SchoolActivityDetail"
           component={SchoolActivityDetailScreen}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="KindergartenActivityDetail"
           component={KindergartenActivityDetailScreen}
+          options={{ headerShown: false }}
         />
         <Stack.Screen
           name="HealthMedDetail"

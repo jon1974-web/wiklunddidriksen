@@ -1215,6 +1215,7 @@
     "school": "Koulu",
     "schoolActivity": "Retki, toiminta, kokous",
     "schoolActivityDesc": "Lisää toiminto kouluun",
+    "kindergarten": "Päiväkoti",
     "kindergartenActivity": "Retki, toiminta, kokous",
     "kindergartenActivityDesc": "Lisää toiminto päiväkotiin"
   },

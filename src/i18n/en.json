@@ -1215,6 +1215,7 @@
     "school": "School",
     "schoolActivity": "Trip, activity, meeting",
     "schoolActivityDesc": "Add an activity to School",
+    "kindergarten": "Kindergarten",
     "kindergartenActivity": "Trip, activity, meeting",
     "kindergartenActivityDesc": "Add an activity to Kindergarten"
   },
