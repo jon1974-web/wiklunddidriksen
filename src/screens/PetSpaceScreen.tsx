@@ -168,7 +168,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
     const { id, section } = editingItem;
     if (section === 'vetVisits') {
       const item = vetVisits.find(v => v.id === id);
-      if (item) setVetForm({ title: item.title, doctor: item.doctor || '', date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', status: item.status });
+      if (item) setVetForm({ title: item.title, doctor: item.doctor || '', date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', status: item.status, documents: item.documents || [] });
     } else if (section === 'medications') {
       const item = medications.find(m => m.id === id);
       if (item) setMedForm({ name: item.name, dosage: item.dosage, frequency: item.frequency || 1, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }], dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
