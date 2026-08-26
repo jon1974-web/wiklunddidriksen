@@ -629,7 +629,6 @@ const styles = StyleSheet.create({
     textAlign: 'left',
     marginLeft: 4,
   },
-  },
   viewMapContainer: {
     borderRadius: 12,
     overflow: 'hidden',
