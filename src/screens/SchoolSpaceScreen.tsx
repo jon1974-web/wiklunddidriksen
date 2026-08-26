@@ -30,7 +30,7 @@ const SCHOOL_THEME = MODULE_COLORS.school;
 
 interface SchoolSpaceScreenProps {
   navigation: any;
-  route?: { params?: { editContactId?: string; openAddSection?: string } };
+  route?: { params?: { editContactId?: string; openAddSection?: string; editActivityId?: string } };
 }
 
 const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
@@ -198,11 +198,20 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   useEffect(() => {
     if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild) {
       setEditingActivityId(null);
-      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
       setShowAddActivityModal(true);
       navigation.setParams({ openAddSection: undefined });
     }
-  }, [route?.params?.openAddSection, familyId, selectedYear, selectedChild]);
+    if (route?.params?.editActivityId && activities.length > 0) {
+      const activity = activities.find(a => a.id === route.params!.editActivityId);
+      if (activity) {
+        setEditingActivityId(activity.id);
+        setActivityForm({ title: activity.title, activityType: activity.activityType, date: activity.date, startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [] });
+        setShowAddActivityModal(true);
+        navigation.setParams({ editActivityId: undefined });
+      }
+    }
+  }, [route?.params?.openAddSection, route?.params?.editActivityId, familyId, selectedYear, selectedChild, activities]);
 
   useEffect(() => {
     if (selectedChild && years.length > 0 && !selectedYear) {
