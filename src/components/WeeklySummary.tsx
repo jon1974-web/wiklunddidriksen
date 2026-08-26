@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
-import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild } from '../types';
+import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +30,7 @@ interface WeeklySummaryProps {
   sectionSettings?: Record<string, boolean>;
   schoolHolidays?: SchoolHoliday[];
   kindergartenHolidays?: SchoolHoliday[];
+  schoolActivities?: SchoolActivity[];
   schoolChildren?: SchoolChild[];
   kindergartenChildren?: KindergartenChild[];
 }
@@ -94,7 +95,7 @@ const statStyles = StyleSheet.create({
   label: { fontSize: 8, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.3 },
 });
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {}, schoolHolidays = [], kindergartenHolidays = [], schoolChildren = [], kindergartenChildren = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {}, schoolHolidays = [], kindergartenHolidays = [], schoolChildren = [], kindergartenChildren = [], schoolActivities = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -249,6 +250,15 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         }
       });
 
+      // School activities
+      schoolActivities.forEach((a) => {
+        if (a.date === dateStr) {
+          const typeLabel = a.activityType === 'tur' ? t('school.activityTypeTur') : a.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
+          const time = a.startTime ? (a.endTime ? `${a.startTime} – ${a.endTime}` : a.startTime) : '';
+          items.push({ type: 'schoolActivity', icon: 'school', iconBg: MODULE_COLORS.school, title: `${a.title} (${typeLabel})`, time });
+        }
+      });
+
       days.push({
         date: d,
         dayName: DAY_NAMES_NB[i],
@@ -260,7 +270,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     }
 
     return { weekNum, days, eventCount, healthCount, petCount, tripCount, birthdayCount, holidayCount, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
-  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolHolidays, kindergartenHolidays, schoolChildren, kindergartenChildren, t, i18nInstance, langKey]);
+  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolHolidays, kindergartenHolidays, schoolChildren, kindergartenChildren, schoolActivities, t, i18nInstance, langKey]);
 
   // Meal plan data
   const mealData = useMemo(() => {

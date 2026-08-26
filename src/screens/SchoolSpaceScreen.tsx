@@ -19,16 +19,18 @@ import {
   getSchoolContacts, addSchoolContact, updateSchoolContact, deleteSchoolContact,
   getSchoolSchedules, addSchoolSchedule, updateSchoolSchedule, deleteSchoolSchedule,
   getSchoolHolidays, addSchoolHoliday, updateSchoolHoliday, deleteSchoolHoliday,
+  getSchoolActivities, addSchoolActivity, updateSchoolActivity, deleteSchoolActivity,
 } from '../services/schoolService';
-import { SchoolChild, SchoolYear, SchoolContact, SchoolSchedule, SchoolHoliday } from '../types';
+import { SchoolChild, SchoolYear, SchoolContact, SchoolSchedule, SchoolHoliday, SchoolActivity } from '../types';
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
+import { DocumentUpload } from '../components/DocumentUpload';
 
 const SCHOOL_THEME = MODULE_COLORS.school;
 
 interface SchoolSpaceScreenProps {
   navigation: any;
-  route?: { params?: { editContactId?: string } };
+  route?: { params?: { editContactId?: string; openAddSection?: string } };
 }
 
 const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
@@ -67,6 +69,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     admins: false,
     classmates: false,
     holidays: false,
+    activities: false,
   });
 
   const toggleSection = (key: string) => {
@@ -88,6 +91,14 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [urlLoading, setUrlLoading] = useState(false);
   const [urlResults, setUrlResults] = useState<{ title: string; dateFrom: string; dateTo: string; timeFrom: string; timeTo: string; checked: boolean }[]>([]);
   const [contactSearch, setContactSearch] = useState('');
+  // Activities state
+  const [activities, setActivities] = useState<SchoolActivity[]>([]);
+  const [showAddActivityModal, setShowAddActivityModal] = useState(false);
+  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', date: '', startTime: '', endTime: '', location: '', note: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
+  const [activityActionModal, setActivityActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  type ActivityPickerField = 'date' | 'startTime' | 'endTime' | null;
+  const [activeActivityPicker, setActiveActivityPicker] = useState<ActivityPickerField>(null);
   const [activeSemester, setActiveSemester] = useState<'høst' | 'vår'>('høst');
 
   const [showAddChildModal, setShowAddChildModal] = useState(false);
@@ -134,16 +145,18 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   }, [selectedChild, familyId]);
 
   const loadYearData = useCallback(async () => {
-    if (!selectedYear || !familyId) { setContacts([]); setSchedules([]); setHolidays([]); return; }
+    if (!selectedYear || !familyId) { setContacts([]); setSchedules([]); setHolidays([]); setActivities([]); return; }
     try {
-      const [c, s, h] = await Promise.all([
+      const [c, s, h, a] = await Promise.all([
         getSchoolContacts(familyId, selectedYear.id, selectedChild?.id),
         getSchoolSchedules(familyId, selectedYear.id),
         getSchoolHolidays(familyId, selectedYear.id, selectedChild?.id),
+        getSchoolActivities(familyId),
       ]);
       setContacts(c);
       setSchedules(s);
       setHolidays(h);
+      setActivities(a);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -181,6 +194,15 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       }
     }
   }, [route?.params?.editContactId, contacts]);
+
+  useEffect(() => {
+    if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild) {
+      setEditingActivityId(null);
+      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', documents: [] });
+      setShowAddActivityModal(true);
+      navigation.setParams({ openAddSection: undefined });
+    }
+  }, [route?.params?.openAddSection, familyId, selectedYear, selectedChild]);
 
   useEffect(() => {
     if (selectedChild && years.length > 0 && !selectedYear) {
@@ -444,6 +466,39 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     try {
       await deleteSchoolHoliday(holidayActionModal.id);
       setHolidayActionModal({ visible: false, id: '', title: '' });
+      loadYearData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleSaveActivity = async () => {
+    if (!familyId || !selectedYear || !selectedChild) return;
+    if (!activityForm.title.trim() || !activityForm.date) {
+      crossAlert(t('common.error'), t('health.enterTitleAndDate'));
+      return;
+    }
+    try {
+      const user = useUserStore.getState().user;
+      if (editingActivityId) {
+        await updateSchoolActivity(familyId, editingActivityId, { ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId });
+      } else {
+        await addSchoolActivity({ ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId, createdBy: user?.uid || '' });
+      }
+      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', documents: [] });
+      setEditingActivityId(null);
+      setShowAddActivityModal(false);
+      loadYearData();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  };
+
+  const handleDeleteActivity = async () => {
+    if (!activityActionModal.id || !familyId) return;
+    try {
+      await deleteSchoolActivity(familyId, activityActionModal.id);
+      setActivityActionModal({ visible: false, id: '', title: '' });
       loadYearData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -1011,6 +1066,39 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
               </View>
             </>
           )}
+
+          {/* Activities Section */}
+          {selectedYear && selectedChild && (
+            <>
+              <View style={[styles.section, { backgroundColor: colors.surface }]}>
+                <TouchableOpacity style={styles.sectionHeader} onPress={() => toggleSection('activities')}>
+                  <View style={styles.sectionTitleRow}>
+                    <Text style={styles.sectionIcon}>📋</Text>
+                    <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.activities')}</Text>
+                    <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({activities.length})</Text>
+                    <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.activities ? '▼' : '▶'}</Text>
+                  </View>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', documents: [] }); setShowAddActivityModal(true); }}>
+                    <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+                  </TouchableOpacity>
+                </TouchableOpacity>
+                {expandedSections.activities && activities.map(a => (
+                  <TouchableOpacity key={a.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: SCHOOL_THEME }]} onPress={() => navigation.navigate('SchoolActivityDetail', { activity: a, source: 'school' })} onLongPress={() => setActivityActionModal({ visible: true, id: a.id, title: a.title })}>
+                    <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Text style={[styles.contactName, { color: colors.text }]}>{a.title}</Text>
+                      <View style={{ backgroundColor: SCHOOL_THEME + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
+                        <Text style={{ color: SCHOOL_THEME, fontSize: 10, fontWeight: '600' }}>{a.activityType === 'tur' ? t('school.activityTypeTur') : a.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}</Text>
+                      </View>
+                    </View>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{a.date}{a.startTime ? ` • ${a.startTime}${a.endTime ? ` – ${a.endTime}` : ''}` : ''}</Text>
+                    {a.location ? <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>📍 {a.location}</Text> : null}
+                    {a.documents && a.documents.length > 0 && <Text style={{ color: SCHOOL_THEME, fontSize: 12, marginTop: 2 }}>📎 {a.documents.length} {t('school.activityDocuments')}</Text>}
+                  </TouchableOpacity>
+                ))}
+                {expandedSections.activities && activities.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noActivities')}</Text>}
+              </View>
+            </>
+          )}
         </ScrollView>
 
         {/* Add Year Modal */}
@@ -1184,6 +1272,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         <ActionModal visible={scheduleActionModal.visible} title={scheduleActionModal.title} onDelete={() => { handleDeleteSchedule(scheduleActionModal.id); setScheduleActionModal({ visible: false, id: '', title: '' }); }} onCancel={() => setScheduleActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
         <ActionModal visible={holidayActionModal.visible} title={holidayActionModal.title} onEdit={() => { setEditingHolidayId(holidayActionModal.id); const h = holidays.find(h => h.id === holidayActionModal.id); if (h) setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); setHolidayActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteHoliday} onCancel={() => setHolidayActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
 
+        <ActionModal visible={activityActionModal.visible} title={activityActionModal.title} onEdit={() => { const a = activities.find(a => a.id === activityActionModal.id); if (a) { setEditingActivityId(a.id); setActivityForm({ title: a.title, activityType: a.activityType, date: a.date, startTime: a.startTime || '', endTime: a.endTime || '', location: a.location || '', note: a.note || '', documents: a.documents || [] }); setShowAddActivityModal(true); } setActivityActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteActivity} onCancel={() => setActivityActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
+
         {/* Add/Edit Holiday Modal */}
         <Modal visible={showAddHolidayModal} transparent animationType="slide">
           <TouchableWithoutFeedback onPress={() => { setShowAddHolidayModal(false); setEditingHolidayId(null); }}>
@@ -1292,6 +1382,110 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
           selectedValue={activeHolidayPicker ? holidayForm[activeHolidayPicker] || '' : ''}
           onSelect={(v) => { if (activeHolidayPicker) setHolidayForm(f => ({ ...f, [activeHolidayPicker]: v })); setActiveHolidayPicker(null); }}
           onClose={() => setActiveHolidayPicker(null)}
+        />
+
+        {/* Add/Edit Activity Modal */}
+        <Modal visible={showAddActivityModal} transparent animationType="slide">
+          <TouchableWithoutFeedback onPress={() => { setShowAddActivityModal(false); setEditingActivityId(null); }}>
+            <View style={styles.modalOverlay}>
+              <TouchableWithoutFeedback>
+                <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '85%' }]}>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>{editingActivityId ? t('school.editActivity') : t('school.addActivity')}</Text>
+                  <ScrollView>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityType')}</Text>
+                      <View style={{ flexDirection: 'row', gap: 8 }}>
+                        {(['tur', 'aktivitet', 'møte'] as const).map((type) => (
+                          <TouchableOpacity key={type} style={[styles.personChip, { backgroundColor: activityForm.activityType === type ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setActivityForm(f => ({ ...f, activityType: type }))}>
+                            <Text style={{ color: activityForm.activityType === type ? '#fff' : colors.text, fontSize: 13 }}>{type === 'tur' ? t('school.activityTypeTur') : type === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityTitle')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.title} onChangeText={(v) => setActivityForm(f => ({ ...f, title: v }))} placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDate')}</Text>
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('date')}>
+                        <Text style={{ color: activityForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.date || 'Velg dato'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 12 }}>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityStartTime')}</Text>
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('startTime')}>
+                          <Text style={{ color: activityForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.startTime || 'Velg tid'}</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityEndTime')}</Text>
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('endTime')}>
+                          <Text style={{ color: activityForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.endTime || 'Velg tid'}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityLocation')}</Text>
+                      <GooglePlacesInput
+                        value={activityForm.location}
+                        onChangeText={(v) => setActivityForm(f => ({ ...f, location: v }))}
+                        placeholder="Søk etter adresse..."
+                        onSelect={(v) => setActivityForm(f => ({ ...f, location: v }))}
+                      />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityNote')}</Text>
+                      <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.note} onChangeText={(v) => setActivityForm(f => ({ ...f, note: v }))} placeholderTextColor={colors.textDisabled} multiline numberOfLines={3} />
+                    </View>
+                    {familyId && selectedChild && selectedYear && (
+                      <View style={styles.field}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
+                        <DocumentUpload
+                          storagePath={`school-activities/${familyId}/${Date.now()}`}
+                          onUploaded={(doc) => setActivityForm(f => ({ ...f, documents: [...f.documents, doc] }))}
+                          accentColor={SCHOOL_THEME}
+                        />
+                        {activityForm.documents.length > 0 && (
+                          <View style={{ marginTop: 8 }}>
+                            {activityForm.documents.map((doc, i) => (
+                              <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                                <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
+                                <TouchableOpacity onPress={() => setActivityForm(f => ({ ...f, documents: f.documents.filter((_, idx) => idx !== i) }))}>
+                                  <Text style={{ color: '#ff4444', fontSize: 12 }}>{t('common.delete')}</Text>
+                                </TouchableOpacity>
+                              </View>
+                            ))}
+                          </View>
+                        )}
+                      </View>
+                    )}
+                  </ScrollView>
+                  <View style={{ flexDirection: 'row', gap: 12, marginTop: 12 }}>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddActivityModal(false); setEditingActivityId(null); }}>
+                      <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.modalBtn, { backgroundColor: SCHOOL_THEME }]} onPress={handleSaveActivity}>
+                      <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.save')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              </TouchableWithoutFeedback>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+
+        {/* Activity DatePickerModal */}
+        <DatePickerModal
+          visible={activeActivityPicker !== null}
+          title={activeActivityPicker === 'date' ? t('school.activityDate') : activeActivityPicker === 'startTime' ? t('school.activityStartTime') : t('school.activityEndTime')}
+          mode={activeActivityPicker === 'startTime' || activeActivityPicker === 'endTime' ? 'time' : 'date'}
+          dateOffset={-365}
+          dateCount={730}
+          selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
+          onSelect={(v) => { if (activeActivityPicker) setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); setActiveActivityPicker(null); }}
+          onClose={() => setActiveActivityPicker(null)}
         />
       </>
     );

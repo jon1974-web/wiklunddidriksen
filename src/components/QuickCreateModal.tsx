@@ -53,6 +53,15 @@ const SECTIONS = [
       { icon: 'transport' as const, nav: (n: any) => n.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }), labelKey: 'quickCreate.newTrip' },
     ],
   },
+  {
+    key: 'school',
+    colorKey: null,
+    lockedColor: MODULE_COLORS.school,
+    headerIcon: 'school' as const,
+    items: [
+      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.schoolActivity' },
+    ],
+  },
 ];
 
 export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ visible, onClose, navigation }) => {
