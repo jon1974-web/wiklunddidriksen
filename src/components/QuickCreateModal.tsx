@@ -275,9 +275,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     borderRadius: 12,
   },
-  row: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
 });
