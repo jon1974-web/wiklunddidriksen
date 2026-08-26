@@ -238,7 +238,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) setMedForm({ name: item.name, person: item.person, dosage: item.dosage, frequency: item.frequency || 1, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }], dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
     } else if (section === 'appointments') {
       const item = appointments.find(a => a.id === id);
-      if (item) setApptForm({ title: item.title, person: item.person, doctor: item.doctor || '', date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '' });
+      if (item) setApptForm({ title: item.title, person: item.person, doctor: item.doctor || '', date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', documents: item.documents || [] });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
       if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', location: item.location || '', note: item.note || '' });

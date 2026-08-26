@@ -8,6 +8,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { cancelNotification } from '../services/notificationService';
 import { getUserProfile } from '../services/familyService';
 import { syncEventToCalendar, updateCalendarEvent, deleteCalendarEvent } from '../services/calendarService';
+import { DocumentUpload } from '../components/DocumentUpload';
 import { useUserStore } from '../store/userStore';
 import { getReminderOptions, getEndDateOptions, getEndTimeOptions } from '../constants/eventOptions';
 import { sanitizeInput, getErrorMessage } from '../utils/validation';
@@ -32,6 +33,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const familyRole = useUserStore((state) => state.familyRole);
   const [isEditing, setIsEditing] = useState(false);
   const [eventData, setEventData] = useState(event);
+  const [editDocuments, setEditDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(event.documents || []);
   const canDelete = eventData.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
   
   const getInitialEndDateDays = () => {
@@ -129,6 +131,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         reminderMinutes,
         reminderAt: reminderAt.toISOString(),
         icon: icon || null,
+        documents: editDocuments.length > 0 ? editDocuments : [],
       };
 
       if (showEndDate) {
@@ -555,6 +558,27 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             </TouchableOpacity>
           ))}
         </View>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
+        <DocumentUpload
+          storagePath={`events/${eventData.familyId || 'general'}/${Date.now()}`}
+          onUploaded={(doc) => setEditDocuments((prev) => [...prev, doc])}
+          accentColor={colors.accent}
+        />
+        {editDocuments.length > 0 && (
+          <View style={{ marginTop: 8 }}>
+            {editDocuments.map((doc, i) => (
+              <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
+                <TouchableOpacity onPress={() => setEditDocuments((prev) => prev.filter((_, idx) => idx !== i))}>
+                  <Text style={{ color: colors.danger, fontSize: 12 }}>{t('common.delete')}</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
 
       <TouchableOpacity style={[styles.updateButton, { backgroundColor: colors.accent }]} onPress={handleUpdate}>
