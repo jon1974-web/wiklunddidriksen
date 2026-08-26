@@ -122,7 +122,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                 <View style={styles.row}>
                   {eventsSection.items.map((item, idx) => (
                     <TouchableOpacity key={idx} style={styles.actionItem} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
-                      <View style={[styles.iconWrap, { backgroundColor: eventsSection.color + '20' }]}>
+                      <View style={styles.iconWrap}>
                         <AppIcon name={item.icon} size={22} color={eventsSection.color} />
                       </View>
                       <Text style={styles.actionTitle}>{t(item.labelKey)}</Text>
