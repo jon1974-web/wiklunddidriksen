@@ -189,7 +189,7 @@ const styles = StyleSheet.create({
   sectionLabel: { fontSize: 12, fontWeight: '700', marginBottom: 8 },
   detailRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, gap: 8 },
   detailLabel: { fontSize: 16, width: 24, textAlign: 'center' },
-  detailValue: { fontSize: 14, flex: 1 },
+  detailValue: { fontSize: 14, flex: 1, textAlign: 'left', marginLeft: 4 },
   actionButton: { padding: 16, borderRadius: 12, alignItems: 'center' },
   actionButtonText: { fontSize: 16, fontWeight: '600' },
 });
