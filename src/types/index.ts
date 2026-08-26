@@ -23,6 +23,7 @@ export interface Event {
   notificationId?: string;
   calendarEventId?: string;
   icon?: string;
+  documents?: SchoolActivityDocument[];
 }
 
 export interface ShoppingItem {
@@ -324,6 +325,7 @@ export interface PetVetVisit {
   notificationId?: string;
   status: 'planned' | 'completed';
   addToCalendar?: boolean;
+  documents?: SchoolActivityDocument[];
   createdAt: number;
 }
 
@@ -486,6 +488,7 @@ export interface HealthAppointment {
   reminder?: string;
   addToCalendar?: boolean;
   notificationId?: string;
+  documents?: SchoolActivityDocument[];
   createdAt: number;
 }
 

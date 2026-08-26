@@ -14,6 +14,7 @@ import { getTodayLocal } from '../utils/dateUtils';
 import { EVENT_ICONS } from '../constants/eventIcons';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
+import { DocumentUpload } from '../components/DocumentUpload';
 
 interface AddEventScreenProps {
   navigation: any;
@@ -36,6 +37,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   const [customEndTime, setCustomEndTime] = useState(prefill?.endTime || '');
   const [reminderMinutes, setReminderMinutes] = useState(prefill?.reminderMinutes || 120);
   const [icon, setIcon] = useState(prefill?.icon || '');
+  const [documents, setDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(prefill?.documents || []);
   const [saving, setSaving] = useState(false);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
@@ -90,6 +92,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         familyId: familyId || null,
         createdAt: Date.now(),
         icon: icon || null,
+        documents: documents.length > 0 ? documents : undefined,
       };
 
       if (showEndDate) {
@@ -335,6 +338,27 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
             </TouchableOpacity>
           ))}
         </View>
+      </View>
+
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
+        <DocumentUpload
+          storagePath={`events/${familyId || 'general'}/${Date.now()}`}
+          onUploaded={(doc) => setDocuments((prev) => [...prev, doc])}
+          accentColor={colors.accent}
+        />
+        {documents.length > 0 && (
+          <View style={{ marginTop: 8 }}>
+            {documents.map((doc, i) => (
+              <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
+                <TouchableOpacity onPress={() => setDocuments((prev) => prev.filter((_, idx) => idx !== i))}>
+                  <Text style={{ color: colors.danger, fontSize: 12 }}>{t('common.delete')}</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        )}
       </View>
 
       <TouchableOpacity

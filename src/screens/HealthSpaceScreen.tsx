@@ -8,6 +8,7 @@ import { AppIcon } from '../components/AppIcon';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { crossAlert } from '../utils/alert';
+import { DocumentUpload } from '../components/DocumentUpload';
 import { getErrorMessage } from '../utils/validation';
 
 import { notifyHealthItem, getUserProfile } from '../services/familyService';
@@ -56,7 +57,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: '', dateTo: '', note: '' });
-  const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
+  const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
@@ -157,7 +158,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         if (!isEditing) {
           notifyHealthItem(familyId, apptForm.title, apptForm.date, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
         }
-        setApptForm({ title: '', person: persons[0] || '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '' });
+        setApptForm({ title: '', person: persons[0] || '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
         let savedVacc;
@@ -584,6 +585,26 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                         </TouchableOpacity>
                       ))}
                     </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
+                    <DocumentUpload
+                      storagePath={`health/${familyId || 'general'}/${Date.now()}`}
+                      onUploaded={(doc) => setApptForm(f => ({ ...f, documents: [...f.documents, doc] }))}
+                      accentColor={MODULE_COLORS.health}
+                    />
+                    {apptForm.documents.length > 0 && (
+                      <View style={{ marginTop: 8 }}>
+                        {apptForm.documents.map((doc, i) => (
+                          <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                            <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
+                            <TouchableOpacity onPress={() => setApptForm(f => ({ ...f, documents: f.documents.filter((_, idx) => idx !== i) }))}>
+                              <Text style={{ color: colors.danger, fontSize: 12 }}>{t('common.delete')}</Text>
+                            </TouchableOpacity>
+                          </View>
+                        ))}
+                      </View>
+                    )}
                   </View>
                 </>
               )}

@@ -9,6 +9,7 @@ import { AppIcon } from '../components/AppIcon';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { crossAlert } from '../utils/alert';
+import { DocumentUpload } from '../components/DocumentUpload';
 import { getErrorMessage } from '../utils/validation';
 import { notifyHealthItem, getUserProfile } from '../services/familyService';
 import { db } from '../services/firebase';
@@ -70,7 +71,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
-  const [vetForm, setVetForm] = useState({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed' });
+  const [vetForm, setVetForm] = useState({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: '', dateTo: '', note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -834,6 +835,26 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                           </TouchableOpacity>
                         ))}
                       </View>
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
+                      <DocumentUpload
+                        storagePath={`pets/${familyId || 'general'}/${Date.now()}`}
+                        onUploaded={(doc) => setVetForm(f => ({ ...f, documents: [...f.documents, doc] }))}
+                        accentColor={PET_THEME}
+                      />
+                      {vetForm.documents.length > 0 && (
+                        <View style={{ marginTop: 8 }}>
+                          {vetForm.documents.map((doc, i) => (
+                            <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                              <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
+                              <TouchableOpacity onPress={() => setVetForm(f => ({ ...f, documents: f.documents.filter((_, idx) => idx !== i) }))}>
+                                <Text style={{ color: colors.danger, fontSize: 12 }}>{t('common.delete')}</Text>
+                              </TouchableOpacity>
+                            </View>
+                          ))}
+                        </View>
+                      )}
                     </View>
                   </>
                 )}
