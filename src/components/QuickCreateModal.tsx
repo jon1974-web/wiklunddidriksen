@@ -12,63 +12,71 @@ interface QuickCreateModalProps {
   navigation: any;
 }
 
-const SECTIONS = [
+type IconName = React.ComponentProps<typeof AppIcon>['name'];
+
+interface SectionItem {
+  icon: IconName;
+  nav: (n: any) => void;
+  labelKey: string;
+  color?: string;
+}
+
+interface Section {
+  key: string;
+  color: string;
+  labelKey: string;
+  items: SectionItem[];
+}
+
+const SECTIONS: Section[] = [
   {
     key: 'events',
-    colorKey: 'accent' as const,
-    lockedColor: null,
-    headerIcon: 'calendar' as const,
+    color: '#3b5a75',
+    labelKey: 'quickCreate.events',
     items: [
-      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Events', { screen: 'AddEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.newEvent' },
-      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.voiceEvent' },
-      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Events', { screen: 'PhotoEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.photoEvent' },
+      { icon: 'calendar' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'AddEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.newEvent' },
+      { icon: 'chat' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.voiceEvent' },
+      { icon: 'camera' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'PhotoEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.photoEvent' },
     ],
   },
   {
     key: 'health',
-    colorKey: null,
-    lockedColor: MODULE_COLORS.health,
-    headerIcon: 'medication' as const,
+    color: MODULE_COLORS.health,
+    labelKey: 'health.title',
     items: [
-      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }), labelKey: 'quickCreate.healthAppointment' },
-      { icon: 'vaccination' as const, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }), labelKey: 'quickCreate.healthVaccination' },
+      { icon: 'medication' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }), labelKey: 'quickCreate.healthAppointment' },
     ],
   },
   {
     key: 'pets',
-    colorKey: null,
-    lockedColor: MODULE_COLORS.pets,
-    headerIcon: 'pet' as const,
+    color: MODULE_COLORS.pets,
+    labelKey: 'pets.title',
     items: [
-      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }), labelKey: 'quickCreate.petVetVisit' },
-      { icon: 'vaccination' as const, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vaccinations', _t: Date.now() } }), labelKey: 'quickCreate.petVaccination' },
-    ],
-  },
-  {
-    key: 'trips',
-    colorKey: null,
-    lockedColor: MODULE_COLORS.trips,
-    headerIcon: 'transport' as const,
-    items: [
-      { icon: 'transport' as const, nav: (n: any) => n.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }), labelKey: 'quickCreate.newTrip' },
+      { icon: 'pet' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }), labelKey: 'quickCreate.petVetVisit' },
     ],
   },
   {
     key: 'school',
-    colorKey: null,
-    lockedColor: MODULE_COLORS.school,
-    headerIcon: 'school' as const,
+    color: MODULE_COLORS.school,
+    labelKey: 'spaces.school',
     items: [
-      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.schoolActivity' },
+      { icon: 'school' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.schoolActivity' },
     ],
   },
   {
     key: 'kindergarten',
-    colorKey: null,
-    lockedColor: MODULE_COLORS.kindergarten,
-    headerIcon: 'kindergarten' as const,
+    color: MODULE_COLORS.kindergarten,
+    labelKey: 'spaces.kindergarten',
     items: [
-      { icon: 'calendar' as const, nav: (n: any) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.kindergartenActivity' },
+      { icon: 'kindergarten' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.kindergartenActivity' },
+    ],
+  },
+  {
+    key: 'trips',
+    color: MODULE_COLORS.trips,
+    labelKey: 'quickCreate.trips',
+    items: [
+      { icon: 'transport' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }), labelKey: 'quickCreate.newTrip' },
     ],
   },
 ];
@@ -82,6 +90,13 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
     setTimeout(navigateFn, 300);
   };
 
+  const eventsSection = SECTIONS[0];
+  const healthSection = SECTIONS[1];
+  const petsSection = SECTIONS[2];
+  const schoolSection = SECTIONS[3];
+  const kindergartenSection = SECTIONS[4];
+  const tripsSection = SECTIONS[5];
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>
@@ -91,45 +106,78 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
               <View style={styles.handle} />
               <View style={styles.header}>
                 <Text style={[styles.title, { color: colors.text }]}>{t('quickCreate.title')}</Text>
-                <TouchableOpacity style={[styles.closeBtn, { borderColor: colors.accent }]} onPress={onClose}>
-                  <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={colors.accent} strokeWidth="2.5" strokeLinecap="round">
+                <TouchableOpacity style={[styles.closeBtn, { borderColor: colors.textSecondary }]} onPress={onClose}>
+                  <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2.5" strokeLinecap="round">
                     <Line x1="18" y1="6" x2="6" y2="18"/>
                     <Line x1="6" y1="6" x2="18" y2="18"/>
                   </Svg>
                 </TouchableOpacity>
               </View>
+
               <View style={styles.content}>
-                {SECTIONS.map((section) => {
-                  const sectionColor = section.colorKey ? colors[section.colorKey] : section.lockedColor!;
-                  return (
-                    <View key={section.key} style={styles.card}>
-                      <View style={[styles.cardBorder, { backgroundColor: sectionColor }]} />
-                      <View style={styles.cardContent}>
-                        <View style={styles.cardTitleRow}>
-                          <AppIcon name={section.headerIcon} size={16} color={sectionColor} />
-                          <Text style={[styles.cardTitle, { color: sectionColor }]}>
-                            {t(`quickCreate.${section.key}`)}
-                          </Text>
-                        </View>
-                        <View style={styles.cardActions}>
-                          {section.items.map((item, idx) => (
-                            <TouchableOpacity
-                              key={idx}
-                              style={[styles.actionBtn, { backgroundColor: sectionColor }]}
-                              onPress={() => navigateAndClose(() => item.nav(navigation))}
-                              activeOpacity={0.8}
-                            >
-                              <View style={styles.actionIconWrap}>
-                                <AppIcon name={item.icon} size={22} color="#fff" />
-                              </View>
-                              <Text style={styles.actionLabel}>{t(item.labelKey)}</Text>
-                            </TouchableOpacity>
-                          ))}
-                        </View>
+                {/* Avtaler section */}
+                <View style={styles.sectionLabelWrap}>
+                  <Text style={[styles.sectionLabel, { color: eventsSection.color }]}>{t(eventsSection.labelKey)}</Text>
+                </View>
+                <View style={styles.row}>
+                  {eventsSection.items.map((item, idx) => (
+                    <TouchableOpacity key={idx} style={styles.actionItem} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
+                      <View style={[styles.iconWrap, { backgroundColor: eventsSection.color + '20' }]}>
+                        <AppIcon name={item.icon} size={22} color={eventsSection.color} />
                       </View>
+                      <Text style={styles.actionTitle}>{t(item.labelKey)}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                {/* Helse + Kjæledyr row */}
+                <View style={styles.row}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => healthSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                    <Text style={[styles.sectionLabel, { color: healthSection.color }]}>{t(healthSection.labelKey)}</Text>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={healthSection.items[0].icon} size={28} color={healthSection.color} />
                     </View>
-                  );
-                })}
+                    <Text style={styles.actionTitle}>{t(healthSection.items[0].labelKey)}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => petsSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                    <Text style={[styles.sectionLabel, { color: petsSection.color }]}>{t(petsSection.labelKey)}</Text>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={petsSection.items[0].icon} size={28} color={petsSection.color} />
+                    </View>
+                    <Text style={styles.actionTitle}>{t(petsSection.items[0].labelKey)}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Skole + Barnehage row */}
+                <View style={styles.row}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => schoolSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                    <Text style={[styles.sectionLabel, { color: schoolSection.color }]}>{t(schoolSection.labelKey)}</Text>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={schoolSection.items[0].icon} size={28} color={schoolSection.color} />
+                    </View>
+                    <Text style={styles.actionTitle}>{t(schoolSection.items[0].labelKey)}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => kindergartenSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                    <Text style={[styles.sectionLabel, { color: kindergartenSection.color }]}>{t(kindergartenSection.labelKey)}</Text>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={kindergartenSection.items[0].icon} size={28} color={kindergartenSection.color} />
+                    </View>
+                    <Text style={styles.actionTitle}>{t(kindergartenSection.items[0].labelKey)}</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Reiser — centered */}
+                <View style={styles.sectionLabelWrap}>
+                  <Text style={[styles.sectionLabel, { color: tripsSection.color }]}>{t(tripsSection.labelKey)}</Text>
+                </View>
+                <View style={styles.centerRow}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => tripsSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={tripsSection.items[0].icon} size={28} color={tripsSection.color} />
+                    </View>
+                    <Text style={styles.actionTitle}>{t(tripsSection.items[0].labelKey)}</Text>
+                  </TouchableOpacity>
+                </View>
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -176,68 +224,60 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  closeText: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
   content: {
     paddingHorizontal: 12,
     paddingBottom: 34,
   },
-  card: {
-    flexDirection: 'row',
-    borderRadius: 12,
-    marginBottom: 8,
-    backgroundColor: '#fff',
-    overflow: 'hidden',
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 3,
+  sectionLabelWrap: {
+    marginBottom: 6,
   },
-  cardBorder: {
-    width: 4,
-  },
-  cardContent: {
-    flex: 1,
-    padding: 10,
-    paddingLeft: 12,
-  },
-  cardTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginBottom: 8,
-  },
-  cardTitle: {
-    fontSize: 14,
+  sectionLabel: {
+    fontSize: 11,
     fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  cardActions: {
+  row: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 8,
+    marginBottom: 16,
   },
-  actionBtn: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 4,
-    paddingVertical: 10,
-    paddingHorizontal: 6,
-    borderRadius: 10,
-  },
-  actionIconWrap: {
-    width: 42,
-    height: 42,
-    borderRadius: 12,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    alignItems: 'center',
+  centerRow: {
+    flexDirection: 'row',
     justifyContent: 'center',
+    marginBottom: 16,
   },
-  actionLabel: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#fff',
+  moduleCol: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+  },
+  iconWrap: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  actionTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1a1a1a',
     textAlign: 'center',
+  },
+  actionItem: {
+    flex: 1,
+    alignItems: 'center',
+    gap: 6,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
+    borderRadius: 12,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: 8,
+    marginBottom: 16,
   },
 });
