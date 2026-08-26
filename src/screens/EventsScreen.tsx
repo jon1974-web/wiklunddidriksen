@@ -893,6 +893,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
                   color={(item.icon === 'pet-visit' || item.icon === 'pet-vaccination') ? '#8E24AA' : MODULE_COLORS.health}
                 />
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
+                {(item as any).documents && (item as any).documents.length > 0 && (
+                  <AppIcon name="file" size={12} color="#1976D2" />
+                )}
               </View>
               <View style={styles.spondTimeRow}>
                 <View style={styles.spondClockOuter}>
@@ -943,6 +946,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <AppIcon name="school" size={14} color={MODULE_COLORS.school} />
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
+                {(item as any).documents && (item as any).documents.length > 0 && (
+                  <AppIcon name="file" size={12} color="#1976D2" />
+                )}
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <View style={styles.spondTimeRow}>
@@ -998,6 +1004,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <AppIcon name="kindergarten" size={14} color={MODULE_COLORS.kindergarten} />
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
+                {(item as any).documents && (item as any).documents.length > 0 && (
+                  <AppIcon name="file" size={12} color="#1976D2" />
+                )}
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
                 <View style={styles.spondTimeRow}>

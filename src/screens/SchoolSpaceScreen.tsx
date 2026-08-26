@@ -1108,14 +1108,18 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 {expandedSections.activities && activities.map(a => (
                   <TouchableOpacity key={a.id} style={[styles.contactCard, { backgroundColor: colors.surface, borderLeftWidth: 3, borderLeftColor: SCHOOL_THEME }]} onPress={() => navigation.navigate('SchoolActivityDetail', { activity: a, source: 'school' })} onLongPress={() => setActivityActionModal({ visible: true, id: a.id, title: a.title })}>
                     <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text style={[styles.contactName, { color: colors.text }]}>{a.title}</Text>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
+                        <Text style={[styles.contactName, { color: colors.text }]}>{a.title}</Text>
+                        {a.documents && a.documents.length > 0 && (
+                          <AppIcon name="file" size={12} color="#1976D2" />
+                        )}
+                      </View>
                       <View style={{ backgroundColor: SCHOOL_THEME + '20', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 }}>
                         <Text style={{ color: SCHOOL_THEME, fontSize: 10, fontWeight: '600' }}>{a.activityType === 'tur' ? t('school.activityTypeTur') : a.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}</Text>
                       </View>
                     </View>
                     <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{a.date}{a.startTime ? ` • ${a.startTime}${a.endTime ? ` – ${a.endTime}` : ''}` : ''}</Text>
                     {a.location ? <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>📍 {a.location}</Text> : null}
-                    {a.documents && a.documents.length > 0 && <Text style={{ color: SCHOOL_THEME, fontSize: 12, marginTop: 2 }}>📎 {a.documents.length} {t('school.activityDocuments')}</Text>}
                   </TouchableOpacity>
                 ))}
                 {expandedSections.activities && activities.length === 0 && <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noActivities')}</Text>}

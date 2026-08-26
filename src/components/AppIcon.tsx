@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline, Ellipse } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email' | 'send' | 'school' | 'kindergarten';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email' | 'send' | 'school' | 'kindergarten' | 'file';
   size?: number;
   color?: string;
 }
@@ -313,6 +313,15 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5
       <Line x1="12" y1="12" x2="18" y2="8"/>
       <Line x1="12" y1="17" x2="8" y2="22"/>
       <Line x1="12" y1="17" x2="16" y2="22"/>
+    </Svg>
+  );
+
+  if (name === 'file') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+      <Polyline points="14 2 14 8 20 8"/>
+      <Line x1="9" y1="13" x2="15" y2="13"/>
+      <Line x1="9" y1="17" x2="15" y2="17"/>
     </Svg>
   );
 

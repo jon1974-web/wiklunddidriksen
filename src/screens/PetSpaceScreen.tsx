@@ -647,7 +647,12 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVetDetail', { visit: v, petName: pets.find(p => p.id === v.petId)?.name, source: 'pets' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.title, section: 'vetVisits' })}>
                   <AppIcon name="calendar" size={20} color={PET_THEME} />
                   <View style={styles.itemText}>
-                    <Text style={[styles.itemTitle, { color: colors.text }]}>{v.title}</Text>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <Text style={[styles.itemTitle, { color: colors.text, flex: 1 }]}>{v.title}</Text>
+                      {v.documents && v.documents.length > 0 && (
+                        <AppIcon name="file" size={12} color="#1976D2" />
+                      )}
+                    </View>
                     <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{v.date} {v.startTime}{v.location ? ' — ' + v.location : ''}</Text>
                   </View>
                   <Text style={[styles.badge, { backgroundColor: (v.status === 'completed' || isDatePast(v.date)) ? '#E8F5E9' : '#FFF3E0', color: (v.status === 'completed' || isDatePast(v.date)) ? '#43A047' : '#FB8C00' }]}>

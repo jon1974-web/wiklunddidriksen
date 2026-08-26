@@ -74,7 +74,15 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
             <Text style={[styles.calMonth, { color: colors.textSecondary }]}>{monthStr}</Text>
           </View>
           <View style={{ flex: 1 }}>
-            <Text style={[styles.title, { color: colors.text }]} numberOfLines={3}>{visit.title}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <Text style={[styles.title, { color: colors.text, flex: 1 }]} numberOfLines={3}>{visit.title}</Text>
+              {visit.documents && visit.documents.length > 0 && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#E3F2FD', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 }}>
+                  <AppIcon name="file" size={12} color="#1976D2" />
+                  <Text style={{ fontSize: 10, fontWeight: '600', color: '#1976D2' }}>{visit.documents.length}</Text>
+                </View>
+              )}
+            </View>
             {timeText ? (
               <Text style={[styles.timeText, { color: '#333' }]}>{timeText}</Text>
             ) : null}

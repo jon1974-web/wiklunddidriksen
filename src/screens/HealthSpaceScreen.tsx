@@ -308,7 +308,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                 <TouchableOpacity key={appt.id} style={styles.item} onPress={() => navigation.navigate('HealthApptDetail', { appointment: appt, source: 'health' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
                 <AppIcon name="calendar" size={20} color={MODULE_COLORS.health} />
                 <View style={styles.itemText}>
-                  <Text style={[styles.itemTitle, { color: colors.text }]}>{appt.title}</Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                    <Text style={[styles.itemTitle, { color: colors.text, flex: 1 }]}>{appt.title}</Text>
+                    {appt.documents && appt.documents.length > 0 && (
+                      <AppIcon name="file" size={12} color="#1976D2" />
+                    )}
+                  </View>
                   <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{appt.date} {appt.startTime} — {appt.location || appt.person}</Text>
                 </View>
                 {appt.date >= today ? (

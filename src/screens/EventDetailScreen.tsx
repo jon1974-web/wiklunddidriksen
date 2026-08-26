@@ -301,7 +301,15 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               <Text style={{ fontSize: 10, fontWeight: '700', textAlign: 'center', textTransform: 'uppercase', color: colors.textSecondary, marginBottom: 4 }}>{monthStr}</Text>
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text }}>{eventData.title}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <Text style={{ fontSize: 17, fontWeight: '700', color: colors.text, flex: 1 }}>{eventData.title}</Text>
+                {eventData.documents && eventData.documents.length > 0 && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3, backgroundColor: '#E3F2FD', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8 }}>
+                    <AppIcon name="file" size={12} color="#1976D2" />
+                    <Text style={{ fontSize: 10, fontWeight: '600', color: '#1976D2' }}>{eventData.documents.length}</Text>
+                  </View>
+                )}
+              </View>
               <Text style={{ fontSize: 14, fontWeight: '700', color: '#333', marginTop: 2 }}>{timeText}</Text>
               <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
                 <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: '#E8F5E9' }}>
