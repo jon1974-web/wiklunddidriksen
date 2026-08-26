@@ -614,19 +614,21 @@ const styles = StyleSheet.create({
   },
   viewDetailRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 12,
+    gap: 8,
   },
   viewDetailLabel: {
-    fontSize: 14,
-    flex: 1,
+    fontSize: 16,
+    width: 24,
+    textAlign: 'center',
   },
   viewDetailValue: {
     fontSize: 14,
-    fontWeight: '500',
-    flex: 2,
-    textAlign: 'right',
+    flex: 1,
+    textAlign: 'left',
+    marginLeft: 4,
+  },
   },
   viewMapContainer: {
     borderRadius: 12,
