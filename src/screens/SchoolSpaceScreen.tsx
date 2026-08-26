@@ -94,7 +94,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   // Activities state
   const [activities, setActivities] = useState<SchoolActivity[]>([]);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
-  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', date: '', startTime: '', endTime: '', location: '', note: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const [activityActionModal, setActivityActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   type ActivityPickerField = 'date' | 'startTime' | 'endTime' | null;
@@ -480,12 +480,26 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     }
     try {
       const user = useUserStore.getState().user;
-      if (editingActivityId) {
-        await updateSchoolActivity(familyId, editingActivityId, { ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId });
-      } else {
-        await addSchoolActivity({ ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId, createdBy: user?.uid || '' });
+      const activityData: any = { ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId, createdBy: user?.uid || '' };
+      // Compute reminderAt
+      if (activityForm.reminder && activityForm.date) {
+        const time = activityForm.startTime || '09:00';
+        const eventTime = new Date(`${activityForm.date}T${time}:00`);
+        let reminderMs = 0;
+        if (activityForm.reminder === '1 time før') reminderMs = 60 * 60 * 1000;
+        else if (activityForm.reminder === '1 dag før') reminderMs = 24 * 60 * 60 * 1000;
+        else if (activityForm.reminder === '3 dager før') reminderMs = 3 * 24 * 60 * 60 * 1000;
+        else if (activityForm.reminder === '1 uke før') reminderMs = 7 * 24 * 60 * 60 * 1000;
+        if (reminderMs > 0) {
+          activityData.reminderAt = new Date(eventTime.getTime() - reminderMs).toISOString();
+        }
       }
-      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', documents: [] });
+      if (editingActivityId) {
+        await updateSchoolActivity(familyId, editingActivityId, activityData);
+      } else {
+        await addSchoolActivity(activityData);
+      }
+      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
       setEditingActivityId(null);
       setShowAddActivityModal(false);
       loadYearData();
@@ -1438,6 +1452,16 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('school.activityNote')}</Text>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.note} onChangeText={(v) => setActivityForm(f => ({ ...f, note: v }))} placeholderTextColor={colors.textDisabled} multiline numberOfLines={3} />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                        {['', '1 time før', '1 dag før', '3 dager før', '1 uke før'].map((r, i) => (
+                          <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: activityForm.reminder === r ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setActivityForm(f => ({ ...f, reminder: r }))}>
+                            <Text style={{ color: activityForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
+                          </TouchableOpacity>
+                        ))}
+                      </View>
                     </View>
                     {familyId && selectedChild && selectedYear && (
                       <View style={styles.field}>

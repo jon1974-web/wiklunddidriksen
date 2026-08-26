@@ -886,6 +886,25 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
     }
   }
 
+  // Process school activity reminders
+  const schoolActivitiesSnap = await db.collectionGroup("activities").where("familyId", "!=", null).limit(200).get();
+  for (const doc of schoolActivitiesSnap.docs) {
+    const actData = doc.data();
+    if (!actData.reminderAt || !actData.familyId) continue;
+
+    const reminderTime = new Date(actData.reminderAt);
+    if (reminderTime >= thirtyMinAgo && reminderTime <= fiveMinFromNow) {
+      const typeLabel = actData.activityType === "tur" ? "Tur" : actData.activityType === "aktivitet" ? "Aktivitet" : "Møte";
+      const sent = await sendNotification({
+        familyId: actData.familyId,
+        title: `📚 ${typeLabel}: ${actData.title}`,
+        body: `Påminnelse om ${actData.date}`,
+        notifKey: `schoolactivity_${doc.id}`,
+      });
+      totalSent += sent;
+    }
+  }
+
   console.log(`checkReminders: ${totalSent} sent`);
   return { sent: totalSent };
 });
@@ -3041,6 +3060,115 @@ exports.onPetVetVisitDeletedForCalendar = onDocumentDeleted({ region: "us-centra
     console.log(`onPetVetVisitDeletedForCalendar: deleted ${event.params.docId}`);
   } catch (error) {
     console.error(`onPetVetVisitDeletedForCalendar error:`, error);
+  }
+});
+
+// ==================== SCHOOL ACTIVITY CALENDAR SYNC ====================
+
+exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const data = snap.data();
+  const familyId = event.params.familyId;
+  const uid = data.createdBy;
+  console.log(`onSchoolActivityCreatedForCalendar: triggered for family ${familyId}, doc ${event.params.docId}, uid: ${uid}`);
+
+  if (!uid) {
+    console.log("No createdBy field, skipping");
+    return;
+  }
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
+      console.log(`User ${uid} not connected to Google Calendar`);
+      return;
+    }
+
+    const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
+    const endDateTime = data.endTime
+      ? `${data.date}T${data.endTime}:00`
+      : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+
+    const typeLabel = data.activityType === "tur" ? "Tur" : data.activityType === "aktivitet" ? "Aktivitet" : "Møte";
+
+    console.log(`Creating calendar event: ${data.title}, ${startDateTime} - ${endDateTime}`);
+
+    const eventId = await createGoogleCalendarEvent(uid, {
+      title: `📚 ${typeLabel}: ${data.title}`,
+      description: data.note || "",
+      startDateTime,
+      endDateTime,
+      location: data.location || "",
+    });
+
+    await db.collection("schoolActivities").doc(familyId).collection("activities").doc(event.params.docId).update({
+      googleCalendarEventId: eventId,
+    });
+
+    console.log(`onSchoolActivityCreatedForCalendar: synced ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onSchoolActivityCreatedForCalendar error:`, error);
+  }
+});
+
+exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
+  const after = event.data?.after?.data();
+  if (!after) return;
+
+  const uid = after.createdBy;
+  const calendarEventId = after.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const startDateTime = `${after.date}T${after.startTime || "09:00"}:00`;
+    const endDateTime = after.endTime
+      ? `${after.date}T${after.endTime}:00`
+      : `${after.date}T${incrementTime(after.startTime || "09:00")}:00`;
+
+    const typeLabel = after.activityType === "tur" ? "Tur" : after.activityType === "aktivitet" ? "Aktivitet" : "Møte";
+
+    await updateGoogleCalendarEvent(uid, calendarEventId, {
+      title: `📚 ${typeLabel}: ${after.title}`,
+      description: after.note || "",
+      startDateTime,
+      endDateTime,
+      location: after.location || "",
+    });
+
+    console.log(`onSchoolActivityUpdatedForCalendar: updated ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onSchoolActivityUpdatedForCalendar error:`, error);
+  }
+});
+
+exports.onSchoolActivityDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+
+  const uid = data.createdBy;
+  const calendarEventId = data.googleCalendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    await deleteGoogleCalendarEvent(uid, calendarEventId);
+    console.log(`onSchoolActivityDeletedForCalendar: deleted ${event.params.docId}`);
+  } catch (error) {
+    console.error(`onSchoolActivityDeletedForCalendar error:`, error);
   }
 });
 

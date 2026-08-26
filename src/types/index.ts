@@ -612,8 +612,11 @@ export interface SchoolActivity {
   endTime?: string;
   location?: string;
   note?: string;
+  reminder?: string;
+  reminderAt?: string;
   documents?: SchoolActivityDocument[];
   createdBy?: string;
+  googleCalendarEventId?: string;
   createdAt: number;
 }
 
