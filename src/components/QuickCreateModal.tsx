@@ -42,7 +42,7 @@ const SECTIONS: Section[] = [
   {
     key: 'health',
     color: MODULE_COLORS.health,
-    labelKey: 'health.title',
+    labelKey: 'quickCreate.health',
     items: [
       { icon: 'medication' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }), labelKey: 'quickCreate.healthAppointment' },
     ],
@@ -50,7 +50,7 @@ const SECTIONS: Section[] = [
   {
     key: 'pets',
     color: MODULE_COLORS.pets,
-    labelKey: 'pets.title',
+    labelKey: 'quickCreate.pets',
     items: [
       { icon: 'pet' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }), labelKey: 'quickCreate.petVetVisit' },
     ],
@@ -58,7 +58,7 @@ const SECTIONS: Section[] = [
   {
     key: 'school',
     color: MODULE_COLORS.school,
-    labelKey: 'spaces.school',
+    labelKey: 'quickCreate.school',
     items: [
       { icon: 'school' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.schoolActivity' },
     ],
@@ -66,7 +66,7 @@ const SECTIONS: Section[] = [
   {
     key: 'kindergarten',
     color: MODULE_COLORS.kindergarten,
-    labelKey: 'spaces.kindergarten',
+    labelKey: 'quickCreate.kindergarten',
     items: [
       { icon: 'kindergarten' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.kindergartenActivity' },
     ],
@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
   },
   sectionLabelWrap: {
     marginBottom: 6,
+    alignItems: 'center',
   },
   sectionLabel: {
     fontSize: 11,
