@@ -334,7 +334,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   };
 
   const resetItemForms = () => {
-    setVetForm({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
+    setVetForm({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned', documents: [] });
     setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: '', dateTo: '', note: '' });
     setFoodForm({ name: '', time: '', amount: '', note: '' });
     setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
