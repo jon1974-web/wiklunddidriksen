@@ -289,7 +289,24 @@
     "helpHolidaysText": "Lomapäivät näyttävät koululomat ja suunnittelupäivät lapselle. Jokainen lomapäivä näyttää kuvakeen, otsikon, päivämäärät ja kuinka kaukana se on.\n\nVoit:\n• Lisätä lomapäiviä manuaalisesti\n• Tuoda kuvasta tekoälyllä\n• Tuoda URL-osoitteesta (linkki koulun verkkosivustolle)\n\nLomapäivät näkyvät myös viikkoenväyhteenvetoon (Oma viikko) muiden tapahtumien kanssa.",
     "helpHolidaysTip": "Lomapäivät järjestetään tulevat ensin. Merkki näyttää onko lomapäivä tänään, X päivän päästä vai X päivää sitten.",
     "helpSettings": "Asetukset",
-    "helpSettingsText": "Voit muokata ja poistaa lapsia, yhteystietoja, aikatauluja ja lomapäiviä pitämällä painavana kohteesta."
+    "helpSettingsText": "Voit muokata ja poistaa lapsia, yhteystietoja, aikatauluja ja lomapäiviä pitämällä painavana kohteesta.",
+    "activities": "Toiminnat",
+    "addActivity": "Lisää toiminto",
+    "editActivity": "Muokkaa toimintoa",
+    "activityType": "Tyyppi",
+    "activityTypeTur": "Retki",
+    "activityTypeAktivitet": "Toiminta",
+    "activityTypeMøte": "Kokous",
+    "activityTitle": "Otsikko",
+    "activityDate": "Päivämäärä",
+    "activityStartTime": "Aloitusaika",
+    "activityEndTime": "Lopetusaika",
+    "activityLocation": "Paikka",
+    "activityNote": "Muistiinpano",
+    "activityDocuments": "Asiakirjat",
+    "activityUploadDoc": "Lataa asiakirja",
+    "activityUploadPhoto": "Lataa kuva",
+    "noActivities": "Ei toimintoja lisätty"
   },
   "kindergarten": {
     "title": "Päiväkotimme",
@@ -1190,7 +1207,10 @@
     "petVaccinationDesc": "Rekisteröi rokotus lemmikille",
     "trips": "Matkat",
     "newTrip": "Uusi matka",
-    "newTripDesc": "Luo uusi matka"
+    "newTripDesc": "Luo uusi matka",
+    "school": "Koulu",
+    "schoolActivity": "Retki, toiminta, kokous",
+    "schoolActivityDesc": "Lisää toiminto kouluun"
   },
   "tabs": {
     "events": "Tapahtumat",

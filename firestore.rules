@@ -188,6 +188,14 @@ service cloud.firestore {
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
+    // School Activities: family-scoped subcollection
+    match /schoolActivities/{familyId} {
+      allow read, write: if request.auth != null && isFamilyMember(familyId);
+      match /{subcollection=**} {
+        allow read, write: if request.auth != null && isFamilyMember(familyId);
+      }
+    }
+
     // Kindergarten Holidays: family-scoped
     match /kindergartenHolidays/{holidayId} {
       allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);

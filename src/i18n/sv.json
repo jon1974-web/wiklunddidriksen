@@ -289,7 +289,24 @@
     "helpHolidaysText": "Helger visar skollov och planeringsdagar för barnet. Varje helg visar en ikon, titel, datum och hur långt borta den är.\n\nDu kan:\n• Lägga till helger manuellt\n• Importera från bild med AI\n• Importera från en URL (länk till skolans webbplats)\n\nHelgerna visas också i den veckovisa sammanfattningen (Min vecka) tillsammans med andra händelser.",
     "helpHolidaysTip": "Helger sorteras med kommande först. Badgen visar om helgen är idag, om X dagar, eller X dagar sedan.",
     "helpSettings": "Inställningar",
-    "helpSettingsText": "Du kan redigera och ta bort barn, kontakter, scheman och helger genom att hålla inne på objektet."
+    "helpSettingsText": "Du kan redigera och ta bort barn, kontakter, scheman och helger genom att hålla inne på objektet.",
+    "activities": "Aktiviteter",
+    "addActivity": "Lägg till aktivitet",
+    "editActivity": "Redigera aktivitet",
+    "activityType": "Typ",
+    "activityTypeTur": "Resa",
+    "activityTypeAktivitet": "Aktivitet",
+    "activityTypeMøte": "Möte",
+    "activityTitle": "Titel",
+    "activityDate": "Datum",
+    "activityStartTime": "Starttid",
+    "activityEndTime": "Sluttid",
+    "activityLocation": "Plats",
+    "activityNote": "Anteckning",
+    "activityDocuments": "Dokument",
+    "activityUploadDoc": "Ladda upp dokument",
+    "activityUploadPhoto": "Ladda upp bild",
+    "noActivities": "Inga aktiviteter tillagda"
   },
   "kindergarten": {
     "title": "Vår förskola",
@@ -1190,7 +1207,10 @@
     "petVaccinationDesc": "Registrera en vaccination för husdjur",
     "trips": "Resor",
     "newTrip": "Ny resa",
-    "newTripDesc": "Skapa en ny resa"
+    "newTripDesc": "Skapa en ny resa",
+    "school": "Skola",
+    "schoolActivity": "Resa, aktivitet, möte",
+    "schoolActivityDesc": "Lägg till en aktivitet i Skola"
   },
   "tabs": {
     "events": "Evenemang",

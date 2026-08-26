@@ -289,7 +289,24 @@
     "helpHolidaysText": "Fridager viser skoleferier og planleggingsdager for barnet. Hver fridag vises med ikon, tittel, datoer og hvor langt unna den er.\n\nDu kan:\n• Legge til fridager manuelt\n• Importere fra bilde med AI\n• Importere fra en URL (lenke til skolens nettside)\n\nFridagene vises også i den ukentlige oppsummeringen (Min uke) sammen med andre avtaler.",
     "helpHolidaysTip": "Fridager sorteres med kommende først. Badge-visningen viser om fridagen er i dag, om X dager, eller X dager siden.",
     "helpSettings": "Innstillinger",
-    "helpSettingsText": "Du kan redigere og slette barn, kontakter, timeplaner og fridager ved å holde inne på elementet."
+    "helpSettingsText": "Du kan redigere og slette barn, kontakter, timeplaner og fridager ved å holde inne på elementet.",
+    "activities": "Aktiviteter",
+    "addActivity": "Legg til aktivitet",
+    "editActivity": "Rediger aktivitet",
+    "activityType": "Type",
+    "activityTypeTur": "Tur",
+    "activityTypeAktivitet": "Aktivitet",
+    "activityTypeMøte": "Møte",
+    "activityTitle": "Tittel",
+    "activityDate": "Dato",
+    "activityStartTime": "Starttid",
+    "activityEndTime": "Sluttid",
+    "activityLocation": "Sted",
+    "activityNote": "Notat",
+    "activityDocuments": "Dokumenter",
+    "activityUploadDoc": "Last opp dokument",
+    "activityUploadPhoto": "Last opp bilde",
+    "noActivities": "Ingen aktiviteter lagt til"
   },
   "kindergarten": {
     "title": "Vår barnehage",
@@ -1190,7 +1207,10 @@
     "petVaccinationDesc": "Registrer en vaksine for kjæledyr",
     "trips": "Reiser",
     "newTrip": "Ny reise",
-    "newTripDesc": "Opprett en ny reise"
+    "newTripDesc": "Opprett en ny reise",
+    "school": "Skole",
+    "schoolActivity": "Tur, aktivitet, møte",
+    "schoolActivityDesc": "Legg til en aktivitet i Skole"
   },
   "tabs": {
     "events": "Avtaler",

@@ -594,6 +594,29 @@ export interface SchoolHoliday {
   createdAt: number;
 }
 
+export interface SchoolActivityDocument {
+  url: string;
+  fileName: string;
+  type: 'image' | 'document';
+}
+
+export interface SchoolActivity {
+  id: string;
+  familyId: string;
+  childId: string;
+  yearId: string;
+  title: string;
+  activityType: 'tur' | 'aktivitet' | 'møte';
+  date: string;
+  startTime?: string;
+  endTime?: string;
+  location?: string;
+  note?: string;
+  documents?: SchoolActivityDocument[];
+  createdBy?: string;
+  createdAt: number;
+}
+
 export interface KindergartenChild {
   id: string;
   name: string;

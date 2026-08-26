@@ -289,7 +289,24 @@
     "helpHolidaysText": "Holidays show school vacations and planning days for the child. Each holiday displays an icon, title, dates and how far away it is.\n\nYou can:\n• Add holidays manually\n• Import from photo with AI\n• Import from a URL (link to school website)\n\nHolidays also appear in the weekly summary (My week) along with other events.",
     "helpHolidaysTip": "Holidays are sorted with upcoming first. The badge shows whether the holiday is today, in X days, or X days ago.",
     "helpSettings": "Settings",
-    "helpSettingsText": "You can edit and delete children, contacts, schedules and holidays by long-pressing on the item."
+    "helpSettingsText": "You can edit and delete children, contacts, schedules and holidays by long-pressing on the item.",
+    "activities": "Activities",
+    "addActivity": "Add activity",
+    "editActivity": "Edit activity",
+    "activityType": "Type",
+    "activityTypeTur": "Trip",
+    "activityTypeAktivitet": "Activity",
+    "activityTypeMøte": "Meeting",
+    "activityTitle": "Title",
+    "activityDate": "Date",
+    "activityStartTime": "Start time",
+    "activityEndTime": "End time",
+    "activityLocation": "Location",
+    "activityNote": "Note",
+    "activityDocuments": "Documents",
+    "activityUploadDoc": "Upload document",
+    "activityUploadPhoto": "Upload photo",
+    "noActivities": "No activities added"
   },
   "kindergarten": {
     "title": "Our Kindergarten",
@@ -1190,7 +1207,10 @@
     "petVaccinationDesc": "Register a vaccination for a pet",
     "trips": "Trips",
     "newTrip": "New trip",
-    "newTripDesc": "Create a new trip"
+    "newTripDesc": "Create a new trip",
+    "school": "School",
+    "schoolActivity": "Trip, activity, meeting",
+    "schoolActivityDesc": "Add an activity to School"
   },
   "tabs": {
     "events": "Events",
