@@ -351,7 +351,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       <TouchableOpacity onPress={() => setIsEditing(false)} style={{ marginBottom: 8 }}>
         <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
       </TouchableOpacity>
-      <Text style={[styles.title, { color: colors.text }]}>Rediger arrangement</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Rediger avtale</Text>
 
       {/* Icon */}
       <View style={styles.field}>
