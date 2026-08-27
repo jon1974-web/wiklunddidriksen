@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { addDoc, collection, updateDoc, doc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
@@ -140,12 +140,18 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
   }, [title, address, dateFrom, dateTo, time, endTime, note, reminderMinutes, user, icon, documents, navigation, familyId]);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={{ paddingHorizontal: 20, paddingTop: 12 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
-        </TouchableOpacity>
-      </View>
+    <Modal visible transparent animationType="slide">
+      <TouchableWithoutFeedback onPress={() => navigation.goBack()}>
+        <View style={styles.modalOverlay}>
+          <TouchableWithoutFeedback>
+            <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+              <View style={styles.modalHandleBar} />
+              <View style={{ alignItems: 'flex-start', paddingHorizontal: 20, paddingTop: 4 }}>
+                <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: colors.accent, fontSize: 18 }}>✕</Text>
+                </TouchableOpacity>
+              </View>
+              <ScrollView style={{ flex: 1, paddingHorizontal: 20 }} contentContainerStyle={{ paddingBottom: 40 }}>
       <Text style={[styles.title, { color: colors.text }]}>Ny avtale</Text>
 
       {/* Icon section */}
@@ -287,6 +293,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
           <Text style={styles.buttonText}>{saving ? '...' : t('common.save')}</Text>
         </TouchableOpacity>
       </View>
+              </ScrollView>
 
       <DatePickerModal
         visible={activePicker !== null}
@@ -298,12 +305,18 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         onSelect={handlePickerSelect}
         onClose={() => setActivePicker(null)}
       />
-    </ScrollView>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%' },
+  modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginTop: 8, marginBottom: 4 },
   title: { fontSize: 24, fontWeight: '700', marginBottom: 20 },
   field: { marginBottom: 16 },
   label: { fontSize: 13, fontWeight: '600', marginBottom: 6 },
