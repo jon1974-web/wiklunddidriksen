@@ -83,11 +83,8 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
           }
         };
 
-        const isBeforeCenter = index === 1;
-        const isAfterCenter = index === 2;
-
         return (
-          <TouchableOpacity key={route.key} style={[styles.tabItem, isBeforeCenter && styles.tabItemLeft, isAfterCenter && styles.tabItemRight]} onPress={onPress} activeOpacity={0.7}>
+          <TouchableOpacity key={route.key} style={styles.tabItem} onPress={onPress} activeOpacity={0.7}>
             <TabIcon icon={icon} focused={isFocused} accentColor={colors.accent} />
             <Text style={[styles.tabLabel, { color: isFocused ? colors.accent : colors.textDisabled }, isFocused && styles.tabLabelActive]}>
               {label}
@@ -131,12 +128,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 3,
     paddingTop: 4,
-  },
-  tabItemLeft: {
-    paddingRight: 20,
-  },
-  tabItemRight: {
-    paddingLeft: 20,
   },
   tabLabel: {
     fontSize: 10,
