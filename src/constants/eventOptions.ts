@@ -1,12 +1,10 @@
 import i18n from '../i18n';
+import { REMINDER_OPTIONS } from './reminderOptions';
 
-export const getReminderOptions = () => [
-  { label: i18n.t('events.reminder15'), value: 15 },
-  { label: i18n.t('events.reminder30'), value: 30 },
-  { label: i18n.t('events.reminder60'), value: 60 },
-  { label: i18n.t('events.reminder120'), value: 120 },
-  { label: i18n.t('events.reminder1440'), value: 1440 },
-];
+export const getReminderOptions = () => REMINDER_OPTIONS.map(o => ({
+  label: o.value === 0 ? i18n.t('health.noReminder') : `${o.label}`,
+  value: o.value,
+}));
 
 export const getEndDateOptions = () => [
   { label: i18n.t('events.endDate1'), value: 1 },

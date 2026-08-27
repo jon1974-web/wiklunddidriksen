@@ -15,6 +15,18 @@ const crypto = require("crypto");
 
 initializeApp();
 
+function reminderMinutesLabel(minutes) {
+  if (!minutes || minutes <= 0) return '';
+  if (minutes < 60) return `${minutes} minutter`;
+  if (minutes === 60) return '1 time';
+  if (minutes === 120) return '2 timer';
+  if (minutes === 1440) return '1 dag';
+  if (minutes === 10080) return '1 uke';
+  if (minutes < 1440) return `${minutes / 60} timer`;
+  if (minutes < 10080) return `${minutes / 1440} dager`;
+  return `${minutes / 10080} uker`;
+}
+
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
 const SPOND_API_BASE = "https://api.spond.com/core/v1";
@@ -843,7 +855,7 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
       const sent = await sendNotification({
         familyId,
         title: `📅 ${eventData.title}`,
-        body: `Påminnelse om ${eventData.reminderMinutes} minutter`,
+        body: `Påminnelse: ${eventData.title} om ${reminderMinutesLabel(eventData.reminderMinutes)}`,
         notifKey: doc.id,
       });
       totalSent += sent;

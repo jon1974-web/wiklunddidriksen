@@ -28,6 +28,7 @@ import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { MODULE_COLORS } from '../constants/moduleColors';
+import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { getTodayLocal } from '../utils/dateUtils';
 
 const PET_ICONS: Record<string, string> = { 'Katt': '🐱', 'Hund': '🐶', 'Fisk': '🐟', 'Fugl': '🐦', 'Kanin': '🐰', 'Hamster': '🐹', 'Skilpadde': '🐢', 'Hest': '🐴', 'Anna': '🐾' };
@@ -72,11 +73,11 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
-  const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
-  const [vaccForm, setVaccForm] = useState({ name: '', date: '', nextDue: '', reminder: '', status: 'completed' as 'completed' | 'pending', note: '' });
+  const [vaccForm, setVaccForm] = useState({ name: '', date: '', nextDue: '', reminder: 0, status: 'completed' as 'completed' | 'pending', note: '' });
   const [insForm, setInsForm] = useState({ provider: '', policyNumber: '', expiryDate: '', documentUrl: '', note: '' });
 
   const isDatePast = useCallback((dateStr: string): boolean => {
@@ -169,7 +170,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
     const { id, section } = editingItem;
     if (section === 'vetVisits') {
       const item = vetVisits.find(v => v.id === id);
-      if (item) setVetForm({ title: item.title, doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', status: item.status, documents: item.documents || [] });
+      if (item) setVetForm({ title: item.title, doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || 0, status: item.status, documents: item.documents || [] });
     } else if (section === 'medications') {
       const item = medications.find(m => m.id === id);
       if (item) setMedForm({ name: item.name, dosage: item.dosage, frequency: item.frequency || 1, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }], dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
@@ -181,7 +182,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
       if (item) setGroomForm({ name: item.name, lastDate: item.lastDate, nextDate: item.nextDate || '', note: item.note || '' });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
-      if (item) setVaccForm({ name: item.name, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', status: item.status, note: item.note || '' });
+      if (item) setVaccForm({ name: item.name, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || 0, status: item.status, note: item.note || '' });
     } else if (section === 'insurance') {
       const item = insurance.find(i => i.id === id);
       if (item) setInsForm({ provider: item.provider, policyNumber: item.policyNumber, expiryDate: item.expiryDate, documentUrl: item.documentUrl || '', note: item.note || '' });
@@ -241,11 +242,11 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId }, user?.uid);
         }
         if (!isEditing && vetForm.dateFrom) {
-          const reminderMinutes = vetForm.reminder ? (vetForm.reminder.includes('1 d') ? 1440 : vetForm.reminder.includes('3') ? 4320 : 10080) : 0;
+          const reminderMinutes = vetForm.reminder || 0;
           const eventDate = new Date(`${vetForm.dateFrom}T${vetForm.startTime || '09:00'}:00`);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
-        setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
+        setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, status: 'planned' });
       } else if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetMedication(editingItem.id, medForm);
@@ -272,7 +273,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           savedVacc = { ...vaccForm, id };
         }
         if (!isEditing && vaccForm.date) {
-          const reminderMinutes = vaccForm.reminder ? (vaccForm.reminder.includes('1 d') ? 1440 : vaccForm.reminder.includes('3') ? 4320 : 10080) : 0;
+          const reminderMinutes = vaccForm.reminder || 0;
           const vaccDate = new Date(`${vaccForm.date}T09:00:00`);
           const eventData = {
             title: `${PET_ICONS[selectedPet.type] || '🐾'} ${selectedPet.name}: ${vaccForm.name}`,
@@ -291,7 +292,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           const docRef = await addDoc(collection(db, 'events'), eventData);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vaccForm.name}`, vaccForm.date, '', '', 'vaccination', user?.displayName || '', selectedPet.name).catch(() => {});
         }
-        setVaccForm({ name: '', date: '', nextDue: '', reminder: '', status: 'completed', note: '' });
+        setVaccForm({ name: '', date: '', nextDue: '', reminder: 0, status: 'completed', note: '' });
       } else if (activeSection === 'insurance') {
         if (!insForm.provider.trim()) { crossAlert('Error', t('pets.enterInsuranceInfo')); return; }
         if (isEditing) await updatePetInsurance(editingItem.id, insForm);
@@ -335,11 +336,11 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   };
 
   const resetItemForms = () => {
-    setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned', documents: [] });
+    setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, status: 'planned', documents: [] });
     setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
     setFoodForm({ name: '', time: '', amount: '', note: '' });
     setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
-    setVaccForm({ name: '', date: '', nextDue: '', reminder: '', status: 'completed', note: '' });
+    setVaccForm({ name: '', date: '', nextDue: '', reminder: 0, status: 'completed', note: '' });
     setInsForm({ provider: '', policyNumber: '', expiryDate: '', documentUrl: '', note: '' });
   };
 
@@ -842,10 +843,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                     </View>
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
-                      <View style={styles.personRow}>
-                        {['', t('health.reminder1Day'), t('health.reminder3Days'), t('health.reminder1Week')].map((r, i) => (
-                          <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: vetForm.reminder === r ? PET_THEME : colors.inputBackground }]} onPress={() => setVetForm(f => ({ ...f, reminder: r }))}>
-                            <Text style={{ color: vetForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                        {REMINDER_OPTIONS.map((option) => (
+                          <TouchableOpacity key={option.value} style={[styles.personChip, { backgroundColor: vetForm.reminder === option.value ? PET_THEME : colors.inputBackground }]} onPress={() => setVetForm(f => ({ ...f, reminder: option.value }))}>
+                            <Text style={{ color: vetForm.reminder === option.value ? '#fff' : colors.text, fontSize: 13 }}>{option.label}</Text>
                           </TouchableOpacity>
                         ))}
                       </View>
@@ -1015,10 +1016,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                     </View>
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
-                      <View style={styles.personRow}>
-                        {['', t('health.reminder1Day'), t('health.reminder3Days'), t('health.reminder1Week')].map((r, i) => (
-                          <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: vaccForm.reminder === r ? PET_THEME : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, reminder: r }))}>
-                            <Text style={{ color: vaccForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
+                      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                        {REMINDER_OPTIONS.map((option) => (
+                          <TouchableOpacity key={option.value} style={[styles.personChip, { backgroundColor: vaccForm.reminder === option.value ? PET_THEME : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, reminder: option.value }))}>
+                            <Text style={{ color: vaccForm.reminder === option.value ? '#fff' : colors.text, fontSize: 13 }}>{option.label}</Text>
                           </TouchableOpacity>
                         ))}
                       </View>

@@ -14,6 +14,7 @@ import { EVENT_ICONS } from '../constants/eventIcons';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
 import { DocumentUpload } from './DocumentUpload';
+import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 
 interface AddEventModalProps {
   visible: boolean;
@@ -32,14 +33,6 @@ interface AddEventModalProps {
     documents?: { url: string; fileName: string; type: 'image' | 'document' }[];
   };
 }
-
-const REMINDER_OPTIONS = [
-  { label: '30 min', value: 30 },
-  { label: '1 time', value: 60 },
-  { label: '2 timer', value: 120 },
-  { label: '1 dag', value: 1440 },
-  { label: '1 uke', value: 10080 },
-];
 
 const addOneHour = (time: string): string => {
   const [h, m] = time.split(':').map(Number);

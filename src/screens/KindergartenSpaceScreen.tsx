@@ -12,6 +12,7 @@ import { DatePickerModal } from '../components/DatePickerModal';
 import * as ImagePicker from 'expo-image-picker';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
+import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { getErrorMessage } from '../utils/validation';
 import { notifyHealthItem } from '../services/familyService';
 import {
@@ -78,7 +79,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   // Activities state
   const [activities, setActivities] = useState<KindergartenActivity[]>([]);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
-  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const [activityActionModal, setActivityActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   type ActivityPickerField = 'dateFrom' | 'dateTo' | 'startTime' | 'endTime' | null;
@@ -193,7 +194,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   useEffect(() => {
     if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild) {
       setEditingActivityId(null);
-      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
       setShowAddActivityModal(true);
       navigation.setParams({ openAddSection: undefined });
     }
@@ -205,7 +206,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
       }
       if (selectedChild) {
         setEditingActivityId(route.params!.editActivityId);
-        setActivityForm(route.params!.editActivityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+        setActivityForm(route.params!.editActivityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
         setShowAddActivityModal(true);
         navigation.setParams({ editActivityId: undefined, editActivityData: undefined, childId: undefined });
       }
@@ -493,17 +494,11 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     try {
       const user = useUserStore.getState().user;
       const activityData: any = { ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId, createdBy: user?.uid || '' };
-      if (activityForm.reminder && activityForm.dateFrom) {
+      if (activityForm.reminder > 0 && activityForm.dateFrom) {
         const time = activityForm.startTime || '09:00';
         const eventTime = new Date(`${activityForm.dateFrom}T${time}:00`);
-        let reminderMs = 0;
-        if (activityForm.reminder === '1 time før') reminderMs = 60 * 60 * 1000;
-        else if (activityForm.reminder === '1 dag før') reminderMs = 24 * 60 * 60 * 1000;
-        else if (activityForm.reminder === '3 dager før') reminderMs = 3 * 24 * 60 * 60 * 1000;
-        else if (activityForm.reminder === '1 uke før') reminderMs = 7 * 24 * 60 * 60 * 1000;
-        if (reminderMs > 0) {
-          activityData.reminderAt = new Date(eventTime.getTime() - reminderMs).toISOString();
-        }
+        const reminderMs = activityForm.reminder * 60 * 1000;
+        activityData.reminderAt = new Date(eventTime.getTime() - reminderMs).toISOString();
       }
       if (editingActivityId) {
         await updateKindergartenActivity(familyId, editingActivityId, activityData);
@@ -511,7 +506,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
         await addKindergartenActivity(activityData);
         notifyHealthItem(familyId, activityForm.title, activityForm.dateFrom, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
       }
-      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
       setEditingActivityId(null);
       setShowAddActivityModal(false);
       loadYearData();
@@ -1049,7 +1044,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({activities.length})</Text>
                     <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.activities ? '▼' : '▶'}</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] }); setShowAddActivityModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] }); setShowAddActivityModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </TouchableOpacity>
@@ -1425,9 +1420,9 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
                       <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                        {['', '1 time før', '1 dag før', '3 dager før', '1 uke før'].map((r, i) => (
-                          <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: activityForm.reminder === r ? KINDERGARTEN_THEME : colors.inputBackground }]} onPress={() => setActivityForm(f => ({ ...f, reminder: r }))}>
-                            <Text style={{ color: activityForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
+                        {REMINDER_OPTIONS.map((option) => (
+                          <TouchableOpacity key={option.value} style={[styles.personChip, { backgroundColor: activityForm.reminder === option.value ? KINDERGARTEN_THEME : colors.inputBackground }]} onPress={() => setActivityForm(f => ({ ...f, reminder: option.value }))}>
+                            <Text style={{ color: activityForm.reminder === option.value ? '#fff' : colors.text, fontSize: 13 }}>{option.label}</Text>
                           </TouchableOpacity>
                         ))}
                       </View>
