@@ -197,21 +197,20 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
       setShowAddActivityModal(true);
       navigation.setParams({ openAddSection: undefined });
     }
-    if (route?.params?.editActivityId && activities.length > 0) {
-      const activity = activities.find(a => a.id === route.params!.editActivityId);
-      if (activity) {
-        // Auto-select the child if not already selected
-        if (!selectedChild || selectedChild.id !== activity.childId) {
-          const child = children.find(c => c.id === activity.childId);
-          if (child) setSelectedChild(child);
-        }
-        setEditingActivityId(activity.id);
-        setActivityForm({ title: activity.title, activityType: activity.activityType, dateFrom: activity.dateFrom, dateTo: activity.dateTo || '', startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [] });
+    if (route?.params?.editActivityId) {
+      // Auto-select the child if passed
+      if (route?.params?.childId && (!selectedChild || selectedChild.id !== route.params.childId)) {
+        const child = children.find(c => c.id === route.params!.childId);
+        if (child) { setSelectedChild(child); return; }
+      }
+      if (selectedChild) {
+        setEditingActivityId(route.params!.editActivityId);
+        setActivityForm(route.params!.editActivityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
         setShowAddActivityModal(true);
-        navigation.setParams({ editActivityId: undefined });
+        navigation.setParams({ editActivityId: undefined, editActivityData: undefined, childId: undefined });
       }
     }
-  }, [route?.params?.openAddSection, route?.params?.editActivityId, familyId, selectedYear, selectedChild, children, activities]);
+  }, [route?.params?.openAddSection, route?.params?.editActivityId, familyId, selectedYear, selectedChild, children]);
 
   useEffect(() => {
     if (selectedChild && years.length > 0 && !selectedYear) {
