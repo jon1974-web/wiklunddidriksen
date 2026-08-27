@@ -6,7 +6,6 @@ export const EVENT_ICONS = [
   { emoji: '✈️', label: 'Reise' },
   { emoji: '🏫', label: 'Skole' },
   { emoji: '🍕', label: 'Restaurant' },
-  { emoji: '🏖️', label: 'Ferie' },
   { emoji: '🎬', label: 'Kino' },
   { emoji: '🎵', label: 'Konsert' },
   { emoji: '💪', label: 'Trening' },
@@ -19,6 +18,4 @@ export const EVENT_ICONS = [
   { emoji: '🚴', label: 'Sykling' },
   { emoji: '🏔️', label: 'Fjelltur' },
   { emoji: '🎣', label: 'Fiske' },
-  { emoji: '🩺', label: 'Lege' },
-  { emoji: '🧠', label: 'Psykolog' },
 ];

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Platform, Linking, Image } from 'react-native';
-import { doc, updateDoc, deleteDoc, deleteField } from 'firebase/firestore';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Linking, Image } from 'react-native';
+import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
 import { Event } from '../types';
@@ -10,8 +10,8 @@ import { getUserProfile } from '../services/familyService';
 import { syncEventToCalendar, updateCalendarEvent, deleteCalendarEvent } from '../services/calendarService';
 import { DocumentUpload } from '../components/DocumentUpload';
 import { useUserStore } from '../store/userStore';
-import { getReminderOptions, getEndDateOptions, getEndTimeOptions } from '../constants/eventOptions';
-import { sanitizeInput, getErrorMessage } from '../utils/validation';
+import { getReminderOptions } from '../constants/eventOptions';
+import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { EVENT_ICONS } from '../constants/eventIcons';
 import { AppIcon } from '../components/AppIcon';
@@ -36,68 +36,52 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [editDocuments, setEditDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(event.documents || []);
   const canDelete = eventData.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
   
-  const getInitialEndDateDays = () => {
-    if (!event.endDate) return null;
-    const start = new Date(event.date);
-    const end = new Date(event.endDate);
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    if (diffDays >= 1 && diffDays <= 4) return diffDays;
-    return null;
+  const addOneHour = (t: string): string => {
+    const [h, m] = t.split(':').map(Number);
+    const total = h * 60 + m + 60;
+    return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
   };
 
-  const getInitialEndTimeDuration = () => {
-    if (!event.endTime) return '';
-    const [startHour, startMin] = event.time.split(':').map(Number);
-    const [endHour, endMin] = event.endTime.split(':').map(Number);
-    const startMins = startHour * 60 + startMin;
-    const endMins = endHour * 60 + endMin;
-    const duration = endMins - startMins;
-    if (duration > 0 && [30, 60, 90, 120].includes(duration)) {
-      return String(duration);
-    }
-    return '';
-  };
+  const REMINDER_OPTIONS = [
+    { label: '30 min', value: 30 },
+    { label: '1 time', value: 60 },
+    { label: '2 timer', value: 120 },
+    { label: '1 dag', value: 1440 },
+    { label: '1 uke', value: 10080 },
+  ];
 
-  const [title, setTitle] = useState(event.title);
-  const [description, setDescription] = useState(event.description || '');
-  const [address, setAddress] = useState(event.address || '');
-  const [date, setDate] = useState(event.date);
-  const [endDateDays, setEndDateDays] = useState<number | null>(getInitialEndDateDays());
-  const [customEndDate, setCustomEndDate] = useState(event.endDate && !getInitialEndDateDays() ? event.endDate : '');
-  const [showEndDate, setShowEndDate] = useState(!!event.endDate);
-  const [time, setTime] = useState(event.time);
-  const [endTime, setEndTime] = useState(getInitialEndTimeDuration());
-  const [showEndTime, setShowEndTime] = useState(!!event.endTime);
-  const [customEndTime, setCustomEndTime] = useState(event.endTime && !getInitialEndTimeDuration() ? event.endTime : '');
-  const [reminderMinutes, setReminderMinutes] = useState(event.reminderMinutes);
+  const [editTitle, setEditTitle] = useState(event.title);
+  const [editAddress, setEditAddress] = useState(event.address || '');
+  const [editDateFrom, setEditDateFrom] = useState(event.date);
+  const [editDateTo, setEditDateTo] = useState(event.endDate || event.date);
+  const [editTime, setEditTime] = useState(event.time);
+  const [editEndTime, setEditEndTime] = useState(event.endTime || addOneHour(event.time));
+  const [editNote, setEditNote] = useState(event.description || '');
+  const [editReminderMinutes, setEditReminderMinutes] = useState(event.reminderMinutes);
+  const [editIcon, setEditIcon] = useState(event.icon || '');
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
-  const [icon, setIcon] = useState(event.icon || '');
   const [showFullNote, setShowFullNote] = useState(false);
 
-  type DetailPickerField = 'date' | 'time' | 'endDate' | 'endTime' | null;
-  const [activePicker, setActivePicker] = useState<DetailPickerField>(null);
+  type EditPickerField = 'dateFrom' | 'dateTo' | 'time' | 'endTime' | null;
+  const [editActivePicker, setEditActivePicker] = useState<EditPickerField>(null);
 
-  const getPickerTitle = () => {
-    const titles: Record<string, string> = { date: 'Velg dato', time: 'Velg tid', endDate: 'Velg sluttdato', endTime: 'Velg sluttid' };
-    return activePicker ? titles[activePicker] : '';
-  };
-
-  const getPickerValue = () => {
-    const values: Record<string, string> = { date, time, endDate: customEndDate, endTime: customEndTime };
-    return activePicker ? values[activePicker] || '' : '';
-  };
+  const isTimePicker = editActivePicker === 'time' || editActivePicker === 'endTime';
 
   const handlePickerSelect = (value: string) => {
-    if (activePicker === 'date') setDate(value);
-    else if (activePicker === 'time') setTime(value);
-    else if (activePicker === 'endDate') setCustomEndDate(value);
-    else if (activePicker === 'endTime') setCustomEndTime(value);
-    setActivePicker(null);
+    if (editActivePicker === 'dateFrom') {
+      setEditDateFrom(value);
+      if (!editDateTo || editDateTo === editDateFrom) setEditDateTo(value);
+    } else if (editActivePicker === 'dateTo') {
+      setEditDateTo(value);
+    } else if (editActivePicker === 'time') {
+      setEditTime(value);
+      setEditEndTime(addOneHour(value));
+    } else if (editActivePicker === 'endTime') {
+      setEditEndTime(value);
+    }
+    setEditActivePicker(null);
   };
-
-  const isTimePicker = activePicker === 'time' || activePicker === 'endTime';
 
   useEffect(() => {
     if (user?.uid) {
@@ -111,92 +95,46 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   }, [user?.uid]);
 
   const handleUpdate = useCallback(async () => {
-    if (!title.trim()) {
+    if (!editTitle.trim()) {
       crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
 
     try {
-      const [hours, mins] = time.split(':').map(Number);
-      const eventStartDate = new Date(date);
+      const [hours, mins] = editTime.split(':').map(Number);
+      const eventStartDate = new Date(editDateFrom);
       eventStartDate.setHours(hours, mins, 0, 0);
-      const reminderAt = new Date(eventStartDate.getTime() - reminderMinutes * 60 * 1000);
+      const reminderAt = new Date(eventStartDate.getTime() - editReminderMinutes * 60 * 1000);
 
       const updateData: any = {
-        title: title.trim(),
-        description: description.trim() || null,
-        address: address.trim() || null,
-        date,
-        time,
-        reminderMinutes,
+        title: editTitle.trim(),
+        description: editNote.trim() || null,
+        address: editAddress.trim() || null,
+        date: editDateFrom,
+        time: editTime,
+        endDate: editDateTo,
+        endTime: editEndTime,
+        reminderMinutes: editReminderMinutes,
         reminderAt: reminderAt.toISOString(),
-        icon: icon || null,
+        icon: editIcon || null,
         documents: editDocuments.length > 0 ? editDocuments : [],
       };
-
-      if (showEndDate) {
-        if (customEndDate) {
-          updateData.endDate = customEndDate;
-        } else if (endDateDays) {
-          const start = new Date(date);
-          start.setDate(start.getDate() + endDateDays);
-          updateData.endDate = start.toISOString().split('T')[0];
-        } else {
-          // Samme dag - end date equals start date
-          updateData.endDate = date;
-        }
-      } else {
-        // Default to same day
-        updateData.endDate = date;
-      }
-
-      if (showEndTime) {
-        if (endTime) {
-          const [hours, mins] = time.split(':').map(Number);
-          const addMins = parseInt(endTime);
-          const totalMins = hours * 60 + mins + addMins;
-          const endHour = Math.floor(totalMins / 60);
-          const endMin = totalMins % 60;
-          updateData.endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-        } else if (customEndTime) {
-          updateData.endTime = customEndTime;
-        }
-      } else {
-        // Always set a default endTime (1 hour after start)
-        const [hours, mins] = time.split(':').map(Number);
-        const totalMins = hours * 60 + mins + 60;
-        const endHour = Math.floor(totalMins / 60);
-        const endMin = totalMins % 60;
-        updateData.endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-      }
 
       await updateDoc(doc(db, 'events', event.id), updateData);
 
       if (user?.uid) {
         const profile = await getUserProfile(user.uid);
         if (profile?.calendarId) {
-          const [hours, mins] = time.split(':').map(Number);
-          const startDate = new Date(date);
-          startDate.setHours(hours, mins, 0, 0);
-          let endDate: Date | undefined;
-          if (updateData.endDate) {
-            const endParsed = new Date(updateData.endDate);
-            endParsed.setHours(hours, mins, 0, 0);
-            endDate = endParsed;
-          }
-          if (updateData.endTime) {
-            const [eH, eM] = updateData.endTime.split(':').map(Number);
-            const endBase = endDate || new Date(startDate);
-            endBase.setHours(eH, eM, 0, 0);
-            endDate = endBase;
-          }
+          const [eH, eM] = editEndTime.split(':').map(Number);
+          const endDate = new Date(editDateTo);
+          endDate.setHours(eH, eM, 0, 0);
           const syncParams = {
-            title: title.trim(),
-            description: description.trim() || undefined,
-            address: address.trim() || undefined,
-            startDate,
+            title: editTitle.trim(),
+            description: editNote.trim() || undefined,
+            address: editAddress.trim() || undefined,
+            startDate: eventStartDate,
             endDate,
-            reminderMinutes,
+            reminderMinutes: editReminderMinutes,
           };
           if (event.calendarEventId) {
             await updateCalendarEvent(event.calendarEventId, syncParams);
@@ -218,7 +156,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [title, description, address, date, time, reminderMinutes, user, showEndDate, customEndDate, endDateDays, showEndTime, endTime, customEndTime, icon, event, navigation]);
+  }, [editTitle, editAddress, editDateFrom, editDateTo, editTime, editEndTime, editNote, editReminderMinutes, editIcon, editDocuments, user, event]);
 
   const handleCopy = useCallback(() => {
     navigation.navigate('AddEvent', {
@@ -332,7 +270,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <View style={styles.viewDetailRow}>
             <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>
-              {getReminderOptions().find((o) => o.value === reminderMinutes)?.label || `${reminderMinutes} min`}
+              {getReminderOptions().find((o) => o.value === eventData.reminderMinutes)?.label || `${eventData.reminderMinutes} min`}
             </Text>
           </View>
           {eventData.description && (
@@ -415,39 +353,85 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       </TouchableOpacity>
       <Text style={[styles.title, { color: colors.text }]}>Rediger arrangement</Text>
 
+      {/* Icon */}
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
         <View style={styles.iconGrid}>
           {EVENT_ICONS.map((item) => (
             <TouchableOpacity
               key={item.emoji}
-              style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, icon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-              onPress={() => setIcon(icon === item.emoji ? '' : item.emoji)}
+              style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, editIcon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+              onPress={() => setEditIcon(editIcon === item.emoji ? '' : item.emoji)}
             >
               <Text style={styles.iconEmoji}>{item.emoji}</Text>
-              <Text style={[styles.iconLabel, { color: icon === item.emoji ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
+              <Text style={[styles.iconLabel, { color: editIcon === item.emoji ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
             </TouchableOpacity>
           ))}
         </View>
       </View>
 
+      {/* Title */}
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-          value={title}
-          onChangeText={setTitle}
+          value={editTitle}
+          onChangeText={setEditTitle}
           placeholder="F.eks. Familiemiddag"
           placeholderTextColor={colors.textDisabled}
         />
       </View>
 
+      {/* Date from / Date to */}
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        <View style={[styles.field, { flex: 1 }]}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateFrom')}</Text>
+          <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('dateFrom')}>
+            <Text style={[styles.dateText, { color: colors.text }]}>{editDateFrom}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={[styles.field, { flex: 1 }]}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateTo')}</Text>
+          <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('dateTo')}>
+            <Text style={[styles.dateText, { color: colors.text }]}>{editDateTo}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Time from / Time to */}
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        <View style={[styles.field, { flex: 1 }]}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeFrom')}</Text>
+          <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('time')}>
+            <Text style={[styles.dateText, { color: colors.text }]}>{editTime}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={[styles.field, { flex: 1 }]}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeTo')}</Text>
+          <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('endTime')}>
+            <Text style={[styles.dateText, { color: colors.text }]}>{editEndTime}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Location */}
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
+        <GooglePlacesInput
+          value={editAddress}
+          onChangeText={setEditAddress}
+          placeholder="Søk etter adresse..."
+          onSelect={setEditAddress}
+        />
+      </View>
+
+      {/* Note */}
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, styles.textArea]}
-          value={description}
-          onChangeText={setDescription}
+          value={editNote}
+          onChangeText={setEditNote}
           placeholder="Legg til en beskrivelse..."
           placeholderTextColor={colors.textDisabled}
           multiline
@@ -455,112 +439,17 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         />
       </View>
 
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
-        <GooglePlacesInput
-          value={address}
-          onChangeText={setAddress}
-          placeholder="Søk etter adresse..."
-          onSelect={setAddress}
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Start dato</Text>
-        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setActivePicker('date')}>
-          <Text style={[styles.dateText, { color: colors.text }]}>{date}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {!showEndDate ? (
-        <TouchableOpacity onPress={() => setShowEndDate(true)}>
-          <Text style={[styles.addLink, { color: colors.accent }]}>+ Legg til sluttdato</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>Varighet</Text>
-          <View style={styles.reminderOptions}>
-            {getEndDateOptions().map((option) => (
-              <TouchableOpacity
-                key={option.value}
-                style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endDateDays === option.value && !customEndDate && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-                onPress={() => { setEndDateDays(option.value); setCustomEndDate(''); }}
-              >
-                <Text style={[styles.reminderText, { color: endDateDays === option.value && !customEndDate ? '#fff' : colors.textSecondary }]}>
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-            <TouchableOpacity
-              style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, customEndDate && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-              onPress={() => setActivePicker('endDate')}
-            >
-              <Text style={[styles.reminderText, { color: customEndDate ? '#fff' : colors.textSecondary }]}>
-                Velg dato
-              </Text>
-            </TouchableOpacity>
-          </View>
-          {customEndDate && (
-            <Text style={[styles.selectedDate, { color: colors.textSecondary }]}>Valgt: {customEndDate}</Text>
-          )}
-          <TouchableOpacity onPress={() => { setShowEndDate(false); setEndDateDays(null); setCustomEndDate(''); }}>
-            <Text style={[styles.removeLink, { color: colors.danger }]}>Fjern sluttdato</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Starttid</Text>
-        <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setActivePicker('time')}>
-          <Text style={[styles.dateText, { color: colors.text }]}>{time}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {!showEndTime ? (
-        <TouchableOpacity onPress={() => setShowEndTime(true)}>
-          <Text style={[styles.addLink, { color: colors.accent }]}>+ Legg til sluttid</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>Varighet</Text>
-          <View style={styles.reminderOptions}>
-            {getEndTimeOptions().map((option) => (
-              <TouchableOpacity
-                key={option.value}
-                style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, endTime === String(option.value) && !customEndTime && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-                onPress={() => { setShowEndTime(true); setEndTime(String(option.value)); setCustomEndTime(''); }}
-              >
-                <Text style={[styles.reminderText, { color: endTime === String(option.value) && !customEndTime ? '#fff' : colors.textSecondary }]}>
-                  {option.label}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-          <Text style={[styles.hintText, { color: colors.textSecondary }]}>Standardvarighet er 1 time hvis ingen varighet velges</Text>
-          <TouchableOpacity
-            style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, customEndTime && !endTime && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-            onPress={() => { setActivePicker('endTime'); setEndTime(''); }}
-          >
-            <Text style={[styles.reminderText, { color: customEndTime && !endTime ? '#fff' : colors.textSecondary }]}>
-              {customEndTime || 'Velg tidspunkt'}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => { setShowEndTime(false); setEndTime(''); setCustomEndTime(''); }}>
-            <Text style={[styles.removeLink, { color: colors.danger }]}>Fjern sluttid</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
+      {/* Reminders */}
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('events.reminder')}</Text>
         <View style={styles.reminderOptions}>
-          {getReminderOptions().map((option) => (
+          {REMINDER_OPTIONS.map((option) => (
             <TouchableOpacity
               key={option.value}
-              style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, reminderMinutes === option.value && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-              onPress={() => setReminderMinutes(option.value)}
+              style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, editReminderMinutes === option.value && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+              onPress={() => setEditReminderMinutes(option.value)}
             >
-              <Text style={[styles.reminderText, { color: reminderMinutes === option.value ? '#fff' : colors.textSecondary }]}>
+              <Text style={[styles.reminderText, { color: editReminderMinutes === option.value ? '#fff' : colors.textSecondary }]}>
                 {option.label}
               </Text>
             </TouchableOpacity>
@@ -568,6 +457,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         </View>
       </View>
 
+      {/* Documents */}
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
         <DocumentUpload
@@ -589,25 +479,24 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         )}
       </View>
 
-      <TouchableOpacity style={[styles.updateButton, { backgroundColor: colors.accent }]} onPress={handleUpdate}>
-        <Text style={styles.buttonText}>Oppdater</Text>
+      {/* Save */}
+      <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleUpdate}>
+        <Text style={styles.buttonText}>{t('common.save')}</Text>
       </TouchableOpacity>
 
-      {canDelete && (
-        <TouchableOpacity style={[styles.deleteButton, { backgroundColor: colors.surface, borderColor: colors.danger }]} onPress={handleDelete}>
-          <Text style={[styles.deleteButtonText, { color: colors.danger }]}>Slett</Text>
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]} onPress={() => setIsEditing(false)}>
+        <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+      </TouchableOpacity>
 
       <DatePickerModal
-        visible={activePicker !== null}
-        title={getPickerTitle()}
+        visible={editActivePicker !== null}
+        title={editActivePicker === 'dateFrom' ? t('kindergarten.holidayDateFrom') : editActivePicker === 'dateTo' ? t('kindergarten.holidayDateTo') : editActivePicker === 'time' ? t('kindergarten.holidayTimeFrom') : t('kindergarten.holidayTimeTo')}
         mode={isTimePicker ? 'time' : 'date'}
         dateOffset={isTimePicker ? 0 : -365}
         dateCount={isTimePicker ? 48 : 730}
-        selectedValue={getPickerValue()}
+        selectedValue={editActivePicker === 'dateFrom' ? editDateFrom : editActivePicker === 'dateTo' ? editDateTo : editActivePicker === 'time' ? editTime : editEndTime}
         onSelect={handlePickerSelect}
-        onClose={() => setActivePicker(null)}
+        onClose={() => setEditActivePicker(null)}
       />
     </ScrollView>
   );
@@ -616,7 +505,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 12,
+    padding: 20,
   },
   detailCard: {
     backgroundColor: '#fff',
@@ -634,9 +523,9 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    marginBottom: 24,
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 20,
   },
   viewCard: {
     borderRadius: 12,
@@ -715,12 +604,12 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   field: {
-    marginBottom: 20,
+    marginBottom: 16,
   },
   label: {
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: '600',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   iconGrid: {
     flexDirection: 'row',
@@ -728,23 +617,24 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   iconOption: {
-    width: 72,
-    paddingVertical: 10,
-    paddingHorizontal: 4,
+    width: 60,
+    height: 60,
     borderRadius: 12,
-    borderWidth: 1,
     alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1.5,
   },
   iconEmoji: {
-    fontSize: 24,
+    fontSize: 22,
   },
   iconLabel: {
-    fontSize: 10,
+    fontSize: 9,
     marginTop: 2,
+    fontWeight: '600',
   },
   input: {
-    padding: 16,
-    borderRadius: 12,
+    padding: 14,
+    borderRadius: 10,
     fontSize: 16,
   },
   textArea: {
@@ -753,20 +643,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 16,
-  },
-  addLink: {
-    fontSize: 16,
-    marginBottom: 20,
-    fontWeight: '600',
-  },
-  hintText: {
-    fontSize: 12,
-    marginBottom: 8,
-    fontStyle: 'italic',
-  },
-  removeLink: {
-    fontSize: 14,
-    marginTop: 8,
+    color: '#333',
   },
   reminderOptions: {
     flexDirection: 'row',
@@ -774,38 +651,24 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   reminderOption: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 20,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
     borderWidth: 1,
   },
   reminderText: {
-    fontSize: 14,
+    fontSize: 13,
+    fontWeight: '600',
   },
-  selectedDate: {
-    marginTop: 8,
-    fontSize: 14,
-  },
-  updateButton: {
+  button: {
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    marginTop: 16,
+    marginTop: 8,
   },
   buttonText: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  deleteButton: {
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginTop: 12,
-    borderWidth: 1,
-  },
-  deleteButtonText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
   },
   copyButton: {
