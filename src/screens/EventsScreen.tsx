@@ -593,7 +593,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
-  }, [events, trips, spondEvents, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource, filterModule]);
+  }, [events, trips, spondEvents, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolActivities, kindergartenActivities, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource, filterModule]);
 
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
