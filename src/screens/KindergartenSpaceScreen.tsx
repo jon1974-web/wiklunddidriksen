@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
+import { notifyHealthItem } from '../services/familyService';
 import {
   getKindergartenChildren, addKindergartenChild, updateKindergartenChild, deleteKindergartenChild,
   getKindergartenYears, addKindergartenYear, updateKindergartenYear, deleteKindergartenYear,
@@ -503,6 +504,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
         await updateKindergartenActivity(familyId, editingActivityId, activityData);
       } else {
         await addKindergartenActivity(activityData);
+        notifyHealthItem(familyId, activityForm.title, activityForm.date, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
       }
       setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
       setEditingActivityId(null);
