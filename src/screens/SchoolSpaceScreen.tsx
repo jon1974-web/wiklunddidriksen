@@ -207,6 +207,11 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     if (route?.params?.editActivityId && activities.length > 0) {
       const activity = activities.find(a => a.id === route.params!.editActivityId);
       if (activity) {
+        // Auto-select the child if not already selected
+        if (!selectedChild || selectedChild.id !== activity.childId) {
+          const child = children.find(c => c.id === activity.childId);
+          if (child) setSelectedChild(child);
+        }
         setEditingActivityId(activity.id);
         setActivityForm({ title: activity.title, activityType: activity.activityType, dateFrom: activity.dateFrom, dateTo: activity.dateTo || '', startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [] });
         setShowAddActivityModal(true);

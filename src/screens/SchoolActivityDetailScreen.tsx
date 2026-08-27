@@ -160,7 +160,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: SCHOOL_COLOR, flex: 1 }]}
-            onPress={() => navigation.navigate('SchoolSpace', { editActivityId: activity.id, returnToEvents: source === 'events' })}
+            onPress={() => navigation.navigate('SchoolSpace', { editActivityId: activity.id, childId: activity.childId, returnToEvents: source === 'events' })}
           >
             <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.edit')}</Text>
           </TouchableOpacity>
