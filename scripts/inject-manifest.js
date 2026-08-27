@@ -22,3 +22,9 @@ if (!html.includes('manifest.json')) {
   fs.writeFileSync(indexPath, html);
   console.log('✓ Updated icon references and meta tags to fampad');
 }
+
+// Write version file for PWA update detection
+const version = Date.now().toString();
+const versionPath = path.join(__dirname, '..', 'dist', 'web', 'version.json');
+fs.writeFileSync(versionPath, JSON.stringify({ version }));
+console.log(`✓ Wrote version.json (${version})`);

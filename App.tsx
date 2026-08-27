@@ -48,6 +48,7 @@ import { KindergartenAIScreen } from './src/screens/KindergartenAIScreen';
 import { SchoolContactDetailScreen } from './src/screens/SchoolContactDetailScreen';
 import { MealPlanScreen } from './src/screens/MealPlanScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
+import { UpdateBanner } from './src/components/UpdateBanner';
 
 const EventDetailScreen = React.lazy(() => import('./src/screens/EventDetailScreen').then(m => ({ default: m.EventDetailScreen })));
 const ShoppingListDetailScreen = React.lazy(() => import('./src/screens/ShoppingListDetailScreen').then(m => ({ default: m.ShoppingListDetailScreen })));
@@ -599,6 +600,7 @@ const AppContent = () => {
     <SafeAreaProvider>
       <NavigationContainer ref={navigationRef}>
         <OfflineBanner />
+        <UpdateBanner />
         {user ? (
           <>
             <Tab.Navigator

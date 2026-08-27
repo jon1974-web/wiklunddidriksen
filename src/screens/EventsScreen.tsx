@@ -723,9 +723,49 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       }
     });
 
+    // Health appointment dots
+    healthAppointments.forEach((a) => {
+      if (!a.dateFrom) return;
+      if (!marks[a.dateFrom]) {
+        marks[a.dateFrom] = { marked: true, dotColor: MODULE_COLORS.health };
+      } else {
+        marks[a.dateFrom] = { ...marks[a.dateFrom], marked: true, dotColor: MODULE_COLORS.health };
+      }
+    });
+
+    // School activity dots
+    schoolActivities.forEach((a) => {
+      if (!a.dateFrom) return;
+      if (!marks[a.dateFrom]) {
+        marks[a.dateFrom] = { marked: true, dotColor: MODULE_COLORS.school };
+      } else {
+        marks[a.dateFrom] = { ...marks[a.dateFrom], marked: true, dotColor: MODULE_COLORS.school };
+      }
+    });
+
+    // Kindergarten activity dots
+    kindergartenActivities.forEach((a) => {
+      if (!a.dateFrom) return;
+      if (!marks[a.dateFrom]) {
+        marks[a.dateFrom] = { marked: true, dotColor: MODULE_COLORS.kindergarten };
+      } else {
+        marks[a.dateFrom] = { ...marks[a.dateFrom], marked: true, dotColor: MODULE_COLORS.kindergarten };
+      }
+    });
+
+    // Pet vet visit dots
+    petVetVisits.forEach((v) => {
+      if (!v.dateFrom) return;
+      if (!marks[v.dateFrom]) {
+        marks[v.dateFrom] = { marked: true, dotColor: MODULE_COLORS.pets };
+      } else {
+        marks[v.dateFrom] = { ...marks[v.dateFrom], marked: true, dotColor: MODULE_COLORS.pets };
+      }
+    });
+
     marks[selectedDate] = { ...marks[selectedDate], selected: true, selectedColor: colors.accent };
     return marks;
-  }, [events, trips, spondEvents, birthdays, selectedDate, colors.accent]);
+  }, [events, trips, spondEvents, birthdays, healthAppointments, schoolActivities, kindergartenActivities, petVetVisits, selectedDate, colors.accent]);
 
   const currentWeek = useMemo(() => getWeekNumber(new Date(selectedDate)), [selectedDate]);
 
