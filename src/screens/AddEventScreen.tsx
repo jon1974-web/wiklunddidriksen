@@ -141,7 +141,7 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <Text style={[styles.title, { color: colors.text }]}>{t('events.addEvent')}</Text>
+      <Text style={[styles.title, { color: colors.text }]}>Ny avtale</Text>
 
       {/* Icon section */}
       <View style={styles.field}>
@@ -269,18 +269,19 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
         )}
       </View>
 
-      {/* Save */}
-      <TouchableOpacity
-        style={[styles.button, { backgroundColor: colors.accent, opacity: saving ? 0.5 : 1 }]}
-        onPress={handleSave}
-        disabled={saving}
-      >
-        <Text style={styles.buttonText}>{saving ? '...' : t('common.save')}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]} onPress={() => navigation.goBack()}>
-        <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
-      </TouchableOpacity>
+      {/* Save & Cancel */}
+      <View style={{ flexDirection: 'row', gap: 12 }}>
+        <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => navigation.goBack()}>
+          <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: colors.accent, opacity: saving ? 0.5 : 1, flex: 1 }]}
+          onPress={handleSave}
+          disabled={saving}
+        >
+          <Text style={styles.buttonText}>{saving ? '...' : t('common.save')}</Text>
+        </TouchableOpacity>
+      </View>
 
       <DatePickerModal
         visible={activePicker !== null}
