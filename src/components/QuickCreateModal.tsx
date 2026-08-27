@@ -264,6 +264,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 8,
     marginBottom: 16,
+    alignSelf: 'center',
+    width: '80%',
   },
   centerRow: {
     flexDirection: 'row',
