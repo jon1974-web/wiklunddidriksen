@@ -880,7 +880,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'healthAppointment') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const d = item.date ? new Date(item.date) : null;
+      const d = item.dateFrom ? new Date(item.dateFrom) : null;
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
@@ -936,7 +936,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'schoolActivity') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const d = item.date ? new Date(item.date) : null;
+      const d = item.dateFrom ? new Date(item.dateFrom) : null;
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
