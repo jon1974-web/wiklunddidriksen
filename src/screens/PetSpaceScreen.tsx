@@ -28,6 +28,7 @@ import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { MODULE_COLORS } from '../constants/moduleColors';
+import { getTodayLocal } from '../utils/dateUtils';
 
 const PET_ICONS: Record<string, string> = { 'Katt': '🐱', 'Hund': '🐶', 'Fisk': '🐟', 'Fugl': '🐦', 'Kanin': '🐰', 'Hamster': '🐹', 'Skilpadde': '🐢', 'Hest': '🐴', 'Anna': '🐾' };
 const PET_TYPES = ['Katt', 'Hund', 'Fisk', 'Fugl', 'Kanin', 'Skilpadde', 'Hamster', 'Hest', 'Anna'];
@@ -71,8 +72,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
-  const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
-  const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: '', dateTo: '', note: '' });
+  const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
   const [vaccForm, setVaccForm] = useState({ name: '', date: '', nextDue: '', reminder: '', status: 'completed' as 'completed' | 'pending', note: '' });
@@ -244,12 +245,12 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           const eventDate = new Date(`${vetForm.dateFrom}T${vetForm.startTime || '09:00'}:00`);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
-        setVetForm({ title: '', doctor: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
+        setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
       } else if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetMedication(editingItem.id, medForm);
         else await addPetMedication({ ...medForm, petId: selectedPet.id, familyId });
-    setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: '', dateTo: '', note: '' });
+    setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
       } else if (activeSection === 'food') {
         if (!foodForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetFood(editingItem.id, foodForm);
@@ -334,8 +335,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   };
 
   const resetItemForms = () => {
-    setVetForm({ title: '', doctor: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned', documents: [] });
-    setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: '', dateTo: '', note: '' });
+    setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned', documents: [] });
+    setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
     setFoodForm({ name: '', time: '', amount: '', note: '' });
     setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
     setVaccForm({ name: '', date: '', nextDue: '', reminder: '', status: 'completed', note: '' });
