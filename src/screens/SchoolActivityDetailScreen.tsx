@@ -83,7 +83,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
               </View>
               <View style={[styles.badge, { backgroundColor: isCompleted ? '#E8F5E9' : '#FFF3E0' }]}>
                 <Text style={{ fontSize: 10, fontWeight: '600', color: isCompleted ? '#43A047' : '#FB8C00' }}>
-                  {isCompleted ? t('health.completed') : getDaysUntil(activity.dateFrom)}
+                  {isCompleted ? t('health.completed') : getDaysUntil(toDateSafe(activity.dateFrom) || new Date())}
                 </Text>
               </View>
             </View>
@@ -183,7 +183,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
   );
 };
 
-const getDaysUntil = (date: string): string => {
+const getDaysUntil = (date: Date): string => {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const target = new Date(date);

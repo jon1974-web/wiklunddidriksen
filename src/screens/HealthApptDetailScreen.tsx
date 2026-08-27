@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { HealthAppointment } from '../types';
 import { MODULE_COLORS } from '../constants/moduleColors';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, toDateSafe } from '../utils/dateUtils';
 import { ActionModal } from '../components/ActionModal';
 import { deleteHealthAppointment } from '../services/healthService';
 import { crossAlert } from '../utils/alert';
@@ -28,7 +28,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const d = appointment.dateFrom ? new Date(appointment.dateFrom) : null;
+  const d = toDateSafe(appointment.dateFrom) || toDateSafe((appointment as any).date);
   const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
   const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
   const dayName = d ? DAY_NAMES[d.getDay()] : '';
@@ -42,7 +42,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
 
   const mapUrl = useMemo(() => appointment.location ? getStaticMapUrl(appointment.location, 15, '600x300') : null, [appointment.location]);
 
-  const isCompleted = appointment.dateFrom < new Date().toISOString().slice(0, 10);
+  const isCompleted = d ? d < new Date() : false;
 
   const familyId = useUserStore((state) => state.familyId);
 
