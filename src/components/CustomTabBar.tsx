@@ -83,8 +83,10 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
           }
         };
 
+        const flexStyle = index === 1 || index === 2 ? { flex: 0.85 } : {};
+
         return (
-          <TouchableOpacity key={route.key} style={styles.tabItem} onPress={onPress} activeOpacity={0.7}>
+          <TouchableOpacity key={route.key} style={[styles.tabItem, flexStyle]} onPress={onPress} activeOpacity={0.7}>
             <TabIcon icon={icon} focused={isFocused} accentColor={colors.accent} />
             <Text style={[styles.tabLabel, { color: isFocused ? colors.accent : colors.textDisabled }, isFocused && styles.tabLabelActive]}>
               {label}
