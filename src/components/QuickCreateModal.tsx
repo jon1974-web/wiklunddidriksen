@@ -130,14 +130,24 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                   <Text style={[styles.sectionLabel, { color: eventsSection.color }]}>{t(eventsSection.labelKey)}</Text>
                 </View>
                 <View style={styles.row}>
-                  {eventsSection.items.map((item, idx) => (
-                    <TouchableOpacity key={idx} style={styles.actionItem} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
-                      <View style={styles.iconWrap}>
-                        <AppIcon name={item.icon} size={28} color={eventsSection.color} />
-                      </View>
-                      <Text style={[styles.actionTitle, { color: lightenColor(eventsSection.color) }]}>{t(item.labelKey)}</Text>
-                    </TouchableOpacity>
-                  ))}
+                  <TouchableOpacity style={[styles.moduleCol, { alignItems: 'flex-start' }]} onPress={() => navigateAndClose(() => eventsSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={eventsSection.items[0].icon} size={28} color={eventsSection.color} />
+                    </View>
+                    <Text style={[styles.actionTitle, { color: lightenColor(eventsSection.color) }]}>{t(eventsSection.items[0].labelKey)}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => eventsSection.items[1].nav(navigation))} activeOpacity={0.6}>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={eventsSection.items[1].icon} size={28} color={eventsSection.color} />
+                    </View>
+                    <Text style={[styles.actionTitle, { color: lightenColor(eventsSection.color) }]}>{t(eventsSection.items[1].labelKey)}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.moduleCol, { alignItems: 'flex-end' }]} onPress={() => navigateAndClose(() => eventsSection.items[2].nav(navigation))} activeOpacity={0.6}>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={eventsSection.items[2].icon} size={28} color={eventsSection.color} />
+                    </View>
+                    <Text style={[styles.actionTitle, { color: lightenColor(eventsSection.color) }]}>{t(eventsSection.items[2].labelKey)}</Text>
+                  </TouchableOpacity>
                 </View>
 
                 {/* Helse + Kjæledyr row */}
