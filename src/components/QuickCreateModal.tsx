@@ -44,7 +44,7 @@ const SECTIONS: Section[] = [
     color: '#3b5a75',
     labelKey: 'quickCreate.events',
     items: [
-      { icon: 'calendar' as IconName, nav: (n: any) => n.navigate('Events', { openAddEvent: true }), labelKey: 'quickCreate.newEvent' },
+      { icon: 'calendar' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'EventsList', params: { openAddEvent: true } }), labelKey: 'quickCreate.newEvent' },
       { icon: 'chat' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.voiceEvent' },
       { icon: 'camera' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'PhotoEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.photoEvent' },
     ],
