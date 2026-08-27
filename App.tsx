@@ -49,7 +49,6 @@ import { SchoolContactDetailScreen } from './src/screens/SchoolContactDetailScre
 import { MealPlanScreen } from './src/screens/MealPlanScreen';
 import { OfflineBanner } from './src/components/OfflineBanner';
 
-const AddEventScreen = React.lazy(() => import('./src/screens/AddEventScreen').then(m => ({ default: m.AddEventScreen })));
 const EventDetailScreen = React.lazy(() => import('./src/screens/EventDetailScreen').then(m => ({ default: m.EventDetailScreen })));
 const ShoppingListDetailScreen = React.lazy(() => import('./src/screens/ShoppingListDetailScreen').then(m => ({ default: m.ShoppingListDetailScreen })));
 const RecipeDetailScreen = React.lazy(() => import('./src/screens/RecipeDetailScreen').then(m => ({ default: m.RecipeDetailScreen })));
@@ -74,8 +73,7 @@ const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 type RootStackParamList = {
-  EventsList: undefined;
-  AddEvent: { event?: Event } | undefined;
+  EventsList: { openAddEvent?: boolean; prefill?: any } | undefined;
   EventDetail: { event: Event };
   EventDetail_Spond: { event: SpondEvent; spondRespondents: SpondRespondent[]; spondConfig: { email: string; password: string } | null };
   VoiceEvent: undefined;
@@ -138,13 +136,6 @@ const EventsStack = () => {
           name="EventsList"
           component={EventsScreen}
           options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="AddEvent"
-          component={AddEventScreen}
-          options={{
-            headerShown: false,
-          }}
         />
         <Stack.Screen
           name="EventDetail"

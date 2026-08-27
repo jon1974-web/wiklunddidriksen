@@ -159,7 +159,8 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   }, [editTitle, editAddress, editDateFrom, editDateTo, editTime, editEndTime, editNote, editReminderMinutes, editIcon, editDocuments, user, event]);
 
   const handleCopy = useCallback(() => {
-    navigation.navigate('AddEvent', {
+    navigation.navigate('EventsList', {
+      openAddEvent: true,
       prefill: {
         title: eventData.title,
         description: eventData.description || '',

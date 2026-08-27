@@ -235,7 +235,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
     } : undefined;
     setParsedEvent(null);
     setTranscript(null);
-    navigation.navigate('AddEvent', { prefill: prefillData });
+    navigation.navigate('EventsList', { openAddEvent: true, prefill: prefillData });
   }, [parsedEvent, navigation]);
 
   const handleReset = useCallback(() => {

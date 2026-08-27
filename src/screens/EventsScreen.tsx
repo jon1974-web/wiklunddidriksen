@@ -21,6 +21,7 @@ import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications }
 import { getUserProfile } from '../services/familyService';
 import { getSchoolActivities } from '../services/schoolService';
 import { getKindergartenActivities } from '../services/kindergartenService';
+import { AddEventModal } from '../components/AddEventModal';
 import { getAllSchoolHolidays, getSchoolChildren } from '../services/schoolService';
 import { getAllKindergartenHolidays, getKindergartenChildren } from '../services/kindergartenService';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -33,6 +34,7 @@ import i18n from '../i18n';
 
 interface EventsScreenProps {
   navigation: any;
+  route?: any;
 }
 
 const EVENT_COLORS = ['#4CAF50', '#2196F3', '#FF9800', '#9C27B0', '#E91E63', '#00BCD4', '#8BC34A', '#FF5722'];
@@ -131,7 +133,7 @@ type UnifiedItem =
   | (SchoolActivity & { _type: 'schoolActivity'; time: string; address?: string; icon?: string })
   | (KindergartenActivity & { _type: 'kindergartenActivity'; time: string; address?: string; icon?: string });
 
-export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
+export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const [events, setEvents] = useState<Event[]>([]);
   const [trips, setTrips] = useState<Trip[]>([]);
@@ -167,6 +169,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [minUkeSections, setMinUkeSections] = useState<Record<string, boolean>>({ meals: true });
   const [tripSubcollections, setTripSubcollections] = useState<Record<string, any>>({});
+  const [showAddEventModal, setShowAddEventModal] = useState(false);
+  const [addEventPrefill, setAddEventPrefill] = useState<any>(undefined);
   const user = useUserStore((state) => state.user);
   const scrollY = useRef(0);
   const headerVisible = useRef(true);
@@ -204,6 +208,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     });
     return () => unsubscribe();
   }, [familyId]);
+
+  useEffect(() => {
+    if (route?.params?.openAddEvent) {
+      setAddEventPrefill(route.params.prefill || undefined);
+      setShowAddEventModal(true);
+      navigation.setParams({ openAddEvent: undefined, prefill: undefined });
+    }
+  }, [route?.params?.openAddEvent]);
 
   const loadTrips = useCallback(async () => {
     if (!familyId) return;
@@ -1286,6 +1298,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         title={eventActionModal.title}
         onDelete={eventActionModal.onDelete}
         onCancel={() => setEventActionModal({ visible: false, title: '' })}
+      />
+
+      <AddEventModal
+        visible={showAddEventModal}
+        onClose={() => { setShowAddEventModal(false); setAddEventPrefill(undefined); }}
+        onSaved={() => { }}
+        prefill={addEventPrefill}
       />
     </SafeAreaView>
   );

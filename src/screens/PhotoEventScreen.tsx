@@ -244,7 +244,8 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
   }, [events, handleCreateEvent, t]);
 
   const handleEditManually = useCallback((event: EditableEvent) => {
-    navigation.navigate('AddEvent', {
+    navigation.navigate('EventsList', {
+      openAddEvent: true,
       prefill: {
         title: event.title,
         description: event.description,
