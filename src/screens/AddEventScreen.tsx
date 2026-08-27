@@ -141,6 +141,11 @@ export const AddEventScreen: React.FC<AddEventScreenProps> = ({ navigation, rout
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={{ paddingHorizontal: 20, paddingTop: 12 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+        </TouchableOpacity>
+      </View>
       <Text style={[styles.title, { color: colors.text }]}>Ny avtale</Text>
 
       {/* Icon section */}
