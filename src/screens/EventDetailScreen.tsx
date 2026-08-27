@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Linking, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Linking, Image, Modal } from 'react-native';
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
@@ -347,158 +347,168 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   }
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
-      <TouchableOpacity onPress={() => setIsEditing(false)} style={{ marginBottom: 8 }}>
-        <Text style={{ color: colors.accent, fontSize: 20 }}>←</Text>
-      </TouchableOpacity>
-      <Text style={[styles.title, { color: colors.text }]}>Rediger avtale</Text>
-
-      {/* Icon */}
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
-        <View style={styles.iconGrid}>
-          {EVENT_ICONS.map((item) => (
-            <TouchableOpacity
-              key={item.emoji}
-              style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, editIcon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-              onPress={() => setEditIcon(editIcon === item.emoji ? '' : item.emoji)}
-            >
-              <Text style={styles.iconEmoji}>{item.emoji}</Text>
-              <Text style={[styles.iconLabel, { color: editIcon === item.emoji ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
+    <View style={[styles.container, { backgroundColor: colors.background, flex: 1 }]}>
+      <Modal visible={isEditing} transparent animationType="slide" onRequestClose={() => setIsEditing(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHandleBar} />
+            <TouchableOpacity onPress={() => setIsEditing(false)} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
+              <Text style={{ color: colors.accent, fontSize: 18 }}>✕</Text>
             </TouchableOpacity>
-          ))}
-        </View>
-      </View>
 
-      {/* Title */}
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-          value={editTitle}
-          onChangeText={setEditTitle}
-          placeholder="F.eks. Familiemiddag"
-          placeholderTextColor={colors.textDisabled}
-        />
-      </View>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={[styles.title, { color: colors.text }]}>Rediger avtale</Text>
 
-      {/* Date from / Date to */}
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <View style={[styles.field, { flex: 1 }]}>
-          <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateFrom')}</Text>
-          <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('dateFrom')}>
-            <Text style={[styles.dateText, { color: colors.text }]}>{editDateFrom}</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={[styles.field, { flex: 1 }]}>
-          <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateTo')}</Text>
-          <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('dateTo')}>
-            <Text style={[styles.dateText, { color: colors.text }]}>{editDateTo}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Time from / Time to */}
-      <View style={{ flexDirection: 'row', gap: 12 }}>
-        <View style={[styles.field, { flex: 1 }]}>
-          <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeFrom')}</Text>
-          <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('time')}>
-            <Text style={[styles.dateText, { color: colors.text }]}>{editTime}</Text>
-          </TouchableOpacity>
-        </View>
-        <View style={[styles.field, { flex: 1 }]}>
-          <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeTo')}</Text>
-          <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('endTime')}>
-            <Text style={[styles.dateText, { color: colors.text }]}>{editEndTime}</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Location */}
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
-        <GooglePlacesInput
-          value={editAddress}
-          onChangeText={setEditAddress}
-          placeholder="Søk etter adresse..."
-          onSelect={setEditAddress}
-        />
-      </View>
-
-      {/* Note */}
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, styles.textArea]}
-          value={editNote}
-          onChangeText={setEditNote}
-          placeholder="Legg til en beskrivelse..."
-          placeholderTextColor={colors.textDisabled}
-          multiline
-          numberOfLines={3}
-        />
-      </View>
-
-      {/* Reminders */}
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('events.reminder')}</Text>
-        <View style={styles.reminderOptions}>
-          {REMINDER_OPTIONS.map((option) => (
-            <TouchableOpacity
-              key={option.value}
-              style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, editReminderMinutes === option.value && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-              onPress={() => setEditReminderMinutes(option.value)}
-            >
-              <Text style={[styles.reminderText, { color: editReminderMinutes === option.value ? '#fff' : colors.textSecondary }]}>
-                {option.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
-
-      {/* Documents */}
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
-        <DocumentUpload
-          storagePath={`events/${eventData.familyId || 'general'}/${Date.now()}`}
-          onUploaded={(doc) => setEditDocuments((prev) => [...prev, doc])}
-          accentColor={colors.accent}
-        />
-        {editDocuments.length > 0 && (
-          <View style={{ marginTop: 8 }}>
-            {editDocuments.map((doc, i) => (
-              <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
-                <TouchableOpacity onPress={() => setEditDocuments((prev) => prev.filter((_, idx) => idx !== i))}>
-                  <Text style={{ color: colors.danger, fontSize: 12 }}>{t('common.delete')}</Text>
-                </TouchableOpacity>
+              {/* Icon */}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+                <View style={styles.iconGrid}>
+                  {EVENT_ICONS.map((item) => (
+                    <TouchableOpacity
+                      key={item.emoji}
+                      style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, editIcon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                      onPress={() => setEditIcon(editIcon === item.emoji ? '' : item.emoji)}
+                    >
+                      <Text style={styles.iconEmoji}>{item.emoji}</Text>
+                      <Text style={[styles.iconLabel, { color: editIcon === item.emoji ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
-            ))}
+
+              {/* Title */}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+                  value={editTitle}
+                  onChangeText={setEditTitle}
+                  placeholder="F.eks. Familiemiddag"
+                  placeholderTextColor={colors.textDisabled}
+                />
+              </View>
+
+              {/* Date from / Date to */}
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateFrom')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('dateFrom')}>
+                    <Text style={[styles.dateText, { color: colors.text }]}>{editDateFrom}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayDateTo')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('dateTo')}>
+                    <Text style={[styles.dateText, { color: colors.text }]}>{editDateTo}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Time from / Time to */}
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeFrom')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('time')}>
+                    <Text style={[styles.dateText, { color: colors.text }]}>{editTime}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('kindergarten.holidayTimeTo')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.surface }]} onPress={() => setEditActivePicker('endTime')}>
+                    <Text style={[styles.dateText, { color: colors.text }]}>{editEndTime}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              {/* Location */}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
+                <GooglePlacesInput
+                  value={editAddress}
+                  onChangeText={setEditAddress}
+                  placeholder="Søk etter adresse..."
+                  onSelect={setEditAddress}
+                />
+              </View>
+
+              {/* Note */}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, styles.textArea]}
+                  value={editNote}
+                  onChangeText={setEditNote}
+                  placeholder="Legg til en beskrivelse..."
+                  placeholderTextColor={colors.textDisabled}
+                  multiline
+                  numberOfLines={3}
+                />
+              </View>
+
+              {/* Reminders */}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('events.reminder')}</Text>
+                <View style={styles.reminderOptions}>
+                  {REMINDER_OPTIONS.map((option) => (
+                    <TouchableOpacity
+                      key={option.value}
+                      style={[styles.reminderOption, { backgroundColor: colors.surface, borderColor: colors.border }, editReminderMinutes === option.value && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                      onPress={() => setEditReminderMinutes(option.value)}
+                    >
+                      <Text style={[styles.reminderText, { color: editReminderMinutes === option.value ? '#fff' : colors.textSecondary }]}>
+                        {option.label}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
+              {/* Documents */}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDocuments')}</Text>
+                <DocumentUpload
+                  storagePath={`events/${eventData.familyId || 'general'}/${Date.now()}`}
+                  onUploaded={(doc) => setEditDocuments((prev) => [...prev, doc])}
+                  accentColor={colors.accent}
+                />
+                {editDocuments.length > 0 && (
+                  <View style={{ marginTop: 8 }}>
+                    {editDocuments.map((doc, i) => (
+                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
+                        <TouchableOpacity onPress={() => setEditDocuments((prev) => prev.filter((_, idx) => idx !== i))}>
+                          <Text style={{ color: colors.danger, fontSize: 12 }}>{t('common.delete')}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+
+              {/* Save */}
+              <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleUpdate}>
+                <Text style={styles.buttonText}>{t('common.save')}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]} onPress={() => setIsEditing(false)}>
+                <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+
+              <DatePickerModal
+                visible={editActivePicker !== null}
+                title={editActivePicker === 'dateFrom' ? t('kindergarten.holidayDateFrom') : editActivePicker === 'dateTo' ? t('kindergarten.holidayDateTo') : editActivePicker === 'time' ? t('kindergarten.holidayTimeFrom') : t('kindergarten.holidayTimeTo')}
+                mode={isTimePicker ? 'time' : 'date'}
+                dateOffset={isTimePicker ? 0 : -365}
+                dateCount={isTimePicker ? 48 : 730}
+                selectedValue={editActivePicker === 'dateFrom' ? editDateFrom : editActivePicker === 'dateTo' ? editDateTo : editActivePicker === 'time' ? editTime : editEndTime}
+                onSelect={handlePickerSelect}
+                onClose={() => setEditActivePicker(null)}
+              />
+            </ScrollView>
           </View>
-        )}
-      </View>
-
-      {/* Save */}
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleUpdate}>
-        <Text style={styles.buttonText}>{t('common.save')}</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]} onPress={() => setIsEditing(false)}>
-        <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
-      </TouchableOpacity>
-
-      <DatePickerModal
-        visible={editActivePicker !== null}
-        title={editActivePicker === 'dateFrom' ? t('kindergarten.holidayDateFrom') : editActivePicker === 'dateTo' ? t('kindergarten.holidayDateTo') : editActivePicker === 'time' ? t('kindergarten.holidayTimeFrom') : t('kindergarten.holidayTimeTo')}
-        mode={isTimePicker ? 'time' : 'date'}
-        dateOffset={isTimePicker ? 0 : -365}
-        dateCount={isTimePicker ? 48 : 730}
-        selectedValue={editActivePicker === 'dateFrom' ? editDateFrom : editActivePicker === 'dateTo' ? editDateTo : editActivePicker === 'time' ? editTime : editEndTime}
-        onSelect={handlePickerSelect}
-        onClose={() => setEditActivePicker(null)}
-      />
-    </ScrollView>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
@@ -703,5 +713,25 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    maxHeight: '85%',
+  },
+  modalHandleBar: {
+    width: 40,
+    height: 4,
+    borderRadius: 2,
+    backgroundColor: '#ccc',
+    alignSelf: 'center',
+    marginBottom: 16,
   },
 });
