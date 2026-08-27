@@ -130,7 +130,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                   <Text style={[styles.sectionLabel, { color: eventsSection.color }]}>{t(eventsSection.labelKey)}</Text>
                 </View>
                 <View style={styles.row}>
-                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => eventsSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={[styles.moduleCol, { alignItems: 'flex-end' }]} onPress={() => navigateAndClose(() => eventsSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <View style={styles.iconWrap}>
                       <AppIcon name={eventsSection.items[0].icon} size={28} color={eventsSection.color} />
                     </View>
@@ -142,9 +142,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     </View>
                     <Text style={[styles.actionTitle, { color: lightenColor(eventsSection.color) }]}>{t(eventsSection.items[1].labelKey)}</Text>
                   </TouchableOpacity>
-                </View>
-                <View style={styles.row}>
-                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => eventsSection.items[2].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={[styles.moduleCol, { alignItems: 'flex-start' }]} onPress={() => navigateAndClose(() => eventsSection.items[2].nav(navigation))} activeOpacity={0.6}>
                     <View style={styles.iconWrap}>
                       <AppIcon name={eventsSection.items[2].icon} size={28} color={eventsSection.color} />
                     </View>
@@ -152,16 +150,22 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                   </TouchableOpacity>
                 </View>
 
-                {/* Helse + Kjæledyr row */}
+                {/* Row 2: Helse, Reiser, Kjæledyr */}
                 <View style={styles.row}>
-                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => healthSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={[styles.moduleCol, { alignItems: 'flex-end' }]} onPress={() => navigateAndClose(() => healthSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: healthSection.color }]}>{t(healthSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={healthSection.items[0].icon} size={28} color={healthSection.color} />
                     </View>
                     <Text style={[styles.actionTitle, { color: lightenColor(healthSection.color) }]}>{t(healthSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => petsSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => tripsSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                    <View style={styles.iconWrap}>
+                      <AppIcon name={tripsSection.items[0].icon} size={28} color={tripsSection.color} />
+                    </View>
+                    <Text style={[styles.actionTitle, { color: lightenColor(tripsSection.color) }]}>{t(tripsSection.items[0].labelKey)}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.moduleCol, { alignItems: 'flex-start' }]} onPress={() => navigateAndClose(() => petsSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: petsSection.color }]}>{t(petsSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={petsSection.items[0].icon} size={28} color={petsSection.color} />
@@ -170,34 +174,22 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                   </TouchableOpacity>
                 </View>
 
-                {/* Skole + Barnehage row */}
+                {/* Row 3: Skole, empty, Barnehage */}
                 <View style={styles.row}>
-                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => schoolSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={[styles.moduleCol, { alignItems: 'flex-end' }]} onPress={() => navigateAndClose(() => schoolSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: schoolSection.color }]}>{t(schoolSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={schoolSection.items[0].icon} size={28} color={schoolSection.color} />
                     </View>
                     <Text style={[styles.actionTitle, { color: lightenColor(schoolSection.color) }]}>{t(schoolSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => kindergartenSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <View style={styles.moduleCol} />
+                  <TouchableOpacity style={[styles.moduleCol, { alignItems: 'flex-start' }]} onPress={() => navigateAndClose(() => kindergartenSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: kindergartenSection.color }]}>{t(kindergartenSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={kindergartenSection.items[0].icon} size={28} color={kindergartenSection.color} />
                     </View>
                     <Text style={[styles.actionTitle, { color: lightenColor(kindergartenSection.color) }]}>{t(kindergartenSection.items[0].labelKey)}</Text>
-                  </TouchableOpacity>
-                </View>
-
-                {/* Reiser — centered */}
-                <View style={styles.sectionLabelWrap}>
-                  <Text style={[styles.sectionLabel, { color: tripsSection.color }]}>{t(tripsSection.labelKey)}</Text>
-                </View>
-                <View style={styles.centerRow}>
-                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => tripsSection.items[0].nav(navigation))} activeOpacity={0.6}>
-                    <View style={styles.iconWrap}>
-                      <AppIcon name={tripsSection.items[0].icon} size={28} color={tripsSection.color} />
-                    </View>
-                    <Text style={[styles.actionTitle, { color: lightenColor(tripsSection.color) }]}>{t(tripsSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
