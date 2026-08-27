@@ -126,7 +126,10 @@ export async function getKindergartenActivities(familyId: string, childId?: stri
   let q = query(getActivitiesCollection(familyId), orderBy('dateFrom', 'desc'));
   if (childId) q = query(getActivitiesCollection(familyId), where('childId', '==', childId), orderBy('dateFrom', 'desc'));
   const snapshot = await getDocs(q);
-  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as KindergartenActivity));
+  return snapshot.docs.map((d) => {
+    const data = d.data();
+    return { id: d.id, ...data, dateFrom: (data.dateFrom || '').trim(), dateTo: (data.dateTo || '').trim() } as KindergartenActivity;
+  });
 }
 
 export async function addKindergartenActivity(data: Omit<KindergartenActivity, 'id' | 'createdAt'>): Promise<string> {
