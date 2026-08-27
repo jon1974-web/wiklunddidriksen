@@ -144,7 +144,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
         getKindergartenContacts(familyId, selectedYear.id, selectedChild?.id),
         getKindergartenSchedules(familyId, selectedYear.id),
         getKindergartenHolidays(familyId, selectedYear.id, selectedChild?.id),
-        getKindergartenActivities(familyId),
+        getKindergartenActivities(familyId, selectedChild?.id),
       ]);
       setContacts(c);
       setSchedules(s);

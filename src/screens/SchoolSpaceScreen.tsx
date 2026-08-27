@@ -151,7 +151,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         getSchoolContacts(familyId, selectedYear.id, selectedChild?.id),
         getSchoolSchedules(familyId, selectedYear.id),
         getSchoolHolidays(familyId, selectedYear.id, selectedChild?.id),
-        getSchoolActivities(familyId),
+        getSchoolActivities(familyId, selectedChild?.id),
       ]);
       setContacts(c);
       setSchedules(s);

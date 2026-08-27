@@ -122,8 +122,9 @@ function getActivitiesCollection(familyId: string) {
   return collection(db, 'schoolActivities', familyId, 'activities');
 }
 
-export async function getSchoolActivities(familyId: string): Promise<SchoolActivity[]> {
-  const q = query(getActivitiesCollection(familyId), orderBy('date', 'desc'));
+export async function getSchoolActivities(familyId: string, childId?: string): Promise<SchoolActivity[]> {
+  let q = query(getActivitiesCollection(familyId), orderBy('date', 'desc'));
+  if (childId) q = query(getActivitiesCollection(familyId), where('childId', '==', childId), orderBy('date', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolActivity));
 }
