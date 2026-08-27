@@ -982,7 +982,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'schoolActivity') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const d = toDateSafe((item as any).dateFrom) || toDateSafe((item as any).date);
+      const dateFromVal = (item as any).dateFrom;
+      const dateVal = (item as any).date;
+      console.log('SCHOOL_DEBUG', { dateFrom: dateFromVal, date: dateVal, typeFrom: typeof dateFromVal, typeDate: typeof dateVal });
+      const d = toDateSafe(dateFromVal) || toDateSafe(dateVal);
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
