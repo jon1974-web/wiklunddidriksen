@@ -72,7 +72,7 @@
       "fields": [
         { "fieldPath": "familyId", "order": "ASCENDING" },
         { "fieldPath": "petId", "order": "ASCENDING" },
-        { "fieldPath": "date", "order": "DESCENDING" }
+        { "fieldPath": "dateFrom", "order": "DESCENDING" }
       ]
     },
     {
@@ -108,7 +108,7 @@
       "fields": [
         { "fieldPath": "familyId", "order": "ASCENDING" },
         { "fieldPath": "petId", "order": "ASCENDING" },
-        { "fieldPath": "date", "order": "DESCENDING" }
+        { "fieldPath": "dateFrom", "order": "DESCENDING" }
       ]
     },
     {
@@ -125,7 +125,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "familyId", "order": "ASCENDING" },
-        { "fieldPath": "date", "order": "DESCENDING" }
+        { "fieldPath": "dateFrom", "order": "DESCENDING" }
       ]
     },
     {
@@ -133,7 +133,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "familyId", "order": "ASCENDING" },
-        { "fieldPath": "date", "order": "DESCENDING" }
+        { "fieldPath": "dateFrom", "order": "DESCENDING" }
       ]
     },
     {
@@ -213,7 +213,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "childId", "order": "ASCENDING" },
-        { "fieldPath": "date", "order": "DESCENDING" }
+        { "fieldPath": "dateFrom", "order": "DESCENDING" }
       ]
     }
   ],
