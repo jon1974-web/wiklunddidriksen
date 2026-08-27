@@ -29,7 +29,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const d = visit.date ? new Date(visit.date) : null;
+  const d = visit.dateFrom ? new Date(visit.dateFrom) : null;
   const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
   const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
   const dayName = d ? DAY_NAMES[d.getDay()] : '';
@@ -41,7 +41,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     return visit.startTime || '';
   }, [visit.startTime, visit.endTime]);
 
-  const isCompleted = visit.status === 'completed' || (visit.date && visit.date < new Date().toISOString().slice(0, 10));
+  const isCompleted = visit.status === 'completed' || (visit.dateFrom && visit.dateFrom < new Date().toISOString().slice(0, 10));
 
   const mapUrl = useMemo(() => visit.location ? getStaticMapUrl(visit.location, 15, '600x300') : null, [visit.location]);
 

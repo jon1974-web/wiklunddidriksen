@@ -2701,10 +2701,10 @@ exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-
       return;
     }
 
-    const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
+    const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.date}T${data.endTime}:00`
-      : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+      ? `${data.dateFrom}T${data.endTime}:00`
+      : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
     console.log(`Creating calendar event: ${data.title}, ${startDateTime} - ${endDateTime}`);
 
@@ -2750,10 +2750,10 @@ exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-centra
       return;
     }
 
-    const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
+    const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.date}T${data.endTime}:00`
-      : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+      ? `${data.dateFrom}T${data.endTime}:00`
+      : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
     console.log(`Creating pet vet visit: ${data.title}, ${startDateTime} - ${endDateTime}`);
 
@@ -2926,10 +2926,10 @@ exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-
     const userData = userDoc.data();
     if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
 
-    const startDateTime = `${after.date}T${after.startTime || "09:00"}:00`;
+    const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.date}T${after.endTime}:00`
-      : `${after.date}T${incrementTime(after.startTime || "09:00")}:00`;
+      ? `${after.dateFrom}T${after.endTime}:00`
+      : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
     await updateGoogleCalendarEvent(uid, calendarEventId, {
       title: `❤️ ${after.title}`,
@@ -2959,10 +2959,10 @@ exports.onPetVetVisitUpdatedForCalendar = onDocumentUpdated({ region: "us-centra
     const userData = userDoc.data();
     if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
 
-    const startDateTime = `${after.date}T${after.startTime || "09:00"}:00`;
+    const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.date}T${after.endTime}:00`
-      : `${after.date}T${incrementTime(after.startTime || "09:00")}:00`;
+      ? `${after.dateFrom}T${after.endTime}:00`
+      : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
     await updateGoogleCalendarEvent(uid, calendarEventId, {
       title: `🐾 ${after.title}`,
@@ -3090,10 +3090,10 @@ exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "us-cen
       return;
     }
 
-    const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
+    const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.date}T${data.endTime}:00`
-      : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+      ? `${data.dateFrom}T${data.endTime}:00`
+      : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
     const typeLabel = data.activityType === "tur" ? "Tur" : data.activityType === "aktivitet" ? "Aktivitet" : "Møte";
 
@@ -3131,10 +3131,10 @@ exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-cen
     const userData = userDoc.data();
     if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
 
-    const startDateTime = `${after.date}T${after.startTime || "09:00"}:00`;
+    const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.date}T${after.endTime}:00`
-      : `${after.date}T${incrementTime(after.startTime || "09:00")}:00`;
+      ? `${after.dateFrom}T${after.endTime}:00`
+      : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
     const typeLabel = after.activityType === "tur" ? "Tur" : after.activityType === "aktivitet" ? "Aktivitet" : "Møte";
 
@@ -3199,10 +3199,10 @@ exports.onKindergartenActivityCreatedForCalendar = onDocumentCreated({ region: "
       return;
     }
 
-    const startDateTime = `${data.date}T${data.startTime || "09:00"}:00`;
+    const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.date}T${data.endTime}:00`
-      : `${data.date}T${incrementTime(data.startTime || "09:00")}:00`;
+      ? `${data.dateFrom}T${data.endTime}:00`
+      : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
     const typeLabel = data.activityType === "tur" ? "Tur" : data.activityType === "aktivitet" ? "Aktivitet" : "Møte";
 
@@ -3238,10 +3238,10 @@ exports.onKindergartenActivityUpdatedForCalendar = onDocumentUpdated({ region: "
     const userData = userDoc.data();
     if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
 
-    const startDateTime = `${after.date}T${after.startTime || "09:00"}:00`;
+    const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.date}T${after.endTime}:00`
-      : `${after.date}T${incrementTime(after.startTime || "09:00")}:00`;
+      ? `${after.dateFrom}T${after.endTime}:00`
+      : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
     const typeLabel = after.activityType === "tur" ? "Tur" : after.activityType === "aktivitet" ? "Aktivitet" : "Møte";
 

@@ -71,7 +71,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
-  const [vetForm, setVetForm] = useState({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: '', dateTo: '', note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -168,7 +168,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
     const { id, section } = editingItem;
     if (section === 'vetVisits') {
       const item = vetVisits.find(v => v.id === id);
-      if (item) setVetForm({ title: item.title, doctor: item.doctor || '', date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', status: item.status, documents: item.documents || [] });
+      if (item) setVetForm({ title: item.title, doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', status: item.status, documents: item.documents || [] });
     } else if (section === 'medications') {
       const item = medications.find(m => m.id === id);
       if (item) setMedForm({ name: item.name, dosage: item.dosage, frequency: item.frequency || 1, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }], dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
@@ -233,18 +233,18 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
     try {
       const isEditing = editingItem !== null;
       if (activeSection === 'vetVisits') {
-        if (!vetForm.title.trim() || !vetForm.date) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
+        if (!vetForm.title.trim() || !vetForm.dateFrom) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
         if (isEditing) {
           await updateVetVisit(editingItem.id, vetForm);
         } else {
           await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId }, user?.uid);
         }
-        if (!isEditing && vetForm.date) {
+        if (!isEditing && vetForm.dateFrom) {
           const reminderMinutes = vetForm.reminder ? (vetForm.reminder.includes('1 d') ? 1440 : vetForm.reminder.includes('3') ? 4320 : 10080) : 0;
-          const eventDate = new Date(`${vetForm.date}T${vetForm.startTime || '09:00'}:00`);
-          notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.date, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
+          const eventDate = new Date(`${vetForm.dateFrom}T${vetForm.startTime || '09:00'}:00`);
+          notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
-        setVetForm({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
+        setVetForm({ title: '', doctor: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned' });
       } else if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetMedication(editingItem.id, medForm);
@@ -334,7 +334,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   };
 
   const resetItemForms = () => {
-    setVetForm({ title: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned', documents: [] });
+    setVetForm({ title: '', doctor: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', status: 'planned', documents: [] });
     setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: '', dateTo: '', note: '' });
     setFoodForm({ name: '', time: '', amount: '', note: '' });
     setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -637,12 +637,12 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('pets.noVetVisits')}</Text>
             ) : (
               [...vetVisits].sort((a, b) => {
-                const aPast = isDatePast(a.date);
-                const bPast = isDatePast(b.date);
+                const aPast = isDatePast(a.dateFrom);
+                const bPast = isDatePast(b.dateFrom);
                 if (aPast && !bPast) return 1;
                 if (!aPast && bPast) return -1;
-                if (aPast && bPast) return b.date.localeCompare(a.date);
-                return a.date.localeCompare(b.date);
+                if (aPast && bPast) return b.dateFrom.localeCompare(a.dateFrom);
+                return a.dateFrom.localeCompare(b.dateFrom);
               }).map(v => (
                 <TouchableOpacity key={v.id} style={styles.item} onPress={() => navigation.navigate('PetVetDetail', { visit: v, petName: pets.find(p => p.id === v.petId)?.name, source: 'pets' })} onLongPress={() => setItemActionModal({ visible: true, id: v.id, title: v.title, section: 'vetVisits' })}>
                   <AppIcon name="calendar" size={20} color={PET_THEME} />
@@ -653,10 +653,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                         <AppIcon name="file" size={12} color="#1976D2" />
                       )}
                     </View>
-                    <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{v.date} {v.startTime}{v.location ? ' — ' + v.location : ''}</Text>
+                    <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{v.dateFrom} {v.startTime}{v.location ? ' — ' + v.location : ''}</Text>
                   </View>
-                  <Text style={[styles.badge, { backgroundColor: (v.status === 'completed' || isDatePast(v.date)) ? '#E8F5E9' : '#FFF3E0', color: (v.status === 'completed' || isDatePast(v.date)) ? '#43A047' : '#FB8C00' }]}>
-                    {(v.status === 'completed' || isDatePast(v.date)) ? t('health.completed') : t('health.pending')}
+                  <Text style={[styles.badge, { backgroundColor: (v.status === 'completed' || isDatePast(v.dateFrom)) ? '#E8F5E9' : '#FFF3E0', color: (v.status === 'completed' || isDatePast(v.dateFrom)) ? '#43A047' : '#FB8C00' }]}>
+                    {(v.status === 'completed' || isDatePast(v.dateFrom)) ? t('health.completed') : t('health.pending')}
                   </Text>
                 </TouchableOpacity>
               ))
@@ -788,11 +788,19 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                       <Text style={[styles.label, { color: colors.text }]}>{t('pets.vetTitle')}</Text>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={vetForm.title} onChangeText={(v) => setVetForm(f => ({ ...f, title: v }))} placeholder={t('pets.vetTitlePlaceholder')} placeholderTextColor={colors.textDisabled} />
                     </View>
-                    <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{t('common.date')}</Text>
-                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('vetDate')}>
-                        <Text style={{ color: vetForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>{vetForm.date || t('common.pickDate')}</Text>
-                      </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', gap: 12 }}>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('health.dateFrom')}</Text>
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('vetDateFrom')}>
+                          <Text style={{ color: vetForm.dateFrom ? colors.text : colors.textDisabled, fontSize: 16 }}>{vetForm.dateFrom || t('common.pickDate')}</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('health.dateTo')}</Text>
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('vetDateTo')}>
+                          <Text style={{ color: vetForm.dateTo ? colors.text : colors.textDisabled, fontSize: 16 }}>{vetForm.dateTo || '—'}</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                     <View style={{ flexDirection: 'row', gap: 12 }}>
                       <View style={[styles.field, { flex: 1 }]}>
@@ -1097,7 +1105,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                       <View style={[styles.viewDivider, { backgroundColor: colors.border }]} />
                       <View style={styles.viewDetailRow}>
                         <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅 {t('common.date')}</Text>
-                        <Text style={[styles.viewDetailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
+                        <Text style={[styles.viewDetailValue, { color: colors.text }]}>{detailModal.item.dateFrom}</Text>
                       </View>
                       <View style={styles.viewDetailRow}>
                         <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐 {t('common.time')}</Text>
@@ -1117,7 +1125,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                       )}
                       <View style={styles.viewDetailRow}>
                         <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>✅ {t('health.status')}</Text>
-                        <Text style={[styles.viewDetailValue, { color: (detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? '#43A047' : '#FB8C00' }]}>{(detailModal.item.status === 'completed' || isDatePast(detailModal.item.date)) ? t('health.completed') : t('health.pending')}</Text>
+                        <Text style={[styles.viewDetailValue, { color: (detailModal.item.status === 'completed' || isDatePast(detailModal.item.dateFrom)) ? '#43A047' : '#FB8C00' }]}>{(detailModal.item.status === 'completed' || isDatePast(detailModal.item.dateFrom)) ? t('health.completed') : t('health.pending')}</Text>
                       </View>
                       {detailModal.item.note && (
                         <View style={styles.viewDetailRow}>
@@ -1145,12 +1153,12 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                             style={[styles.calendarWebButton, { backgroundColor: userCalendarProvider === 'google' ? '#4285F4' : '#0078D4' }]}
                             onPress={() => {
                               const [h, m] = (detailModal.item.startTime || '09:00').split(':').map(Number);
-                              const start = new Date(detailModal.item.date);
+                              const start = new Date(detailModal.item.dateFrom);
                               start.setHours(h, m, 0, 0);
                               let end: Date;
                               if (detailModal.item.endTime) {
                                 const [eh, em] = detailModal.item.endTime.split(':').map(Number);
-                                end = new Date(detailModal.item.date);
+                                end = new Date(detailModal.item.dateFrom);
                                 end.setHours(eh, em, 0, 0);
                               } else {
                                 end = new Date(start.getTime() + 60 * 60 * 1000);
@@ -1354,20 +1362,21 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         dateOffset={
           activePicker === 'petBirthday' || activePicker === 'petChipDate' ? -5475 :
           activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? -1825 :
-          activePicker === 'vetDate' || activePicker === 'vaccDate' ? -1825 :
+          activePicker === 'vetDateFrom' || activePicker === 'vetDateTo' || activePicker === 'vaccDate' ? -1825 :
           activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? -365 :
           activePicker === 'foodTime' ? 0 : 0
         }
         dateCount={
           activePicker === 'petBirthday' || activePicker === 'petChipDate' ? 5840 :
           activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? 2190 :
-          activePicker === 'vetDate' || activePicker === 'vaccDate' ? 2190 :
+          activePicker === 'vetDateFrom' || activePicker === 'vetDateTo' || activePicker === 'vaccDate' ? 2190 :
           activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? 730 : 365
         }
         selectedValue={
           activePicker === 'petBirthday' ? petForm.birthday :
           activePicker === 'petChipDate' ? petForm.chipDate :
-          activePicker === 'vetDate' ? vetForm.date :
+          activePicker === 'vetDateFrom' ? vetForm.dateFrom :
+          activePicker === 'vetDateTo' ? vetForm.dateTo :
           activePicker === 'vetStartTime' ? vetForm.startTime :
           activePicker === 'vetEndTime' ? vetForm.endTime :
           activePicker === 'medDateFrom' ? medForm.dateFrom :
@@ -1383,7 +1392,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         onSelect={(value) => {
           if (activePicker === 'petBirthday') setPetForm(f => ({ ...f, birthday: value }));
           else if (activePicker === 'petChipDate') setPetForm(f => ({ ...f, chipDate: value }));
-          else if (activePicker === 'vetDate') setVetForm(f => ({ ...f, date: value }));
+          else if (activePicker === 'vetDateFrom') { setVetForm(f => ({ ...f, dateFrom: value, dateTo: f.dateTo || value })); }
+          else if (activePicker === 'vetDateTo') setVetForm(f => ({ ...f, dateTo: value }));
           else if (activePicker === 'vetStartTime') setVetForm(f => ({ ...f, startTime: value }));
           else if (activePicker === 'vetEndTime') setVetForm(f => ({ ...f, endTime: value }));
           else if (activePicker === 'medDateFrom') setMedForm(f => ({ ...f, dateFrom: value }));

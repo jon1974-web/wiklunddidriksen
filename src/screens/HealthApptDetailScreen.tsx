@@ -28,7 +28,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const d = appointment.date ? new Date(appointment.date) : null;
+  const d = appointment.dateFrom ? new Date(appointment.dateFrom) : null;
   const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
   const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
   const dayName = d ? DAY_NAMES[d.getDay()] : '';
@@ -42,7 +42,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
 
   const mapUrl = useMemo(() => appointment.location ? getStaticMapUrl(appointment.location, 15, '600x300') : null, [appointment.location]);
 
-  const isCompleted = appointment.date < new Date().toISOString().slice(0, 10);
+  const isCompleted = appointment.dateFrom < new Date().toISOString().slice(0, 10);
 
   const familyId = useUserStore((state) => state.familyId);
 
@@ -90,7 +90,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
             <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
               <View style={[styles.badge, { backgroundColor: isCompleted ? '#E8F5E9' : '#FFF3E0' }]}>
                 <Text style={{ fontSize: 10, fontWeight: '600', color: isCompleted ? '#43A047' : '#FB8C00' }}>
-                  {isCompleted ? t('health.completed') : getDaysUntil(appointment.date)}
+                  {isCompleted ? t('health.completed') : getDaysUntil(appointment.dateFrom)}
                 </Text>
               </View>
             </View>

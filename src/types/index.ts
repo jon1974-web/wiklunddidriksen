@@ -316,7 +316,8 @@ export interface PetVetVisit {
   familyId: string;
   title: string;
   doctor?: string;
-  date: string;
+  dateFrom: string;
+  dateTo?: string;
   startTime: string;
   endTime?: string;
   location?: string;
@@ -480,7 +481,8 @@ export interface HealthAppointment {
   title: string;
   person: string;
   doctor?: string;
-  date: string;
+  dateFrom: string;
+  dateTo?: string;
   startTime: string;
   endTime?: string;
   location?: string;
@@ -610,7 +612,8 @@ export interface SchoolActivity {
   yearId: string;
   title: string;
   activityType: 'tur' | 'aktivitet' | 'møte';
-  date: string;
+  dateFrom: string;
+  dateTo?: string;
   startTime?: string;
   endTime?: string;
   location?: string;
@@ -630,7 +633,8 @@ export interface KindergartenActivity {
   yearId: string;
   title: string;
   activityType: 'tur' | 'aktivitet' | 'møte';
-  date: string;
+  dateFrom: string;
+  dateTo?: string;
   startTime?: string;
   endTime?: string;
   location?: string;

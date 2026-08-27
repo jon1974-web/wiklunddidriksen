@@ -299,6 +299,8 @@
     "activityTypeMøte": "Kokous",
     "activityTitle": "Otsikko",
     "activityDate": "Päivämäärä",
+    "activityDateFrom": "Alkupäivä",
+    "activityDateTo": "Loppupäivä",
     "activityStartTime": "Aloitusaika",
     "activityEndTime": "Lopetusaika",
     "activityLocation": "Paikka",

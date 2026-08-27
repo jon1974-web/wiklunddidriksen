@@ -26,7 +26,7 @@ export async function deletePet(petId: string): Promise<void> {
 
 // Vet Visits (flat collection with familyId + petId)
 export async function getVetVisits(familyId: string, petId: string): Promise<PetVetVisit[]> {
-  const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('date', 'desc'));
+  const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), where('petId', '==', petId), orderBy('dateFrom', 'desc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetVetVisit));
 }
@@ -146,7 +146,7 @@ export async function deletePetInsurance(insId: string): Promise<void> {
 
 // Family-wide queries (for WeeklySummary)
 export async function getAllVetVisits(familyId: string): Promise<PetVetVisit[]> {
-  const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), orderBy('date', 'desc'), limit(50));
+  const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), orderBy('dateFrom', 'desc'), limit(50));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as PetVetVisit));
 }

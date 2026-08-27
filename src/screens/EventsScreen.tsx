@@ -471,23 +471,23 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         const end = e.endTimestamp ? formatSpondDate(e.endTimestamp) : start;
         return selectedDate >= start && selectedDate <= end;
       }).map((e) => ({ ...e, _type: 'spond' as const }));
-      const dayHealth = healthAppointments.filter((a) => a.date === selectedDate).map((a) => ({
-        ...a, _type: 'healthAppointment' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.date, description: `${a.person}${a.location ? ' — ' + a.location : ''}`, icon: '🏥',
+      const dayHealth = healthAppointments.filter((a) => a.dateFrom === selectedDate).map((a) => ({
+        ...a, _type: 'healthAppointment' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.dateFrom, description: `${a.person}${a.location ? ' — ' + a.location : ''}`, icon: '🏥',
       }));
       const dayVaccinations = healthVaccinations.filter((v) => v.date === selectedDate).map((v) => ({
         ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('health.vaccinations')}: ${v.name}`, date: v.date, description: v.person, icon: '💉',
       }));
-      const dayPetVetVisits = petVetVisits.filter((v) => v.date === selectedDate).map((v) => ({
-        ...v, _type: 'healthAppointment' as const, time: v.startTime || '09:00', address: v.location || '', title: v.title, date: v.date, description: v.petId, icon: 'pet-visit',
+      const dayPetVetVisits = petVetVisits.filter((v) => v.dateFrom === selectedDate).map((v) => ({
+        ...v, _type: 'healthAppointment' as const, time: v.startTime || '09:00', address: v.location || '', title: v.title, date: v.dateFrom, description: v.petId, icon: 'pet-visit',
       }));
       const dayPetVaccinations = petVaccinations.filter((v) => v.date === selectedDate).map((v) => ({
         ...v, _type: 'healthAppointment' as const, time: '09:00', address: v.location || '', title: `${t('pets.vaccinations')}: ${v.name}`, date: v.date, description: v.petId, icon: 'pet-vaccination',
       }));
-      const daySchoolActivities = schoolActivities.filter((a) => a.date === selectedDate).map((a) => ({
-        ...a, _type: 'schoolActivity' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.date, description: a.activityType, icon: 'school',
+      const daySchoolActivities = schoolActivities.filter((a) => a.dateFrom === selectedDate).map((a) => ({
+        ...a, _type: 'schoolActivity' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.dateFrom, description: a.activityType, icon: 'school',
       }));
-      const dayKindergartenActivities = kindergartenActivities.filter((a) => a.date === selectedDate).map((a) => ({
-        ...a, _type: 'kindergartenActivity' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.date, description: a.activityType, icon: 'kindergarten',
+      const dayKindergartenActivities = kindergartenActivities.filter((a) => a.dateFrom === selectedDate).map((a) => ({
+        ...a, _type: 'kindergartenActivity' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.dateFrom, description: a.activityType, icon: 'kindergarten',
       }));
       let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
@@ -505,13 +505,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
       ...events.map((e) => ({ ...e, _type: 'event' as const })),
       ...trips.map((t) => ({ ...t, _type: 'trip' as const })),
       ...spondEvents.map((e) => ({ ...e, _type: 'spond' as const })),
-      ...healthAppointments.filter(a => a.date).map((a) => ({
+      ...healthAppointments.filter(a => a.dateFrom).map((a) => ({
         ...a,
         _type: 'healthAppointment' as const,
         time: a.startTime || '09:00',
         address: a.location || '',
         title: a.title,
-        date: a.date,
+        date: a.dateFrom,
         description: `${a.person}${a.location ? ' — ' + a.location : ''}`,
         icon: '🏥',
       })),
@@ -525,13 +525,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         description: v.person,
         icon: '💉',
       })),
-      ...petVetVisits.filter(v => v.date).map((v) => ({
+      ...petVetVisits.filter(v => v.dateFrom).map((v) => ({
         ...v,
         _type: 'healthAppointment' as const,
         time: v.startTime || '09:00',
         address: v.location || '',
         title: v.title,
-        date: v.date,
+        date: v.dateFrom,
         description: v.petId,
         icon: 'pet-visit',
       })),
@@ -545,23 +545,23 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
         description: v.petId,
         icon: 'pet-vaccination',
       })),
-      ...schoolActivities.filter(a => a.date).map((a) => ({
+      ...schoolActivities.filter(a => a.dateFrom).map((a) => ({
         ...a,
         _type: 'schoolActivity' as const,
         time: a.startTime || '09:00',
         address: a.location || '',
         title: a.title,
-        date: a.date,
+        date: a.dateFrom,
         description: a.activityType,
         icon: 'school',
       })),
-      ...kindergartenActivities.filter(a => a.date).map((a) => ({
+      ...kindergartenActivities.filter(a => a.dateFrom).map((a) => ({
         ...a,
         _type: 'kindergartenActivity' as const,
         time: a.startTime || '09:00',
         address: a.location || '',
         title: a.title,
-        date: a.date,
+        date: a.dateFrom,
         description: a.activityType,
         icon: 'kindergarten',
       })),

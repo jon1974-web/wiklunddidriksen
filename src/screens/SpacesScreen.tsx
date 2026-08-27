@@ -57,7 +57,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       getHealthMedications(familyId),
       getHealthVaccinations(familyId),
     ]).then(([appts, meds, vaccs]) => {
-      const futureAppts = appts.filter(a => a.date >= todayStr);
+      const futureAppts = appts.filter(a => a.dateFrom >= todayStr);
       const activeMeds = meds.filter(m => {
         if (m.dateTo && m.dateTo < todayStr) return false;
         if (m.dateFrom && m.dateFrom > todayStr) return false;

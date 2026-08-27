@@ -95,10 +95,10 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   // Activities state
   const [activities, setActivities] = useState<SchoolActivity[]>([]);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
-  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const [activityActionModal, setActivityActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
-  type ActivityPickerField = 'date' | 'startTime' | 'endTime' | null;
+  type ActivityPickerField = 'dateFrom' | 'dateTo' | 'startTime' | 'endTime' | null;
   const [activeActivityPicker, setActiveActivityPicker] = useState<ActivityPickerField>(null);
   const [activeSemester, setActiveSemester] = useState<'høst' | 'vår'>('høst');
 
@@ -199,7 +199,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   useEffect(() => {
     if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild) {
       setEditingActivityId(null);
-      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
       setShowAddActivityModal(true);
       navigation.setParams({ openAddSection: undefined });
     }
@@ -207,7 +207,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       const activity = activities.find(a => a.id === route.params!.editActivityId);
       if (activity) {
         setEditingActivityId(activity.id);
-        setActivityForm({ title: activity.title, activityType: activity.activityType, date: activity.date, startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [] });
+        setActivityForm({ title: activity.title, activityType: activity.activityType, dateFrom: activity.dateFrom, dateTo: activity.dateTo || '', startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [] });
         setShowAddActivityModal(true);
         navigation.setParams({ editActivityId: undefined });
       }
@@ -484,7 +484,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
   const handleSaveActivity = async () => {
     if (!familyId || !selectedYear || !selectedChild) return;
-    if (!activityForm.title.trim() || !activityForm.date) {
+    if (!activityForm.title.trim() || !activityForm.dateFrom) {
       crossAlert(t('common.error'), t('health.enterTitleAndDate'));
       return;
     }
@@ -492,9 +492,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       const user = useUserStore.getState().user;
       const activityData: any = { ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId, createdBy: user?.uid || '' };
       // Compute reminderAt
-      if (activityForm.reminder && activityForm.date) {
+      if (activityForm.reminder && activityForm.dateFrom) {
         const time = activityForm.startTime || '09:00';
-        const eventTime = new Date(`${activityForm.date}T${time}:00`);
+        const eventTime = new Date(`${activityForm.dateFrom}T${time}:00`);
         let reminderMs = 0;
         if (activityForm.reminder === '1 time før') reminderMs = 60 * 60 * 1000;
         else if (activityForm.reminder === '1 dag før') reminderMs = 24 * 60 * 60 * 1000;
@@ -508,9 +508,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         await updateSchoolActivity(familyId, editingActivityId, activityData);
       } else {
         await addSchoolActivity(activityData);
-        notifyHealthItem(familyId, activityForm.title, activityForm.date, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
+        notifyHealthItem(familyId, activityForm.title, activityForm.dateFrom, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
       }
-      setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
       setEditingActivityId(null);
       setShowAddActivityModal(false);
       loadYearData();
@@ -1103,7 +1103,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({activities.length})</Text>
                     <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.activities ? '▼' : '▶'}</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', date: '', startTime: '', endTime: '', location: '', note: '', documents: [] }); setShowAddActivityModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', documents: [] }); setShowAddActivityModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </TouchableOpacity>
@@ -1120,7 +1120,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                         <Text style={{ color: SCHOOL_THEME, fontSize: 10, fontWeight: '600' }}>{a.activityType === 'tur' ? t('school.activityTypeTur') : a.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}</Text>
                       </View>
                     </View>
-                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{a.date}{a.startTime ? ` • ${a.startTime}${a.endTime ? ` – ${a.endTime}` : ''}` : ''}</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>{a.dateFrom}{a.dateTo && a.dateTo !== a.dateFrom ? ` — ${a.dateTo}` : ''}{a.startTime ? ` • ${a.startTime}${a.endTime ? ` – ${a.endTime}` : ''}` : ''}</Text>
                     {a.location ? <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 2 }}>📍 {a.location}</Text> : null}
                   </TouchableOpacity>
                 ))}
@@ -1301,7 +1301,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         <ActionModal visible={scheduleActionModal.visible} title={scheduleActionModal.title} onDelete={() => { handleDeleteSchedule(scheduleActionModal.id); setScheduleActionModal({ visible: false, id: '', title: '' }); }} onCancel={() => setScheduleActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
         <ActionModal visible={holidayActionModal.visible} title={holidayActionModal.title} onEdit={() => { setEditingHolidayId(holidayActionModal.id); const h = holidays.find(h => h.id === holidayActionModal.id); if (h) setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); setHolidayActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteHoliday} onCancel={() => setHolidayActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
 
-        <ActionModal visible={activityActionModal.visible} title={activityActionModal.title} onEdit={() => { const a = activities.find(a => a.id === activityActionModal.id); if (a) { setEditingActivityId(a.id); setActivityForm({ title: a.title, activityType: a.activityType, date: a.date, startTime: a.startTime || '', endTime: a.endTime || '', location: a.location || '', note: a.note || '', documents: a.documents || [] }); setShowAddActivityModal(true); } setActivityActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteActivity} onCancel={() => setActivityActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
+        <ActionModal visible={activityActionModal.visible} title={activityActionModal.title} onEdit={() => { const a = activities.find(a => a.id === activityActionModal.id); if (a) { setEditingActivityId(a.id); setActivityForm({ title: a.title, activityType: a.activityType, dateFrom: a.dateFrom, dateTo: a.dateTo || '', startTime: a.startTime || '', endTime: a.endTime || '', location: a.location || '', note: a.note || '', documents: a.documents || [] }); setShowAddActivityModal(true); } setActivityActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteActivity} onCancel={() => setActivityActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
 
         {/* Add/Edit Holiday Modal */}
         <Modal visible={showAddHolidayModal} transparent animationType="slide">
@@ -1435,11 +1435,19 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                       <Text style={[styles.label, { color: colors.text }]}>{t('school.activityTitle')}</Text>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.title} onChangeText={(v) => setActivityForm(f => ({ ...f, title: v }))} placeholderTextColor={colors.textDisabled} />
                     </View>
-                    <View style={styles.field}>
-                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDate')}</Text>
-                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('date')}>
-                        <Text style={{ color: activityForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.date || 'Velg dato'}</Text>
-                      </TouchableOpacity>
+                    <View style={{ flexDirection: 'row', gap: 12 }}>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDateFrom')}</Text>
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('dateFrom')}>
+                          <Text style={{ color: activityForm.dateFrom ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.dateFrom || 'Velg dato'}</Text>
+                        </TouchableOpacity>
+                      </View>
+                      <View style={[styles.field, { flex: 1 }]}>
+                        <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDateTo')}</Text>
+                        <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('dateTo')}>
+                          <Text style={{ color: activityForm.dateTo ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.dateTo || '—'}</Text>
+                        </TouchableOpacity>
+                      </View>
                     </View>
                     <View style={{ flexDirection: 'row', gap: 12 }}>
                       <View style={[styles.field, { flex: 1 }]}>
@@ -1518,12 +1526,12 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         {/* Activity DatePickerModal */}
         <DatePickerModal
           visible={activeActivityPicker !== null}
-          title={activeActivityPicker === 'date' ? t('school.activityDate') : activeActivityPicker === 'startTime' ? t('school.activityStartTime') : t('school.activityEndTime')}
+          title={activeActivityPicker === 'dateFrom' ? t('school.activityDateFrom') : activeActivityPicker === 'dateTo' ? t('school.activityDateTo') : activeActivityPicker === 'startTime' ? t('school.activityStartTime') : t('school.activityEndTime')}
           mode={activeActivityPicker === 'startTime' || activeActivityPicker === 'endTime' ? 'time' : 'date'}
           dateOffset={-365}
           dateCount={730}
           selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
-          onSelect={(v) => { if (activeActivityPicker) setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); setActiveActivityPicker(null); }}
+          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo || v })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
           onClose={() => setActiveActivityPicker(null)}
         />
       </>

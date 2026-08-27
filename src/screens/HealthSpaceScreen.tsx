@@ -57,7 +57,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: '', dateTo: '', note: '' });
-  const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
@@ -132,7 +132,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   }, [route?.params?.openAddSection, route?.params?.editId, route?.params?.editSection, appointments, medications, vaccinations, allergies, growth]);
 
   const today = new Date().toISOString().split('T')[0];
-  const upcomingAppointments = appointments.filter(a => a.date >= today).slice(0, 3);
+  const upcomingAppointments = appointments.filter(a => a.dateFrom >= today).slice(0, 3);
 
   const handleAdd = async () => {
     if (!familyId) return;
@@ -144,7 +144,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         else await addHealthMedication(familyId, medForm);
         setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: '', dateTo: '', note: '' });
       } else if (activeSection === 'appointments') {
-        if (!apptForm.title.trim() || !apptForm.date) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
+        if (!apptForm.title.trim() || !apptForm.dateFrom) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
         const user = useUserStore.getState().user;
         let savedAppt;
         if (isEditing) {
@@ -156,9 +156,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         }
         // Send push notification to family members
         if (!isEditing) {
-          notifyHealthItem(familyId, apptForm.title, apptForm.date, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
+          notifyHealthItem(familyId, apptForm.title, apptForm.dateFrom, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
         }
-        setApptForm({ title: '', person: persons[0] || '', doctor: '', date: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+        setApptForm({ title: '', person: persons[0] || '', doctor: '', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
         let savedVacc;
@@ -238,7 +238,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) setMedForm({ name: item.name, person: item.person, dosage: item.dosage, frequency: item.frequency || 1, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }], dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
     } else if (section === 'appointments') {
       const item = appointments.find(a => a.id === id);
-      if (item) setApptForm({ title: item.title, person: item.person, doctor: item.doctor || '', date: item.date, startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', documents: item.documents || [] });
+      if (item) setApptForm({ title: item.title, person: item.person, doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', documents: item.documents || [] });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
       if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', location: item.location || '', note: item.note || '' });
@@ -298,12 +298,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
             <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('health.noAppointments')}</Text>
           ) : (
             [...appointments].sort((a, b) => {
-              const aPast = a.date < today;
-              const bPast = b.date < today;
+              const aPast = a.dateFrom < today;
+              const bPast = b.dateFrom < today;
               if (aPast && !bPast) return 1;
               if (!aPast && bPast) return -1;
-              if (aPast && bPast) return b.date.localeCompare(a.date);
-              return a.date.localeCompare(b.date);
+              if (aPast && bPast) return b.dateFrom.localeCompare(a.dateFrom);
+              return a.dateFrom.localeCompare(b.dateFrom);
             }).map(appt => (
                 <TouchableOpacity key={appt.id} style={styles.item} onPress={() => navigation.navigate('HealthApptDetail', { appointment: appt, source: 'health' })} onLongPress={() => setActionModal({ visible: true, id: appt.id, title: appt.title, section: 'appointments' })}>
                 <AppIcon name="calendar" size={20} color={MODULE_COLORS.health} />
@@ -314,10 +314,10 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                       <AppIcon name="file" size={12} color="#1976D2" />
                     )}
                   </View>
-                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{appt.date} {appt.startTime} — {appt.location || appt.person}</Text>
+                  <Text style={[styles.itemSub, { color: colors.textSecondary }]}>{appt.dateFrom} {appt.startTime} — {appt.location || appt.person}</Text>
                 </View>
-                {appt.date >= today ? (
-                  <Text style={[styles.badge, { backgroundColor: '#FFF3E0', color: '#FB8C00' }]}>{getDaysUntil(appt.date)}</Text>
+                {appt.dateFrom >= today ? (
+                  <Text style={[styles.badge, { backgroundColor: '#FFF3E0', color: '#FB8C00' }]}>{getDaysUntil(appt.dateFrom)}</Text>
                 ) : (
                   <Text style={[styles.badge, { backgroundColor: '#E8F5E9', color: '#43A047' }]}>{t('health.completed')}</Text>
                 )}
@@ -538,11 +538,19 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                       ))}
                     </View>
                   </View>
-                  <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>{t('health.date')}</Text>
-                    <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('apptDate')}>
-                      <Text style={{ color: apptForm.date ? colors.text : colors.textDisabled, fontSize: 16 }}>{apptForm.date || 'Velg dato'}</Text>
-                    </TouchableOpacity>
+                  <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.dateFrom')}</Text>
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('apptDateFrom')}>
+                        <Text style={{ color: apptForm.dateFrom ? colors.text : colors.textDisabled, fontSize: 16 }}>{apptForm.dateFrom || 'Velg dato'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.dateTo')}</Text>
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('apptDateTo')}>
+                        <Text style={{ color: apptForm.dateTo ? colors.text : colors.textDisabled, fontSize: 16 }}>{apptForm.dateTo || '—'}</Text>
+                      </TouchableOpacity>
+                    </View>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 12 }}>
                     <View style={[styles.field, { flex: 1 }]}>
@@ -819,7 +827,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <View style={[styles.viewDivider, { backgroundColor: colors.border }]} />
                     <View style={styles.viewDetailRow}>
                       <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅 {t('health.date')}</Text>
-                      <Text style={[styles.viewDetailValue, { color: colors.text }]}>{detailModal.item.date}</Text>
+                      <Text style={[styles.viewDetailValue, { color: colors.text }]}>{detailModal.item.dateFrom}</Text>
                     </View>
                     <View style={styles.viewDetailRow}>
                       <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🕐 {t('health.startTime')}</Text>
@@ -863,12 +871,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                           style={[styles.calendarWebButton, { backgroundColor: userCalendarProvider === 'google' ? '#4285F4' : '#0078D4' }]}
                           onPress={() => {
                             const [h, m] = (detailModal.item.startTime || '09:00').split(':').map(Number);
-                            const start = new Date(detailModal.item.date);
+                            const start = new Date(detailModal.item.dateFrom);
                             start.setHours(h, m, 0, 0);
                             let end: Date;
                             if (detailModal.item.endTime) {
                               const [eh, em] = detailModal.item.endTime.split(':').map(Number);
-                              end = new Date(detailModal.item.date);
+                              end = new Date(detailModal.item.dateFrom);
                               end.setHours(eh, em, 0, 0);
                             } else {
                               end = new Date(start.getTime() + 60 * 60 * 1000);
@@ -1024,14 +1032,14 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         mode={activePicker?.includes('Time') || activePicker?.includes('time') ? 'time' : 'date'}
         dateOffset={
           activePicker === 'medDateFrom' || activePicker === 'medDateTo' ? -1825 :
-          activePicker === 'apptDate' ? -1825 :
+          activePicker === 'apptDateFrom' || activePicker === 'apptDateTo' ? -1825 :
           activePicker === 'vaccDate' ? -1825 :
           activePicker === 'vaccNextDue' ? -365 :
           activePicker === 'growthDate' ? -1825 : 0
         }
         dateCount={
           activePicker === 'medDateFrom' || activePicker === 'medDateTo' ? 2190 :
-          activePicker === 'apptDate' ? 2190 :
+          activePicker === 'apptDateFrom' || activePicker === 'apptDateTo' ? 2190 :
           activePicker === 'vaccDate' ? 2190 :
           activePicker === 'vaccNextDue' ? 730 :
           activePicker === 'growthDate' ? 2190 : 365
@@ -1039,7 +1047,8 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         selectedValue={
           activePicker === 'medDateFrom' ? medForm.dateFrom :
           activePicker === 'medDateTo' ? medForm.dateTo :
-          activePicker === 'apptDate' ? apptForm.date :
+          activePicker === 'apptDateFrom' ? apptForm.dateFrom :
+          activePicker === 'apptDateTo' ? apptForm.dateTo :
           activePicker === 'apptStartTime' ? apptForm.startTime :
           activePicker === 'apptEndTime' ? apptForm.endTime :
           activePicker === 'vaccDate' ? vaccForm.date :
@@ -1058,7 +1067,8 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               setMedForm(f => ({ ...f, timeSlots: newSlots }));
             }
           }
-          else if (activePicker === 'apptDate') setApptForm(f => ({ ...f, date: value }));
+          else if (activePicker === 'apptDateFrom') { setApptForm(f => ({ ...f, dateFrom: value, dateTo: f.dateTo || value })); }
+          else if (activePicker === 'apptDateTo') setApptForm(f => ({ ...f, dateTo: value }));
           else if (activePicker === 'apptStartTime') setApptForm(f => ({ ...f, startTime: value }));
           else if (activePicker === 'apptEndTime') setApptForm(f => ({ ...f, endTime: value }));
           else if (activePicker === 'vaccDate') setVaccForm(f => ({ ...f, date: value }));

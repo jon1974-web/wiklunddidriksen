@@ -32,7 +32,7 @@ export async function deleteHealthMedication(familyId: string, id: string): Prom
 
 // Appointments
 export async function getHealthAppointments(familyId: string): Promise<HealthAppointment[]> {
-  const q = query(getHealthCollection(familyId, 'appointments'), orderBy('date', 'asc'));
+  const q = query(getHealthCollection(familyId, 'appointments'), orderBy('dateFrom', 'asc'));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HealthAppointment));
 }

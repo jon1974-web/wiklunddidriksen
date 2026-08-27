@@ -299,6 +299,8 @@
     "activityTypeMøte": "Møte",
     "activityTitle": "Tittel",
     "activityDate": "Dato",
+    "activityDateFrom": "Fra dato",
+    "activityDateTo": "Til dato",
     "activityStartTime": "Starttid",
     "activityEndTime": "Sluttid",
     "activityLocation": "Sted",

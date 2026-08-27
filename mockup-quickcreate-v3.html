@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fampad — Quick Create Final</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #0a0a0a; color: #fff; padding: 40px 20px; }
+h1 { text-align: center; font-size: 28px; margin-bottom: 8px; }
+.subtitle { text-align: center; color: #666; font-size: 14px; margin-bottom: 40px; }
+.row { display: flex; justify-content: center; gap: 32px; flex-wrap: wrap; margin-bottom: 48px; }
+.phone { width: 320px; background: #1a1a1a; border-radius: 32px; overflow: hidden; box-shadow: 0 16px 50px rgba(0,0,0,0.4); flex-shrink: 0; }
+.phone-screen { background: #F6F7F9; border-radius: 24px; height: 600px; overflow: hidden; }
+.phone-status { height: 44px; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #333; }
+.phone-content { padding: 20px 16px; }
+.module-label { font-size: 11px; font-weight: 700; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.row-pair { display: flex; gap: 16px; margin-bottom: 20px; }
+.module-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px; border-radius: 12px; }
+.module-col:active { background: rgba(0,0,0,0.04); }
+.module-icon { width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; }
+.module-action { font-size: 13px; font-weight: 600; color: #1a1a1a; text-align: center; }
+.trip-row { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px; border-radius: 10px; }
+.trip-row:active { background: rgba(0,0,0,0.04); }
+.trip-action { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+.avtaler-row { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
+.avtaler-item { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; }
+.avtaler-item:active { background: rgba(0,0,0,0.04); }
+</style>
+</head>
+<body>
+
+<h1>Quick Create — Final</h1>
+<p class="subtitle">Concept 3: No backgrounds, centered headers, icons + labels</p>
+
+<div class="row">
+  <div class="phone">
+    <div class="phone-screen">
+      <div class="phone-status">9:41</div>
+      <div class="phone-content">
+        <div style="text-align:center;margin-bottom:16px;">
+          <div class="module-label" style="color:#3b5a75;">Avtaler</div>
+        </div>
+        <div class="avtaler-row">
+          <div class="avtaler-item">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:#1a1a1a;">Manuell</div>
+          </div>
+          <div class="avtaler-item">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#3b5a75" stroke="none"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:#1a1a1a;">Tale</div>
+          </div>
+          <div class="avtaler-item">
+            <div style="width:44px;height:44px;display:flex;align-items:center;justify-content:center;">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#3b5a75" stroke="none"><path d="M12 15.5c1.25 0 2.45-.2 3.57-.57.35-.11.74-.11 1.09 0C17.55 15.9 18.76 16.1 20 16.1V6c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v10.1c0 1.54.9 2.99 2.34 3.63l1.76.76c.39.17.82.17 1.21 0z"/></svg>
+            </div>
+            <div style="font-size:13px;font-weight:600;color:#1a1a1a;">Foto</div>
+          </div>
+        </div>
+
+        <div class="row-pair">
+          <div class="module-col">
+            <div class="module-label" style="color:#C67B5C;">Helse</div>
+            <div class="module-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#C67B5C" stroke="none"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            </div>
+            <div class="module-action">Helsetime</div>
+          </div>
+          <div class="module-col">
+            <div class="module-label" style="color:#9B7DB8;">Kjæledyr</div>
+            <div class="module-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#9B7DB8" stroke="none"><circle cx="8" cy="7" r="2.5"/><circle cx="16" cy="7" r="2.5"/><circle cx="5" cy="13" r="2"/><circle cx="19" cy="13" r="2"/><ellipse cx="12" cy="18" rx="5" ry="3.5"/></svg>
+            </div>
+            <div class="module-action">Vet.time</div>
+          </div>
+        </div>
+
+        <div class="row-pair">
+          <div class="module-col">
+            <div class="module-label" style="color:#6B8F71;">Skole</div>
+            <div class="module-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#6B8F71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,3 2,9 12,15 22,9"/><polyline points="5,11 5,17 12,21 19,17"/><line x1="22" y1="9" x2="22" y2="17"/></svg>
+            </div>
+            <div class="module-action">Aktivitet</div>
+          </div>
+          <div class="module-col">
+            <div class="module-label" style="color:#E8836A;">Barnehage</div>
+            <div class="module-icon">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#E8836A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="5" r="3"/><line x1="12" y1="8" x2="12" y2="17"/><line x1="12" y1="12" x2="6" y2="8"/><line x1="12" y1="12" x2="18" y2="8"/><line x1="12" y1="17" x2="8" y2="22"/><line x1="12" y1="17" x2="16" y2="22"/></svg>
+            </div>
+            <div class="module-action">Aktivitet</div>
+          </div>
+        </div>
+
+        <div style="text-align:center;">
+          <div class="module-label" style="color:#7EC8E3;">Reiser</div>
+          <div class="trip-row">
+            <div style="width:28px;height:28px;display:flex;align-items:center;justify-content:center;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="trip-action">Ny reise</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
