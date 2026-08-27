@@ -920,11 +920,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'healthAppointment') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const d = item.dateFrom ? new Date(item.dateFrom) : null;
-      const calDay = d ? d.getDate() : '?';
+      const dateVal = (item as any).dateFrom || (item as any).date || '';
+      const d = dateVal ? new Date(dateVal) : null;
+      const calDay = d && !isNaN(d.getTime()) ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
-      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
-      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
+      const calMonth = d && !isNaN(d.getTime()) ? MONTHS_SV[d.getMonth()] : '';
+      const calDayName = d && !isNaN(d.getTime()) ? t(DAY_KEYS[d.getDay()]) : '';
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
@@ -976,11 +977,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'schoolActivity') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const d = item.dateFrom ? new Date(item.dateFrom) : null;
-      const calDay = d ? d.getDate() : '?';
+      const dateVal = (item as any).dateFrom || (item as any).date || '';
+      const d = dateVal ? new Date(dateVal) : null;
+      const calDay = d && !isNaN(d.getTime()) ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
-      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
-      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
+      const calMonth = d && !isNaN(d.getTime()) ? MONTHS_SV[d.getMonth()] : '';
+      const calDayName = d && !isNaN(d.getTime()) ? t(DAY_KEYS[d.getDay()]) : '';
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       const typeLabel = (item as any).activityType === 'tur' ? t('school.activityTypeTur') : (item as any).activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
       return (
@@ -1034,11 +1036,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'kindergartenActivity') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const d = item.dateFrom ? new Date(item.dateFrom) : null;
-      const calDay = d ? d.getDate() : '?';
+      const dateVal = (item as any).dateFrom || (item as any).date || '';
+      const d = dateVal ? new Date(dateVal) : null;
+      const calDay = d && !isNaN(d.getTime()) ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
-      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
-      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
+      const calMonth = d && !isNaN(d.getTime()) ? MONTHS_SV[d.getMonth()] : '';
+      const calDayName = d && !isNaN(d.getTime()) ? t(DAY_KEYS[d.getDay()]) : '';
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       const typeLabel = (item as any).activityType === 'tur' ? t('school.activityTypeTur') : (item as any).activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
       return (
