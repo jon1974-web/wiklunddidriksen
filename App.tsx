@@ -144,6 +144,7 @@ const EventsStack = () => {
           component={AddEventScreen}
           options={{
             headerShown: false,
+            presentation: 'modal',
           }}
         />
         <Stack.Screen
