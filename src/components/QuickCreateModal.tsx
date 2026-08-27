@@ -129,7 +129,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                 <View style={styles.sectionLabelWrap}>
                   <Text style={[styles.sectionLabel, { color: eventsSection.color }]}>{t(eventsSection.labelKey)}</Text>
                 </View>
-                <View style={styles.row}>
+                <View style={[styles.row, { justifyContent: 'space-between' }]}>
                   <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => eventsSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <View style={styles.iconWrap}>
                       <AppIcon name={eventsSection.items[0].icon} size={28} color={eventsSection.color} />
