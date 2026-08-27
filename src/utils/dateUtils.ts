@@ -10,6 +10,12 @@ export const toDateSafe = (val: any): Date | null => {
   return null;
 };
 
+export const toDateString = (val: any): string => {
+  const d = toDateSafe(val);
+  if (!d) return '';
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
 export const getTodayLocal = (): string => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;

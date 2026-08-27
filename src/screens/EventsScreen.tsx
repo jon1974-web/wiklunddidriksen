@@ -262,22 +262,28 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
   const loadHolidays = useCallback(async () => {
     if (!familyId) return;
     try {
-      const [sh, kh, sc, kc, sa, ka] = await Promise.all([
+      const [sh, kh, sc, kc] = await Promise.all([
         getAllSchoolHolidays(familyId),
         getAllKindergartenHolidays(familyId),
         getSchoolChildren(familyId),
         getKindergartenChildren(familyId),
-        getSchoolActivities(familyId),
-        getKindergartenActivities(familyId),
       ]);
       setSchoolHolidays(sh);
       setKindergartenHolidays(kh);
       setSchoolChildren(sc);
       setKindergartenChildren(kc);
+    } catch (error) {
+      // Silently fail for holidays
+    }
+    try {
+      const [sa, ka] = await Promise.all([
+        getSchoolActivities(familyId),
+        getKindergartenActivities(familyId),
+      ]);
       setSchoolActivities(sa);
       setKindergartenActivities(ka);
     } catch (error) {
-      // Silently fail for holidays
+      console.log('Failed to load activities:', error);
     }
   }, [familyId]);
 
@@ -976,7 +982,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'schoolActivity') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const d = toDateSafe((item as any).dateFrom) || toDateSafe((item as any).date);
+      const d = item.dateFrom ? new Date(item.dateFrom) : null;
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
