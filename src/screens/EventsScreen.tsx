@@ -441,7 +441,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     const getDateStr = (item: UnifiedItem): string => {
       if (item._type === 'trip') return item.startDate;
       if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
-      return item.endDate || item.date;
+      if (item._type === 'event') return (item as Event).endDate || (item as Event).date;
+      return (item as any).dateFrom || '';
     };
     const getTimeStr = (item: UnifiedItem): string => {
       if (item._type === 'event') return item.time || '99:99';
@@ -586,7 +587,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     const getDateStr = (item: UnifiedItem): string => {
       if (item._type === 'trip') return item.startDate;
       if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
-      return item.endDate || item.date;
+      if (item._type === 'event') return (item as Event).endDate || (item as Event).date;
+      return (item as any).dateFrom || '';
     };
     const allItems: UnifiedItem[] = [
       ...events.map((e) => ({ ...e, _type: 'event' as const })),
@@ -980,7 +982,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation }) => {
     }
     if (item._type === 'kindergartenActivity') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const d = item.date ? new Date(item.date) : null;
+      const d = item.dateFrom ? new Date(item.dateFrom) : null;
       const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
