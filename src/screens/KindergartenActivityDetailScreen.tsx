@@ -10,6 +10,7 @@ import { deleteKindergartenActivity } from '../services/kindergartenService';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { toDateSafe } from '../utils/dateUtils';
 
 interface Props {
   navigation: any;
@@ -27,7 +28,7 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const d = activity.dateFrom ? new Date(activity.dateFrom) : null;
+  const d = toDateSafe(activity.dateFrom) || toDateSafe((activity as any).date);
   const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
   const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
   const dayName = d ? DAY_NAMES[d.getDay()] : '';

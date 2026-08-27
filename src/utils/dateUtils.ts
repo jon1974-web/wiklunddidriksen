@@ -1,6 +1,15 @@
 import { getLocale } from '../constants/languages';
 import i18n from '../i18n';
 
+export const toDateSafe = (val: any): Date | null => {
+  if (!val) return null;
+  if (val instanceof Date) return val;
+  if (typeof val === 'string') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
+  if (typeof val === 'number') { const d = new Date(val); return isNaN(d.getTime()) ? null : d; }
+  if (typeof val === 'object' && typeof val.toDate === 'function') { return val.toDate(); }
+  return null;
+};
+
 export const getTodayLocal = (): string => {
   const d = new Date();
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;

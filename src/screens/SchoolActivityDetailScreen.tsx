@@ -10,6 +10,7 @@ import { deleteSchoolActivity } from '../services/schoolService';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { toDateSafe } from '../utils/dateUtils';
 
 interface Props {
   navigation: any;
@@ -27,7 +28,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
-  const d = activity.dateFrom ? new Date(activity.dateFrom) : null;
+  const d = toDateSafe(activity.dateFrom) || toDateSafe((activity as any).date);
   const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
   const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
   const dayName = d ? DAY_NAMES[d.getDay()] : '';
@@ -41,7 +42,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
 
   const mapUrl = useMemo(() => activity.location ? getStaticMapUrl(activity.location, 15, '600x300') : null, [activity.location]);
 
-  const isCompleted = activity.dateFrom < new Date().toISOString().slice(0, 10);
+  const isCompleted = d ? d < new Date() : false;
   const familyId = useUserStore((state) => state.familyId);
   const canDelete = activity.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
 

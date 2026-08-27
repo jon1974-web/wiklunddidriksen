@@ -10,7 +10,7 @@ import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
 import { SpondResponseModal } from '../components/SpondResponseModal';
-import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
+import { getWeekNumber, getTodayLocal, formatDate, formatSpondTimestamp, formatSpondDate, toDateSafe } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
@@ -920,12 +920,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'healthAppointment') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const dateVal = (item as any).dateFrom || (item as any).date || '';
-      const d = dateVal ? new Date(dateVal) : null;
-      const calDay = d && !isNaN(d.getTime()) ? d.getDate() : '?';
+      const d = toDateSafe((item as any).dateFrom) || toDateSafe((item as any).date);
+      const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
-      const calMonth = d && !isNaN(d.getTime()) ? MONTHS_SV[d.getMonth()] : '';
-      const calDayName = d && !isNaN(d.getTime()) ? t(DAY_KEYS[d.getDay()]) : '';
+      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
+      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
@@ -977,12 +976,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'schoolActivity') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const dateVal = (item as any).dateFrom || (item as any).date || '';
-      const d = dateVal ? new Date(dateVal) : null;
-      const calDay = d && !isNaN(d.getTime()) ? d.getDate() : '?';
+      const d = toDateSafe((item as any).dateFrom) || toDateSafe((item as any).date);
+      const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
-      const calMonth = d && !isNaN(d.getTime()) ? MONTHS_SV[d.getMonth()] : '';
-      const calDayName = d && !isNaN(d.getTime()) ? t(DAY_KEYS[d.getDay()]) : '';
+      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
+      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       const typeLabel = (item as any).activityType === 'tur' ? t('school.activityTypeTur') : (item as any).activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
       return (
@@ -1036,12 +1034,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
     if (item._type === 'kindergartenActivity') {
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
-      const dateVal = (item as any).dateFrom || (item as any).date || '';
-      const d = dateVal ? new Date(dateVal) : null;
-      const calDay = d && !isNaN(d.getTime()) ? d.getDate() : '?';
+      const d = toDateSafe((item as any).dateFrom) || toDateSafe((item as any).date);
+      const calDay = d ? d.getDate() : '?';
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
-      const calMonth = d && !isNaN(d.getTime()) ? MONTHS_SV[d.getMonth()] : '';
-      const calDayName = d && !isNaN(d.getTime()) ? t(DAY_KEYS[d.getDay()]) : '';
+      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
+      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       const typeLabel = (item as any).activityType === 'tur' ? t('school.activityTypeTur') : (item as any).activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
       return (
