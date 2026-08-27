@@ -184,11 +184,6 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
           <TouchableWithoutFeedback>
             <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
               <View style={styles.modalHandleBar} />
-              <View style={{ alignItems: 'flex-start', paddingHorizontal: 20, paddingTop: 4 }}>
-                <TouchableOpacity onPress={onClose} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ color: colors.accent, fontSize: 18 }}>✕</Text>
-                </TouchableOpacity>
-              </View>
               <ScrollView style={{ flex: 1, paddingHorizontal: 20 }} contentContainerStyle={{ paddingBottom: 40 }}>
                 <Text style={[styles.title, { color: colors.text }]}>Ny avtale</Text>
 

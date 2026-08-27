@@ -351,11 +351,8 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     <View style={[styles.container, { backgroundColor: colors.background, flex: 1 }]}>
       <Modal visible={isEditing} transparent animationType="slide" onRequestClose={() => setIsEditing(false)}>
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
             <View style={styles.modalHandleBar} />
-            <TouchableOpacity onPress={() => setIsEditing(false)} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-              <Text style={{ color: colors.accent, fontSize: 18 }}>✕</Text>
-            </TouchableOpacity>
 
             <ScrollView showsVerticalScrollIndicator={false}>
               <Text style={[styles.title, { color: colors.text }]}>Rediger avtale</Text>
