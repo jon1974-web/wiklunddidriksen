@@ -483,14 +483,15 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                 )}
               </View>
 
-              {/* Save */}
-              <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent }]} onPress={handleUpdate}>
-                <Text style={styles.buttonText}>{t('common.save')}</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]} onPress={() => setIsEditing(false)}>
-                <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
-              </TouchableOpacity>
+              {/* Save & Cancel */}
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => setIsEditing(false)}>
+                  <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.accent, flex: 1 }]} onPress={handleUpdate}>
+                  <Text style={styles.buttonText}>{t('common.save')}</Text>
+                </TouchableOpacity>
+              </View>
 
               <DatePickerModal
                 visible={editActivePicker !== null}
