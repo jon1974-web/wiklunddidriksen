@@ -83,7 +83,7 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
           }
         };
 
-        const shiftStyle = index === 1 ? { paddingRight: 24 } : index === 2 ? { paddingLeft: 24 } : {};
+        const shiftStyle = index === 1 ? { paddingRight: 40 } : index === 2 ? { paddingLeft: 40 } : {};
 
         return (
           <TouchableOpacity key={route.key} style={[styles.tabItem, shiftStyle]} onPress={onPress} activeOpacity={0.7}>
