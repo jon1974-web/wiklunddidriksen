@@ -130,7 +130,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                   <Text style={[styles.sectionLabel, { color: eventsSection.color }]}>{t(eventsSection.labelKey)}</Text>
                 </View>
                 <View style={styles.row}>
-                  <TouchableOpacity style={[styles.moduleCol, { flex: 0.8 }]} onPress={() => navigateAndClose(() => eventsSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => eventsSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <View style={styles.iconWrap}>
                       <AppIcon name={eventsSection.items[0].icon} size={28} color={eventsSection.color} />
                     </View>
@@ -142,7 +142,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     </View>
                     <Text style={[styles.actionTitle, { color: lightenColor(eventsSection.color) }]}>{t(eventsSection.items[1].labelKey)}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={[styles.moduleCol, { flex: 0.8 }]} onPress={() => navigateAndClose(() => eventsSection.items[2].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => eventsSection.items[2].nav(navigation))} activeOpacity={0.6}>
                     <View style={styles.iconWrap}>
                       <AppIcon name={eventsSection.items[2].icon} size={28} color={eventsSection.color} />
                     </View>
@@ -152,7 +152,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
 
                 {/* Row 2: Helse → empty ← Kjæledyr */}
                 <View style={styles.row}>
-                  <TouchableOpacity style={[styles.moduleCol, { flex: 0.8 }]} onPress={() => navigateAndClose(() => healthSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => healthSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: healthSection.color }]}>{t(healthSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={healthSection.items[0].icon} size={28} color={healthSection.color} />
@@ -160,7 +160,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     <Text style={[styles.actionTitle, { color: lightenColor(healthSection.color) }]}>{t(healthSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
                   <View style={styles.moduleCol} />
-                  <TouchableOpacity style={[styles.moduleCol, { flex: 0.8 }]} onPress={() => navigateAndClose(() => petsSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => petsSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: petsSection.color }]}>{t(petsSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={petsSection.items[0].icon} size={28} color={petsSection.color} />
@@ -171,7 +171,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
 
                 {/* Row 3: School → empty ← Kindergarten */}
                 <View style={styles.row}>
-                  <TouchableOpacity style={[styles.moduleCol, { flex: 0.8 }]} onPress={() => navigateAndClose(() => schoolSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => schoolSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: schoolSection.color }]}>{t(schoolSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={schoolSection.items[0].icon} size={28} color={schoolSection.color} />
@@ -179,7 +179,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     <Text style={[styles.actionTitle, { color: lightenColor(schoolSection.color) }]}>{t(schoolSection.items[0].labelKey)}</Text>
                   </TouchableOpacity>
                   <View style={styles.moduleCol} />
-                  <TouchableOpacity style={[styles.moduleCol, { flex: 0.8 }]} onPress={() => navigateAndClose(() => kindergartenSection.items[0].nav(navigation))} activeOpacity={0.6}>
+                  <TouchableOpacity style={styles.moduleCol} onPress={() => navigateAndClose(() => kindergartenSection.items[0].nav(navigation))} activeOpacity={0.6}>
                     <Text style={[styles.sectionLabel, { color: kindergartenSection.color }]}>{t(kindergartenSection.labelKey)}</Text>
                     <View style={styles.iconWrap}>
                       <AppIcon name={kindergartenSection.items[0].icon} size={28} color={kindergartenSection.color} />
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   moduleCol: {
-    flex: 1,
+    flex: 0.8,
     alignItems: 'center',
     gap: 2,
     paddingVertical: 10,
