@@ -218,7 +218,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         navigation.setParams({ editActivityId: undefined });
       }
     }
-  }, [route?.params?.openAddSection, route?.params?.editActivityId, familyId, selectedYear, selectedChild, activities]);
+  }, [route?.params?.openAddSection, route?.params?.editActivityId, familyId, selectedYear, selectedChild, children, activities]);
 
   useEffect(() => {
     if (selectedChild && years.length > 0 && !selectedYear) {
