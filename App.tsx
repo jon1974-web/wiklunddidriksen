@@ -143,10 +143,7 @@ const EventsStack = () => {
           name="AddEvent"
           component={AddEventScreen}
           options={{
-            title: 'Nytt arrangement',
-            headerStyle: { backgroundColor: colors.surface },
-            headerTintColor: colors.text,
-            headerLeft: () => <BackButton />,
+            headerShown: false,
           }}
         />
         <Stack.Screen
