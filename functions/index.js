@@ -1781,7 +1781,7 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
     excludeUid: uid,
   });
 
-  trackUsageLog(uid, "notifyHealthItem", familyId);
+  trackUsageLog(uid, "reminderNotification", familyId);
   return res.status(200).json({ sent });
 });
 
