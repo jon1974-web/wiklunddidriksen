@@ -129,7 +129,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                       <AppIcon name={section.moduleIcon} size={24} color={section.color} />
                     </View>
                     <Text style={[styles.moduleName, { color: section.color }]}>{t(section.labelKey)}</Text>
-                    <View style={styles.actionChips}>
+                    <View style={[styles.actionChips, section.items.length === 1 && styles.actionChipsFull]}>
                       {section.items.map((item, i) => (
                         <TouchableOpacity key={i} style={styles.actionChip} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
                           <View style={styles.actionIconWrap}>
@@ -218,6 +218,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 6,
     marginLeft: 'auto',
+  },
+  actionChipsFull: {
+    flex: 1,
   },
   actionChip: {
     alignItems: 'center',
