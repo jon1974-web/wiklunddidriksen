@@ -45,7 +45,7 @@ function setCorsHeaders(res, req) {
     res.set("Access-Control-Allow-Origin", origin);
   }
   res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Filename");
+  res.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Filename, X-Type");
 }
 
 async function verifyAuth(req) {
