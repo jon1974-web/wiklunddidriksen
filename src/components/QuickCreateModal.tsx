@@ -225,8 +225,6 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 8,
     borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
   },
   actionIconWrap: {
     width: 24,
