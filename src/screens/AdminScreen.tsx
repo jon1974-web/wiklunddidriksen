@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions, TextInput, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,39 @@ import { useUserStore } from '../store/userStore';
 import { auth } from '../services/firebase';
 
 const ADMIN_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getAdminStats';
+const GET_FAMILY_LIST_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getFamilyList';
+const GET_FAMILY_DETAIL_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getFamilyDetail';
+
+interface FamilyItem {
+  id: string;
+  name: string;
+  memberCount: number;
+  createdAt?: number;
+}
+
+interface FamilyMember {
+  uid: string;
+  displayName?: string;
+  role: 'owner' | 'admin' | 'member';
+  email?: string;
+}
+
+interface FamilyDetail {
+  id: string;
+  name: string;
+  owner?: string;
+  members: Record<string, FamilyMember>;
+  memberCount: number;
+  dataCounts?: {
+    events?: number;
+    health?: number;
+    vetVisits?: number;
+    school?: number;
+    kindergarten?: number;
+    pets?: number;
+    trips?: number;
+  };
+}
 
 interface AdminScreenProps {
   navigation: any;
@@ -37,6 +70,14 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState<any>(null);
+
+  // Families tab state
+  const [families, setFamilies] = useState<FamilyItem[]>([]);
+  const [familiesLoading, setFamiliesLoading] = useState(false);
+  const [familySearch, setFamilySearch] = useState('');
+  const [selectedFamily, setSelectedFamily] = useState<FamilyDetail | null>(null);
+  const [familyDetailLoading, setFamilyDetailLoading] = useState(false);
+  const [showFamilyDetail, setShowFamilyDetail] = useState(false);
 
   const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/triggerAdminStats';
 
@@ -77,6 +118,49 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
     }
   }, [fetchStats]);
 
+  const fetchFamilies = useCallback(async () => {
+    setFamiliesLoading(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      const res = await fetch(GET_FAMILY_LIST_URL, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFamilies(data.families || data || []);
+      }
+    } catch (error) {
+      console.log('Failed to fetch families:', error);
+    } finally {
+      setFamiliesLoading(false);
+    }
+  }, []);
+
+  const fetchFamilyDetail = useCallback(async (familyId: string) => {
+    setFamilyDetailLoading(true);
+    setShowFamilyDetail(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      const res = await fetch(GET_FAMILY_DETAIL_URL, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ familyId }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSelectedFamily(data);
+      }
+    } catch (error) {
+      console.log('Failed to fetch family detail:', error);
+    } finally {
+      setFamilyDetailLoading(false);
+    }
+  }, []);
+
   const isAdmin = appRole === 'appOwner';
 
   useEffect(() => {
@@ -88,6 +172,12 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
     const interval = setInterval(fetchStats, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, [isAdmin, navigation, fetchStats]);
+
+  useEffect(() => {
+    if (isAdmin && activeTab === 'families') {
+      fetchFamilies();
+    }
+  }, [isAdmin, activeTab, fetchFamilies]);
 
   if (!isAdmin) return null;
 
@@ -150,11 +240,203 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
     );
   };
 
-  const renderFamilies = () => (
-    <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
-      <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>{t('admin.familiesComingSoon')}</Text>
-    </View>
-  );
+  const renderFamilies = () => {
+    const filteredFamilies = families.filter(f =>
+      (f.name || '').toLowerCase().includes(familySearch.toLowerCase())
+    );
+
+    return (
+      <View>
+        <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <Text style={styles.searchIcon}>🔍</Text>
+          <TextInput
+            style={[styles.searchInput, { color: colors.text, fontSize: 16 }]}
+            placeholder={t('admin.searchFamilies')}
+            placeholderTextColor={colors.textDisabled}
+            value={familySearch}
+            onChangeText={setFamilySearch}
+            autoCorrect={false}
+          />
+          {familySearch.length > 0 && (
+            <TouchableOpacity onPress={() => setFamilySearch('')} style={styles.clearBtn}>
+              <Text style={{ color: colors.textSecondary }}>✕</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        {familiesLoading ? (
+          <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} />
+        ) : filteredFamilies.length === 0 ? (
+          <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>
+              {t('admin.noFamiliesFound')}
+            </Text>
+          </View>
+        ) : (
+          <View style={isMobile ? styles.familyList : styles.familyGrid}>
+            {filteredFamilies.map((family) => (
+              <TouchableOpacity
+                key={family.id}
+                style={[styles.familyCard, { backgroundColor: colors.surface }]}
+                onPress={() => fetchFamilyDetail(family.id)}
+                activeOpacity={0.7}
+              >
+                <View style={styles.familyCardHeader}>
+                  <View style={[styles.familyIcon, { backgroundColor: '#3b5a75' }]}>
+                    <Text style={styles.familyIconText}>👨‍👩‍👧‍👦</Text>
+                  </View>
+                  <View style={styles.familyCardInfo}>
+                    <Text style={[styles.familyName, { color: colors.text }]} numberOfLines={1}>
+                      {family.name}
+                    </Text>
+                    <Text style={[styles.familyMemberCount, { color: colors.textSecondary }]}>
+                      {family.memberCount} {t('admin.members')}
+                    </Text>
+                  </View>
+                  <Text style={[styles.arrow, { color: colors.textDisabled }]}>›</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+
+        <FamilyDetailModal
+          visible={showFamilyDetail}
+          onClose={() => { setShowFamilyDetail(false); setSelectedFamily(null); }}
+          family={selectedFamily}
+          loading={familyDetailLoading}
+          t={t}
+          colors={colors}
+        />
+      </View>
+    );
+  };
+
+  const FamilyDetailModal: React.FC<{
+    visible: boolean;
+    onClose: () => void;
+    family: FamilyDetail | null;
+    loading: boolean;
+    t: any;
+    colors: any;
+  }> = ({ visible, onClose, family, loading, t, colors }) => {
+    const dataCards = family?.dataCounts ? [
+      { label: t('admin.events'), value: family.dataCounts.events || 0, color: '#3b5a75', icon: '📅' },
+      { label: t('admin.healthAppointments'), value: family.dataCounts.health || 0, color: '#C67B5C', icon: '🏥' },
+      { label: t('admin.vetBesøk'), value: family.dataCounts.vetVisits || 0, color: '#9B7DB8', icon: '🐾' },
+      { label: t('admin.schoolActivities'), value: family.dataCounts.school || 0, color: '#6B8F71', icon: '🏫' },
+      { label: t('admin.kindergartenActivities'), value: family.dataCounts.kindergarten || 0, color: '#E8836A', icon: '🎒' },
+      { label: t('admin.pets'), value: family.dataCounts.pets || 0, color: '#9B7DB8', icon: '🐕' },
+      { label: t('admin.trips'), value: family.dataCounts.trips || 0, color: '#7EC8E3', icon: '✈️' },
+    ] : [];
+
+    const roleLabel = (role: string) => {
+      if (role === 'owner') return t('admin.owner');
+      if (role === 'admin') return t('admin.admin');
+      return t('admin.member');
+    };
+
+    const roleColor = (role: string) => {
+      if (role === 'owner') return '#E6A817';
+      if (role === 'admin') return '#C67B5C';
+      return '#6B8F71';
+    };
+
+    return (
+      <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+        <SafeAreaView style={[styles.modalContainer, { backgroundColor: colors.background }]}>
+          <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+            <TouchableOpacity onPress={onClose} style={[styles.backBtn, { borderColor: colors.accent }]}>
+              <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+            </TouchableOpacity>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('admin.familyDetail')}</Text>
+            <View style={{ width: 36 }} />
+          </View>
+
+          {loading ? (
+            <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} />
+          ) : family ? (
+            <ScrollView style={styles.modalContent} contentContainerStyle={{ padding: 16 }}>
+              <View style={[styles.detailHeader, { backgroundColor: colors.surface }]}>
+                <View style={[styles.detailIcon, { backgroundColor: '#3b5a75' }]}>
+                  <Text style={styles.detailIconText}>👨‍👩‍👧‍👦</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.detailName, { color: colors.text }]}>{family.name}</Text>
+                  {family.owner && (
+                    <Text style={[styles.detailOwner, { color: colors.textSecondary }]}>
+                      {t('admin.owner')}: {family.owner}
+                    </Text>
+                  )}
+                  <Text style={[styles.detailCount, { color: colors.textSecondary }]}>
+                    {family.memberCount} {t('admin.members')}
+                  </Text>
+                </View>
+              </View>
+
+              {dataCards.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('admin.dataCounts')}</Text>
+                  <View style={styles.dataGrid}>
+                    {dataCards.map((card, i) => (
+                      <View key={i} style={[styles.dataCard, { backgroundColor: colors.surface, borderLeftColor: card.color }]}>
+                        <View style={styles.dataCardHeader}>
+                          <Text style={styles.dataCardIcon}>{card.icon}</Text>
+                          <Text style={[styles.dataCardValue, { color: card.color }]}>{card.value}</Text>
+                        </View>
+                        <Text style={[styles.dataCardLabel, { color: colors.textSecondary }]}>{card.label}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {family.members && Object.keys(family.members).length > 0 && (
+                <View style={styles.section}>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('admin.members')}</Text>
+                  <View style={[styles.memberList, { backgroundColor: colors.surface }]}>
+                    {Object.entries(family.members).map(([uid, member], index) => (
+                      <View key={uid}>
+                        <View style={styles.memberRow}>
+                          <View style={[styles.memberAvatar, { backgroundColor: roleColor(member.role) }]}>
+                            <Text style={styles.memberAvatarText}>
+                              {(member.displayName || member.email || uid).charAt(0).toUpperCase()}
+                            </Text>
+                          </View>
+                          <View style={styles.memberInfo}>
+                            <Text style={[styles.memberName, { color: colors.text }]} numberOfLines={1}>
+                              {member.displayName || member.email || uid}
+                            </Text>
+                            {member.email && member.email !== member.displayName && (
+                              <Text style={[styles.memberEmail, { color: colors.textSecondary }]} numberOfLines={1}>
+                                {member.email}
+                              </Text>
+                            )}
+                          </View>
+                          <View style={[styles.roleBadge, { backgroundColor: roleColor(member.role) + '20' }]}>
+                            <Text style={[styles.roleText, { color: roleColor(member.role) }]}>
+                              {roleLabel(member.role)}
+                            </Text>
+                          </View>
+                        </View>
+                        {index < Object.keys(family.members!).length - 1 && (
+                          <View style={[styles.memberDivider, { backgroundColor: colors.border }]} />
+                        )}
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              )}
+            </ScrollView>
+          ) : (
+            <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>{t('admin.noFamiliesFound')}</Text>
+            </View>
+          )}
+        </SafeAreaView>
+      </Modal>
+    );
+  };
 
   const renderUsers = () => (
     <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
@@ -319,4 +601,112 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   placeholderText: { fontSize: 14 },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+  },
+  searchIcon: { fontSize: 14, marginRight: 8 },
+  searchInput: {
+    flex: 1,
+    paddingVertical: 12,
+  },
+  clearBtn: { padding: 8 },
+  familyList: { flexDirection: 'column', gap: 8 },
+  familyGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
+  familyCard: {
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 8,
+  },
+  familyCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  familyIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  familyIconText: { fontSize: 20 },
+  familyCardInfo: { flex: 1, marginLeft: 12 },
+  familyName: { fontSize: 16, fontWeight: '600' },
+  familyMemberCount: { fontSize: 13, marginTop: 2 },
+  arrow: { fontSize: 24, fontWeight: '300' },
+  modalContainer: { flex: 1 },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  modalTitle: { fontSize: 18, fontWeight: '700' },
+  modalContent: { flex: 1 },
+  detailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  detailIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  detailIconText: { fontSize: 28 },
+  detailName: { fontSize: 20, fontWeight: '700' },
+  detailOwner: { fontSize: 13, marginTop: 4 },
+  detailCount: { fontSize: 13, marginTop: 2 },
+  section: { marginBottom: 16 },
+  sectionTitle: { fontSize: 16, fontWeight: '600', marginBottom: 12 },
+  dataGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  dataCard: {
+    width: '48%',
+    padding: 12,
+    borderRadius: 10,
+    borderLeftWidth: 3,
+  },
+  dataCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dataCardIcon: { fontSize: 16 },
+  dataCardValue: { fontSize: 20, fontWeight: '700' },
+  dataCardLabel: { fontSize: 12, marginTop: 4 },
+  memberList: { borderRadius: 12, overflow: 'hidden' },
+  memberRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+  memberAvatar: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  memberAvatarText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  memberInfo: { flex: 1, marginLeft: 12 },
+  memberName: { fontSize: 15, fontWeight: '500' },
+  memberEmail: { fontSize: 12, marginTop: 2 },
+  roleBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  roleText: { fontSize: 11, fontWeight: '600' },
+  memberDivider: { height: 1, marginLeft: 64 },
 });

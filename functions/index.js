@@ -361,6 +361,122 @@ exports.trackUsage = onRequest({ region: "us-central1", memory: "128MB" }, async
   return res.status(200).json({ success: true });
 });
 
+// Admin: Get list of all families with member counts
+exports.getFamilyList = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
+
+  const db = getFirestore();
+  const familiesSnap = await db.collection("families").limit(500).get();
+
+  const families = [];
+  for (const doc of familiesSnap.docs) {
+    const data = doc.data();
+    const members = data.members || {};
+    const memberCount = Object.keys(members).length;
+    const ownerUid = Object.entries(members).find(([_, v]) => v.role === "owner")?.[0] || null;
+
+    let ownerName = "";
+    if (ownerUid) {
+      const ownerSnap = await db.collection("users").doc(ownerUid).get();
+      if (ownerSnap.exists) {
+        ownerName = ownerSnap.data().displayName || ownerSnap.data().email || "";
+      }
+    }
+
+    const eventsSnap = await db.collection("events")
+      .where("familyId", "==", doc.id)
+      .count().get();
+
+    families.push({
+      id: doc.id,
+      name: data.name || "Unknown",
+      memberCount,
+      ownerName,
+      ownerUid,
+      eventCount: eventsSnap.data().count,
+      createdAt: data.createdAt || null,
+    });
+  }
+
+  return res.status(200).json({ families });
+});
+
+// Admin: Get detail for a specific family
+exports.getFamilyDetail = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
+
+  const familyId = req.query.familyId;
+  if (!familyId) return res.status(400).json({ error: "familyId is required" });
+
+  const db = getFirestore();
+  const familySnap = await db.collection("families").doc(familyId).get();
+  if (!familySnap.exists) return res.status(404).json({ error: "Family not found" });
+
+  const familyData = familySnap.data();
+  const members = familyData.members || {};
+
+  const memberUids = Object.keys(members);
+  const memberDetails = [];
+  for (const mUid of memberUids) {
+    const userSnap = await db.collection("users").doc(mUid).get();
+    if (userSnap.exists) {
+      const userData = userSnap.data();
+      memberDetails.push({
+        uid: mUid,
+        displayName: userData.displayName || "",
+        email: userData.email || "",
+        role: members[mUid].role,
+        createdAt: userData.createdAt || null,
+      });
+    }
+  }
+
+  const counts = {};
+  const collections = ["events", "birthdays", "trips", "recipes"];
+  for (const col of collections) {
+    const snap = await db.collection(col).where("familyId", "==", familyId).count().get();
+    counts[col] = snap.data().count;
+  }
+
+  const subcollections = ["petVetVisits", "petVaccinations", "petMedications", "schoolHolidays", "kindergartenHolidays"];
+  for (const col of subcollections) {
+    const snap = await db.collectionGroup(col).where("familyId", "==", familyId).count().get();
+    counts[col] = snap.data().count;
+  }
+
+  const schoolActSnap = await db.collection("schoolActivities").doc(familyId).collection("activities").count().get();
+  counts.schoolActivities = schoolActSnap.data().count;
+
+  const kgActSnap = await db.collection("kindergartenActivities").doc(familyId).collection("activities").count().get();
+  counts.kindergartenActivities = kgActSnap.data().count;
+
+  const healthSnap = await db.collection("health").doc(familyId).collection("appointments").count().get();
+  counts.healthAppointments = healthSnap.data().count;
+
+  const healthMedSnap = await db.collection("health").doc(familyId).collection("medications").count().get();
+  counts.healthMedications = healthMedSnap.data().count;
+
+  return res.status(200).json({
+    family: {
+      id: familyId,
+      name: familyData.name,
+      createdAt: familyData.createdAt,
+    },
+    members: memberDetails,
+    counts,
+  });
+});
+
 // Centralized notification helper - used by all notification functions
 async function sendNotification({ familyId, title, body, notifKey, excludeUid }) {
   const db = getFirestore();
