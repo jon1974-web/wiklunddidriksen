@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions, TextInput, Modal } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions, TextInput, Modal, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -432,15 +432,19 @@ const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunction
     };
 
     return (
-      <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
-        <SafeAreaView style={[styles.modalContainer, { backgroundColor: colors.background }]}>
-          <View style={[styles.modalHeader, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-            <TouchableOpacity onPress={onClose} style={[styles.backBtn, { borderColor: colors.accent }]}>
-              <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
-            </TouchableOpacity>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('admin.familyDetail')}</Text>
-            <View style={{ width: 36 }} />
-          </View>
+      <Modal visible={visible} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalSheet, { backgroundColor: colors.surface }]}>
+                <View style={styles.modalHandle} />
+                <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
+                  <TouchableOpacity onPress={onClose} style={[styles.backBtn, { borderColor: colors.accent }]}>
+                    <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
+                  </TouchableOpacity>
+                  <Text style={[styles.modalTitle, { color: colors.text }]}>{t('admin.familyDetail')}</Text>
+                  <View style={{ width: 36 }} />
+                </View>
 
           {loading ? (
             <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} />
@@ -522,7 +526,10 @@ const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunction
               <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>{t('admin.noFamiliesFound')}</Text>
             </View>
           )}
-        </SafeAreaView>
+            </View>
+          </TouchableWithoutFeedback>
+        </View>
+      </TouchableWithoutFeedback>
       </Modal>
     );
   };
@@ -893,7 +900,9 @@ const styles = StyleSheet.create({
   familyName: { fontSize: 16, fontWeight: '600' },
   familyMemberCount: { fontSize: 13, marginTop: 2 },
   arrow: { fontSize: 24, fontWeight: '300' },
-  modalContainer: { flex: 1 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalSheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%' },
+  modalHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ddd', alignSelf: 'center', marginTop: 10, marginBottom: 4 },
   modalHeader: {
     flexDirection: 'row',
     alignItems: 'center',
