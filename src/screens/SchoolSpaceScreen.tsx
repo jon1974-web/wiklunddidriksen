@@ -97,7 +97,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   // Activities state
   const [activities, setActivities] = useState<SchoolActivity[]>([]);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
-  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const [activityActionModal, setActivityActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   type ActivityPickerField = 'dateFrom' | 'dateTo' | 'startTime' | 'endTime' | null;
@@ -201,7 +201,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   useEffect(() => {
     if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild) {
       setEditingActivityId(null);
-      setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
       setShowAddActivityModal(true);
       navigation.setParams({ openAddSection: undefined });
     }
@@ -213,7 +213,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       }
       if (selectedChild) {
         setEditingActivityId(route.params!.editActivityId);
-        setActivityForm(route.params!.editActivityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: '', documents: [] });
+        setActivityForm(route.params!.editActivityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: '', documents: [] });
         setShowAddActivityModal(true);
         navigation.setParams({ editActivityId: undefined, editActivityData: undefined, childId: undefined });
       }
@@ -510,7 +510,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         await addSchoolActivity(activityData);
         notifyHealthItem(familyId, activityForm.title, activityForm.dateFrom, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
       }
-      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
       setEditingActivityId(null);
       setShowAddActivityModal(false);
       loadYearData();
@@ -1103,7 +1103,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({activities.length})</Text>
                     <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.activities ? '▼' : '▶'}</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', documents: [] }); setShowAddActivityModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', documents: [] }); setShowAddActivityModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </TouchableOpacity>
@@ -1531,7 +1531,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
           dateOffset={-365}
           dateCount={730}
           selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
-          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo || v })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
+          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo && f.dateTo >= v ? f.dateTo : v })); } else if (activeActivityPicker === 'dateTo') { setActivityForm(f => ({ ...f, dateTo: v >= f.dateFrom ? v : f.dateTo })); } else if (activeActivityPicker === 'startTime') { const [h, m] = v.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setActivityForm(f => ({ ...f, startTime: v, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
           onClose={() => setActiveActivityPicker(null)}
         />
       </>

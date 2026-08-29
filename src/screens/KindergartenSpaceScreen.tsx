@@ -79,7 +79,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   // Activities state
   const [activities, setActivities] = useState<KindergartenActivity[]>([]);
   const [showAddActivityModal, setShowAddActivityModal] = useState(false);
-  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [activityForm, setActivityForm] = useState({ title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const [activityActionModal, setActivityActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   type ActivityPickerField = 'dateFrom' | 'dateTo' | 'startTime' | 'endTime' | null;
@@ -194,7 +194,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   useEffect(() => {
     if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild) {
       setEditingActivityId(null);
-      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
       setShowAddActivityModal(true);
       navigation.setParams({ openAddSection: undefined });
     }
@@ -206,7 +206,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
       }
       if (selectedChild) {
         setEditingActivityId(route.params!.editActivityId);
-        setActivityForm(route.params!.editActivityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
+        setActivityForm(route.params!.editActivityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
         setShowAddActivityModal(true);
         navigation.setParams({ editActivityId: undefined, editActivityData: undefined, childId: undefined });
       }
@@ -506,7 +506,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
         await addKindergartenActivity(activityData);
         notifyHealthItem(familyId, activityForm.title, activityForm.dateFrom, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
       }
-      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
       setEditingActivityId(null);
       setShowAddActivityModal(false);
       loadYearData();
@@ -1044,7 +1044,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({activities.length})</Text>
                     <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.activities ? '▼' : '▶'}</Text>
                   </View>
-                  <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] }); setShowAddActivityModal(true); }}>
+                  <TouchableOpacity style={[styles.addButton, { backgroundColor: KINDERGARTEN_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingActivityId(null); setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] }); setShowAddActivityModal(true); }}>
                     <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                   </TouchableOpacity>
                 </TouchableOpacity>
@@ -1242,7 +1242,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
         <ActionModal visible={scheduleActionModal.visible} title={scheduleActionModal.title} onDelete={() => { handleDeleteSchedule(scheduleActionModal.id); setScheduleActionModal({ visible: false, id: '', title: '' }); }} onCancel={() => setScheduleActionModal({ visible: false, id: '', title: '' })} accentColor={KINDERGARTEN_THEME} />
         <ActionModal visible={holidayActionModal.visible} title={holidayActionModal.title} onEdit={() => { setEditingHolidayId(holidayActionModal.id); const h = holidays.find(h => h.id === holidayActionModal.id); if (h) setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); setHolidayActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteHoliday} onCancel={() => setHolidayActionModal({ visible: false, id: '', title: '' })} accentColor={KINDERGARTEN_THEME} />
 
-        <ActionModal visible={activityActionModal.visible} title={activityActionModal.title} onEdit={() => { const a = activities.find(a => a.id === activityActionModal.id); if (a) { setEditingActivityId(a.id); setActivityForm({ title: a.title, activityType: a.activityType, dateFrom: a.dateFrom, dateTo: a.dateTo || '', startTime: a.startTime || '', endTime: a.endTime || '', location: a.location || '', note: a.note || '', reminder: a.reminder || '', documents: a.documents || [] }); setShowAddActivityModal(true); } setActivityActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteActivity} onCancel={() => setActivityActionModal({ visible: false, id: '', title: '' })} accentColor={KINDERGARTEN_THEME} />
+        <ActionModal visible={activityActionModal.visible} title={activityActionModal.title} onEdit={() => { const a = activities.find(a => a.id === activityActionModal.id); if (a) { setEditingActivityId(a.id); setActivityForm({ title: a.title, activityType: a.activityType, dateFrom: a.dateFrom, dateTo: a.dateTo || '', startTime: a.startTime || '', endTime: a.endTime || '', location: a.location || '', note: a.note || '', reminder: a.reminder || 0, documents: a.documents || [] }); setShowAddActivityModal(true); } setActivityActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteActivity} onCancel={() => setActivityActionModal({ visible: false, id: '', title: '' })} accentColor={KINDERGARTEN_THEME} />
 
         {/* Add/Edit Holiday Modal */}
         <Modal visible={showAddHolidayModal} transparent animationType="slide">
@@ -1472,7 +1472,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
           dateOffset={-365}
           dateCount={730}
           selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
-          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo || v })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
+          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo && f.dateTo >= v ? f.dateTo : v })); } else if (activeActivityPicker === 'dateTo') { setActivityForm(f => ({ ...f, dateTo: v >= f.dateFrom ? v : f.dateTo })); } else if (activeActivityPicker === 'startTime') { const [h, m] = v.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setActivityForm(f => ({ ...f, startTime: v, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
           onClose={() => setActiveActivityPicker(null)}
         />
       </>

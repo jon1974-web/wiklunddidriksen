@@ -73,7 +73,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
-  const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -246,7 +246,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           const eventDate = new Date(`${vetForm.dateFrom}T${vetForm.startTime || '09:00'}:00`);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
-        setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, status: 'planned' });
+        setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' });
       } else if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetMedication(editingItem.id, medForm);
@@ -336,7 +336,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   };
 
   const resetItemForms = () => {
-    setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, status: 'planned', documents: [] });
+    setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned', documents: [] });
     setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
     setFoodForm({ name: '', time: '', amount: '', note: '' });
     setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -1394,9 +1394,9 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         onSelect={(value) => {
           if (activePicker === 'petBirthday') setPetForm(f => ({ ...f, birthday: value }));
           else if (activePicker === 'petChipDate') setPetForm(f => ({ ...f, chipDate: value }));
-          else if (activePicker === 'vetDateFrom') { setVetForm(f => ({ ...f, dateFrom: value, dateTo: f.dateTo || value })); }
-          else if (activePicker === 'vetDateTo') setVetForm(f => ({ ...f, dateTo: value }));
-          else if (activePicker === 'vetStartTime') setVetForm(f => ({ ...f, startTime: value }));
+          else if (activePicker === 'vetDateFrom') { setVetForm(f => ({ ...f, dateFrom: value, dateTo: f.dateTo && f.dateTo >= value ? f.dateTo : value })); }
+          else if (activePicker === 'vetDateTo') { if (value >= vetForm.dateFrom) setVetForm(f => ({ ...f, dateTo: value })); }
+          else if (activePicker === 'vetStartTime') { const [h, m] = value.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setVetForm(f => ({ ...f, startTime: value, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); }
           else if (activePicker === 'vetEndTime') setVetForm(f => ({ ...f, endTime: value }));
           else if (activePicker === 'medDateFrom') setMedForm(f => ({ ...f, dateFrom: value }));
           else if (activePicker === 'medDateTo') setMedForm(f => ({ ...f, dateTo: value }));

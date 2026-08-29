@@ -46,8 +46,8 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
   const [address, setAddress] = useState(prefill?.address || '');
   const [dateFrom, setDateFrom] = useState(prefill?.date || getTodayLocal());
   const [dateTo, setDateTo] = useState(prefill?.endDate || prefill?.date || getTodayLocal());
-  const [time, setTime] = useState(prefill?.time || '09:00');
-  const [endTime, setEndTime] = useState(prefill?.endTime || addOneHour(prefill?.time || '09:00'));
+  const [time, setTime] = useState(prefill?.time || '10:00');
+  const [endTime, setEndTime] = useState(prefill?.endTime || addOneHour(prefill?.time || '10:00'));
   const [note, setNote] = useState(prefill?.description || '');
   const [reminderMinutes, setReminderMinutes] = useState(prefill?.reminderMinutes || 60);
   const [icon, setIcon] = useState(prefill?.icon || '');
@@ -66,8 +66,8 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
       setAddress(prefill.address || '');
       setDateFrom(prefill.date || getTodayLocal());
       setDateTo(prefill.endDate || prefill.date || getTodayLocal());
-      setTime(prefill.time || '09:00');
-      setEndTime(prefill.endTime || addOneHour(prefill.time || '09:00'));
+      setTime(prefill.time || '10:00');
+      setEndTime(prefill.endTime || addOneHour(prefill.time || '10:00'));
       setNote(prefill.description || '');
       setReminderMinutes(prefill.reminderMinutes || 60);
       setIcon(prefill.icon || '');
@@ -77,8 +77,8 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
       setAddress('');
       setDateFrom(getTodayLocal());
       setDateTo(getTodayLocal());
-      setTime('09:00');
-      setEndTime('10:00');
+      setTime('10:00');
+      setEndTime('11:00');
       setNote('');
       setReminderMinutes(60);
       setIcon('');
@@ -89,9 +89,9 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
   const handlePickerSelect = (value: string) => {
     if (activePicker === 'dateFrom') {
       setDateFrom(value);
-      if (!dateTo || dateTo === dateFrom) setDateTo(value);
+      if (!dateTo || dateTo < value) setDateTo(value);
     } else if (activePicker === 'dateTo') {
-      setDateTo(value);
+      if (value >= dateFrom) setDateTo(value);
     } else if (activePicker === 'time') {
       setTime(value);
       setEndTime(addOneHour(value));

@@ -59,7 +59,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
-  const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
@@ -166,7 +166,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         if (!isEditing) {
           notifyHealthItem(familyId, apptForm.title, apptForm.dateFrom, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
         }
-        setApptForm({ title: '', person: persons[0] || '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '', endTime: '', location: '', note: '', reminder: 0, documents: [] });
+        setApptForm({ title: '', person: persons[0] || '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
         let savedVacc;
@@ -246,7 +246,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) setMedForm({ name: item.name, person: item.person, dosage: item.dosage, frequency: item.frequency || 1, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }], dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
     } else if (section === 'appointments') {
       const item = appointments.find(a => a.id === id);
-      if (item) setApptForm({ title: item.title, person: item.person, doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || '', documents: item.documents || [] });
+      if (item) setApptForm({ title: item.title, person: item.person, doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || 0, documents: item.documents || [] });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
       if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', location: item.location || '', note: item.note || '' });
@@ -1075,9 +1075,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               setMedForm(f => ({ ...f, timeSlots: newSlots }));
             }
           }
-          else if (activePicker === 'apptDateFrom') { setApptForm(f => ({ ...f, dateFrom: value, dateTo: f.dateTo || value })); }
-          else if (activePicker === 'apptDateTo') setApptForm(f => ({ ...f, dateTo: value }));
-          else if (activePicker === 'apptStartTime') setApptForm(f => ({ ...f, startTime: value }));
+          else if (activePicker === 'apptDateFrom') { setApptForm(f => ({ ...f, dateFrom: value, dateTo: f.dateTo && f.dateTo >= value ? f.dateTo : value })); }
+          else if (activePicker === 'apptDateTo') { if (value >= apptForm.dateFrom) setApptForm(f => ({ ...f, dateTo: value })); }
+          else if (activePicker === 'apptStartTime') { const [h, m] = value.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setApptForm(f => ({ ...f, startTime: value, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); }
           else if (activePicker === 'apptEndTime') setApptForm(f => ({ ...f, endTime: value }));
           else if (activePicker === 'vaccDate') setVaccForm(f => ({ ...f, date: value }));
           else if (activePicker === 'vaccNextDue') setVaccForm(f => ({ ...f, nextDue: value }));
