@@ -320,7 +320,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
             (events || []).forEach((e) => {
               allEvents.push({ ...e, _groupId: gid });
             });
-          } else {
+    } else if (type === "recipe") {
             console.warn(`spondProxy: group ${gid} returned ${response.status}`);
           }
         } catch (e) {
@@ -759,7 +759,7 @@ Return ONLY valid JSON:
 
 If no holidays found, return {"holidays": []}.`;
       userText = "Extract all holidays and days off visible in this image.";
-    } else {
+    } else if (type === "recipe") {
       systemPrompt = `You are a recipe parser. Extract ALL recipes visible in this image and return structured data.
 
 For each recipe found, extract:
@@ -867,6 +867,8 @@ For each activity found, extract:
 
 Return ONLY valid JSON: { "events": [ { "title", "activityType", "date", "dateTo", "startTime", "endTime", "location", "reminderMinutes" } ] }`;
       userText = "Extract all kindergarten activities visible in this image.";
+    } else {
+      return res.status(400).json({ error: "Invalid type" });
     }
 
     const completion = await openai.chat.completions.create({
