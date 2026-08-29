@@ -1310,6 +1310,9 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
   }
 
   console.log(`checkReminders: ${totalSent} sent`);
+  if (totalSent > 0) {
+    trackUsageLog("system", "reminderNotification", null);
+  }
   return { sent: totalSent };
 });
 
@@ -1866,6 +1869,9 @@ exports.checkBirthdayReminders = onSchedule({ schedule: "every 5 minutes", timeZ
 
   console.log(`checkBirthdayReminders: ${totalSent} sent`);
   console.log(`checkBirthdayReminders debug:`, JSON.stringify(debugLog));
+  if (totalSent > 0) {
+    trackUsageLog("system", "birthdayNotification", null);
+  }
   return { sent: totalSent };
 });
 
