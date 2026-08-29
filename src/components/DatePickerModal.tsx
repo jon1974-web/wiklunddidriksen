@@ -59,6 +59,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
   const resolvedAccent = accentColor || colors.accent;
   const [dateInput, setDateInput] = useState('');
   const [customTime, setCustomTime] = useState('');
+  const [manualDate, setManualDate] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
   const options = useMemo(() => {
@@ -125,16 +126,14 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
       const [y, m, d] = trimmed.split('-');
       targetDate = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
     }
-    if (targetDate) {
-      const opt = options.find(o => o.value === targetDate);
-      if (opt) {
-        onSelect(opt.value);
-        onClose();
-      }
+    if (targetDate && /^\d{4}-\d{2}-\d{2}$/.test(targetDate)) {
+      onSelect(targetDate);
+      onClose();
     }
-  }, [dateInput, options, onSelect, onClose]);
+  }, [dateInput, onSelect, onClose]);
 
   const handleOpen = useCallback(() => {
+    setManualDate('');
     if (mode === 'time') {
       setCustomTime(selectedValue || '');
       return;
@@ -228,6 +227,61 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
                       if (/^([01]\d|2[0-3]):([0-5]\d)$/.test(normalized)) {
                         onSelect(normalized);
                         setCustomTime('');
+                        onClose();
+                      }
+                    }}
+                  >
+                    <Text style={styles.customTimeButtonText}>✓</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+              {mode === 'date' && (
+                <View style={[styles.customTimeRow, { borderTopColor: colors.border }]}>
+                  <Text style={[styles.customTimeLabel, { color: colors.textSecondary }]}>Eller skriv inn:</Text>
+                  <TextInput
+                    style={[styles.customTimeInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+                    value={manualDate}
+                    onChangeText={setManualDate}
+                    placeholder="f.eks. 2020-03-15"
+                    placeholderTextColor={colors.textDisabled}
+                    keyboardType="numbers-and-punctuation"
+                    maxLength={10}
+                    onSubmitEditing={() => {
+                      if (!manualDate.trim()) return;
+                      let normalized = manualDate.trim();
+                      if (/^\d{4}$/.test(normalized)) {
+                        normalized = `${normalized}-01-01`;
+                      } else if (/^\d{4}-\d{1,2}$/.test(normalized)) {
+                        const [y, m] = normalized.split('-');
+                        normalized = `${y}-${m.padStart(2, '0')}-01`;
+                      } else if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(normalized)) {
+                        const [y, m, d] = normalized.split('-');
+                        normalized = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+                      }
+                      if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+                        onSelect(normalized);
+                        setManualDate('');
+                        onClose();
+                      }
+                    }}
+                  />
+                  <TouchableOpacity
+                    style={[styles.customTimeButton, { backgroundColor: resolvedAccent }]}
+                    onPress={() => {
+                      if (!manualDate.trim()) return;
+                      let normalized = manualDate.trim();
+                      if (/^\d{4}$/.test(normalized)) {
+                        normalized = `${normalized}-01-01`;
+                      } else if (/^\d{4}-\d{1,2}$/.test(normalized)) {
+                        const [y, m] = normalized.split('-');
+                        normalized = `${y}-${m.padStart(2, '0')}-01`;
+                      } else if (/^\d{4}-\d{1,2}-\d{1,2}$/.test(normalized)) {
+                        const [y, m, d] = normalized.split('-');
+                        normalized = `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`;
+                      }
+                      if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) {
+                        onSelect(normalized);
+                        setManualDate('');
                         onClose();
                       }
                     }}
