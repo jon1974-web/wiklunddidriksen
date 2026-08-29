@@ -129,7 +129,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
         familyId: familyId || null,
         createdAt: Date.now(),
         icon: icon || null,
-        documents: documents.length > 0 ? documents : undefined,
+        documents: documents.length > 0 ? documents : [],
       };
 
       eventData.endDate = dateTo;
