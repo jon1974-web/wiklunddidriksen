@@ -268,6 +268,13 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: accentColor }]}>
+          <Text style={{ color: accentColor, fontSize: 18 }}>←</Text>
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>{t('voiceActivity.title')}</Text>
+        <View style={{ width: 36 }} />
+      </View>
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
         <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
           {t('voice.instruction')}
@@ -465,6 +472,26 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+  },
+  backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
   },
   helperSection: {
     padding: 16,
