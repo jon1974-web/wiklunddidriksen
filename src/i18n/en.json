@@ -1365,6 +1365,10 @@
     "usageTotalCalls": "Total API Calls",
     "usageDailyChart": "Daily API Usage (Last 7 Days)",
     "usageByFunction": "Usage by Function",
-    "usageCalls": "calls"
+    "usageCalls": "calls",
+    "rateLimitsSource": "Source",
+    "noRateLimits": "No rate limits found",
+    "maxRequests": "Max Requests",
+    "windowMinutes": "Window (minutes)"
   }
 }

@@ -98,13 +98,39 @@ const RATE_LIMITS = {
   translateRecipe: { maxRequests: 10, windowMinutes: 1 },
 };
 
+let rateLimitsCache = null;
+let rateLimitsCacheTime = 0;
+const RATE_LIMITS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+async function getRateLimitsConfig() {
+  const now = Date.now();
+  if (rateLimitsCache && (now - rateLimitsCacheTime) < RATE_LIMITS_CACHE_TTL) {
+    return rateLimitsCache;
+  }
+  try {
+    const db = getFirestore();
+    const snap = await db.collection("systemConfig").doc("rateLimits").get();
+    if (snap.exists && snap.data().limits) {
+      rateLimitsCache = snap.data().limits;
+      rateLimitsCacheTime = now;
+      return rateLimitsCache;
+    }
+  } catch (error) {
+    // Fall back to defaults
+  }
+  rateLimitsCache = RATE_LIMITS;
+  rateLimitsCacheTime = now;
+  return RATE_LIMITS;
+}
+
 async function checkRateLimit(uid, functionName) {
-  const limits = RATE_LIMITS[functionName];
-  if (!limits) return true;
+  const limits = await getRateLimitsConfig();
+  const config = limits[functionName];
+  if (!config) return true;
 
   const db = getFirestore();
   const now = new Date();
-  const windowStart = new Date(now.getTime() - limits.windowMinutes * 60 * 1000);
+  const windowStart = new Date(now.getTime() - config.windowMinutes * 60 * 1000);
 
   const rateLimitRef = db.collection("rateLimits").doc(`${uid}_${functionName}`);
   const snap = await rateLimitRef.get();
@@ -112,7 +138,7 @@ async function checkRateLimit(uid, functionName) {
   if (snap.exists) {
     const data = snap.data();
     const requests = (data.requests || []).filter(ts => new Date(ts) > windowStart);
-    if (requests.length >= limits.maxRequests) {
+    if (requests.length >= config.maxRequests) {
       return false;
     }
     requests.push(now.toISOString());
@@ -552,6 +578,77 @@ exports.getFamilyDetail = onRequest({ region: "us-central1", memory: "256MB" }, 
     members: memberDetails,
     counts,
   });
+});
+
+// Admin: Get current rate limits
+exports.getRateLimits = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
+
+  const db = getFirestore();
+  const configSnap = await db.collection("systemConfig").doc("rateLimits").get();
+
+  if (configSnap.exists) {
+    return res.status(200).json(configSnap.data());
+  }
+
+  // Return default hardcoded limits
+  return res.status(200).json({
+    limits: {
+      spondProxy: { maxRequests: 30, windowMinutes: 1 },
+      photoToData: { maxRequests: 5, windowMinutes: 1 },
+      voiceToEvent: { maxRequests: 5, windowMinutes: 1 },
+      destinationTips: { maxRequests: 10, windowMinutes: 1 },
+      notifyNewEvent: { maxRequests: 10, windowMinutes: 1 },
+      notifyHealthItem: { maxRequests: 10, windowMinutes: 1 },
+      aiRecipeSuggestions: { maxRequests: 10, windowMinutes: 1 },
+      importRecipeFromUrl: { maxRequests: 5, windowMinutes: 1 },
+      translateRecipe: { maxRequests: 10, windowMinutes: 1 },
+    },
+    source: "default",
+  });
+});
+
+// Admin: Update rate limits
+exports.updateRateLimits = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
+
+  const { limits } = req.body;
+  if (!limits || typeof limits !== "object") {
+    return res.status(400).json({ error: "limits object is required" });
+  }
+
+  // Validate limits
+  for (const [fn, config] of Object.entries(limits)) {
+    if (typeof config !== "object" || !config.maxRequests || !config.windowMinutes) {
+      return res.status(400).json({ error: `Invalid config for ${fn}` });
+    }
+  }
+
+  const db = getFirestore();
+  await db.collection("systemConfig").doc("rateLimits").set({
+    limits,
+    updatedAt: new Date().toISOString(),
+    updatedBy: uid,
+  });
+
+  await db.collection("auditLogs").add({
+    action: "updateRateLimits",
+    performedBy: uid,
+    details: { limits },
+    timestamp: new Date().toISOString(),
+  });
+
+  return res.status(200).json({ success: true });
 });
 
 // Centralized notification helper - used by all notification functions

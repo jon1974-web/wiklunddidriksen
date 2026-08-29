@@ -1365,6 +1365,10 @@
     "usageTotalCalls": "API-kutsuja yhteensä",
     "usageDailyChart": "Päivittäinen API-käyttö (viimeiset 7 päivää)",
     "usageByFunction": "Käyttö toiminnon mukaan",
-    "usageCalls": "kutsua"
+    "usageCalls": "kutsua",
+    "rateLimitsSource": "Lähde",
+    "noRateLimits": "Nopeusrajoituksia ei löytynyt",
+    "maxRequests": "Max pyynnöt",
+    "windowMinutes": "Ikkuna (minuuttia)"
   }
 }

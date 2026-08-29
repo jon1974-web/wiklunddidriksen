@@ -1365,6 +1365,10 @@
     "usageTotalCalls": "Totalt API-anrop",
     "usageDailyChart": "Daglig API-användning (senaste 7 dagarna)",
     "usageByFunction": "Användning per funktion",
-    "usageCalls": "anrop"
+    "usageCalls": "anrop",
+    "rateLimitsSource": "Källa",
+    "noRateLimits": "Inga taxegränser hittades",
+    "maxRequests": "Max förfrågningar",
+    "windowMinutes": "Fönster (minuter)"
   }
 }

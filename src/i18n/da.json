@@ -1365,6 +1365,10 @@
     "usageTotalCalls": "Totalt API-opkald",
     "usageDailyChart": "Dagligt API-forbrug (sidste 7 dage)",
     "usageByFunction": "Forbrug per funktion",
-    "usageCalls": "opkald"
+    "usageCalls": "opkald",
+    "rateLimitsSource": "Kilde",
+    "noRateLimits": "Ingen takstgrænser fundet",
+    "maxRequests": "Maks forespørgsler",
+    "windowMinutes": "Vindue (minutter)"
   }
 }

@@ -9,6 +9,8 @@ import { auth } from '../services/firebase';
 const ADMIN_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getAdminStats';
 const GET_FAMILY_LIST_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getFamilyList';
 const GET_FAMILY_DETAIL_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getFamilyDetail';
+const GET_RATE_LIMITS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getRateLimits';
+const UPDATE_RATE_LIMITS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/updateRateLimits';
 
 interface FamilyItem {
   id: string;
@@ -82,6 +84,12 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
   // Usage tab state
   const [usageStats, setUsageStats] = useState<any>(null);
   const [usageLoading, setUsageLoading] = useState(false);
+
+  // Settings tab state
+  const [rateLimits, setRateLimits] = useState<Record<string, { maxRequests: number; windowMinutes: number }>>({});
+  const [rateLimitsLoading, setRateLimitsLoading] = useState(false);
+  const [rateLimitsSaving, setRateLimitsSaving] = useState<string | null>(null);
+  const [rateLimitsSource, setRateLimitsSource] = useState<string>('');
 
   const GET_USAGE_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getUsageStats';
 const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/triggerAdminStats';
@@ -163,6 +171,51 @@ const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunction
     }
   }, []);
 
+  const fetchRateLimits = useCallback(async () => {
+    setRateLimitsLoading(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      const res = await fetch(GET_RATE_LIMITS_URL, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRateLimits(data.limits || {});
+        setRateLimitsSource(data.source || 'default');
+      }
+    } catch (error) {
+      console.log('Failed to fetch rate limits:', error);
+    } finally {
+      setRateLimitsLoading(false);
+    }
+  }, []);
+
+  const updateRateLimit = useCallback(async (functionName: string) => {
+    setRateLimitsSaving(functionName);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      const updatedLimits = { ...rateLimits };
+      const res = await fetch(UPDATE_RATE_LIMITS_URL, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ limits: updatedLimits }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRateLimits(data.limits || updatedLimits);
+        setRateLimitsSource(data.source || 'config');
+      }
+    } catch (error) {
+      console.log('Failed to update rate limit:', error);
+    } finally {
+      setRateLimitsSaving(null);
+    }
+  }, [rateLimits]);
+
   const fetchFamilyDetail = useCallback(async (familyId: string) => {
     setFamilyDetailLoading(true);
     setShowFamilyDetail(true);
@@ -207,6 +260,12 @@ const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunction
       fetchUsageStats();
     }
   }, [isAdmin, activeTab, fetchUsageStats]);
+
+  useEffect(() => {
+    if (isAdmin && activeTab === 'settings') {
+      fetchRateLimits();
+    }
+  }, [isAdmin, activeTab, fetchRateLimits]);
 
   if (!isAdmin) return null;
 
@@ -566,11 +625,84 @@ const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunction
     </View>
   );
 
-  const renderSettings = () => (
-    <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
-      <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>{t('admin.settingsComingSoon')}</Text>
-    </View>
-  );
+  const renderSettings = () => {
+    if (rateLimitsLoading) {
+      return <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} />;
+    }
+
+    const functionNames = Object.keys(rateLimits).sort();
+
+    return (
+      <View>
+        <View style={[styles.settingsInfoBar, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.settingsInfoText, { color: colors.textSecondary }]}>
+            {t('admin.rateLimitsSource')}: <Text style={{ color: colors.text, fontWeight: '600' }}>{rateLimitsSource}</Text>
+          </Text>
+        </View>
+
+        {functionNames.length === 0 ? (
+          <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>{t('admin.noRateLimits')}</Text>
+          </View>
+        ) : (
+          <View style={styles.settingsList}>
+            {functionNames.map((fnName) => {
+              const limit = rateLimits[fnName];
+              const isSaving = rateLimitsSaving === fnName;
+              return (
+                <View key={fnName} style={[styles.settingsRow, { backgroundColor: colors.surface }]}>
+                  <View style={styles.settingsRowHeader}>
+                    <Text style={[styles.settingsFunctionName, { color: colors.text }]} numberOfLines={1}>{fnName}</Text>
+                  </View>
+                  <View style={styles.settingsInputsRow}>
+                    <View style={styles.settingsInputGroup}>
+                      <Text style={[styles.settingsInputLabel, { color: colors.textSecondary }]}>{t('admin.maxRequests')}</Text>
+                      <TextInput
+                        style={[styles.settingsInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.background, fontSize: 16 }]}
+                        keyboardType="numeric"
+                        value={String(limit.maxRequests)}
+                        onChangeText={(val) => {
+                          const num = parseInt(val, 10);
+                          if (!isNaN(num) && num >= 0) {
+                            setRateLimits((prev) => ({ ...prev, [fnName]: { ...prev[fnName], maxRequests: num } }));
+                          }
+                        }}
+                      />
+                    </View>
+                    <View style={styles.settingsInputGroup}>
+                      <Text style={[styles.settingsInputLabel, { color: colors.textSecondary }]}>{t('admin.windowMinutes')}</Text>
+                      <TextInput
+                        style={[styles.settingsInput, { color: colors.text, borderColor: colors.border, backgroundColor: colors.background, fontSize: 16 }]}
+                        keyboardType="numeric"
+                        value={String(limit.windowMinutes)}
+                        onChangeText={(val) => {
+                          const num = parseInt(val, 10);
+                          if (!isNaN(num) && num >= 1) {
+                            setRateLimits((prev) => ({ ...prev, [fnName]: { ...prev[fnName], windowMinutes: num } }));
+                          }
+                        }}
+                      />
+                    </View>
+                    <TouchableOpacity
+                      style={[styles.settingsSaveBtn, { backgroundColor: isSaving ? colors.textDisabled : colors.accent }]}
+                      onPress={() => updateRateLimit(fnName)}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                      ) : (
+                        <Text style={styles.settingsSaveBtnText}>{t('common.save')}</Text>
+                      )}
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              );
+            })}
+          </View>
+        )}
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
@@ -904,4 +1036,38 @@ const styles = StyleSheet.create({
     height: 1,
     marginLeft: 34,
   },
+  settingsInfoBar: {
+    padding: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  settingsInfoText: { fontSize: 13 },
+  settingsList: { gap: 12 },
+  settingsRow: {
+    padding: 16,
+    borderRadius: 12,
+  },
+  settingsRowHeader: { marginBottom: 10 },
+  settingsFunctionName: { fontSize: 14, fontWeight: '600', fontFamily: 'monospace' },
+  settingsInputsRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 10,
+  },
+  settingsInputGroup: { flex: 1 },
+  settingsInputLabel: { fontSize: 11, marginBottom: 4 },
+  settingsInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  settingsSaveBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    minWidth: 60,
+    alignItems: 'center',
+  },
+  settingsSaveBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
 });
