@@ -70,14 +70,14 @@ After signing in, you need to either create or join a family:
 
 ## Navigation Overview
 
-fampad uses a bottom tab bar with tabs positioned symmetrically around a central "+" button. Chat and Våre steder are positioned between the other tabs and the center plus button.
+fampad uses a bottom tab bar with tabs positioned symmetrically around a central "+" button. Chat and Our Places are positioned between the other tabs and the center plus button.
 
 | Tab | Icon | Description |
 |-----|------|-------------|
-| **Kalender** | Calendar | Events from all sources (manual, Spond, health, pets) |
+| **Calendar** | Calendar | Events from all sources (manual, Spond, health, pets) |
 | **Chat** | Chat bubble | Family messaging with images and reactions |
-| **Våre steder** | Compass/House | Spaces hub — access all modules |
-| **Profil** | Person | Settings, family management, integrations |
+| **Our Places** | Compass/House | Spaces hub — access all modules |
+| **Profile** | Person | Settings, family management, integrations |
 
 The **+ (plus)** button in the center of the tab bar opens the **Quick Create** modal for fast content creation.
 
@@ -114,7 +114,7 @@ Events come from multiple sources and are color-coded:
    - **Time** and optional end time
    - **Address** (Google Places search)
    - **Description** (optional notes)
-   - **Reminder** (Ingen, 30 min, 1 time, 2 timer, 1 dag, 1 uke)
+   - **Reminder** (None, 30 min, 1 hour, 2 hours, 1 day, 1 week)
    - **Document upload** (optional)
 4. Tap "Lagre" (Save)
 
@@ -174,7 +174,7 @@ The **+** button in the center of the tab bar opens a modal with quick-create sh
 
 ### Events Section
 - **Manuelt** — Create a new manual event
-- **Tale** — Voice-to-event: record Norwegian speech, AI converts to event
+- **Tale** — Voice-to-event: record speech, AI converts to event
 - **Foto** — Photo-to-event: snap a photo of a schedule, AI extracts events
 
 ### Health Section
@@ -188,7 +188,7 @@ The **+** button in the center of the tab bar opens a modal with quick-create sh
 - **Foto** — Photo-to-activity: snap a photo, AI creates vet visit
 
 ### School Section
-- **Manuelt** — Create a new school activity (tur/aktivitet/møte)
+- **Manuelt** — Create a new school activity (trip/activity/meeting)
 - **Tale** — Voice-to-activity: record speech, AI creates school activity
 - **Foto** — Photo-to-activity: snap a photo, AI creates school activity
 
@@ -208,7 +208,7 @@ The Weekly Summary shows everything happening this week in one view.
 
 ### Accessing It
 
-1. Go to the **Events** (Kalender) tab
+1. Go to the **Events** (Calendar) tab
 2. Tap the "Min uke" (My week) button at the top
 
 ### What's Included
@@ -224,15 +224,15 @@ The weekly summary shows the current week (Monday through Sunday) with:
 
 | Section | Content |
 |---------|---------|
-| **Arrangementer** | Manual events for the week |
+| **Events** | Manual events for the week |
 | **Spond** | Sports club events with RSVP status |
-| **Reiser** | Active trips (transport, hotels, restaurants) |
-| **Helse** | Health appointments and medications |
-| **Kjæledyr** | Pet vet visits and vaccinations |
-| **Skole** | School activities (tur, aktivitet, møte) |
-| **Barnehage** | Kindergarten activities |
-| **Bursdager** | Upcoming birthdays |
-| **Middager** | Weekly meal plan (breakfast, lunch, dinner) |
+| **Trips** | Active trips (transport, hotels, restaurants) |
+| **Health** | Health appointments and medications |
+| **Pets** | Pet vet visits and vaccinations |
+| **School** | School activities (trip, activity, meeting) |
+| **Kindergarten** | Kindergarten activities |
+| **Birthdays** | Upcoming birthdays |
+| **Dinners** | Weekly meal plan (breakfast, lunch, dinner) |
 
 ### Customizing Sections
 
@@ -242,7 +242,7 @@ You can show/hide sections in Profile > "Min uke" settings. Customize which info
 
 ## Spaces (Modules)
 
-Access all modules from the **Våre steder** tab. Each space has its own card with an icon, name, and item count.
+Access all modules from the **Our Places** tab. Each space has its own card with an icon, name, and item count.
 
 ### Trips & Travel
 
@@ -274,7 +274,7 @@ Track family health information:
   - **Person**: Multi-select — assign appointments to multiple family members
   - **Doctor**: Doctor name
   - **Date/Time**: dateFrom/dateTo with auto-sync
-  - **Reminders**: Friendly labels (30 min, 1 time, 2 timer, 1 dag, 1 uke)
+  - **Reminders**: Friendly labels (30 min, 1 hour, 2 hours, 1 day, 1 week)
 - **Vaccinations**: Record vaccinations with next-due dates
 - **Allergies**: Document allergies with severity levels
 - **Growth**: Log height and weight measurements over time
@@ -291,7 +291,7 @@ Manage pet care with dedicated sections:
 - **Vet Visits**: Schedule and track veterinary appointments
   - **Doctor**: Veterinarian name
   - **Date/Time**: dateFrom/dateTo with auto-sync
-  - **Reminders**: Friendly labels (30 min, 1 time, 2 timer, 1 dag, 1 uke)
+  - **Reminders**: Friendly labels (30 min, 1 hour, 2 hours, 1 day, 1 week)
 - **Medications**: Track pet medications and dosages
 - **Food**: Record feeding schedules and amounts
 - **Grooming**: Track grooming schedule with next-due dates
@@ -305,11 +305,11 @@ Manage pet care with dedicated sections:
 Organize school information:
 
 - **Children**: Add children with school name and contact info
-- **Activities**: Create school activities (tur/aktivitet/møte) with:
-  - **Type**: tur (trip), aktivitet (activity), møte (meeting)
+- **Activities**: Create school activities (trip/activity/meeting) with:
+  - **Type**: trip, activity, meeting
   - **Date range**: dateFrom/dateTo with auto-sync (dateTo matches dateFrom when changed, never before dateFrom)
   - **Time range**: Optional start/end times
-  - **Reminders**: Friendly labels (Ingen, 30 min, 1 time, 2 timer, 1 dag, 1 uke)
+  - **Reminders**: Friendly labels (None, 30 min, 1 hour, 2 hours, 1 day, 1 week)
   - **Documents**: Upload and store documents (permission slips, schedules, etc.)
   - **Calendar sync**: Google Calendar integration for all activity types
 - **Contacts**: Teachers and classmates with phone/email/parent info
@@ -328,7 +328,7 @@ Organize school information:
 Manage kindergarten information with the same features as School:
 
 - **Children**: Add children with kindergarten name and contact info
-- **Activities**: Create kindergarten activities (tur/aktivitet/møte) with date/time ranges, reminders, documents, and calendar sync
+- **Activities**: Create kindergarten activities (trip/activity/meeting) with date/time ranges, reminders, documents, and calendar sync
 - **Contacts**: Teachers and staff with contact info
 - **Schedules**: Upload schedule images
 
@@ -356,7 +356,7 @@ Plan family meals with:
 - **Weekly meal plan**: Assign breakfast, lunch, and dinner for each day
 - **Shopping lists**: Auto-generate shopping lists from meal plans
 
-**Recipe Categories**: kylling (chicken), kjoett (meat), fisk (fish), vegetar (vegetarian), pasta, gryte (casserole), suppe (soup), frokost (breakfast), sott (dessert)
+**Recipe Categories**: chicken, meat, fish, vegetarian, pasta, casserole, soup, breakfast, dessert
 
 ### Shopping Lists
 
@@ -368,16 +368,16 @@ Create and manage checkable shopping lists. Items can be added from the meal pla
 
 ### Voice-to-Event/Activity
 
-Create events or activities by speaking in Norwegian:
+Create events or activities by speaking:
 
 1. Tap the **+** button > "Tale" in any module section
 2. Tap the microphone to start recording
-3. Speak naturally in Norwegian, e.g.: "Møte med barnehagen på onsdag klokka 14"
+3. Speak naturally, e.g.: "Meeting with kindergarten on Wednesday at 2 PM"
 4. Tap stop when done
 5. AI transcribes your speech and extracts:
    - Event/activity title
-   - Date (resolves "i morgen", "på mandag", etc.)
-   - Time (understands "halv tre", "kvart over to", etc.)
+   - Date (resolves "tomorrow", "on Monday", etc.)
+   - Time (understands "half past two", "quarter past two", etc.)
    - Description
 6. Review and edit if needed
 7. Save
@@ -386,7 +386,7 @@ Voice-to-event works for all modules:
 - **Events**: Creates a calendar event
 - **Health**: Creates a health appointment
 - **Pets**: Creates a vet visit
-- **School**: Creates a school activity (tur/aktivitet/møte)
+- **School**: Creates a school activity (trip/activity/meeting)
 - **Kindergarten**: Creates a kindergarten activity
 
 ### Photo-to-Event/Activity
@@ -434,16 +434,16 @@ All modules use the same reminder options:
 
 | Label | Minutes |
 |-------|---------|
-| Ingen | 0 |
+| None | 0 |
 | 30 min | 30 |
-| 1 time | 60 |
-| 2 timer | 120 |
-| 1 dag | 1440 |
-| 1 uke | 10080 |
+| 1 hour | 60 |
+| 2 hours | 120 |
+| 1 day | 1440 |
+| 1 week | 10080 |
 
-Reminders are sent as phone notifications with friendly labels (not "60 minutes" but "1 time").
+Reminders are sent as phone notifications with friendly labels (not "60 minutes" but "1 hour").
 
-Default reminder: **1 time** (60 minutes)
+Default reminder: **1 hour** (60 minutes)
 Default time for new items: **10:00–11:00**
 
 ---
@@ -480,7 +480,7 @@ The Profile tab contains all your personal and family settings.
 - Toggle push notifications on/off
 - Configure which sections appear in "Min uke" weekly summary
 - Birthday reminders are sent automatically at 08:00 Oslo time
-- Activity reminders use friendly Norwegian labels (not raw minute counts)
+- Activity reminders use friendly labels (not raw minute counts)
 
 ### Spond Integration
 
@@ -515,16 +515,16 @@ Your theme preference is saved and persists between sessions.
 
 fampad supports 5 languages:
 
-1. **Norsk (Bokmal)** — Default
-2. **Svenska**
-3. **Dansk**
+1. **Norwegian (Bokmål)** — Default
+2. **Swedish**
+3. **Danish**
 4. **English**
-5. **Suomi (Finnish)**
+5. **Finnish**
 
 ### Changing Language
 
 1. Go to Profile
-2. Scroll to "Sprak" (Language)
+2. Scroll to "Språk" (Language)
 3. Select your preferred language
 4. The entire interface updates immediately
 
@@ -547,13 +547,13 @@ fampad is a Progressive Web App (PWA) that can be installed on your device:
 **On iOS (Safari):**
 1. Open fampad in Safari
 2. Tap the Share button (square with arrow)
-3. Tap "Legg til på hjemskjerm" (Add to Home Screen)
-4. Name it and tap "Legg til"
+3. Tap "Add to Home Screen"
+4. Name it and tap "Add"
 
 **On Android (Chrome):**
 1. Open fampad in Chrome
 2. Tap the three-dot menu
-3. Tap "Legg til på hjemskjerm" (Add to Home Screen)
+3. Tap "Add to Home Screen"
 4. Confirm installation
 
 **On Desktop:**
@@ -591,7 +591,7 @@ When a new version is available, fampad shows an update banner. Tap to refresh a
 
 - Add weather forecasts for your destination
 - Get AI-powered destination tips and local phrases
-- Use transport tabs (utreise/hjemreise) for round trips
+- Use transport tabs (departure/arrival) for round trips
 - Track packing lists with checkboxes
 
 ### Data Safety

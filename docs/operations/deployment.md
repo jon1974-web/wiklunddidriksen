@@ -1,10 +1,10 @@
-# Familiesenter — Deployment Guide
+# fampad — Deployment Guide
 
 <p align="center">
-  <img src="../../assets/icon.png" alt="Familiesenter Logo" width="120" height="120" />
+  <img src="../../assets/icon.png" alt="fampad Logo" width="120" height="120" />
 </p>
 
-<p align="center"><strong>Deployment procedures for the Familiesenter application</strong></p>
+<p align="center"><strong>Deployment procedures for the fampad application</strong></p>
 
 ---
 
@@ -268,7 +268,7 @@ firebase emulators:start --only firestore
 
 **File**: `firestore.indexes.json`
 
-Contains 21 composite indexes across all collections.
+Contains composite indexes across all collections.
 
 ### Step 2: Deploy Indexes
 
@@ -298,9 +298,13 @@ npx firebase-tools deploy --only firestore:indexes --project familiesenter-837bb
 | `petVaccinations` | familyId ASC, date DESC | All vaccinations by date |
 | `petInsurance` | familyId ASC, petId ASC, createdAt DESC | Insurance per pet |
 | `schoolChildren` | familyId ASC, createdAt ASC | School children listing |
-| `schoolYears` | familyId ASC, createdAt ASC | School years listing |
+| `schoolActivities` | familyId ASC, dateFrom ASC | School activities by date |
 | `schoolContacts` | familyId ASC, createdAt ASC | School contacts listing |
 | `schoolSchedules` | familyId ASC, createdAt ASC | School schedules listing |
+| `kindergartenChildren` | familyId ASC, createdAt ASC | Kindergarten children listing |
+| `kindergartenActivities` | familyId ASC, dateFrom ASC | Kindergarten activities by date |
+| `kindergartenContacts` | familyId ASC, createdAt ASC | Kindergarten contacts listing |
+| `kindergartenSchedules` | familyId ASC, createdAt ASC | Kindergarten schedules listing |
 
 ### Adding New Indexes
 
@@ -341,6 +345,7 @@ npx firebase-tools deploy --only storage --project familiesenter-837bb
 - Chat images: `chat/{timestamp}_{random}`
 - Pet photos: Pet profile images
 - School schedules: Schedule document uploads
+- School/kindergarten activity documents: Permission slips, forms
 - Trip documents: Travel document uploads
 
 ---
@@ -475,4 +480,4 @@ Cloud Functions do not have built-in rollback. To revert:
 
 ---
 
-*Document generated for Familiesenter v1.0.0*
+*Document generated for fampad v1.0.0*

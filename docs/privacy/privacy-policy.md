@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="../../assets/icon.png" alt="Familiesenter Logo" width="120" height="120" />
+  <img src="../../assets/icon.png" alt="fampad Logo" width="120" height="120" />
 </p>
 
-<h1 align="center">Familiesenter</h1>
+<h1 align="center">fampad</h1>
 <h2 align="center">Personvernpolicy / Privacy Policy</h2>
 
 <p align="center">
@@ -30,9 +30,9 @@
 
 ## 1. Introduction
 
-Familiesenter ("we," "us," or "our") is a family coordination application designed to help families organize their daily lives. This privacy policy explains what personal data we collect, how we use it, and what rights you have under the General Data Protection Regulation (GDPR) and other applicable data protection laws.
+fampad ("we," "us," or "our") is a family coordination application designed to help families organize their daily lives. This privacy policy explains what personal data we collect, how we use it, and what rights you have under the General Data Protection Regulation (GDPR) and other applicable data protection laws.
 
-By using Familiesenter, you agree to the collection and use of information as described in this policy. We are committed to protecting your privacy and the privacy of your family members.
+By using fampad, you agree to the collection and use of information as described in this policy. We are committed to protecting your privacy and the privacy of your family members.
 
 ---
 
@@ -40,7 +40,7 @@ By using Familiesenter, you agree to the collection and use of information as de
 
 The data controller responsible for your personal data is:
 
-**Familiesenter**
+**fampad**
 Email: [jon@wiklunddidriksen.com](mailto:jon@wiklunddidriksen.com)
 
 ---
@@ -186,7 +186,7 @@ We use your personal data for the following purposes:
 
 ## 5. Third-Party Services
 
-We use the following third-party services to provide Familiesenter:
+We use the following third-party services to provide fampad:
 
 ### 5.1 Google Firebase
 
@@ -272,7 +272,7 @@ Cloud Functions only accept requests from approved origins:
 
 ## 7. Family Data Isolation
 
-Familiesenter implements strict data isolation between families:
+fampad implements strict data isolation between families:
 
 - Every document in Firestore includes a `familyId` field.
 - Firestore rules verify family membership before allowing any read or write operation.
@@ -323,7 +323,7 @@ You have the right to object to processing of your personal data for specific pu
 
 ## 9. Children's Data Protection
 
-Familiesenter may contain data about children (e.g., school information, health records, pet information). We take special measures to protect children's data:
+fampad may contain data about children (e.g., school information, health records, pet information). We take special measures to protect children's data:
 
 - **Parental consent**: Only parents or legal guardians should create accounts and enter data about children.
 - **Access control**: Children's data is only accessible to family members.

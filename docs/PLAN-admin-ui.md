@@ -1,7 +1,7 @@
 # Admin UI Plan
 
 ## Overview
-An admin panel for the Familiesenter app to manage system settings, monitor usage, and handle administrative tasks.
+An admin panel for the fampad app to manage system settings, monitor usage, and handle administrative tasks.
 
 ---
 

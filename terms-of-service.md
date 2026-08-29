@@ -1,7 +1,7 @@
 # Vilkår for bruk
 
 ## Godkjennelse av vilkår
-Ved å bruke Familiesenter godtar du disse vilkårene. Hvis du ikke godtar dem, skal du ikke bruke appen.
+Ved å bruke fampad godtar du disse vilkårene. Hvis du ikke godtar dem, skal du ikke bruke appen.
 
 ## Kontoansvar
 - Du er ansvarlig for å holde påloggingsinformasjonen din hemmelig
@@ -37,7 +37,7 @@ Ved å bruke Familiesenter godtar du disse vilkårene. Hvis du ikke godtar dem, 
 # Terms of Service
 
 ## Acceptance of Terms
-By using Familiesenter, you agree to these terms. If you do not agree, you should not use the app.
+By using fampad, you agree to these terms. If you do not agree, you should not use the app.
 
 ## Account Responsibility
 - You are responsible for keeping your login credentials confidential

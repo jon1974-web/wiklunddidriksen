@@ -1,4 +1,4 @@
-# Security & Privacy Plan
+# fampad — Security & Privacy Plan
 
 ## Current Assessment: 6.4/10
 

@@ -1,7 +1,7 @@
-# Familiesenter — Monitoring & Incident Response
+# fampad — Monitoring & Incident Response
 
 <p align="center">
-  <img src="../../assets/icon.png" alt="Familiesenter Logo" width="120" height="120" />
+  <img src="../../assets/icon.png" alt="fampad Logo" width="120" height="120" />
 </p>
 
 <p align="center"><strong>Monitoring, error handling, and incident response procedures</strong></p>
@@ -25,7 +25,7 @@
 
 ## Monitoring Overview
 
-Familiesenter is a Firebase-based application. Monitoring relies on:
+fampad is a Firebase-based application. Monitoring relies on:
 
 - **Firebase Console**: Central dashboard for all services
 - **Cloud Function Logs**: Real-time and historical logs
@@ -519,4 +519,4 @@ For advanced monitoring, consider:
 
 ---
 
-*Document generated for Familiesenter v1.0.0*
+*Document generated for fampad v1.0.0*

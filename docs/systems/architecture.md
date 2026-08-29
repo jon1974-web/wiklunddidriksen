@@ -1,7 +1,7 @@
-# Familiesenter — System Architecture
+# fampad — System Architecture
 
 <p align="center">
-  <img src="../../assets/icon.png" alt="Familiesenter Logo" width="120" height="120" />
+  <img src="../../assets/icon.png" alt="fampad Logo" width="120" height="120" />
 </p>
 
 <p align="center"><strong>Family organization platform built with Expo + Firebase</strong></p>
@@ -27,7 +27,7 @@
 
 ## Overview
 
-Familiesenter is a cross-platform family organization Progressive Web App (PWA) built with **Expo SDK 56** and **React Native Web**. It targets web browsers primarily, with native iOS support via Expo. The backend is entirely serverless using **Firebase**.
+fampad is a cross-platform family organization Progressive Web App (PWA) built with **Expo SDK 56** and **React Native Web**. It targets web browsers primarily, with native iOS support via Expo. The backend is entirely serverless using **Firebase**.
 
 **Key architectural decisions:**
 - Client reads directly from Firestore; all write mutations for family management go through Cloud Functions for security
@@ -47,7 +47,7 @@ Familiesenter is a cross-platform family organization Progressive Web App (PWA) 
 | **Cloud Firestore** | Primary database for all app data | `firestore.rules`, `firestore.indexes.json` |
 | **Firebase Hosting** | PWA hosting with SPA rewrites | `firebase.json` |
 | **Cloud Functions** | Serverless API endpoints (Node.js 22) | `functions/index.js` |
-| **Firebase Storage** | File uploads (chat images, pet photos, school schedules) | `storage.rules` |
+| **Firebase Storage** | File uploads (chat images, pet photos, school schedules, activity documents) | `storage.rules` |
 | **Firebase Cloud Messaging** | Push notifications for web PWA | FCM tokens stored in `users/{uid}` |
 
 ### Firebase Configuration
@@ -142,6 +142,8 @@ Family-scoped events.
 | `notificationId` | string | Scheduled notification ID |
 | `calendarEventId` | string | Google Calendar event ID |
 | `icon` | string | Event icon |
+| `documentUrl` | string | Uploaded document URL |
+| `documentName` | string | Uploaded document name |
 
 #### `spondResponses/{responseId}`
 Spond event response tracking, family-scoped.
@@ -257,7 +259,7 @@ Health data is organized as subcollections under a family-scoped document.
 | Subcollection | Type | Key Fields |
 |---------------|------|------------|
 | `health/{familyId}/medications/{id}` | HealthMedication | name, person, dosage, frequency |
-| `health/{familyId}/appointments/{id}` | HealthAppointment | title, person, doctor, date, time, location |
+| `health/{familyId}/appointments/{id}` | HealthAppointment | title, person (multi-select), doctor, dateFrom, dateTo, time, location, reminderMinutes, documentUrl |
 | `health/{familyId}/vaccinations/{id}` | HealthVaccination | name, person, date, nextDue, status |
 | `health/{familyId}/allergies/{id}` | HealthAllergy | allergen, person, severity |
 | `health/{familyId}/growth/{id}` | HealthGrowth | person, height, weight, date |
@@ -271,7 +273,7 @@ Health data is organized as subcollections under a family-scoped document.
 | Collection | Type | Key Fields |
 |------------|------|------------|
 | `pets/{id}` | Pet | name, type, gender, breed, birthday, chipId, photoUrl, familyId |
-| `petVetVisits/{id}` | PetVetVisit | petId, title, doctor, date, time, location, status, familyId |
+| `petVetVisits/{id}` | PetVetVisit | petId, title, doctor, dateFrom, dateTo, time, location, status, reminderMinutes, familyId |
 | `petMedications/{id}` | PetMedication | petId, name, dosage, frequency, familyId |
 | `petFood/{id}` | PetFood | petId, name, time, amount, familyId |
 | `petGrooming/{id}` | PetGrooming | petId, name, lastDate, nextDate, familyId |
@@ -285,9 +287,20 @@ Health data is organized as subcollections under a family-scoped document.
 | Collection | Type | Key Fields |
 |------------|------|------------|
 | `schoolChildren/{id}` | SchoolChild | name, school, phone, email, photoUrl, familyId |
-| `schoolYears/{id}` | SchoolYear | childId, year, grade, school, familyId |
-| `schoolContacts/{id}` | SchoolContact | yearId, childId, name, role, parentName/Phone/Email, familyId |
-| `schoolSchedules/{id}` | SchoolSchedule | yearId, childId, semester, imageUrl, fileName, familyId |
+| `schoolActivities/{id}` | SchoolActivity | childId, type (tur/aktivitet/møte), title, description, dateFrom, dateTo, timeFrom, timeTo, location, reminderMinutes, documentUrl, documentName, calendarEventId, familyId |
+| `schoolContacts/{id}` | SchoolContact | childId, name, role, parentName/Phone/Email, familyId |
+| `schoolSchedules/{id}` | SchoolSchedule | childId, semester, imageUrl, fileName, familyId |
+
+---
+
+### Kindergarten Module
+
+| Collection | Type | Key Fields |
+|------------|------|------------|
+| `kindergartenChildren/{id}` | KindergartenChild | name, kindergarten, phone, email, photoUrl, familyId |
+| `kindergartenActivities/{id}` | KindergartenActivity | childId, type (tur/aktivitet/møte), title, description, dateFrom, dateTo, timeFrom, timeTo, location, reminderMinutes, documentUrl, documentName, calendarEventId, familyId |
+| `kindergartenContacts/{id}` | KindergartenContact | childId, name, role, parentName/Phone/Email, familyId |
+| `kindergartenSchedules/{id}` | KindergartenSchedule | childId, semester, imageUrl, fileName, familyId |
 
 ---
 
@@ -440,6 +453,7 @@ async function callFunction(name: string, data: Record<string, unknown> = {}) {
 - **Purpose**: Export events to user's Google Calendar
 - **Plugin**: `expo-calendar`
 - **Config**: `calendarId`, `calendarEmail`, `calendarProvider` stored in user profile
+- **Supported types**: Manual events, school activities, kindergarten activities, health appointments, vet visits
 
 ### Google Maps
 - **Purpose**: Location selection, static map images, directions
@@ -465,8 +479,8 @@ async function callFunction(name: string, data: Record<string, unknown> = {}) {
 // app.json — web section
 "web": {
   "bundler": "metro",
-  "name": "Familiesenter",
-  "shortName": "Familiesenter",
+  "name": "fampad",
+  "shortName": "fampad",
   "display": "standalone",
   "startUrl": "/",
   "backgroundColor": "#f5f5f5",
@@ -497,6 +511,7 @@ async function callFunction(name: string, data: Record<string, unknown> = {}) {
 - App can be "installed" from browser
 - Standalone display mode
 - Custom splash screen via `assets/icon.png`
+- **Update banner**: Shown when a new version is available
 
 ---
 
@@ -508,9 +523,11 @@ async function callFunction(name: string, data: Record<string, unknown> = {}) {
 Tab.Navigator (CustomTabBar)
 ├── Events Stack    (calendar icon)
 ├── Chat Stack      (chat icon)
-├── Trips Stack     (compass/house icon) — serves as "Hjem" / Spaces hub
+├── Trips Stack     (compass/house icon) — serves as "Våre steder" / Spaces hub
 └── Profile Stack   (person icon)
 ```
+
+Tab bar layout: Chat and Våre steder are positioned between the outer tabs and the center "+" button for balanced ergonomics.
 
 The center "+" button opens the **QuickCreateModal**.
 
@@ -523,7 +540,8 @@ EventsList (EventsScreen)
 ├── EventDetail (EventDetailScreen) — lazy loaded
 ├── EventDetail_Spond (SpondEventDetailScreen) — lazy loaded
 ├── VoiceEvent (VoiceEventScreen) — lazy loaded
-└── PhotoEvent (PhotoEventScreen) — lazy loaded
+├── VoiceActivity (VoiceActivityScreen) — lazy loaded
+└── PhotoActivity (PhotoActivityScreen) — lazy loaded
 ```
 
 #### Trips Stack (Spaces Hub)
@@ -535,7 +553,11 @@ SpacesList (SpacesScreen)
 ├── MealPlan (MealPlanScreen)
 ├── SchoolSpace (SchoolSpaceScreen)
 │   ├── SchoolAI (SchoolAIScreen)
+│   ├── SchoolActivityDetail (SchoolActivityDetailScreen)
 │   └── SchoolContactDetail (SchoolContactDetailScreen)
+├── KindergartenSpace (KindergartenSpaceScreen)
+│   ├── KindergartenActivityDetail (KindergartenActivityDetailScreen)
+│   └── KindergartenContactDetail (KindergartenContactDetailScreen)
 ├── TripsList (TripsScreen)
 │   ├── AddTrip (AddTripScreen)
 │   └── TripDetail (TripDetailScreen)
@@ -544,14 +566,6 @@ SpacesList (SpacesScreen)
 │       ├── PackingListDetail (PackingListDetailScreen)
 │       ├── RecipeDetail (RecipeDetailScreen)
 │       └── ShoppingListDetail (ShoppingListDetailScreen)
-├── RecipeDetail (RecipeDetailScreen)
-├── ShoppingListDetail (ShoppingListDetailScreen)
-└── PhotoRecipe (PhotoRecipeScreen)
-```
-
-#### MealPlan Stack (standalone in tab bar)
-```
-MealPlan (MealPlanScreen)
 ├── RecipeDetail (RecipeDetailScreen)
 ├── ShoppingListDetail (ShoppingListDetailScreen)
 └── PhotoRecipe (PhotoRecipeScreen)
@@ -571,16 +585,17 @@ ProfileMain (ProfileScreen)
 ### Code Splitting
 
 Heavy screens are lazy-loaded with `React.lazy()`:
-- `AddEventScreen`, `EventDetailScreen`, `VoiceEventScreen`, `PhotoEventScreen`
+- `AddEventScreen`, `EventDetailScreen`, `VoiceEventScreen`, `VoiceActivityScreen`, `PhotoActivityScreen`
 - `AddTripScreen`, `TripDetailScreen`, `TransportDetailScreen`
-- `SchoolAIScreen`, `PackingListDetailScreen`
+- `SchoolAIScreen`, `SchoolActivityDetailScreen`, `PackingListDetailScreen`
+- `KindergartenActivityDetailScreen`
 - `RecipeDetailScreen`, `ShoppingListDetailScreen`, `PhotoRecipeScreen`
 
 ---
 
 ## Module System
 
-Each module corresponds to a "Space" accessible from the Trips/Hjem tab.
+Each module corresponds to a "Space" accessible from the Våre steder tab.
 
 ### Module Colors
 
@@ -588,11 +603,11 @@ Defined in `src/constants/moduleColors.ts`:
 
 | Module | Color | Background | Hex |
 |--------|-------|------------|-----|
-| Trips | Blue | Light blue | `#42A5F5` / `#E3F2FD` |
-| Health | Red | Light red | `#E53935` / `#FFEBEE` |
-| School | Green | Light green | `#43A047` / `#E8F5E9` |
-| Birthdays | Orange | Light orange | `#FB8C00` / `#FFF3E0` |
-| Pets | Purple | Light purple | `#8E24AA` / `#F3E5F5` |
+| Trips | Blue | Light blue | `#7EC8E3` / `#E3F2FD` |
+| Health | Red/Brown | Light red | `#C67B5C` / `#FFEBEE` |
+| School | Green | Light green | `#6B8F71` / `#E8F5E9` |
+| Kindergarten | Orange | Light orange | `#E8836A` / `#FFF3E0` |
+| Pets | Purple | Light purple | `#9B7DB8` / `#F3E5F5` |
 | Meal Plan | Teal | Light teal | `#0097A7` / `#E0F7FA` |
 | Home | Indigo | Light indigo | `#5C6BC0` / `#E8EAF6` |
 
@@ -607,7 +622,8 @@ Defined in `src/constants/moduleColors.ts`:
 | Trips | `TripsScreen` + `TripDetailScreen` | `tripService.ts` | `trips` + subcollections |
 | Health | `HealthSpaceScreen` | `healthService.ts` | `health/{familyId}/{subcollection}` |
 | Pets | `PetSpaceScreen` | `petService.ts` | Flat collections: `pets`, `petVetVisits`, etc. |
-| School | `SchoolSpaceScreen` | `schoolService.ts` | Flat collections: `schoolChildren`, `schoolYears`, etc. |
+| School | `SchoolSpaceScreen` | `schoolService.ts` | Flat collections: `schoolChildren`, `schoolActivities`, etc. |
+| Kindergarten | `KindergartenSpaceScreen` | `kindergartenService.ts` | Flat collections: `kindergartenChildren`, `kindergartenActivities`, etc. |
 | Birthdays | `BirthdaySpaceScreen` | `birthdayService.ts` | `birthdays` + `gifts` flat collections |
 | Meal Plan | `MealPlanScreen` | Direct Firestore queries | `recipes` + `mealPlans` flat collections |
 
@@ -698,12 +714,14 @@ The `firestore.rules` file implements family-scoped access control:
 | `src/services/healthService.ts` | Health data operations |
 | `src/services/petService.ts` | Pet data operations |
 | `src/services/schoolService.ts` | School data operations |
+| `src/services/kindergartenService.ts` | Kindergarten data operations |
 | `src/services/spondService.ts` | Spond API integration |
 | `src/services/notificationService.ts` | Push notification configuration |
 | `src/store/userStore.ts` | Zustand global state |
 | `src/theme/ThemeContext.tsx` | Theme provider (9 themes) |
 | `src/i18n/index.ts` | i18n initialization |
 | `src/components/QuickCreateModal.tsx` | Quick-create modal |
+| `src/components/DatePickerModal.tsx` | Custom date/time picker |
 | `src/components/WeeklySummary.tsx` | "Min uke" weekly summary |
 | `src/components/CustomTabBar.tsx` | Bottom tab bar |
 | `src/constants/moduleColors.ts` | Module color definitions |
@@ -716,4 +734,4 @@ The `firestore.rules` file implements family-scoped access control:
 
 ---
 
-*Document generated for Familiesenter v1.0.0*
+*Document generated for fampad v1.0.0*
