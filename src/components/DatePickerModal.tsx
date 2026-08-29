@@ -138,14 +138,13 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
       setCustomTime(selectedValue || '');
       return;
     }
+    setDateInput('');
     if (selectedValue) {
-      setDateInput(selectedValue);
       const idx = options.findIndex(opt => opt.value === selectedValue);
       if (idx >= 0) scrollToIndex(idx);
     } else {
       const today = new Date();
       const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
-      setDateInput(todayStr);
       const idx = options.findIndex(opt => opt.value === todayStr);
       if (idx >= 0) scrollToIndex(idx);
     }
