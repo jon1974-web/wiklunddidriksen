@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { addHealthAppointment } from '../services/healthService';
@@ -11,6 +11,8 @@ import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
 import { auth } from '../services/firebase';
+import { getFamilyMembersWithRoles } from '../services/familyService';
+import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 
 type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity';
 
@@ -28,7 +30,7 @@ interface ParsedData {
   startTime: string;
   endTime?: string;
   location?: string;
-  reminder?: string;
+  reminder: number;
   activityType?: 'tur' | 'aktivitet' | 'møte';
 }
 
@@ -74,6 +76,32 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
+  const [persons, setPersons] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (!familyId) return;
+    getFamilyMembersWithRoles(familyId).then((members) => {
+      setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+    }).catch(() => {});
+  }, [familyId]);
+
+  // Fuzzy match spoken name to closest family member
+  const findClosestMatch = useCallback((spokenName: string, names: string[]): string[] => {
+    if (!spokenName || names.length === 0) return [];
+    const lower = spokenName.toLowerCase();
+    const matches = names.filter(n => n.toLowerCase().includes(lower) || lower.includes(n.toLowerCase()));
+    if (matches.length > 0) return matches;
+    return names.filter(n => {
+      const nameLower = n.toLowerCase();
+      let i = 0;
+      for (const char of lower) {
+        const idx = nameLower.indexOf(char, i);
+        if (idx === -1) return false;
+        i = idx + 1;
+      }
+      return true;
+    });
+  }, []);
 
   const showPerson = type === 'healthAppointment';
   const showActivityType = type === 'schoolActivity' || type === 'kindergartenActivity';
@@ -185,6 +213,13 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
 
       const data = await apiResponse.json();
       setTranscript(data.transcript);
+      // Auto-match person to family members if available
+      if (type === 'healthAppointment' && data.data.person && persons.length > 0) {
+        const matches = findClosestMatch(data.data.person, persons);
+        if (matches.length > 0) {
+          data.data.person = matches.join(', ');
+        }
+      }
       setParsedData(data.data);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
@@ -357,13 +392,25 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
               {showPerson && (
                 <>
                   <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
-                  <TextInput
-                    style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
-                    value={parsedData.person || ''}
-                    onChangeText={(v) => handleFieldChange('person', v)}
-                    placeholder={t('health.person')}
-                    placeholderTextColor={colors.textDisabled}
-                  />
+                  <View style={styles.personRow}>
+                    {persons.map(p => {
+                      const selectedPersons = (parsedData.person || '').split(',').map(s => s.trim()).filter(Boolean);
+                      const isSelected = selectedPersons.includes(p);
+                      return (
+                        <TouchableOpacity
+                          key={p}
+                          style={[styles.personChip, { backgroundColor: isSelected ? accentColor : colors.inputBackground }]}
+                          onPress={() => {
+                            const current = (parsedData.person || '').split(',').map(s => s.trim()).filter(Boolean);
+                            const updated = isSelected ? current.filter(x => x !== p) : [...current, p];
+                            handleFieldChange('person', updated.join(', '));
+                          }}
+                        >
+                          <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
                 </>
               )}
 
@@ -452,13 +499,17 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
               />
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.reminder')}</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
-                value={parsedData.reminder || ''}
-                onChangeText={(v) => handleFieldChange('reminder', v)}
-                placeholder={t('common.reminder')}
-                placeholderTextColor={colors.textDisabled}
-              />
+              <View style={styles.personRow}>
+                {REMINDER_OPTIONS.map((option) => (
+                  <TouchableOpacity
+                    key={option.value}
+                    style={[styles.personChip, { backgroundColor: parsedData.reminder === option.value ? accentColor : colors.inputBackground }]}
+                    onPress={() => handleFieldChange('reminder', String(option.value))}
+                  >
+                    <Text style={{ color: parsedData.reminder === option.value ? '#fff' : colors.text, fontSize: 13 }}>{option.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
 
             <View style={styles.resultActions}>
@@ -510,6 +561,17 @@ const styles = StyleSheet.create({
   helperSection: {
     padding: 16,
     borderBottomWidth: 1,
+  },
+  personRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: 12,
+  },
+  personChip: {
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
   },
   subtitle: {
     fontSize: 14,

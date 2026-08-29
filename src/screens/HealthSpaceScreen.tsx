@@ -59,7 +59,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
 
   // Form states
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
-  const [apptForm, setApptForm] = useState({ title: '', person: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [apptForm, setApptForm] = useState<{ title: string; person: string[]; doctor: string; dateFrom: string; dateTo: string; startTime: string; endTime: string; location: string; note: string; reminder: number; documents: { url: string; fileName: string; type: 'image' | 'document' }[] }>({ title: '', person: [], doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
@@ -166,7 +166,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         if (!isEditing) {
           notifyHealthItem(familyId, apptForm.title, apptForm.dateFrom, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
         }
-        setApptForm({ title: '', person: persons[0] || '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
+        setApptForm({ title: '', person: [], doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
       } else if (activeSection === 'vaccinations') {
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
         let savedVacc;
@@ -246,7 +246,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) setMedForm({ name: item.name, person: item.person, dosage: item.dosage, frequency: item.frequency || 1, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }], dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
     } else if (section === 'appointments') {
       const item = appointments.find(a => a.id === id);
-      if (item) setApptForm({ title: item.title, person: item.person, doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || 0, documents: item.documents || [] });
+      if (item) setApptForm({ title: item.title, person: Array.isArray(item.person) ? item.person : item.person ? [item.person] : [], doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || 0, documents: item.documents || [] });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
       if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', location: item.location || '', note: item.note || '' });
@@ -539,11 +539,18 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
                     <View style={styles.personRow}>
-                      {persons.map(p => (
-                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: apptForm.person === p ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setApptForm(f => ({ ...f, person: p }))}>
-                          <Text style={{ color: apptForm.person === p ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
-                        </TouchableOpacity>
-                      ))}
+                      {persons.map(p => {
+                        const isSelected = Array.isArray(apptForm.person) && apptForm.person.includes(p);
+                        return (
+                          <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => {
+                            const current = Array.isArray(apptForm.person) ? apptForm.person : [];
+                            const updated = isSelected ? current.filter(x => x !== p) : [...current, p];
+                            setApptForm(f => ({ ...f, person: updated }));
+                          }}>
+                            <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
                     </View>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 12 }}>
