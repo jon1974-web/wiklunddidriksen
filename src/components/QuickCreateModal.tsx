@@ -36,7 +36,7 @@ const SECTIONS: Section[] = [
     moduleIcon: 'calendar',
     labelKey: 'quickCreate.events',
     items: [
-      { icon: 'calendar' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'EventsList', params: { openAddEvent: true } }), labelKey: 'quickCreate.newEvent' },
+      { icon: 'pencil' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'EventsList', params: { openAddEvent: true } }), labelKey: 'quickCreate.newEvent' },
       { icon: 'microphone' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.voiceEvent' },
       { icon: 'camera' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'PhotoEvent', params: { _t: Date.now() } }), labelKey: 'quickCreate.photoEvent' },
     ],
@@ -47,7 +47,7 @@ const SECTIONS: Section[] = [
     moduleIcon: 'medication',
     labelKey: 'quickCreate.health',
     items: [
-      { icon: 'medication' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }), labelKey: 'quickCreate.healthAppointment' },
+      { icon: 'pencil' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }), labelKey: 'quickCreate.healthAppointment' },
       { icon: 'microphone' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'VoiceActivity', params: { type: 'healthAppointment', moduleColor: MODULE_COLORS.health, _t: Date.now() } }), labelKey: 'quickCreate.voiceHealth' },
       { icon: 'camera' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'PhotoActivity', params: { type: 'healthAppointment', moduleColor: MODULE_COLORS.health, _t: Date.now() } }), labelKey: 'quickCreate.photoHealth' },
     ],
@@ -58,7 +58,7 @@ const SECTIONS: Section[] = [
     moduleIcon: 'pet',
     labelKey: 'quickCreate.pets',
     items: [
-      { icon: 'pet' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }), labelKey: 'quickCreate.petVetVisit' },
+      { icon: 'pencil' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }), labelKey: 'quickCreate.petVetVisit' },
       { icon: 'microphone' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'VoiceActivity', params: { type: 'vetVisit', moduleColor: MODULE_COLORS.pets, _t: Date.now() } }), labelKey: 'quickCreate.voiceVet' },
       { icon: 'camera' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'PhotoActivity', params: { type: 'vetVisit', moduleColor: MODULE_COLORS.pets, _t: Date.now() } }), labelKey: 'quickCreate.photoVet' },
     ],
@@ -69,7 +69,7 @@ const SECTIONS: Section[] = [
     moduleIcon: 'school',
     labelKey: 'quickCreate.school',
     items: [
-      { icon: 'school' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.schoolActivity' },
+      { icon: 'pencil' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.schoolActivity' },
       { icon: 'microphone' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'VoiceActivity', params: { type: 'schoolActivity', moduleColor: MODULE_COLORS.school, _t: Date.now() } }), labelKey: 'quickCreate.voiceSchool' },
       { icon: 'camera' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'PhotoActivity', params: { type: 'schoolActivity', moduleColor: MODULE_COLORS.school, _t: Date.now() } }), labelKey: 'quickCreate.photoSchool' },
     ],
@@ -80,7 +80,7 @@ const SECTIONS: Section[] = [
     moduleIcon: 'kindergarten',
     labelKey: 'quickCreate.kindergarten',
     items: [
-      { icon: 'kindergarten' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.kindergartenActivity' },
+      { icon: 'pencil' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.kindergartenActivity' },
       { icon: 'microphone' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'VoiceActivity', params: { type: 'kindergartenActivity', moduleColor: MODULE_COLORS.kindergarten, _t: Date.now() } }), labelKey: 'quickCreate.voiceKindergarten' },
       { icon: 'camera' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'PhotoActivity', params: { type: 'kindergartenActivity', moduleColor: MODULE_COLORS.kindergarten, _t: Date.now() } }), labelKey: 'quickCreate.photoKindergarten' },
     ],
@@ -91,7 +91,7 @@ const SECTIONS: Section[] = [
     moduleIcon: 'transport',
     labelKey: 'quickCreate.trips',
     items: [
-      { icon: 'transport' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }), labelKey: 'quickCreate.newTrip' },
+      { icon: 'pencil' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }), labelKey: 'quickCreate.newTrip' },
     ],
   },
 ];
