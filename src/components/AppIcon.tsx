@@ -35,10 +35,12 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5
 
   if (name === 'microphone') return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/>
-      <Path d="M19 10v2a7 7 0 01-14 0v-2"/>
-      <Line x1="12" y1="19" x2="12" y2="23"/>
-      <Line x1="8" y1="23" x2="16" y2="23"/>
+      <Path d="M12.5 1a3 3 0 00-2.83 4.02l.02.06a3 3 0 005.66 0l.02-.06A3 3 0 0012.5 1z" transform="rotate(-10 12.5 7)"/>
+      <Line x1="11" y1="8.5" x2="14" y2="8.5" transform="rotate(-10 12.5 7)"/>
+      <Line x1="11.2" y1="10.5" x2="13.8" y2="10.5" transform="rotate(-10 12.5 7)"/>
+      <Path d="M19 10v2a7 7 0 01-14 0v-2" transform="rotate(-5 12 12)"/>
+      <Line x1="12.5" y1="19" x2="13" y2="23"/>
+      <Line x1="9" y1="23" x2="17" y2="23"/>
     </Svg>
   );
 
