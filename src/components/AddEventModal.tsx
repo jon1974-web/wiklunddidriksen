@@ -325,8 +325,8 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                 visible={activePicker !== null}
                 title={activePicker === 'dateFrom' ? t('kindergarten.holidayDateFrom') : activePicker === 'dateTo' ? t('kindergarten.holidayDateTo') : activePicker === 'time' ? t('kindergarten.holidayTimeFrom') : t('kindergarten.holidayTimeTo')}
                 mode={isTimePicker ? 'time' : 'date'}
-                dateOffset={isTimePicker ? 0 : -365}
-                dateCount={isTimePicker ? 48 : 730}
+                dateOffset={isTimePicker ? 0 : -30}
+                dateCount={isTimePicker ? 48 : 760}
                 selectedValue={activePicker === 'dateFrom' ? dateFrom : activePicker === 'dateTo' ? dateTo : activePicker === 'time' ? time : endTime}
                 onSelect={handlePickerSelect}
                 onClose={() => setActivePicker(null)}

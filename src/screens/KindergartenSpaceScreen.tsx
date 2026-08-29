@@ -1469,8 +1469,8 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
           visible={activeActivityPicker !== null}
           title={activeActivityPicker === 'dateFrom' ? t('school.activityDateFrom') : activeActivityPicker === 'dateTo' ? t('school.activityDateTo') : activeActivityPicker === 'startTime' ? t('school.activityStartTime') : t('school.activityEndTime')}
           mode={activeActivityPicker === 'startTime' || activeActivityPicker === 'endTime' ? 'time' : 'date'}
-          dateOffset={-365}
-          dateCount={730}
+          dateOffset={editingActivityId ? -365 : -30}
+          dateCount={editingActivityId ? 730 : 760}
           selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
           onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo && f.dateTo >= v ? f.dateTo : v })); } else if (activeActivityPicker === 'dateTo') { setActivityForm(f => ({ ...f, dateTo: v >= f.dateFrom ? v : f.dateTo })); } else if (activeActivityPicker === 'startTime') { const [h, m] = v.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setActivityForm(f => ({ ...f, startTime: v, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
           onClose={() => setActiveActivityPicker(null)}
