@@ -1299,6 +1299,10 @@
     "stopRecording": "Stoppa inspelning",
     "edit": "Redigera",
     "create": "Skapa aktivitet",
-    "creating": "Skapar..."
+    "creating": "Skapar...",
+    "voiceHealthExample": "t.ex. \"Läkarbesök hos Hansen på måndag klockan 14 på Majorstuen klinik\"",
+    "voiceVetExample": "t.ex. \"Veterinärbesök för Luna på torsdag klockan 10.30 på Djurkliniken\"",
+    "voiceSchoolExample": "t.ex. \"Vandring till skogen med klassen på fredag från klockan 9 till 14\"",
+    "voiceKindergartenExample": "t.ex. \"Föräldramöte i förskolan onsdag klockan 18 på personalrummet\""
   }
 }

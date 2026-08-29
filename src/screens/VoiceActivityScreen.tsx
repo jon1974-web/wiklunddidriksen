@@ -41,6 +41,13 @@ const ACTIVITY_LABELS: Record<ActivityType, string> = {
   kindergartenActivity: 'barnehageaktivitet',
 };
 
+const ACTIVITY_EXAMPLE_KEYS: Record<ActivityType, string> = {
+  healthAppointment: 'voiceActivity.voiceHealthExample',
+  vetVisit: 'voiceActivity.voiceVetExample',
+  schoolActivity: 'voiceActivity.voiceSchoolExample',
+  kindergartenActivity: 'voiceActivity.voiceKindergartenExample',
+};
+
 const ACTIVITY_TYPE_OPTIONS: Array<{ value: 'tur' | 'aktivitet' | 'møte'; label: string }> = [
   { value: 'tur', label: 'Tur' },
   { value: 'aktivitet', label: 'Aktivitet' },
@@ -280,7 +287,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           {t('voice.instruction')}
         </Text>
         <Text style={[styles.helperExample, { color: colors.textDisabled }]}>
-          {t('voice.activityExample', { type: ACTIVITY_LABELS[type] })}
+          {t(ACTIVITY_EXAMPLE_KEYS[type])}
         </Text>
       </View>
 
