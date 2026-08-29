@@ -123,6 +123,64 @@ async function checkRateLimit(uid, functionName) {
   return true;
 }
 
+async function verifyAppOwner(req) {
+  const uid = await verifyAuth(req);
+  if (!uid) return null;
+  const db = getFirestore();
+  const userSnap = await db.collection("users").doc(uid).get();
+  if (!userSnap.exists || userSnap.data().appRole !== "appOwner") return null;
+  return uid;
+}
+
+exports.grantAppOwner = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
+
+  const { targetUid } = req.body;
+  if (!targetUid) return res.status(400).json({ error: "targetUid is required" });
+
+  const db = getFirestore();
+  await db.collection("users").doc(targetUid).update({ appRole: "appOwner" });
+
+  await db.collection("auditLogs").add({
+    action: "grantAppOwner",
+    performedBy: uid,
+    targetUid,
+    timestamp: new Date().toISOString(),
+  });
+
+  return res.status(200).json({ success: true });
+});
+
+exports.revokeAppOwner = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
+
+  const { targetUid } = req.body;
+  if (!targetUid) return res.status(400).json({ error: "targetUid is required" });
+  if (targetUid === uid) return res.status(400).json({ error: "Cannot revoke your own app owner access" });
+
+  const db = getFirestore();
+  await db.collection("users").doc(targetUid).update({ appRole: null });
+
+  await db.collection("auditLogs").add({
+    action: "revokeAppOwner",
+    performedBy: uid,
+    targetUid,
+    timestamp: new Date().toISOString(),
+  });
+
+  return res.status(200).json({ success: true });
+});
+
 // Audit logging - log critical actions
 async function logAuditEvent(uid, action, details = {}) {
   try {

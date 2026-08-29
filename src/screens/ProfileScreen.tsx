@@ -61,6 +61,7 @@ export const ProfileScreen: React.FC = () => {
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const familyRole = useUserStore((state) => state.familyRole);
+  const appRole = useUserStore((state) => state.appRole);
   const setFamily = useUserStore((state) => state.setFamily);
   const { colors, mode, setMode } = useTheme();
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -1314,6 +1315,15 @@ export const ProfileScreen: React.FC = () => {
             </View>
           )}
         </View>
+      )}
+
+      {appRole === 'appOwner' && (
+        <TouchableOpacity
+          style={[styles.logoutButton, { backgroundColor: colors.accent }]}
+          onPress={() => navigation.navigate('Admin')}
+        >
+          <Text style={styles.logoutButtonText}>{t('admin.adminPanel')}</Text>
+        </TouchableOpacity>
       )}
 
       <TouchableOpacity style={[styles.logoutButton, { backgroundColor: colors.danger }]} onPress={handleLogout}>

@@ -1321,5 +1321,27 @@
     "voiceVetTitle": "Tale til dyrlæge",
     "voiceSchoolTitle": "Tale til skoleaktivitet",
     "voiceKindergartenTitle": "Tale til børnehaveaktivitet"
+  },
+  "admin": {
+    "title": "Adminpanel",
+    "adminPanel": "Adminpanel",
+    "dashboard": "Oversigt",
+    "families": "Familier",
+    "users": "Brugere",
+    "settings": "Indstillinger",
+    "totalFamilies": "Totalt familier",
+    "totalUsers": "Totalt brugere",
+    "newThisWeek": "Nye denne uge",
+    "apiCallsToday": "API-opkald i dag",
+    "storageUsed": "Lagerforbrug",
+    "estimatedCost": "Estimeret omkostning",
+    "familiesComingSoon": "Familieoversigt kommer snart",
+    "usersComingSoon": "Brugeroversigt kommer snart",
+    "settingsComingSoon": "Indstillinger kommer snart",
+    "rateLimits": "Takstgrænser",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "grantAccess": "Giv adgang",
+    "revokeAccess": "Fjern adgang"
   }
 }

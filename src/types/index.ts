@@ -259,6 +259,7 @@ export interface UserProfile {
   familyId: string | null;
   familyName: string | null;
   familyRole?: 'owner' | 'admin' | 'member';
+  appRole?: 'appOwner' | null;
   calendarId: string | null;
   calendarEmail: string | null;
   calendarProvider: 'google' | 'outlook' | null;

@@ -1321,5 +1321,27 @@
     "voiceVetTitle": "Voice to vet visit",
     "voiceSchoolTitle": "Voice to school activity",
     "voiceKindergartenTitle": "Voice to kindergarten activity"
+  },
+  "admin": {
+    "title": "Admin Panel",
+    "adminPanel": "Admin Panel",
+    "dashboard": "Dashboard",
+    "families": "Families",
+    "users": "Users",
+    "settings": "Settings",
+    "totalFamilies": "Total Families",
+    "totalUsers": "Total Users",
+    "newThisWeek": "New This Week",
+    "apiCallsToday": "API Calls Today",
+    "storageUsed": "Storage Used",
+    "estimatedCost": "Estimated Cost",
+    "familiesComingSoon": "Family overview coming soon",
+    "usersComingSoon": "User overview coming soon",
+    "settingsComingSoon": "Settings coming soon",
+    "rateLimits": "Rate Limits",
+    "save": "Save",
+    "cancel": "Cancel",
+    "grantAccess": "Grant Access",
+    "revokeAccess": "Revoke Access"
   }
 }

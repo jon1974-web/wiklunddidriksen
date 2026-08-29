@@ -1321,5 +1321,27 @@
     "voiceVetTitle": "Puhe eläinlääkärille",
     "voiceSchoolTitle": "Puhe koulutoimintaan",
     "voiceKindergartenTitle": "Puhe päiväkotitoimintaan"
+  },
+  "admin": {
+    "title": "Ylläpitopaneeli",
+    "adminPanel": "Ylläpitopaneeli",
+    "dashboard": "Koontinäkymä",
+    "families": "Perheet",
+    "users": "Käyttäjät",
+    "settings": "Asetukset",
+    "totalFamilies": "Perheitä yhteensä",
+    "totalUsers": "Käyttäjiä yhteensä",
+    "newThisWeek": "Uusia tällä viikolla",
+    "apiCallsToday": "API-kutsuja tänään",
+    "storageUsed": "Tallennustila",
+    "estimatedCost": "Arvioitu kustannus",
+    "familiesComingSoon": "Perhenäkymä tulossa pian",
+    "usersComingSoon": "Käyttäjänäkymä tulossa pian",
+    "settingsComingSoon": "Asetukset tulossa pian",
+    "rateLimits": "Nopeusrajoitukset",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "grantAccess": "Myönnä pääsy",
+    "revokeAccess": "Poista pääsy"
   }
 }

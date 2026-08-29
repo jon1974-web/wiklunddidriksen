@@ -27,6 +27,7 @@ import { ShoppingListsScreen } from './src/screens/ShoppingListsScreen';
 import { ChatScreen } from './src/screens/ChatScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { BirthdayScreen } from './src/screens/BirthdayScreen';
+import { AdminScreen } from './src/screens/AdminScreen';
 import { SpacesScreen } from './src/screens/SpacesScreen';
 import { TripsScreen } from './src/screens/TripsScreen';
 import { HealthSpaceScreen } from './src/screens/HealthSpaceScreen';
@@ -426,6 +427,11 @@ const ProfileStack = () => {
         component={BirthdayScreen}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name="Admin"
+        component={AdminScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 };
@@ -499,6 +505,7 @@ const AppContent = () => {
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
   const setFamily = useUserStore((state) => state.setFamily);
+  const setAppRole = useUserStore((state) => state.setAppRole);
   const setPendingInviteCode = useUserStore((state) => state.setPendingInviteCode);
   const { colors } = useTheme();
 
@@ -567,6 +574,9 @@ const AppContent = () => {
           setUser({ ...userData, avatarUrl: profile?.avatarUrl || undefined, timezone: profile?.timezone || detectedTimezone });
           if (profile?.familyId) {
             setFamily(profile.familyId, profile.familyName, profile.familyRole || null);
+          }
+          if (profile?.appRole) {
+            setAppRole(profile.appRole);
           }
           // Auto-save timezone if not set in profile
           if (!profile?.timezone && detectedTimezone) {

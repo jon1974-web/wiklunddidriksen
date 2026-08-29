@@ -1321,5 +1321,27 @@
     "voiceVetTitle": "Tale til veterinærtime",
     "voiceSchoolTitle": "Tale til skoleaktivitet",
     "voiceKindergartenTitle": "Tale til barnehageaktivitet"
+  },
+  "admin": {
+    "title": "Adminpanel",
+    "adminPanel": "Adminpanel",
+    "dashboard": "Oversikt",
+    "families": "Familier",
+    "users": "Brukere",
+    "settings": "Innstillinger",
+    "totalFamilies": "Totalt familier",
+    "totalUsers": "Totalt brukere",
+    "newThisWeek": "Nye denne uken",
+    "apiCallsToday": "API-kall i dag",
+    "storageUsed": "Lagringsbruk",
+    "estimatedCost": "Estimert kostnad",
+    "familiesComingSoon": "Familieoversikt kommer snart",
+    "usersComingSoon": "Brukeroversikt kommer snart",
+    "settingsComingSoon": "Innstillinger kommer snart",
+    "rateLimits": "Rategrenser",
+    "save": "Lagre",
+    "cancel": "Avbryt",
+    "grantAccess": "Gi tilgang",
+    "revokeAccess": "Fjern tilgang"
   }
 }
