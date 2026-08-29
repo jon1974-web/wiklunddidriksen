@@ -1303,6 +1303,10 @@
     "voiceHealthExample": "t.ex. \"Läkarbesök hos Hansen på måndag klockan 14 på Majorstuen klinik\"",
     "voiceVetExample": "t.ex. \"Veterinärbesök för Luna på torsdag klockan 10.30 på Djurkliniken\"",
     "voiceSchoolExample": "t.ex. \"Vandring till skogen med klassen på fredag från klockan 9 till 14\"",
-    "voiceKindergartenExample": "t.ex. \"Föräldramöte i förskolan onsdag klockan 18 på personalrummet\""
+    "voiceKindergartenExample": "t.ex. \"Föräldramöte i förskolan onsdag klockan 18 på personalrummet\"",
+    "voiceHealthTitle": "Tal till hälsovård",
+    "voiceVetTitle": "Tal till veterinär",
+    "voiceSchoolTitle": "Tal till skolaktivitet",
+    "voiceKindergartenTitle": "Tal till förskoleaktivitet"
   }
 }

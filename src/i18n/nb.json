@@ -1303,6 +1303,10 @@
     "voiceHealthExample": "F.eks. “Legetime hos Hansen på mandag klokken 14 på Majorstuen legekontor”",
     "voiceVetExample": "F.eks. “Veterinærbesøk for Luna på torsdag klokken 10.30 på Dyreklinikken”",
     "voiceSchoolExample": "F.eks. “Tur til marka med klassen på fredag fra klokken 9 til 14”",
-    "voiceKindergartenExample": "F.eks. “Foreldremøte i barnehagen onsdag klokken 18 på personalrommet”"
+    "voiceKindergartenExample": "F.eks. “Foreldremøte i barnehagen onsdag klokken 18 på personalrommet”",
+    "voiceHealthTitle": "Tale til helsetime",
+    "voiceVetTitle": "Tale til veterinærtime",
+    "voiceSchoolTitle": "Tale til skoleaktivitet",
+    "voiceKindergartenTitle": "Tale til barnehageaktivitet"
   }
 }

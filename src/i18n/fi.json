@@ -1303,6 +1303,10 @@
     "voiceHealthExample": "esim. \"Lääkäajan Hansenille maanantaina klo 14 Majorstuen klinikalla\"",
     "voiceVetExample": "esim. \"Eläinlääkäajan Lunalle torstaina klo 10.30 Eläinklinikalla\"",
     "voiceSchoolExample": "esim. \"Retki metsään luokan kanssa perjantaina klo 9-14\"",
-    "voiceKindergartenExample": "esim. \"Vanhemmakokous päiväkodissa keskiviikona klo 18 henkilöstöhuoneessa\""
+    "voiceKindergartenExample": "esim. \"Vanhemmakokous päiväkodissa keskiviikona klo 18 henkilöstöhuoneessa\"",
+    "voiceHealthTitle": "Puhe terveysaikaan",
+    "voiceVetTitle": "Puhe eläinlääkärille",
+    "voiceSchoolTitle": "Puhe koulutoimintaan",
+    "voiceKindergartenTitle": "Puhe päiväkotitoimintaan"
   }
 }

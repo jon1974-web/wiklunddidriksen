@@ -1303,6 +1303,10 @@
     "voiceHealthExample": "e.g. \"Doctor appointment with Hansen on Monday at 2pm at Majorstuen clinic\"",
     "voiceVetExample": "e.g. \"Vet visit for Luna on Thursday at 10:30 at the Animal Clinic\"",
     "voiceSchoolExample": "e.g. \"Hike to the forest with the class on Friday from 9am to 2pm\"",
-    "voiceKindergartenExample": "e.g. \"Parent meeting at kindergarten on Wednesday at 6pm in the staff room\""
+    "voiceKindergartenExample": "e.g. \"Parent meeting at kindergarten on Wednesday at 6pm in the staff room\"",
+    "voiceHealthTitle": "Voice to health appointment",
+    "voiceVetTitle": "Voice to vet visit",
+    "voiceSchoolTitle": "Voice to school activity",
+    "voiceKindergartenTitle": "Voice to kindergarten activity"
   }
 }

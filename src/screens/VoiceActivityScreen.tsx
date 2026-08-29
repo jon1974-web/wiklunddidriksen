@@ -48,6 +48,13 @@ const ACTIVITY_EXAMPLE_KEYS: Record<ActivityType, string> = {
   kindergartenActivity: 'voiceActivity.voiceKindergartenExample',
 };
 
+const ACTIVITY_TITLE_KEYS: Record<ActivityType, string> = {
+  healthAppointment: 'voiceActivity.voiceHealthTitle',
+  vetVisit: 'voiceActivity.voiceVetTitle',
+  schoolActivity: 'voiceActivity.voiceSchoolTitle',
+  kindergartenActivity: 'voiceActivity.voiceKindergartenTitle',
+};
+
 const ACTIVITY_TYPE_OPTIONS: Array<{ value: 'tur' | 'aktivitet' | 'møte'; label: string }> = [
   { value: 'tur', label: 'Tur' },
   { value: 'aktivitet', label: 'Aktivitet' },
@@ -279,7 +286,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: accentColor }]}>
           <Text style={{ color: accentColor, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>{t('voiceActivity.title')}</Text>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>{t(ACTIVITY_TITLE_KEYS[type])}</Text>
         <View style={{ width: 36 }} />
       </View>
       <View style={[styles.helperSection, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
