@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, ActivityIndicator, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
-import Svg, { Rect, Line, Circle, Path } from 'react-native-svg';
+import { auth } from '../services/firebase';
+
+const ADMIN_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getAdminStats';
 
 interface AdminScreenProps {
   navigation: any;
@@ -42,17 +44,29 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
       navigation.goBack();
       return;
     }
-    // TODO: Fetch admin stats from Cloud Function
-    setTimeout(() => {
-      setStats({
-        totalFamilies: 0,
-        totalUsers: 0,
-        newThisWeek: 0,
-        apiCallsToday: 0,
-        storageUsed: '0 MB',
-      });
-      setLoading(false);
-    }, 1000);
+
+    const fetchStats = async () => {
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+        const idToken = await currentUser.getIdToken();
+        const res = await fetch(ADMIN_STATS_URL, {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setStats(data);
+        }
+      } catch (error) {
+        console.log('Failed to fetch admin stats:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+    const interval = setInterval(fetchStats, 5 * 60 * 1000); // Refresh every 5 min
+    return () => clearInterval(interval);
   }, [isAdmin, navigation]);
 
   if (!isAdmin) return null;
@@ -64,21 +78,57 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
     { key: 'settings', label: t('admin.settings'), icon: '⚙️' },
   ];
 
-  const renderDashboard = () => (
-    <View style={isMobile ? styles.mobileGrid : styles.desktopGrid}>
-      {[
-        { label: t('admin.totalFamilies'), value: stats?.totalFamilies ?? '—', color: '#3b5a75' },
-        { label: t('admin.totalUsers'), value: stats?.totalUsers ?? '—', color: '#C67B5C' },
-        { label: t('admin.newThisWeek'), value: stats?.newThisWeek ?? '—', color: '#6B8F71' },
-        { label: t('admin.apiCallsToday'), value: stats?.apiCallsToday ?? '—', color: '#E6A817' },
-      ].map((card, i) => (
-        <View key={i} style={[styles.statCard, { borderLeftColor: card.color, backgroundColor: colors.surface }]}>
-          <Text style={[styles.statValue, { color: card.color }]}>{card.value}</Text>
-          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{card.label}</Text>
+  const renderDashboard = () => {
+    const cards = [
+      { label: t('admin.totalFamilies'), value: stats?.totalFamilies ?? '—', color: '#3b5a75', icon: '👨‍👩‍👧‍👦' },
+      { label: t('admin.totalUsers'), value: stats?.totalUsers ?? '—', color: '#C67B5C', icon: '👤' },
+      { label: t('admin.newThisWeek'), value: stats?.newThisWeek ?? '—', color: '#6B8F71', icon: '📈' },
+      { label: t('admin.apiCallsToday'), value: stats?.apiCallsToday ?? '—', color: '#E6A817', icon: '⚡' },
+    ];
+
+    const maxVal = Math.max(...cards.map(c => typeof c.value === 'number' ? c.value : 0), 1);
+
+    return (
+      <View>
+        {/* Metric cards */}
+        <View style={isMobile ? styles.mobileGrid : styles.desktopGrid}>
+          {cards.map((card, i) => (
+            <TouchableOpacity key={i} style={[styles.statCard, { borderLeftColor: card.color, backgroundColor: colors.surface }]} activeOpacity={0.7}>
+              <View style={styles.statCardHeader}>
+                <Text style={styles.statIcon}>{card.icon}</Text>
+                <Text style={[styles.statValue, { color: card.color }]}>{card.value}</Text>
+              </View>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{card.label}</Text>
+              {/* Mini bar */}
+              <View style={[styles.barBg, { backgroundColor: card.color + '15' }]}>
+                <View style={[styles.barFill, { backgroundColor: card.color, width: `${((typeof card.value === 'number' ? card.value : 0) / maxVal) * 100}%` }]} />
+              </View>
+            </TouchableOpacity>
+          ))}
         </View>
-      ))}
-    </View>
-  );
+
+        {/* Last updated */}
+        {stats?.lastUpdated && (
+          <Text style={[styles.lastUpdated, { color: colors.textDisabled }]}>
+            {t('admin.lastUpdated')}: {new Date(stats.lastUpdated).toLocaleString('nb-NO')}
+          </Text>
+        )}
+
+        {/* Quick stats row */}
+        <View style={[styles.quickStatsRow, { backgroundColor: colors.surface }]}>
+          <View style={styles.quickStat}>
+            <Text style={[styles.quickStatValue, { color: colors.text }]}>{stats?.totalEvents ?? '—'}</Text>
+            <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>{t('admin.totalEvents')}</Text>
+          </View>
+          <View style={[styles.quickStatDivider, { backgroundColor: colors.border }]} />
+          <View style={styles.quickStat}>
+            <Text style={[styles.quickStatValue, { color: colors.text }]}>{stats?.storageUsed ?? '—'}</Text>
+            <Text style={[styles.quickStatLabel, { color: colors.textSecondary }]}>{t('admin.storageUsed')}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
 
   const renderFamilies = () => (
     <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
@@ -189,8 +239,46 @@ const styles = StyleSheet.create({
     borderLeftWidth: 4,
     marginBottom: 0,
   },
+  statCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  statIcon: { fontSize: 20 },
   statValue: { fontSize: 28, fontWeight: '700' },
   statLabel: { fontSize: 13, marginTop: 4 },
+  barBg: {
+    height: 4,
+    borderRadius: 2,
+    marginTop: 8,
+    overflow: 'hidden',
+  },
+  barFill: {
+    height: '100%',
+    borderRadius: 2,
+  },
+  lastUpdated: {
+    fontSize: 11,
+    marginTop: 12,
+    textAlign: 'center',
+  },
+  quickStatsRow: {
+    flexDirection: 'row',
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 16,
+    alignItems: 'center',
+  },
+  quickStat: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  quickStatValue: { fontSize: 20, fontWeight: '700' },
+  quickStatLabel: { fontSize: 12, marginTop: 2 },
+  quickStatDivider: {
+    width: 1,
+    height: 30,
+  },
   placeholderCard: {
     padding: 24,
     borderRadius: 12,

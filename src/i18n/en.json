@@ -1342,6 +1342,8 @@
     "save": "Save",
     "cancel": "Cancel",
     "grantAccess": "Grant Access",
-    "revokeAccess": "Revoke Access"
+    "revokeAccess": "Revoke Access",
+    "totalEvents": "Total Events",
+    "lastUpdated": "Last updated"
   }
 }

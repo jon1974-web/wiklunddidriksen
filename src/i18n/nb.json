@@ -1342,6 +1342,8 @@
     "save": "Lagre",
     "cancel": "Avbryt",
     "grantAccess": "Gi tilgang",
-    "revokeAccess": "Fjern tilgang"
+    "revokeAccess": "Fjern tilgang",
+    "totalEvents": "Totalt arrangementer",
+    "lastUpdated": "Sist oppdatert"
   }
 }

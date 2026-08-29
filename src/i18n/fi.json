@@ -1342,6 +1342,8 @@
     "save": "Tallenna",
     "cancel": "Peruuta",
     "grantAccess": "Myönnä pääsy",
-    "revokeAccess": "Poista pääsy"
+    "revokeAccess": "Poista pääsy",
+    "totalEvents": "Tapahtumia yhteensä",
+    "lastUpdated": "Viimeksi päivitetty"
   }
 }

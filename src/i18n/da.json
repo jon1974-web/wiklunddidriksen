@@ -1342,6 +1342,8 @@
     "save": "Gem",
     "cancel": "Annuller",
     "grantAccess": "Giv adgang",
-    "revokeAccess": "Fjern adgang"
+    "revokeAccess": "Fjern adgang",
+    "totalEvents": "Totalt begivenheder",
+    "lastUpdated": "Senest opdateret"
   }
 }

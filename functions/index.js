@@ -197,6 +197,108 @@ async function logAuditEvent(uid, action, details = {}) {
   }
 }
 
+// Admin Stats - get cached dashboard data
+exports.getAdminStats = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
+
+  const db = getFirestore();
+  const statsSnap = await db.collection("systemConfig").doc("adminStats").get();
+
+  if (!statsSnap.exists) {
+    return res.status(200).json({
+      totalFamilies: 0,
+      totalUsers: 0,
+      newThisWeek: 0,
+      apiCallsToday: 0,
+      storageUsed: "0 MB",
+      lastUpdated: null,
+    });
+  }
+
+  return res.status(200).json(statsSnap.data());
+});
+
+// Update admin stats - scheduled hourly
+exports.updateAdminStats = onSchedule({ schedule: "every 1 hours", timeZone: "Europe/Oslo", region: "us-central1" }, async (event) => {
+  const db = getFirestore();
+
+  try {
+    // Count families
+    const familiesSnap = await db.collection("families").count().get();
+    const totalFamilies = familiesSnap.data().count;
+
+    // Count users
+    const usersSnap = await db.collection("users").count().get();
+    const totalUsers = usersSnap.data().count;
+
+    // New users this week
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const newUsersSnap = await db.collection("users")
+      .where("createdAt", ">=", oneWeekAgo.getTime())
+      .count().get();
+    const newThisWeek = newUsersSnap.data().count;
+
+    // API calls today (from usageLogs)
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const apiCallsSnap = await db.collection("usageLogs")
+      .where("timestamp", ">=", todayStart.toISOString())
+      .count().get();
+    const apiCallsToday = apiCallsSnap.data().count;
+
+    // Count events
+    const eventsSnap = await db.collection("events").count().get();
+
+    // Count health appointments
+    const healthSnap = await db.collectionGroup("health").doc("appointments").get().catch(() => null);
+
+    // Update stats
+    await db.collection("systemConfig").doc("adminStats").set({
+      totalFamilies,
+      totalUsers,
+      newThisWeek,
+      apiCallsToday,
+      totalEvents: eventsSnap.data().count,
+      storageUsed: "0 MB",
+      lastUpdated: new Date().toISOString(),
+    });
+
+    console.log(`Admin stats updated: ${totalFamilies} families, ${totalUsers} users, ${apiCallsToday} API calls`);
+  } catch (error) {
+    console.error("Failed to update admin stats:", error.message);
+  }
+});
+
+// Track usage - log API calls for cost tracking
+exports.trackUsage = onRequest({ region: "us-central1", memory: "128MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const { functionName, familyId, costEstimate } = req.body;
+  if (!functionName) return res.status(400).json({ error: "functionName is required" });
+
+  const db = getFirestore();
+  await db.collection("usageLogs").add({
+    uid,
+    familyId: familyId || null,
+    functionName,
+    costEstimate: costEstimate || 0,
+    timestamp: new Date().toISOString(),
+  });
+
+  return res.status(200).json({ success: true });
+});
+
 // Centralized notification helper - used by all notification functions
 async function sendNotification({ familyId, title, body, notifKey, excludeUid }) {
   const db = getFirestore();

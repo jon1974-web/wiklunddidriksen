@@ -1342,6 +1342,8 @@
     "save": "Spara",
     "cancel": "Avbryt",
     "grantAccess": "Ge åtkomst",
-    "revokeAccess": "Ta bort åtkomst"
+    "revokeAccess": "Ta bort åtkomst",
+    "totalEvents": "Totalt evenemang",
+    "lastUpdated": "Senast uppdaterad"
   }
 }
