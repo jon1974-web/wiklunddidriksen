@@ -1039,15 +1039,15 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         title={activePicker?.includes('Date') || activePicker?.includes('date') || activePicker?.includes('Due') ? t('health.date') : t('health.startTime')}
         mode={activePicker?.includes('Time') || activePicker?.includes('time') ? 'time' : 'date'}
         dateOffset={
+          activePicker === 'apptDateFrom' || activePicker === 'apptDateTo' ? (editingItem ? -1825 : -30) :
           activePicker === 'medDateFrom' || activePicker === 'medDateTo' ? -1825 :
-          activePicker === 'apptDateFrom' || activePicker === 'apptDateTo' ? -1825 :
           activePicker === 'vaccDate' ? -1825 :
           activePicker === 'vaccNextDue' ? -365 :
           activePicker === 'growthDate' ? -1825 : 0
         }
         dateCount={
+          activePicker === 'apptDateFrom' || activePicker === 'apptDateTo' ? (editingItem ? 2190 : 760) :
           activePicker === 'medDateFrom' || activePicker === 'medDateTo' ? 2190 :
-          activePicker === 'apptDateFrom' || activePicker === 'apptDateTo' ? 2190 :
           activePicker === 'vaccDate' ? 2190 :
           activePicker === 'vaccNextDue' ? 730 :
           activePicker === 'growthDate' ? 2190 : 365

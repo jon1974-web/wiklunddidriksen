@@ -1364,14 +1364,16 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         dateOffset={
           activePicker === 'petBirthday' || activePicker === 'petChipDate' ? -5475 :
           activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? -1825 :
-          activePicker === 'vetDateFrom' || activePicker === 'vetDateTo' || activePicker === 'vaccDate' ? -1825 :
+          activePicker === 'vetDateFrom' || activePicker === 'vetDateTo' ? (editingItem ? -1825 : -30) :
+          activePicker === 'vaccDate' ? -1825 :
           activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? -365 :
           activePicker === 'foodTime' ? 0 : 0
         }
         dateCount={
           activePicker === 'petBirthday' || activePicker === 'petChipDate' ? 5840 :
           activePicker === 'groomLastDate' || activePicker === 'medDateFrom' ? 2190 :
-          activePicker === 'vetDateFrom' || activePicker === 'vetDateTo' || activePicker === 'vaccDate' ? 2190 :
+          activePicker === 'vetDateFrom' || activePicker === 'vetDateTo' ? (editingItem ? 2190 : 760) :
+          activePicker === 'vaccDate' ? 2190 :
           activePicker === 'groomNextDate' || activePicker === 'vaccNextDue' || activePicker === 'insExpiryDate' ? 730 : 365
         }
         selectedValue={
