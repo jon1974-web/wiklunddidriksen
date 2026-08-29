@@ -35,7 +35,47 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
   const { isMobile, isTablet, isDesktop } = useResponsive();
   const [activeTab, setActiveTab] = useState<TabKey>('dashboard');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState<any>(null);
+
+  const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/triggerAdminStats';
+
+  const fetchStats = useCallback(async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      const res = await fetch(ADMIN_STATS_URL, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.log('Failed to fetch admin stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const triggerStats = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      await fetch(TRIGGER_STATS_URL, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      await fetchStats();
+    } catch (error) {
+      console.log('Failed to trigger stats:', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchStats]);
 
   const isAdmin = appRole === 'appOwner';
 
@@ -44,30 +84,10 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
       navigation.goBack();
       return;
     }
-
-    const fetchStats = async () => {
-      try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) return;
-        const idToken = await currentUser.getIdToken();
-        const res = await fetch(ADMIN_STATS_URL, {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setStats(data);
-        }
-      } catch (error) {
-        console.log('Failed to fetch admin stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
-    const interval = setInterval(fetchStats, 5 * 60 * 1000); // Refresh every 5 min
+    const interval = setInterval(fetchStats, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [isAdmin, navigation]);
+  }, [isAdmin, navigation, fetchStats]);
 
   if (!isAdmin) return null;
 
@@ -155,7 +175,13 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
           <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text }]}>{t('admin.title')}</Text>
-        <View style={{ width: 36 }} />
+        <TouchableOpacity
+          style={[styles.refreshBtn, { borderColor: colors.accent }]}
+          onPress={triggerStats}
+          disabled={refreshing}
+        >
+          <Text style={{ color: colors.accent, fontSize: 14 }}>{refreshing ? '⏳' : '🔄'}</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Tab bar */}
@@ -200,6 +226,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
   },
   backBtn: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  refreshBtn: {
     width: 36,
     height: 36,
     borderRadius: 18,
