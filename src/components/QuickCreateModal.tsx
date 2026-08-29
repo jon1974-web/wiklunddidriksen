@@ -24,24 +24,16 @@ interface SectionItem {
 interface Section {
   key: string;
   color: string;
+  moduleIcon: IconName;
   labelKey: string;
   items: SectionItem[];
 }
-
-const lightenColor = (hex: string, factor: number = 0.35): string => {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  const lr = Math.round(r + (255 - r) * factor);
-  const lg = Math.round(g + (255 - g) * factor);
-  const lb = Math.round(b + (255 - b) * factor);
-  return `#${lr.toString(16).padStart(2, '0')}${lg.toString(16).padStart(2, '0')}${lb.toString(16).padStart(2, '0')}`;
-};
 
 const SECTIONS: Section[] = [
   {
     key: 'events',
     color: '#3b5a75',
+    moduleIcon: 'calendar',
     labelKey: 'quickCreate.events',
     items: [
       { icon: 'calendar' as IconName, nav: (n: any) => n.navigate('Events', { screen: 'EventsList', params: { openAddEvent: true } }), labelKey: 'quickCreate.newEvent' },
@@ -52,6 +44,7 @@ const SECTIONS: Section[] = [
   {
     key: 'health',
     color: MODULE_COLORS.health,
+    moduleIcon: 'medication',
     labelKey: 'quickCreate.health',
     items: [
       { icon: 'medication' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HealthSpace', params: { openAddSection: 'appointments', _t: Date.now() } }), labelKey: 'quickCreate.healthAppointment' },
@@ -62,6 +55,7 @@ const SECTIONS: Section[] = [
   {
     key: 'pets',
     color: MODULE_COLORS.pets,
+    moduleIcon: 'pet',
     labelKey: 'quickCreate.pets',
     items: [
       { icon: 'pet' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', _t: Date.now() } }), labelKey: 'quickCreate.petVetVisit' },
@@ -72,6 +66,7 @@ const SECTIONS: Section[] = [
   {
     key: 'school',
     color: MODULE_COLORS.school,
+    moduleIcon: 'school',
     labelKey: 'quickCreate.school',
     items: [
       { icon: 'school' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.schoolActivity' },
@@ -82,6 +77,7 @@ const SECTIONS: Section[] = [
   {
     key: 'kindergarten',
     color: MODULE_COLORS.kindergarten,
+    moduleIcon: 'kindergarten',
     labelKey: 'quickCreate.kindergarten',
     items: [
       { icon: 'kindergarten' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', _t: Date.now() } }), labelKey: 'quickCreate.kindergartenActivity' },
@@ -92,6 +88,7 @@ const SECTIONS: Section[] = [
   {
     key: 'trips',
     color: MODULE_COLORS.trips,
+    moduleIcon: 'transport',
     labelKey: 'quickCreate.trips',
     items: [
       { icon: 'transport' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'AddTrip', params: { _t: Date.now() } }), labelKey: 'quickCreate.newTrip' },
@@ -107,13 +104,6 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
     onClose();
     setTimeout(navigateFn, 300);
   };
-
-  const eventsSection = SECTIONS[0];
-  const healthSection = SECTIONS[1];
-  const petsSection = SECTIONS[2];
-  const schoolSection = SECTIONS[3];
-  const kindergartenSection = SECTIONS[4];
-  const tripsSection = SECTIONS[5];
 
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
@@ -133,95 +123,24 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
               </View>
 
               <View style={styles.content}>
-                {/* Events row */}
-                <View style={styles.sectionLabelWrap}>
-                  <Text style={[styles.sectionLabel, { color: eventsSection.color }]}>{t(eventsSection.labelKey)}</Text>
-                </View>
-                <View style={styles.row}>
-                  {eventsSection.items.map((item, i) => (
-                    <TouchableOpacity key={i} style={styles.moduleCol} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
-                      <View style={styles.iconWrap}>
-                        <AppIcon name={item.icon} size={28} color={eventsSection.color} />
-                      </View>
-                      <Text style={[styles.actionTitle, { color: lightenColor(eventsSection.color) }]}>{t(item.labelKey)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* Health row */}
-                <View style={styles.sectionLabelWrap}>
-                  <Text style={[styles.sectionLabel, { color: healthSection.color }]}>{t(healthSection.labelKey)}</Text>
-                </View>
-                <View style={styles.row}>
-                  {healthSection.items.map((item, i) => (
-                    <TouchableOpacity key={i} style={styles.moduleCol} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
-                      <View style={styles.iconWrap}>
-                        <AppIcon name={item.icon} size={28} color={healthSection.color} />
-                      </View>
-                      <Text style={[styles.actionTitle, { color: lightenColor(healthSection.color) }]}>{t(item.labelKey)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* Pets row */}
-                <View style={styles.sectionLabelWrap}>
-                  <Text style={[styles.sectionLabel, { color: petsSection.color }]}>{t(petsSection.labelKey)}</Text>
-                </View>
-                <View style={styles.row}>
-                  {petsSection.items.map((item, i) => (
-                    <TouchableOpacity key={i} style={styles.moduleCol} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
-                      <View style={styles.iconWrap}>
-                        <AppIcon name={item.icon} size={28} color={petsSection.color} />
-                      </View>
-                      <Text style={[styles.actionTitle, { color: lightenColor(petsSection.color) }]}>{t(item.labelKey)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* School row */}
-                <View style={styles.sectionLabelWrap}>
-                  <Text style={[styles.sectionLabel, { color: schoolSection.color }]}>{t(schoolSection.labelKey)}</Text>
-                </View>
-                <View style={styles.row}>
-                  {schoolSection.items.map((item, i) => (
-                    <TouchableOpacity key={i} style={styles.moduleCol} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
-                      <View style={styles.iconWrap}>
-                        <AppIcon name={item.icon} size={28} color={schoolSection.color} />
-                      </View>
-                      <Text style={[styles.actionTitle, { color: lightenColor(schoolSection.color) }]}>{t(item.labelKey)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* Kindergarten row */}
-                <View style={styles.sectionLabelWrap}>
-                  <Text style={[styles.sectionLabel, { color: kindergartenSection.color }]}>{t(kindergartenSection.labelKey)}</Text>
-                </View>
-                <View style={styles.row}>
-                  {kindergartenSection.items.map((item, i) => (
-                    <TouchableOpacity key={i} style={styles.moduleCol} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
-                      <View style={styles.iconWrap}>
-                        <AppIcon name={item.icon} size={28} color={kindergartenSection.color} />
-                      </View>
-                      <Text style={[styles.actionTitle, { color: lightenColor(kindergartenSection.color) }]}>{t(item.labelKey)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* Trips row */}
-                <View style={styles.sectionLabelWrap}>
-                  <Text style={[styles.sectionLabel, { color: tripsSection.color }]}>{t(tripsSection.labelKey)}</Text>
-                </View>
-                <View style={styles.centerRow}>
-                  {tripsSection.items.map((item, i) => (
-                    <TouchableOpacity key={i} style={styles.moduleCol} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
-                      <View style={styles.iconWrap}>
-                        <AppIcon name={item.icon} size={28} color={tripsSection.color} />
-                      </View>
-                      <Text style={[styles.actionTitle, { color: lightenColor(tripsSection.color) }]}>{t(item.labelKey)}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
+                {SECTIONS.map((section) => (
+                  <View key={section.key} style={styles.moduleRow}>
+                    <View style={[styles.moduleIconWrap, { backgroundColor: section.color + '15' }]}>
+                      <AppIcon name={section.moduleIcon} size={24} color={section.color} />
+                    </View>
+                    <Text style={[styles.moduleName, { color: section.color }]}>{t(section.labelKey)}</Text>
+                    <View style={styles.actionChips}>
+                      {section.items.map((item, i) => (
+                        <TouchableOpacity key={i} style={styles.actionChip} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
+                          <View style={styles.actionIconWrap}>
+                            <AppIcon name={item.icon} size={20} color={section.color} />
+                          </View>
+                          <Text style={[styles.actionLabel, { color: section.color }]}>{t(item.labelKey)}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                ))}
               </View>
             </View>
           </TouchableWithoutFeedback>
@@ -270,55 +189,53 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 12,
-    paddingBottom: 34,
+    paddingBottom: 20,
   },
-  sectionLabelWrap: {
-    marginBottom: 6,
+  moduleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-  },
-  sectionLabel: {
-    fontSize: 11,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  row: {
-    flexDirection: 'row',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    marginBottom: 2,
+    borderRadius: 12,
     gap: 8,
-    marginBottom: 16,
-    alignSelf: 'center',
-    width: '80%',
   },
-  centerRow: {
-    flexDirection: 'row',
+  moduleIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
     justifyContent: 'center',
-    marginBottom: 16,
+    alignItems: 'center',
+    flexShrink: 0,
   },
-  moduleCol: {
-    flex: 0.8,
+  moduleName: {
+    fontSize: 13,
+    fontWeight: '700',
+    minWidth: 70,
+    flexShrink: 0,
+  },
+  actionChips: {
+    flexDirection: 'row',
+    gap: 6,
+    marginLeft: 'auto',
+  },
+  actionChip: {
     alignItems: 'center',
     gap: 2,
-    paddingVertical: 10,
+    paddingVertical: 6,
     paddingHorizontal: 8,
-    borderRadius: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
-  iconWrap: {
-    width: 44,
-    height: 44,
+  actionIconWrap: {
+    width: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  actionTitle: {
-    fontSize: 13,
+  actionLabel: {
+    fontSize: 10,
     fontWeight: '600',
-    textAlign: 'center',
-  },
-  actionItem: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRadius: 12,
   },
 });
