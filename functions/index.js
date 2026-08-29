@@ -459,27 +459,11 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
 
     const today = new Date().toISOString().split("T")[0];
 
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are an event parser. Convert Norwegian speech into structured event data.
+    // Determine type from request header
+    const activityType = req.headers['x-type'] || 'event';
 
-Today's date is ${today}.
-
-When the user says "i dag" (today), use today's date.
-When the user says "i morgen" (tomorrow), use tomorrow's date.
-When the user says "på mandag" (on Monday), "på tirsdag" (on Tuesday), etc., use the next occurrence of that weekday.
-When the user says "neste uke" (next week), use dates from next week.
-
-Norwegian days: mandag=Monday, tirsdag=Tuesday, onsdag=Wednesday, torsdag=Thursday, fredag=Friday, lørdag=Saturday, søndag=Sunday.
-
-Norwegian months: januar=January, februar=February, mars=March, april=April, mai=May, juni=June, juli=July, august=August, september=September, oktober=October, november=November, desember=December.
-
-Time expressions: "klokka 14" = 14:00, "halv tre" = 14:30, "kvart over to" = 14:15, "kvart på tre" = 14:45, "formiddag" = morning/10:00, "ettermiddag" = afternoon/15:00, "kveld" = evening/18:00.
-
-Return ONLY valid JSON with this exact structure:
+    const typePrompts = {
+      event: `Return ONLY valid JSON with this exact structure:
 {
   "title": "event title",
   "description": "description or empty string",
@@ -495,6 +479,91 @@ If no end date is mentioned, set endDate to null.
 If no specific time is mentioned, default to "09:00".
 If no specific reminder is mentioned, default to 30 minutes.
 Always extract a meaningful title from the speech.`,
+      healthAppointment: `Return ONLY valid JSON with this exact structure:
+{
+  "title": "appointment title (e.g. 'Legetime', 'Tannlege')",
+  "person": "patient/person name or empty string",
+  "doctor": "doctor name or empty string",
+  "date": "YYYY-MM-DD",
+  "dateTo": "YYYY-MM-DD or same as date",
+  "startTime": "HH:MM",
+  "endTime": "HH:MM or empty string",
+  "location": "location or empty string",
+  "reminderMinutes": 60
+}
+
+If no time is mentioned, default to "10:00".
+If no reminder is mentioned, default to 60 minutes (1 hour).
+Extract doctor name if mentioned.`,
+      vetVisit: `Return ONLY valid JSON with this exact structure:
+{
+  "title": "visit title (e.g. 'Veterinærbesøk', 'Vaksine')",
+  "doctor": "vet name or empty string",
+  "date": "YYYY-MM-DD",
+  "dateTo": "YYYY-MM-DD or same as date",
+  "startTime": "HH:MM",
+  "endTime": "HH:MM or empty string",
+  "location": "location or empty string",
+  "reminderMinutes": 60
+}
+
+If no time is mentioned, default to "10:00".
+If no reminder is mentioned, default to 60 minutes.`,
+      schoolActivity: `Return ONLY valid JSON with this exact structure:
+{
+  "title": "activity title (e.g. 'Tur til marka', 'Foreldremøte')",
+  "activityType": "tur" or "aktivitet" or "møte",
+  "date": "YYYY-MM-DD",
+  "dateTo": "YYYY-MM-DD or same as date",
+  "startTime": "HH:MM",
+  "endTime": "HH:MM or empty string",
+  "location": "location or empty string",
+  "reminderMinutes": 60
+}
+
+Use "tur" for hikes/walks, "aktivitet" for activities, "møte" for meetings.
+If no time is mentioned, default to "10:00".
+If no reminder is mentioned, default to 60 minutes.`,
+      kindergartenActivity: `Return ONLY valid JSON with this exact structure:
+{
+  "title": "activity title (e.g. 'Tur til parken', 'Foreldremøte')",
+  "activityType": "tur" or "aktivitet" or "møte",
+  "date": "YYYY-MM-DD",
+  "dateTo": "YYYY-MM-DD or same as date",
+  "startTime": "HH:MM",
+  "endTime": "HH:MM or empty string",
+  "location": "location or empty string",
+  "reminderMinutes": 60
+}
+
+Use "tur" for hikes/walks, "aktivitet" for activities, "møte" for meetings.
+If no time is mentioned, default to "10:00".
+If no reminder is mentioned, default to 60 minutes.`,
+    };
+
+    const systemPrompt = `You are an activity parser. Convert Norwegian speech into structured data.
+
+Today's date is ${today}.
+
+When the user says "i dag" (today), use today's date.
+When the user says "i morgen" (tomorrow), use tomorrow's date.
+When the user says "på mandag" (on Monday), "på tirsdag" (on Tuesday), etc., use the next occurrence of that weekday.
+When the user says "neste uke" (next week), use dates from next week.
+
+Norwegian days: mandag=Monday, tirsdag=Tuesday, onsdag=Wednesday, torsdag=Thursday, fredag=Friday, lørdag=Saturday, søndag=Sunday.
+
+Norwegian months: januar=January, februar=February, mars=March, april=April, mai=May, juni=June, juli=July, august=August, september=September, oktober=October, november=November, desember=December.
+
+Time expressions: "klokka 14" = 14:00, "halv tre" = 14:30, "kvart over to" = 14:15, "kvart på tre" = 14:45, "formiddag" = morning/10:00, "ettermiddag" = afternoon/15:00, "kveld" = evening/18:00.
+
+${typePrompts[activityType] || typePrompts.event}`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: systemPrompt,
         },
         {
           role: "user",
@@ -506,16 +575,36 @@ Always extract a meaningful title from the speech.`,
 
     const result = JSON.parse(completion.choices[0].message.content);
 
+    // Backward compatible response for event type, full data for activity types
+    if (activityType === 'event') {
+      return res.status(200).json({
+        transcript,
+        event: {
+          title: result.title || "",
+          description: result.description || "",
+          date: result.date || today,
+          endDate: result.endDate || null,
+          time: result.time || "09:00",
+          endTime: result.endTime || null,
+          reminderMinutes: result.reminderMinutes || 30,
+        },
+      });
+    }
+
     return res.status(200).json({
       transcript,
-      event: {
+      type: activityType,
+      data: {
         title: result.title || "",
-        description: result.description || "",
         date: result.date || today,
-        endDate: result.endDate || null,
-        time: result.time || "09:00",
-        endTime: result.endTime || null,
-        reminderMinutes: result.reminderMinutes || 30,
+        dateTo: result.dateTo || result.date || today,
+        startTime: result.startTime || "10:00",
+        endTime: result.endTime || "",
+        location: result.location || "",
+        reminderMinutes: result.reminderMinutes || 60,
+        ...(activityType === 'healthAppointment' ? { person: result.person || '', doctor: result.doctor || '' } : {}),
+        ...(activityType === 'vetVisit' ? { doctor: result.doctor || '' } : {}),
+        ...(activityType === 'schoolActivity' || activityType === 'kindergartenActivity' ? { activityType: result.activityType || 'aktivitet' } : {}),
       },
     });
   } catch (error) {
@@ -558,8 +647,8 @@ exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       return res.status(400).json({ error: "No image data received" });
     }
 
-    if (type !== "event" && type !== "recipe" && type !== "classlist" && type !== "holidays") {
-      return res.status(400).json({ error: "Invalid type. Only 'event', 'recipe', 'classlist', and 'holidays' are supported." });
+    if (type !== "event" && type !== "recipe" && type !== "classlist" && type !== "holidays" && type !== "healthAppointment" && type !== "vetVisit" && type !== "schoolActivity" && type !== "kindergartenActivity") {
+      return res.status(400).json({ error: "Invalid type." });
     }
 
     const today = new Date().toISOString().split("T")[0];
@@ -709,6 +798,75 @@ Return ONLY valid JSON with this exact structure:
   ]
 }`;
       userText = "Extract all recipes visible in this image.";
+    } else if (type === "healthAppointment") {
+      systemPrompt = `You are a health appointment parser. Extract appointment details from this image (could be an invitation, letter, SMS screenshot, or calendar entry).
+
+Today's date is ${today}.
+
+For each appointment found, extract:
+- title: Appointment title (e.g. "Legetime", "Tannlege", "Spesialist")
+- person: Patient/person name if visible, or empty string
+- doctor: Doctor/specialist name if visible, or empty string
+- date: Date as YYYY-MM-DD
+- dateTo: End date as YYYY-MM-DD or same as date
+- startTime: Start time as HH:MM (default "10:00")
+- endTime: End time as HH:MM or empty string
+- location: Location/clinic if visible, or empty string
+- reminderMinutes: 60
+
+Return ONLY valid JSON: { "events": [ { "title", "person", "doctor", "date", "dateTo", "startTime", "endTime", "location", "reminderMinutes" } ] }`;
+      userText = "Extract all health appointments visible in this image.";
+    } else if (type === "vetVisit") {
+      systemPrompt = `You are a vet visit parser. Extract visit details from this image (could be an invitation, letter, SMS screenshot, or calendar entry).
+
+Today's date is ${today}.
+
+For each visit found, extract:
+- title: Visit title (e.g. "Veterinærbesøk", "Vaksine", "Kastra")
+- doctor: Vet name if visible, or empty string
+- date: Date as YYYY-MM-DD
+- dateTo: End date as YYYY-MM-DD or same as date
+- startTime: Start time as HH:MM (default "10:00")
+- endTime: End time as HH:MM or empty string
+- location: Location/clinic if visible, or empty string
+- reminderMinutes: 60
+
+Return ONLY valid JSON: { "events": [ { "title", "doctor", "date", "dateTo", "startTime", "endTime", "location", "reminderMinutes" } ] }`;
+      userText = "Extract all vet visits visible in this image.";
+    } else if (type === "schoolActivity") {
+      systemPrompt = `You are a school activity parser. Extract activity details from this image (could be a letter, notice, or schedule).
+
+Today's date is ${today}.
+
+For each activity found, extract:
+- title: Activity title (e.g. "Tur til marka", "Foreldremøte", "Svømming")
+- activityType: "tur" for hikes/walks, "aktivitet" for activities, "møte" for meetings
+- date: Date as YYYY-MM-DD
+- dateTo: End date as YYYY-MM-DD or same as date
+- startTime: Start time as HH:MM (default "10:00")
+- endTime: End time as HH:MM or empty string
+- location: Location if visible, or empty string
+- reminderMinutes: 60
+
+Return ONLY valid JSON: { "events": [ { "title", "activityType", "date", "dateTo", "startTime", "endTime", "location", "reminderMinutes" } ] }`;
+      userText = "Extract all school activities visible in this image.";
+    } else if (type === "kindergartenActivity") {
+      systemPrompt = `You are a kindergarten activity parser. Extract activity details from this image (could be a letter, notice, or schedule).
+
+Today's date is ${today}.
+
+For each activity found, extract:
+- title: Activity title (e.g. "Tur til parken", "Foreldremøte")
+- activityType: "tur" for hikes/walks, "aktivitet" for activities, "møte" for meetings
+- date: Date as YYYY-MM-DD
+- dateTo: End date as YYYY-MM-DD or same as date
+- startTime: Start time as HH:MM (default "10:00")
+- endTime: End time as HH:MM or empty string
+- location: Location if visible, or empty string
+- reminderMinutes: 60
+
+Return ONLY valid JSON: { "events": [ { "title", "activityType", "date", "dateTo", "startTime", "endTime", "location", "reminderMinutes" } ] }`;
+      userText = "Extract all kindergarten activities visible in this image.";
     }
 
     const completion = await openai.chat.completions.create({

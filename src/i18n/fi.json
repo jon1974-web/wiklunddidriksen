@@ -861,6 +861,38 @@
     "retry": "Lataa uudelleen",
     "error": "Ei voitu lukea tapahtumia kuvasta"
   },
+  "photoActivity": {
+    "title": "Valokuva toiminnaksi",
+    "healthAppointmentTitle": "Valokuva terveysajanvaraukseksi",
+    "healthAppointmentInstruction": "Ota tai valitse kuva luodaksesi uuden terveysajanvarauksen",
+    "healthAppointmentCreated": "Terveysajanvaraus luotu!",
+    "vetVisitTitle": "Valokuva eläinlääkärivierailuksi",
+    "vetVisitInstruction": "Ota tai valitse kuva luodaksesi uuden eläinlääkärivierailun",
+    "vetVisitCreated": "Eläinlääkärivierailu luotu!",
+    "schoolActivityTitle": "Valokuva kouluaktiviteetiksi",
+    "schoolActivityInstruction": "Ota tai valitse kuva luodaksesi uuden kouluaktiviteetin",
+    "schoolActivityCreated": "Kouluaktiviteetti luotu!",
+    "kindergartenActivityTitle": "Valokuva päiväkotiaktiviteetiksi",
+    "kindergartenActivityInstruction": "Ota tai valitse kuva luodaksesi uuden päiväkotiaktiviteetin",
+    "kindergartenActivityCreated": "Päiväkotiaktiviteetti luotu!",
+    "noActivities": "Ei aktiviteetteja löytynyt kuvasta",
+    "activitiesFound": "aktiviteettia löytynyt",
+    "singleCreated": "aktiviteetti luotu",
+    "multipleCreated": "aktiviteettia luotu",
+    "createActivity": "Luo aktiviteetti",
+    "createSelected": "Luo valitut",
+    "creating": "Luodaan...",
+    "error": "Ei voitu lukea aktiviteettia kuvasta",
+    "cameraPermission": "Kameran käyttöoikeus tarvitaan kuvien ottamiseen.",
+    "timeout": "Aikakatkaisu. Kuva voi olla liian suuri tai verkko on hidas.",
+    "fetchError": "Ei voitu yhdistää palvelimeen. Cloud Function voi puuttua.",
+    "instruction": "Ota kuva tai valitse galleriasta luodaksesi toimintoja",
+    "processing": "Käsitellään kuvaa...",
+    "takePhoto": "Ota kuva",
+    "pickImage": "Valitse galleriasta",
+    "processing2": "Käsitellään...",
+    "tryAgain": "Yritä uudelleen"
+  },
   "photoRecipe": {
     "title": "Valokuva reseptiksi",
     "instruction": "Ota tai valitse kuva luodaksesi uuden reseptin",
@@ -1218,7 +1250,15 @@
     "schoolActivityDesc": "Lisää toiminto kouluun",
     "kindergarten": "Päiväkotimme",
     "kindergartenActivity": "Toiminto",
-    "kindergartenActivityDesc": "Lisää toiminto päiväkotiin"
+    "kindergartenActivityDesc": "Lisää toiminto päiväkotiin",
+    "voiceHealth": "Puhe",
+    "photoHealth": "Valokuva",
+    "voiceVet": "Puhe",
+    "photoVet": "Valokuva",
+    "voiceSchool": "Puhe",
+    "photoSchool": "Valokuva",
+    "voiceKindergarten": "Puhe",
+    "photoKindergarten": "Valokuva"
   },
   "tabs": {
     "events": "Tapahtumamme",
@@ -1250,5 +1290,15 @@
     "searchTime": "esim. 10:35",
     "manualDatePlaceholder": "esim. 2020-03-15",
     "close": "Sulje"
+  },
+  "voiceActivity": {
+    "title": "Puhe toiminnaksi",
+    "instruction": "Paina mikrofonia ja puhu luodaksesi toiminnan",
+    "processing": "Käsitellään puhetta...",
+    "startRecording": "Aloita tallennus",
+    "stopRecording": "Pysäytä tallennus",
+    "edit": "Muokkaa",
+    "create": "Luo toiminta",
+    "creating": "Luodaan..."
   }
 }

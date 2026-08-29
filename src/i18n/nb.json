@@ -805,6 +805,38 @@
     "retry": "Last inn på nytt",
     "error": "Kunne ikke lese arrangement fra bildet"
   },
+  "photoActivity": {
+    "title": "Foto til aktivitet",
+    "healthAppointmentTitle": "Foto til helseavtale",
+    "healthAppointmentInstruction": "Ta eller velg et bilde for å opprette en ny helseavtale",
+    "healthAppointmentCreated": "Helseavtale opprettet!",
+    "vetVisitTitle": "Foto til veterinærbesøk",
+    "vetVisitInstruction": "Ta eller velg et bilde for å opprette et nytt veterinærbesøk",
+    "vetVisitCreated": "Veterinærbesøk opprettet!",
+    "schoolActivityTitle": "Foto til skoleaktivitet",
+    "schoolActivityInstruction": "Ta eller velg et bilde for å opprette en ny skoleaktivitet",
+    "schoolActivityCreated": "Skoleaktivitet opprettet!",
+    "kindergartenActivityTitle": "Foto til barnehageaktivitet",
+    "kindergartenActivityInstruction": "Ta eller velg et bilde for å opprette en ny barnehageaktivitet",
+    "kindergartenActivityCreated": "Barnehageaktivitet opprettet!",
+    "noActivities": "Ingen aktiviteter funnet i bildet",
+    "activitiesFound": "aktiviteter funnet",
+    "singleCreated": "aktivitet opprettet",
+    "multipleCreated": "aktiviteter opprettet",
+    "createActivity": "Opprett aktivitet",
+    "createSelected": "Opprett valgte",
+    "creating": "Oppretter...",
+    "error": "Kunne ikke lese aktivitet fra bildet",
+    "cameraPermission": "Kameratilgang er nødvendig for å ta bilder.",
+    "timeout": "Tidsavbrudd. Bildet kan være for stort eller nettverket er tregt.",
+    "fetchError": "Kunne ikke koble til serveren. Cloud Function kan mangle.",
+    "instruction": "Ta et bilde eller velg fra galleriet for å opprette aktiviteter",
+    "processing": "Behandler bilde...",
+    "takePhoto": "Ta bilde",
+    "pickImage": "Velg fra galleri",
+    "processing2": "Behandler...",
+    "tryAgain": "Prøv igjen"
+  },
   "photoRecipe": {
     "title": "Foto til oppskrift",
     "instruction": "Ta eller velg et bilde for å opprette en ny oppskrift",
@@ -1218,7 +1250,15 @@
     "schoolActivityDesc": "Legg til en aktivitet i Skole",
     "kindergarten": "Vår barnehage",
     "kindergartenActivity": "Aktivitet",
-    "kindergartenActivityDesc": "Legg til en aktivitet i Barnehage"
+    "kindergartenActivityDesc": "Legg til en aktivitet i Barnehage",
+    "voiceHealth": "Tale",
+    "photoHealth": "Foto",
+    "voiceVet": "Tale",
+    "photoVet": "Foto",
+    "voiceSchool": "Tale",
+    "photoSchool": "Foto",
+    "voiceKindergarten": "Tale",
+    "photoKindergarten": "Foto"
   },
   "tabs": {
     "events": "Avtaler",
@@ -1250,5 +1290,15 @@
     "searchTime": "f.eks. 10:35",
     "manualDatePlaceholder": "f.eks. 2020-03-15",
     "close": "Lukk"
+  },
+  "voiceActivity": {
+    "title": "Tale til aktivitet",
+    "instruction": "Trykk på mikrofonen og snakk for å opprette en aktivitet",
+    "processing": "Behandler tale...",
+    "startRecording": "Start opptak",
+    "stopRecording": "Stopp opptak",
+    "edit": "Rediger",
+    "create": "Opprett aktivitet",
+    "creating": "Oppretter..."
   }
 }

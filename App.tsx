@@ -55,6 +55,8 @@ const ShoppingListDetailScreen = React.lazy(() => import('./src/screens/Shopping
 const RecipeDetailScreen = React.lazy(() => import('./src/screens/RecipeDetailScreen').then(m => ({ default: m.RecipeDetailScreen })));
 const VoiceEventScreen = React.lazy(() => import('./src/screens/VoiceEventScreen').then(m => ({ default: m.VoiceEventScreen })));
 const PhotoEventScreen = React.lazy(() => import('./src/screens/PhotoEventScreen').then(m => ({ default: m.PhotoEventScreen })));
+const VoiceActivityScreen = React.lazy(() => import('./src/screens/VoiceActivityScreen').then(m => ({ default: m.VoiceActivityScreen })));
+const PhotoActivityScreen = React.lazy(() => import('./src/screens/PhotoActivityScreen').then(m => ({ default: m.PhotoActivityScreen })));
 const PhotoRecipeScreen = React.lazy(() => import('./src/screens/PhotoRecipeScreen').then(m => ({ default: m.PhotoRecipeScreen })));
 const AddTripScreen = React.lazy(() => import('./src/screens/AddTripScreen').then(m => ({ default: m.AddTripScreen })));
 const TripDetailScreen = React.lazy(() => import('./src/screens/TripDetailScreen').then(m => ({ default: m.TripDetailScreen })));
@@ -163,6 +165,20 @@ const EventsStack = () => {
             headerStyle: { backgroundColor: colors.surface },
             headerTintColor: colors.text,
             headerLeft: () => <BackButton />,
+          }}
+        />
+        <Stack.Screen
+          name="VoiceActivity"
+          component={VoiceActivityScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="PhotoActivity"
+          component={PhotoActivityScreen}
+          options={{
+            headerShown: false,
           }}
         />
         <Stack.Screen

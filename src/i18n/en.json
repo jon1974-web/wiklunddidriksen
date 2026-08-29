@@ -805,6 +805,38 @@
     "retry": "Reload",
     "error": "Could not read events from the image"
   },
+  "photoActivity": {
+    "title": "Photo to activity",
+    "healthAppointmentTitle": "Photo to health appointment",
+    "healthAppointmentInstruction": "Take or choose a photo to create a new health appointment",
+    "healthAppointmentCreated": "Health appointment created!",
+    "vetVisitTitle": "Photo to vet visit",
+    "vetVisitInstruction": "Take or choose a photo to create a new vet visit",
+    "vetVisitCreated": "Vet visit created!",
+    "schoolActivityTitle": "Photo to school activity",
+    "schoolActivityInstruction": "Take or choose a photo to create a new school activity",
+    "schoolActivityCreated": "School activity created!",
+    "kindergartenActivityTitle": "Photo to kindergarten activity",
+    "kindergartenActivityInstruction": "Take or choose a photo to create a new kindergarten activity",
+    "kindergartenActivityCreated": "Kindergarten activity created!",
+    "noActivities": "No activities found in the image",
+    "activitiesFound": "activities found",
+    "singleCreated": "activity created",
+    "multipleCreated": "activities created",
+    "createActivity": "Create activity",
+    "createSelected": "Create selected",
+    "creating": "Creating...",
+    "error": "Could not read activity from the image",
+    "cameraPermission": "Camera access is required to take photos.",
+    "timeout": "Timeout. The image may be too large or the network is slow.",
+    "fetchError": "Could not connect to server. Cloud Function may be missing.",
+    "instruction": "Take a photo or pick from gallery to create activities",
+    "processing": "Processing image...",
+    "takePhoto": "Take photo",
+    "pickImage": "Pick from gallery",
+    "processing2": "Processing...",
+    "tryAgain": "Try again"
+  },
   "photoRecipe": {
     "title": "Photo to recipe",
     "instruction": "Take or choose a photo to create a new recipe",
@@ -1218,7 +1250,15 @@
     "schoolActivityDesc": "Add an activity to School",
     "kindergarten": "Our kindergarten",
     "kindergartenActivity": "Activity",
-    "kindergartenActivityDesc": "Add an activity to Kindergarten"
+    "kindergartenActivityDesc": "Add an activity to Kindergarten",
+    "voiceHealth": "Voice",
+    "photoHealth": "Photo",
+    "voiceVet": "Voice",
+    "photoVet": "Photo",
+    "voiceSchool": "Voice",
+    "photoSchool": "Photo",
+    "voiceKindergarten": "Voice",
+    "photoKindergarten": "Photo"
   },
   "tabs": {
     "events": "Events",
@@ -1250,5 +1290,15 @@
     "searchTime": "e.g. 10:35",
     "manualDatePlaceholder": "e.g. 2020-03-15",
     "close": "Close"
+  },
+  "voiceActivity": {
+    "title": "Voice to activity",
+    "instruction": "Press the microphone and speak to create an activity",
+    "processing": "Processing speech...",
+    "startRecording": "Start recording",
+    "stopRecording": "Stop recording",
+    "edit": "Edit",
+    "create": "Create activity",
+    "creating": "Creating..."
   }
 }

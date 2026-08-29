@@ -861,6 +861,38 @@
     "retry": "Indlæs igen",
     "error": "Kunne ikke læse begivenheder fra billedet"
   },
+  "photoActivity": {
+    "title": "Foto til aktivitet",
+    "healthAppointmentTitle": "Foto til sundhedsaftale",
+    "healthAppointmentInstruction": "Tag eller vælg et billede for at oprette en ny sundhedsaftale",
+    "healthAppointmentCreated": "Sundhedsaftale oprettet!",
+    "vetVisitTitle": "Foto til dyrlægebesøg",
+    "vetVisitInstruction": "Tag eller vælg et billede for at oprette et nyt dyrlægebesøg",
+    "vetVisitCreated": "Dyrlægebesøg oprettet!",
+    "schoolActivityTitle": "Foto til skoleaktivitet",
+    "schoolActivityInstruction": "Tag eller vælg et billede for at oprette en ny skoleaktivitet",
+    "schoolActivityCreated": "Skoleaktivitet oprettet!",
+    "kindergartenActivityTitle": "Foto til børnehaveaktivitet",
+    "kindergartenActivityInstruction": "Tag eller vælg et billede for at oprette en ny børnehaveaktivitet",
+    "kindergartenActivityCreated": "Børnehaveaktivitet oprettet!",
+    "noActivities": "Ingen aktiviteter fundet i billedet",
+    "activitiesFound": "aktiviteter fundet",
+    "singleCreated": "aktivitet oprettet",
+    "multipleCreated": "aktiviteter oprettet",
+    "createActivity": "Opret aktivitet",
+    "createSelected": "Opret valgte",
+    "creating": "Opretter...",
+    "error": "Kunne ikke læse aktivitet fra billedet",
+    "cameraPermission": "Kameraadgang er nødvendig for at tage billeder.",
+    "timeout": "Timeout. Billedet kan være for stort eller netværket er langsomt.",
+    "fetchError": "Kunne ikke oprette forbindelse til serveren. Cloud Function kan mangle.",
+    "instruction": "Tag et billede eller vælg fra galleriet for at oprette aktiviteter",
+    "processing": "Behandler billede...",
+    "takePhoto": "Tag billede",
+    "pickImage": "Vælg fra galleri",
+    "processing2": "Behandler...",
+    "tryAgain": "Prøv igen"
+  },
   "photoRecipe": {
     "title": "Foto til opskrift",
     "instruction": "Tag eller vælg et billede for at oprette en ny opskrift",
@@ -1218,7 +1250,15 @@
     "schoolActivityDesc": "Tilføj en aktivitet til Skole",
     "kindergarten": "Vores børnehave",
     "kindergartenActivity": "Aktivitet",
-    "kindergartenActivityDesc": "Tilføj en aktivitet til Børnehave"
+    "kindergartenActivityDesc": "Tilføj en aktivitet til Børnehave",
+    "voiceHealth": "Tale",
+    "photoHealth": "Foto",
+    "voiceVet": "Tale",
+    "photoVet": "Foto",
+    "voiceSchool": "Tale",
+    "photoSchool": "Foto",
+    "voiceKindergarten": "Tale",
+    "photoKindergarten": "Foto"
   },
   "tabs": {
     "events": "Vores begivenheder",
@@ -1250,5 +1290,15 @@
     "searchTime": "f.eks. 10:35",
     "manualDatePlaceholder": "f.eks. 2020-03-15",
     "close": "Luk"
+  },
+  "voiceActivity": {
+    "title": "Tale til aktivitet",
+    "instruction": "Tryk på mikrofonen og tal for at oprette en aktivitet",
+    "processing": "Behandler tale...",
+    "startRecording": "Start optagelse",
+    "stopRecording": "Stop optagelse",
+    "edit": "Rediger",
+    "create": "Opret aktivitet",
+    "creating": "Opretter..."
   }
 }

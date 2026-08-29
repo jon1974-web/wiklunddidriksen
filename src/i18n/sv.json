@@ -861,6 +861,38 @@
     "retry": "Ladda om",
     "error": "Kunde inte läsa evenemang från bilden"
   },
+  "photoActivity": {
+    "title": "Foto till aktivitet",
+    "healthAppointmentTitle": "Foto till hälsoavtal",
+    "healthAppointmentInstruction": "Ta eller välj ett foto för att skapa ett nytt hälsoavtal",
+    "healthAppointmentCreated": "Hälsoavtal skapat!",
+    "vetVisitTitle": "Foto till veterinärbesök",
+    "vetVisitInstruction": "Ta eller välj ett foto för att skapa ett nytt veterinärbesök",
+    "vetVisitCreated": "Veterinärbesök skapat!",
+    "schoolActivityTitle": "Foto till skolaktivitet",
+    "schoolActivityInstruction": "Ta eller välj ett foto för att skapa en ny skolaktivitet",
+    "schoolActivityCreated": "Skolaktivitet skapad!",
+    "kindergartenActivityTitle": "Foto till förskoleaktivitet",
+    "kindergartenActivityInstruction": "Ta eller välj ett foto för att skapa en ny förskoleaktivitet",
+    "kindergartenActivityCreated": "Förskoleaktivitet skapad!",
+    "noActivities": "Inga aktiviteter hittades i bilden",
+    "activitiesFound": "aktiviteter hittades",
+    "singleCreated": "aktivitet skapad",
+    "multipleCreated": "aktiviteter skapade",
+    "createActivity": "Skapa aktivitet",
+    "createSelected": "Skapa valda",
+    "creating": "Skapar...",
+    "error": "Kunde inte läsa aktivitet från bilden",
+    "cameraPermission": "Kameraåtkomst krävs för att ta foton.",
+    "timeout": "Tidsgräns. Bilden kan vara för stor eller nätverket är långsamt.",
+    "fetchError": "Kunde inte ansluta till servern. Cloud Function kan saknas.",
+    "instruction": "Ta ett bild eller välj från galleriet för att skapa aktiviteter",
+    "processing": "Behandlar bild...",
+    "takePhoto": "Ta bild",
+    "pickImage": "Välj från galleri",
+    "processing2": "Behandlar...",
+    "tryAgain": "Försök igen"
+  },
   "photoRecipe": {
     "title": "Foto till recept",
     "instruction": "Ta eller välj ett foto för att skapa ett nytt recept",
@@ -1218,7 +1250,15 @@
     "schoolActivityDesc": "Lägg till en aktivitet i Skola",
     "kindergarten": "Vår förskola",
     "kindergartenActivity": "Aktivitet",
-    "kindergartenActivityDesc": "Lägg till en aktivitet i Förskola"
+    "kindergartenActivityDesc": "Lägg till en aktivitet i Förskola",
+    "voiceHealth": "Tal",
+    "photoHealth": "Foto",
+    "voiceVet": "Tal",
+    "photoVet": "Foto",
+    "voiceSchool": "Tal",
+    "photoSchool": "Foto",
+    "voiceKindergarten": "Tal",
+    "photoKindergarten": "Foto"
   },
   "tabs": {
     "events": "Evenemang",
@@ -1250,5 +1290,15 @@
     "searchTime": "t.ex. 10:35",
     "manualDatePlaceholder": "t.ex. 2020-03-15",
     "close": "Stäng"
+  },
+  "voiceActivity": {
+    "title": "Tal till aktivitet",
+    "instruction": "Tryck på mikrofonen och prata för att skapa en aktivitet",
+    "processing": "Behandlar tal...",
+    "startRecording": "Starta inspelning",
+    "stopRecording": "Stoppa inspelning",
+    "edit": "Redigera",
+    "create": "Skapa aktivitet",
+    "creating": "Skapar..."
   }
 }
