@@ -1359,6 +1359,12 @@
     "grantAccess": "Myönnä pääsy",
     "revokeAccess": "Poista pääsy",
     "totalEvents": "Tapahtumia yhteensä",
-    "lastUpdated": "Viimeksi päivitetty"
+    "lastUpdated": "Viimeksi päivitetty",
+    "usage": "Käyttö",
+    "usageNoData": "Käyttödataa ei ole saatavilla",
+    "usageTotalCalls": "API-kutsuja yhteensä",
+    "usageDailyChart": "Päivittäinen API-käyttö (viimeiset 7 päivää)",
+    "usageByFunction": "Käyttö toiminnon mukaan",
+    "usageCalls": "kutsua"
   }
 }

@@ -361,6 +361,83 @@ exports.trackUsage = onRequest({ region: "us-central1", memory: "128MB" }, async
   return res.status(200).json({ success: true });
 });
 
+// Admin: Get usage stats for cost dashboard
+exports.getUsageStats = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
+
+  const db = getFirestore();
+  const days = parseInt(req.query.days) || 7;
+
+  // Cost estimates per function (USD)
+  const COST_PER_CALL = {
+    voiceToEvent: 0.01,
+    photoToData: 0.005,
+    spondProxy: 0.001,
+    destinationTips: 0.002,
+    aiRecipeSuggestions: 0.003,
+    reminderNotification: 0.001,
+    birthdayNotification: 0.001,
+  };
+
+  try {
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - days);
+
+    const logsSnap = await db.collection("usageLogs")
+      .where("timestamp", ">=", startDate.toISOString())
+      .orderBy("timestamp", "desc")
+      .limit(10000)
+      .get();
+
+    // Aggregate by function
+    const byFunction = {};
+    const byDay = {};
+    let totalCost = 0;
+
+    logsSnap.docs.forEach(doc => {
+      const data = doc.data();
+      const fn = data.functionName || "unknown";
+      const date = (data.timestamp || "").substring(0, 10);
+      const cost = COST_PER_CALL[fn] || 0.001;
+
+      if (!byFunction[fn]) byFunction[fn] = { count: 0, cost: 0 };
+      byFunction[fn].count++;
+      byFunction[fn].cost += cost;
+
+      if (!byDay[date]) byDay[date] = { count: 0, cost: 0 };
+      byDay[date].count++;
+      byDay[date].cost += cost;
+
+      totalCost += cost;
+    });
+
+    // Convert daily costs to array sorted by date
+    const dailyStats = Object.entries(byDay)
+      .map(([date, stats]) => ({ date, ...stats }))
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    return res.status(200).json({
+      totalCalls: logsSnap.docs.length,
+      totalCost: Math.round(totalCost * 100) / 100,
+      byFunction: Object.entries(byFunction).map(([name, stats]) => ({
+        name,
+        count: stats.count,
+        cost: Math.round(stats.cost * 100) / 100,
+      })).sort((a, b) => b.count - a.count),
+      dailyStats,
+      days,
+    });
+  } catch (error) {
+    console.error("Failed to get usage stats:", error.message);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // Admin: Get list of all families with member counts
 exports.getFamilyList = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);

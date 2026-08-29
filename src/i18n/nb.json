@@ -1359,6 +1359,12 @@
     "grantAccess": "Gi tilgang",
     "revokeAccess": "Fjern tilgang",
     "totalEvents": "Totalt arrangementer",
-    "lastUpdated": "Sist oppdatert"
+    "lastUpdated": "Sist oppdatert",
+    "usage": "Bruk",
+    "usageNoData": "Ingen brukerdata tilgjengelig",
+    "usageTotalCalls": "Totalt API-kall",
+    "usageDailyChart": "Daglig API-bruk (siste 7 dager)",
+    "usageByFunction": "Bruk per funksjon",
+    "usageCalls": "kall"
   }
 }

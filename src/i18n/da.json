@@ -1359,6 +1359,12 @@
     "grantAccess": "Giv adgang",
     "revokeAccess": "Fjern adgang",
     "totalEvents": "Totalt begivenheder",
-    "lastUpdated": "Senest opdateret"
+    "lastUpdated": "Senest opdateret",
+    "usage": "Forbrug",
+    "usageNoData": "Ingen forbrugsdata tilgængelig",
+    "usageTotalCalls": "Totalt API-opkald",
+    "usageDailyChart": "Dagligt API-forbrug (sidste 7 dage)",
+    "usageByFunction": "Forbrug per funktion",
+    "usageCalls": "opkald"
   }
 }

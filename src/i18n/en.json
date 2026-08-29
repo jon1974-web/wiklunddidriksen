@@ -1359,6 +1359,12 @@
     "grantAccess": "Grant Access",
     "revokeAccess": "Revoke Access",
     "totalEvents": "Total Events",
-    "lastUpdated": "Last updated"
+    "lastUpdated": "Last updated",
+    "usage": "Usage",
+    "usageNoData": "No usage data available",
+    "usageTotalCalls": "Total API Calls",
+    "usageDailyChart": "Daily API Usage (Last 7 Days)",
+    "usageByFunction": "Usage by Function",
+    "usageCalls": "calls"
   }
 }

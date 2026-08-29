@@ -1359,6 +1359,12 @@
     "grantAccess": "Ge åtkomst",
     "revokeAccess": "Ta bort åtkomst",
     "totalEvents": "Totalt evenemang",
-    "lastUpdated": "Senast uppdaterad"
+    "lastUpdated": "Senast uppdaterad",
+    "usage": "Användning",
+    "usageNoData": "Ingen användningsdata tillgänglig",
+    "usageTotalCalls": "Totalt API-anrop",
+    "usageDailyChart": "Daglig API-användning (senaste 7 dagarna)",
+    "usageByFunction": "Användning per funktion",
+    "usageCalls": "anrop"
   }
 }

@@ -45,7 +45,7 @@ interface AdminScreenProps {
   navigation: any;
 }
 
-type TabKey = 'dashboard' | 'families' | 'users' | 'settings';
+type TabKey = 'dashboard' | 'families' | 'users' | 'usage' | 'settings';
 
 const useResponsive = () => {
   const [width, setWidth] = useState(Dimensions.get('window').width);
@@ -79,7 +79,12 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
   const [familyDetailLoading, setFamilyDetailLoading] = useState(false);
   const [showFamilyDetail, setShowFamilyDetail] = useState(false);
 
-  const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/triggerAdminStats';
+  // Usage tab state
+  const [usageStats, setUsageStats] = useState<any>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
+
+  const GET_USAGE_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getUsageStats';
+const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/triggerAdminStats';
 
   const fetchStats = useCallback(async () => {
     try {
@@ -138,6 +143,26 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
     }
   }, []);
 
+  const fetchUsageStats = useCallback(async () => {
+    setUsageLoading(true);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      const res = await fetch(GET_USAGE_STATS_URL, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setUsageStats(data);
+      }
+    } catch (error) {
+      console.log('Failed to fetch usage stats:', error);
+    } finally {
+      setUsageLoading(false);
+    }
+  }, []);
+
   const fetchFamilyDetail = useCallback(async (familyId: string) => {
     setFamilyDetailLoading(true);
     setShowFamilyDetail(true);
@@ -179,12 +204,19 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
     }
   }, [isAdmin, activeTab, fetchFamilies]);
 
+  useEffect(() => {
+    if (isAdmin && activeTab === 'usage') {
+      fetchUsageStats();
+    }
+  }, [isAdmin, activeTab, fetchUsageStats]);
+
   if (!isAdmin) return null;
 
   const tabs: { key: TabKey; label: string; icon: string }[] = [
     { key: 'dashboard', label: t('admin.dashboard'), icon: '📊' },
     { key: 'families', label: t('admin.families'), icon: '👨‍👩‍👧‍👦' },
     { key: 'users', label: t('admin.users'), icon: '👤' },
+    { key: 'usage', label: t('admin.usage'), icon: '📈' },
     { key: 'settings', label: t('admin.settings'), icon: '⚙️' },
   ];
 
@@ -438,6 +470,98 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
     );
   };
 
+  const renderUsage = () => {
+    if (usageLoading) {
+      return <ActivityIndicator size="large" color={colors.accent} style={{ marginTop: 40 }} />;
+    }
+
+    if (!usageStats) {
+      return (
+        <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>{t('admin.usageNoData')}</Text>
+        </View>
+      );
+    }
+
+    const { totalCalls, totalCost, byFunction, dailyStats } = usageStats;
+
+    const maxDailyCount = Math.max(...(dailyStats || []).map((d: any) => d.count || 0), 1);
+
+    const chartBarColor = colors.accent;
+
+    return (
+      <View>
+        {/* Summary cards */}
+        <View style={isMobile ? styles.mobileGrid : styles.desktopGrid}>
+          <View style={[styles.statCard, { borderLeftColor: '#3b5a75', backgroundColor: colors.surface }]}>
+            <View style={styles.statCardHeader}>
+              <Text style={styles.statIcon}>⚡</Text>
+              <Text style={[styles.statValue, { color: '#3b5a75' }]}>{totalCalls ?? '—'}</Text>
+            </View>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('admin.usageTotalCalls')}</Text>
+          </View>
+          <View style={[styles.statCard, { borderLeftColor: '#C67B5C', backgroundColor: colors.surface }]}>
+            <View style={styles.statCardHeader}>
+              <Text style={styles.statIcon}>💰</Text>
+              <Text style={[styles.statValue, { color: '#C67B5C' }]}>{totalCost != null ? `$${totalCost.toFixed(2)}` : '—'}</Text>
+            </View>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{t('admin.estimatedCost')}</Text>
+          </View>
+        </View>
+
+        {/* Daily bar chart */}
+        {dailyStats && dailyStats.length > 0 && (
+          <View style={[styles.usageChartCard, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('admin.usageDailyChart')}</Text>
+            <View style={styles.chartContainer}>
+              {dailyStats.map((day: any, index: number) => {
+                const barHeight = maxDailyCount > 0 ? (day.count / maxDailyCount) * 120 : 0;
+                const dayLabel = day.date ? new Date(day.date).toLocaleDateString('nb-NO', { weekday: 'short', day: 'numeric' }) : '';
+                return (
+                  <View key={index} style={styles.chartBarWrapper}>
+                    <Text style={[styles.chartBarCount, { color: colors.text }]}>{day.count || 0}</Text>
+                    <View style={[styles.chartBarBg, { height: 120 }]}>
+                      <View style={[styles.chartBarFill, { height: Math.max(barHeight, 2), backgroundColor: chartBarColor }]} />
+                    </View>
+                    <Text style={[styles.chartBarLabel, { color: colors.textSecondary }]} numberOfLines={1}>{dayLabel}</Text>
+                  </View>
+                );
+              })}
+            </View>
+          </View>
+        )}
+
+        {/* Function breakdown */}
+        {byFunction && byFunction.length > 0 && (
+          <View style={styles.section}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('admin.usageByFunction')}</Text>
+            <View style={[styles.usageFunctionList, { backgroundColor: colors.surface }]}>
+              {byFunction.map((fn: any, index: number) => (
+                <View key={index}>
+                  <View style={styles.usageFunctionRow}>
+                    <View style={[styles.usageFunctionDot, { backgroundColor: chartBarColor }]} />
+                    <View style={styles.usageFunctionInfo}>
+                      <Text style={[styles.usageFunctionName, { color: colors.text }]} numberOfLines={1}>{fn.name}</Text>
+                      <Text style={[styles.usageFunctionCalls, { color: colors.textSecondary }]}>
+                        {fn.count} {t('admin.usageCalls')}
+                      </Text>
+                    </View>
+                    <Text style={[styles.usageFunctionCost, { color: '#C67B5C' }]}>
+                      {fn.cost != null ? `$${fn.cost.toFixed(4)}` : '—'}
+                    </Text>
+                  </View>
+                  {index < byFunction.length - 1 && (
+                    <View style={[styles.usageFunctionDivider, { backgroundColor: colors.border }]} />
+                  )}
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+      </View>
+    );
+  };
+
   const renderUsers = () => (
     <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
       <Text style={[styles.placeholderText, { color: colors.textSecondary }]}>{t('admin.usersComingSoon')}</Text>
@@ -489,6 +613,7 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
             {activeTab === 'dashboard' && renderDashboard()}
             {activeTab === 'families' && renderFamilies()}
             {activeTab === 'users' && renderUsers()}
+            {activeTab === 'usage' && renderUsage()}
             {activeTab === 'settings' && renderSettings()}
           </>
         )}
@@ -709,4 +834,76 @@ const styles = StyleSheet.create({
   },
   roleText: { fontSize: 11, fontWeight: '600' },
   memberDivider: { height: 1, marginLeft: 64 },
+  usageChartCard: {
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+    marginBottom: 16,
+  },
+  chartContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+    paddingTop: 12,
+    paddingHorizontal: 4,
+  },
+  chartBarWrapper: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  chartBarCount: {
+    fontSize: 11,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  chartBarBg: {
+    width: '70%',
+    maxWidth: 32,
+    borderRadius: 4,
+    overflow: 'hidden',
+    justifyContent: 'flex-end',
+  },
+  chartBarFill: {
+    width: '100%',
+    borderRadius: 4,
+  },
+  chartBarLabel: {
+    fontSize: 9,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  usageFunctionList: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  usageFunctionRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 12,
+  },
+  usageFunctionDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: 12,
+  },
+  usageFunctionInfo: {
+    flex: 1,
+  },
+  usageFunctionName: {
+    fontSize: 15,
+    fontWeight: '500',
+  },
+  usageFunctionCalls: {
+    fontSize: 12,
+    marginTop: 2,
+  },
+  usageFunctionCost: {
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  usageFunctionDivider: {
+    height: 1,
+    marginLeft: 34,
+  },
 });
