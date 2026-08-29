@@ -44,7 +44,7 @@ function setCorsHeaders(res, req) {
   if (ALLOWED_ORIGINS.includes(origin) || (origin && /^http:\/\/localhost:\d+$/.test(origin))) {
     res.set("Access-Control-Allow-Origin", origin);
   }
-  res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.set("Access-Control-Allow-Headers", "Content-Type, Authorization, X-Filename, X-Type");
 }
 
