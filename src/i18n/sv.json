@@ -82,7 +82,14 @@
     "today": "Idag",
     "tomorrow": "Imorgon",
     "daysAgo": "dagar sedan",
-    "weeksAgo": "veckor sedan"
+    "weeksAgo": "veckor sedan",
+    "dateFrom": "Från datum",
+    "dateTo": "Till datum",
+    "location": "Plats",
+    "reminder": "Påminnelse",
+    "saved": "sparad",
+    "activityType": "Aktivitetstyp",
+    "creating": "Skapar..."
   },
   "auth": {
     "title": "Fampad",
@@ -839,7 +846,12 @@
     "startRecording": "Tryck för att starta inspelning",
     "stopRecording": "Tryck för att stoppa",
     "instruction": "Prata in i mikrofonen för att skapa ett nytt evenemang",
-    "example": "T.ex. Fotbollsträning på Ekebergsletta på torsdag klockan 19 till 21 på Ekeberg konstgräs bana 2"
+    "example": "T.ex. Fotbollsträning på Ekebergsletta på torsdag klockan 19 till 21 på Ekeberg konstgräs bana 2",
+    "suggestion": "Förslag",
+    "editBeforeSave": "Redigera innan du sparar",
+    "youSaid": "Du sa:",
+    "micPermission": "Mikrofonåtkomst krävs för inspelning",
+    "tryAgain": "Försök igen"
   },
   "photoEvent": {
     "title": "Foto till evenemang",

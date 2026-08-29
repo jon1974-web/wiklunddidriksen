@@ -82,7 +82,14 @@
     "today": "Tänään",
     "tomorrow": "Huomenna",
     "daysAgo": "päivää sitten",
-    "weeksAgo": "viikkoa sitten"
+    "weeksAgo": "viikkoa sitten",
+    "dateFrom": "Alkupäivä",
+    "dateTo": "Loppupäivä",
+    "location": "Sijainti",
+    "reminder": "Muistutus",
+    "saved": "tallennettu",
+    "activityType": "Toimintatyyppi",
+    "creating": "Luodaan..."
   },
   "auth": {
     "title": "Fampad",
@@ -839,7 +846,12 @@
     "startRecording": "Aloita tallennusnapauttamalla",
     "stopRecording": "Pysäytä napauttamalla",
     "instruction": "Puhu mikrofoniin luodaksesi uuden tapahtuman",
-    "example": "Esim. Jalkapallotreenni Ekebergslettalla torstaina klo 19-21 Ekebergin tekojääkenttä 2"
+    "example": "Esim. Jalkapallotreenni Ekebergslettalla torstaina klo 19-21 Ekebergin tekojääkenttä 2",
+    "suggestion": "Ehdotus",
+    "editBeforeSave": "Muokkaa ennen tallennusta",
+    "youSaid": "Sanoit:",
+    "micPermission": "Mikrofonikäyttö vaaditaan äänitykseen",
+    "tryAgain": "Yritä uudelleen"
   },
   "photoEvent": {
     "title": "Valokuva tapahtumaksi",

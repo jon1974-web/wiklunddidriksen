@@ -82,7 +82,14 @@
     "today": "I dag",
     "tomorrow": "I morgen",
     "daysAgo": "dager siden",
-    "weeksAgo": "uker siden"
+    "weeksAgo": "uker siden",
+    "dateFrom": "Fra dato",
+    "dateTo": "Til dato",
+    "location": "Sted",
+    "reminder": "Påminnelse",
+    "saved": "lagret",
+    "activityType": "Aktivitetstype",
+    "creating": "Oppretter..."
   },
   "auth": {
     "title": "Fampad",
@@ -783,7 +790,12 @@
     "startRecording": "Trykk for å starte opptak",
     "stopRecording": "Trykk for å stoppe",
     "instruction": "Snakk i mikrofonen for å opprette et nytt arrangement",
-    "example": "F.eks. \"Fotballtrening på Ekebergsletta på torsdag klokken 19 til 21 på Ekeberg kunstgress bane 2\""
+    "example": "F.eks. \"Fotballtrening på Ekebergsletta på torsdag klokken 19 til 21 på Ekeberg kunstgress bane 2\"",
+    "suggestion": "Forslag",
+    "editBeforeSave": "Rediger før du lagrer",
+    "youSaid": "Du sa:",
+    "micPermission": "Mikrofontilgang kreves for å bruke taleopptak",
+    "tryAgain": "Prøv igjen"
   },
   "photoEvent": {
     "title": "Foto til arrangement",

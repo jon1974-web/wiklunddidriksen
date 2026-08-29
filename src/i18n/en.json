@@ -82,7 +82,14 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "daysAgo": "days ago",
-    "weeksAgo": "weeks ago"
+    "weeksAgo": "weeks ago",
+    "dateFrom": "From date",
+    "dateTo": "To date",
+    "location": "Location",
+    "reminder": "Reminder",
+    "saved": "saved",
+    "activityType": "Activity type",
+    "creating": "Creating..."
   },
   "auth": {
     "title": "Fampad",
@@ -783,7 +790,12 @@
     "startRecording": "Tap to start recording",
     "stopRecording": "Tap to stop",
     "instruction": "Speak into the microphone to create a new event",
-    "example": "E.g. \"Football practice at Ekeberg on Thursday from 7 to 9 PM at Ekeberg artificial pitch field 2\""
+    "example": "E.g. \"Football practice at Ekeberg on Thursday from 7 to 9 PM at Ekeberg artificial pitch field 2\"",
+    "suggestion": "Suggestion",
+    "editBeforeSave": "Edit before saving",
+    "youSaid": "You said:",
+    "micPermission": "Microphone access is required for voice recording",
+    "tryAgain": "Try again"
   },
   "photoEvent": {
     "title": "Photo to event",
