@@ -275,6 +275,54 @@ exports.updateAdminStats = onSchedule({ schedule: "every 1 hours", timeZone: "Eu
   }
 });
 
+// Manual trigger for admin stats (temporary - for initial data population)
+exports.triggerAdminStats = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+
+  const uid = await verifyAppOwner(req);
+  if (!uid) return res.status(403).json({ error: "Forbidden" });
+
+  const db = getFirestore();
+  try {
+    const familiesSnap = await db.collection("families").count().get();
+    const totalFamilies = familiesSnap.data().count;
+
+    const usersSnap = await db.collection("users").count().get();
+    const totalUsers = usersSnap.data().count;
+
+    const oneWeekAgo = new Date();
+    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const newUsersSnap = await db.collection("users")
+      .where("createdAt", ">=", oneWeekAgo.getTime())
+      .count().get();
+    const newThisWeek = newUsersSnap.data().count;
+
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const apiCallsSnap = await db.collection("usageLogs")
+      .where("timestamp", ">=", todayStart.toISOString())
+      .count().get();
+    const apiCallsToday = apiCallsSnap.data().count;
+
+    const eventsSnap = await db.collection("events").count().get();
+
+    await db.collection("systemConfig").doc("adminStats").set({
+      totalFamilies,
+      totalUsers,
+      newThisWeek,
+      apiCallsToday,
+      totalEvents: eventsSnap.data().count,
+      storageUsed: "0 MB",
+      lastUpdated: new Date().toISOString(),
+    });
+
+    return res.status(200).json({ success: true, totalFamilies, totalUsers, newThisWeek, apiCallsToday });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // Track usage - log API calls for cost tracking
 exports.trackUsage = onRequest({ region: "us-central1", memory: "128MB" }, async (req, res) => {
   setCorsHeaders(res, req);
