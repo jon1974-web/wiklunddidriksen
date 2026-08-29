@@ -851,7 +851,8 @@
     "editBeforeSave": "Rediger inden du gemmer",
     "youSaid": "Du sagde:",
     "micPermission": "Mikrofontilladelse er nødvendig for optagelse",
-    "tryAgain": "Prøv igen"
+    "tryAgain": "Prøv igen",
+    "processing": "Behandler tale..."
   },
   "photoEvent": {
     "title": "Foto til begivenhed",

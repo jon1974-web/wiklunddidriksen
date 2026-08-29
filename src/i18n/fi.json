@@ -851,7 +851,8 @@
     "editBeforeSave": "Muokkaa ennen tallennusta",
     "youSaid": "Sanoit:",
     "micPermission": "Mikrofonikäyttö vaaditaan äänitykseen",
-    "tryAgain": "Yritä uudelleen"
+    "tryAgain": "Yritä uudelleen",
+    "processing": "Käsitellään puhetta..."
   },
   "photoEvent": {
     "title": "Valokuva tapahtumaksi",

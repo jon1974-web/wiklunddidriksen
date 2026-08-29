@@ -851,7 +851,8 @@
     "editBeforeSave": "Redigera innan du sparar",
     "youSaid": "Du sa:",
     "micPermission": "Mikrofonåtkomst krävs för inspelning",
-    "tryAgain": "Försök igen"
+    "tryAgain": "Försök igen",
+    "processing": "Behandlar tal..."
   },
   "photoEvent": {
     "title": "Foto till evenemang",

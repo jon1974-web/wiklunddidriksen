@@ -795,7 +795,8 @@
     "editBeforeSave": "Rediger før du lagrer",
     "youSaid": "Du sa:",
     "micPermission": "Mikrofontilgang kreves for å bruke taleopptak",
-    "tryAgain": "Prøv igjen"
+    "tryAgain": "Prøv igjen",
+    "processing": "Behandler tale..."
   },
   "photoEvent": {
     "title": "Foto til arrangement",
