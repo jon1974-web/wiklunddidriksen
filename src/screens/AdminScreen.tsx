@@ -170,10 +170,8 @@ const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunction
       const currentUser = auth.currentUser;
       if (!currentUser) return;
       const idToken = await currentUser.getIdToken();
-      const res = await fetch(GET_FAMILY_DETAIL_URL, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${idToken}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ familyId }),
+      const res = await fetch(`${GET_FAMILY_DETAIL_URL}?familyId=${familyId}`, {
+        headers: { Authorization: `Bearer ${idToken}` },
       });
       if (res.ok) {
         const data = await res.json();
