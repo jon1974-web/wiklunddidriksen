@@ -394,7 +394,6 @@
     "noSchedule": "Ingen skema uploadet",
     "autumn": "Efterår",
     "spring": "Forår",
-    "importFromImage": "Importer fra billede",
     "importClassList": "Importer liste fra billede",
     "aiDescription": "Brug AI til at hente information fra billede",
     "photo": "Billede",
@@ -1244,5 +1243,12 @@
     "to": "Til {city}",
     "toEnd": "Til slut",
     "ongoing": "I gang"
+  },
+  "datePicker": {
+    "orTypeIn": "Eller skriv ind:",
+    "searchDate": "Skriv år eller dato (f.eks. 2025 eller 2025-04-15)",
+    "searchTime": "f.eks. 10:35",
+    "manualDatePlaceholder": "f.eks. 2020-03-15",
+    "close": "Luk"
   }
 }

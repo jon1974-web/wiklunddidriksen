@@ -394,7 +394,6 @@
     "noSchedule": "Ei aikataulua ladattu",
     "autumn": "Syksy",
     "spring": "Kevät",
-    "importFromImage": "Tuo kuvasta",
     "importClassList": "Tuo lista kuvasta",
     "aiDescription": "Käytä AI:ta noutaaksesi tietoja kuvasta",
     "photo": "Valokuva",
@@ -1244,5 +1243,12 @@
     "to": "Asti {city}",
     "toEnd": "Asti loppuun",
     "ongoing": "Käynnissä"
+  },
+  "datePicker": {
+    "orTypeIn": "Tai kirjoita:",
+    "searchDate": "Kirjoita vuosi tai päivämäärä (esim. 2025 tai 2025-04-15)",
+    "searchTime": "esim. 10:35",
+    "manualDatePlaceholder": "esim. 2020-03-15",
+    "close": "Sulje"
   }
 }

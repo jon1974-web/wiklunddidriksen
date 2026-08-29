@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Modal, TouchableWithoutFeedback, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { getLocale } from '../constants/languages';
 
@@ -56,6 +57,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
   accentColor,
 }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const resolvedAccent = accentColor || colors.accent;
   const [dateInput, setDateInput] = useState('');
   const [customTime, setCustomTime] = useState('');
@@ -163,7 +165,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
                     style={[styles.dateInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
                     value={dateInput}
                     onChangeText={handleInputChange}
-                    placeholder="Skriv år eller dato (f.eks. 2025 eller 2025-04-15)"
+                    placeholder={t('datePicker.searchDate')}
                     placeholderTextColor={colors.textDisabled}
                     keyboardType="numbers-and-punctuation"
                     maxLength={10}
@@ -187,12 +189,12 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
               </ScrollView>
               {mode === 'time' && (
                 <View style={[styles.customTimeRow, { borderTopColor: colors.border }]}>
-                  <Text style={[styles.customTimeLabel, { color: colors.textSecondary }]}>Eller skriv inn:</Text>
+                  <Text style={[styles.customTimeLabel, { color: colors.textSecondary }]}>{t('datePicker.orTypeIn')}</Text>
                   <TextInput
                     style={[styles.customTimeInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
                     value={customTime}
                     onChangeText={setCustomTime}
-                    placeholder="f.eks. 10:35"
+                    placeholder={t('datePicker.searchTime')}
                     placeholderTextColor={colors.textDisabled}
                     keyboardType="numbers-and-punctuation"
                     maxLength={5}
@@ -236,12 +238,12 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
               )}
               {mode === 'date' && (
                 <View style={[styles.customTimeRow, { borderTopColor: colors.border }]}>
-                  <Text style={[styles.customTimeLabel, { color: colors.textSecondary }]}>Eller skriv inn:</Text>
+                  <Text style={[styles.customTimeLabel, { color: colors.textSecondary }]}>{t('datePicker.orTypeIn')}</Text>
                   <TextInput
                     style={[styles.customTimeInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
                     value={manualDate}
                     onChangeText={setManualDate}
-                    placeholder="f.eks. 2020-03-15"
+                    placeholder={t('datePicker.manualDatePlaceholder')}
                     placeholderTextColor={colors.textDisabled}
                     keyboardType="numbers-and-punctuation"
                     maxLength={10}
@@ -290,7 +292,7 @@ export const DatePickerModal: React.FC<DatePickerModalProps> = React.memo(({
                 </View>
               )}
               <TouchableOpacity style={[styles.closeButton, { borderTopColor: colors.border }]} onPress={onClose}>
-                <Text style={[styles.closeText, { color: resolvedAccent }]}>Lukk</Text>
+                <Text style={[styles.closeText, { color: resolvedAccent }]}>{t('datePicker.close')}</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>

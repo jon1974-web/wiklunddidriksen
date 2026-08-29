@@ -394,7 +394,6 @@
     "noSchedule": "Inga scheman uppladdade",
     "autumn": "Höst",
     "spring": "Vår",
-    "importFromImage": "Importera från bild",
     "importClassList": "Importera lista från bild",
     "aiDescription": "Använd AI för att hämta information från bild",
     "photo": "Foto",
@@ -1244,5 +1243,12 @@
     "to": "Till {city}",
     "toEnd": "Till slut",
     "ongoing": "Pågår"
+  },
+  "datePicker": {
+    "orTypeIn": "Eller skriv in:",
+    "searchDate": "Skriv år eller datum (t.ex. 2025 eller 2025-04-15)",
+    "searchTime": "t.ex. 10:35",
+    "manualDatePlaceholder": "t.ex. 2020-03-15",
+    "close": "Stäng"
   }
 }

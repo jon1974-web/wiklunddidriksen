@@ -394,7 +394,6 @@
     "noSchedule": "Ingen plan lastet opp",
     "autumn": "Høst",
     "spring": "Vår",
-    "importFromImage": "Importer fra bilde",
     "importClassList": "Importer liste fra bilde",
     "aiDescription": "Bruk AI til å hente ut informasjon fra bilde",
     "photo": "Bilde",
@@ -1244,5 +1243,12 @@
     "to": "Til {city}",
     "toEnd": "Til slutt",
     "ongoing": "Pågår"
+  },
+  "datePicker": {
+    "orTypeIn": "Eller skriv inn:",
+    "searchDate": "Skriv år eller dato (f.eks. 2025 eller 2025-04-15)",
+    "searchTime": "f.eks. 10:35",
+    "manualDatePlaceholder": "f.eks. 2020-03-15",
+    "close": "Lukk"
   }
 }

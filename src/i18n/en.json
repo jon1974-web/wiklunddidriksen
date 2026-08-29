@@ -394,7 +394,6 @@
     "noSchedule": "No schedule uploaded",
     "autumn": "Autumn",
     "spring": "Spring",
-    "importFromImage": "Import from image",
     "importClassList": "Import list from image",
     "aiDescription": "Use AI to extract information from image",
     "photo": "Photo",
@@ -1244,5 +1243,12 @@
     "to": "To {city}",
     "toEnd": "To end",
     "ongoing": "Ongoing"
+  },
+  "datePicker": {
+    "orTypeIn": "Or type in:",
+    "searchDate": "Type year or date (e.g. 2025 or 2025-04-15)",
+    "searchTime": "e.g. 10:35",
+    "manualDatePlaceholder": "e.g. 2020-03-15",
+    "close": "Close"
   }
 }
