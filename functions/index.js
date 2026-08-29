@@ -197,6 +197,20 @@ async function logAuditEvent(uid, action, details = {}) {
   }
 }
 
+async function trackUsageLog(uid, functionName, familyId) {
+  try {
+    const db = getFirestore();
+    await db.collection("usageLogs").add({
+      uid,
+      familyId: familyId || null,
+      functionName,
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    // Silent fail - don't block main function
+  }
+}
+
 // Admin Stats - get cached dashboard data
 exports.getAdminStats = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
@@ -453,6 +467,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
       if (!response.ok) {
         return res.status(response.status).json(result);
       }
+      trackUsageLog(uid, "spondProxy", req.body.familyId || null);
       return res.status(200).json(result);
     }
 
@@ -473,6 +488,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
       if (!response.ok) {
         return res.status(response.status).json(result);
       }
+      trackUsageLog(uid, "spondProxy", req.body.familyId || null);
       return res.status(200).json(result);
     }
 
@@ -511,6 +527,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
           }
         }
       }
+      trackUsageLog(uid, "spondProxy", req.body.familyId || null);
       return res.status(200).json(members);
     }
 
@@ -535,6 +552,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
           console.warn(`spondProxy: group ${gid} failed:`, e.message);
         }
       }
+      trackUsageLog(uid, "spondProxy", req.body.familyId || null);
       return res.status(200).json(allEvents);
     }
 
@@ -554,6 +572,7 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
       if (!response.ok) {
         return res.status(response.status).json(result);
       }
+      trackUsageLog(uid, "spondProxy", req.body.familyId || null);
       return res.status(200).json(result);
     }
 
@@ -782,6 +801,8 @@ ${typePrompts[activityType] || typePrompts.event}`;
     });
 
     const result = JSON.parse(completion.choices[0].message.content);
+
+    trackUsageLog(uid, "voiceToEvent", req.body.familyId || null);
 
     // Backward compatible response for event type, full data for activity types
     if (activityType === 'event') {
@@ -1109,6 +1130,8 @@ Return ONLY valid JSON: { "events": [ { "title", "activityType", "date", "dateTo
 
     const result = JSON.parse(completion.choices[0].message.content);
 
+    trackUsageLog(uid, "photoToData", req.body.familyId || null);
+
     if (type === "event") {
       const events = Array.isArray(result.events) ? result.events : [];
       const normalized = events.map((e) => ({
@@ -1371,6 +1394,8 @@ Include 5-7 items in thingsToDo and restaurants. Include 3-5 local phrases. Incl
       scamWarnings: result.scamWarnings || [],
       generatedAt: new Date().toISOString(),
     };
+
+    trackUsageLog(uid, "destinationTips", req.body.familyId || null);
 
     return res.status(200).json({ tips });
   } catch (error) {
@@ -1724,6 +1749,7 @@ exports.notifyNewEvent = onRequest({ region: "us-central1", memory: "256MB" }, a
   });
 
   console.log(`notifyNewEvent: sent ${sent} notifications for ${eventTitle}`);
+  trackUsageLog(uid, "notifyNewEvent", familyId);
   return res.status(200).json({ sent });
 });
 
@@ -1755,6 +1781,7 @@ exports.notifyHealthItem = onRequest({ region: "us-central1", memory: "256MB" },
     excludeUid: uid,
   });
 
+  trackUsageLog(uid, "notifyHealthItem", familyId);
   return res.status(200).json({ sent });
 });
 
@@ -1967,6 +1994,7 @@ Estimate caloriesPerServing based on ingredients and portions.`,
       ...r,
       category: validCategories.includes(r.category) ? r.category : "kjoett",
     }));
+    trackUsageLog(uid, "aiRecipeSuggestions", req.body.familyId || null);
     return res.status(200).json({ recipes: validatedRecipes });
   } catch (error) {
     console.error("AI recipe suggestion error:", error);
