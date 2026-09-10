@@ -1382,6 +1382,9 @@
     "weeks": "Number of weeks",
     "custom": "Custom",
     "events": "events",
-    "create": "Create"
+    "create": "Create",
+    "deleteTitle": "Delete schedule",
+    "deleteConfirm": "Are you sure you want to delete all events in this schedule?",
+    "deleteAll": "Delete all"
   }
 }

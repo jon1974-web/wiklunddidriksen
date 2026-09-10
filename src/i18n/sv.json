@@ -1382,6 +1382,9 @@
     "weeks": "Antal veckor",
     "custom": "Anpassad",
     "events": "händelser",
-    "create": "Skapa"
+    "create": "Skapa",
+    "deleteTitle": "Ta bort upprepning",
+    "deleteConfirm": "Är du säker på att du vill ta bort alla händelser i denna upprepning?",
+    "deleteAll": "Ta bort alla"
   }
 }

@@ -24,6 +24,7 @@ export interface Event {
   calendarEventId?: string;
   icon?: string;
   documents?: SchoolActivityDocument[];
+  scheduleGroupId?: string;
 }
 
 export interface ShoppingItem {

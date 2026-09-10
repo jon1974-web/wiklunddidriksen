@@ -1382,6 +1382,9 @@
     "weeks": "Antall uker",
     "custom": "Egendefinert",
     "events": "avtaler",
-    "create": "Opprett"
+    "create": "Opprett",
+    "deleteTitle": "Slett gjentakelse",
+    "deleteConfirm": "Er du sikker på at du vil slette alle hendelsene i denne gjentakelsen?",
+    "deleteAll": "Slett alle"
   }
 }

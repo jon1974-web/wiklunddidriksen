@@ -14,8 +14,12 @@ interface ScheduleModalProps {
   visible: boolean;
   onClose: () => void;
   onConfirm: (config: ScheduleConfig) => void;
+  onDeleteSchedule?: () => void;
   startDate: string;
   moduleColor: string;
+  preselectedDays?: number[];
+  preselectedWeeks?: number;
+  isEditing?: boolean;
 }
 
 const WEEK_DAYS = [
@@ -44,15 +48,25 @@ function getWeekNumber(date: Date): number {
   return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
 }
 
-export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, onConfirm, startDate, moduleColor }) => {
+export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, onConfirm, onDeleteSchedule, startDate, moduleColor, preselectedDays, preselectedWeeks, isEditing }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
 
-  const [selectedDays, setSelectedDays] = useState<number[]>([1]);
+  const [selectedDays, setSelectedDays] = useState<number[]>(preselectedDays || [1]);
   const [weekType, setWeekType] = useState<string>('all');
-  const [weekCount, setWeekCount] = useState<number>(4);
+  const [weekCount, setWeekCount] = useState<number>(preselectedWeeks || 4);
   const [customWeeks, setCustomWeeks] = useState('');
   const [showCustom, setShowCustom] = useState(false);
+
+  // Reset to preselected values when modal opens
+  React.useEffect(() => {
+    if (visible) {
+      setSelectedDays(preselectedDays || [1]);
+      setWeekCount(preselectedWeeks || 4);
+      setShowCustom(false);
+      setCustomWeeks('');
+    }
+  }, [visible, preselectedDays, preselectedWeeks]);
 
   const toggleDay = (day: number) => {
     setSelectedDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]);
@@ -193,6 +207,11 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
 
                 {/* Actions */}
                 <View style={styles.actions}>
+                  {isEditing && onDeleteSchedule && (
+                    <TouchableOpacity style={[styles.btn, { backgroundColor: '#F44336' }]} onPress={() => { onDeleteSchedule(); onClose(); }}>
+                      <Text style={[styles.btnText, { color: '#fff' }]}>{t('schedule.deleteAll')}</Text>
+                    </TouchableOpacity>
+                  )}
                   <TouchableOpacity style={[styles.btn, { backgroundColor: colors.inputBackground }]} onPress={onClose}>
                     <Text style={[styles.btnText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>

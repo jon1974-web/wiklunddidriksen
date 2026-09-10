@@ -1382,6 +1382,9 @@
     "weeks": "Viikkojen määrä",
     "custom": "Mukautettu",
     "events": "tapahtumaa",
-    "create": "Luo"
+    "create": "Luo",
+    "deleteTitle": "Poista toisto",
+    "deleteConfirm": "Haluatko varmasti poistaa kaikki tämän toiston tapahtumat?",
+    "deleteAll": "Poista kaikki"
   }
 }

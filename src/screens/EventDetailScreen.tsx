@@ -179,8 +179,22 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     });
   }, [eventData, navigation]);
 
+  const isScheduled = !!eventData.scheduleGroupId;
+
   const handleScheduleConfirm = useCallback(async (config: { days: number[]; weeks: number; groupId: string }) => {
     try {
+      const groupId = eventData.scheduleGroupId || config.groupId;
+
+      // If modifying an existing schedule, delete all events with this groupId
+      if (eventData.scheduleGroupId) {
+        const existingEvents = await import('firebase/firestore').then(m =>
+          m.getDocs(m.query(m.collection(db, 'events'), m.where('scheduleGroupId', '==', eventData.scheduleGroupId!)))
+        );
+        for (const doc of existingEvents.docs) {
+          await deleteDoc(doc.ref);
+        }
+      }
+
       const startDate = new Date(eventData.date);
       const eventsToCreate: any[] = [];
 
@@ -198,7 +212,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               date: dateStr,
               endDate: eventData.endDate ? (() => {
                 const end = new Date(eventData.endDate);
-                end.setDate(end.getDate() + w * 7 + d - (startDate.getDay() === eventData.date ? 0 : 0));
+                end.setDate(end.getDate() + w * 7 + d);
                 return `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`;
               })() : null,
               time: eventData.time,
@@ -208,7 +222,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               createdBy: user?.uid,
               familyId: eventData.familyId || null,
               createdAt: Date.now(),
-              scheduleGroupId: config.groupId,
+              scheduleGroupId: groupId,
             });
           }
         }
@@ -218,13 +232,45 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         for (const evt of eventsToCreate) {
           await addDoc(collection(db, 'events'), evt);
         }
+        // Send one notification about the schedule change, not for each event
+        if (eventData.scheduleGroupId && eventsToCreate.length > 0) {
+          const firstEvent = eventsToCreate[0];
+          await import('../services/familyService').then(m =>
+            m.notifyNewEvent(eventData.familyId || '', `${firstEvent.title} (${eventsToCreate.length} ${t('schedule.events')})`, firstEvent.date, firstEvent.time, user?.displayName || 'En i familien')
+          );
+        }
         crossAlert(t('common.success'), `${eventsToCreate.length} ${t('schedule.events')} ${t('common.saved')}!`);
       }
       setShowSchedule(false);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     }
-  }, [eventData, user]);
+  }, [eventData, user, t]);
+
+  const handleDeleteSchedule = useCallback(async () => {
+    if (!eventData.scheduleGroupId) return;
+    crossAlert(t('schedule.deleteTitle'), t('schedule.deleteConfirm'), [
+      { text: t('common.cancel'), style: 'cancel' },
+      {
+        text: t('schedule.deleteAll'),
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const existingEvents = await import('firebase/firestore').then(m =>
+              m.getDocs(m.query(m.collection(db, 'events'), m.where('scheduleGroupId', '==', eventData.scheduleGroupId!)))
+            );
+            for (const doc of existingEvents.docs) {
+              await deleteDoc(doc.ref);
+            }
+            crossAlert(t('common.success'), `${existingEvents.size} ${t('schedule.events')} ${t('common.deleted')}!`);
+            navigation.goBack();
+          } catch (error) {
+            crossAlert(t('common.error'), getErrorMessage(error));
+          }
+        },
+      },
+    ]);
+  }, [eventData, navigation, t]);
 
   const handleDelete = useCallback(() => {
     crossAlert(t('events.deleteTitle'), t('events.deleteConfirm'), [
@@ -279,9 +325,14 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
             <AppIcon name="links" size={16} color={colors.accent} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowSchedule(true)} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
-            <AppIcon name="schedule" size={16} color={colors.accent} />
+          <TouchableOpacity onPress={() => setShowSchedule(true)} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: isScheduled ? colors.accent : colors.textSecondary, backgroundColor: isScheduled ? colors.accent + '20' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+            <AppIcon name="schedule" size={16} color={isScheduled ? colors.accent : colors.textSecondary} />
           </TouchableOpacity>
+          {isScheduled && (
+            <TouchableOpacity onPress={handleDeleteSchedule} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.danger, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={{ color: colors.danger, fontSize: 14 }}>✕</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Top card with calendar icon */}
@@ -571,8 +622,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         visible={showSchedule}
         onClose={() => setShowSchedule(false)}
         onConfirm={handleScheduleConfirm}
+        onDeleteSchedule={isScheduled ? handleDeleteSchedule : undefined}
         startDate={eventData.date}
         moduleColor="#3b5a75"
+        isEditing={isScheduled}
       />
     </View>
   );

@@ -1382,6 +1382,9 @@
     "weeks": "Antal uger",
     "custom": "Brugerdefineret",
     "events": "begivenheder",
-    "create": "Opret"
+    "create": "Opret",
+    "deleteTitle": "Slet gentagelse",
+    "deleteConfirm": "Er du sikker på at du vil slette alle begivenheder i denne gentagelse?",
+    "deleteAll": "Slet alle"
   }
 }
