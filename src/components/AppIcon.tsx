@@ -2,7 +2,7 @@ import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline, Ellipse } from 'react-native-svg';
 
 interface AppIconProps {
-  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email' | 'send' | 'school' | 'kindergarten' | 'file';
+  name: 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email' | 'send' | 'school' | 'kindergarten' | 'file' | 'pencil' | 'microphone' | 'middag' | 'bursdag' | 'fest' | 'sport' | 'restaurant' | 'kino' | 'konsert' | 'trening' | 'hoytid' | 'barnedag' | 'hjemme' | 'spill' | 'kaffe' | 'loping' | 'sykling' | 'fjelltur' | 'fiske' | 'cheerleading' | 'racketsport' | 'tur' | 'schedule';
   size?: number;
   color?: string;
 }

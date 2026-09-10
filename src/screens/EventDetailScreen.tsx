@@ -471,16 +471,21 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
                 <View style={styles.iconGrid}>
-                  {EVENT_ICONS.map((item) => (
-                    <TouchableOpacity
-                      key={item.emoji}
-                      style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, editIcon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-                      onPress={() => setEditIcon(editIcon === item.emoji ? '' : item.emoji)}
-                    >
-                      <Text style={styles.iconEmoji}>{item.emoji}</Text>
-                      <Text style={[styles.iconLabel, { color: editIcon === item.emoji ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
-                    </TouchableOpacity>
-                  ))}
+                  {EVENT_ICONS.map((item) => {
+                    const isSelected = editIcon === item.icon;
+                    return (
+                      <TouchableOpacity
+                        key={item.icon}
+                        style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, isSelected && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                        onPress={() => setEditIcon(isSelected ? '' : item.icon)}
+                      >
+                        <View style={styles.iconEmoji}>
+                          <AppIcon name={item.icon} size={22} color={isSelected ? '#fff' : colors.textSecondary} />
+                        </View>
+                        <Text style={[styles.iconLabel, { color: isSelected ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
 
