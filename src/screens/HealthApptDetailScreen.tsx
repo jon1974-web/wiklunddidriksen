@@ -7,6 +7,7 @@ import { HealthAppointment } from '../types';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { formatDate, toDateSafe } from '../utils/dateUtils';
 import { ActionModal } from '../components/ActionModal';
+import { AppIcon } from '../components/AppIcon';
 import { deleteHealthAppointment } from '../services/healthService';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
@@ -58,11 +59,34 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
     }
   };
 
+  const handleCopy = useCallback(() => {
+    navigation.navigate('HealthSpace', {
+      openAddSection: 'appointments',
+      prefill: {
+        title: appointment.title,
+        person: appointment.person || '',
+        doctor: appointment.doctor || '',
+        dateFrom: appointment.dateFrom || (appointment as any).date || '',
+        dateTo: (appointment as any).dateTo || '',
+        startTime: appointment.startTime || '',
+        endTime: appointment.endTime || '',
+        location: appointment.location || '',
+        note: appointment.note || '',
+      },
+    });
+  }, [appointment, navigation]);
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.healthBg }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: HEALTH_COLOR }]}>
-        <Text style={{ color: HEALTH_COLOR, fontSize: 18 }}>←</Text>
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: HEALTH_COLOR }]}>
+          <Text style={{ color: HEALTH_COLOR, fontSize: 18 }}>←</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: HEALTH_COLOR, alignItems: 'center', justifyContent: 'center' }}>
+          <AppIcon name="links" size={16} color={HEALTH_COLOR} />
+        </TouchableOpacity>
+      </View>
 
       {/* Top card with calendar icon */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, marginBottom: 10, backgroundColor: colors.surface }]}>

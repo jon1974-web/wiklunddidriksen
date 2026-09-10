@@ -165,6 +165,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       prefill: {
         title: eventData.title,
         description: eventData.description || '',
+        address: eventData.address || '',
         date: eventData.date,
         time: eventData.time,
         endDate: eventData.endDate || '',

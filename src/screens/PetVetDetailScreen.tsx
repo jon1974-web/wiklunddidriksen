@@ -57,11 +57,33 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     }
   };
 
+  const handleCopy = useCallback(() => {
+    navigation.navigate('PetSpace', {
+      openAddSection: 'vetVisits',
+      prefill: {
+        title: visit.title,
+        doctor: visit.doctor || '',
+        dateFrom: visit.dateFrom || '',
+        dateTo: (visit as any).dateTo || '',
+        startTime: visit.startTime || '',
+        endTime: visit.endTime || '',
+        location: visit.location || '',
+        note: visit.note || '',
+      },
+    });
+  }, [visit, navigation]);
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.petsBg }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: PET_COLOR }]}>
-        <Text style={{ color: PET_COLOR, fontSize: 18 }}>←</Text>
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: PET_COLOR }]}>
+          <Text style={{ color: PET_COLOR, fontSize: 18 }}>←</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: PET_COLOR, alignItems: 'center', justifyContent: 'center' }}>
+          <AppIcon name="links" size={16} color={PET_COLOR} />
+        </TouchableOpacity>
+      </View>
 
       {/* Top card with calendar icon */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, marginBottom: 10, backgroundColor: colors.surface }]}>

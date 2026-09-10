@@ -6,6 +6,7 @@ import { useUserStore } from '../store/userStore';
 import { KindergartenActivity } from '../types';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { ActionModal } from '../components/ActionModal';
+import { AppIcon } from '../components/AppIcon';
 import { deleteKindergartenActivity } from '../services/kindergartenService';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
@@ -56,13 +57,35 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
     }
   };
 
+  const handleCopy = useCallback(() => {
+    navigation.navigate('KindergartenSpace', {
+      openAddSection: 'activities',
+      prefill: {
+        title: activity.title,
+        activityType: activity.activityType,
+        dateFrom: activity.dateFrom,
+        dateTo: activity.dateTo || '',
+        startTime: activity.startTime || '',
+        endTime: activity.endTime || '',
+        location: activity.location || '',
+        note: activity.note || '',
+      },
+    });
+  }, [activity, navigation]);
+
   const typeLabel = activity.activityType === 'tur' ? t('school.activityTypeTur') : activity.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.kindergartenBg }]}>
-      <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: KINDERGARTEN_COLOR }]}>
-        <Text style={{ color: KINDERGARTEN_COLOR, fontSize: 18 }}>←</Text>
-      </TouchableOpacity>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: KINDERGARTEN_COLOR }]}>
+          <Text style={{ color: KINDERGARTEN_COLOR, fontSize: 18 }}>←</Text>
+        </TouchableOpacity>
+        <View style={{ flex: 1 }} />
+        <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: KINDERGARTEN_COLOR, alignItems: 'center', justifyContent: 'center' }}>
+          <AppIcon name="links" size={16} color={KINDERGARTEN_COLOR} />
+        </TouchableOpacity>
+      </View>
 
       {/* Top card with calendar icon */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: KINDERGARTEN_COLOR, marginBottom: 10, backgroundColor: colors.surface }]}>
