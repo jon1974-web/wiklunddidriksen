@@ -341,13 +341,13 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Stats bar */}
           <View style={styles.statsRow}>
-            <StatChip count={weekData.eventCount} label={t('weekly.events')} color={MODULE_COLORS.home} />
-            <StatChip count={weekData.healthCount} label={t('health.title')} color={MODULE_COLORS.health} />
-            <StatChip count={weekData.petCount} label={t('pets.title')} color={MODULE_COLORS.pets} />
-            <StatChip count={weekData.tripCount} label={t('weekly.trips')} color={MODULE_COLORS.trips} />
-            <StatChip count={weekData.schoolActivityCount} label={t('weekly.schoolActivities')} color={MODULE_COLORS.school} />
-            <StatChip count={weekData.kindergartenActivityCount} label={t('weekly.kindergartenActivities')} color={MODULE_COLORS.kindergarten} />
-            <StatChip count={weekData.birthdayCount} label={t('birthdays.title')} color={MODULE_COLORS.birthdays} />
+            {weekData.eventCount > 0 && <StatChip count={weekData.eventCount} label={t('weekly.events')} color={MODULE_COLORS.home} />}
+            {weekData.healthCount > 0 && <StatChip count={weekData.healthCount} label={t('health.title')} color={MODULE_COLORS.health} />}
+            {weekData.petCount > 0 && <StatChip count={weekData.petCount} label={t('pets.title')} color={MODULE_COLORS.pets} />}
+            {weekData.tripCount > 0 && <StatChip count={weekData.tripCount} label={t('weekly.trips')} color={MODULE_COLORS.trips} />}
+            {weekData.schoolActivityCount > 0 && <StatChip count={weekData.schoolActivityCount} label={t('weekly.schoolActivities')} color={MODULE_COLORS.school} />}
+            {weekData.kindergartenActivityCount > 0 && <StatChip count={weekData.kindergartenActivityCount} label={t('weekly.kindergartenActivities')} color={MODULE_COLORS.kindergarten} />}
+            {weekData.birthdayCount > 0 && <StatChip count={weekData.birthdayCount} label={t('birthdays.title')} color={MODULE_COLORS.birthdays} />}
           </View>
 
           {/* Day cards */}
