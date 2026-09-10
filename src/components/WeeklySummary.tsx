@@ -348,7 +348,6 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             <StatChip count={weekData.schoolActivityCount} label={t('weekly.schoolActivities')} color={MODULE_COLORS.school} />
             <StatChip count={weekData.kindergartenActivityCount} label={t('weekly.kindergartenActivities')} color={MODULE_COLORS.kindergarten} />
             <StatChip count={weekData.birthdayCount} label={t('birthdays.title')} color={MODULE_COLORS.birthdays} />
-            <StatChip count={weekData.holidayCount} label={t('kindergarten.holidays')} color={MODULE_COLORS.school} />
           </View>
 
           {/* Day cards */}
