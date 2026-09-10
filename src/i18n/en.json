@@ -1295,7 +1295,11 @@
     "fromStart": "From start",
     "to": "To {city}",
     "toEnd": "To end",
-    "ongoing": "Ongoing"
+    "ongoing": "Ongoing",
+    "events": "Appointments",
+    "trips": "Trips",
+    "schoolActivities": "School",
+    "kindergartenActivities": "Kindergarten"
   },
   "datePicker": {
     "orTypeIn": "Or type in:",

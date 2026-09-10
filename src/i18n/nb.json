@@ -1295,7 +1295,11 @@
     "fromStart": "Fra start",
     "to": "Til {city}",
     "toEnd": "Til slutt",
-    "ongoing": "Pågår"
+    "ongoing": "Pågår",
+    "events": "Avtaler",
+    "trips": "Reiser",
+    "schoolActivities": "Skole",
+    "kindergartenActivities": "Barnehage"
   },
   "datePicker": {
     "orTypeIn": "Eller skriv inn:",

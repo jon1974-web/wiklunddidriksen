@@ -125,6 +125,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     let tripCount = 0;
     let birthdayCount = 0;
     let holidayCount = 0;
+    let schoolActivityCount = 0;
+    let kindergartenActivityCount = 0;
 
     // Build days with items
     const days: { date: Date; dayName: string; dayNameShort: string; dateNum: number; monthStr: string; items: { type: string; icon: string; iconBg: string; title: string; time: string }[] }[] = [];
@@ -253,21 +255,34 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
       // School activities
       schoolActivities.forEach((a) => {
-        if (a.date === dateStr) {
+        if (a.dateFrom === dateStr || (a.dateTo && dateStr >= a.dateFrom && dateStr <= a.dateTo)) {
           const typeLabel = a.activityType === 'tur' ? t('school.activityTypeTur') : a.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
           const time = a.startTime ? (a.endTime ? `${a.startTime} – ${a.endTime}` : a.startTime) : '';
           items.push({ type: 'schoolActivity', icon: 'school', iconBg: MODULE_COLORS.school, title: `${a.title} (${typeLabel})`, time });
+          schoolActivityCount++;
         }
       });
 
       // Kindergarten activities
       kindergartenActivities.forEach((a) => {
-        if (a.date === dateStr) {
+        if (a.dateFrom === dateStr || (a.dateTo && dateStr >= a.dateFrom && dateStr <= a.dateTo)) {
           const typeLabel = a.activityType === 'tur' ? t('school.activityTypeTur') : a.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
           const time = a.startTime ? (a.endTime ? `${a.startTime} – ${a.endTime}` : a.startTime) : '';
           items.push({ type: 'kindergartenActivity', icon: 'kindergarten', iconBg: MODULE_COLORS.kindergarten, title: `${a.title} (${typeLabel})`, time });
+          kindergartenActivityCount++;
         }
       });
+
+      // Sort: events/activities/trips by startTime first, then health/pet/holidays, then birthdays at bottom
+      const birthdaysItems = items.filter(i => i.type === 'birthday');
+      const otherItems = items.filter(i => i.type !== 'birthday');
+      otherItems.sort((a, b) => {
+        const timeA = a.time || 'zz';
+        const timeB = b.time || 'zz';
+        return timeA.localeCompare(timeB);
+      });
+      items.length = 0;
+      items.push(...otherItems, ...birthdaysItems);
 
       days.push({
         date: d,
@@ -279,7 +294,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       });
     }
 
-    return { weekNum, days, eventCount, healthCount, petCount, tripCount, birthdayCount, holidayCount, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
+    return { weekNum, days, eventCount, healthCount, petCount, tripCount, birthdayCount, holidayCount, schoolActivityCount, kindergartenActivityCount, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
   }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolHolidays, kindergartenHolidays, schoolChildren, kindergartenChildren, schoolActivities, kindergartenActivities, t, i18nInstance, langKey]);
 
   // Meal plan data
@@ -326,10 +341,12 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           {/* Stats bar */}
           <View style={styles.statsRow}>
-            <StatChip count={weekData.eventCount} label={t('quickCreate.events')} color={MODULE_COLORS.home} />
+            <StatChip count={weekData.eventCount} label={t('weekly.events')} color={MODULE_COLORS.home} />
             <StatChip count={weekData.healthCount} label={t('health.title')} color={MODULE_COLORS.health} />
             <StatChip count={weekData.petCount} label={t('pets.title')} color={MODULE_COLORS.pets} />
-            <StatChip count={weekData.tripCount} label={t('quickCreate.trips')} color={MODULE_COLORS.trips} />
+            <StatChip count={weekData.tripCount} label={t('weekly.trips')} color={MODULE_COLORS.trips} />
+            <StatChip count={weekData.schoolActivityCount} label={t('weekly.schoolActivities')} color={MODULE_COLORS.school} />
+            <StatChip count={weekData.kindergartenActivityCount} label={t('weekly.kindergartenActivities')} color={MODULE_COLORS.kindergarten} />
             <StatChip count={weekData.birthdayCount} label={t('birthdays.title')} color={MODULE_COLORS.birthdays} />
             <StatChip count={weekData.holidayCount} label={t('kindergarten.holidays')} color={MODULE_COLORS.school} />
           </View>

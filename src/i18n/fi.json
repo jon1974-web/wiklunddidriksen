@@ -1295,7 +1295,11 @@
     "fromStart": "Lähtien alusta",
     "to": "Asti {city}",
     "toEnd": "Asti loppuun",
-    "ongoing": "Käynnissä"
+    "ongoing": "Käynnissä",
+    "events": "Ajat",
+    "trips": "Matkat",
+    "schoolActivities": "Koulu",
+    "kindergartenActivities": "Päiväkoti"
   },
   "datePicker": {
     "orTypeIn": "Tai kirjoita:",
