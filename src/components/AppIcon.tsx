@@ -346,5 +346,203 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5
     </Svg>
   );
 
+  // Event icons
+  if (name === 'middag') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="13" r="8"/>
+      <Path d="M5 2v5c0 1.1.9 2 2 2h1"/>
+      <Path d="M5 2v9"/>
+      <Path d="M17 2v5c0 1.1-.9 2-2 2h-1"/>
+      <Path d="M17 2v9"/>
+    </Svg>
+  );
+
+  if (name === 'bursdag') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="9" cy="7" r="4"/>
+      <Path d="M9 11v5a2 2 0 004 0v-5"/>
+      <Path d="M15 5l2-3"/>
+      <Circle cx="17" cy="3" r="2"/>
+      <Path d="M17 5v2"/>
+    </Svg>
+  );
+
+  if (name === 'fest') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M5.8 11.3L2 22l10.7-3.8"/>
+      <Path d="M4 3h.01"/>
+      <Path d="M22 8h.01"/>
+      <Path d="M15 2h.01"/>
+      <Path d="M22 20h.01"/>
+      <Path d="M22 2l-2.24.75a2.9 2.9 0 00-1.96 3.12v.01c-.13.49-.42.96-.77 1.35-.36.4-.78.69-1.23.88A4.01 4.01 0 0022 2z"/>
+    </Svg>
+  );
+
+  if (name === 'sport') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M6 9H4.5a2.5 2.5 0 010-5H6"/>
+      <Path d="M18 9h1.5a2.5 2.5 0 000-5H18"/>
+      <Path d="M4 22h16"/>
+      <Path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20 7 22"/>
+      <Path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20 17 22"/>
+      <Path d="M18 2H6v7a6 6 0 0012 0V2z"/>
+    </Svg>
+  );
+
+  if (name === 'restaurant') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 002-2V2"/>
+      <Path d="M7 2v20"/>
+      <Path d="M21 15V2a5 5 0 00-5 5v6c0 1.1.9 2 2 2h3zm0 0v7"/>
+    </Svg>
+  );
+
+  if (name === 'kino') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="2" y="2" width="20" height="20" rx="2"/>
+      <Path d="M7 2v4l3-2 3 2V2"/>
+      <Path d="M10 6v12"/>
+      <Path d="M14 6v12"/>
+      <Path d="M2 8h20"/>
+    </Svg>
+  );
+
+  if (name === 'konsert') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M9 18V5l12-2v13"/>
+      <Circle cx="6" cy="18" r="3"/>
+      <Circle cx="18" cy="16" r="3"/>
+    </Svg>
+  );
+
+  if (name === 'trening') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="4" r="2"/>
+      <Path d="M10 7h4"/>
+      <Path d="M12 6v4"/>
+      <Path d="M10 10l-1 4"/>
+      <Path d="M14 10l1 4"/>
+      <Rect x="5" y="5.5" width="3" height="3" rx="0.5"/>
+      <Rect x="16" y="5.5" width="3" height="3" rx="0.5"/>
+      <Line x1="8" y1="7" x2="10" y2="9"/>
+      <Line x1="16" y1="7" x2="14" y2="9"/>
+    </Svg>
+  );
+
+  if (name === 'hoytid') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Polyline points="20 12 20 22 4 22 4 12"/>
+      <Rect x="2" y="7" width="20" height="5"/>
+      <Line x1="12" y1="22" x2="12" y2="7"/>
+      <Path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/>
+      <Path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/>
+    </Svg>
+  );
+
+  if (name === 'barnedag') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="9" cy="7" r="4"/>
+      <Path d="M9 11v5a2 2 0 004 0v-5"/>
+      <Path d="M15 5l2-3"/>
+      <Circle cx="17" cy="3" r="2"/>
+      <Path d="M17 5v2"/>
+    </Svg>
+  );
+
+  if (name === 'hjemme') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/>
+      <Polyline points="9 22 9 12 15 12 15 22"/>
+    </Svg>
+  );
+
+  if (name === 'spill') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="2" y="6" width="20" height="12" rx="2"/>
+      <Circle cx="8" cy="12" r="2"/>
+      <Circle cx="16" cy="12" r="2"/>
+      <Line x1="6" y1="10" x2="6" y2="14"/>
+      <Line x1="18" y1="10" x2="18" y2="14"/>
+    </Svg>
+  );
+
+  if (name === 'kaffe') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M17 8h1a4 4 0 010 8h-1"/>
+      <Path d="M3 8h14v9a4 4 0 01-4 4H7a4 4 0 01-4-4V8z"/>
+      <Line x1="6" y1="1" x2="6" y2="4"/>
+      <Line x1="10" y1="1" x2="10" y2="4"/>
+      <Line x1="14" y1="1" x2="14" y2="4"/>
+    </Svg>
+  );
+
+  if (name === 'loping') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="14" cy="4" r="2"/>
+      <Path d="M4 20l4-8 3 1 5-9 4 5"/>
+      <Path d="M11 13l-3 7"/>
+      <Path d="M20 14l-2 6"/>
+    </Svg>
+  );
+
+  if (name === 'sykling') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="5.5" cy="17.5" r="3.5"/>
+      <Circle cx="18.5" cy="17.5" r="3.5"/>
+      <Path d="M15 6h3l2 5h-4"/>
+      <Path d="M12 17.5l-3.5-5.5h5l3.5 5.5"/>
+    </Svg>
+  );
+
+  if (name === 'fjelltur') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M12 3l8 16H4l8-16z"/>
+      <Path d="M12 3v6"/>
+      <Path d="M12 6l4-1"/>
+    </Svg>
+  );
+
+  if (name === 'fiske') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M6.5 12c.94-3.26 2.6-6.5 5.5-8.5 4-2.7 8.5-2 11 2s2 8.5-1 11.5c-2 2-5 3-8 3-6 0-10-4-10-8 0-2 1-3 3-3 2 0 3 1 3 1"/>
+      <Circle cx="8" cy="12" r="1"/>
+    </Svg>
+  );
+
+  if (name === 'cheerleading') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Circle cx="12" cy="4" r="2"/>
+      <Path d="M12 6v3"/>
+      <Path d="M10 7h4"/>
+      <Circle cx="7" cy="14" r="2"/>
+      <Path d="M7 16v5"/>
+      <Path d="M7 16l3-4"/>
+      <Circle cx="17" cy="14" r="2"/>
+      <Path d="M17 16v5"/>
+      <Path d="M17 16l-3-4"/>
+      <Path d="M10 7l-3 7"/>
+      <Path d="M14 7l3 7"/>
+    </Svg>
+  );
+
+  if (name === 'racketsport') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Ellipse cx="16" cy="8" rx="5" ry="7" transform="rotate(-30 16 8)"/>
+      <Path d="M10 12l-6 10"/>
+      <Circle cx="8" cy="17" r="2"/>
+    </Svg>
+  );
+
+  if (name === 'tur') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M4 20V8a4 4 0 014-4h8a4 4 0 014 4v12"/>
+      <Path d="M4 20h16"/>
+      <Path d="M8 4V2"/>
+      <Path d="M16 4V2"/>
+      <Path d="M8 20v-6h8v6"/>
+      <Line x1="8" y1="12" x2="16" y2="12"/>
+    </Svg>
+  );
+
   return null;
 };

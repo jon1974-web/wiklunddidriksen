@@ -14,6 +14,7 @@ import { EVENT_ICONS } from '../constants/eventIcons';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
 import { DocumentUpload } from './DocumentUpload';
+import { AppIcon } from './AppIcon';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 
 interface AddEventModalProps {
@@ -184,16 +185,21 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                 <View style={styles.field}>
                   <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
                   <View style={styles.iconGrid}>
-                    {EVENT_ICONS.map((item) => (
-                      <TouchableOpacity
-                        key={item.emoji}
-                        style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, icon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-                        onPress={() => setIcon(icon === item.emoji ? '' : item.emoji)}
-                      >
-                        <Text style={styles.iconEmoji}>{item.emoji}</Text>
-                        <Text style={[styles.iconLabel, { color: icon === item.emoji ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
-                      </TouchableOpacity>
-                    ))}
+                    {EVENT_ICONS.map((item) => {
+                      const isSelected = icon === item.icon;
+                      return (
+                        <TouchableOpacity
+                          key={item.icon}
+                          style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, isSelected && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                          onPress={() => setIcon(isSelected ? '' : item.icon)}
+                        >
+                          <View style={styles.iconEmoji}>
+                            <AppIcon name={item.icon} size={22} color={isSelected ? '#fff' : colors.textSecondary} />
+                          </View>
+                          <Text style={[styles.iconLabel, { color: isSelected ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                 </View>
 
@@ -353,7 +359,7 @@ const styles = StyleSheet.create({
   dateText: { fontSize: 16, color: '#333' },
   iconGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   iconOption: { width: 60, height: 60, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5 },
-  iconEmoji: { fontSize: 22 },
+  iconEmoji: { fontSize: 22, alignItems: 'center', justifyContent: 'center' },
   iconLabel: { fontSize: 9, marginTop: 2, fontWeight: '600' },
   reminderOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   reminderOption: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10, borderWidth: 1 },
