@@ -113,6 +113,8 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
 
   if (!visible) return null;
 
+  console.log('ScheduleModal render, visible:', visible);
+
   return (
     <View style={styles.overlay}>
       <TouchableWithoutFeedback onPress={onClose}>
