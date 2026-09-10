@@ -3,8 +3,6 @@ export const EVENT_ICONS = [
   { emoji: '🎂', label: 'Bursdag' },
   { emoji: '🎉', label: 'Fest' },
   { emoji: '⚽', label: 'Sport' },
-  { emoji: '✈️', label: 'Reise' },
-  { emoji: '🏫', label: 'Skole' },
   { emoji: '🍕', label: 'Restaurant' },
   { emoji: '🎬', label: 'Kino' },
   { emoji: '🎵', label: 'Konsert' },
