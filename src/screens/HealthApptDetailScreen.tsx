@@ -101,6 +101,19 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>Detaljer</Text>
+        {(() => {
+          const dateFrom = appointment.dateFrom || (appointment as any).date;
+          const dateTo = (appointment as any).dateTo;
+          const dateText = dateTo && dateTo !== dateFrom
+            ? `${formatDate(dateFrom)} – ${formatDate(dateTo)}`
+            : formatDate(dateFrom);
+          return (
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📅</Text>
+              <Text style={[styles.detailValue, { color: colors.text }]}>{dateText}</Text>
+            </View>
+          );
+        })()}
         {appointment.person && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👤</Text>

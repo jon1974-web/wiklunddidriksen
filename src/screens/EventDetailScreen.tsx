@@ -263,6 +263,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         {/* Detail card */}
         <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#3b5a75' }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>Detaljer</Text>
+          <View style={styles.viewDetailRow}>
+            <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅</Text>
+            <Text style={[styles.viewDetailValue, { color: colors.text }]}>{dateText}</Text>
+          </View>
           {eventData.address && (
             <View style={styles.viewDetailRow}>
               <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📍</Text>

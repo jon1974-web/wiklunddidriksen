@@ -100,6 +100,19 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionLabel, { color: PET_COLOR }]}>Detaljer</Text>
+        {(() => {
+          const dateFrom = visit.dateFrom;
+          const dateTo = (visit as any).dateTo;
+          const dateText = dateTo && dateTo !== dateFrom
+            ? `${formatDate(dateFrom)} – ${formatDate(dateTo)}`
+            : formatDate(dateFrom);
+          return (
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📅</Text>
+              <Text style={[styles.detailValue, { color: colors.text }]}>{dateText}</Text>
+            </View>
+          );
+        })()}
         {visit.location && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📍</Text>

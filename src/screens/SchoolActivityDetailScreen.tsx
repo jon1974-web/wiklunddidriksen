@@ -10,7 +10,7 @@ import { deleteSchoolActivity } from '../services/schoolService';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
-import { toDateSafe } from '../utils/dateUtils';
+import { toDateSafe, formatDate } from '../utils/dateUtils';
 
 interface Props {
   navigation: any;
@@ -94,6 +94,19 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: SCHOOL_COLOR, backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionLabel, { color: SCHOOL_COLOR }]}>Detaljer</Text>
+        {(() => {
+          const dateFrom = activity.dateFrom;
+          const dateTo = activity.dateTo;
+          const dateText = dateTo && dateTo !== dateFrom
+            ? `${formatDate(dateFrom)} – ${formatDate(dateTo)}`
+            : formatDate(dateFrom);
+          return (
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📅</Text>
+              <Text style={[styles.detailValue, { color: colors.text }]}>{dateText}</Text>
+            </View>
+          );
+        })()}
         {activity.location && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📍</Text>
