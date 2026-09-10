@@ -118,7 +118,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
   return (
     <View style={styles.overlay}>
       <TouchableWithoutFeedback onPress={onClose}>
-        <View style={styles.overlayBg}>
+
           <TouchableWithoutFeedback>
             <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
               <View style={styles.handle} />
@@ -129,119 +129,18 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
                 <Text style={[styles.title, { color: colors.text }]}>{t('schedule.title')}</Text>
                 <View style={{ width: 36 }} />
               </View>
-
               <ScrollView style={styles.content} contentContainerStyle={{ padding: 16 }}>
-                {/* Days of week */}
-                <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{t('schedule.days')}</Text>
-                <View style={styles.dayRow}>
-                  {WEEK_DAYS.map((day) => {
-                    const isSelected = selectedDays.includes(day.key);
-                    return (
-                      <TouchableOpacity
-                        key={day.key}
-                        style={[styles.dayBtn, { backgroundColor: isSelected ? moduleColor : colors.inputBackground, borderColor: isSelected ? moduleColor : colors.border }]}
-                        onPress={() => toggleDay(day.key)}
-                      >
-                        <Text style={[styles.dayBtnText, { color: isSelected ? '#fff' : colors.text }]}>{day.label}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-
-                {/* Week type */}
-                <Text style={[styles.sectionLabel, { color: colors.textSecondary, marginTop: 16 }]}>{t('schedule.repeat')}</Text>
-                <View style={styles.weekTypeRow}>
-                  {WEEK_OPTIONS.map((opt) => (
-                    <TouchableOpacity
-                      key={opt.value}
-                      style={[styles.weekTypeBtn, { backgroundColor: weekType === opt.value ? moduleColor : colors.inputBackground, borderColor: weekType === opt.value ? moduleColor : colors.border }]}
-                      onPress={() => setWeekType(opt.value)}
-                    >
-                      <Text style={[styles.weekTypeBtnText, { color: weekType === opt.value ? '#fff' : colors.text }]}>{opt.label}</Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-
-                {/* Week count */}
-                <Text style={[styles.sectionLabel, { color: colors.textSecondary, marginTop: 16 }]}>{t('schedule.weeks')}</Text>
-                <View style={styles.weekCountRow}>
-                  {WEEK_COUNTS.map((count) => (
-                    <TouchableOpacity
-                      key={count}
-                      style={[styles.weekCountBtn, { backgroundColor: !showCustom && weekCount === count ? moduleColor : colors.inputBackground, borderColor: !showCustom && weekCount === count ? moduleColor : colors.border }]}
-                      onPress={() => { setWeekCount(count); setShowCustom(false); }}
-                    >
-                      <Text style={[styles.weekCountBtnText, { color: !showCustom && weekCount === count ? '#fff' : colors.text }]}>{count}</Text>
-                    </TouchableOpacity>
-                  ))}
-                  <TouchableOpacity
-                    style={[styles.weekCountBtn, { backgroundColor: showCustom ? moduleColor : colors.inputBackground, borderColor: showCustom ? moduleColor : colors.border }]}
-                    onPress={() => setShowCustom(true)}
-                  >
-                    <Text style={[styles.weekCountBtnText, { color: showCustom ? '#fff' : colors.text }]}>{t('schedule.custom')}</Text>
-                  </TouchableOpacity>
-                  {showCustom && (
-                    <TextInput
-                      style={[styles.customInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
-                      value={customWeeks}
-                      onChangeText={setCustomWeeks}
-                      placeholder="?"
-                      placeholderTextColor={colors.textDisabled}
-                      keyboardType="numeric"
-                      maxLength={3}
-                    />
-                  )}
-                </View>
-
-                {/* Preview */}
-                {previewDates.length > 0 && (
-                  <View style={[styles.previewBox, { backgroundColor: colors.inputBackground }]}>
-                    <Text style={[styles.previewTitle, { color: colors.text }]}>
-                      {previewDates.length} {t('schedule.events')}
-                    </Text>
-                    <Text style={[styles.previewDates, { color: colors.textSecondary }]}>
-                      {previewDates.slice(0, 6).map(d => {
-                        const date = new Date(d);
-                        return `${DAY_NAMES[date.getDay()]} ${date.getDate()}.`;
-                      }).join(', ')}
-                      {previewDates.length > 6 ? ` ... +${previewDates.length - 6}` : ''}
-                    </Text>
-                  </View>
-                )}
-
-                {/* Actions */}
-                <View style={styles.actions}>
-                  {isEditing && onDeleteSchedule && (
-                    <TouchableOpacity style={[styles.btn, { backgroundColor: '#F44336' }]} onPress={() => { onDeleteSchedule(); onClose(); }}>
-                      <Text style={[styles.btnText, { color: '#fff' }]}>{t('schedule.deleteAll')}</Text>
-                    </TouchableOpacity>
-                  )}
-                  <TouchableOpacity style={[styles.btn, { backgroundColor: colors.inputBackground }]} onPress={onClose}>
-                    <Text style={[styles.btnText, { color: colors.text }]}>{t('common.cancel')}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[styles.btn, { backgroundColor: moduleColor, opacity: previewDates.length > 0 ? 1 : 0.5 }]}
-                    onPress={handleConfirm}
-                    disabled={previewDates.length === 0}
-                  >
-                    <Text style={[styles.btnText, { color: '#fff' }]}>
-                      {t('schedule.create')} ({previewDates.length})
-                    </Text>
-                  </TouchableOpacity>
-                </View>
               </ScrollView>
             </View>
           </TouchableWithoutFeedback>
-        </View>
       </TouchableWithoutFeedback>
     </View>
   );
+
 };
 
 const styles = StyleSheet.create({
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end', zIndex: 9999 },
-  overlayBg: { flex: 1 },
-  overlayBg: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' as const },
+  overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" as const },
   sheet: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%' },
   handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ddd', alignSelf: 'center' as const, marginTop: 10, marginBottom: 4 },
   header: { flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'space-between' as const, paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
