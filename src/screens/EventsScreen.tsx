@@ -1177,6 +1177,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
           <TouchableOpacity
             style={[styles.sortIconButton, { borderColor: colors.accent }, showSortPanel && { backgroundColor: colors.accent }]}
             onPress={() => setShowSortPanel(!showSortPanel)}
+            onLongPress={() => { setFilterModule(null); setFilterSource(null); setShowPastEvents(false); setShowSortPanel(false); }}
           >
             <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={showSortPanel ? '#fff' : colors.accent} strokeWidth="2.5" strokeLinecap="round">
               <Line x1="4" y1="6" x2="20" y2="6"/>
