@@ -325,7 +325,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
             <AppIcon name="links" size={16} color={colors.accent} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => setShowSchedule(true)} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: isScheduled ? colors.accent : colors.textSecondary, backgroundColor: isScheduled ? colors.accent + '20' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
+          <TouchableOpacity onPress={() => { console.log('SCHEDULE CLICK'); setShowSchedule(true); }} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: isScheduled ? colors.accent : colors.textSecondary, backgroundColor: isScheduled ? colors.accent + '20' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
             <AppIcon name="schedule" size={16} color={isScheduled ? colors.accent : colors.textSecondary} />
           </TouchableOpacity>
           {isScheduled && (
