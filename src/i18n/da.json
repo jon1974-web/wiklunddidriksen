@@ -1374,5 +1374,14 @@
     "noRateLimits": "Ingen takstgrænser fundet",
     "maxRequests": "Maks forespørgsler",
     "windowMinutes": "Vindue (minutter)"
+  },
+  "schedule": {
+    "title": "Planlæg gentagelse",
+    "days": "Vælg dage",
+    "repeat": "Gentag",
+    "weeks": "Antal uger",
+    "custom": "Brugerdefineret",
+    "events": "begivenheder",
+    "create": "Opret"
   }
 }

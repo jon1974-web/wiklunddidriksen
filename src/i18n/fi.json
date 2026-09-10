@@ -1374,5 +1374,14 @@
     "noRateLimits": "Nopeusrajoituksia ei löytynyt",
     "maxRequests": "Max pyynnöt",
     "windowMinutes": "Ikkuna (minuuttia)"
+  },
+  "schedule": {
+    "title": "Suunnittele toisto",
+    "days": "Valitse päivät",
+    "repeat": "Toista",
+    "weeks": "Viikkojen määrä",
+    "custom": "Mukautettu",
+    "events": "tapahtumaa",
+    "create": "Luo"
   }
 }

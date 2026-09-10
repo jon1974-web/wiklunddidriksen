@@ -1374,5 +1374,14 @@
     "noRateLimits": "Inga taxegränser hittades",
     "maxRequests": "Max förfrågningar",
     "windowMinutes": "Fönster (minuter)"
+  },
+  "schedule": {
+    "title": "Planera upprepning",
+    "days": "Välj dagar",
+    "repeat": "Upprepa",
+    "weeks": "Antal veckor",
+    "custom": "Anpassad",
+    "events": "händelser",
+    "create": "Skapa"
   }
 }

@@ -229,6 +229,9 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
             <AppIcon name="links" size={16} color={colors.accent} />
           </TouchableOpacity>
+          <TouchableOpacity style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+            <AppIcon name="schedule" size={16} color={colors.accent} />
+          </TouchableOpacity>
         </View>
 
         {/* Top card with calendar icon */}

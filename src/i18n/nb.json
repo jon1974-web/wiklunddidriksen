@@ -1374,5 +1374,14 @@
     "noRateLimits": "Ingen rategrenser funnet",
     "maxRequests": "Maks forespørsler",
     "windowMinutes": "Vindu (minutter)"
+  },
+  "schedule": {
+    "title": "Planlegg gjentakelse",
+    "days": "Velg dager",
+    "repeat": "Gjenta",
+    "weeks": "Antall uker",
+    "custom": "Egendefinert",
+    "events": "avtaler",
+    "create": "Opprett"
   }
 }

@@ -85,6 +85,9 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
         <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: SCHOOL_COLOR, alignItems: 'center', justifyContent: 'center' }}>
           <AppIcon name="links" size={16} color={SCHOOL_COLOR} />
         </TouchableOpacity>
+        <TouchableOpacity style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: SCHOOL_COLOR, alignItems: 'center', justifyContent: 'center' }}>
+          <AppIcon name="schedule" size={16} color={SCHOOL_COLOR} />
+        </TouchableOpacity>
       </View>
 
       {/* Top card with calendar icon */}

@@ -1374,5 +1374,14 @@
     "noRateLimits": "No rate limits found",
     "maxRequests": "Max Requests",
     "windowMinutes": "Window (minutes)"
+  },
+  "schedule": {
+    "title": "Schedule repeat",
+    "days": "Select days",
+    "repeat": "Repeat",
+    "weeks": "Number of weeks",
+    "custom": "Custom",
+    "events": "events",
+    "create": "Create"
   }
 }

@@ -85,6 +85,9 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
         <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: KINDERGARTEN_COLOR, alignItems: 'center', justifyContent: 'center' }}>
           <AppIcon name="links" size={16} color={KINDERGARTEN_COLOR} />
         </TouchableOpacity>
+        <TouchableOpacity style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: KINDERGARTEN_COLOR, alignItems: 'center', justifyContent: 'center' }}>
+          <AppIcon name="schedule" size={16} color={KINDERGARTEN_COLOR} />
+        </TouchableOpacity>
       </View>
 
       {/* Top card with calendar icon */}
