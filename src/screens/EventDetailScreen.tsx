@@ -3,6 +3,8 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Linkin
 import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
+import { ScheduleModal } from '../components/ScheduleModal';
+import { addDoc, collection } from 'firebase/firestore';
 import { Event } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { cancelNotification } from '../services/notificationService';
@@ -34,6 +36,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [isEditing, setIsEditing] = useState(false);
   const [eventData, setEventData] = useState(event);
   const [editDocuments, setEditDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(event.documents || []);
+  const [showSchedule, setShowSchedule] = useState(false);
   const canDelete = eventData.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
   
   const addOneHour = (t: string): string => {
@@ -176,6 +179,53 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     });
   }, [eventData, navigation]);
 
+  const handleScheduleConfirm = useCallback(async (config: { days: number[]; weeks: number; groupId: string }) => {
+    try {
+      const startDate = new Date(eventData.date);
+      const eventsToCreate: any[] = [];
+
+      for (let w = 0; w < config.weeks; w++) {
+        for (let d = 0; d < 7; d++) {
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + w * 7 + d);
+
+          if (config.days.includes(date.getDay())) {
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            eventsToCreate.push({
+              title: eventData.title,
+              description: eventData.description || null,
+              address: eventData.address || null,
+              date: dateStr,
+              endDate: eventData.endDate ? (() => {
+                const end = new Date(eventData.endDate);
+                end.setDate(end.getDate() + w * 7 + d - (startDate.getDay() === eventData.date ? 0 : 0));
+                return `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`;
+              })() : null,
+              time: eventData.time,
+              endTime: eventData.endTime || null,
+              reminderMinutes: eventData.reminderMinutes || 30,
+              icon: eventData.icon || null,
+              createdBy: user?.uid,
+              familyId: eventData.familyId || null,
+              createdAt: Date.now(),
+              scheduleGroupId: config.groupId,
+            });
+          }
+        }
+      }
+
+      if (eventsToCreate.length > 0) {
+        for (const evt of eventsToCreate) {
+          await addDoc(collection(db, 'events'), evt);
+        }
+        crossAlert(t('common.success'), `${eventsToCreate.length} ${t('schedule.events')} ${t('common.saved')}!`);
+      }
+      setShowSchedule(false);
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
+  }, [eventData, user]);
+
   const handleDelete = useCallback(() => {
     crossAlert(t('events.deleteTitle'), t('events.deleteConfirm'), [
       { text: 'Avbryt', style: 'cancel' },
@@ -229,7 +279,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
             <AppIcon name="links" size={16} color={colors.accent} />
           </TouchableOpacity>
-          <TouchableOpacity style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
+          <TouchableOpacity onPress={() => setShowSchedule(true)} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
             <AppIcon name="schedule" size={16} color={colors.accent} />
           </TouchableOpacity>
         </View>
@@ -516,6 +566,14 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           </View>
         </View>
       </Modal>
+
+      <ScheduleModal
+        visible={showSchedule}
+        onClose={() => setShowSchedule(false)}
+        onConfirm={handleScheduleConfirm}
+        startDate={eventData.date}
+        moduleColor="#3b5a75"
+      />
     </View>
   );
 };

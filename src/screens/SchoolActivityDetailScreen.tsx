@@ -6,8 +6,9 @@ import { useUserStore } from '../store/userStore';
 import { SchoolActivity } from '../types';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { ActionModal } from '../components/ActionModal';
+import { ScheduleModal } from '../components/ScheduleModal';
 import { AppIcon } from '../components/AppIcon';
-import { deleteSchoolActivity } from '../services/schoolService';
+import { deleteSchoolActivity, addSchoolActivity } from '../services/schoolService';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -28,6 +29,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
   const familyRole = useUserStore((state) => state.familyRole);
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
 
   const d = toDateSafe(activity.dateFrom) || toDateSafe((activity as any).date);
   const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
@@ -73,6 +75,38 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
     });
   }, [activity, navigation]);
 
+  const handleScheduleConfirm = useCallback(async (config: { days: number[]; weeks: number; groupId: string }) => {
+    try {
+      const startDate = new Date(activity.dateFrom);
+      for (let w = 0; w < config.weeks; w++) {
+        for (let d = 0; d < 7; d++) {
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + w * 7 + d);
+          if (config.days.includes(date.getDay())) {
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            await addSchoolActivity({
+              title: activity.title,
+              activityType: activity.activityType,
+              dateFrom: dateStr,
+              dateTo: dateStr,
+              startTime: activity.startTime || '',
+              endTime: activity.endTime || '',
+              location: activity.location || '',
+              note: activity.note || '',
+              childId: activity.childId,
+              familyId: familyId || '',
+              createdBy: user?.uid || '',
+              scheduleGroupId: config.groupId,
+            } as any);
+          }
+        }
+      }
+      setShowSchedule(false);
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
+  }, [activity, familyId, user, t]);
+
   const typeLabel = activity.activityType === 'tur' ? t('school.activityTypeTur') : activity.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
 
   return (
@@ -85,7 +119,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
         <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: SCHOOL_COLOR, alignItems: 'center', justifyContent: 'center' }}>
           <AppIcon name="links" size={16} color={SCHOOL_COLOR} />
         </TouchableOpacity>
-        <TouchableOpacity style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: SCHOOL_COLOR, alignItems: 'center', justifyContent: 'center' }}>
+        <TouchableOpacity onPress={() => setShowSchedule(true)} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: SCHOOL_COLOR, alignItems: 'center', justifyContent: 'center' }}>
           <AppIcon name="schedule" size={16} color={SCHOOL_COLOR} />
         </TouchableOpacity>
       </View>
@@ -217,6 +251,14 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
         title={activity.title}
         onDelete={handleDelete}
         onCancel={() => setShowDeleteModal(false)}
+      />
+
+      <ScheduleModal
+        visible={showSchedule}
+        onClose={() => setShowSchedule(false)}
+        onConfirm={handleScheduleConfirm}
+        startDate={activity.dateFrom}
+        moduleColor={SCHOOL_COLOR}
       />
     </ScrollView>
   );

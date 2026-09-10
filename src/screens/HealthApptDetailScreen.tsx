@@ -8,6 +8,8 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { formatDate, toDateSafe } from '../utils/dateUtils';
 import { ActionModal } from '../components/ActionModal';
 import { AppIcon } from '../components/AppIcon';
+import { ScheduleModal } from '../components/ScheduleModal';
+import { addHealthAppointment } from '../services/healthService';
 import { deleteHealthAppointment } from '../services/healthService';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
@@ -28,6 +30,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   const familyRole = useUserStore((state) => state.familyRole);
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
 
   const d = toDateSafe(appointment.dateFrom) || toDateSafe((appointment as any).date);
   const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
@@ -76,6 +79,41 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
     });
   }, [appointment, navigation]);
 
+  const handleScheduleConfirm = useCallback(async (config: { days: number[]; weeks: number; groupId: string }) => {
+    try {
+      const dateFrom = appointment.dateFrom || (appointment as any).date || '';
+      const startDate = new Date(dateFrom);
+
+      for (let w = 0; w < config.weeks; w++) {
+        for (let d = 0; d < 7; d++) {
+          const date = new Date(startDate);
+          date.setDate(startDate.getDate() + w * 7 + d);
+
+          if (config.days.includes(date.getDay())) {
+            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            await addHealthAppointment(familyId || '', {
+              title: appointment.title,
+              person: appointment.person || '',
+              doctor: appointment.doctor || '',
+              dateFrom: dateStr,
+              dateTo: dateStr,
+              startTime: appointment.startTime || '',
+              endTime: appointment.endTime || '',
+              location: appointment.location || '',
+              note: appointment.note || '',
+              reminder: 0,
+              documents: [],
+              scheduleGroupId: config.groupId,
+            } as any);
+          }
+        }
+      }
+      setShowSchedule(false);
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
+  }, [appointment, familyId]);
+
   return (
     <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.healthBg }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
@@ -86,7 +124,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
         <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: HEALTH_COLOR, alignItems: 'center', justifyContent: 'center' }}>
           <AppIcon name="links" size={16} color={HEALTH_COLOR} />
         </TouchableOpacity>
-        <TouchableOpacity style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: HEALTH_COLOR, alignItems: 'center', justifyContent: 'center' }}>
+        <TouchableOpacity onPress={() => setShowSchedule(true)} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: HEALTH_COLOR, alignItems: 'center', justifyContent: 'center' }}>
           <AppIcon name="schedule" size={16} color={HEALTH_COLOR} />
         </TouchableOpacity>
       </View>
@@ -240,6 +278,14 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
         title={appointment.title}
         onDelete={handleDelete}
         onCancel={() => setShowDeleteModal(false)}
+      />
+
+      <ScheduleModal
+        visible={showSchedule}
+        onClose={() => setShowSchedule(false)}
+        onConfirm={handleScheduleConfirm}
+        startDate={appointment.dateFrom || (appointment as any).date || ''}
+        moduleColor={HEALTH_COLOR}
       />
     </ScrollView>
   );
