@@ -316,6 +316,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     const monthStr = d ? MONTHS[d.getMonth()] : '';
 
     return (
+      <View style={{ flex: 1 }}>
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
@@ -632,7 +633,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         moduleColor="#3b5a75"
         isEditing={isScheduled}
       />
-    </View>
+</View>
   );
 };
 
