@@ -41,6 +41,41 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
   const [preloadedWeeks, setPreloadedWeeks] = useState<number>(4);
   const [preloadedWeekType, setPreloadedWeekType] = useState<string>('all');
+  const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
+
+  useEffect(() => {
+    if (eventData.scheduleGroupId && eventData.familyId) {
+      const loadScheduleInfo = async () => {
+        try {
+          const q = query(collection(db, 'events'), where('familyId', '==', eventData.familyId), where('scheduleGroupId', '==', eventData.scheduleGroupId));
+          const snapshot = await getDocs(q);
+          const weekNums = new Set<number>();
+          let minDate = Infinity;
+          let maxDate = -Infinity;
+          for (const d of snapshot.docs) {
+            const evt = d.data();
+            if (evt.date) {
+              const ts = new Date(evt.date).getTime();
+              weekNums.add(getWeekNumber(new Date(evt.date)));
+              if (ts < minDate) minDate = ts;
+              if (ts > maxDate) maxDate = ts;
+            }
+          }
+          const hasOdd = Array.from(weekNums).some(w => w % 2 !== 0);
+          const hasEven = Array.from(weekNums).some(w => w % 2 === 0);
+          const weekType = hasOdd && hasEven ? 'all' : hasOdd ? 'odd' : hasEven ? 'even' : 'all';
+          const start = new Date(minDate);
+          const end = new Date(maxDate);
+          setScheduleInfo({
+            weekType,
+            startDate: `${start.getDate()}.${start.getMonth() + 1}.${start.getFullYear()}`,
+            endDate: `${end.getDate()}.${end.getMonth() + 1}.${end.getFullYear()}`,
+          });
+        } catch (error) {}
+      };
+      loadScheduleInfo();
+    }
+  }, [eventData.scheduleGroupId, eventData.familyId]);
 
   const getWeekNumber = (date: Date): number => {
     const d = new Date(date);
@@ -321,9 +356,11 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#3b5a75' }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>Detaljer</Text>
           {eventData.scheduleGroupId && (
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, backgroundColor: '#E3F2FD', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}>
-              <Text style={{ fontSize: 14 }}>📅</Text>
-              <Text style={{ fontSize: 12, fontWeight: '600', color: '#3b5a75' }}>Gjentakelse</Text>
+            <View style={styles.viewDetailRow}>
+              <AppIcon name="schedule" size={18} color={colors.textSecondary} />
+              <Text style={[styles.viewDetailValue, { color: colors.text }]}>
+                {scheduleInfo ? `Gjentakelse · ${scheduleInfo.weekType === 'odd' ? 'Oddetall uker' : scheduleInfo.weekType === 'even' ? 'Partall uker' : 'Alle uker'} · ${scheduleInfo.startDate} – ${scheduleInfo.endDate}` : 'Gjentakelse'}
+              </Text>
             </View>
           )}
           <View style={styles.viewDetailRow}>
