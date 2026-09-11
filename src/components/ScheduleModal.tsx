@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, ScrollView, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, ScrollView, TextInput, Modal } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { AppIcon } from './AppIcon';
@@ -111,30 +111,120 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
 
   const DAY_NAMES = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
 
-  if (!visible) return null;
-
-  console.log('ScheduleModal render, visible:', visible);
-
   return (
-    <View style={styles.overlay}>
-      <TouchableWithoutFeedback onPress={onClose}>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <TouchableWithoutFeedback onPress={onClose}>
 
-          <TouchableWithoutFeedback>
-            <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
-              <View style={styles.handle} />
-              <View style={styles.header}>
-                <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { borderColor: colors.accent }]}>
-                  <Text style={{ color: colors.accent, fontSize: 18 }}>✕</Text>
-                </TouchableOpacity>
-                <Text style={[styles.title, { color: colors.text }]}>{t('schedule.title')}</Text>
-                <View style={{ width: 36 }} />
+            <TouchableWithoutFeedback>
+              <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
+                <View style={styles.handle} />
+                <View style={styles.header}>
+                  <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { borderColor: colors.accent }]}>
+                    <Text style={{ color: colors.accent, fontSize: 18 }}>✕</Text>
+                  </TouchableOpacity>
+                  <Text style={[styles.title, { color: colors.text }]}>{t('schedule.title')}</Text>
+                  <View style={{ width: 36 }} />
+                </View>
+                <ScrollView style={styles.content} contentContainerStyle={{ padding: 16 }}>
+                  <Text style={[styles.sectionLabel, { color: colors.text }]}>Dager</Text>
+                  <View style={styles.dayRow}>
+                    {WEEK_DAYS.map((day) => {
+                      const isSelected = selectedDays.includes(day.key);
+                      return (
+                        <TouchableOpacity
+                          key={day.key}
+                          style={[styles.dayBtn, { borderColor: isSelected ? moduleColor : colors.border, backgroundColor: isSelected ? moduleColor + '20' : 'transparent' }]}
+                          onPress={() => toggleDay(day.key)}
+                        >
+                          <Text style={[styles.dayBtnText, { color: isSelected ? moduleColor : colors.text }]}>{day.label}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 20 }]}>Uker</Text>
+                  <View style={styles.weekTypeRow}>
+                    {WEEK_OPTIONS.map((opt) => {
+                      const isSelected = weekType === opt.value;
+                      return (
+                        <TouchableOpacity
+                          key={opt.value}
+                          style={[styles.weekTypeBtn, { borderColor: isSelected ? moduleColor : colors.border, backgroundColor: isSelected ? moduleColor + '20' : 'transparent' }]}
+                          onPress={() => setWeekType(opt.value)}
+                        >
+                          <Text style={[styles.weekTypeBtnText, { color: isSelected ? moduleColor : colors.text }]}>{opt.label}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+
+                  <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 20 }]}>Antall uker</Text>
+                  <View style={styles.weekCountRow}>
+                    {WEEK_COUNTS.map((count) => {
+                      const isSelected = weekCount === count && !showCustom;
+                      return (
+                        <TouchableOpacity
+                          key={count}
+                          style={[styles.weekCountBtn, { borderColor: isSelected ? moduleColor : colors.border, backgroundColor: isSelected ? moduleColor + '20' : 'transparent' }]}
+                          onPress={() => { setWeekCount(count); setShowCustom(false); }}
+                        >
+                          <Text style={[styles.weekCountBtnText, { color: isSelected ? moduleColor : colors.text }]}>{count}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                    <TouchableOpacity
+                      style={[styles.weekCountBtn, { borderColor: showCustom ? moduleColor : colors.border, backgroundColor: showCustom ? moduleColor + '20' : 'transparent' }]}
+                      onPress={() => setShowCustom(true)}
+                    >
+                      <TextInput
+                        style={[styles.customInput, { color: showCustom ? moduleColor : colors.text, borderColor: 'transparent' }]}
+                        placeholder="..."
+                        placeholderTextColor={colors.textDisabled}
+                        keyboardType="numeric"
+                        value={showCustom ? customWeeks : ''}
+                        onChangeText={(text) => { setCustomWeeks(text); setShowCustom(true); }}
+                        onFocus={() => setShowCustom(true)}
+                      />
+                    </TouchableOpacity>
+                  </View>
+
+                  {previewDates.length > 0 && (
+                    <View style={[styles.previewBox, { backgroundColor: moduleColor + '10' }]}>
+                      <Text style={[styles.previewTitle, { color: moduleColor }]}>Forhåndsvisning ({previewDates.length} {t('schedule.events')})</Text>
+                      <Text style={[styles.previewDates, { color: colors.text }]}>
+                        {previewDates.slice(0, 10).join(', ')}{previewDates.length > 10 ? ` ... +${previewDates.length - 10}` : ''}
+                      </Text>
+                    </View>
+                  )}
+
+                  <View style={styles.actions}>
+                    <TouchableOpacity style={[styles.btn, { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }]} onPress={onClose}>
+                      <Text style={[styles.btnText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.btn, { backgroundColor: moduleColor, opacity: selectedDays.length === 0 || previewDates.length === 0 ? 0.5 : 1 }]}
+                      onPress={handleConfirm}
+                      disabled={selectedDays.length === 0 || previewDates.length === 0}
+                    >
+                      <Text style={[styles.btnText, { color: '#fff' }]}>{t('common.save')}</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  {isEditing && onDeleteSchedule && (
+                    <TouchableOpacity
+                      style={[styles.btn, { backgroundColor: '#D32F2F', marginTop: 12 }]}
+                      onPress={onDeleteSchedule}
+                    >
+                      <Text style={[styles.btnText, { color: '#fff' }]}>Fjern gjentakelse</Text>
+                    </TouchableOpacity>
+                  )}
+                </ScrollView>
               </View>
-              <ScrollView style={styles.content} contentContainerStyle={{ padding: 16 }}>
-              </ScrollView>
-            </View>
-          </TouchableWithoutFeedback>
-      </TouchableWithoutFeedback>
-    </View>
+            </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </View>
+    </Modal>
   );
 
 };

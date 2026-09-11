@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, TouchableWithoutFeedback } from 'react-native';
 import { addDoc, collection, updateDoc, doc } from 'firebase/firestore';
 import { GooglePlacesInput } from './GooglePlacesInput';
 import { DatePickerModal } from './DatePickerModal';
+import { ScheduleModal } from './ScheduleModal';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
@@ -22,6 +23,7 @@ interface AddEventModalProps {
   onClose: () => void;
   onSaved?: () => void;
   prefill?: {
+    id?: string;
     title?: string;
     address?: string;
     date?: string;
@@ -54,6 +56,8 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
   const [icon, setIcon] = useState(prefill?.icon || '');
   const [documents, setDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(prefill?.documents || []);
   const [saving, setSaving] = useState(false);
+  const [showSchedule, setShowSchedule] = useState(false);
+  const [scheduleConfig, setScheduleConfig] = useState<{ days: number[]; weeks: number; groupId: string } | null>(null);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
@@ -73,6 +77,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
       setReminderMinutes(prefill.reminderMinutes || 60);
       setIcon(prefill.icon || '');
       setDocuments(prefill.documents || []);
+      setScheduleConfig(null);
     } else if (visible) {
       setTitle('');
       setAddress('');
@@ -84,6 +89,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
       setReminderMinutes(60);
       setIcon('');
       setDocuments([]);
+      setScheduleConfig(null);
     }
   }, [visible]);
 
@@ -113,53 +119,97 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
 
     setSaving(true);
     try {
-      const [hours, mins] = time.split(':').map(Number);
-      const eventStartDate = new Date(dateFrom);
-      eventStartDate.setHours(hours, mins, 0, 0);
-      const reminderAt = new Date(eventStartDate.getTime() - reminderMinutes * 60 * 1000);
+      if (scheduleConfig) {
+        const startDate = new Date(dateFrom);
+        const eventsToCreate: any[] = [];
 
-      const eventData: any = {
-        title: sanitizeInput(title),
-        description: note.trim() ? sanitizeInput(note) : null,
-        address: address.trim() ? sanitizeInput(address, 200) : null,
-        date: dateFrom,
-        time,
-        reminderMinutes,
-        reminderAt: reminderAt.toISOString(),
-        createdBy: user?.uid,
-        familyId: familyId || null,
-        createdAt: Date.now(),
-        icon: icon || null,
-        documents: documents.length > 0 ? documents : [],
-      };
+        for (let w = 0; w < scheduleConfig.weeks; w++) {
+          for (let d = 0; d < 7; d++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + w * 7 + d);
 
-      eventData.endDate = dateTo;
-      eventData.endTime = endTime;
+            if (scheduleConfig.days.includes(date.getDay())) {
+              const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+              const [h, m] = time.split(':').map(Number);
+              const eventStart = new Date(dateStr);
+              eventStart.setHours(h, m, 0, 0);
+              const reminderAt = new Date(eventStart.getTime() - reminderMinutes * 60 * 1000);
 
-      const docRef = await addDoc(collection(db, 'events'), eventData);
-
-      if (user?.uid) {
-        const profile = await getUserProfile(user.uid);
-        if (profile?.calendarId) {
-          const [eH, eM] = endTime.split(':').map(Number);
-          const endDate = new Date(dateTo);
-          endDate.setHours(eH, eM, 0, 0);
-          const calEventId = await syncEventToCalendar(profile.calendarId, {
-            title: sanitizeInput(title),
-            description: note.trim() ? sanitizeInput(note) : undefined,
-            address: address.trim() ? sanitizeInput(address, 200) : undefined,
-            startDate: eventStartDate,
-            endDate,
-            reminderMinutes,
-          });
-          if (calEventId) {
-            await updateDoc(doc(db, 'events', docRef.id), { calendarEventId: calEventId });
+              eventsToCreate.push({
+                title: sanitizeInput(title),
+                description: note.trim() ? sanitizeInput(note) : null,
+                address: address.trim() ? sanitizeInput(address, 200) : null,
+                date: dateStr,
+                endDate: null,
+                time,
+                endTime: null,
+                reminderMinutes,
+                reminderAt: reminderAt.toISOString(),
+                createdBy: user?.uid,
+                familyId: familyId || null,
+                createdAt: Date.now(),
+                icon: icon || null,
+                documents: documents.length > 0 ? documents : [],
+                scheduleGroupId: scheduleConfig.groupId,
+              });
+            }
           }
         }
-      }
 
-      if (familyId && user) {
-        notifyNewEvent(familyId, sanitizeInput(title), dateFrom, time, user.displayName || 'En i familien').catch(() => {});
+        if (eventsToCreate.length > 0) {
+          for (const evt of eventsToCreate) {
+            await addDoc(collection(db, 'events'), evt);
+          }
+        }
+      } else {
+        const [hours, mins] = time.split(':').map(Number);
+        const eventStartDate = new Date(dateFrom);
+        eventStartDate.setHours(hours, mins, 0, 0);
+        const reminderAt = new Date(eventStartDate.getTime() - reminderMinutes * 60 * 1000);
+
+        const eventData: any = {
+          title: sanitizeInput(title),
+          description: note.trim() ? sanitizeInput(note) : null,
+          address: address.trim() ? sanitizeInput(address, 200) : null,
+          date: dateFrom,
+          time,
+          reminderMinutes,
+          reminderAt: reminderAt.toISOString(),
+          createdBy: user?.uid,
+          familyId: familyId || null,
+          createdAt: Date.now(),
+          icon: icon || null,
+          documents: documents.length > 0 ? documents : [],
+        };
+
+        eventData.endDate = dateTo;
+        eventData.endTime = endTime;
+
+        const docRef = await addDoc(collection(db, 'events'), eventData);
+
+        if (user?.uid) {
+          const profile = await getUserProfile(user.uid);
+          if (profile?.calendarId) {
+            const [eH, eM] = endTime.split(':').map(Number);
+            const endDate = new Date(dateTo);
+            endDate.setHours(eH, eM, 0, 0);
+            const calEventId = await syncEventToCalendar(profile.calendarId, {
+              title: sanitizeInput(title),
+              description: note.trim() ? sanitizeInput(note) : undefined,
+              address: address.trim() ? sanitizeInput(address, 200) : undefined,
+              startDate: eventStartDate,
+              endDate,
+              reminderMinutes,
+            });
+            if (calEventId) {
+              await updateDoc(doc(db, 'events', docRef.id), { calendarEventId: calEventId });
+            }
+          }
+        }
+
+        if (familyId && user) {
+          notifyNewEvent(familyId, sanitizeInput(title), dateFrom, time, user.displayName || 'En i familien').catch(() => {});
+        }
       }
 
       onSaved?.();
@@ -169,9 +219,24 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
     } finally {
       setSaving(false);
     }
-  }, [title, address, dateFrom, dateTo, time, endTime, note, reminderMinutes, user, icon, documents, familyId, onClose, onSaved, saving]);
+  }, [title, address, dateFrom, dateTo, time, endTime, note, reminderMinutes, user, icon, documents, familyId, onClose, onSaved, saving, scheduleConfig]);
+
+  const handleScheduleConfirm = useCallback((config: { days: number[]; weeks: number; groupId: string }) => {
+    setScheduleConfig(config);
+    setShowSchedule(false);
+  }, []);
+
+  const DAY_NAMES = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
+
+  const schedulePreview = useMemo(() => {
+    if (!scheduleConfig) return null;
+    const dayLabels = scheduleConfig.days.map(d => DAY_NAMES[d]).join(', ');
+    const weekLabel = scheduleConfig.weeks === 1 ? '1 uke' : `${scheduleConfig.weeks} uker`;
+    return `${dayLabels} i ${weekLabel}`;
+  }, [scheduleConfig]);
 
   return (
+    <>
     <Modal visible={visible} transparent animationType="slide">
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.modalOverlay}>
@@ -312,6 +377,31 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                   )}
                 </View>
 
+                {/* Schedule */}
+                <View style={styles.field}>
+                  {schedulePreview ? (
+                    <View style={{ padding: 12, borderRadius: 10, backgroundColor: colors.accent + '15', borderWidth: 1, borderColor: colors.accent + '40' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <AppIcon name="schedule" size={18} color={colors.accent} />
+                        <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>Gjentakelse</Text>
+                      </View>
+                      <Text style={{ color: colors.text, fontSize: 13, marginBottom: 8 }}>{schedulePreview}</Text>
+                      <TouchableOpacity onPress={() => { setScheduleConfig(null); }}>
+                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>Fjern gjentakelse</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
+                      onPress={() => setShowSchedule(true)}
+                    >
+                      <AppIcon name="schedule" size={18} color={colors.accent} />
+                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{t('schedule.title')}</Text>
+                      <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+
                 {/* Save & Cancel */}
                 <View style={{ flexDirection: 'row', gap: 12 }}>
                   <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={onClose}>
@@ -342,6 +432,15 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
         </View>
       </TouchableWithoutFeedback>
     </Modal>
+
+    <ScheduleModal
+      visible={showSchedule}
+      onClose={() => setShowSchedule(false)}
+      onConfirm={handleScheduleConfirm}
+      startDate={dateFrom}
+      moduleColor={colors.accent}
+    />
+    </>
   );
 };
 

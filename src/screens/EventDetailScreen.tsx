@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Linking, Image, Modal } from 'react-native';
-import { doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Linking, Image, Modal, TouchableWithoutFeedback } from 'react-native';
+import { doc, updateDoc, deleteDoc, query, where, getDocs, collection, addDoc } from 'firebase/firestore';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { db } from '../services/firebase';
 import { ScheduleModal } from '../components/ScheduleModal';
-import { addDoc, collection } from 'firebase/firestore';
 import { Event } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { cancelNotification } from '../services/notificationService';
@@ -36,7 +35,9 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [isEditing, setIsEditing] = useState(false);
   const [eventData, setEventData] = useState(event);
   const [editDocuments, setEditDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(event.documents || []);
-  const [showSchedule, setShowSchedule] = useState(false);
+  const [showEditSchedule, setShowEditSchedule] = useState(false);
+  const [showScheduleDeleteModal, setShowScheduleDeleteModal] = useState(false);
+  const [editScheduleConfig, setEditScheduleConfig] = useState<{ days: number[]; weeks: number } | null>(null);
   const canDelete = eventData.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
   
   const addOneHour = (t: string): string => {
@@ -151,16 +152,36 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         }
       }
 
+      if (editScheduleConfig && eventData.scheduleGroupId) {
+        const q = query(collection(db, 'events'), where('scheduleGroupId', '==', eventData.scheduleGroupId));
+        const snapshot = await getDocs(q);
+        let deletedCount = 0;
+        for (const d of snapshot.docs) {
+          const evt = d.data();
+          if (evt.date) {
+            const evtDate = new Date(evt.date);
+            if (!editScheduleConfig.days.includes(evtDate.getDay())) {
+              await deleteDoc(doc(db, 'events', d.id));
+              deletedCount++;
+            }
+          }
+        }
+        if (deletedCount > 0) {
+          crossAlert('Gjentakelse oppdatert', `${deletedCount} hendelser ble slettet for fjernede dager.`);
+        }
+      }
+
       setEventData({
         ...eventData,
         ...updateData,
         notificationId: eventData.notificationId,
       });
+      setEditScheduleConfig(null);
       setIsEditing(false);
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [editTitle, editAddress, editDateFrom, editDateTo, editTime, editEndTime, editNote, editReminderMinutes, editIcon, editDocuments, user, event]);
+  }, [editTitle, editAddress, editDateFrom, editDateTo, editTime, editEndTime, editNote, editReminderMinutes, editIcon, editDocuments, user, event, editScheduleConfig]);
 
   const handleCopy = useCallback(() => {
     navigation.navigate('EventsList', {
@@ -179,122 +200,51 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     });
   }, [eventData, navigation]);
 
-  const isScheduled = !!eventData.scheduleGroupId;
+  const handleScheduleConfirm = useCallback((config: { days: number[]; weeks: number; groupId: string }) => {
+    setEditScheduleConfig({ days: config.days, weeks: config.weeks });
+    setShowEditSchedule(false);
+  }, []);
 
-  const handleScheduleConfirm = useCallback(async (config: { days: number[]; weeks: number; groupId: string }) => {
+  const DAY_NAMES_FULL = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
+
+  const handleDeleteThisEvent = useCallback(async () => {
     try {
-      const groupId = eventData.scheduleGroupId || config.groupId;
-
-      // If modifying an existing schedule, delete all events with this groupId
-      if (eventData.scheduleGroupId) {
-        const existingEvents = await import('firebase/firestore').then(m =>
-          m.getDocs(m.query(m.collection(db, 'events'), m.where('scheduleGroupId', '==', eventData.scheduleGroupId!)))
-        );
-        for (const doc of existingEvents.docs) {
-          await deleteDoc(doc.ref);
-        }
+      if (event.notificationId) {
+        await cancelNotification(event.notificationId);
       }
-
-      const startDate = new Date(eventData.date);
-      const eventsToCreate: any[] = [];
-
-      for (let w = 0; w < config.weeks; w++) {
-        for (let d = 0; d < 7; d++) {
-          const date = new Date(startDate);
-          date.setDate(startDate.getDate() + w * 7 + d);
-
-          if (config.days.includes(date.getDay())) {
-            const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-            eventsToCreate.push({
-              title: eventData.title,
-              description: eventData.description || null,
-              address: eventData.address || null,
-              date: dateStr,
-              endDate: eventData.endDate ? (() => {
-                const end = new Date(eventData.endDate);
-                end.setDate(end.getDate() + w * 7 + d);
-                return `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`;
-              })() : null,
-              time: eventData.time,
-              endTime: eventData.endTime || null,
-              reminderMinutes: eventData.reminderMinutes || 30,
-              icon: eventData.icon || null,
-              createdBy: user?.uid,
-              familyId: eventData.familyId || null,
-              createdAt: Date.now(),
-              scheduleGroupId: groupId,
-            });
-          }
-        }
+      if (event.calendarEventId) {
+        await deleteCalendarEvent(event.calendarEventId);
       }
-
-      if (eventsToCreate.length > 0) {
-        for (const evt of eventsToCreate) {
-          await addDoc(collection(db, 'events'), evt);
-        }
-        // Send one notification about the schedule change, not for each event
-        if (eventData.scheduleGroupId && eventsToCreate.length > 0) {
-          const firstEvent = eventsToCreate[0];
-          await import('../services/familyService').then(m =>
-            m.notifyNewEvent(eventData.familyId || '', `${firstEvent.title} (${eventsToCreate.length} ${t('schedule.events')})`, firstEvent.date, firstEvent.time, user?.displayName || 'En i familien')
-          );
-        }
-        crossAlert(t('common.success'), `${eventsToCreate.length} ${t('schedule.events')} ${t('common.saved')}!`);
-      }
-      setShowSchedule(false);
+      await deleteDoc(doc(db, 'events', event.id));
+      navigation.goBack();
     } catch (error) {
-      crossAlert(t('common.error'), getErrorMessage(error));
+      crossAlert('Error', getErrorMessage(error));
     }
-  }, [eventData, user, t]);
+  }, [event, navigation]);
 
-  const handleDeleteSchedule = useCallback(async () => {
-    if (!eventData.scheduleGroupId) return;
-    crossAlert(t('schedule.deleteTitle'), t('schedule.deleteConfirm'), [
-      { text: t('common.cancel'), style: 'cancel' },
-      {
-        text: t('schedule.deleteAll'),
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            const existingEvents = await import('firebase/firestore').then(m =>
-              m.getDocs(m.query(m.collection(db, 'events'), m.where('scheduleGroupId', '==', eventData.scheduleGroupId!)))
-            );
-            for (const doc of existingEvents.docs) {
-              await deleteDoc(doc.ref);
-            }
-            crossAlert(t('common.success'), `${existingEvents.size} ${t('schedule.events')} ${t('common.deleted')}!`);
-            navigation.goBack();
-          } catch (error) {
-            crossAlert(t('common.error'), getErrorMessage(error));
-          }
-        },
-      },
-    ]);
-  }, [eventData, navigation, t]);
+  const handleDeleteAllSchedule = useCallback(async () => {
+    try {
+      const q = query(collection(db, 'events'), where('familyId', '==', event.familyId), where('scheduleGroupId', '==', event.scheduleGroupId));
+      const snapshot = await getDocs(q);
+      for (const d of snapshot.docs) {
+        await deleteDoc(doc(db, 'events', d.id));
+      }
+      navigation.goBack();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
+  }, [event.scheduleGroupId, navigation]);
 
   const handleDelete = useCallback(() => {
-    crossAlert(t('events.deleteTitle'), t('events.deleteConfirm'), [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Slett',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            if (event.notificationId) {
-              await cancelNotification(event.notificationId);
-            }
-            if (event.calendarEventId) {
-              await deleteCalendarEvent(event.calendarEventId);
-            }
-            await deleteDoc(doc(db, 'events', event.id));
-            navigation.goBack();
-          } catch (error) {
-            crossAlert('Error', getErrorMessage(error));
-          }
-        },
-      },
-    ]);
-  }, [event, navigation]);
+    if (eventData.scheduleGroupId) {
+      setShowScheduleDeleteModal(true);
+    } else {
+      crossAlert(t('events.deleteTitle'), t('events.deleteConfirm'), [
+        { text: 'Avbryt', style: 'cancel' },
+        { text: 'Slett', style: 'destructive', onPress: handleDeleteThisEvent },
+      ]);
+    }
+  }, [eventData.scheduleGroupId, handleDeleteThisEvent]);
 
   const dateText = eventData.endDate
     ? `${formatDate(eventData.date)} - ${formatDate(eventData.endDate)}`
@@ -307,16 +257,14 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     ? getStaticMapUrl(eventData.address, 15, '600x300')
     : null;
 
-  if (!isEditing) {
-    const d = eventData.date ? new Date(eventData.date) : null;
-    const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
-    const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
-    const dayName = d ? DAY_NAMES[d.getDay()] : '';
-    const dayNum = d ? d.getDate() : '';
-    const monthStr = d ? MONTHS[d.getMonth()] : '';
+  const d = eventData.date ? new Date(eventData.date) : null;
+  const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
+  const MONTHS = ['JAN', 'FEB', 'MAR', 'APR', 'MAI', 'JUN', 'JUL', 'AUG', 'SEP', 'OKT', 'NOV', 'DES'];
+  const dayName = d ? DAY_NAMES[d.getDay()] : '';
+  const dayNum = d ? d.getDate() : '';
+  const monthStr = d ? MONTHS[d.getMonth()] : '';
 
-    return (
-      <View style={{ flex: 1 }}>
+  const viewContent = (
       <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
@@ -326,14 +274,6 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.accent, alignItems: 'center', justifyContent: 'center' }}>
             <AppIcon name="links" size={16} color={colors.accent} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => { console.log('SCHEDULE CLICK'); setShowSchedule(true); }} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: isScheduled ? colors.accent : colors.textSecondary, backgroundColor: isScheduled ? colors.accent + '20' : 'transparent', alignItems: 'center', justifyContent: 'center' }}>
-            <AppIcon name="schedule" size={16} color={isScheduled ? colors.accent : colors.textSecondary} />
-          </TouchableOpacity>
-          {isScheduled && (
-            <TouchableOpacity onPress={handleDeleteSchedule} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: colors.danger, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={{ color: colors.danger, fontSize: 14 }}>✕</Text>
-            </TouchableOpacity>
-          )}
         </View>
 
         {/* Top card with calendar icon */}
@@ -369,6 +309,12 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         {/* Detail card */}
         <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#3b5a75' }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>Detaljer</Text>
+          {eventData.scheduleGroupId && (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, backgroundColor: '#E3F2FD', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}>
+              <Text style={{ fontSize: 14 }}>📅</Text>
+              <Text style={{ fontSize: 12, fontWeight: '600', color: '#3b5a75' }}>Gjentakelse</Text>
+            </View>
+          )}
           <View style={styles.viewDetailRow}>
             <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📅</Text>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>{dateText}</Text>
@@ -455,11 +401,12 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           </View>
         </View>
       </ScrollView>
-    );
-  }
+  );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background, flex: 1 }]}>
+    <View style={{ flex: 1 }}>
+      {!isEditing && viewContent}
+
       <Modal visible={isEditing} transparent animationType="slide" onRequestClose={() => setIsEditing(false)}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
@@ -472,21 +419,16 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
                 <View style={styles.iconGrid}>
-                  {EVENT_ICONS.map((item) => {
-                    const isSelected = editIcon === item.icon;
-                    return (
-                      <TouchableOpacity
-                        key={item.icon}
-                        style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, isSelected && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-                        onPress={() => setEditIcon(isSelected ? '' : item.icon)}
-                      >
-                        <View style={styles.iconEmoji}>
-                          <AppIcon name={item.icon} size={22} color={isSelected ? '#fff' : colors.textSecondary} />
-                        </View>
-                        <Text style={[styles.iconLabel, { color: isSelected ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
+                  {EVENT_ICONS.map((item) => (
+                    <TouchableOpacity
+                      key={item.icon}
+                      style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, editIcon === item.icon && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+                      onPress={() => setEditIcon(editIcon === item.icon ? '' : item.icon)}
+                    >
+                      <Text style={styles.iconEmoji}>{item.icon}</Text>
+                      <Text style={[styles.iconLabel, { color: editIcon === item.icon ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
               </View>
 
@@ -599,6 +541,32 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                 )}
               </View>
 
+              {/* Schedule editing */}
+              {eventData.scheduleGroupId && (
+                <View style={{ marginBottom: 12 }}>
+                  <Text style={[styles.label, { color: colors.text }]}>Gjentakelse</Text>
+                  {editScheduleConfig ? (
+                    <View style={{ padding: 12, borderRadius: 10, backgroundColor: colors.accent + '15', borderWidth: 1, borderColor: colors.accent + '40' }}>
+                      <Text style={{ color: colors.text, fontSize: 13, marginBottom: 4 }}>
+                        {editScheduleConfig.days.map(d => DAY_NAMES_FULL[d]).join(', ')} i {editScheduleConfig.weeks} {editScheduleConfig.weeks === 1 ? 'uke' : 'uker'}
+                      </Text>
+                      <TouchableOpacity onPress={() => setEditScheduleConfig(null)}>
+                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>Fjern endringer</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
+                      onPress={() => setShowEditSchedule(true)}
+                    >
+                      <Text style={{ fontSize: 16 }}>📅</Text>
+                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{t('schedule.title')}</Text>
+                      <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
+
               {/* Save & Cancel */}
               <View style={{ flexDirection: 'row', gap: 12 }}>
                 <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => setIsEditing(false)}>
@@ -625,15 +593,37 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       </Modal>
 
       <ScheduleModal
-        visible={showSchedule}
-        onClose={() => setShowSchedule(false)}
+        visible={showEditSchedule}
+        onClose={() => setShowEditSchedule(false)}
         onConfirm={handleScheduleConfirm}
-        onDeleteSchedule={isScheduled ? handleDeleteSchedule : undefined}
         startDate={eventData.date}
         moduleColor="#3b5a75"
-        isEditing={isScheduled}
       />
-</View>
+
+      <Modal visible={showScheduleDeleteModal} transparent animationType="fade" onRequestClose={() => setShowScheduleDeleteModal(false)}>
+        <TouchableWithoutFeedback onPress={() => setShowScheduleDeleteModal(false)}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+            <TouchableWithoutFeedback>
+              <View style={{ backgroundColor: colors.surface, borderRadius: 20, padding: 24, width: '100%', maxWidth: 320, alignItems: 'center' }}>
+                <Image source={require('../../assets/icon.png')} style={{ width: 56, height: 56, borderRadius: 14, marginBottom: 16 }} />
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text, textAlign: 'center', marginBottom: 4 }}>Gjentakelse</Text>
+                <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center', marginBottom: 20 }}>Hva vil du gjøre?</Text>
+
+                <TouchableOpacity style={{ width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginBottom: 8, backgroundColor: colors.accent }} onPress={() => { setShowScheduleDeleteModal(false); handleDeleteThisEvent(); }}>
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}>Slett denne hendelsen</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginBottom: 8, backgroundColor: '#E53935' }} onPress={() => { setShowScheduleDeleteModal(false); handleDeleteAllSchedule(); }}>
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}>Slett hele gjentakelsen</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={{ width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center', backgroundColor: colors.inputBackground }} onPress={() => setShowScheduleDeleteModal(false)}>
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textSecondary }}>Avbryt</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+    </View>
   );
 };
 

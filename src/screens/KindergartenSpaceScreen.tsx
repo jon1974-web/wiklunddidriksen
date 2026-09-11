@@ -27,6 +27,9 @@ import { KindergartenChild, KindergartenYear, KindergartenContact, KindergartenS
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 import { DocumentUpload } from '../components/DocumentUpload';
+import { ScheduleModal } from '../components/ScheduleModal';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from '../services/firebase';
 import { getTodayLocal } from '../utils/dateUtils';
 
 const KINDERGARTEN_THEME = '#FF7043';
@@ -84,6 +87,8 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   const [activityActionModal, setActivityActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   type ActivityPickerField = 'dateFrom' | 'dateTo' | 'startTime' | 'endTime' | null;
   const [activeActivityPicker, setActiveActivityPicker] = useState<ActivityPickerField>(null);
+  const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
+  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; groupId: string } | null>(null);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     staff: false,
     members: false,
@@ -502,6 +507,25 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
       }
       if (editingActivityId) {
         await updateKindergartenActivity(familyId, editingActivityId, activityData);
+      } else if (repeatScheduleConfig) {
+        const startDate = new Date(activityForm.dateFrom);
+        for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
+          for (let d = 0; d < 7; d++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + w * 7 + d);
+            if (repeatScheduleConfig.days.includes(date.getDay())) {
+              const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+              await addDoc(collection(db, 'kindergartenActivities', familyId, 'activities'), {
+                ...activityData,
+                dateFrom: dateStr,
+                dateTo: dateStr,
+                scheduleGroupId: repeatScheduleConfig.groupId,
+                createdAt: Date.now(),
+              });
+            }
+          }
+        }
+        notifyHealthItem(familyId, activityForm.title, activityForm.dateFrom, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
       } else {
         await addKindergartenActivity(activityData);
         notifyHealthItem(familyId, activityForm.title, activityForm.dateFrom, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
@@ -509,6 +533,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
       setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
       setEditingActivityId(null);
       setShowAddActivityModal(false);
+      setRepeatScheduleConfig(null);
       loadYearData();
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
@@ -1450,6 +1475,32 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                       </View>
                     )}
                   </ScrollView>
+                  {/* Schedule */}
+                  <View style={{ marginBottom: 16 }}>
+                    {repeatScheduleConfig ? (
+                      <View style={{ padding: 12, borderRadius: 10, backgroundColor: colors.accent + '15', borderWidth: 1, borderColor: colors.accent + '40' }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                          <AppIcon name="schedule" size={18} color={KINDERGARTEN_THEME} />
+                          <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>Gjentakelse</Text>
+                        </View>
+                        <Text style={{ color: colors.text, fontSize: 13, marginBottom: 4 }}>
+                          {repeatScheduleConfig.days.map(d => ['Søn','Man','Tir','Ons','Tor','Fre','Lør'][d]).join(', ')} i {repeatScheduleConfig.weeks} {repeatScheduleConfig.weeks === 1 ? 'uke' : 'uker'}
+                        </Text>
+                        <TouchableOpacity onPress={() => setRepeatScheduleConfig(null)}>
+                          <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>Fjern gjentakelse</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ) : (
+                      <TouchableOpacity
+                        style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
+                        onPress={() => setShowRepeatSchedule(true)}
+                      >
+                        <AppIcon name="schedule" size={18} color={KINDERGARTEN_THEME} />
+                        <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>Planlegg gjentakelse</Text>
+                        <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
                   <View style={{ flexDirection: 'row', gap: 12, marginTop: 12 }}>
                     <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddActivityModal(false); setEditingActivityId(null); }}>
                       <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
@@ -1474,6 +1525,18 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
           selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
           onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo && f.dateTo >= v ? f.dateTo : v })); } else if (activeActivityPicker === 'dateTo') { setActivityForm(f => ({ ...f, dateTo: v >= f.dateFrom ? v : f.dateTo })); } else if (activeActivityPicker === 'startTime') { const [h, m] = v.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setActivityForm(f => ({ ...f, startTime: v, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
           onClose={() => setActiveActivityPicker(null)}
+        />
+
+        {/* Repeat Schedule Modal */}
+        <ScheduleModal
+          visible={showRepeatSchedule}
+          onClose={() => setShowRepeatSchedule(false)}
+          onConfirm={(config) => {
+            setRepeatScheduleConfig(config);
+            setShowRepeatSchedule(false);
+          }}
+          startDate={activityForm.dateFrom}
+          moduleColor={KINDERGARTEN_THEME}
         />
       </>
     );

@@ -329,6 +329,7 @@ export interface PetVetVisit {
   status: 'planned' | 'completed';
   addToCalendar?: boolean;
   documents?: SchoolActivityDocument[];
+  scheduleGroupId?: string;
   createdAt: number;
 }
 
@@ -493,6 +494,7 @@ export interface HealthAppointment {
   addToCalendar?: boolean;
   notificationId?: string;
   documents?: SchoolActivityDocument[];
+  scheduleGroupId?: string;
   createdAt: number;
 }
 
@@ -624,6 +626,7 @@ export interface SchoolActivity {
   reminderAt?: string;
   documents?: SchoolActivityDocument[];
   createdBy?: string;
+  scheduleGroupId?: string;
   googleCalendarEventId?: string;
   createdAt: number;
 }
@@ -645,6 +648,7 @@ export interface KindergartenActivity {
   reminderAt?: string;
   documents?: SchoolActivityDocument[];
   createdBy?: string;
+  scheduleGroupId?: string;
   googleCalendarEventId?: string;
   createdAt: number;
 }

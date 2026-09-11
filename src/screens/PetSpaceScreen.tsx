@@ -30,6 +30,7 @@ import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { getTodayLocal } from '../utils/dateUtils';
+import { ScheduleModal } from '../components/ScheduleModal';
 
 const PET_ICONS: Record<string, string> = { 'Katt': '🐱', 'Hund': '🐶', 'Fisk': '🐟', 'Fugl': '🐦', 'Kanin': '🐰', 'Hamster': '🐹', 'Skilpadde': '🐢', 'Hest': '🐴', 'Anna': '🐾' };
 const PET_TYPES = ['Katt', 'Hund', 'Fisk', 'Fugl', 'Kanin', 'Skilpadde', 'Hamster', 'Hest', 'Anna'];
@@ -74,6 +75,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
   const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
+  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; groupId: string } | null>(null);
   const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -238,15 +241,34 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         if (!vetForm.title.trim() || !vetForm.dateFrom) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
         if (isEditing) {
           await updateVetVisit(editingItem.id, vetForm);
+        } else if (repeatScheduleConfig) {
+          const startDate = new Date(vetForm.dateFrom);
+          for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
+            for (let d = 0; d < 7; d++) {
+              const date = new Date(startDate);
+              date.setDate(startDate.getDate() + w * 7 + d);
+              if (repeatScheduleConfig.days.includes(date.getDay())) {
+                const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                await addDoc(collection(db, 'petVetVisits'), {
+                  ...vetForm,
+                  dateFrom: dateStr,
+                  dateTo: dateStr,
+                  petId: selectedPet.id,
+                  familyId,
+                  createdBy: user?.uid || null,
+                  scheduleGroupId: repeatScheduleConfig.groupId,
+                  createdAt: Date.now(),
+                });
+              }
+            }
+          }
+          notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         } else {
           await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId }, user?.uid);
-        }
-        if (!isEditing && vetForm.dateFrom) {
-          const reminderMinutes = vetForm.reminder || 0;
-          const eventDate = new Date(`${vetForm.dateFrom}T${vetForm.startTime || '09:00'}:00`);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
         setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' });
+        setRepeatScheduleConfig(null);
       } else if (activeSection === 'medications') {
         if (!medForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetMedication(editingItem.id, medForm);
@@ -1055,9 +1077,37 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                       <Text style={[styles.label, { color: colors.text }]}>{t('common.note')}</Text>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={insForm.note} onChangeText={(v) => setInsForm(f => ({ ...f, note: v }))} placeholderTextColor={colors.textDisabled} multiline />
                     </View>
-                  </>
-                )}
+                </>
+              )}
               </ScrollView>
+              {/* Schedule - only for vet visits */}
+              {activeSection === 'vetVisits' && (
+                <View style={{ marginBottom: 16 }}>
+                  {repeatScheduleConfig ? (
+                    <View style={{ padding: 12, borderRadius: 10, backgroundColor: colors.accent + '15', borderWidth: 1, borderColor: colors.accent + '40' }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <AppIcon name="schedule" size={18} color={MODULE_COLORS.pets} />
+                        <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>Gjentakelse</Text>
+                      </View>
+                      <Text style={{ color: colors.text, fontSize: 13, marginBottom: 4 }}>
+                        {repeatScheduleConfig.days.map(d => ['Søn','Man','Tir','Ons','Tor','Fre','Lør'][d]).join(', ')} i {repeatScheduleConfig.weeks} {repeatScheduleConfig.weeks === 1 ? 'uke' : 'uker'}
+                      </Text>
+                      <TouchableOpacity onPress={() => setRepeatScheduleConfig(null)}>
+                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>Fjern gjentakelse</Text>
+                      </TouchableOpacity>
+                    </View>
+                  ) : (
+                    <TouchableOpacity
+                      style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
+                      onPress={() => setShowRepeatSchedule(true)}
+                    >
+                      <AppIcon name="schedule" size={18} color={MODULE_COLORS.pets} />
+                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>Planlegg gjentakelse</Text>
+                      <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
+                    </TouchableOpacity>
+                  )}
+                </View>
+              )}
               <View style={styles.modalActions}>
                 <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowItemModal(false); setEditingItem(null); }}>
                   <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
@@ -1420,6 +1470,18 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         }}
         onClose={() => setActivePicker(null)}
         accentColor={MODULE_COLORS.pets}
+      />
+
+      {/* Repeat Schedule Modal */}
+      <ScheduleModal
+        visible={showRepeatSchedule}
+        onClose={() => setShowRepeatSchedule(false)}
+        onConfirm={(config) => {
+          setRepeatScheduleConfig(config);
+          setShowRepeatSchedule(false);
+        }}
+        startDate={vetForm.dateFrom}
+        moduleColor={PET_THEME}
       />
 
       <HelpCenter
