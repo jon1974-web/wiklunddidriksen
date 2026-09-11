@@ -813,7 +813,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
             </View>
             <View style={styles.spondCardContent}>
-              <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.icon || '✈️'} {item.title}</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                {item._type === 'event' && item.icon ? (
+                  <AppIcon name={item.icon as any} size={16} color={colors.accent} />
+                ) : (
+                  <Text>{item.icon || '✈️'}</Text>
+                )}
+                <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
+              </View>
               <View style={styles.spondTimeRow}>
                 <View style={styles.tripDateIconOuter}>
                   <View style={styles.tripDateIconTop} />
