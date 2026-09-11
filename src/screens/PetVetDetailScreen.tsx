@@ -173,7 +173,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         <Text style={[styles.sectionLabel, { color: PET_COLOR }]}>Detaljer</Text>
         {visit.scheduleGroupId && (
           <View style={styles.viewDetailRow}>
-            <View style={styles.viewDetailLabel}><AppIcon name="schedule" size={18} color={colors.textSecondary} /></View>
+            <View style={[styles.viewDetailLabel, { alignItems: 'center', justifyContent: 'center' }]}><AppIcon name="schedule" size={18} color={colors.textSecondary} /></View>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>
               {scheduleInfo ? `Gjentakelse · ${scheduleInfo.weekType === 'odd' ? 'Oddetall uker' : scheduleInfo.weekType === 'even' ? 'Partall uker' : 'Alle uker'} · ${scheduleInfo.startDate} – ${scheduleInfo.endDate}` : 'Gjentakelse'}
             </Text>

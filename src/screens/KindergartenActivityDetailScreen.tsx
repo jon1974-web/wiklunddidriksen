@@ -167,7 +167,7 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
         <Text style={[styles.sectionLabel, { color: KINDERGARTEN_COLOR }]}>Detaljer</Text>
         {activity.scheduleGroupId && (
           <View style={styles.viewDetailRow}>
-            <View style={styles.viewDetailLabel}><AppIcon name="schedule" size={18} color={colors.textSecondary} /></View>
+            <View style={[styles.viewDetailLabel, { alignItems: 'center', justifyContent: 'center' }]}><AppIcon name="schedule" size={18} color={colors.textSecondary} /></View>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>
               {scheduleInfo ? `Gjentakelse · ${scheduleInfo.weekType === 'odd' ? 'Oddetall uker' : scheduleInfo.weekType === 'even' ? 'Partall uker' : 'Alle uker'} · ${scheduleInfo.startDate} – ${scheduleInfo.endDate}` : 'Gjentakelse'}
             </Text>

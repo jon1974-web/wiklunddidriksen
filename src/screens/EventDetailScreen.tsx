@@ -357,7 +357,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>Detaljer</Text>
           {eventData.scheduleGroupId && (
             <View style={styles.viewDetailRow}>
-              <View style={styles.viewDetailLabel}>
+              <View style={[styles.viewDetailLabel, { alignItems: 'center', justifyContent: 'center' }]}>
                 <AppIcon name="schedule" size={18} color={colors.textSecondary} />
               </View>
               <Text style={[styles.viewDetailValue, { color: colors.text }]}>
