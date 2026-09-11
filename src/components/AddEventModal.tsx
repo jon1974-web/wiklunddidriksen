@@ -43,6 +43,14 @@ const addOneHour = (time: string): string => {
   return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
 };
 
+function getWeekNumber(date: Date): number {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
+
 export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, onSaved, prefill }) => {
   const { t } = useTranslation();
   const [title, setTitle] = useState(prefill?.title || '');
@@ -57,7 +65,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
   const [documents, setDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(prefill?.documents || []);
   const [saving, setSaving] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
-  const [scheduleConfig, setScheduleConfig] = useState<{ days: number[]; weeks: number; groupId: string } | null>(null);
+  const [scheduleConfig, setScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
@@ -124,6 +132,10 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
         const eventsToCreate: any[] = [];
 
         for (let w = 0; w < scheduleConfig.weeks; w++) {
+          const weekNum = getWeekNumber(startDate) + w;
+          if (scheduleConfig.weekType === 'odd' && weekNum % 2 === 0) continue;
+          if (scheduleConfig.weekType === 'even' && weekNum % 2 !== 0) continue;
+
           for (let d = 0; d < 7; d++) {
             const date = new Date(startDate);
             date.setDate(startDate.getDate() + w * 7 + d);
@@ -221,7 +233,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
     }
   }, [title, address, dateFrom, dateTo, time, endTime, note, reminderMinutes, user, icon, documents, familyId, onClose, onSaved, saving, scheduleConfig]);
 
-  const handleScheduleConfirm = useCallback((config: { days: number[]; weeks: number; groupId: string }) => {
+  const handleScheduleConfirm = useCallback((config: { days: number[]; weeks: number; weekType: string; groupId: string }) => {
     setScheduleConfig(config);
     setShowSchedule(false);
   }, []);

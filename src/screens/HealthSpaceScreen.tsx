@@ -64,7 +64,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [medForm, setMedForm] = useState({ name: '', person: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
   const [apptForm, setApptForm] = useState<{ title: string; person: string[]; doctor: string; dateFrom: string; dateTo: string; startTime: string; endTime: string; location: string; note: string; reminder: number; documents: { url: string; fileName: string; type: 'image' | 'document' }[] }>({ title: '', person: [], doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
   const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
-  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; groupId: string } | null>(null);
+  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
@@ -164,6 +164,10 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         } else if (repeatScheduleConfig) {
           const startDate = new Date(apptForm.dateFrom);
           for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
+            const weekNum = getWeekNumber(startDate) + w;
+            if (repeatScheduleConfig.weekType === 'odd' && weekNum % 2 === 0) continue;
+            if (repeatScheduleConfig.weekType === 'even' && weekNum % 2 !== 0) continue;
+
             for (let d = 0; d < 7; d++) {
               const date = new Date(startDate);
               date.setDate(startDate.getDate() + w * 7 + d);

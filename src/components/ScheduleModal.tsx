@@ -7,6 +7,7 @@ import { AppIcon } from './AppIcon';
 interface ScheduleConfig {
   days: number[];
   weeks: number;
+  weekType: string;
   groupId: string;
 }
 
@@ -105,6 +106,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
     onConfirm({
       days: selectedDays,
       weeks: effectiveWeeks,
+      weekType,
       groupId: `schedule_${Date.now()}`,
     });
   }, [selectedDays, effectiveWeeks, previewDates, onConfirm]);

@@ -32,6 +32,15 @@ import { ScheduleModal } from '../components/ScheduleModal';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../services/firebase';
 
+
+function getWeekNumber(date: Date): number {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
+
 const SCHOOL_THEME = MODULE_COLORS.school;
 
 interface SchoolSpaceScreenProps {
@@ -106,7 +115,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   type ActivityPickerField = 'dateFrom' | 'dateTo' | 'startTime' | 'endTime' | null;
   const [activeActivityPicker, setActiveActivityPicker] = useState<ActivityPickerField>(null);
   const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
-  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; groupId: string } | null>(null);
+  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
   const [activeSemester, setActiveSemester] = useState<'høst' | 'vår'>('høst');
 
   const [showAddChildModal, setShowAddChildModal] = useState(false);
@@ -514,6 +523,10 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       } else if (repeatScheduleConfig) {
         const startDate = new Date(activityForm.dateFrom);
         for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
+          const weekNum = getWeekNumber(startDate) + w;
+          if (repeatScheduleConfig.weekType === 'odd' && weekNum % 2 === 0) continue;
+          if (repeatScheduleConfig.weekType === 'even' && weekNum % 2 !== 0) continue;
+
           for (let d = 0; d < 7; d++) {
             const date = new Date(startDate);
             date.setDate(startDate.getDate() + w * 7 + d);

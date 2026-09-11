@@ -34,6 +34,15 @@ import { ScheduleModal } from '../components/ScheduleModal';
 
 const PET_ICONS: Record<string, string> = { 'Katt': '🐱', 'Hund': '🐶', 'Fisk': '🐟', 'Fugl': '🐦', 'Kanin': '🐰', 'Hamster': '🐹', 'Skilpadde': '🐢', 'Hest': '🐴', 'Anna': '🐾' };
 const PET_TYPES = ['Katt', 'Hund', 'Fisk', 'Fugl', 'Kanin', 'Skilpadde', 'Hamster', 'Hest', 'Anna'];
+
+function getWeekNumber(date: Date): number {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
+
 const PET_THEME = MODULE_COLORS.pets;
 
 type PetSectionType = 'vetVisits' | 'medications' | 'food' | 'grooming' | 'vaccinations' | 'insurance';
@@ -76,7 +85,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
 
   const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
-  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; groupId: string } | null>(null);
+  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
   const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -244,6 +253,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         } else if (repeatScheduleConfig) {
           const startDate = new Date(vetForm.dateFrom);
           for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
+            const weekNum = getWeekNumber(startDate) + w;
+            if (repeatScheduleConfig.weekType === 'odd' && weekNum % 2 === 0) continue;
+            if (repeatScheduleConfig.weekType === 'even' && weekNum % 2 !== 0) continue;
+
             for (let d = 0; d < 7; d++) {
               const date = new Date(startDate);
               date.setDate(startDate.getDate() + w * 7 + d);
