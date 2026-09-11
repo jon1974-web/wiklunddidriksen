@@ -40,39 +40,16 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [editScheduleConfig, setEditScheduleConfig] = useState<{ days: number[]; weeks: number } | null>(null);
   const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
   const [preloadedWeeks, setPreloadedWeeks] = useState<number>(4);
-  const canDelete = eventData.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
+  const [preloadedWeekType, setPreloadedWeekType] = useState<string>('all');
 
-  useEffect(() => {
-    if (isEditing && eventData.scheduleGroupId) {
-      const loadSchedule = async () => {
-        try {
-          const q = query(collection(db, 'events'), where('familyId', '==', event.familyId), where('scheduleGroupId', '==', eventData.scheduleGroupId));
-          const snapshot = await getDocs(q);
-          const daySet = new Set<number>();
-          let minDate = Infinity;
-          let maxDate = -Infinity;
-          for (const d of snapshot.docs) {
-            const evt = d.data();
-            if (evt.date) {
-              const dt = new Date(evt.date);
-              daySet.add(dt.getDay());
-              const ts = dt.getTime();
-              if (ts < minDate) minDate = ts;
-              if (ts > maxDate) maxDate = ts;
-            }
-          }
-          const days = Array.from(daySet).sort((a, b) => a - b);
-          const weeks = Math.max(1, Math.round((maxDate - minDate) / (7 * 86400000)) + 1);
-          setPreloadedDays(days);
-          setPreloadedWeeks(weeks);
-        } catch (error) {
-          setPreloadedDays([1]);
-          setPreloadedWeeks(4);
-        }
-      };
-      loadSchedule();
-    }
-  }, [isEditing, eventData.scheduleGroupId]);
+  const getWeekNumber = (date: Date): number => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+    const week1 = new Date(d.getFullYear(), 0, 4);
+    return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  };
+  const canDelete = eventData.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
   
   const addOneHour = (t: string): string => {
     const [h, m] = t.split(':').map(Number);
@@ -591,7 +568,42 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                   ) : (
                     <TouchableOpacity
                       style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
-                      onPress={() => setShowEditSchedule(true)}
+                      onPress={async () => {
+                        if (eventData.scheduleGroupId) {
+                          try {
+                            const q = query(collection(db, 'events'), where('familyId', '==', event.familyId), where('scheduleGroupId', '==', eventData.scheduleGroupId));
+                            const snapshot = await getDocs(q);
+                            const daySet = new Set<number>();
+                            const weekNums = new Set<number>();
+                            let minDate = Infinity;
+                            let maxDate = -Infinity;
+                            for (const d of snapshot.docs) {
+                              const evt = d.data();
+                              if (evt.date) {
+                                const dt = new Date(evt.date);
+                                daySet.add(dt.getDay());
+                                weekNums.add(getWeekNumber(dt));
+                                const ts = dt.getTime();
+                                if (ts < minDate) minDate = ts;
+                                if (ts > maxDate) maxDate = ts;
+                              }
+                            }
+                            const days = Array.from(daySet).sort((a, b) => a - b);
+                            const weeks = Math.max(1, Math.round((maxDate - minDate) / (7 * 86400000)) + 1);
+                            const hasOdd = Array.from(weekNums).some(w => w % 2 !== 0);
+                            const hasEven = Array.from(weekNums).some(w => w % 2 === 0);
+                            const wType = hasOdd && hasEven ? 'all' : hasOdd ? 'odd' : hasEven ? 'even' : 'all';
+                            setPreloadedDays(days);
+                            setPreloadedWeeks(weeks);
+                            setPreloadedWeekType(wType);
+                          } catch (error) {
+                            setPreloadedDays([1]);
+                            setPreloadedWeeks(4);
+                            setPreloadedWeekType('all');
+                          }
+                        }
+                        setShowEditSchedule(true);
+                      }}
                     >
                       <AppIcon name="schedule" size={18} color={colors.accent} />
                       <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>Rediger gjentakelse</Text>
@@ -634,6 +646,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         moduleColor="#3b5a75"
         preselectedDays={preloadedDays}
         preselectedWeeks={preloadedWeeks}
+        preselectedWeekType={preloadedWeekType}
         isEditing
       />
 

@@ -20,6 +20,7 @@ interface ScheduleModalProps {
   moduleColor: string;
   preselectedDays?: number[];
   preselectedWeeks?: number;
+  preselectedWeekType?: string;
   isEditing?: boolean;
 }
 
@@ -49,12 +50,12 @@ function getWeekNumber(date: Date): number {
   return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
 }
 
-export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, onConfirm, onDeleteSchedule, startDate, moduleColor, preselectedDays, preselectedWeeks, isEditing }) => {
+export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, onConfirm, onDeleteSchedule, startDate, moduleColor, preselectedDays, preselectedWeeks, preselectedWeekType, isEditing }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
 
   const [selectedDays, setSelectedDays] = useState<number[]>(preselectedDays || [1]);
-  const [weekType, setWeekType] = useState<string>('all');
+  const [weekType, setWeekType] = useState<string>(preselectedWeekType || 'all');
   const [weekCount, setWeekCount] = useState<number>(preselectedWeeks || 4);
   const [customWeeks, setCustomWeeks] = useState('');
   const [showCustom, setShowCustom] = useState(false);
@@ -63,11 +64,12 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
   React.useEffect(() => {
     if (visible) {
       setSelectedDays(preselectedDays || [1]);
+      setWeekType(preselectedWeekType || 'all');
       setWeekCount(preselectedWeeks || 4);
       setShowCustom(false);
       setCustomWeeks('');
     }
-  }, [visible, preselectedDays, preselectedWeeks]);
+  }, [visible, preselectedDays, preselectedWeeks, preselectedWeekType]);
 
   const toggleDay = (day: number) => {
     setSelectedDays(prev => prev.includes(day) ? prev.filter(d => d !== day) : [...prev, day]);
