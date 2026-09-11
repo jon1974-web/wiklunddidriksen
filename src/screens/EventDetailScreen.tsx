@@ -38,7 +38,41 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [showEditSchedule, setShowEditSchedule] = useState(false);
   const [showScheduleDeleteModal, setShowScheduleDeleteModal] = useState(false);
   const [editScheduleConfig, setEditScheduleConfig] = useState<{ days: number[]; weeks: number } | null>(null);
+  const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
+  const [preloadedWeeks, setPreloadedWeeks] = useState<number>(4);
   const canDelete = eventData.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
+
+  useEffect(() => {
+    if (isEditing && eventData.scheduleGroupId) {
+      const loadSchedule = async () => {
+        try {
+          const q = query(collection(db, 'events'), where('familyId', '==', event.familyId), where('scheduleGroupId', '==', eventData.scheduleGroupId));
+          const snapshot = await getDocs(q);
+          const daySet = new Set<number>();
+          let minDate = Infinity;
+          let maxDate = -Infinity;
+          for (const d of snapshot.docs) {
+            const evt = d.data();
+            if (evt.date) {
+              const dt = new Date(evt.date);
+              daySet.add(dt.getDay());
+              const ts = dt.getTime();
+              if (ts < minDate) minDate = ts;
+              if (ts > maxDate) maxDate = ts;
+            }
+          }
+          const days = Array.from(daySet).sort((a, b) => a - b);
+          const weeks = Math.max(1, Math.round((maxDate - minDate) / (7 * 86400000)) + 1);
+          setPreloadedDays(days);
+          setPreloadedWeeks(weeks);
+        } catch (error) {
+          setPreloadedDays([1]);
+          setPreloadedWeeks(4);
+        }
+      };
+      loadSchedule();
+    }
+  }, [isEditing, eventData.scheduleGroupId]);
   
   const addOneHour = (t: string): string => {
     const [h, m] = t.split(':').map(Number);
@@ -425,7 +459,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                       style={[styles.iconOption, { backgroundColor: colors.surface, borderColor: colors.border }, editIcon === item.icon && { backgroundColor: colors.accent, borderColor: colors.accent }]}
                       onPress={() => setEditIcon(editIcon === item.icon ? '' : item.icon)}
                     >
-                      <Text style={styles.iconEmoji}>{item.icon}</Text>
+                      <AppIcon name={item.icon as any} size={22} color={editIcon === item.icon ? '#fff' : colors.textSecondary} />
                       <Text style={[styles.iconLabel, { color: editIcon === item.icon ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
                     </TouchableOpacity>
                   ))}
@@ -559,8 +593,8 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                       style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
                       onPress={() => setShowEditSchedule(true)}
                     >
-                      <Text style={{ fontSize: 16 }}>📅</Text>
-                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{t('schedule.title')}</Text>
+                      <AppIcon name="schedule" size={18} color={colors.accent} />
+                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>Rediger gjentakelse</Text>
                       <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
                     </TouchableOpacity>
                   )}
@@ -598,6 +632,9 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         onConfirm={handleScheduleConfirm}
         startDate={eventData.date}
         moduleColor="#3b5a75"
+        preselectedDays={preloadedDays}
+        preselectedWeeks={preloadedWeeks}
+        isEditing
       />
 
       <Modal visible={showScheduleDeleteModal} transparent animationType="fade" onRequestClose={() => setShowScheduleDeleteModal(false)}>
