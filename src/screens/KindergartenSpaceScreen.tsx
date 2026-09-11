@@ -28,7 +28,7 @@ import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 import { DocumentUpload } from '../components/DocumentUpload';
 import { ScheduleModal } from '../components/ScheduleModal';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { getTodayLocal } from '../utils/dateUtils';
 
@@ -98,6 +98,9 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   const [activeActivityPicker, setActiveActivityPicker] = useState<ActivityPickerField>(null);
   const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
   const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
+  const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
+  const [preloadedWeeks, setPreloadedWeeks] = useState<number>(4);
+  const [preloadedWeekType, setPreloadedWeekType] = useState<string>('all');
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     staff: false,
     members: false,
@@ -516,6 +519,28 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
       }
       if (editingActivityId) {
         await updateKindergartenActivity(familyId, editingActivityId, activityData);
+        if (repeatScheduleConfig) {
+          const editingActivity = activities.find(a => a.id === editingActivityId);
+          if (editingActivity?.scheduleGroupId) {
+            const q = query(collection(db, 'kindergartenActivities', familyId, 'activities'), where('familyId', '==', familyId), where('scheduleGroupId', '==', editingActivity.scheduleGroupId));
+            const snapshot = await getDocs(q);
+            let deletedCount = 0;
+            for (const d of snapshot.docs) {
+              const evt = d.data();
+              const dateField = evt.dateFrom || evt.date;
+              if (dateField) {
+                const evtDate = new Date(dateField);
+                if (!repeatScheduleConfig.days.includes(evtDate.getDay())) {
+                  await deleteDoc(doc(db, 'kindergartenActivities', familyId, 'activities', d.id));
+                  deletedCount++;
+                }
+              }
+            }
+            if (deletedCount > 0) {
+              crossAlert('Gjentakelse oppdatert', `${deletedCount} aktiviteter ble slettet for fjernede dager.`);
+            }
+          }
+        }
       } else if (repeatScheduleConfig) {
         const startDate = new Date(activityForm.dateFrom);
         for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
@@ -1506,10 +1531,50 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     ) : (
                       <TouchableOpacity
                         style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
-                        onPress={() => setShowRepeatSchedule(true)}
+                        onPress={async () => {
+                          if (!familyId) return;
+                          if (editingActivityId) {
+                            const editingActivity = activities.find(a => a.id === editingActivityId);
+                            if (editingActivity?.scheduleGroupId) {
+                              try {
+                                const groupId = editingActivity.scheduleGroupId;
+                                const q = query(collection(db, 'kindergartenActivities', familyId, 'activities'), where('familyId', '==', familyId), where('scheduleGroupId', '==', groupId));
+                                const snapshot = await getDocs(q);
+                                const daySet = new Set<number>();
+                                const weekNums = new Set<number>();
+                                let minDate = Infinity;
+                                let maxDate = -Infinity;
+                                for (const d of snapshot.docs) {
+                                  const evt = d.data();
+                                  const dateField = evt.dateFrom || evt.date;
+                                  if (dateField) {
+                                    const dt = new Date(dateField);
+                                    daySet.add(dt.getDay());
+                                    weekNums.add(getWeekNumber(dt));
+                                    const ts = dt.getTime();
+                                    if (ts < minDate) minDate = ts;
+                                    if (ts > maxDate) maxDate = ts;
+                                  }
+                                }
+                                const days = Array.from(daySet).sort((a, b) => a - b);
+                                const weeks = Math.max(1, Math.round((maxDate - minDate) / (7 * 86400000)) + 1);
+                                const hasOdd = Array.from(weekNums).some(w => w % 2 !== 0);
+                                const hasEven = Array.from(weekNums).some(w => w % 2 === 0);
+                                setPreloadedDays(days);
+                                setPreloadedWeeks(weeks);
+                                setPreloadedWeekType(hasOdd && hasEven ? 'all' : hasOdd ? 'odd' : hasEven ? 'even' : 'all');
+                              } catch (error) {
+                                setPreloadedDays([1]);
+                                setPreloadedWeeks(4);
+                                setPreloadedWeekType('all');
+                              }
+                            }
+                          }
+                          setShowRepeatSchedule(true);
+                        }}
                       >
                         <AppIcon name="schedule" size={18} color={KINDERGARTEN_THEME} />
-                        <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>Planlegg gjentakelse</Text>
+                        <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{editingActivityId && activities.find(a => a.id === editingActivityId)?.scheduleGroupId ? 'Rediger gjentakelse' : 'Planlegg gjentakelse'}</Text>
                         <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
                       </TouchableOpacity>
                     )}
@@ -1550,6 +1615,10 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
           }}
           startDate={activityForm.dateFrom}
           moduleColor={KINDERGARTEN_THEME}
+          preselectedDays={preloadedDays}
+          preselectedWeeks={preloadedWeeks}
+          preselectedWeekType={preloadedWeekType}
+          isEditing={!!editingActivityId}
         />
       </>
     );

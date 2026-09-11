@@ -32,6 +32,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
 
+
   const getWeekNumber = (date: Date): number => {
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
@@ -39,6 +40,9 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
     const week1 = new Date(d.getFullYear(), 0, 4);
     return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
   };
+
+  const familyId = useUserStore((state) => state.familyId);
+
 
   useEffect(() => {
     const groupId = activity.scheduleGroupId;
@@ -92,7 +96,6 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
   const mapUrl = useMemo(() => activity.location ? getStaticMapUrl(activity.location, 15, '600x300') : null, [activity.location]);
 
   const isCompleted = d ? d < new Date() : false;
-  const familyId = useUserStore((state) => state.familyId);
   const canDelete = activity.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
 
   const handleDelete = async () => {
@@ -253,7 +256,7 @@ const handleCopy = useCallback(() => {
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: SCHOOL_COLOR, flex: 1 }]}
-            onPress={() => navigation.navigate('SchoolSpace', { editActivityId: activity.id, childId: activity.childId, editActivityData: { title: activity.title, activityType: activity.activityType, dateFrom: activity.dateFrom, dateTo: activity.dateTo || '', startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [] }, returnToEvents: source === 'events' })}
+            onPress={() => navigation.navigate('SchoolSpace', { editActivityId: activity.id, childId: activity.childId, editActivityData: { title: activity.title, activityType: activity.activityType, dateFrom: activity.dateFrom, dateTo: activity.dateTo || '', startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [], scheduleGroupId: activity.scheduleGroupId || '' }, returnToEvents: source === 'events' })}
           >
             <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.edit')}</Text>
           </TouchableOpacity>

@@ -13,7 +13,7 @@ import { DocumentUpload } from '../components/DocumentUpload';
 import { getErrorMessage } from '../utils/validation';
 import { notifyHealthItem, getUserProfile } from '../services/familyService';
 import { db } from '../services/firebase';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import {
   getPets, addPet, updatePet, deletePet,
   getVetVisits, addVetVisit, updateVetVisit, deleteVetVisit,
@@ -86,6 +86,9 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
   const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
   const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
+  const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
+  const [preloadedWeeks, setPreloadedWeeks] = useState<number>(4);
+  const [preloadedWeekType, setPreloadedWeekType] = useState<string>('all');
   const [medForm, setMedForm] = useState({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }] as { time: string; reminderMinutes: number }[], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
   const [foodForm, setFoodForm] = useState({ name: '', time: '', amount: '', note: '' });
   const [groomForm, setGroomForm] = useState({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -250,6 +253,28 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         if (!vetForm.title.trim() || !vetForm.dateFrom) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
         if (isEditing) {
           await updateVetVisit(editingItem.id, vetForm);
+          if (repeatScheduleConfig) {
+            const editingVisit = vetVisits.find(v => v.id === editingItem.id);
+            if (editingVisit?.scheduleGroupId) {
+              const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), where('scheduleGroupId', '==', editingVisit.scheduleGroupId));
+              const snapshot = await getDocs(q);
+              let deletedCount = 0;
+              for (const d of snapshot.docs) {
+                const evt = d.data();
+                const dateField = evt.dateFrom || evt.date;
+                if (dateField) {
+                  const evtDate = new Date(dateField);
+                  if (!repeatScheduleConfig.days.includes(evtDate.getDay())) {
+                    await deleteDoc(doc(db, 'petVetVisits', d.id));
+                    deletedCount++;
+                  }
+                }
+              }
+              if (deletedCount > 0) {
+                crossAlert('Gjentakelse oppdatert', `${deletedCount} veterinærbesøk ble slettet for fjernede dager.`);
+              }
+            }
+          }
         } else if (repeatScheduleConfig) {
           const startDate = new Date(vetForm.dateFrom);
           for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
@@ -1112,10 +1137,50 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                   ) : (
                     <TouchableOpacity
                       style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
-                      onPress={() => setShowRepeatSchedule(true)}
+                    onPress={async () => {
+                      if (!familyId) return;
+                      if (editingItem && editingItem.section === 'vetVisits') {
+                        const editingVisit = vetVisits.find(v => v.id === editingItem.id);
+                        if (editingVisit?.scheduleGroupId) {
+                          try {
+                            const groupId = editingVisit.scheduleGroupId;
+                            const q = query(collection(db, 'petVetVisits'), where('familyId', '==', familyId), where('scheduleGroupId', '==', groupId));
+                              const snapshot = await getDocs(q);
+                              const daySet = new Set<number>();
+                              const weekNums = new Set<number>();
+                              let minDate = Infinity;
+                              let maxDate = -Infinity;
+                              for (const d of snapshot.docs) {
+                                const evt = d.data();
+                                const dateField = evt.dateFrom || evt.date;
+                                if (dateField) {
+                                  const dt = new Date(dateField);
+                                  daySet.add(dt.getDay());
+                                  weekNums.add(getWeekNumber(dt));
+                                  const ts = dt.getTime();
+                                  if (ts < minDate) minDate = ts;
+                                  if (ts > maxDate) maxDate = ts;
+                                }
+                              }
+                              const days = Array.from(daySet).sort((a, b) => a - b);
+                              const weeks = Math.max(1, Math.round((maxDate - minDate) / (7 * 86400000)) + 1);
+                              const hasOdd = Array.from(weekNums).some(w => w % 2 !== 0);
+                              const hasEven = Array.from(weekNums).some(w => w % 2 === 0);
+                              setPreloadedDays(days);
+                              setPreloadedWeeks(weeks);
+                              setPreloadedWeekType(hasOdd && hasEven ? 'all' : hasOdd ? 'odd' : hasEven ? 'even' : 'all');
+                            } catch (error) {
+                              setPreloadedDays([1]);
+                              setPreloadedWeeks(4);
+                              setPreloadedWeekType('all');
+                            }
+                          }
+                        }
+                        setShowRepeatSchedule(true);
+                      }}
                     >
                       <AppIcon name="schedule" size={18} color={MODULE_COLORS.pets} />
-                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>Planlegg gjentakelse</Text>
+                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{editingItem && editingItem.section === 'vetVisits' && vetVisits.find(v => v.id === editingItem.id)?.scheduleGroupId ? 'Rediger gjentakelse' : 'Planlegg gjentakelse'}</Text>
                       <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
                     </TouchableOpacity>
                   )}
@@ -1495,6 +1560,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         }}
         startDate={vetForm.dateFrom}
         moduleColor={PET_THEME}
+        preselectedDays={preloadedDays}
+        preselectedWeeks={preloadedWeeks}
+        preselectedWeekType={preloadedWeekType}
+        isEditing={!!editingItem && editingItem.section === 'vetVisits'}
       />
 
       <HelpCenter

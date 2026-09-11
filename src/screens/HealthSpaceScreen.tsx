@@ -28,8 +28,16 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { getTodayLocal } from '../utils/dateUtils';
 import { ScheduleModal } from '../components/ScheduleModal';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
+
+function getWeekNumber(date: Date): number {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
 
 type SectionType = 'medications' | 'appointments' | 'vaccinations' | 'allergies' | 'growth';
 
@@ -65,6 +73,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [apptForm, setApptForm] = useState<{ title: string; person: string[]; doctor: string; dateFrom: string; dateTo: string; startTime: string; endTime: string; location: string; note: string; reminder: number; documents: { url: string; fileName: string; type: 'image' | 'document' }[] }>({ title: '', person: [], doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
   const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
   const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
+  const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
+  const [preloadedWeeks, setPreloadedWeeks] = useState<number>(4);
+  const [preloadedWeekType, setPreloadedWeekType] = useState<string>('all');
   const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
@@ -161,6 +172,28 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         }
         if (isEditing) {
           await updateHealthAppointment(familyId, editingItem.id, apptData);
+          if (repeatScheduleConfig) {
+            const editingAppt = appointments.find(a => a.id === editingItem.id);
+            if (editingAppt?.scheduleGroupId) {
+              const q = query(collection(db, 'health', familyId, 'appointments'), where('familyId', '==', familyId), where('scheduleGroupId', '==', editingAppt.scheduleGroupId));
+              const snapshot = await getDocs(q);
+              let deletedCount = 0;
+              for (const d of snapshot.docs) {
+                const evt = d.data();
+                const dateField = evt.dateFrom || evt.date;
+                if (dateField) {
+                  const evtDate = new Date(dateField);
+                  if (!repeatScheduleConfig.days.includes(evtDate.getDay())) {
+                    await deleteDoc(doc(db, 'health', familyId, 'appointments', d.id));
+                    deletedCount++;
+                  }
+                }
+              }
+              if (deletedCount > 0) {
+                crossAlert('Gjentakelse oppdatert', `${deletedCount} avtaler ble slettet for fjernede dager.`);
+              }
+            }
+          }
         } else if (repeatScheduleConfig) {
           const startDate = new Date(apptForm.dateFrom);
           for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
@@ -793,10 +826,50 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                 ) : (
                   <TouchableOpacity
                     style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
-                    onPress={() => setShowRepeatSchedule(true)}
+                    onPress={async () => {
+                      if (!familyId) return;
+                      if (editingItem && editingItem.section === 'appointments') {
+                        const editingAppt = appointments.find(a => a.id === editingItem.id);
+                        if (editingAppt?.scheduleGroupId) {
+                          try {
+                            const groupId = editingAppt.scheduleGroupId;
+                            const q = query(collection(db, 'health', familyId, 'appointments'), where('familyId', '==', familyId), where('scheduleGroupId', '==', groupId));
+                            const snapshot = await getDocs(q);
+                            const daySet = new Set<number>();
+                            const weekNums = new Set<number>();
+                            let minDate = Infinity;
+                            let maxDate = -Infinity;
+                            for (const d of snapshot.docs) {
+                              const evt = d.data();
+                              const dateField = evt.dateFrom || evt.date;
+                              if (dateField) {
+                                const dt = new Date(dateField);
+                                daySet.add(dt.getDay());
+                                weekNums.add(getWeekNumber(dt));
+                                const ts = dt.getTime();
+                                if (ts < minDate) minDate = ts;
+                                if (ts > maxDate) maxDate = ts;
+                              }
+                            }
+                            const days = Array.from(daySet).sort((a, b) => a - b);
+                            const weeks = Math.max(1, Math.round((maxDate - minDate) / (7 * 86400000)) + 1);
+                            const hasOdd = Array.from(weekNums).some(w => w % 2 !== 0);
+                            const hasEven = Array.from(weekNums).some(w => w % 2 === 0);
+                            setPreloadedDays(days);
+                            setPreloadedWeeks(weeks);
+                            setPreloadedWeekType(hasOdd && hasEven ? 'all' : hasOdd ? 'odd' : hasEven ? 'even' : 'all');
+                          } catch (error) {
+                            setPreloadedDays([1]);
+                            setPreloadedWeeks(4);
+                            setPreloadedWeekType('all');
+                          }
+                        }
+                      }
+                      setShowRepeatSchedule(true);
+                    }}
                   >
                     <AppIcon name="schedule" size={18} color={MODULE_COLORS.health} />
-                    <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>Planlegg gjentakelse</Text>
+                    <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{editingItem && editingItem.section === 'appointments' && appointments.find(a => a.id === editingItem.id)?.scheduleGroupId ? 'Rediger gjentakelse' : 'Planlegg gjentakelse'}</Text>
                     <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
                   </TouchableOpacity>
                 )}
@@ -1157,6 +1230,10 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         }}
         startDate={apptForm.dateFrom}
         moduleColor={MODULE_COLORS.health}
+        preselectedDays={preloadedDays}
+        preselectedWeeks={preloadedWeeks}
+        preselectedWeekType={preloadedWeekType}
+        isEditing={!!editingItem && editingItem.section === 'appointments'}
       />
     </SafeAreaView>
   );

@@ -31,6 +31,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
+
   const familyId = useUserStore((state) => state.familyId);
 
   const getWeekNumber = (date: Date): number => {
@@ -40,6 +41,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
     const week1 = new Date(d.getFullYear(), 0, 4);
     return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
   };
+
 
   useEffect(() => {
     const groupId = visit.scheduleGroupId;

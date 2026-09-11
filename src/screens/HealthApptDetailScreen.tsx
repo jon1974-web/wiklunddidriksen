@@ -32,6 +32,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
 
+
   const getWeekNumber = (date: Date): number => {
     const d = new Date(date);
     d.setHours(0, 0, 0, 0);
@@ -41,6 +42,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   };
 
   const familyId = useUserStore((state) => state.familyId);
+
 
   useEffect(() => {
     const groupId = appointment.scheduleGroupId;
