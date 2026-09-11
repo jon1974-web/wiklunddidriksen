@@ -5,6 +5,7 @@ import { formatDate, formatTime } from '../utils/dateUtils';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
+import { AppIcon } from './AppIcon';
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
 const DAY_KEYS = ['days.sun','days.mon','days.tue','days.wed','days.thu','days.fri','days.sat'];
@@ -83,7 +84,10 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
           <Text style={[styles.calMonth, { color: colors.textSecondary }]}>{monthStr}</Text>
         </View>
         <View style={styles.content}>
-          <Text style={[styles.title, { color: colors.text }]} numberOfLines={2}>{event.icon ? `${event.icon} ` : ''}{event.title}</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            {event.icon ? <AppIcon name={event.icon as any} size={16} color={colors.accent} /> : null}
+            <Text style={[styles.title, { color: colors.text, flex: 1 }]} numberOfLines={2}>{event.title}</Text>
+          </View>
           <View style={styles.timeRow}>
             <ClockIcon />
             <Text style={[styles.time, { color: colors.text }]}>{timeText}</Text>
