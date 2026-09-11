@@ -117,6 +117,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
     const weekStr = toLocalDateStr(start);
     const endStr = toLocalDateStr(end);
+    const startStr = weekStr;
 
     // Count stats
     let eventCount = 0;
@@ -228,7 +229,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           else if (isEnd) time = tr.city ? t('weekly.to', { city: tr.city }) : t('weekly.toEnd');
           else time = tr.city || t('weekly.ongoing');
           items.push({ type: 'trip', icon: 'transport', iconBg: '#E3F2FD', title: tr.title, time });
-          if (isStart) tripCount++;
+          if (dateStr === tr.startDate || (dateStr > tr.startDate && dateStr === startStr)) tripCount++;
         }
       });
 
