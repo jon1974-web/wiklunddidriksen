@@ -1,5 +1,7 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, Linking, StyleSheet } from 'react-native';
+import { query, where, getDocs, collection } from 'firebase/firestore';
+import { db } from '../services/firebase';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
@@ -28,6 +30,54 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   const familyRole = useUserStore((state) => state.familyRole);
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
+
+  const getWeekNumber = (date: Date): number => {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+    const week1 = new Date(d.getFullYear(), 0, 4);
+    return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+  };
+
+  const familyId = useUserStore((state) => state.familyId);
+
+  useEffect(() => {
+    const groupId = appointment.scheduleGroupId;
+    const familyIdVal = familyId;
+    if (groupId && familyIdVal) {
+      const loadScheduleInfo = async () => {
+        try {
+          const q = query(collection(db, 'health', familyIdVal, 'appointments'), where('scheduleGroupId', '==', groupId));
+          const snapshot = await getDocs(q);
+          const weekNums = new Set<number>();
+          let minDate = Infinity;
+          let maxDate = -Infinity;
+          for (const d of snapshot.docs) {
+            const evt = d.data();
+            const dateField = evt.dateFrom || evt.date;
+            if (dateField) {
+              const ts = new Date(dateField).getTime();
+              weekNums.add(getWeekNumber(new Date(dateField)));
+              if (ts < minDate) minDate = ts;
+              if (ts > maxDate) maxDate = ts;
+            }
+          }
+          const hasOdd = Array.from(weekNums).some(w => w % 2 !== 0);
+          const hasEven = Array.from(weekNums).some(w => w % 2 === 0);
+          const weekType = hasOdd && hasEven ? 'all' : hasOdd ? 'odd' : hasEven ? 'even' : 'all';
+          const start = new Date(minDate);
+          const end = new Date(maxDate);
+          setScheduleInfo({
+            weekType,
+            startDate: `${start.getDate()}.${start.getMonth() + 1}.${start.getFullYear()}`,
+            endDate: `${end.getDate()}.${end.getMonth() + 1}.${end.getFullYear()}`,
+          });
+        } catch (error) {}
+      };
+      loadScheduleInfo();
+    }
+  }, [appointment.scheduleGroupId, familyId]);
 
   const d = toDateSafe(appointment.dateFrom) || toDateSafe((appointment as any).date);
   const DAY_NAMES = ['SØN', 'MAN', 'TIR', 'ONS', 'TOR', 'FRE', 'LØR'];
@@ -44,8 +94,6 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   const mapUrl = useMemo(() => appointment.location ? getStaticMapUrl(appointment.location, 15, '600x300') : null, [appointment.location]);
 
   const isCompleted = d ? d < new Date() : false;
-
-  const familyId = useUserStore((state) => state.familyId);
 
   const canDelete = (appointment as any).createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin';
 
@@ -126,9 +174,11 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>Detaljer</Text>
         {appointment.scheduleGroupId && (
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8, backgroundColor: '#FBE9E7', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 }}>
-            <Text style={{ fontSize: 14 }}>📅</Text>
-            <Text style={{ fontSize: 12, fontWeight: '600', color: HEALTH_COLOR }}>Gjentakelse</Text>
+          <View style={styles.viewDetailRow}>
+            <View style={styles.viewDetailLabel}><AppIcon name="schedule" size={18} color={colors.textSecondary} /></View>
+            <Text style={[styles.viewDetailValue, { color: colors.text }]}>
+              {scheduleInfo ? `Gjentakelse · ${scheduleInfo.weekType === 'odd' ? 'Oddetall uker' : scheduleInfo.weekType === 'even' ? 'Partall uker' : 'Alle uker'} · ${scheduleInfo.startDate} – ${scheduleInfo.endDate}` : 'Gjentakelse'}
+            </Text>
           </View>
         )}
         {(() => {
@@ -275,6 +325,9 @@ const styles = StyleSheet.create({
   detailRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, gap: 8 },
   detailLabel: { fontSize: 16, width: 24, textAlign: 'center' },
   detailValue: { fontSize: 14, flex: 1, textAlign: 'left', marginLeft: 4 },
+  viewDetailLabel: { fontSize: 16, width: 24, textAlign: "center" },
+  viewDetailRow: { flexDirection: 'row', alignItems: 'flex-start', marginBottom: 12, gap: 8 },
+  viewDetailValue: { fontSize: 14, flex: 1, textAlign: 'left', marginLeft: 4 },
   actionButton: { padding: 16, borderRadius: 12, alignItems: 'center' },
   actionButtonText: { fontSize: 16, fontWeight: '600' },
 });
