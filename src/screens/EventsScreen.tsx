@@ -461,6 +461,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       if (item._type === 'trip') return item.startDate;
       if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
       if (item._type === 'event') return (item as Event).endDate || (item as Event).date;
+      if (item._type === 'birthday') return item.date;
       return (item as any).dateFrom || '';
     };
     const getTimeStr = (item: UnifiedItem): string => {
@@ -622,13 +623,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
-  }, [events, trips, spondEvents, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolActivities, kindergartenActivities, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource, filterModule]);
+  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolActivities, kindergartenActivities, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource, filterModule]);
 
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
       if (item._type === 'trip') return item.startDate;
       if (item._type === 'spond') return formatSpondDate(item.endTimestamp || item.startTimestamp);
       if (item._type === 'event') return (item as Event).endDate || (item as Event).date;
+      if (item._type === 'birthday') return item.date;
       return (item as any).dateFrom || '';
     };
     const allItems: UnifiedItem[] = [
