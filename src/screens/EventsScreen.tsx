@@ -1136,10 +1136,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const calMonth = MONTHS_SV[bDate.getMonth()];
       const calDayName = t(DAY_KEYS[bDate.getDay()]);
       const today = new Date();
-      const birth = new Date(b.date);
-      let age = today.getFullYear() - birth.getFullYear();
-      const monthDiff = today.getMonth() - birth.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+      let age = today.getFullYear() - bDate.getFullYear();
+      const monthDiff = today.getMonth() - bDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < bDate.getDate())) {
         age--;
       }
       return (
