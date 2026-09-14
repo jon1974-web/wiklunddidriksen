@@ -131,7 +131,8 @@ type UnifiedItem =
   | (PetVetVisit & { _type: 'petVetVisit'; title: string; address?: string; time: string; icon?: string })
   | (PetVaccination & { _type: 'petVaccination'; title: string; address?: string; time: string; icon?: string })
   | (SchoolActivity & { _type: 'schoolActivity'; time: string; address?: string; icon?: string })
-  | (KindergartenActivity & { _type: 'kindergartenActivity'; time: string; address?: string; icon?: string });
+  | (KindergartenActivity & { _type: 'kindergartenActivity'; time: string; address?: string; icon?: string })
+  | (Birthday & { _type: 'birthday'; title: string; date: string; time: string });
 
 export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
@@ -508,13 +509,22 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const dayKindergartenActivities = kindergartenActivities.filter((a) => a.dateFrom === selectedDate).map((a) => ({
         ...a, _type: 'kindergartenActivity' as const, time: a.startTime || '09:00', address: a.location || '', title: a.title, date: a.dateFrom, description: a.activityType, icon: 'kindergarten',
       }));
-      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities];
+      const dayBirthdays = birthdays.filter((b) => {
+        const bDate = new Date(b.date);
+        const bMonthDay = `${String(bDate.getMonth() + 1).padStart(2, '0')}-${String(bDate.getDate()).padStart(2, '0')}`;
+        const currentYear = new Date().getFullYear();
+        return selectedDate === `${currentYear}-${bMonthDay}`;
+      }).map((b) => ({
+        ...b, _type: 'birthday' as const, title: `🎂 ${b.name}`, date: selectedDate, time: '',
+      }));
+      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities, ...dayBirthdays];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
       else if (filterModule === 'health') dayItems = dayItems.filter((i) => i._type === 'healthAppointment');
       else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
       else if (filterModule === 'trip') dayItems = dayItems.filter((i) => i._type === 'trip');
       else if (filterModule === 'school') dayItems = dayItems.filter((i) => i._type === 'schoolActivity');
       else if (filterModule === 'kindergarten') dayItems = dayItems.filter((i) => i._type === 'kindergartenActivity');
+      else if (filterModule === 'birthday') dayItems = dayItems.filter((i) => i._type === 'birthday');
       else if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
       dayItems.sort(sortByDate);
@@ -584,6 +594,18 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         description: a.activityType,
         icon: 'kindergarten',
       })),
+      ...birthdays.map((b) => {
+        const bDate = new Date(b.date);
+        const bMonthDay = `${String(bDate.getMonth() + 1).padStart(2, '0')}-${String(bDate.getDate()).padStart(2, '0')}`;
+        const currentYear = new Date().getFullYear();
+        return {
+          ...b,
+          _type: 'birthday' as const,
+          title: b.name,
+          date: `${currentYear}-${bMonthDay}`,
+          time: '',
+        };
+      }),
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
     let filtered = allItems;
     if (filterModule === 'event') filtered = allItems.filter((i) => i._type === 'event');
@@ -592,8 +614,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     else if (filterModule === 'trip') filtered = allItems.filter((i) => i._type === 'trip');
     else if (filterModule === 'school') filtered = allItems.filter((i) => i._type === 'schoolActivity');
     else if (filterModule === 'kindergarten') filtered = allItems.filter((i) => i._type === 'kindergartenActivity');
+    else if (filterModule === 'birthday') filtered = allItems.filter((i) => i._type === 'birthday');
     else if (filterSource && filterSource !== 'app') filtered = allItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
-    else if (filterSource === 'app') filtered = allItems.filter((i) => i._type === 'event' || i._type === 'trip');
+    else if (filterSource === 'app') filtered = allItems.filter((i) => i._type === 'event' || i._type === 'trip' || i._type === 'birthday');
     const upcoming = filtered.filter((i) => getDateStr(i) >= today);
     const past = filtered.filter((i) => getDateStr(i) < today);
     return showPastEvents
@@ -1099,6 +1122,37 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
                 <Image source={{ uri: mapUrl }} style={styles.spondMapImage} />
               </TouchableOpacity>
             )}
+          </View>
+        </TouchableOpacity>
+      );
+    }
+    if (item._type === 'birthday') {
+      const BIRTHDAY_COLOR = '#E6A817';
+      const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
+      const bDate = new Date(item.date);
+      const calDay = bDate.getDate();
+      const calMonth = MONTHS_SV[bDate.getMonth()];
+      const calDayName = t(DAY_KEYS[bDate.getDay()]);
+      return (
+        <TouchableOpacity
+          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftWidth: 4, borderLeftColor: BIRTHDAY_COLOR }]}
+          onPress={() => navigation.navigate('Bursdager')}
+        >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={styles.spondCalIcon}>
+              <View style={[styles.spondCalTopBar, { backgroundColor: BIRTHDAY_COLOR }]}>
+                <Text style={styles.spondCalYear}>{calDayName}</Text>
+              </View>
+              <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
+              <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
+            </View>
+            <View style={styles.spondCardContent}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <AppIcon name="birthday" size={14} color={BIRTHDAY_COLOR} />
+                <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.name}</Text>
+              </View>
+              <Text style={[styles.spondCardTime, { color: colors.textSecondary }]}>🎂 Bursdag</Text>
+            </View>
           </View>
         </TouchableOpacity>
       );
