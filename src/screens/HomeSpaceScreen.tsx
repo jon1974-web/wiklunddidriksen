@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
@@ -48,6 +49,7 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
   const [formPostNumber, setFormPostNumber] = useState('');
   const [formPostCity, setFormPostCity] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const [formPhotoUrl, setFormPhotoUrl] = useState('');
   const [saving, setSaving] = useState(false);
 
   const loadHomes = useCallback(async () => {
@@ -90,6 +92,7 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
     setFormPostNumber('');
     setFormPostCity('');
     setFormDescription('');
+    setFormPhotoUrl('');
     setEditingHome(null);
   };
 
@@ -108,6 +111,7 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
         postNumber: formPostNumber.trim(),
         postCity: formPostCity.trim(),
         description: formDescription.trim(),
+        photoUrl: formPhotoUrl,
         familyId,
       };
       if (editingHome) {
@@ -146,6 +150,7 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
       setFormPostNumber(home.postNumber);
       setFormPostCity(home.postCity);
       setFormDescription(home.description);
+      setFormPhotoUrl(home.photoUrl || '');
       setShowAddModal(true);
     }
     setHomeActionModal({ visible: false, id: '', title: '' });
@@ -194,18 +199,16 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
                   onPress={() => navigation.navigate('HomeDetail', { home })}
                   onLongPress={() => setHomeActionModal({ visible: true, id: home.id, title: home.name })}
                 >
-                  <View style={[styles.homeCardHeader, { backgroundColor: HOME_THEME + '20' }]}>
+                  <View style={styles.homeCardIcon}>
                     <AppIcon name={getHomeTypeIcon(home.homeType) as any} size={24} color={HOME_THEME} />
-                    <Text style={[styles.homeCardType, { color: HOME_THEME }]}>
-                      {HOME_TYPES.find((ht) => ht.type === home.homeType)?.label || home.homeType}
-                    </Text>
                   </View>
-                  <View style={styles.homeCardBody}>
-                    <Text style={[styles.homeCardName, { color: colors.text }]} numberOfLines={1}>{home.name}</Text>
-                    {home.address ? (
-                      <Text style={[styles.homeCardAddress, { color: colors.textSecondary }]} numberOfLines={1}>📍 {home.address}</Text>
-                    ) : null}
-                  </View>
+                  <Text style={[styles.homeCardName, { color: colors.text }]} numberOfLines={1}>{home.name}</Text>
+                  {home.description ? (
+                    <Text style={[styles.homeCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{home.description}</Text>
+                  ) : null}
+                  {home.photoUrl ? (
+                    <Image source={{ uri: home.photoUrl }} style={styles.homeCardPhoto} resizeMode="cover" />
+                  ) : null}
                   {mapUrl && (
                     <Image source={{ uri: mapUrl }} style={styles.homeCardMap} resizeMode="cover" />
                   )}
@@ -257,6 +260,56 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
                   placeholder={t('homes.namePlaceholder')}
                   placeholderTextColor={colors.textDisabled}
                 />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.photo')}</Text>
+                <TouchableOpacity
+                  style={[styles.imagePicker, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                  onPress={async () => {
+                    const result = await ImagePicker.launchImageLibraryAsync({
+                      mediaTypes: ['images'],
+                      allowsEditing: true,
+                      aspect: [16, 9],
+                      quality: 0.7,
+                      base64: true,
+                    });
+                    if (!result.canceled && result.assets[0]) {
+                      try {
+                        const { webUploadFile } = await import('../services/webStorage');
+                        const asset = result.assets[0];
+                        const fileName = `home_${Date.now()}.jpg`;
+                        const path = `home-photos/${fileName}`;
+                        let blob: Blob;
+                        if (asset.base64 && Platform.OS === 'web') {
+                          const byteString = atob(asset.base64);
+                          const ab = new ArrayBuffer(byteString.length);
+                          const ia = new Uint8Array(ab);
+                          for (let i = 0; i < byteString.length; i++) {
+                            ia[i] = byteString.charCodeAt(i);
+                          }
+                          blob = new Blob([ab], { type: 'image/jpeg' });
+                        } else {
+                          const response = await fetch(asset.uri);
+                          blob = await response.blob();
+                        }
+                        const url = await webUploadFile(path, blob);
+                        setFormPhotoUrl(url);
+                      } catch (err) {
+                        crossAlert('Error', getErrorMessage(err));
+                      }
+                    }
+                  }}
+                >
+                  {formPhotoUrl ? (
+                    <Image source={{ uri: formPhotoUrl }} style={styles.imagePreview} />
+                  ) : (
+                    <View style={{ alignItems: 'center', gap: 4 }}>
+                      <AppIcon name="camera" size={24} color={colors.textDisabled} />
+                      <Text style={{ color: colors.textDisabled, fontSize: 13 }}>{t('homes.uploadPhoto')}</Text>
+                    </View>
+                  )}
+                </TouchableOpacity>
               </View>
 
               <View style={styles.field}>
@@ -365,13 +418,12 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 16, fontWeight: '600' },
   emptySubtext: { fontSize: 14 },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
-  homeCard: { width: '30%', borderRadius: 16, overflow: 'hidden', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 3 },
-  homeCardHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, padding: 10 },
-  homeCardType: { fontSize: 11, fontWeight: '600' },
-  homeCardBody: { padding: 10, paddingBottom: 6 },
-  homeCardName: { fontSize: 14, fontWeight: '600', textAlign: 'center' },
-  homeCardAddress: { fontSize: 11, textAlign: 'center' },
-  homeCardMap: { width: '100%', height: 80 },
+  homeCard: { width: '30%', borderRadius: 16, overflow: 'hidden', borderWidth: 1.5, borderColor: '#e0e0e0' },
+  homeCardIcon: { alignItems: 'center', paddingTop: 10 },
+  homeCardName: { fontSize: 12, fontWeight: '700', textAlign: 'center', paddingHorizontal: 6, marginTop: 4 },
+  homeCardDesc: { fontSize: 10, textAlign: 'center', paddingHorizontal: 6, marginTop: 2, lineHeight: 14 },
+  homeCardPhoto: { width: '100%', height: 60, marginTop: 6 },
+  homeCardMap: { width: '100%', height: 60, marginTop: 2 },
   homeCardAdd: { borderWidth: 2, borderStyle: 'dashed', backgroundColor: 'transparent', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', padding: 12 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
@@ -385,4 +437,6 @@ const styles = StyleSheet.create({
   typeLabel: { fontSize: 13, fontWeight: '600' },
   button: { padding: 16, borderRadius: 12, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  imagePicker: { borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', height: 120, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  imagePreview: { width: '100%', height: '100%', borderRadius: 12 },
 });

@@ -1409,6 +1409,8 @@
     "helpWhat": "Hva er Våre hjem?",
     "helpWhatText": "Her kan du legge til alle hjemmene dine — hus, hytte, leilighet og mer. For hvert hjem kan du senere legge til prosjekter, handlelister og oppgaver.",
     "helpHow": "Hvordan bruke det",
-    "helpHowText": "Trykk på + for å legge til et nytt hjem. Velg type, legg til navn og adresse. Trykk lenge på et hjem for å redigere eller slette."
+    "helpHowText": "Trykk på + for å legge til et nytt hjem. Velg type, legg til navn og adresse. Trykk lenge på et hjem for å redigere eller slette.",
+    "homes.photo": "Bilde",
+    "homes.uploadPhoto": "Last opp bilde"
   }
 }

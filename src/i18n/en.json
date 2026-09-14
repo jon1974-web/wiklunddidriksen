@@ -1409,6 +1409,8 @@
     "helpWhat": "What are Our Homes?",
     "helpWhatText": "Here you can add all your homes — house, cabin, apartment and more. For each home you can later add projects, shopping lists and tasks.",
     "helpHow": "How to use it",
-    "helpHowText": "Press + to add a new home. Select type, add name and address. Long press a home to edit or delete."
+    "helpHowText": "Press + to add a new home. Select type, add name and address. Long press a home to edit or delete.",
+    "homes.photo": "Photo",
+    "homes.uploadPhoto": "Upload photo"
   }
 }

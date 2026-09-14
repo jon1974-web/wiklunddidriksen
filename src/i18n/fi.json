@@ -1409,6 +1409,8 @@
     "helpWhat": "Mitä on Kotimme?",
     "helpWhatText": "Tässä voit lisätä kaikki kotisi — talon, mökin, asunnon ja lisää. Jokaiselle kodille voit myöhemmin lisätä projekteja, ostoslistoja ja tehtäviä.",
     "helpHow": "Käyttöohje",
-    "helpHowText": "Paina + lisätäksesi uuden kodin. Valitse tyyppi, lisää nimi ja osoite. Paina pitkään koodia muokataksesi tai poistaaksesi."
+    "helpHowText": "Paina + lisätäksesi uuden kodin. Valitse tyyppi, lisää nimi ja osoite. Paina pitkään koodia muokataksesi tai poistaaksesi.",
+    "homes.photo": "Valokuva",
+    "homes.uploadPhoto": "Lataa kuva"
   }
 }

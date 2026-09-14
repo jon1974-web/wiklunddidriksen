@@ -720,6 +720,7 @@ export interface Home {
   postNumber: string;
   postCity: string;
   description: string;
+  photoUrl?: string;
   familyId: string;
   createdAt: number;
 }

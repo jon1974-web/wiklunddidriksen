@@ -1409,6 +1409,8 @@
     "helpWhat": "Vad är Våra hem?",
     "helpWhatText": "Här kan du lägga till alla dina hem — hus, stuga, lägenhet och mer. För varje hem kan du senare lägga till projekt, inköpslistor och uppgifter.",
     "helpHow": "Hur man använder det",
-    "helpHowText": "Tryck + för att lägga till ett nytt hem. Välj typ, lägg till namn och adress. Håll ner ett hem för att redigera eller ta bort."
+    "helpHowText": "Tryck + för att lägga till ett nytt hem. Välj typ, lägg till namn och adress. Håll ner ett hem för att redigera eller ta bort.",
+    "homes.photo": "Bild",
+    "homes.uploadPhoto": "Ladda upp bild"
   }
 }
