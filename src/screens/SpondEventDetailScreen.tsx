@@ -216,7 +216,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       )}
 
       {/* Din status */}
-      {stampStatus && event.groupId && (
+      {event.groupId && (
         <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Din status</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
