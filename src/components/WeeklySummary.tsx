@@ -164,14 +164,14 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
       // Health — appointments + vaccinations
       healthAppointments.forEach((a) => {
-        if (a.date === dateStr) {
+        if ((a.dateFrom || a.date) === dateStr) {
           const time = a.endTime ? `${a.startTime || ''} – ${a.endTime}` : a.startTime || '';
           items.push({ type: 'health', icon: 'medication', iconBg: '#FFEBEE', title: `${a.title} — ${a.person}`, time });
           healthCount++;
         }
       });
       healthVaccinations.forEach((v) => {
-        if (v.date === dateStr) {
+        if ((v.dateFrom || v.date) === dateStr) {
           items.push({ type: 'health', icon: 'vaccination', iconBg: '#FFEBEE', title: `${v.name} — ${v.person}`, time: '' });
           healthCount++;
         }
@@ -187,14 +187,14 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
       // Pets
       petVetVisits.forEach((v) => {
-        if (v.date === dateStr) {
+        if ((v.dateFrom || v.date) === dateStr) {
           const time = v.endTime ? `${v.startTime || ''} – ${v.endTime}` : v.startTime || '';
           items.push({ type: 'pet', icon: 'pet', iconBg: '#F3E5F5', title: `${v.title} — ${v.petId}`, time });
           petCount++;
         }
       });
       petVaccinations.forEach((v) => {
-        if (v.date === dateStr) {
+        if ((v.dateFrom || v.date) === dateStr) {
           items.push({ type: 'pet', icon: 'vaccination', iconBg: '#F3E5F5', title: `${v.name} — ${v.petId}`, time: '' });
           petCount++;
         }
