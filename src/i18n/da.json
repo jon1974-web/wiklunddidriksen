@@ -1386,5 +1386,29 @@
     "deleteTitle": "Slet gentagelse",
     "deleteConfirm": "Er du sikker på at du vil slette alle begivenheder i denne gentagelse?",
     "deleteAll": "Slet alle"
+  },
+  "homes": {
+    "empty": "Ingen hjem tilføjet endnu",
+    "addFirst": "Tryk + for at tilføje dit første hjem",
+    "addHome": "Tilføj hjem",
+    "editHome": "Rediger hjem",
+    "name": "Navn",
+    "namePlaceholder": "f.eks. Vores hus",
+    "type": "Type",
+    "address": "Adresse",
+    "addressPlaceholder": "Søg efter adresse...",
+    "postNumber": "Postnummer",
+    "postCity": "By",
+    "postCityPlaceholder": "f.eks. København",
+    "description": "Beskrivelse",
+    "descriptionPlaceholder": "Tilføj en beskrivelse...",
+    "nameRequired": "Indtast venligst et navn",
+    "comingSoon": "Kommer snart",
+    "projects": "Projekter",
+    "helpTitle": "Vores hjem",
+    "helpWhat": "Hvad er Vores hjem?",
+    "helpWhatText": "Her kan du tilføje alle dine hjem — hus, hytte, lejlighed og mere. For hvert hjem kan du senere tilføje projekter, indkøbslister og opgaver.",
+    "helpHow": "Hvordan bruger man det",
+    "helpHowText": "Tryk + for at tilføje et nyt hjem. Vælg type, tilføj navn og adresse. Lang tryk på et hjem for at redigere eller slette."
   }
 }

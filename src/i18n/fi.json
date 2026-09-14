@@ -186,7 +186,7 @@
     "birthdays": "Syntymäpäivät",
     "pets": "Lemmikkimme",
     "mealplan": "Ruoka",
-    "home": "Koti",
+    "home": "Kotimme",
     "tripsCount": "{{count}} aktiivista matkaa",
     "healthCount": "{{count}} tällä viikolla",
     "schoolCount": "{{count}} lastenta",
@@ -1386,5 +1386,29 @@
     "deleteTitle": "Poista toisto",
     "deleteConfirm": "Haluatko varmasti poistaa kaikki tämän toiston tapahtumat?",
     "deleteAll": "Poista kaikki"
+  },
+  "homes": {
+    "empty": "Ei vielä kotia",
+    "addFirst": "Lisää ensimmäinen koti painamalla +",
+    "addHome": "Lisää koti",
+    "editHome": "Muokkaa kotia",
+    "name": "Nimi",
+    "namePlaceholder": "esim. Talomme",
+    "type": "Tyyppi",
+    "address": "Osoite",
+    "addressPlaceholder": "Hae osoite...",
+    "postNumber": "Postinumero",
+    "postCity": "Kaupunki",
+    "postCityPlaceholder": "esim. Helsinki",
+    "description": "Kuvaus",
+    "descriptionPlaceholder": "Lisää kuvaus...",
+    "nameRequired": "Anna nimi",
+    "comingSoon": "Tulossa pian",
+    "projects": "Projektit",
+    "helpTitle": "Kotimme",
+    "helpWhat": "Mitä on Kotimme?",
+    "helpWhatText": "Tässä voit lisätä kaikki kotisi — talon, mökin, asunnon ja lisää. Jokaiselle kodille voit myöhemmin lisätä projekteja, ostoslistoja ja tehtäviä.",
+    "helpHow": "Käyttöohje",
+    "helpHowText": "Paina + lisätäksesi uuden kodin. Valitse tyyppi, lisää nimi ja osoite. Paina pitkään koodia muokataksesi tai poistaaksesi."
   }
 }

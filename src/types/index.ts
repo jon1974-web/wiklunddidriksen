@@ -709,3 +709,17 @@ export interface KindergartenSchedule {
   familyId: string;
   createdAt: number;
 }
+
+export type HomeType = 'house' | 'cabin' | 'summerCabin' | 'winterCabin' | 'apartment';
+
+export interface Home {
+  id: string;
+  name: string;
+  homeType: HomeType;
+  address: string;
+  postNumber: string;
+  postCity: string;
+  description: string;
+  familyId: string;
+  createdAt: number;
+}

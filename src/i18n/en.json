@@ -187,7 +187,7 @@
     "birthdays": "Our Birthdays",
     "pets": "Our Pets",
     "mealplan": "Our Meals",
-    "home": "Our Home",
+    "home": "Our Homes",
     "tripsCount": "{{count}} active trips",
     "healthCount": "{{count}} this week",
     "schoolCount": "{{count}} children",
@@ -1386,5 +1386,29 @@
     "deleteTitle": "Delete schedule",
     "deleteConfirm": "Are you sure you want to delete all events in this schedule?",
     "deleteAll": "Delete all"
+  },
+  "homes": {
+    "empty": "No homes added yet",
+    "addFirst": "Press + to add your first home",
+    "addHome": "Add home",
+    "editHome": "Edit home",
+    "name": "Name",
+    "namePlaceholder": "e.g. Our House",
+    "type": "Type",
+    "address": "Address",
+    "addressPlaceholder": "Search for address...",
+    "postNumber": "Postal code",
+    "postCity": "City",
+    "postCityPlaceholder": "e.g. Oslo",
+    "description": "Description",
+    "descriptionPlaceholder": "Add a description...",
+    "nameRequired": "Please enter a name",
+    "comingSoon": "Coming soon",
+    "projects": "Projects",
+    "helpTitle": "Our Homes",
+    "helpWhat": "What are Our Homes?",
+    "helpWhatText": "Here you can add all your homes — house, cabin, apartment and more. For each home you can later add projects, shopping lists and tasks.",
+    "helpHow": "How to use it",
+    "helpHowText": "Press + to add a new home. Select type, add name and address. Long press a home to edit or delete."
   }
 }

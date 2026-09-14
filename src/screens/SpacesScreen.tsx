@@ -154,11 +154,10 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
     {
       id: 'home',
       name: t('spaces.home'),
-      icon: 'hotel',
+      icon: 'house',
       iconColor: MODULE_COLORS.home,
       count: '',
       screen: 'HomeSpace',
-      disabled: true,
     },
   ];
 

@@ -187,7 +187,7 @@
     "birthdays": "Våre bursdager",
     "pets": "Våre kjæledyr",
     "mealplan": "Vår mat",
-    "home": "Vårt hjem",
+    "home": "Våre hjem",
     "tripsCount": "{{count}} aktive turer",
     "healthCount": "{{count}} denne uken",
     "schoolCount": "{{count}} barn på skole",
@@ -1386,5 +1386,29 @@
     "deleteTitle": "Slett gjentakelse",
     "deleteConfirm": "Er du sikker på at du vil slette alle hendelsene i denne gjentakelsen?",
     "deleteAll": "Slett alle"
+  },
+  "homes": {
+    "empty": "Ingen hjem lagt til ennå",
+    "addFirst": "Trykk + for å legge til ditt første hjem",
+    "addHome": "Legg til hjem",
+    "editHome": "Rediger hjem",
+    "name": "Navn",
+    "namePlaceholder": "F.eks. Huset vårt",
+    "type": "Type",
+    "address": "Adresse",
+    "addressPlaceholder": "Søk etter adresse...",
+    "postNumber": "Postnummer",
+    "postCity": "Sted",
+    "postCityPlaceholder": "F.eks. Oslo",
+    "description": "Beskrivelse",
+    "descriptionPlaceholder": "Legg til en beskrivelse...",
+    "nameRequired": "Vennligst skriv et navn",
+    "comingSoon": "Kommer snart",
+    "projects": "Prosjekter",
+    "helpTitle": "Våre hjem",
+    "helpWhat": "Hva er Våre hjem?",
+    "helpWhatText": "Her kan du legge til alle hjemmene dine — hus, hytte, leilighet og mer. For hvert hjem kan du senere legge til prosjekter, handlelister og oppgaver.",
+    "helpHow": "Hvordan bruke det",
+    "helpHowText": "Trykk på + for å legge til et nytt hjem. Velg type, legg til navn og adresse. Trykk lenge på et hjem for å redigere eller slette."
   }
 }

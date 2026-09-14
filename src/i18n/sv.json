@@ -186,7 +186,7 @@
     "birthdays": "Våra födelsedagar",
     "pets": "Våra husdjur",
     "mealplan": "Vår mat",
-    "home": "Vårt hem",
+    "home": "Våra hem",
     "tripsCount": "{{count}} aktiva resor",
     "healthCount": "{{count}} denne veckan",
     "schoolCount": "{{count}} barn",
@@ -1386,5 +1386,29 @@
     "deleteTitle": "Ta bort upprepning",
     "deleteConfirm": "Är du säker på att du vill ta bort alla händelser i denna upprepning?",
     "deleteAll": "Ta bort alla"
+  },
+  "homes": {
+    "empty": "Inga hem tillagda ännu",
+    "addFirst": "Tryck + för att lägga till ditt första hem",
+    "addHome": "Lägg till hem",
+    "editHome": "Redigera hem",
+    "name": "Namn",
+    "namePlaceholder": "t.ex. Vårt hus",
+    "type": "Typ",
+    "address": "Adress",
+    "addressPlaceholder": "Sök efter adress...",
+    "postNumber": "Postnummer",
+    "postCity": "Ort",
+    "postCityPlaceholder": "t.ex. Stockholm",
+    "description": "Beskrivning",
+    "descriptionPlaceholder": "Lägg till en beskrivning...",
+    "nameRequired": "Vänligen ange ett namn",
+    "comingSoon": "Kommer snart",
+    "projects": "Projekt",
+    "helpTitle": "Våra hem",
+    "helpWhat": "Vad är Våra hem?",
+    "helpWhatText": "Här kan du lägga till alla dina hem — hus, stuga, lägenhet och mer. För varje hem kan du senare lägga till projekt, inköpslistor och uppgifter.",
+    "helpHow": "Hur man använder det",
+    "helpHowText": "Tryck + för att lägga till ett nytt hem. Välj typ, lägg till namn och adress. Håll ner ett hem för att redigera eller ta bort."
   }
 }
