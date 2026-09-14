@@ -1136,7 +1136,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const calMonth = MONTHS_SV[bDate.getMonth()];
       const calDayName = t(DAY_KEYS[bDate.getDay()]);
       const today = new Date();
-      const age = today.getFullYear() - bDate.getFullYear();
+      const birth = new Date(b.date);
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+        age--;
+      }
       return (
         <TouchableOpacity
           style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftWidth: 4, borderLeftColor: BIRTHDAY_COLOR }]}
