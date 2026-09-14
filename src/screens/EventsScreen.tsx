@@ -516,7 +516,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         const currentYear = new Date().getFullYear();
         return selectedDate === `${currentYear}-${bMonthDay}`;
       }).map((b) => ({
-        ...b, _type: 'birthday' as const, title: `🎂 ${b.name}`, date: selectedDate, time: '',
+        ...b, _type: 'birthday' as const, title: `🎂 ${b.name}`, date: selectedDate, birthDate: b.date, time: '',
       }));
       let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities, ...dayBirthdays];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
@@ -604,6 +604,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
           _type: 'birthday' as const,
           title: b.name,
           date: `${currentYear}-${bMonthDay}`,
+          birthDate: b.date,
           time: '',
         };
       }),
@@ -1136,9 +1137,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const calMonth = MONTHS_SV[bDate.getMonth()];
       const calDayName = t(DAY_KEYS[bDate.getDay()]);
       const today = new Date();
-      let age = today.getFullYear() - bDate.getFullYear();
-      const monthDiff = today.getMonth() - bDate.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < bDate.getDate())) {
+      const birthDateStr = (item as any).birthDate || item.date;
+      const birth = new Date(birthDateStr);
+      let age = today.getFullYear() - birth.getFullYear();
+      const monthDiff = today.getMonth() - birth.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
         age--;
       }
       return (
