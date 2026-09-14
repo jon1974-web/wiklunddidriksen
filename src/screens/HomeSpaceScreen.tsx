@@ -221,13 +221,11 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
               );
             })}
             <TouchableOpacity
-              style={[styles.addCard, { backgroundColor: colors.surface, borderColor: HOME_THEME }]}
+              style={[styles.homeCard, styles.homeCardAdd, { borderColor: colors.textDisabled }]}
               onPress={() => { resetForm(); setShowAddModal(true); }}
             >
-              <View style={[styles.addIcon, { backgroundColor: HOME_THEME }]}>
-                <Text style={{ color: '#fff', fontSize: 24, fontWeight: '300' }}>+</Text>
-              </View>
-              <Text style={[styles.addText, { color: HOME_THEME }]}>{t('homes.addHome')}</Text>
+              <AppIcon name="house" size={36} color={colors.textDisabled} />
+              <Text style={[styles.homeCardName, { color: colors.textDisabled }]}>{t('homes.addHome')}</Text>
             </TouchableOpacity>
           </View>
       </ScrollView>
@@ -379,9 +377,7 @@ const styles = StyleSheet.create({
   homeCardName: { fontSize: 15, fontWeight: '700', marginBottom: 2 },
   homeCardAddress: { fontSize: 12 },
   homeCardMap: { width: '100%', height: 80 },
-  addCard: { width: '47%', borderRadius: 14, borderWidth: 2, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', paddingVertical: 30, gap: 8 },
-  addIcon: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
-  addText: { fontSize: 13, fontWeight: '600' },
+  homeCardAdd: { borderWidth: 2, borderStyle: 'dashed', backgroundColor: 'transparent', alignItems: 'center', justifyContent: 'center', paddingVertical: 30, gap: 8 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
   modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginBottom: 16 },
