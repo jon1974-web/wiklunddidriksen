@@ -282,7 +282,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                   {extracting ? (
                     <ActivityIndicator size="small" color={HOME_THEME} />
                   ) : (
-                    <AppIcon name="image" size={20} color={HOME_THEME} />
+                    <AppIcon name="camera" size={20} color={HOME_THEME} />
                   )}
                   <Text style={{ color: HOME_THEME, fontSize: 12, fontWeight: '600' }}>{t('homes.photoWall')}</Text>
                 </TouchableOpacity>

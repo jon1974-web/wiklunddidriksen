@@ -1437,7 +1437,7 @@
     "colorNameOrCodeRequired": "Lisää nimi tai koodi",
     "unnamed": "Nimetön",
     "extractedColor": "Poimittu väri",
-    "photoTag": "📷 Kuvaa tunnus",
-    "photoWall": "🎨 Kuvaa seinä"
+    "photoTag": "Kuvaa tunnus",
+    "photoWall": "Kuvaa seinä"
   }
 }
