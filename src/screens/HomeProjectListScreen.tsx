@@ -148,18 +148,12 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
             style={[styles.addButton, { backgroundColor: HOME_THEME }]}
             onPress={() => { resetForm(); setShowAddModal(true); }}
           >
-            <Text style={{ color: '#fff', fontSize: 20, fontWeight: '600' }}>+</Text>
+            <Text style={{ color: '#fff', fontSize: 22, fontWeight: '600', textAlign: 'center', lineHeight: 36 }}>+</Text>
           </TouchableOpacity>
         </View>
       </View>
       <ScrollView style={styles.content}>
-        {projects.length === 0 ? (
-          <View style={styles.emptyState}>
-            <AppIcon name="activities" size={48} color={colors.textDisabled} />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('homes.noProjects')}</Text>
-          </View>
-        ) : (
-          projects.map((project) => {
+        {projects.map((project) => {
             const statusStyle = getStatusStyle(project.status);
             return (
               <TouchableOpacity
@@ -179,8 +173,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
                 ) : null}
               </TouchableOpacity>
             );
-          })
-        )}
+          })}
       </ScrollView>
 
       <ActionModal
@@ -265,7 +258,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1 },
   screenTitle: { fontSize: 22, fontWeight: '700' },
-  addButton: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
+  addButton: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   content: { flex: 1, padding: 16 },
   emptyState: { alignItems: 'center', marginTop: 80, gap: 12 },
   emptyText: { fontSize: 16, fontWeight: '600' },
