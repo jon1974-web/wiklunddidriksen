@@ -742,7 +742,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     marks[todayStr] = { ...marks[todayStr], today: true };
 
     // Birthday dots
-    const BIRTHDAY_COLOR = '#FF69B4';
+    const BIRTHDAY_COLOR = MODULE_COLORS.birthdays;
     birthdays.forEach((b) => {
       const bDate = new Date(b.date);
       const bMonthDay = `${String(bDate.getMonth() + 1).padStart(2, '0')}-${String(bDate.getDate()).padStart(2, '0')}`;
@@ -1130,7 +1130,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       );
     }
     if (item._type === 'birthday') {
-      const BIRTHDAY_COLOR = '#E6A817';
+      const BIRTHDAY_COLOR = MODULE_COLORS.birthdays;
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
       const bDate = new Date(item.date);
       const calDay = bDate.getDate();
@@ -1139,11 +1139,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const today = new Date();
       const birthDateStr = (item as any).birthDate || item.date;
       const birth = new Date(birthDateStr);
-      let age = today.getFullYear() - birth.getFullYear();
-      const monthDiff = today.getMonth() - birth.getMonth();
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
-        age--;
-      }
+      const age = today.getFullYear() - birth.getFullYear();
       return (
         <TouchableOpacity
           style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftWidth: 4, borderLeftColor: BIRTHDAY_COLOR }]}
