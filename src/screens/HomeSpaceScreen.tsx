@@ -282,18 +282,21 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
               <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('homes.address')}</Text>
                 <GooglePlacesInput
-                  placeholder={t('homes.addressPlaceholder')}
-                  address={formAddress}
-                  onAddressChange={(addr: string, details?: any) => {
+                  value={formAddress}
+                  onChangeText={setFormAddress}
+                  onSelect={(addr) => {
                     setFormAddress(addr);
-                    if (details) {
-                      const comps = details.address_components || [];
-                      const postal = comps.find((c: any) => c.types.includes('postal_code'));
-                      const city = comps.find((c: any) => c.types.includes('locality') || c.types.includes('sublocality'));
-                      if (postal) setFormPostNumber(postal.long_name);
-                      if (city) setFormPostCity(city.long_name);
+                    const parts = addr.split(', ');
+                    for (const part of parts) {
+                      const postalMatch = part.trim().match(/^(\d{4})\s+(.+)/);
+                      if (postalMatch) {
+                        setFormPostNumber(postalMatch[1]);
+                        setFormPostCity(postalMatch[2].replace(/,.*$/, '').trim());
+                        break;
+                      }
                     }
                   }}
+                  placeholder={t('homes.addressPlaceholder')}
                 />
               </View>
 
