@@ -1158,8 +1158,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
                 <AppIcon name="fest" size={16} color={BIRTHDAY_COLOR} />
                 <Text style={{ fontSize: 16, fontWeight: '600', color: BIRTHDAY_COLOR }}>Bursdag</Text>
               </View>
-              <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.name}</Text>
-              <Text style={[styles.spondCardTime, { color: colors.textSecondary }]}>🎂 {age} år</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <AppIcon name="person" size={14} color={BIRTHDAY_COLOR} />
+                <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.name}</Text>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <AppIcon name="birthday" size={14} color={BIRTHDAY_COLOR} />
+                <Text style={[styles.spondCardTime, { color: colors.textSecondary }]}>{age} år</Text>
+              </View>
             </View>
           </View>
         </TouchableOpacity>
