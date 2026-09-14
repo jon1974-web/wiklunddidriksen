@@ -185,13 +185,6 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
         </View>
       </View>
       <ScrollView style={styles.content}>
-        {homes.length === 0 && (
-          <View style={styles.emptyState}>
-            <AppIcon name="house" size={48} color={colors.textDisabled} />
-            <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('homes.empty')}</Text>
-            <Text style={[styles.emptySubtext, { color: colors.textDisabled }]}>{t('homes.addFirst')}</Text>
-          </View>
-        )}
         <View style={styles.grid}>
             {homes.map((home) => {
               const mapUrl = home.address ? getStaticMapUrl(home.address, 15, '200x200') : null;
