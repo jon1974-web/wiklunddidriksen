@@ -237,8 +237,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       )}
 
       {/* Svar fra alle */}
-      {stampStatus && (
-        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
           <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Svar fra alle {event.groupName ? `— ${event.groupName}` : ''}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity
@@ -282,7 +281,6 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
             </View>
           )}
         </View>
-      )}
 
       {responseModal && spondConfig && (
         <SpondResponseModal
