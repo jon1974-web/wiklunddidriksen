@@ -1135,12 +1135,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const calDay = bDate.getDate();
       const calMonth = MONTHS_SV[bDate.getMonth()];
       const calDayName = t(DAY_KEYS[bDate.getDay()]);
+      const today = new Date();
+      const age = today.getFullYear() - bDate.getFullYear();
       return (
         <TouchableOpacity
           style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftWidth: 4, borderLeftColor: BIRTHDAY_COLOR }]}
           onPress={() => navigation.navigate('Bursdager')}
         >
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
             <View style={styles.spondCalIcon}>
               <View style={[styles.spondCalTopBar, { backgroundColor: BIRTHDAY_COLOR }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
@@ -1153,7 +1155,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
                 <AppIcon name="birthday" size={14} color={BIRTHDAY_COLOR} />
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.name}</Text>
               </View>
-              <Text style={[styles.spondCardTime, { color: colors.textSecondary }]}>🎂 Bursdag</Text>
+              <Text style={[styles.spondCardTime, { color: colors.textSecondary }]}>🎂 {age} år</Text>
             </View>
           </View>
         </TouchableOpacity>
