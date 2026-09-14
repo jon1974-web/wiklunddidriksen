@@ -1411,6 +1411,7 @@
     "helpHow": "Käyttöohje",
     "helpHowText": "Paina + lisätäksesi uuden kodin. Valitse tyyppi, lisää nimi ja osoite. Paina pitkään koodia muokataksesi tai poistaaksesi.",
     "homes.photo": "Valokuva",
-    "homes.uploadPhoto": "Lataa kuva"
+    "homes.uploadPhoto": "Lataa kuva",
+    "instructions": "Ohjeet"
   }
 }

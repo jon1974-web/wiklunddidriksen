@@ -20,7 +20,8 @@ export const HomeDetailScreen: React.FC<HomeDetailScreenProps> = ({ navigation, 
   const { home } = route.params;
 
   const tiles = [
-    { id: 'projects', icon: 'activities', label: t('homes.projects'), screen: 'HomeProjects', disabled: true },
+    { id: 'instructions', icon: 'instruksjon', label: t('homes.instructions'), screen: 'HomeInstructions', disabled: true },
+    { id: 'projects', icon: 'activities', label: t('homes.projects'), screen: 'HomeProjects', disabled: false },
   ];
 
   return (
@@ -55,12 +56,6 @@ export const HomeDetailScreen: React.FC<HomeDetailScreenProps> = ({ navigation, 
             {tile.disabled && <Text style={{ color: '#E53935', fontSize: 10, fontWeight: '600' }}>{t('homes.comingSoon')}</Text>}
           </TouchableOpacity>
         ))}
-        {home.description ? (
-          <View style={[styles.card, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.cardTitle, { color: colors.text }]}>{t('homes.description')}</Text>
-            <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20 }}>{home.description}</Text>
-          </View>
-        ) : null}
       </ScrollView>
     </SafeAreaView>
   );

@@ -1411,6 +1411,7 @@
     "helpHow": "Hvordan bruger man det",
     "helpHowText": "Tryk + for at tilføje et nyt hjem. Vælg type, tilføj navn og adresse. Lang tryk på et hjem for at redigere eller slette.",
     "homes.photo": "Billede",
-    "homes.uploadPhoto": "Upload billede"
+    "homes.uploadPhoto": "Upload billede",
+    "instructions": "Instruktioner"
   }
 }

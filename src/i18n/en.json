@@ -1411,6 +1411,7 @@
     "helpHow": "How to use it",
     "helpHowText": "Press + to add a new home. Select type, add name and address. Long press a home to edit or delete.",
     "homes.photo": "Photo",
-    "homes.uploadPhoto": "Upload photo"
+    "homes.uploadPhoto": "Upload photo",
+    "instructions": "Instructions"
   }
 }
