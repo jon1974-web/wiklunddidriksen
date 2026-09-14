@@ -710,7 +710,7 @@ export interface KindergartenSchedule {
   createdAt: number;
 }
 
-export type HomeType = 'house' | 'cabin' | 'summerCabin' | 'winterCabin' | 'apartment';
+export type HomeType = 'house' | 'summerCabin' | 'winterCabin' | 'apartment';
 
 export interface Home {
   id: string;

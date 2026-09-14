@@ -19,10 +19,9 @@ const HOME_THEME = MODULE_COLORS.home;
 
 const HOME_TYPES: { type: HomeType; icon: string; label: string }[] = [
   { type: 'house', icon: 'house', label: 'Hus' },
-  { type: 'cabin', icon: 'hotel', label: 'Hytte' },
-  { type: 'summerCabin', icon: 'hotel', label: 'Sommerhytte' },
-  { type: 'winterCabin', icon: 'hotel', label: 'Vinterhytte' },
-  { type: 'apartment', icon: 'house', label: 'Leilighet' },
+  { type: 'summerCabin', icon: 'summerCabin', label: 'Sommerhytte' },
+  { type: 'winterCabin', icon: 'winterCabin', label: 'Vinterhytte' },
+  { type: 'apartment', icon: 'apartment', label: 'Leilighet' },
 ];
 
 interface HomeSpaceScreenProps {

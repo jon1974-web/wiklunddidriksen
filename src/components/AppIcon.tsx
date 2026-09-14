@@ -554,5 +554,46 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5
     </Svg>
   );
 
+  if (name === 'apartment') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="4" y="2" width="16" height="20" rx="1"/>
+      <Line x1="9" y1="6" x2="9" y2="6.01"/>
+      <Line x1="15" y1="6" x2="15" y2="6.01"/>
+      <Line x1="9" y1="10" x2="9" y2="10.01"/>
+      <Line x1="15" y1="10" x2="15" y2="10.01"/>
+      <Line x1="9" y1="14" x2="9" y2="14.01"/>
+      <Line x1="15" y1="14" x2="15" y2="14.01"/>
+      <Line x1="9" y1="18" x2="15" y2="18"/>
+      <Path d="M9 22v-4h6v4"/>
+    </Svg>
+  );
+
+  if (name === 'summerCabin') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3 21h18"/>
+      <Path d="M5 21V7l7-4 7 4v14"/>
+      <Path d="M9 21v-6h6v6"/>
+      <Circle cx="17" cy="5" r="2"/>
+      <Path d="M19 3l1 1"/>
+      <Path d="M17 3l-1 1"/>
+      <Path d="M19 5l1 1"/>
+      <Path d="M15 5l-1 1"/>
+      <Path d="M17 3v-1"/>
+      <Path d="M19 5l1-1"/>
+    </Svg>
+  );
+
+  if (name === 'winterCabin') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3 21h18"/>
+      <Path d="M5 21V7l7-4 7 4v14"/>
+      <Path d="M9 21v-6h6v6"/>
+      <Line x1="12" y1="2" x2="12" y2="5"/>
+      <Line x1="10" y1="3.5" x2="14" y2="3.5"/>
+      <Line x1="11" y1="2" x2="13" y2="4"/>
+      <Line x1="13" y1="2" x2="11" y2="4"/>
+    </Svg>
+  );
+
   return null;
 };
