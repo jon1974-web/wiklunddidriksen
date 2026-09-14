@@ -724,3 +724,15 @@ export interface Home {
   familyId: string;
   createdAt: number;
 }
+
+export interface HomePaintColor {
+  id: string;
+  homeId: string;
+  name: string;
+  code: string;
+  brand: string;
+  room: string;
+  hexColor?: string;
+  familyId: string;
+  createdAt: number;
+}

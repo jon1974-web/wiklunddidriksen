@@ -564,6 +564,15 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5
     </Svg>
   );
 
+  if (name === 'paintColor') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M19 11V9a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h8"/>
+      <Path d="M19 11a2 2 0 012 2v1a2 2 0 01-2 2h-1"/>
+      <Circle cx="12" cy="15" r="3"/>
+      <Path d="M12 12v3"/>
+    </Svg>
+  );
+
   if (name === 'apartment') return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
       <Rect x="4" y="2" width="16" height="20" rx="1"/>
