@@ -35,6 +35,8 @@ import { BirthdaySpaceScreen } from './src/screens/BirthdaySpaceScreen';
 import { PetSpaceScreen } from './src/screens/PetSpaceScreen';
 import { HomeSpaceScreen } from './src/screens/HomeSpaceScreen';
 import { HomeDetailScreen } from './src/screens/HomeDetailScreen';
+import { HomeProjectListScreen } from './src/screens/HomeProjectListScreen';
+import { HomeProjectDetailScreen } from './src/screens/HomeProjectDetailScreen';
 import { PetVetDetailScreen } from './src/screens/PetVetDetailScreen';
 import { PetVaccDetailScreen } from './src/screens/PetVaccDetailScreen';
 import { PetMedDetailScreen } from './src/screens/PetMedDetailScreen';
@@ -97,6 +99,8 @@ type RootStackParamList = {
   PetSpace: undefined;
   HomeSpace: undefined;
   HomeDetail: { home: import('./src/types').Home };
+  HomeProjects: { home: import('./src/types').Home };
+  HomeProjectDetail: { home: import('./src/types').Home; project: import('./src/types').HomeProject };
   PetVetDetail: { visit: import('./src/types').PetVetVisit; petName?: string };
   PetVaccDetail: { vaccination: import('./src/types').PetVaccination; petName?: string };
   KindergartenContactDetail: { contact: import('./src/types').KindergartenContact; childId?: string; yearId?: string };
@@ -285,6 +289,16 @@ const TripsStack = () => {
         <Stack.Screen
           name="HomeDetail"
           component={HomeDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="HomeProjects"
+          component={HomeProjectListScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="HomeProjectDetail"
+          component={HomeProjectDetailScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

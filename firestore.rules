@@ -126,6 +126,18 @@ service cloud.firestore {
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
+    // Home Projects: family-scoped
+    match /homeProjects/{projectId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
+    // Home Paint Colors: family-scoped
+    match /homePaintColors/{colorId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
     // Spond Responses: family-scoped
     match /spondResponses/{responseId} {
       allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);

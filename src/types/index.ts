@@ -736,3 +736,13 @@ export interface HomePaintColor {
   familyId: string;
   createdAt: number;
 }
+
+export interface HomeProject {
+  id: string;
+  homeId: string;
+  title: string;
+  description: string;
+  status: 'active' | 'completed' | 'on-hold';
+  familyId: string;
+  createdAt: number;
+}

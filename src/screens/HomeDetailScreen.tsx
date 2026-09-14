@@ -21,7 +21,7 @@ export const HomeDetailScreen: React.FC<HomeDetailScreenProps> = ({ navigation, 
 
   const tiles = [
     { id: 'instructions', icon: 'instruksjon', label: t('homes.instructions'), screen: 'HomeInstructions', disabled: true },
-    { id: 'projects', icon: 'activities', label: t('homes.projects'), screen: 'HomeProjects', disabled: true },
+    { id: 'projects', icon: 'activities', label: t('homes.projects'), screen: 'HomeProjects', disabled: false },
   ];
 
   return (
@@ -48,6 +48,7 @@ export const HomeDetailScreen: React.FC<HomeDetailScreenProps> = ({ navigation, 
             key={tile.id}
             style={[styles.tile, { backgroundColor: colors.surface, opacity: tile.disabled ? 0.5 : 1 }]}
             disabled={tile.disabled}
+            onPress={() => navigation.navigate(tile.screen, { home })}
           >
             <View style={[styles.tileIcon, { backgroundColor: HOME_THEME }]}>
               <AppIcon name={tile.icon as any} size={24} color="#fff" />

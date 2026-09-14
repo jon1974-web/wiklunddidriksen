@@ -4095,3 +4095,100 @@ exports.debugCheckPetVet = onRequest({ region: "us-central1" }, async (req, res)
   });
   res.json(results);
 });
+
+exports.homeExtractColor = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!(await checkRateLimit(uid, "homeExtractColor"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const { imageBase64 } = req.body;
+
+    if (!imageBase64) {
+      return res.status(400).json({ error: "No image data received" });
+    }
+
+    const systemPrompt = `You are a color analysis expert. Analyze this image and extract paint color information.
+
+Look for:
+1. If this is a paint can/bucket label: Extract the color name, color code (like Jotun 1234, NCS S 0502-Y, or similar), brand name, and try to determine the approximate hex color.
+2. If this is a wall/surface color: Identify the dominant paint color, suggest a color name if possible, and determine the closest hex color code.
+
+Return your response as JSON with these fields:
+{
+  "name": "Color name if visible or can be inferred (e.g. 'Hvit Prakt', 'Klassisk Hvit')",
+  "code": "Color code if visible (e.g. 'Jotun 1234', 'NCS S 0502-Y', 'RAL 9010')",
+  "brand": "Brand name if visible (e.g. 'Jotun', 'Dyrup', 'Beckers')",
+  "hexColor": "Approximate hex color code (e.g. '#F5F0EB')"
+}
+
+If you cannot determine something, leave that field as an empty string. Always try to determine the hexColor based on what you see.
+Return ONLY the JSON, no other text.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: { url: `data:image/jpeg;base64,${imageBase64}`, detail: "high" },
+            },
+            {
+              type: "text",
+              text: "Analyze this image and extract color information. Return only JSON.",
+            },
+          ],
+        },
+      ],
+      max_tokens: 500,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+
+    let colorData;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        colorData = JSON.parse(jsonMatch[0]);
+      } else {
+        colorData = { name: "", code: "", brand: "", hexColor: "" };
+      }
+    } catch (parseError) {
+      colorData = { name: "", code: "", brand: "", hexColor: "" };
+    }
+
+    res.json({
+      name: colorData.name || "",
+      code: colorData.code || "",
+      brand: colorData.brand || "",
+      hexColor: colorData.hexColor || "",
+    });
+  } catch (error) {
+    console.error("homeExtractColor error:", error);
+    res.status(500).json({ error: "Failed to extract color. Please try again." });
+  }
+});
