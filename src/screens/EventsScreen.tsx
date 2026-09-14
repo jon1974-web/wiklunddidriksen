@@ -1154,9 +1154,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
             </View>
             <View style={styles.spondCardContent}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 2 }}>
-                <AppIcon name="fest" size={12} color={BIRTHDAY_COLOR} />
-                <Text style={{ fontSize: 11, fontWeight: '600', color: BIRTHDAY_COLOR }}>Bursdag</Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
+                <AppIcon name="fest" size={16} color={BIRTHDAY_COLOR} />
+                <Text style={{ fontSize: 16, fontWeight: '600', color: BIRTHDAY_COLOR }}>Bursdag</Text>
               </View>
               <Text style={[styles.spondCardTitle, { color: colors.text }]} numberOfLines={2}>{item.name}</Text>
               <Text style={[styles.spondCardTime, { color: colors.textSecondary }]}>🎂 {age} år</Text>
