@@ -744,6 +744,8 @@ export interface HomeProject {
   title: string;
   description: string;
   budget: number;
+  startDate?: string;
+  endDate?: string;
   status: 'active' | 'completed' | 'on-hold';
   familyId: string;
   createdAt: number;

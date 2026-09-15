@@ -8,6 +8,7 @@ import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
+import { formatDate } from '../utils/dateUtils';
 import { Home, HomeProject } from '../types';
 import { getHomeProjects, addHomeProject, updateHomeProject, deleteHomeProject } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
@@ -74,7 +75,8 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
     if (!familyId) return;
     setSaving(true);
     try {
-      const data = {
+      const today = new Date().toISOString().split('T')[0];
+      const data: any = {
         homeId: home.id,
         title: formTitle.trim(),
         description: formDescription.trim(),
@@ -83,8 +85,12 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
         familyId,
       };
       if (editingProject) {
+        if (formStatus === 'completed' && !editingProject.endDate) {
+          data.endDate = today;
+        }
         await updateHomeProject(editingProject, data);
       } else {
+        data.startDate = today;
         await addHomeProject(data);
       }
       resetForm();
@@ -174,6 +180,11 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
                 </View>
                 {project.description ? (
                   <Text style={[styles.projectCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{project.description}</Text>
+                ) : null}
+                {project.startDate ? (
+                  <Text style={{ fontSize: 11, color: colors.textDisabled, marginTop: 4 }}>
+                    📅 {formatDate(project.startDate)}{project.endDate ? ` → ${formatDate(project.endDate)}` : ''}
+                  </Text>
                 ) : null}
               </TouchableOpacity>
             );
