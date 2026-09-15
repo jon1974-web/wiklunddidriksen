@@ -1504,6 +1504,19 @@
     "budget": "Budjetti",
     "budgetPlaceholder": "esim. 50000",
     "spent": "Käytetty",
-    "remaining": "Jäljellä"
+    "remaining": "Jäljellä",
+    "tasks": "Tehtävät",
+    "addTask": "Lisää tehtävä",
+    "editTask": "Muokkaa tehtävää",
+    "taskTitle": "Otsikko",
+    "taskTitlePlaceholder": "esim. Maalaa katto",
+    "taskTitleRequired": "Kirjoita otsikko",
+    "noTasks": "Ei tehtäviä vielä",
+    "statusTodo": "Todo",
+    "statusInProgress": "Käynnissä",
+    "statusDone": "Valmis",
+    "startTask": "Aloita tehtävä",
+    "completeTask": "Suorita tehtävä",
+    "noDescription": "Ei kuvausta"
   }
 }

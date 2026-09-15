@@ -1504,6 +1504,19 @@
     "budget": "Budget",
     "budgetPlaceholder": "t.ex. 50000",
     "spent": "Använt",
-    "remaining": "Återstående"
+    "remaining": "Återstående",
+    "tasks": "Uppgifter",
+    "addTask": "Lägg till uppgift",
+    "editTask": "Redigera uppgift",
+    "taskTitle": "Titel",
+    "taskTitlePlaceholder": "t.ex. Måla taket",
+    "taskTitleRequired": "Vänligen ange en titel",
+    "noTasks": "Inga uppgifter ännu",
+    "statusTodo": "Todo",
+    "statusInProgress": "Pågående",
+    "statusDone": "Klar",
+    "startTask": "Starta uppgift",
+    "completeTask": "Slutför uppgift",
+    "noDescription": "Ingen beskrivning"
   }
 }

@@ -1504,6 +1504,19 @@
     "budget": "Budsjett",
     "budgetPlaceholder": "F.eks. 50000",
     "spent": "Forbrukt",
-    "remaining": "Gjenstående"
+    "remaining": "Gjenstående",
+    "tasks": "Oppgaver",
+    "addTask": "Legg til oppgave",
+    "editTask": "Rediger oppgave",
+    "taskTitle": "Tittel",
+    "taskTitlePlaceholder": "F.eks. Male taket",
+    "taskTitleRequired": "Vennligst skriv en tittel",
+    "noTasks": "Ingen oppgaver ennå",
+    "statusTodo": "Todo",
+    "statusInProgress": "Pågående",
+    "statusDone": "Ferdig",
+    "startTask": "Start oppgave",
+    "completeTask": "Fullfør oppgave",
+    "noDescription": "Ingen beskrivelse"
   }
 }

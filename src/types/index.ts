@@ -800,3 +800,16 @@ export interface HomeOffer {
   familyId: string;
   createdAt: number;
 }
+
+export type HomeTaskStatus = 'todo' | 'in-progress' | 'done';
+
+export interface HomeTask {
+  id: string;
+  projectId: string;
+  title: string;
+  description: string;
+  status: HomeTaskStatus;
+  linkedItemId?: string;
+  familyId: string;
+  createdAt: number;
+}

@@ -1504,6 +1504,19 @@
     "budget": "Budget",
     "budgetPlaceholder": "f.eks. 50000",
     "spent": "Brugt",
-    "remaining": "Resterende"
+    "remaining": "Resterende",
+    "tasks": "Opgaver",
+    "addTask": "Tilføj opgave",
+    "editTask": "Rediger opgave",
+    "taskTitle": "Titel",
+    "taskTitlePlaceholder": "f.eks. Male loftet",
+    "taskTitleRequired": "Skriv venligst en titel",
+    "noTasks": "Ingen opgaver endnu",
+    "statusTodo": "Todo",
+    "statusInProgress": "I gang",
+    "statusDone": "Færdig",
+    "startTask": "Start opgave",
+    "completeTask": "Fuldend opgave",
+    "noDescription": "Ingen beskrivelse"
   }
 }

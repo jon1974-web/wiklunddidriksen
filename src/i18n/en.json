@@ -1504,6 +1504,19 @@
     "budget": "Budget",
     "budgetPlaceholder": "e.g. 50000",
     "spent": "Spent",
-    "remaining": "Remaining"
+    "remaining": "Remaining",
+    "tasks": "Tasks",
+    "addTask": "Add task",
+    "editTask": "Edit task",
+    "taskTitle": "Title",
+    "taskTitlePlaceholder": "e.g. Paint the ceiling",
+    "taskTitleRequired": "Please enter a title",
+    "noTasks": "No tasks yet",
+    "statusTodo": "Todo",
+    "statusInProgress": "In progress",
+    "statusDone": "Done",
+    "startTask": "Start task",
+    "completeTask": "Complete task",
+    "noDescription": "No description"
   }
 }

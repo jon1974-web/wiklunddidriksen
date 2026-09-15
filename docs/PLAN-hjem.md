@@ -59,10 +59,13 @@
 ## 📋 Gjenstående
 
 ### Phase 5: Oppgavetavle (Kanban)
-- [ ] Tavle med 3 kolonner: Todo → Pågående → Ferdig
+- [x] Tavle med 3 kolonner: Todo → Pågående → Ferdig
+- [x] Kompakte oppgavekort med tittel
+- [x] Pilknapper for å flytte oppgaver mellom kolonner
+- [x] Tapp på oppgave → detaljvisning med tittel, beskrivelse, status
+- [x] Lang-press → rediger/slett
 - [ ] Koble oppgaver til handleliste-varer
 - [ ] Legg til oppgaver direkte fra handleliste
-- [ ] Dra og slipp mellom kolonner
 
 ### AI-funksjoner
 - [x] Fargeuttrekk fra bilder (etiketter + vegger)

@@ -2,7 +2,7 @@ import {
   collection, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, doc, where,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Home, HomePaintColor, HomeProject, HomeInstruction, HomeService, HomeShoppingItem, HomeOffer } from '../types';
+import { Home, HomePaintColor, HomeProject, HomeInstruction, HomeService, HomeShoppingItem, HomeOffer, HomeTask } from '../types';
 
 export async function getHomes(familyId: string): Promise<Home[]> {
   const q = query(collection(db, 'homes'), where('familyId', '==', familyId), orderBy('createdAt', 'asc'));
@@ -145,4 +145,24 @@ export async function updateHomeOffer(offerId: string, data: Partial<HomeOffer>)
 
 export async function deleteHomeOffer(offerId: string): Promise<void> {
   await deleteDoc(doc(db, 'homeOffers', offerId));
+}
+
+// Tasks
+export async function getHomeTasks(familyId: string, projectId: string): Promise<HomeTask[]> {
+  const q = query(collection(db, 'homeTasks'), where('familyId', '==', familyId), where('projectId', '==', projectId), orderBy('createdAt', 'asc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HomeTask));
+}
+
+export async function addHomeTask(data: Omit<HomeTask, 'id' | 'createdAt'>): Promise<string> {
+  const docRef = await addDoc(collection(db, 'homeTasks'), { ...data, createdAt: Date.now() });
+  return docRef.id;
+}
+
+export async function updateHomeTask(taskId: string, data: Partial<HomeTask>): Promise<void> {
+  await updateDoc(doc(db, 'homeTasks', taskId), data);
+}
+
+export async function deleteHomeTask(taskId: string): Promise<void> {
+  await deleteDoc(doc(db, 'homeTasks', taskId));
 }

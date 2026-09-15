@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../theme/ThemeContext';
@@ -9,8 +9,8 @@ import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
-import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer } from '../types';
-import { getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer } from '../services/homeService';
+import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer, HomeTask, HomeTaskStatus } from '../types';
+import { getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 
 const HOME_THEME = MODULE_COLORS.home;
@@ -61,17 +61,29 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [offerFileName, setOfferFileName] = useState('');
   const [savingOffer, setSavingOffer] = useState(false);
 
+  const [tasks, setTasks] = useState<HomeTask[]>([]);
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [showTaskDetail, setShowTaskDetail] = useState<HomeTask | null>(null);
+  const [editingTask, setEditingTask] = useState<string | null>(null);
+  const [taskActionModal, setTaskActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [addTaskStatus, setAddTaskStatus] = useState<HomeTaskStatus>('todo');
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
+  const [savingTask, setSavingTask] = useState(false);
+
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
-      const [colorData, itemData, offerData] = await Promise.allSettled([
+      const [colorData, itemData, offerData, taskData] = await Promise.allSettled([
         getHomePaintColors(familyId, project.homeId, project.id),
         getHomeShoppingItems(familyId, project.id),
         getHomeOffers(familyId, project.id),
+        getHomeTasks(familyId, project.id),
       ]);
       setPaintColors(colorData.status === 'fulfilled' ? colorData.value : []);
       setShoppingItems(itemData.status === 'fulfilled' ? itemData.value : []);
       setOffers(offerData.status === 'fulfilled' ? offerData.value : []);
+      setTasks(taskData.status === 'fulfilled' ? taskData.value : []);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
@@ -448,6 +460,56 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const totalChecked = useMemo(() => shoppingItems.filter(i => i.checked).reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0), [shoppingItems]);
   const totalOffers = useMemo(() => offers.reduce((sum, o) => sum + (o.price || 0), 0), [offers]);
 
+  const resetTaskForm = () => { setTaskTitle(''); setTaskDescription(''); setAddTaskStatus('todo'); setEditingTask(null); };
+
+  const handleSaveTask = async () => {
+    if (!taskTitle.trim()) { crossAlert(t('common.error'), t('homes.taskTitleRequired')); return; }
+    if (!familyId) return;
+    setSavingTask(true);
+    try {
+      const data = {
+        projectId: project.id,
+        title: taskTitle.trim(),
+        description: taskDescription.trim(),
+        status: addTaskStatus,
+        familyId,
+      };
+      if (editingTask) { await updateHomeTask(editingTask, data); }
+      else { await addHomeTask(data); }
+      resetTaskForm();
+      setShowAddTask(false);
+      loadData();
+    } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+    finally { setSavingTask(false); }
+  };
+
+  const handleDeleteTask = async () => {
+    if (!taskActionModal.id) return;
+    try { await deleteHomeTask(taskActionModal.id); setTaskActionModal({ visible: false, id: '', title: '' }); loadData(); }
+    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const handleEditTask = () => {
+    const task = tasks.find((t) => t.id === taskActionModal.id);
+    if (task) {
+      setEditingTask(task.id);
+      setTaskTitle(task.title);
+      setTaskDescription(task.description);
+      setAddTaskStatus(task.status);
+      setShowAddTask(true);
+    }
+    setTaskActionModal({ visible: false, id: '', title: '' });
+  };
+
+  const handleMoveTask = async (taskId: string, newStatus: HomeTaskStatus) => {
+    try { await updateHomeTask(taskId, { status: newStatus }); loadData(); }
+    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const todoTasks = useMemo(() => tasks.filter(t => t.status === 'todo'), [tasks]);
+  const inProgressTasks = useMemo(() => tasks.filter(t => t.status === 'in-progress'), [tasks]);
+  const doneTasks = useMemo(() => tasks.filter(t => t.status === 'done'), [tasks]);
+
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -643,6 +705,64 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
             ))
           )}
         </View>
+
+        {/* Tasks Board */}
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleRow}>
+              <AppIcon name="activities" size={18} color={HOME_THEME} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.tasks')}</Text>
+              <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({tasks.length})</Text>
+            </View>
+            <TouchableOpacity style={[styles.addButton, { backgroundColor: HOME_THEME }]} onPress={() => { resetTaskForm(); setAddTaskStatus('todo'); setShowAddTask(true); }}>
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+            </TouchableOpacity>
+          </View>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -16, paddingHorizontal: 16 }}>
+            {(['todo', 'in-progress', 'done'] as const).map((status) => {
+              const statusTasks = status === 'todo' ? todoTasks : status === 'in-progress' ? inProgressTasks : doneTasks;
+              const statusLabel = status === 'todo' ? t('homes.statusTodo') : status === 'in-progress' ? t('homes.statusInProgress') : t('homes.statusDone');
+              const statusColor = status === 'todo' ? '#F9A825' : status === 'in-progress' ? '#1976D2' : '#43A047';
+              return (
+                <View key={status} style={[styles.kanbanColumn, { backgroundColor: colors.inputBackground }]}>
+                  <View style={[styles.kanbanColumnHeader, { borderBottomColor: statusColor }]}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                      <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+                      <Text style={[styles.kanbanColumnTitle, { color: colors.text }]}>{statusLabel}</Text>
+                      <Text style={{ fontSize: 11, color: colors.textSecondary }}>({statusTasks.length})</Text>
+                    </View>
+                    {status === 'todo' && (
+                      <TouchableOpacity onPress={() => { resetTaskForm(); setAddTaskStatus('todo'); setShowAddTask(true); }}>
+                        <Text style={{ color: HOME_THEME, fontSize: 18, fontWeight: '600' }}>+</Text>
+                      </TouchableOpacity>
+                    )}
+                  </View>
+                  {statusTasks.map((task) => (
+                    <TouchableOpacity key={task.id} style={[styles.taskCard, { backgroundColor: colors.surface }]} onPress={() => setShowTaskDetail(task)} onLongPress={() => setTaskActionModal({ visible: true, id: task.id, title: task.title })}>
+                      <Text style={[styles.taskCardTitle, { color: colors.text }]} numberOfLines={2}>{task.title}</Text>
+                      <View style={{ flexDirection: 'row', gap: 4, marginTop: 6 }}>
+                        {status !== 'todo' && (
+                          <TouchableOpacity style={[styles.taskMoveBtn, { backgroundColor: colors.inputBackground }]} onPress={() => handleMoveTask(task.id, status === 'in-progress' ? 'todo' : 'in-progress')}>
+                            <Text style={{ fontSize: 10, color: colors.textSecondary }}>←</Text>
+                          </TouchableOpacity>
+                        )}
+                        {status !== 'done' && (
+                          <TouchableOpacity style={[styles.taskMoveBtn, { backgroundColor: colors.inputBackground }]} onPress={() => handleMoveTask(task.id, 'done')}>
+                            <Text style={{ fontSize: 10, color: colors.textSecondary }}>→</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    </TouchableOpacity>
+                  ))}
+                  {statusTasks.length === 0 && (
+                    <Text style={{ fontSize: 11, color: colors.textDisabled, textAlign: 'center', padding: 8 }}>{t('homes.noTasks')}</Text>
+                  )}
+                </View>
+              );
+            })}
+          </ScrollView>
+        </View>
       </ScrollView>
 
       <ActionModal
@@ -670,6 +790,64 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         onCancel={() => setOfferActionModal({ visible: false, id: '', title: '' })}
         accentColor={HOME_THEME}
       />
+
+      <ActionModal
+        visible={taskActionModal.visible}
+        title={taskActionModal.title}
+        onEdit={handleEditTask}
+        onDelete={handleDeleteTask}
+        onCancel={() => setTaskActionModal({ visible: false, id: '', title: '' })}
+        accentColor={HOME_THEME}
+      />
+
+      {/* Task Detail Modal */}
+      <Modal visible={!!showTaskDetail} transparent animationType="fade" onRequestClose={() => setShowTaskDetail(null)}>
+        <TouchableWithoutFeedback onPress={() => setShowTaskDetail(null)}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+            <TouchableWithoutFeedback>
+              <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 20, width: '100%', maxWidth: 340 }}>
+                {showTaskDetail && (
+                  <>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                        <View style={[styles.statusDot, { backgroundColor: showTaskDetail.status === 'todo' ? '#F9A825' : showTaskDetail.status === 'in-progress' ? '#1976D2' : '#43A047' }]} />
+                        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary }}>
+                          {showTaskDetail.status === 'todo' ? t('homes.statusTodo') : showTaskDetail.status === 'in-progress' ? t('homes.statusInProgress') : t('homes.statusDone')}
+                        </Text>
+                      </View>
+                      <TouchableOpacity onPress={() => setShowTaskDetail(null)}>
+                        <Text style={{ fontSize: 18, color: colors.textSecondary }}>✕</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <Text style={{ fontSize: 18, fontWeight: '700', color: colors.text, marginBottom: 8 }}>{showTaskDetail.title}</Text>
+                    {showTaskDetail.description ? (
+                      <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20, marginBottom: 16 }}>{showTaskDetail.description}</Text>
+                    ) : (
+                      <Text style={{ fontSize: 14, color: colors.textDisabled, marginBottom: 16 }}>{t('homes.noDescription')}</Text>
+                    )}
+                    {showTaskDetail.status !== 'done' && (
+                      <View style={{ flexDirection: 'row', gap: 8 }}>
+                        {showTaskDetail.status === 'todo' && (
+                          <TouchableOpacity style={[styles.button, { backgroundColor: '#1976D2', flex: 1 }]} onPress={() => { handleMoveTask(showTaskDetail.id, 'in-progress'); setShowTaskDetail(null); }}>
+                            <Text style={[styles.buttonText, { color: '#fff' }]}>{t('homes.startTask')}</Text>
+                          </TouchableOpacity>
+                        )}
+                        {showTaskDetail.status === 'in-progress' && (
+                          <TouchableOpacity style={[styles.button, { backgroundColor: '#43A047', flex: 1 }]} onPress={() => { handleMoveTask(showTaskDetail.id, 'done'); setShowTaskDetail(null); }}>
+                            <Text style={[styles.buttonText, { color: '#fff' }]}>{t('homes.completeTask')}</Text>
+                          </TouchableOpacity>
+                        )}
+                      </View>
+                    )}
+                  </>
+                )}
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Add/Edit Task Modal */}
 
       <Modal visible={showAddColor} transparent animationType="slide" onRequestClose={() => setShowAddColor(false)}>
         <View style={styles.modalOverlay}>
@@ -905,6 +1083,37 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           </View>
         </View>
       </Modal>
+
+      {/* Add/Edit Task Modal */}
+      <Modal visible={showAddTask} transparent animationType="slide" onRequestClose={() => setShowAddTask(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHandleBar} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{editingTask ? t('homes.editTask') : t('homes.addTask')}</Text>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.taskTitle')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={taskTitle} onChangeText={setTaskTitle} placeholder={t('homes.taskTitlePlaceholder')} placeholderTextColor={colors.textDisabled} />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.description')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, { minHeight: 80, textAlignVertical: 'top' }]} value={taskDescription} onChangeText={setTaskDescription} placeholder={t('homes.descriptionPlaceholder')} placeholderTextColor={colors.textDisabled} multiline numberOfLines={3} />
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowAddTask(false); resetTaskForm(); }}>
+                  <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, opacity: savingTask ? 0.5 : 1, flex: 1 }]} onPress={handleSaveTask} disabled={savingTask}>
+                  <Text style={styles.buttonText}>{savingTask ? '...' : t('common.save')}</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -943,4 +1152,11 @@ const styles = StyleSheet.create({
   checkbox: { width: 24, height: 24, borderRadius: 6, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   shoppingItemName: { fontSize: 14, fontWeight: '500' },
   receiptBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  kanbanColumn: { width: 200, borderRadius: 12, padding: 10, marginRight: 10, flexShrink: 0 },
+  kanbanColumnHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: 8, borderBottomWidth: 2, marginBottom: 8 },
+  kanbanColumnTitle: { fontSize: 13, fontWeight: '700' },
+  statusDot: { width: 8, height: 8, borderRadius: 4 },
+  taskCard: { borderRadius: 8, padding: 10, marginBottom: 6, borderWidth: 1, borderColor: '#e0e0e0' },
+  taskCardTitle: { fontSize: 13, fontWeight: '600' },
+  taskMoveBtn: { width: 24, height: 20, borderRadius: 4, alignItems: 'center', justifyContent: 'center' },
 });
