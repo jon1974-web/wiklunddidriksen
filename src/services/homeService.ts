@@ -31,7 +31,7 @@ export async function getHomePaintColors(familyId: string, homeId: string, proje
   if (projectId) {
     return allColors.filter((c) => c.projectId === projectId);
   }
-  return allColors.filter((c) => !c.projectId);
+  return allColors;
 }
 
 export async function addHomePaintColor(data: Omit<HomePaintColor, 'id' | 'createdAt'>): Promise<string> {
