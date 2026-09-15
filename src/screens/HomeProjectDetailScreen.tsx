@@ -64,14 +64,14 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
-      const [colorData, itemData, offerData] = await Promise.all([
+      const [colorData, itemData, offerData] = await Promise.allSettled([
         getHomePaintColors(familyId, project.homeId, project.id),
         getHomeShoppingItems(familyId, project.id),
         getHomeOffers(familyId, project.id),
       ]);
-      setPaintColors(colorData);
-      setShoppingItems(itemData);
-      setOffers(offerData);
+      setPaintColors(colorData.status === 'fulfilled' ? colorData.value : []);
+      setShoppingItems(itemData.status === 'fulfilled' ? itemData.value : []);
+      setOffers(offerData.status === 'fulfilled' ? offerData.value : []);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
