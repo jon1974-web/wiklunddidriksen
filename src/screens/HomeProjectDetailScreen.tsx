@@ -780,7 +780,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                           </TouchableOpacity>
                         )}
                         {status !== 'done' && (
-                          <TouchableOpacity style={[styles.taskMoveBtn, { backgroundColor: colors.inputBackground }]} onPress={() => handleMoveTask(task.id, 'done')}>
+                          <TouchableOpacity style={[styles.taskMoveBtn, { backgroundColor: colors.inputBackground }]} onPress={() => handleMoveTask(task.id, status === 'in-progress' ? 'done' : 'in-progress')}>
                             <Text style={{ fontSize: 10, color: colors.textSecondary }}>→</Text>
                           </TouchableOpacity>
                         )}
