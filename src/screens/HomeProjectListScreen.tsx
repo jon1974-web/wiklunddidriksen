@@ -3,6 +3,7 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal,
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { DatePickerModal } from '../components/DatePickerModal';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
@@ -44,6 +45,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
   const [formBudget, setFormBudget] = useState('');
   const [formStartDate, setFormStartDate] = useState('');
   const [formStatus, setFormStatus] = useState<'active' | 'completed' | 'on-hold'>('active');
+  const [activePicker, setActivePicker] = useState<'startDate' | null>(null);
   const [saving, setSaving] = useState(false);
 
   const loadProjects = useCallback(async () => {
@@ -248,13 +250,12 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
 
               <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('homes.startDate')}</Text>
-                <TextInput
-                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-                  value={formStartDate}
-                  onChangeText={setFormStartDate}
-                  placeholder="YYYY-MM-DD"
-                  placeholderTextColor={colors.textDisabled}
-                />
+                <TouchableOpacity
+                  style={[styles.input, { backgroundColor: colors.surface }]}
+                  onPress={() => setActivePicker('startDate')}
+                >
+                  <Text style={{ color: colors.text }}>{formStartDate || '—'}</Text>
+                </TouchableOpacity>
               </View>
 
               <View style={styles.field}>
@@ -291,6 +292,17 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
           </View>
         </View>
       </Modal>
+
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={t('homes.startDate')}
+        mode="date"
+        dateOffset={-30}
+        dateCount={760}
+        selectedValue={formStartDate}
+        onSelect={(value) => { setFormStartDate(value); setActivePicker(null); }}
+        onClose={() => setActivePicker(null)}
+      />
     </SafeAreaView>
   );
 };
