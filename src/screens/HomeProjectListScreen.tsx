@@ -187,9 +187,12 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
                   <Text style={[styles.projectCardDesc, { color: colors.textSecondary }]} numberOfLines={2}>{project.description}</Text>
                 ) : null}
                 {project.startDate ? (
-                  <Text style={{ fontSize: 11, color: colors.textDisabled, marginTop: 4 }}>
-                    📅 {formatDate(project.startDate)}{project.endDate ? ` → ${formatDate(project.endDate)}` : ''}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                    <AppIcon name="calendar" size={12} color={colors.textDisabled} />
+                    <Text style={{ fontSize: 13, color: colors.textSecondary }}>
+                      {formatDate(project.startDate)}{project.endDate ? ` → ${formatDate(project.endDate)}` : ''}
+                    </Text>
+                  </View>
                 ) : null}
               </TouchableOpacity>
             );
