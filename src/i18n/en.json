@@ -1439,6 +1439,7 @@
     "extractedColor": "Extracted color",
     "photoTag": "Photo tag",
     "photoWall": "Photo wall",
-    "fetchColor": "Get color"
+    "fetchColor": "Get color",
+    "maintenance": "Maintenance"
   }
 }

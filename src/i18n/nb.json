@@ -1439,6 +1439,7 @@
     "extractedColor": "Utklekket farge",
     "photoTag": "Fotografér etikett",
     "photoWall": "Fotografér vegg",
-    "fetchColor": "Hent farge"
+    "fetchColor": "Hent farge",
+    "maintenance": "Vedlikehold"
   }
 }

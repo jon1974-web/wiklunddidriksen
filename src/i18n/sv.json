@@ -1439,6 +1439,7 @@
     "extractedColor": "Extraherad färg",
     "photoTag": "Fotografera etikett",
     "photoWall": "Fotografera vägg",
-    "fetchColor": "Hämta färg"
+    "fetchColor": "Hämta färg",
+    "maintenance": "Underhåll"
   }
 }

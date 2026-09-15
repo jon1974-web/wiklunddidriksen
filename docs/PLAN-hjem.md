@@ -8,10 +8,10 @@
 
 ### Phase 1: Core
 - [x] Home type med `homeType` (house, summerCabin, winterCabin, apartment)
-- [x] Custom SVG-ikoner for alle typer + `instruksjon` + `paintColor`
+- [x] Custom SVG-ikoner for alle typer + `instruksjon` + `paintColor` + `vedlikehold`
 - [x] `homeService.ts` med full CRUD for hjem, prosjekter, fargekoder
 - [x] HomeSpaceScreen — legg til/rediger/slett hjem med bilde, adresse, kart
-- [x] HomeDetailScreen — tile-grid med Prosjekter og Instruksjoner (deaktivert)
+- [x] HomeDetailScreen — tile-grid med Instruksjoner, Vedlikehold og Prosjekter
 - [x] Tile-kort: ikon → navn → beskrivelse → bilde → kart
 - [x] Google Places autofullføring med postnummer/sted
 - [x] Aktivert i Våre steder ("Våre hjem")
@@ -36,6 +36,12 @@
 ### Phase 3: Farger (resterende)
 - [ ] Legg til manuelt hex-farge-input-felt (så brukere kan skrive hex uten AI)
 - [ ] Fargevelger for visuell valg
+
+### Phase 3.5: Vedlikehold
+- [ ] Vedlikeholdsplan per hjem — sjekklister for vedlikeholdsoppgaver
+- [ ] Kalender for planlagt vedlikehold (vask, maling, kontroll etc.)
+- [ ] Påminnelser for vedlikeholdsoppgaver
+- [ ] AI-forslag for vedlikehold basert på hjemtype og alder
 
 ### Phase 4: Handleliste + Tilbud
 - [ ] Handleliste per prosjekt med priser og totalberegning

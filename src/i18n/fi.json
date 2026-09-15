@@ -1439,6 +1439,7 @@
     "extractedColor": "Poimittu väri",
     "photoTag": "Kuvaa tunnus",
     "photoWall": "Kuvaa seinä",
-    "fetchColor": "Hae väri"
+    "fetchColor": "Hae väri",
+    "maintenance": "Kunnossapito"
   }
 }
