@@ -37,11 +37,19 @@
 - [ ] Legg til manuelt hex-farge-input-felt (så brukere kan skrive hex uten AI)
 - [ ] Fargevelger for visuell valg
 
-### Phase 3.5: Vedlikehold
-- [ ] Vedlikeholdsplan per hjem — sjekklister for vedlikeholdsoppgaver
-- [ ] Kalender for planlagt vedlikehold (vask, maling, kontroll etc.)
-- [ ] Påminnelser for vedlikeholdsoppgaver
-- [ ] AI-forslag for vedlikehold basert på hjemtype og alder
+### Phase 3.5: Instruksjoner
+- [ ] Seksjon "Komme hjem" og "Forlate hjem" — instruksjoner for ankomst og avreise
+- [ ] AI foto-til-tekst: ta bilde av håndskrevne notater, AI leser og skriver til instruksjonene
+- [ ] Manuell legg til/rediger/slett instruksjoner
+- [ ] Mulighet til å laste opp bilder av instruksjoner
+
+### Phase 3.6: Vedlikehold
+- [ ] Farger-seksjon (gjenbruk komponent fra Prosjekter)
+- [ ] Serviceavtaler/intervaller:
+  - [ ] Legg til service med type, dato, intervall
+  - [ ] Type service (f.eks. ventilasjon, varmepumpe, peis, etc.)
+  - [ ] Når det skal skje og hvor ofte
+  - [ ] Kalender/oversikt over kommende serviceavtaler
 
 ### Phase 4: Handleliste + Tilbud
 - [ ] Handleliste per prosjekt med priser og totalberegning
