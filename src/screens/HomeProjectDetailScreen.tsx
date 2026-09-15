@@ -608,7 +608,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <AppIcon name="shopping" size={18} color={HOME_THEME} />
+              <AppIcon name="oppgaver" size={18} color={HOME_THEME} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.shoppingList')}</Text>
               <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({shoppingItems.length})</Text>
             </View>
@@ -656,7 +656,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                 <AppIcon name={item.receiptUrl ? 'file' : 'camera'} size={14} color={item.receiptUrl ? '#43A047' : colors.textDisabled} />
               </TouchableOpacity>
               <TouchableOpacity style={styles.receiptBtn} onPress={() => { setTaskTitle(item.name); setTaskDescription(item.quantity > 1 ? `x${item.quantity}` : ''); setAddTaskStatus('todo'); setShowAddTask(true); }}>
-                <AppIcon name="activities" size={14} color={HOME_THEME} />
+                <AppIcon name="oppgaver" size={14} color={HOME_THEME} />
               </TouchableOpacity>
             </TouchableOpacity>
           ))}
@@ -666,7 +666,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <AppIcon name="shopping" size={18} color={HOME_THEME} />
+              <AppIcon name="oppgaver" size={18} color={HOME_THEME} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.offers')}</Text>
               <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({offers.length})</Text>
             </View>
@@ -730,7 +730,10 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                             setShowAddTask(true);
                           }}
                         >
-                          <Text style={{ fontSize: 10, fontWeight: '600', color: HOME_THEME }}>+ Oppgave</Text>
+                          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
+                            <AppIcon name="oppgaver" size={12} color={HOME_THEME} />
+                            <Text style={{ fontSize: 10, fontWeight: '600', color: HOME_THEME }}>Oppgave</Text>
+                          </View>
                         </TouchableOpacity>
                       </View>
                     ))}
