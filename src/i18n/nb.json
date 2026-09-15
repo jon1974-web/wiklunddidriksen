@@ -1440,6 +1440,19 @@
     "photoTag": "Fotografér etikett",
     "photoWall": "Fotografér vegg",
     "fetchColor": "Hent farge",
-    "maintenance": "Vedlikehold"
+    "maintenance": "Vedlikehold",
+    "homes.comingHome": "Komme hjem",
+    "homes.leavingHome": "Forlate hjem",
+    "homes.noInstructions": "Ingen instruksjoner ennå",
+    "homes.addInstruction": "Legg til instruksjon",
+    "homes.editInstruction": "Rediger instruksjon",
+    "homes.instructionTitle": "Tittel",
+    "homes.instructionTitlePlaceholder": "F.eks. Nøkkel og alarm",
+    "homes.instructionTitleRequired": "Vennligst skriv en tittel",
+    "homes.instructionContent": "Instruksjoner",
+    "homes.instructionContentPlaceholder": "Skriv inn instruksjonene her...",
+    "homes.section": "Seksjon",
+    "homes.scanNote": "Skann notat",
+    "homes.scanFromGallery": "Skann fra galleri"
   }
 }

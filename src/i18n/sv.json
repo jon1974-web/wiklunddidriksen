@@ -1440,6 +1440,19 @@
     "photoTag": "Fotografera etikett",
     "photoWall": "Fotografera vägg",
     "fetchColor": "Hämta färg",
-    "maintenance": "Underhåll"
+    "maintenance": "Underhåll",
+    "homes.comingHome": "Komma hem",
+    "homes.leavingHome": "Lämna hem",
+    "homes.noInstructions": "Inga instruktioner ännu",
+    "homes.addInstruction": "Lägg till instruktion",
+    "homes.editInstruction": "Redigera instruktion",
+    "homes.instructionTitle": "Titel",
+    "homes.instructionTitlePlaceholder": "t.ex. Nyckel och larm",
+    "homes.instructionTitleRequired": "Vänligen ange en titel",
+    "homes.instructionContent": "Instruktioner",
+    "homes.instructionContentPlaceholder": "Skriv instruktionerna här...",
+    "homes.section": "Sektion",
+    "homes.scanNote": "Skanna anteckning",
+    "homes.scanFromGallery": "Skanna från galleri"
   }
 }

@@ -1440,6 +1440,19 @@
     "photoTag": "Kuvaa tunnus",
     "photoWall": "Kuvaa seinä",
     "fetchColor": "Hae väri",
-    "maintenance": "Kunnossapito"
+    "maintenance": "Kunnossapito",
+    "homes.comingHome": "Kotiin tullessa",
+    "homes.leavingHome": "Kotiin lähtiessä",
+    "homes.noInstructions": "Ei vielä ohjeita",
+    "homes.addInstruction": "Lisää ohje",
+    "homes.editInstruction": "Muokkaa ohjetta",
+    "homes.instructionTitle": "Otsikko",
+    "homes.instructionTitlePlaceholder": "esim. Avain ja hälytys",
+    "homes.instructionTitleRequired": "Anna otsikko",
+    "homes.instructionContent": "Ohjeet",
+    "homes.instructionContentPlaceholder": "Kirjoita ohjeet tähän...",
+    "homes.section": "Osio",
+    "homes.scanNote": "Skannaa muistiinpano",
+    "homes.scanFromGallery": "Skannaa galleriasta"
   }
 }

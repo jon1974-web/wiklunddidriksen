@@ -138,6 +138,12 @@ service cloud.firestore {
       allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
     }
 
+    // Home Instructions: family-scoped
+    match /homeInstructions/{instructionId} {
+      allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);
+      allow create: if request.auth != null && isFamilyMember(request.resource.data.familyId);
+    }
+
     // Spond Responses: family-scoped
     match /spondResponses/{responseId} {
       allow read, update, delete: if request.auth != null && isFamilyMember(resource.data.familyId);

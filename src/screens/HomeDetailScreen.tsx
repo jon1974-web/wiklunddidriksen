@@ -20,7 +20,7 @@ export const HomeDetailScreen: React.FC<HomeDetailScreenProps> = ({ navigation, 
   const { home } = route.params;
 
   const tiles = [
-    { id: 'instructions', icon: 'instruksjon', label: t('homes.instructions'), screen: 'HomeInstructions', disabled: true },
+    { id: 'instructions', icon: 'instruksjon', label: t('homes.instructions'), screen: 'HomeInstructions', disabled: false },
     { id: 'maintenance', icon: 'vedlikehold', label: t('homes.maintenance'), screen: 'HomeMaintenance', disabled: true },
     { id: 'projects', icon: 'activities', label: t('homes.projects'), screen: 'HomeProjects', disabled: false },
   ];

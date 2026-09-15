@@ -4235,3 +4235,102 @@ Return ONLY the JSON, no other text.`;
     res.status(500).json({ error: "Failed to extract color. Please try again." });
   }
 });
+
+exports.homeExtractInstruction = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!(await checkRateLimit(uid, "homeExtractInstruction"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const { imageBase64 } = req.body;
+
+    if (!imageBase64) {
+      return res.status(400).json({ error: "No image data received" });
+    }
+
+    const systemPrompt = `You are an instruction reader. Analyze this image and extract instructions from it.
+
+This could be:
+- A handwritten note with instructions
+- A printed document with instructions
+- A checklist or procedure
+- Any text-based instruction
+
+Determine if the instructions are about:
+- "coming": What to do when coming to a home (arriving)
+- "leaving": What to do when leaving a home (departing)
+
+Extract ALL the text you can read, even if it's handwritten. Preserve the structure and order.
+
+Return your response as JSON:
+{
+  "title": "A short descriptive title for these instructions (e.g. 'Ankomst', 'Avreise', 'Nøkkel og alarm')",
+  "content": "The full text of the instructions, preserving line breaks and structure",
+  "section": "coming or leaving"
+}
+
+If you cannot determine if it's coming or leaving, default to "coming".
+Return ONLY the JSON, no other text.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: { url: `data:image/jpeg;base64,${imageBase64}`, detail: "high" },
+            },
+            {
+              type: "text",
+              text: "Read and extract the instructions from this image. Return only JSON.",
+            },
+          ],
+        },
+      ],
+      max_tokens: 1000,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+
+    let instructionData;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      instructionData = jsonMatch ? JSON.parse(jsonMatch[0]) : { title: "", content: "", section: "coming" };
+    } catch (parseError) {
+      instructionData = { title: "", content: content, section: "coming" };
+    }
+
+    res.json({
+      title: instructionData.title || "",
+      content: instructionData.content || "",
+      section: instructionData.section || "coming",
+    });
+  } catch (error) {
+    console.error("homeExtractInstruction error:", error);
+    res.status(500).json({ error: "Failed to extract instructions. Please try again." });
+  }
+});

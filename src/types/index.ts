@@ -746,3 +746,14 @@ export interface HomeProject {
   familyId: string;
   createdAt: number;
 }
+
+export interface HomeInstruction {
+  id: string;
+  homeId: string;
+  section: 'coming' | 'leaving';
+  title: string;
+  content: string;
+  imageUrl?: string;
+  familyId: string;
+  createdAt: number;
+}

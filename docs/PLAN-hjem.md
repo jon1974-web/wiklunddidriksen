@@ -39,8 +39,8 @@
 
 ### Phase 3.5: Instruksjoner
 - [ ] Seksjon "Komme hjem" og "Forlate hjem" — instruksjoner for ankomst og avreise
-- [ ] AI foto-til-tekst: ta bilde av håndskrevne notater, AI leser og skriver til instruksjonene
-- [ ] Manuell legg til/rediger/slett instruksjoner
+- [x] AI foto-til-tekst: ta bilde av håndskrevne notater, AI leser og skriver til instruksjonene
+- [x] Manuell legg til/rediger/slett instruksjoner
 - [ ] Mulighet til å laste opp bilder av instruksjoner
 
 ### Phase 3.6: Vedlikehold
