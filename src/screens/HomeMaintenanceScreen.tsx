@@ -11,8 +11,8 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
 import { getTodayLocal, formatDate } from '../utils/dateUtils';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
-import { Home, HomeService, HomePaintColor } from '../types';
-import { getHomeServices, addHomeService, updateHomeService, deleteHomeService, getHomePaintColors, addHomePaintColor, deleteHomePaintColor } from '../services/homeService';
+import { Home, HomeService, HomePaintColor, HomeProject } from '../types';
+import { getHomeServices, addHomeService, updateHomeService, deleteHomeService, getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeProjects } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 import { DatePickerModal } from '../components/DatePickerModal';
 
@@ -39,6 +39,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
 
   const [services, setServices] = useState<HomeService[]>([]);
   const [paintColors, setPaintColors] = useState<HomePaintColor[]>([]);
+  const [projects, setProjects] = useState<HomeProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddService, setShowAddService] = useState(false);
   const [showAddColor, setShowAddColor] = useState(false);
@@ -68,12 +69,14 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
-      const [svcData, colorData] = await Promise.all([
+      const [svcData, colorData, projectData] = await Promise.all([
         getHomeServices(familyId, home.id),
         getHomePaintColors(familyId, home.id),
+        getHomeProjects(familyId, home.id),
       ]);
       setServices(svcData);
       setPaintColors(colorData);
+      setProjects(projectData);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
@@ -319,16 +322,22 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
           </View>
           {paintColors.length === 0 ? (
             <Text style={{ fontSize: 13, color: colors.textDisabled, textAlign: 'center', padding: 16 }}>{t('homes.noColors')}</Text>
-          ) : paintColors.map((color) => (
+          ) : paintColors.map((color) => {
+            const project = color.projectId ? projects.find((p) => p.id === color.projectId) : null;
+            return (
             <TouchableOpacity key={color.id} style={[styles.colorItem, { borderBottomColor: colors.border }]} onLongPress={() => setColorActionModal({ visible: true, id: color.id, title: color.name || color.code })}>
               {color.hexColor ? <View style={[styles.colorSwatch, { backgroundColor: color.hexColor }]} /> : <View style={[styles.colorSwatch, { backgroundColor: colors.inputBackground }]}><Text style={{ fontSize: 10, color: colors.textDisabled }}>🎨</Text></View>}
               <View style={{ flex: 1 }}>
                 <Text style={[styles.colorName, { color: colors.text }]} numberOfLines={1}>{color.name || t('homes.unnamed')}</Text>
                 <Text style={[styles.colorCode, { color: colors.textSecondary }]}>{color.code}{color.brand ? ` · ${color.brand}` : ''}</Text>
-                {color.room ? <Text style={[styles.colorRoom, { color: colors.textDisabled }]}>📍 {color.room}</Text> : null}
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  {project ? <Text style={[styles.colorRoom, { color: colors.textDisabled }]}>📋 {project.title}</Text> : null}
+                  {color.room ? <Text style={[styles.colorRoom, { color: colors.textDisabled }]}>📍 {color.room}</Text> : null}
+                </View>
               </View>
             </TouchableOpacity>
-          ))}
+            );
+          })}
         </View>
       </ScrollView>
 
