@@ -590,13 +590,14 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5
   );
 
   if (name === 'ai') return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-      <Path d="M12 2a4 4 0 014 4v2a4 4 0 01-8 0V6a4 4 0 014-4z"/>
-      <Path d="M6 10v1a6 6 0 0012 0v-1"/>
-      <Line x1="12" y1="17" x2="12" y2="21"/>
-      <Line x1="8" y1="21" x2="16" y2="21"/>
-      <Circle cx="10" cy="6" r="0.5" fill={color} stroke="none"/>
-      <Circle cx="14" cy="6" r="0.5" fill={color} stroke="none"/>
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="3" y="8" width="18" height="12" rx="3"/>
+      <Path d="M8 8V6a4 4 0 018 0v2"/>
+      <Circle cx="9" cy="14" r="1.5" fill={color}/>
+      <Circle cx="15" cy="14" r="1.5" fill={color}/>
+      <Path d="M9 17.5c1 1.5 6 1.5 6 0" strokeLinecap="round"/>
+      <Line x1="12" y1="4" x2="12" y2="8"/>
+      <Circle cx="12" cy="3" r="1" fill={color}/>
     </Svg>
   );
 
