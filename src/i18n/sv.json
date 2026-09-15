@@ -1521,8 +1521,9 @@
     "startDate": "Startdatum",
     "completeProject": "Avsluta projekt",
     "aiSuggestions": "AI-förslag",
-    "approveSuggestions": "Godkänn förslag",
+    "approveSuggestions": "Godkänn",
     "created": "skapade",
-    "shoppingListItems": "inköpslisteelement"
+    "shoppingListItems": "inköpslisteelement",
+    "aiSuggest": "AI-förslag för projektet"
   }
 }

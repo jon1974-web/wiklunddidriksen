@@ -640,7 +640,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           {loadingSuggestions ? (
             <ActivityIndicator size="small" color={HOME_THEME} />
           ) : (
-            <AppIcon name="camera" size={20} color={HOME_THEME} />
+            <AppIcon name="ai" size={20} color={HOME_THEME} />
           )}
           <Text style={{ color: HOME_THEME, fontSize: 14, fontWeight: '600' }}>{t('homes.aiSuggest')}</Text>
           <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{project.title}</Text>

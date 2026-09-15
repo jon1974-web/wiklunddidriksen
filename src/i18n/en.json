@@ -1520,9 +1520,10 @@
     "noDescription": "No description",
     "startDate": "Start date",
     "completeProject": "Complete project",
-    "aiSuggestions": "AI Suggestions",
-    "approveSuggestions": "Approve suggestions",
+    "aiSuggestions": "AI suggestions",
+    "approveSuggestions": "Approve",
     "created": "created",
-    "shoppingListItems": "shopping list items"
+    "shoppingListItems": "shopping list items",
+    "aiSuggest": "AI suggestions for project"
   }
 }

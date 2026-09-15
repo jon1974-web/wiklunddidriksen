@@ -1521,8 +1521,9 @@
     "startDate": "Aloituspvm",
     "completeProject": "Viimeistele projekti",
     "aiSuggestions": "AI-ehdotukset",
-    "approveSuggestions": "Hyväksy ehdotukset",
+    "approveSuggestions": "Hyväksy",
     "created": "luotu",
-    "shoppingListItems": "ostoslistan kohteet"
+    "shoppingListItems": "ostoslistan kohteet",
+    "aiSuggest": "AI-ehdotukset projektille"
   }
 }

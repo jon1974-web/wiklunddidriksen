@@ -1521,8 +1521,9 @@
     "startDate": "Startdato",
     "completeProject": "Avslutt prosjekt",
     "aiSuggestions": "AI-forslag",
-    "approveSuggestions": "Godkjenn forslag",
+    "approveSuggestions": "Godkjenn",
     "created": "opprettet",
-    "shoppingListItems": "handlelisteelementer"
+    "shoppingListItems": "handlelisteelementer",
+    "aiSuggest": "AI-forslag for prosjektet"
   }
 }
