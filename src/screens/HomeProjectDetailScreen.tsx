@@ -596,6 +596,9 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                   <Text style={[styles.colorCode, { color: colors.textSecondary }]} numberOfLines={1}>{color.code}{color.brand ? ` · ${color.brand}` : ''}</Text>
                   {color.room ? <Text style={[styles.colorRoom, { color: colors.textDisabled }]} numberOfLines={1}>📍 {color.room}</Text> : null}
                 </View>
+                <TouchableOpacity style={styles.receiptBtn} onPress={() => { setTaskTitle(`${color.name || color.code}${color.room ? ' - ' + color.room : ''}`); setTaskDescription(color.code); setAddTaskStatus('todo'); setShowAddTask(true); }}>
+                  <AppIcon name="oppgaver" size={14} color={HOME_THEME} />
+                </TouchableOpacity>
               </TouchableOpacity>
             ))
           )}
@@ -742,7 +745,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <AppIcon name="activities" size={18} color={HOME_THEME} />
+              <AppIcon name="oppgaver" size={18} color={HOME_THEME} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.tasks')}</Text>
               <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({tasks.length})</Text>
             </View>
