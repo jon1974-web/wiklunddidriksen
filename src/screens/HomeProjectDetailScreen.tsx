@@ -652,6 +652,9 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
               <TouchableOpacity style={styles.receiptBtn} onPress={() => handleUploadReceipt(item.id)}>
                 <AppIcon name={item.receiptUrl ? 'file' : 'camera'} size={14} color={item.receiptUrl ? '#43A047' : colors.textDisabled} />
               </TouchableOpacity>
+              <TouchableOpacity style={styles.receiptBtn} onPress={() => { setTaskTitle(item.name); setTaskDescription(item.quantity > 1 ? `x${item.quantity}` : ''); setAddTaskStatus('todo'); setShowAddTask(true); }}>
+                <AppIcon name="activities" size={14} color={HOME_THEME} />
+              </TouchableOpacity>
             </TouchableOpacity>
           ))}
         </View>
