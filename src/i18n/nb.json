@@ -1517,6 +1517,7 @@
     "statusDone": "Ferdig",
     "startTask": "Start oppgave",
     "completeTask": "Fullfør oppgave",
-    "noDescription": "Ingen beskrivelse"
+    "noDescription": "Ingen beskrivelse",
+    "startDate": "Startdato"
   }
 }

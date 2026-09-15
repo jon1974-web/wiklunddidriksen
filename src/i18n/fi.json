@@ -1517,6 +1517,7 @@
     "statusDone": "Valmis",
     "startTask": "Aloita tehtävä",
     "completeTask": "Suorita tehtävä",
-    "noDescription": "Ei kuvausta"
+    "noDescription": "Ei kuvausta",
+    "startDate": "Aloituspvm"
   }
 }

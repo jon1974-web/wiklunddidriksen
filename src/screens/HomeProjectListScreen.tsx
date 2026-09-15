@@ -42,6 +42,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
   const [formTitle, setFormTitle] = useState('');
   const [formDescription, setFormDescription] = useState('');
   const [formBudget, setFormBudget] = useState('');
+  const [formStartDate, setFormStartDate] = useState('');
   const [formStatus, setFormStatus] = useState<'active' | 'completed' | 'on-hold'>('active');
   const [saving, setSaving] = useState(false);
 
@@ -63,6 +64,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
     setFormTitle('');
     setFormDescription('');
     setFormBudget('');
+    setFormStartDate(new Date().toISOString().split('T')[0]);
     setFormStatus('active');
     setEditingProject(null);
   };
@@ -81,6 +83,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
         title: formTitle.trim(),
         description: formDescription.trim(),
         budget: parseFloat(formBudget) || 0,
+        startDate: formStartDate,
         status: formStatus,
         familyId,
       };
@@ -90,7 +93,6 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
         }
         await updateHomeProject(editingProject, data);
       } else {
-        data.startDate = today;
         await addHomeProject(data);
       }
       resetForm();
@@ -121,6 +123,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
       setFormTitle(project.title);
       setFormDescription(project.description);
       setFormBudget(String(project.budget || ''));
+      setFormStartDate(project.startDate || new Date().toISOString().split('T')[0]);
       setFormStatus(project.status);
       setShowAddModal(true);
     }
@@ -240,6 +243,17 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
                   placeholder={t('homes.budgetPlaceholder')}
                   placeholderTextColor={colors.textDisabled}
                   keyboardType="numeric"
+                />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.startDate')}</Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+                  value={formStartDate}
+                  onChangeText={setFormStartDate}
+                  placeholder="YYYY-MM-DD"
+                  placeholderTextColor={colors.textDisabled}
                 />
               </View>
 

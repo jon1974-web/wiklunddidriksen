@@ -1517,6 +1517,7 @@
     "statusDone": "Done",
     "startTask": "Start task",
     "completeTask": "Complete task",
-    "noDescription": "No description"
+    "noDescription": "No description",
+    "startDate": "Start date"
   }
 }
