@@ -1469,6 +1469,18 @@
     "freqMonthly": "Monthly",
     "freqQuarterly": "Quarterly",
     "freqYearly": "Yearly",
-    "noServices": "No service appointments yet"
+    "noServices": "No service appointments yet",
+    "shoppingList": "Shopping list",
+    "addItem": "Add item",
+    "editItem": "Edit item",
+    "itemName": "Item name",
+    "itemNamePlaceholder": "e.g. Paint",
+    "itemNameRequired": "Please enter a name",
+    "quantity": "Quantity",
+    "unitPrice": "Unit price",
+    "total": "Total",
+    "totalItems": "Total items",
+    "totalCost": "Total cost",
+    "checkedCost": "Purchased"
   }
 }

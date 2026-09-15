@@ -773,3 +773,14 @@ export interface HomeService {
   familyId: string;
   createdAt: number;
 }
+
+export interface HomeShoppingItem {
+  id: string;
+  projectId: string;
+  name: string;
+  quantity: number;
+  unitPrice: number;
+  checked: boolean;
+  familyId: string;
+  createdAt: number;
+}

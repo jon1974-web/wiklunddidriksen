@@ -52,9 +52,9 @@
 - [x] Custom ikoner for vedlikehold-seksjonene
 
 ### Phase 4: Handleliste + Tilbud
-- [ ] Handleliste per prosjekt med priser og totalberegning
-- [ ] Prisberegning: totalpris for alle varer + tilbud
-- [ ] Budsjett vs. forbrukt oversikt på prosjektsiden
+- [x] Handleliste per prosjekt med priser og totalberegning
+- [x] Prisberegning: totalpris for alle varer + sjekkede varer
+- [x] Budsjett-oversikt: antall varer, totalkostnad, sjekket kostnad
 - [ ] Tilbud-opplasting med AI OCR-uttrekk (leverandør, pris, varer)
 - [ ] Budsjett-sammenligning: tilbud vs. faktiske kostnader
 

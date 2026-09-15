@@ -1469,6 +1469,18 @@
     "freqMonthly": "Kuukausittain",
     "freqQuarterly": "Neljännesvuosittain",
     "freqYearly": "Vuosittain",
-    "noServices": "Ei vielä huoltokäyntejä"
+    "noServices": "Ei vielä huoltokäyntejä",
+    "shoppingList": "Ostoslista",
+    "addItem": "Lisää tuote",
+    "editItem": "Muokkaa tuotetta",
+    "itemName": "Tuotteen nimi",
+    "itemNamePlaceholder": "esim. Maali",
+    "itemNameRequired": "Kirjoita nimi",
+    "quantity": "Määrä",
+    "unitPrice": "Yksikköhinta",
+    "total": "Yhteensä",
+    "totalItems": "Tuotteita yhteensä",
+    "totalCost": "Kokonaiskustannus",
+    "checkedCost": "Ostettu"
   }
 }

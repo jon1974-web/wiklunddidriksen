@@ -1469,6 +1469,18 @@
     "freqMonthly": "Månedlig",
     "freqQuarterly": "Kvartalsvis",
     "freqYearly": "Årlig",
-    "noServices": "Ingen serviceavtaler ennå"
+    "noServices": "Ingen serviceavtaler ennå",
+    "shoppingList": "Handleliste",
+    "addItem": "Legg til vare",
+    "editItem": "Rediger vare",
+    "itemName": "Varenavn",
+    "itemNamePlaceholder": "F.eks. Maling",
+    "itemNameRequired": "Vennligst skriv et navn",
+    "quantity": "Antall",
+    "unitPrice": "Stykkpris",
+    "total": "Totalt",
+    "totalItems": "Totalt antall",
+    "totalCost": "Total kostnad",
+    "checkedCost": "Kjøpt"
   }
 }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -9,8 +9,8 @@ import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
-import { Home, HomeProject, HomePaintColor } from '../types';
-import { getHomePaintColors, addHomePaintColor, deleteHomePaintColor } from '../services/homeService';
+import { Home, HomeProject, HomePaintColor, HomeShoppingItem } from '../types';
+import { getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 
 const HOME_THEME = MODULE_COLORS.home;
@@ -40,19 +40,32 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [extracting, setExtracting] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const loadColors = useCallback(async () => {
+  const [shoppingItems, setShoppingItems] = useState<HomeShoppingItem[]>([]);
+  const [showAddItem, setShowAddItem] = useState(false);
+  const [editingItem, setEditingItem] = useState<string | null>(null);
+  const [itemActionModal, setItemActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [itemName, setItemName] = useState('');
+  const [itemQuantity, setItemQuantity] = useState('1');
+  const [itemUnitPrice, setItemUnitPrice] = useState('');
+  const [savingItem, setSavingItem] = useState(false);
+
+  const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
-      const data = await getHomePaintColors(familyId, project.homeId);
-      setPaintColors(data);
+      const [colorData, itemData] = await Promise.all([
+        getHomePaintColors(familyId, project.homeId),
+        getHomeShoppingItems(familyId, project.id),
+      ]);
+      setPaintColors(colorData);
+      setShoppingItems(itemData);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setLoading(false);
     }
-  }, [familyId, project.homeId]);
+  }, [familyId, project.homeId, project.id]);
 
-  useEffect(() => { loadColors(); }, [loadColors]);
+  useEffect(() => { loadData(); }, [loadData]);
 
   const resetForm = () => {
     setColorName('');
@@ -158,7 +171,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       });
       resetForm();
       setShowAddColor(false);
-      loadColors();
+      loadData();
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
@@ -171,11 +184,61 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     try {
       await deleteHomePaintColor(colorActionModal.id);
       setColorActionModal({ visible: false, id: '', title: '' });
-      loadColors();
+      loadData();
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
+
+  const resetItemForm = () => { setItemName(''); setItemQuantity('1'); setItemUnitPrice(''); setEditingItem(null); };
+
+  const handleSaveItem = async () => {
+    if (!itemName.trim()) { crossAlert(t('common.error'), t('homes.itemNameRequired')); return; }
+    if (!familyId) return;
+    setSavingItem(true);
+    try {
+      const data = {
+        projectId: project.id,
+        name: itemName.trim(),
+        quantity: parseInt(itemQuantity) || 1,
+        unitPrice: parseFloat(itemUnitPrice) || 0,
+        checked: false,
+        familyId,
+      };
+      if (editingItem) { await updateHomeShoppingItem(editingItem, data); }
+      else { await addHomeShoppingItem(data); }
+      resetItemForm();
+      setShowAddItem(false);
+      loadData();
+    } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+    finally { setSavingItem(false); }
+  };
+
+  const handleDeleteItem = async () => {
+    if (!itemActionModal.id) return;
+    try { await deleteHomeShoppingItem(itemActionModal.id); setItemActionModal({ visible: false, id: '', title: '' }); loadData(); }
+    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const handleEditItem = () => {
+    const item = shoppingItems.find((i) => i.id === itemActionModal.id);
+    if (item) {
+      setEditingItem(item.id);
+      setItemName(item.name);
+      setItemQuantity(String(item.quantity));
+      setItemUnitPrice(String(item.unitPrice || ''));
+      setShowAddItem(true);
+    }
+    setItemActionModal({ visible: false, id: '', title: '' });
+  };
+
+  const handleToggleItem = async (item: HomeShoppingItem) => {
+    try { await updateHomeShoppingItem(item.id, { checked: !item.checked }); loadData(); }
+    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const totalSpent = useMemo(() => shoppingItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0), [shoppingItems]);
+  const totalChecked = useMemo(() => shoppingItems.filter(i => i.checked).reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0), [shoppingItems]);
 
   if (loading) {
     return (
@@ -243,6 +306,53 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
             ))
           )}
         </View>
+
+        {/* Shopping List */}
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleRow}>
+              <AppIcon name="shopping" size={18} color={HOME_THEME} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.shoppingList')}</Text>
+              <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({shoppingItems.length})</Text>
+            </View>
+            <TouchableOpacity style={[styles.addButton, { backgroundColor: HOME_THEME }]} onPress={() => { resetItemForm(); setShowAddItem(true); }}>
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Budget overview */}
+          {shoppingItems.length > 0 && (
+            <View style={[styles.budgetRow, { backgroundColor: colors.inputBackground }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, color: colors.textSecondary }}>{t('homes.totalItems')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text }}>{shoppingItems.length}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, color: colors.textSecondary }}>{t('homes.totalCost')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: HOME_THEME }}>{totalSpent.toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, color: colors.textSecondary }}>{t('homes.checkedCost')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: '#43A047' }}>{totalChecked.toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+              </View>
+            </View>
+          )}
+
+          {shoppingItems.map((item) => (
+            <TouchableOpacity key={item.id} style={[styles.shoppingItem, { borderBottomColor: colors.border }]} onPress={() => handleToggleItem(item)} onLongPress={() => setItemActionModal({ visible: true, id: item.id, title: item.name })}>
+              <View style={[styles.checkbox, { borderColor: item.checked ? HOME_THEME : colors.border, backgroundColor: item.checked ? HOME_THEME : 'transparent' }]}>
+                {item.checked && <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>✓</Text>}
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={[styles.shoppingItemName, { color: item.checked ? colors.textDisabled : colors.text, textDecorationLine: item.checked ? 'line-through' : 'none' }]}>{item.name}</Text>
+                {item.quantity > 1 && <Text style={{ fontSize: 11, color: colors.textSecondary }}>x{item.quantity}</Text>}
+              </View>
+              {item.unitPrice > 0 && (
+                <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>{(item.quantity * item.unitPrice).toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+              )}
+            </TouchableOpacity>
+          ))}
+        </View>
       </ScrollView>
 
       <ActionModal
@@ -250,6 +360,15 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         title={colorActionModal.title}
         onDelete={handleDeleteColor}
         onCancel={() => setColorActionModal({ visible: false, id: '', title: '' })}
+        accentColor={HOME_THEME}
+      />
+
+      <ActionModal
+        visible={itemActionModal.visible}
+        title={itemActionModal.title}
+        onEdit={handleEditItem}
+        onDelete={handleDeleteItem}
+        onCancel={() => setItemActionModal({ visible: false, id: '', title: '' })}
         accentColor={HOME_THEME}
       />
 
@@ -395,6 +514,49 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           </View>
         </View>
       </Modal>
+
+      {/* Add Shopping Item Modal */}
+      <Modal visible={showAddItem} transparent animationType="slide" onRequestClose={() => setShowAddItem(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHandleBar} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{editingItem ? t('homes.editItem') : t('homes.addItem')}</Text>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.itemName')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={itemName} onChangeText={setItemName} placeholder={t('homes.itemNamePlaceholder')} placeholderTextColor={colors.textDisabled} />
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('homes.quantity')}</Text>
+                  <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={itemQuantity} onChangeText={setItemQuantity} keyboardType="numeric" placeholder="1" placeholderTextColor={colors.textDisabled} />
+                </View>
+                <View style={[styles.field, { flex: 2 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('homes.unitPrice')}</Text>
+                  <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={itemUnitPrice} onChangeText={setItemUnitPrice} keyboardType="numeric" placeholder="0" placeholderTextColor={colors.textDisabled} />
+                </View>
+              </View>
+
+              {itemQuantity && itemUnitPrice ? (
+                <View style={[styles.budgetRow, { backgroundColor: colors.inputBackground, marginBottom: 16 }]}>
+                  <Text style={{ fontSize: 14, fontWeight: '700', color: HOME_THEME }}>{t('homes.total')}: {((parseInt(itemQuantity) || 0) * (parseFloat(itemUnitPrice) || 0)).toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+                </View>
+              ) : null}
+
+              <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowAddItem(false); resetItemForm(); }}>
+                  <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, opacity: savingItem ? 0.5 : 1, flex: 1 }]} onPress={handleSaveItem} disabled={savingItem}>
+                  <Text style={styles.buttonText}>{savingItem ? '...' : t('common.save')}</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -427,4 +589,8 @@ const styles = StyleSheet.create({
   input: { padding: 14, borderRadius: 10, fontSize: 16 },
   button: { padding: 16, borderRadius: 12, alignItems: 'center' },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
+  budgetRow: { flexDirection: 'row', borderRadius: 10, padding: 12, marginBottom: 12, gap: 12 },
+  shoppingItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1 },
+  checkbox: { width: 24, height: 24, borderRadius: 6, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
+  shoppingItemName: { fontSize: 14, fontWeight: '500' },
 });

@@ -1469,6 +1469,18 @@
     "freqMonthly": "Månadsvis",
     "freqQuarterly": "Kvartalsvis",
     "freqYearly": "Årsvis",
-    "noServices": "Inga serviceavtal ännu"
+    "noServices": "Inga serviceavtal ännu",
+    "shoppingList": "Inköpslista",
+    "addItem": "Lägg till vara",
+    "editItem": "Redigera vara",
+    "itemName": "Varans namn",
+    "itemNamePlaceholder": "t.ex. Målning",
+    "itemNameRequired": "Vänligen skriv ett namn",
+    "quantity": "Antal",
+    "unitPrice": "Styckpris",
+    "total": "Totalt",
+    "totalItems": "Totalt antal",
+    "totalCost": "Total kostnad",
+    "checkedCost": "Inköpt"
   }
 }
