@@ -1519,6 +1519,10 @@
     "completeTask": "Slutför uppgift",
     "noDescription": "Ingen beskrivning",
     "startDate": "Startdatum",
-    "completeProject": "Avsluta projekt"
+    "completeProject": "Avsluta projekt",
+    "aiSuggestions": "AI-förslag",
+    "approveSuggestions": "Godkänn förslag",
+    "created": "skapade",
+    "shoppingListItems": "inköpslisteelement"
   }
 }

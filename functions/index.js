@@ -4538,3 +4538,113 @@ Return ONLY the JSON, no other text.`;
     res.status(500).json({ error: "Failed to extract offer. Please try again." });
   }
 });
+
+exports.homeSuggestTasks = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!(await checkRateLimit(uid, "homeSuggestTasks"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const { title } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ error: "No project title provided" });
+    }
+
+    const systemPrompt = `You are a home improvement project planner. Given a project title, suggest relevant tasks and shopping list items.
+
+The project title is: "${title}"
+
+For this type of project, suggest:
+1. Tasks that need to be done (in Norwegian)
+2. Shopping list items with quantities where possible (in Norwegian)
+3. Link tasks to the shopping items they need
+
+Return your response as JSON:
+{
+  "tasks": [
+    {
+      "title": "Task title",
+      "description": "Brief description of the task",
+      "shoppingItems": ["Item 1", "Item 2"]
+    }
+  ],
+  "shoppingList": [
+    {
+      "name": "Item name",
+      "quantity": 1,
+      "unitPrice": 0
+    }
+  ]
+}
+
+Guidelines:
+- Tasks should be practical, actionable steps for this specific project
+- Shopping items should be real materials/tools needed
+- Quantities should be reasonable estimates (you can use 0 if uncertain)
+- Keep descriptions brief but useful
+- Suggest 4-8 tasks and 5-10 shopping items
+- Use Norwegian language
+- Be specific to the project type (e.g., bathroom renovation vs fence building)
+
+Return ONLY the JSON, no other text.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Suggest tasks and shopping items for this project: ${title}` },
+      ],
+      max_tokens: 2000,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+
+    let data;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      data = jsonMatch ? JSON.parse(jsonMatch[0]) : { tasks: [], shoppingList: [] };
+    } catch (parseError) {
+      data = { tasks: [], shoppingList: [] };
+    }
+
+    // Ensure proper structure
+    const tasks = (data.tasks || []).map((t) => ({
+      title: t.title || "",
+      description: t.description || "",
+      shoppingItems: Array.isArray(t.shoppingItems) ? t.shoppingItems : [],
+    })).filter((t) => t.title);
+
+    const shoppingList = (data.shoppingList || []).map((item) => ({
+      name: item.name || "",
+      quantity: Math.max(1, parseInt(item.quantity) || 1),
+      unitPrice: Math.max(0, parseFloat(item.unitPrice) || 0),
+    })).filter((item) => item.name);
+
+    res.json({ tasks, shoppingList });
+  } catch (error) {
+    console.error("homeSuggestTasks error:", error);
+    res.status(500).json({ error: "Failed to generate suggestions. Please try again." });
+  }
+});

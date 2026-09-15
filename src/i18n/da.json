@@ -1519,6 +1519,10 @@
     "completeTask": "Fuldend opgave",
     "noDescription": "Ingen beskrivelse",
     "startDate": "Startdato",
-    "completeProject": "Afslut projekt"
+    "completeProject": "Afslut projekt",
+    "aiSuggestions": "AI-forslag",
+    "approveSuggestions": "Godkend forslag",
+    "created": "oprettet",
+    "shoppingListItems": "indkøbslisteelementer"
   }
 }

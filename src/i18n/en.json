@@ -1519,6 +1519,10 @@
     "completeTask": "Complete task",
     "noDescription": "No description",
     "startDate": "Start date",
-    "completeProject": "Complete project"
+    "completeProject": "Complete project",
+    "aiSuggestions": "AI Suggestions",
+    "approveSuggestions": "Approve suggestions",
+    "created": "created",
+    "shoppingListItems": "shopping list items"
   }
 }

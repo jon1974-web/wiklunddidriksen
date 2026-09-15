@@ -73,6 +73,11 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [taskDescription, setTaskDescription] = useState('');
   const [savingTask, setSavingTask] = useState(false);
 
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [suggestedTasks, setSuggestedTasks] = useState<{ title: string; description: string; shoppingItems: string[]; selected: boolean }[]>([]);
+  const [suggestedItems, setSuggestedItems] = useState<{ name: string; quantity: number; unitPrice: number; selected: boolean }[]>([]);
+  const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
@@ -512,6 +517,73 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
   };
 
+  const handleSuggest = async () => {
+    if (!project.title) {
+      crossAlert(t('common.error'), t('homes.projectTitleRequired'));
+      return;
+    }
+    setLoadingSuggestions(true);
+    setShowSuggestions(true);
+    try {
+      const { auth } = await import('../services/firebase');
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) return;
+
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/homeSuggestTasks', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: project.title }),
+      });
+      const data = await res.json();
+      if (data.tasks) {
+        setSuggestedTasks(data.tasks.map((t: any) => ({ ...t, selected: true })));
+      }
+      if (data.shoppingList) {
+        setSuggestedItems(data.shoppingList.map((i: any) => ({ ...i, selected: true })));
+      }
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+      setShowSuggestions(false);
+    } finally {
+      setLoadingSuggestions(false);
+    }
+  };
+
+  const handleApproveSuggestions = async () => {
+    if (!familyId) return;
+    const selectedTasks = suggestedTasks.filter(t => t.selected);
+    const selectedItems = suggestedItems.filter(i => i.selected);
+
+    try {
+      for (const item of selectedItems) {
+        await addHomeShoppingItem({
+          projectId: project.id,
+          name: item.name,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          checked: false,
+          familyId,
+        });
+      }
+
+      for (const task of selectedTasks) {
+        await addHomeTask({
+          projectId: project.id,
+          title: task.title,
+          description: task.description,
+          status: 'todo',
+          familyId,
+        });
+      }
+
+      crossAlert(t('common.success'), `${selectedTasks.length} ${t('homes.tasks')} + ${selectedItems.length} ${t('homes.shoppingListItems')} ${t('homes.created')}`);
+      setShowSuggestions(false);
+      loadData();
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
+  };
+
   const todoTasks = useMemo(() => tasks.filter(t => t.status === 'todo'), [tasks]);
   const inProgressTasks = useMemo(() => tasks.filter(t => t.status === 'in-progress'), [tasks]);
   const doneTasks = useMemo(() => tasks.filter(t => t.status === 'done'), [tasks]);
@@ -559,6 +631,21 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         )}
       </View>
       <ScrollView style={styles.content}>
+        {/* AI Suggestion */}
+        <TouchableOpacity
+          style={[styles.aiSuggestButton, { backgroundColor: HOME_THEME + '15', borderColor: HOME_THEME }]}
+          onPress={handleSuggest}
+          disabled={loadingSuggestions}
+        >
+          {loadingSuggestions ? (
+            <ActivityIndicator size="small" color={HOME_THEME} />
+          ) : (
+            <AppIcon name="camera" size={20} color={HOME_THEME} />
+          )}
+          <Text style={{ color: HOME_THEME, fontSize: 14, fontWeight: '600' }}>{t('homes.aiSuggest')}</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{project.title}</Text>
+        </TouchableOpacity>
+
         {/* Colors section */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
@@ -1181,6 +1268,66 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           </View>
         </View>
       </Modal>
+
+      {/* Suggestion Preview Modal */}
+      <Modal visible={showSuggestions} transparent animationType="slide" onRequestClose={() => setShowSuggestions(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background, maxHeight: '90%' }]}>
+            <View style={styles.modalHandleBar} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{t('homes.aiSuggestions')}</Text>
+              <Text style={{ fontSize: 13, color: colors.textSecondary, marginBottom: 16 }}>{project.title}</Text>
+
+              {loadingSuggestions ? (
+                <ActivityIndicator size="large" color={HOME_THEME} style={{ marginVertical: 40 }} />
+              ) : (
+                <>
+                  {suggestedTasks.length > 0 && (
+                    <View style={{ marginBottom: 16 }}>
+                      <Text style={[styles.label, { color: colors.text, marginBottom: 8 }]}>{t('homes.tasks')} ({suggestedTasks.filter(t => t.selected).length})</Text>
+                      {suggestedTasks.map((task, idx) => (
+                        <TouchableOpacity key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.border }} onPress={() => setSuggestedTasks(prev => prev.map((t, i) => i === idx ? { ...t, selected: !t.selected } : t))}>
+                          <View style={[styles.checkbox, { borderColor: task.selected ? HOME_THEME : colors.border, backgroundColor: task.selected ? HOME_THEME : 'transparent' }]}>
+                            {task.selected && <Text style={{ color: '#fff', fontSize: 10, fontWeight: '700' }}>✓</Text>}
+                          </View>
+                          <View style={{ flex: 1 }}>
+                            <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>{task.title}</Text>
+                            {task.description ? <Text style={{ fontSize: 11, color: colors.textSecondary }} numberOfLines={1}>{task.description}</Text> : null}
+                          </View>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+
+                  {suggestedItems.length > 0 && (
+                    <View style={{ marginBottom: 16 }}>
+                      <Text style={[styles.label, { color: colors.text, marginBottom: 8 }]}>{t('homes.shoppingList')} ({suggestedItems.filter(i => i.selected).length})</Text>
+                      {suggestedItems.map((item, idx) => (
+                        <TouchableOpacity key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: colors.border }} onPress={() => setSuggestedItems(prev => prev.map((i, j) => j === idx ? { ...i, selected: !i.selected } : i))}>
+                          <View style={[styles.checkbox, { borderColor: item.selected ? HOME_THEME : colors.border, backgroundColor: item.selected ? HOME_THEME : 'transparent' }]}>
+                            {item.selected && <Text style={{ color: '#fff', fontSize: 10, fontWeight: '700' }}>✓</Text>}
+                          </View>
+                          <Text style={{ flex: 1, fontSize: 13, color: colors.text }}>{item.name}</Text>
+                          {item.quantity > 1 && <Text style={{ fontSize: 11, color: colors.textSecondary }}>x{item.quantity}</Text>}
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  )}
+                </>
+              )}
+
+              <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => setShowSuggestions(false)}>
+                  <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, flex: 1 }]} onPress={handleApproveSuggestions} disabled={loadingSuggestions || (suggestedTasks.filter(t => t.selected).length === 0 && suggestedItems.filter(i => i.selected).length === 0)}>
+                  <Text style={styles.buttonText}>{t('homes.approveSuggestions')}</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -1226,4 +1373,5 @@ const styles = StyleSheet.create({
   taskCard: { borderRadius: 8, padding: 10, marginBottom: 6, borderWidth: 1, borderColor: '#e0e0e0' },
   taskCardTitle: { fontSize: 13, fontWeight: '600' },
   taskMoveBtn: { width: 24, height: 20, borderRadius: 4, alignItems: 'center', justifyContent: 'center' },
+  aiSuggestButton: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 14, borderRadius: 12, borderWidth: 1, marginBottom: 16 },
 });

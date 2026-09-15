@@ -1519,6 +1519,10 @@
     "completeTask": "Suorita tehtävä",
     "noDescription": "Ei kuvausta",
     "startDate": "Aloituspvm",
-    "completeProject": "Viimeistele projekti"
+    "completeProject": "Viimeistele projekti",
+    "aiSuggestions": "AI-ehdotukset",
+    "approveSuggestions": "Hyväksy ehdotukset",
+    "created": "luotu",
+    "shoppingListItems": "ostoslistan kohteet"
   }
 }
