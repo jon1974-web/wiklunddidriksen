@@ -9,7 +9,8 @@ import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, getLocale } from '../utils/dateUtils';
+import i18n from '../i18n';
 import { Home, HomeProject } from '../types';
 import { getHomeProjects, addHomeProject, updateHomeProject, deleteHomeProject } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
@@ -52,6 +53,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
     if (!familyId) return;
     try {
       const data = await getHomeProjects(familyId, home.id);
+      data.sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''));
       setProjects(data);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
@@ -190,7 +192,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 }}>
                     <AppIcon name="calendar" size={12} color={colors.textDisabled} />
                     <Text style={{ fontSize: 13, color: colors.textSecondary }}>
-                      {formatDate(project.startDate)}{project.endDate ? ` → ${formatDate(project.endDate)}` : ''}
+                      {new Date(project.startDate).toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'short', year: 'numeric' })}{project.endDate ? ` – ${new Date(project.endDate).toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}
                     </Text>
                   </View>
                 ) : null}
