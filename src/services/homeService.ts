@@ -24,8 +24,13 @@ export async function deleteHome(homeId: string): Promise<void> {
 }
 
 // Paint Colors
-export async function getHomePaintColors(familyId: string, homeId: string): Promise<HomePaintColor[]> {
-  const q = query(collection(db, 'homePaintColors'), where('familyId', '==', familyId), where('homeId', '==', homeId), orderBy('createdAt', 'desc'));
+export async function getHomePaintColors(familyId: string, homeId: string, projectId?: string): Promise<HomePaintColor[]> {
+  let q;
+  if (projectId) {
+    q = query(collection(db, 'homePaintColors'), where('familyId', '==', familyId), where('homeId', '==', homeId), where('projectId', '==', projectId), orderBy('createdAt', 'desc'));
+  } else {
+    q = query(collection(db, 'homePaintColors'), where('familyId', '==', familyId), where('homeId', '==', homeId), orderBy('createdAt', 'desc'));
+  }
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HomePaintColor));
 }

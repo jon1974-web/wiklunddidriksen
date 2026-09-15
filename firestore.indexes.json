@@ -27,6 +27,16 @@
       ]
     },
     {
+      "collectionGroup": "homePaintColors",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "familyId", "order": "ASCENDING" },
+        { "fieldPath": "homeId", "order": "ASCENDING" },
+        { "fieldPath": "projectId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "homeInstructions",
       "queryScope": "COLLECTION",
       "fields": [

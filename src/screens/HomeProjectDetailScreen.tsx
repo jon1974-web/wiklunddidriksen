@@ -53,7 +53,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     if (!familyId) return;
     try {
       const [colorData, itemData] = await Promise.all([
-        getHomePaintColors(familyId, project.homeId),
+        getHomePaintColors(familyId, project.homeId, project.id),
         getHomeShoppingItems(familyId, project.id),
       ]);
       setPaintColors(colorData);
@@ -162,6 +162,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     try {
       await addHomePaintColor({
         homeId: project.homeId,
+        projectId: project.id,
         name: colorName.trim(),
         code: colorCode.trim(),
         brand: colorBrand.trim(),

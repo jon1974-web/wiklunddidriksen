@@ -728,6 +728,7 @@ export interface Home {
 export interface HomePaintColor {
   id: string;
   homeId: string;
+  projectId?: string;
   name: string;
   code: string;
   brand: string;
