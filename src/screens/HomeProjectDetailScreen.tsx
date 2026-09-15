@@ -608,7 +608,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <AppIcon name="oppgaver" size={18} color={HOME_THEME} />
+              <AppIcon name="shopping" size={18} color={HOME_THEME} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.shoppingList')}</Text>
               <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({shoppingItems.length})</Text>
             </View>
@@ -666,7 +666,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <AppIcon name="oppgaver" size={18} color={HOME_THEME} />
+              <AppIcon name="shopping" size={18} color={HOME_THEME} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.offers')}</Text>
               <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({offers.length})</Text>
             </View>
