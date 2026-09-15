@@ -49,7 +49,10 @@
   - [ ] Legg til service med type, dato, intervall
   - [ ] Type service (f.eks. ventilasjon, varmepumpe, peis, etc.)
   - [ ] Når det skal skje og hvor ofte
-  - [ ] Kalender/oversikt over kommende serviceavtaler
+  - [ ] Serviceavtaler vises som event-kort i hendelseslisten
+  - [ ] Serviceavtaler vises i kalendervisningen på hendelsessiden
+  - [ ] Serviceavtaler vises i ukesoversikten (WeeklySummary)
+  - [ ] Bruk eksisterende kalender- og hendelsesvisning — ingen ny kalender
 
 ### Phase 4: Handleliste + Tilbud
 - [ ] Handleliste per prosjekt med priser og totalberegning
