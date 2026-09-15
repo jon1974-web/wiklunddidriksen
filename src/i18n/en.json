@@ -1518,6 +1518,7 @@
     "startTask": "Start task",
     "completeTask": "Complete task",
     "noDescription": "No description",
-    "startDate": "Start date"
+    "startDate": "Start date",
+    "completeProject": "Complete project"
   }
 }

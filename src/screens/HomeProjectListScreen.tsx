@@ -182,8 +182,26 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
               >
                 <View style={styles.projectCardHeader}>
                   <Text style={[styles.projectCardTitle, { color: colors.text }]} numberOfLines={1}>{project.title}</Text>
-                  <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
-                    <Text style={{ fontSize: 10, fontWeight: '600', color: statusStyle.color }}>{statusStyle.label}</Text>
+                  <View style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
+                    {project.status !== 'completed' && (
+                      <TouchableOpacity
+                        style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: '#E8F5E9' }}
+                        onPress={async () => {
+                          try {
+                            const today = new Date().toISOString().split('T')[0];
+                            await updateHomeProject(project.id, { status: 'completed', endDate: today });
+                            loadProjects();
+                          } catch (error) {
+                            crossAlert(t('common.error'), getErrorMessage(error));
+                          }
+                        }}
+                      >
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: '#43A047' }}>{t('homes.completeProject')}</Text>
+                      </TouchableOpacity>
+                    )}
+                    <View style={[styles.statusBadge, { backgroundColor: statusStyle.bg }]}>
+                      <Text style={{ fontSize: 10, fontWeight: '600', color: statusStyle.color }}>{statusStyle.label}</Text>
+                    </View>
                   </View>
                 </View>
                 {project.description ? (

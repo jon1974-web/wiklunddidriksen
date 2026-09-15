@@ -1518,6 +1518,7 @@
     "startTask": "Starta uppgift",
     "completeTask": "Slutför uppgift",
     "noDescription": "Ingen beskrivning",
-    "startDate": "Startdatum"
+    "startDate": "Startdatum",
+    "completeProject": "Avsluta projekt"
   }
 }

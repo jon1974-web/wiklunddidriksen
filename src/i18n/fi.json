@@ -1518,6 +1518,7 @@
     "startTask": "Aloita tehtävä",
     "completeTask": "Suorita tehtävä",
     "noDescription": "Ei kuvausta",
-    "startDate": "Aloituspvm"
+    "startDate": "Aloituspvm",
+    "completeProject": "Viimeistele projekti"
   }
 }

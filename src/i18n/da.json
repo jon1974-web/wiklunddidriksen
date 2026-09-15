@@ -1518,6 +1518,7 @@
     "startTask": "Start opgave",
     "completeTask": "Fuldend opgave",
     "noDescription": "Ingen beskrivelse",
-    "startDate": "Startdato"
+    "startDate": "Startdato",
+    "completeProject": "Afslut projekt"
   }
 }
