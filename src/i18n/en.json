@@ -1481,6 +1481,11 @@
     "total": "Total",
     "totalItems": "Total items",
     "totalCost": "Total cost",
-    "checkedCost": "Purchased"
+    "checkedCost": "Purchased",
+    "receiptScanned": "Receipt scanned",
+    "itemsAdded": "items added",
+    "receiptNoItems": "No items found",
+    "receiptNoItemsText": "Could not read items from the receipt. Try again with a clearer image.",
+    "uploadReceipt": "Upload receipt"
   }
 }

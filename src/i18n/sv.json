@@ -1481,6 +1481,11 @@
     "total": "Totalt",
     "totalItems": "Totalt antal",
     "totalCost": "Total kostnad",
-    "checkedCost": "Inköpt"
+    "checkedCost": "Inköpt",
+    "receiptScanned": "Kvitto skannat",
+    "itemsAdded": "varor tillagda",
+    "receiptNoItems": "Inga varor hittade",
+    "receiptNoItemsText": "Kunde inte läsa varor från kvittot. Försök igen med en tydligare bild.",
+    "uploadReceipt": "Ladda upp kvitto"
   }
 }

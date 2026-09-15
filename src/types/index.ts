@@ -781,6 +781,7 @@ export interface HomeShoppingItem {
   quantity: number;
   unitPrice: number;
   checked: boolean;
+  receiptUrl?: string;
   familyId: string;
   createdAt: number;
 }

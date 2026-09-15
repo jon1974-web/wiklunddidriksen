@@ -1481,6 +1481,11 @@
     "total": "Yhteensä",
     "totalItems": "Tuotteita yhteensä",
     "totalCost": "Kokonaiskustannus",
-    "checkedCost": "Ostettu"
+    "checkedCost": "Ostettu",
+    "receiptScanned": "Kuitti skannattu",
+    "itemsAdded": "tuotetta lisätty",
+    "receiptNoItems": "Ei tuotteita",
+    "receiptNoItemsText": "Tuotteita ei voitu lukea kuitista. Yritä uudella kirkkaammalla kuvalla.",
+    "uploadReceipt": "Lataa kuitti"
   }
 }

@@ -237,6 +237,96 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
   };
 
+  const handleReceiptScan = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8, base64: true });
+      if (result.canceled || !result.assets[0]) return;
+      setExtracting(true);
+      const asset = result.assets[0];
+
+      // Upload receipt image first
+      const { webUploadFile } = await import('../services/webStorage');
+      let blob: Blob;
+      if (asset.base64 && Platform.OS === 'web') {
+        const byteString = atob(asset.base64);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        blob = new Blob([ab], { type: 'image/jpeg' });
+      } else {
+        const response = await fetch(asset.uri);
+        blob = await response.blob();
+      }
+      const receiptUrl = await webUploadFile(`receipts/${Date.now()}.jpg`, blob);
+
+      let imageBase64: string;
+      if (asset.base64) { imageBase64 = asset.base64; } else {
+        const response = await fetch(asset.uri); const b = await response.blob();
+        const reader = new FileReader();
+        imageBase64 = await new Promise<string>((resolve) => { reader.onloadend = () => resolve((reader.result as string).split(',')[1]); reader.readAsDataURL(b); });
+      }
+
+      const { auth } = await import('../services/firebase');
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) return;
+
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/homeExtractReceipt', {
+        method: 'POST', headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64 }),
+      });
+      const data = await res.json();
+
+      if (data.items && data.items.length > 0 && familyId) {
+        let addedCount = 0;
+        for (const item of data.items) {
+          await addHomeShoppingItem({
+            projectId: project.id,
+            name: item.name,
+            quantity: item.quantity || 1,
+            unitPrice: item.unitPrice || 0,
+            checked: false,
+            receiptUrl,
+            familyId,
+          });
+          addedCount++;
+        }
+        crossAlert(t('homes.receiptScanned'), `${addedCount} ${t('homes.itemsAdded')}`);
+        loadData();
+      } else {
+        crossAlert(t('homes.receiptNoItems'), t('homes.receiptNoItemsText'));
+      }
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  const handleUploadReceipt = async (itemId: string) => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8, base64: true });
+      if (result.canceled || !result.assets[0]) return;
+      const asset = result.assets[0];
+      const { webUploadFile } = await import('../services/webStorage');
+      let blob: Blob;
+      if (asset.base64 && Platform.OS === 'web') {
+        const byteString = atob(asset.base64);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        blob = new Blob([ab], { type: 'image/jpeg' });
+      } else {
+        const response = await fetch(asset.uri);
+        blob = await response.blob();
+      }
+      const url = await webUploadFile(`receipts/${Date.now()}.jpg`, blob);
+      await updateHomeShoppingItem(itemId, { receiptUrl: url });
+      loadData();
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
+  };
+
   const totalSpent = useMemo(() => shoppingItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0), [shoppingItems]);
   const totalChecked = useMemo(() => shoppingItems.filter(i => i.checked).reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0), [shoppingItems]);
 
@@ -315,9 +405,14 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.shoppingList')}</Text>
               <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({shoppingItems.length})</Text>
             </View>
-            <TouchableOpacity style={[styles.addButton, { backgroundColor: HOME_THEME }]} onPress={() => { resetItemForm(); setShowAddItem(true); }}>
-              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
-            </TouchableOpacity>
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: HOME_THEME + '20' }]} onPress={handleReceiptScan}>
+                <AppIcon name="camera" size={16} color={HOME_THEME} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: HOME_THEME }]} onPress={() => { resetItemForm(); setShowAddItem(true); }}>
+                <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+              </TouchableOpacity>
+            </View>
           </View>
 
           {/* Budget overview */}
@@ -348,8 +443,11 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                 {item.quantity > 1 && <Text style={{ fontSize: 11, color: colors.textSecondary }}>x{item.quantity}</Text>}
               </View>
               {item.unitPrice > 0 && (
-                <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>{(item.quantity * item.unitPrice).toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+                <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text, marginRight: 8 }}>{(item.quantity * item.unitPrice).toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
               )}
+              <TouchableOpacity style={styles.receiptBtn} onPress={() => handleUploadReceipt(item.id)}>
+                <AppIcon name={item.receiptUrl ? 'file' : 'camera'} size={14} color={item.receiptUrl ? '#43A047' : colors.textDisabled} />
+              </TouchableOpacity>
             </TouchableOpacity>
           ))}
         </View>
@@ -593,4 +691,5 @@ const styles = StyleSheet.create({
   shoppingItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1 },
   checkbox: { width: 24, height: 24, borderRadius: 6, borderWidth: 2, alignItems: 'center', justifyContent: 'center' },
   shoppingItemName: { fontSize: 14, fontWeight: '500' },
+  receiptBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.inputBackground },
 });

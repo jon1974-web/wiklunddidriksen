@@ -4334,3 +4334,106 @@ Return ONLY the JSON, no other text.`;
     res.status(500).json({ error: "Failed to extract instructions. Please try again." });
   }
 });
+
+exports.homeExtractReceipt = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!(await checkRateLimit(uid, "homeExtractReceipt"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const { imageBase64 } = req.body;
+
+    if (!imageBase64) {
+      return res.status(400).json({ error: "No image data received" });
+    }
+
+    const systemPrompt = `You are a receipt reader. Analyze this receipt image and extract ALL items with their prices.
+
+For each item found, extract:
+- name: The item name (as written on the receipt, or a clear description)
+- quantity: How many of this item (default 1 if not specified)
+- unitPrice: The price per unit in Norwegian kroner (use the total price if quantity is 1)
+
+Important:
+- Read all items, even partially visible ones
+- Use Norwegian kroner (kr) as the currency
+- If quantity is not visible, assume 1
+- If a price looks like it includes multiple items, try to calculate the unit price
+- Skip summary lines, taxes, and payment info — only extract actual product items
+- Be thorough — get every item you can read
+
+Return your response as JSON:
+{
+  "items": [
+    { "name": "Item name", "quantity": 1, "unitPrice": 49.90 },
+    { "name": "Another item", "quantity": 2, "unitPrice": 29.50 }
+  ]
+}
+
+Return ONLY the JSON, no other text.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: { url: `data:image/jpeg;base64,${imageBase64}`, detail: "high" },
+            },
+            {
+              type: "text",
+              text: "Read this receipt and extract all items with prices. Return only JSON.",
+            },
+          ],
+        },
+      ],
+      max_tokens: 2000,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+
+    let receiptData;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      receiptData = jsonMatch ? JSON.parse(jsonMatch[0]) : { items: [] };
+    } catch (parseError) {
+      receiptData = { items: [] };
+    }
+
+    // Ensure items array and each item has required fields
+    const items = (receiptData.items || []).map((item) => ({
+      name: item.name || "",
+      quantity: Math.max(1, parseInt(item.quantity) || 1),
+      unitPrice: Math.max(0, parseFloat(item.unitPrice) || 0),
+    })).filter((item) => item.name);
+
+    res.json({ items });
+  } catch (error) {
+    console.error("homeExtractReceipt error:", error);
+    res.status(500).json({ error: "Failed to extract receipt. Please try again." });
+  }
+});

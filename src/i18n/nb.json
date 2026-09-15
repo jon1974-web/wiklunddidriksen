@@ -1481,6 +1481,11 @@
     "total": "Totalt",
     "totalItems": "Totalt antall",
     "totalCost": "Total kostnad",
-    "checkedCost": "Kjøpt"
+    "checkedCost": "Kjøpt",
+    "receiptScanned": "Kvittering skannet",
+    "itemsAdded": "varer lagt til",
+    "receiptNoItems": "Ingen varer funnet",
+    "receiptNoItemsText": "Kunne ikke lese varer fra kvitteringen. Prøv igjen med et tydeligere bilde.",
+    "uploadReceipt": "Last opp kvittering"
   }
 }
