@@ -4477,18 +4477,19 @@ Look for:
 - Vendor/company name
 - Phone number (if visible)
 - Total price (the final amount to pay, including VAT/moms)
-- List of items/services described in the offer
+- Individual items/services described in the offer
 
 Return your response as JSON:
 {
   "vendorName": "Company or contractor name",
   "vendorPhone": "Phone number if visible, empty string if not",
   "price": 12345,
-  "items": "Brief description of what the offer covers (e.g. 'Montering av nytt gulv og lister')"
+  "items": "Brief summary of what the offer covers",
+  "itemsList": ["Individual item 1", "Individual item 2", "Individual item 3"]
 }
 
 - price should be a number (no currency symbol)
-- items should be a brief summary, not a full itemized list
+- itemsList should be an array of individual work items/services
 - If you cannot find something, use an empty string or 0
 - Be thorough but concise
 
@@ -4530,6 +4531,7 @@ Return ONLY the JSON, no other text.`;
       vendorPhone: offerData.vendorPhone || "",
       price: Math.max(0, parseFloat(offerData.price) || 0),
       items: offerData.items || "",
+      itemsList: Array.isArray(offerData.itemsList) ? offerData.itemsList.filter(i => i) : [],
     });
   } catch (error) {
     console.error("homeExtractOffer error:", error);

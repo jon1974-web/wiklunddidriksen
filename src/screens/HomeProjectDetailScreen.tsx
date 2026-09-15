@@ -59,6 +59,8 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [offerItems, setOfferItems] = useState('');
   const [offerFileUrl, setOfferFileUrl] = useState('');
   const [offerFileName, setOfferFileName] = useState('');
+  const [offerItemsList, setOfferItemsList] = useState<string[]>([]);
+  const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
   const [savingOffer, setSavingOffer] = useState(false);
 
   const [tasks, setTasks] = useState<HomeTask[]>([]);
@@ -361,6 +363,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     setOfferItems('');
     setOfferFileUrl('');
     setOfferFileName('');
+    setOfferItemsList([]);
     setEditingOffer(null);
   };
 
@@ -375,6 +378,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         vendorPhone: offerPhone.trim(),
         price: parseFloat(offerPrice) || 0,
         items: offerItems.trim(),
+        itemsList: offerItemsList,
         fileUrl: offerFileUrl || undefined,
         fileName: offerFileName || undefined,
         familyId,
@@ -404,6 +408,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       setOfferItems(offer.items || '');
       setOfferFileUrl(offer.fileUrl || '');
       setOfferFileName(offer.fileName || '');
+      setOfferItemsList(offer.itemsList || []);
       setShowAddOffer(true);
     }
     setOfferActionModal({ visible: false, id: '', title: '' });
@@ -450,6 +455,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       if (data.vendorPhone) setOfferPhone(data.vendorPhone);
       if (data.price) setOfferPrice(String(data.price));
       if (data.items) setOfferItems(data.items);
+      if (data.itemsList) setOfferItemsList(data.itemsList);
       if (fileUrl) { setOfferFileUrl(fileUrl); setOfferFileName('offer.jpg'); }
       setShowAddOffer(true);
     } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
@@ -687,20 +693,43 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
             offers.map((offer) => (
               <TouchableOpacity
                 key={offer.id}
-                style={[styles.shoppingItem, { borderBottomColor: colors.border }]}
+                style={[styles.shoppingItem, { borderBottomColor: colors.border, flexDirection: 'column', alignItems: 'stretch' }]}
+                onPress={() => setExpandedOffer(expandedOffer === offer.id ? null : offer.id)}
                 onLongPress={() => setOfferActionModal({ visible: true, id: offer.id, title: offer.vendorName })}
               >
-                <View style={{ flex: 1 }}>
-                  <Text style={[styles.shoppingItemName, { color: colors.text }]} numberOfLines={1}>{offer.vendorName}</Text>
-                  {offer.items ? <Text style={{ fontSize: 12, color: colors.textSecondary }} numberOfLines={1}>{offer.items}</Text> : null}
-                  {offer.vendorPhone ? <Text style={{ fontSize: 11, color: colors.textDisabled }} numberOfLines={1}>📞 {offer.vendorPhone}</Text> : null}
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.shoppingItemName, { color: colors.text }]} numberOfLines={1}>{offer.vendorName}</Text>
+                    {offer.items ? <Text style={{ fontSize: 12, color: colors.textSecondary }} numberOfLines={1}>{offer.items}</Text> : null}
+                    {offer.vendorPhone ? <Text style={{ fontSize: 11, color: colors.textDisabled }} numberOfLines={1}>📞 {offer.vendorPhone}</Text> : null}
+                  </View>
+                  {offer.price > 0 && (
+                    <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text, marginRight: 8 }}>{offer.price.toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+                  )}
+                  {offer.fileUrl ? (
+                    <AppIcon name="file" size={14} color="#43A047" />
+                  ) : null}
                 </View>
-                {offer.price > 0 && (
-                  <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text, marginRight: 8 }}>{offer.price.toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+                {expandedOffer === offer.id && offer.itemsList && offer.itemsList.length > 0 && (
+                  <View style={{ marginTop: 8, paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border }}>
+                    {offer.itemsList.map((item, idx) => (
+                      <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingVertical: 4 }}>
+                        <Text style={{ fontSize: 12, color: colors.text, flex: 1 }}>• {item}</Text>
+                        <TouchableOpacity
+                          style={{ paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, backgroundColor: HOME_THEME + '20' }}
+                          onPress={() => {
+                            setTaskTitle(item);
+                            setTaskDescription('');
+                            setAddTaskStatus('todo');
+                            setShowAddTask(true);
+                          }}
+                        >
+                          <Text style={{ fontSize: 10, fontWeight: '600', color: HOME_THEME }}>+ Oppgave</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
                 )}
-                {offer.fileUrl ? (
-                  <AppIcon name="file" size={14} color="#43A047" />
-                ) : null}
               </TouchableOpacity>
             ))
           )}
@@ -1063,6 +1092,17 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                 <Text style={[styles.label, { color: colors.text }]}>{t('homes.offerItems')}</Text>
                 <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text, minHeight: 60, textAlignVertical: 'top' }]} value={offerItems} onChangeText={setOfferItems} placeholder={t('homes.offerItemsPlaceholder')} placeholderTextColor={colors.textDisabled} multiline />
               </View>
+
+              {offerItemsList.length > 0 && (
+                <View style={styles.field}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('homes.offerItems')}</Text>
+                  {offerItemsList.map((item, idx) => (
+                    <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 4 }}>
+                      <Text style={{ fontSize: 13, color: colors.text, flex: 1 }}>• {item}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
 
               {offerFileUrl ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.inputBackground, marginBottom: 16 }}>

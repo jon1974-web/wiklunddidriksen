@@ -795,6 +795,7 @@ export interface HomeOffer {
   vendorPhone?: string;
   price: number;
   items: string;
+  itemsList?: string[];
   fileUrl?: string;
   fileName?: string;
   familyId: string;

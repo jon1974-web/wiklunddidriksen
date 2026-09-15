@@ -1497,7 +1497,7 @@
     "vendorPhone": "Puhelin",
     "vendorPhonePlaceholder": "esim. 123 45 678",
     "offerPrice": "Hinta",
-    "offerItems": "Kuvaus",
+    "offerItems": "Tarjouksen tuotteet",
     "offerItemsPlaceholder": "esim. Lämpöpumppu, asennus mukana",
     "totalOffers": "Tarjouksia yhteensä",
     "totalOfferCost": "Tarjousten kokonaiskustannus",
