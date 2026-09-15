@@ -233,7 +233,7 @@ export const HomeInstructionsScreen: React.FC<HomeInstructionsScreenProps> = ({ 
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <Text style={{ fontSize: 18 }}>🏠</Text>
+              <AppIcon name="comingHome" size={18} color={HOME_THEME} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.comingHome')}</Text>
               <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({comingInstructions.length})</Text>
             </View>
@@ -255,7 +255,7 @@ export const HomeInstructionsScreen: React.FC<HomeInstructionsScreenProps> = ({ 
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionTitleRow}>
-              <Text style={{ fontSize: 18 }}>🚪</Text>
+              <AppIcon name="leavingHome" size={18} color={HOME_THEME} />
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.leavingHome')}</Text>
               <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({leavingInstructions.length})</Text>
             </View>
@@ -323,7 +323,7 @@ export const HomeInstructionsScreen: React.FC<HomeInstructionsScreenProps> = ({ 
                         onPress={() => setFormSection(sec)}
                       >
                         <Text style={{ fontSize: 13, fontWeight: '600', color: isSelected ? '#fff' : colors.text }}>
-                          {sec === 'coming' ? '🏠 ' + t('homes.comingHome') : '🚪 ' + t('homes.leavingHome')}
+                          {sec === 'coming' ? t('homes.comingHome') : t('homes.leavingHome')}
                         </Text>
                       </TouchableOpacity>
                     );
