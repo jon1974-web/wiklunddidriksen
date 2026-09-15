@@ -1524,6 +1524,11 @@
     "approveSuggestions": "Godkend",
     "created": "oprettet",
     "shoppingListItems": "indkøbslisteelementer",
-    "aiSuggest": "AI-forslag til projektet"
+    "aiSuggest": "AI-forslag til projektet",
+    "linkedItems": "Tilknyttede indkøbslisteelementer",
+    "linkToShoppingList": "Tilknyt til indkøbsliste",
+    "noUnlinkedItems": "Ingen utilknyttede varer",
+    "noUnlinkedItemsText": "Alle indkøbslisteelementer er allerede tilknyttet til opgaver.",
+    "itemsLinked": "elementer tilknyttet"
   }
 }

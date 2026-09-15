@@ -1524,6 +1524,11 @@
     "approveSuggestions": "Hyväksy",
     "created": "luotu",
     "shoppingListItems": "ostoslistan kohteet",
-    "aiSuggest": "AI-ehdotukset projektille"
+    "aiSuggest": "AI-ehdotukset projektille",
+    "linkedItems": "Liittyvät ostoslistakohteet",
+    "linkToShoppingList": "Liitä ostoslistaan",
+    "noUnlinkedItems": "Ei liittämättömiä tuotteita",
+    "noUnlinkedItemsText": "Kaikki ostoslistakohteet on jo liitetty tehtäviin.",
+    "itemsLinked": "kohdetta liitetty"
   }
 }

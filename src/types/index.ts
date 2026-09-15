@@ -786,6 +786,7 @@ export interface HomeShoppingItem {
   unitPrice: number;
   checked: boolean;
   receiptUrl?: string;
+  linkedTaskId?: string;
   familyId: string;
   createdAt: number;
 }
@@ -812,7 +813,7 @@ export interface HomeTask {
   title: string;
   description: string;
   status: HomeTaskStatus;
-  linkedItemId?: string;
+  linkedItemIds?: string[];
   familyId: string;
   createdAt: number;
 }

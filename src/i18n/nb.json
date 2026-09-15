@@ -1524,6 +1524,11 @@
     "approveSuggestions": "Godkjenn",
     "created": "opprettet",
     "shoppingListItems": "handlelisteelementer",
-    "aiSuggest": "AI-forslag for prosjektet"
+    "aiSuggest": "AI-forslag for prosjektet",
+    "linkedItems": "Koblede handlelisteelementer",
+    "linkToShoppingList": "Koble til handleliste",
+    "noUnlinkedItems": "Ingen ubundne varer",
+    "noUnlinkedItemsText": "Alle handlelisteelementer er allerede bundet til oppgaver.",
+    "itemsLinked": "elementer koblet"
   }
 }

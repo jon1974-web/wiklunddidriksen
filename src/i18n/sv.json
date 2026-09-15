@@ -1524,6 +1524,11 @@
     "approveSuggestions": "Godkänn",
     "created": "skapade",
     "shoppingListItems": "inköpslisteelement",
-    "aiSuggest": "AI-förslag för projektet"
+    "aiSuggest": "AI-förslag för projektet",
+    "linkedItems": "Kopplade inköpslistelement",
+    "linkToShoppingList": "Koppla till inköpslista",
+    "noUnlinkedItems": "Inga okopplade varor",
+    "noUnlinkedItemsText": "Alla inköpslistelement är redan kopplade till uppgifter.",
+    "itemsLinked": "element kopplade"
   }
 }

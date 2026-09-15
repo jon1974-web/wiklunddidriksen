@@ -267,8 +267,16 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   };
 
   const handleToggleItem = async (item: HomeShoppingItem) => {
-    try { await updateHomeShoppingItem(item.id, { checked: !item.checked }); loadData(); }
-    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+    try {
+      const newChecked = !item.checked;
+      await updateHomeShoppingItem(item.id, { checked: newChecked });
+      if (newChecked && item.linkedTaskId) {
+        await updateHomeTask(item.linkedTaskId, { status: 'done' });
+      }
+      loadData();
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
   };
 
   const handleReceiptScan = async () => {
@@ -513,8 +521,18 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   };
 
   const handleMoveTask = async (taskId: string, newStatus: HomeTaskStatus) => {
-    try { await updateHomeTask(taskId, { status: newStatus }); loadData(); }
-    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+    try {
+      await updateHomeTask(taskId, { status: newStatus });
+      const task = tasks.find(t => t.id === taskId);
+      if (task && task.linkedItemIds && task.linkedItemIds.length > 0) {
+        for (const itemId of task.linkedItemIds) {
+          await updateHomeShoppingItem(itemId, { checked: newStatus === 'done' });
+        }
+      }
+      loadData();
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
   };
 
   const handleSuggest = async () => {
@@ -555,8 +573,10 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     const selectedItems = suggestedItems.filter(i => i.selected);
 
     try {
+      // Create shopping items first and collect their IDs
+      const createdItemIds: Record<string, string> = {};
       for (const item of selectedItems) {
-        await addHomeShoppingItem({
+        const id = await addHomeShoppingItem({
           projectId: project.id,
           name: item.name,
           quantity: item.quantity,
@@ -564,14 +584,20 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           checked: false,
           familyId,
         });
+        createdItemIds[item.name.toLowerCase()] = id;
       }
 
+      // Create tasks with linked shopping items
       for (const task of selectedTasks) {
+        const linkedItemIds = task.shoppingItems
+          .map((name) => createdItemIds[name.toLowerCase()])
+          .filter(Boolean);
         await addHomeTask({
           projectId: project.id,
           title: task.title,
           description: task.description,
           status: 'todo',
+          linkedItemIds: linkedItemIds.length > 0 ? linkedItemIds : undefined,
           familyId,
         });
       }
@@ -735,6 +761,15 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
               <View style={{ flex: 1 }}>
                 <Text style={[styles.shoppingItemName, { color: item.checked ? colors.textDisabled : colors.text, textDecorationLine: item.checked ? 'line-through' : 'none' }]}>{item.name}</Text>
                 {item.quantity > 1 && <Text style={{ fontSize: 11, color: colors.textSecondary }}>x{item.quantity}</Text>}
+                {item.linkedTaskId && (() => {
+                  const linkedTask = tasks.find(t => t.id === item.linkedTaskId);
+                  return linkedTask ? (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                      <AppIcon name="oppgaver" size={10} color={HOME_THEME} />
+                      <Text style={{ fontSize: 10, color: HOME_THEME }} numberOfLines={1}>{linkedTask.title}</Text>
+                    </View>
+                  ) : null;
+                })()}
               </View>
               {item.unitPrice > 0 && (
                 <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text, marginRight: 8 }}>{(item.quantity * item.unitPrice).toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
@@ -949,6 +984,43 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                       <Text style={{ fontSize: 14, color: colors.textSecondary, lineHeight: 20, marginBottom: 16 }}>{showTaskDetail.description}</Text>
                     ) : (
                       <Text style={{ fontSize: 14, color: colors.textDisabled, marginBottom: 16 }}>{t('homes.noDescription')}</Text>
+                    )}
+                    {/* Linked shopping items */}
+                    {showTaskDetail.linkedItemIds && showTaskDetail.linkedItemIds.length > 0 && (
+                      <View style={{ marginTop: 12, paddingTop: 12, borderTopWidth: 1, borderTopColor: colors.border }}>
+                        <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary, marginBottom: 6 }}>{t('homes.linkedItems')}</Text>
+                        {showTaskDetail.linkedItemIds.map((itemId) => {
+                          const linkedItem = shoppingItems.find(i => i.id === itemId);
+                          return linkedItem ? (
+                            <View key={itemId} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 3 }}>
+                              <View style={[styles.checkbox, { borderColor: linkedItem.checked ? HOME_THEME : colors.border, backgroundColor: linkedItem.checked ? HOME_THEME : 'transparent', width: 18, height: 18 }]}>
+                                {linkedItem.checked && <Text style={{ color: '#fff', fontSize: 8, fontWeight: '700' }}>✓</Text>}
+                              </View>
+                              <Text style={{ fontSize: 12, color: linkedItem.checked ? colors.textDisabled : colors.text, textDecorationLine: linkedItem.checked ? 'line-through' : 'none' }}>{linkedItem.name}</Text>
+                            </View>
+                          ) : null;
+                        })}
+                      </View>
+                    )}
+                    {(!showTaskDetail.linkedItemIds || showTaskDetail.linkedItemIds.length === 0) && (
+                      <TouchableOpacity
+                        style={{ marginTop: 12, padding: 8, borderRadius: 8, borderWidth: 1, borderColor: HOME_THEME, borderStyle: 'dashed' }}
+                        onPress={async () => {
+                          const unlinkedItems = shoppingItems.filter(i => !i.linkedTaskId);
+                          if (unlinkedItems.length === 0) {
+                            crossAlert(t('homes.noUnlinkedItems'), t('homes.noUnlinkedItemsText'));
+                            return;
+                          }
+                          for (const item of unlinkedItems) {
+                            await updateHomeShoppingItem(item.id, { linkedTaskId: showTaskDetail.id });
+                          }
+                          crossAlert(t('common.success'), `${unlinkedItems.length} ${t('homes.itemsLinked')}`);
+                          setShowTaskDetail(null);
+                          loadData();
+                        }}
+                      >
+                        <Text style={{ fontSize: 12, color: HOME_THEME, textAlign: 'center' }}>{t('homes.linkToShoppingList')}</Text>
+                      </TouchableOpacity>
                     )}
                     {showTaskDetail.status !== 'done' && (
                       <View style={{ flexDirection: 'row', gap: 8 }}>

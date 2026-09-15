@@ -1524,6 +1524,11 @@
     "approveSuggestions": "Approve",
     "created": "created",
     "shoppingListItems": "shopping list items",
-    "aiSuggest": "AI suggestions for project"
+    "aiSuggest": "AI suggestions for project",
+    "linkedItems": "Linked shopping items",
+    "linkToShoppingList": "Link to shopping list",
+    "noUnlinkedItems": "No unlinked items",
+    "noUnlinkedItemsText": "All shopping items are already linked to tasks.",
+    "itemsLinked": "items linked"
   }
 }
