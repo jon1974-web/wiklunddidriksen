@@ -1500,6 +1500,10 @@
     "offerItems": "Kuvaus",
     "offerItemsPlaceholder": "esim. Lämpöpumppu, asennus mukana",
     "totalOffers": "Tarjouksia yhteensä",
-    "totalOfferCost": "Tarjousten kokonaiskustannus"
+    "totalOfferCost": "Tarjousten kokonaiskustannus",
+    "budget": "Budjetti",
+    "budgetPlaceholder": "esim. 50000",
+    "spent": "Käytetty",
+    "remaining": "Jäljellä"
   }
 }

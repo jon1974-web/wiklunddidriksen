@@ -1500,6 +1500,10 @@
     "offerItems": "Beskrivelse",
     "offerItemsPlaceholder": "F.eks. Varmeovn, inkl. montering",
     "totalOffers": "Antall tilbud",
-    "totalOfferCost": "Total tilbudskostnad"
+    "totalOfferCost": "Total tilbudskostnad",
+    "budget": "Budsjett",
+    "budgetPlaceholder": "F.eks. 50000",
+    "spent": "Forbrukt",
+    "remaining": "Gjenstående"
   }
 }

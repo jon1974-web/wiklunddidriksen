@@ -1500,6 +1500,10 @@
     "offerItems": "Beskrivning",
     "offerItemsPlaceholder": "t.ex. Värmepanna, inkl. installation",
     "totalOffers": "Antal offerter",
-    "totalOfferCost": "Total offertkostnad"
+    "totalOfferCost": "Total offertkostnad",
+    "budget": "Budget",
+    "budgetPlaceholder": "t.ex. 50000",
+    "spent": "Använt",
+    "remaining": "Återstående"
   }
 }

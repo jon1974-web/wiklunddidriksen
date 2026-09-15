@@ -40,6 +40,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
 
   const [formTitle, setFormTitle] = useState('');
   const [formDescription, setFormDescription] = useState('');
+  const [formBudget, setFormBudget] = useState('');
   const [formStatus, setFormStatus] = useState<'active' | 'completed' | 'on-hold'>('active');
   const [saving, setSaving] = useState(false);
 
@@ -60,6 +61,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
   const resetForm = () => {
     setFormTitle('');
     setFormDescription('');
+    setFormBudget('');
     setFormStatus('active');
     setEditingProject(null);
   };
@@ -76,6 +78,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
         homeId: home.id,
         title: formTitle.trim(),
         description: formDescription.trim(),
+        budget: parseFloat(formBudget) || 0,
         status: formStatus,
         familyId,
       };
@@ -111,6 +114,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
       setEditingProject(project.id);
       setFormTitle(project.title);
       setFormDescription(project.description);
+      setFormBudget(String(project.budget || ''));
       setFormStatus(project.status);
       setShowAddModal(true);
     }
@@ -213,6 +217,18 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
                   placeholderTextColor={colors.textDisabled}
                   multiline
                   numberOfLines={3}
+                />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.budget')}</Text>
+                <TextInput
+                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+                  value={formBudget}
+                  onChangeText={setFormBudget}
+                  placeholder={t('homes.budgetPlaceholder')}
+                  placeholderTextColor={colors.textDisabled}
+                  keyboardType="numeric"
                 />
               </View>
 

@@ -743,6 +743,7 @@ export interface HomeProject {
   homeId: string;
   title: string;
   description: string;
+  budget: number;
   status: 'active' | 'completed' | 'on-hold';
   familyId: string;
   createdAt: number;

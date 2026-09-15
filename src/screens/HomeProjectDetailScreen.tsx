@@ -471,6 +471,24 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
             <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
           </View>
         </View>
+        {project.budget > 0 && (
+          <View style={[styles.budgetSummary, { backgroundColor: colors.inputBackground }]}>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 10, color: colors.textSecondary }}>{t('homes.budget')}</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: colors.text }}>{project.budget.toLocaleString('nb-NO')} kr</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 10, color: colors.textSecondary }}>{t('homes.spent')}</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: HOME_THEME }}>{(totalSpent + totalOffers).toLocaleString('nb-NO')} kr</Text>
+            </View>
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 10, color: colors.textSecondary }}>{t('homes.remaining')}</Text>
+              <Text style={{ fontSize: 13, fontWeight: '700', color: (project.budget - totalSpent - totalOffers) < 0 ? '#E53935' : '#43A047' }}>
+                {(project.budget - totalSpent - totalOffers).toLocaleString('nb-NO')} kr
+              </Text>
+            </View>
+          </View>
+        )}
       </View>
       <ScrollView style={styles.content}>
         {/* Colors section */}
@@ -894,6 +912,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
 const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1 },
+  budgetSummary: { flexDirection: 'row', borderRadius: 10, padding: 10, marginTop: 8, gap: 8 },
   screenTitle: { fontSize: 22, fontWeight: '700' },
   content: { flex: 1, padding: 16 },
   section: { borderRadius: 14, padding: 16, marginBottom: 12 },

@@ -1500,6 +1500,10 @@
     "offerItems": "Beskrivelse",
     "offerItemsPlaceholder": "f.eks. Varmepumpe, inkl. montering",
     "totalOffers": "Antal tilbud",
-    "totalOfferCost": "Total tilbudskostnad"
+    "totalOfferCost": "Total tilbudskostnad",
+    "budget": "Budget",
+    "budgetPlaceholder": "f.eks. 50000",
+    "spent": "Brugt",
+    "remaining": "Resterende"
   }
 }

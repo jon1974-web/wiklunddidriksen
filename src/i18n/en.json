@@ -1500,6 +1500,10 @@
     "offerItems": "Description",
     "offerItemsPlaceholder": "e.g. Heater, incl. installation",
     "totalOffers": "Total offers",
-    "totalOfferCost": "Total offer cost"
+    "totalOfferCost": "Total offer cost",
+    "budget": "Budget",
+    "budgetPlaceholder": "e.g. 50000",
+    "spent": "Spent",
+    "remaining": "Remaining"
   }
 }
