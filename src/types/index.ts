@@ -786,3 +786,16 @@ export interface HomeShoppingItem {
   familyId: string;
   createdAt: number;
 }
+
+export interface HomeOffer {
+  id: string;
+  projectId: string;
+  vendorName: string;
+  vendorPhone?: string;
+  price: number;
+  items: string;
+  fileUrl?: string;
+  fileName?: string;
+  familyId: string;
+  createdAt: number;
+}

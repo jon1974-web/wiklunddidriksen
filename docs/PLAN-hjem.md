@@ -55,8 +55,9 @@
 - [x] Handleliste per prosjekt med priser og totalberegning
 - [x] Prisberegning: totalpris for alle varer + sjekkede varer
 - [x] Budsjett-oversikt: antall varer, totalkostnad, sjekket kostnad
-- [ ] Tilbud-opplasting med AI OCR-uttrekk (leverandør, pris, varer)
-- [ ] Budsjett-sammenligning: tilbud vs. faktiske kostnader
+- [x] Tilbud-opplasting med AI OCR-uttrekk (leverandør, pris, varer)
+- [x] Tilbud-seksjon med budsjett-oversikt
+- [ ] Budsjett-sammenligning: handleliste + tilbud totalt
 
 ### Phase 5: Oppgavetavle (Kanban)
 - [ ] Tavle med 3 kolonner: Todo → Pågående → Ferdig

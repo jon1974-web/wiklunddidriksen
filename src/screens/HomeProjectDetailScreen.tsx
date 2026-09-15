@@ -9,8 +9,8 @@ import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
-import { Home, HomeProject, HomePaintColor, HomeShoppingItem } from '../types';
-import { getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem } from '../services/homeService';
+import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer } from '../types';
+import { getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 
 const HOME_THEME = MODULE_COLORS.home;
@@ -49,15 +49,29 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [itemUnitPrice, setItemUnitPrice] = useState('');
   const [savingItem, setSavingItem] = useState(false);
 
+  const [offers, setOffers] = useState<HomeOffer[]>([]);
+  const [showAddOffer, setShowAddOffer] = useState(false);
+  const [editingOffer, setEditingOffer] = useState<string | null>(null);
+  const [offerActionModal, setOfferActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [offerVendor, setOfferVendor] = useState('');
+  const [offerPhone, setOfferPhone] = useState('');
+  const [offerPrice, setOfferPrice] = useState('');
+  const [offerItems, setOfferItems] = useState('');
+  const [offerFileUrl, setOfferFileUrl] = useState('');
+  const [offerFileName, setOfferFileName] = useState('');
+  const [savingOffer, setSavingOffer] = useState(false);
+
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
-      const [colorData, itemData] = await Promise.all([
+      const [colorData, itemData, offerData] = await Promise.all([
         getHomePaintColors(familyId, project.homeId, project.id),
         getHomeShoppingItems(familyId, project.id),
+        getHomeOffers(familyId, project.id),
       ]);
       setPaintColors(colorData);
       setShoppingItems(itemData);
+      setOffers(offerData);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
@@ -328,8 +342,111 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     }
   };
 
+  const resetOfferForm = () => {
+    setOfferVendor('');
+    setOfferPhone('');
+    setOfferPrice('');
+    setOfferItems('');
+    setOfferFileUrl('');
+    setOfferFileName('');
+    setEditingOffer(null);
+  };
+
+  const handleSaveOffer = async () => {
+    if (!offerVendor.trim()) { crossAlert(t('common.error'), t('homes.vendorRequired')); return; }
+    if (!familyId) return;
+    setSavingOffer(true);
+    try {
+      const data = {
+        projectId: project.id,
+        vendorName: offerVendor.trim(),
+        vendorPhone: offerPhone.trim(),
+        price: parseFloat(offerPrice) || 0,
+        items: offerItems.trim(),
+        fileUrl: offerFileUrl || undefined,
+        fileName: offerFileName || undefined,
+        familyId,
+      };
+      if (editingOffer) { await updateHomeOffer(editingOffer, data); }
+      else { await addHomeOffer(data); }
+      resetOfferForm();
+      setShowAddOffer(false);
+      loadData();
+    } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+    finally { setSavingOffer(false); }
+  };
+
+  const handleDeleteOffer = async () => {
+    if (!offerActionModal.id) return;
+    try { await deleteHomeOffer(offerActionModal.id); setOfferActionModal({ visible: false, id: '', title: '' }); loadData(); }
+    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const handleEditOffer = () => {
+    const offer = offers.find((o) => o.id === offerActionModal.id);
+    if (offer) {
+      setEditingOffer(offer.id);
+      setOfferVendor(offer.vendorName);
+      setOfferPhone(offer.vendorPhone || '');
+      setOfferPrice(String(offer.price || ''));
+      setOfferItems(offer.items || '');
+      setOfferFileUrl(offer.fileUrl || '');
+      setOfferFileName(offer.fileName || '');
+      setShowAddOffer(true);
+    }
+    setOfferActionModal({ visible: false, id: '', title: '' });
+  };
+
+  const handleScanOffer = async () => {
+    try {
+      const result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8, base64: true });
+      if (result.canceled || !result.assets[0]) return;
+      setExtracting(true);
+      const asset = result.assets[0];
+
+      const { webUploadFile } = await import('../services/webStorage');
+      let blob: Blob;
+      if (asset.base64 && Platform.OS === 'web') {
+        const byteString = atob(asset.base64);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        blob = new Blob([ab], { type: 'image/jpeg' });
+      } else {
+        const response = await fetch(asset.uri);
+        blob = await response.blob();
+      }
+      const fileUrl = await webUploadFile(`offers/${Date.now()}.jpg`, blob);
+
+      let imageBase64: string;
+      if (asset.base64) { imageBase64 = asset.base64; } else {
+        const response = await fetch(asset.uri); const b = await response.blob();
+        const reader = new FileReader();
+        imageBase64 = await new Promise<string>((resolve) => { reader.onloadend = () => resolve((reader.result as string).split(',')[1]); reader.readAsDataURL(b); });
+      }
+
+      const { auth } = await import('../services/firebase');
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) return;
+
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/homeExtractOffer', {
+        method: 'POST', headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64 }),
+      });
+      const data = await res.json();
+      if (data.vendorName) setOfferVendor(data.vendorName);
+      if (data.vendorPhone) setOfferPhone(data.vendorPhone);
+      if (data.price) setOfferPrice(String(data.price));
+      if (data.items) setOfferItems(data.items);
+      if (fileUrl) { setOfferFileUrl(fileUrl); setOfferFileName('offer.jpg'); }
+      setShowAddOffer(true);
+    } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+    finally { setExtracting(false); }
+  };
+
   const totalSpent = useMemo(() => shoppingItems.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0), [shoppingItems]);
   const totalChecked = useMemo(() => shoppingItems.filter(i => i.checked).reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0), [shoppingItems]);
+  const totalOffers = useMemo(() => offers.reduce((sum, o) => sum + (o.price || 0), 0), [offers]);
 
   if (loading) {
     return (
@@ -452,6 +569,62 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
             </TouchableOpacity>
           ))}
         </View>
+
+        {/* Tilbud */}
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleRow}>
+              <AppIcon name="shopping" size={18} color={HOME_THEME} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.offers')}</Text>
+              <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({offers.length})</Text>
+            </View>
+            <View style={{ flexDirection: 'row', gap: 6 }}>
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: HOME_THEME + '20' }]} onPress={handleScanOffer}>
+                <AppIcon name="camera" size={16} color={HOME_THEME} />
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: HOME_THEME }]} onPress={() => { resetOfferForm(); setShowAddOffer(true); }}>
+                <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {offers.length > 0 && (
+            <View style={[styles.budgetRow, { backgroundColor: colors.inputBackground }]}>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, color: colors.textSecondary }}>{t('homes.totalOffers')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: colors.text }}>{offers.length}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 11, color: colors.textSecondary }}>{t('homes.totalOfferCost')}</Text>
+                <Text style={{ fontSize: 14, fontWeight: '700', color: HOME_THEME }}>{totalOffers.toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+              </View>
+            </View>
+          )}
+
+          {offers.length === 0 ? (
+            <Text style={{ fontSize: 13, color: colors.textDisabled, textAlign: 'center', padding: 16 }}>{t('homes.noOffers')}</Text>
+          ) : (
+            offers.map((offer) => (
+              <TouchableOpacity
+                key={offer.id}
+                style={[styles.shoppingItem, { borderBottomColor: colors.border }]}
+                onLongPress={() => setOfferActionModal({ visible: true, id: offer.id, title: offer.vendorName })}
+              >
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.shoppingItemName, { color: colors.text }]} numberOfLines={1}>{offer.vendorName}</Text>
+                  {offer.items ? <Text style={{ fontSize: 12, color: colors.textSecondary }} numberOfLines={1}>{offer.items}</Text> : null}
+                  {offer.vendorPhone ? <Text style={{ fontSize: 11, color: colors.textDisabled }} numberOfLines={1}>📞 {offer.vendorPhone}</Text> : null}
+                </View>
+                {offer.price > 0 && (
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text, marginRight: 8 }}>{offer.price.toLocaleString('nb-NO', { minimumFractionDigits: 0 })} kr</Text>
+                )}
+                {offer.fileUrl ? (
+                  <AppIcon name="file" size={14} color="#43A047" />
+                ) : null}
+              </TouchableOpacity>
+            ))
+          )}
+        </View>
       </ScrollView>
 
       <ActionModal
@@ -468,6 +641,15 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         onEdit={handleEditItem}
         onDelete={handleDeleteItem}
         onCancel={() => setItemActionModal({ visible: false, id: '', title: '' })}
+        accentColor={HOME_THEME}
+      />
+
+      <ActionModal
+        visible={offerActionModal.visible}
+        title={offerActionModal.title}
+        onEdit={handleEditOffer}
+        onDelete={handleDeleteOffer}
+        onCancel={() => setOfferActionModal({ visible: false, id: '', title: '' })}
         accentColor={HOME_THEME}
       />
 
@@ -650,6 +832,55 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, opacity: savingItem ? 0.5 : 1, flex: 1 }]} onPress={handleSaveItem} disabled={savingItem}>
                   <Text style={styles.buttonText}>{savingItem ? '...' : t('common.save')}</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Add/Edit Offer Modal */}
+      <Modal visible={showAddOffer} transparent animationType="slide" onRequestClose={() => setShowAddOffer(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHandleBar} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{editingOffer ? t('homes.editOffer') : t('homes.addOffer')}</Text>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.vendorName')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={offerVendor} onChangeText={setOfferVendor} placeholder={t('homes.vendorNamePlaceholder')} placeholderTextColor={colors.textDisabled} />
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('homes.vendorPhone')}</Text>
+                  <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={offerPhone} onChangeText={setOfferPhone} placeholder={t('homes.vendorPhonePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                </View>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('homes.offerPrice')}</Text>
+                  <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={offerPrice} onChangeText={setOfferPrice} keyboardType="numeric" placeholder="0" placeholderTextColor={colors.textDisabled} />
+                </View>
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.offerItems')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text, minHeight: 60, textAlignVertical: 'top' }]} value={offerItems} onChangeText={setOfferItems} placeholder={t('homes.offerItemsPlaceholder')} placeholderTextColor={colors.textDisabled} multiline />
+              </View>
+
+              {offerFileUrl ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.inputBackground, marginBottom: 16 }}>
+                  <AppIcon name="file" size={16} color="#43A047" />
+                  <Text style={{ fontSize: 13, color: colors.text, flex: 1 }} numberOfLines={1}>{offerFileName || 'Vedlegg'}</Text>
+                </View>
+              ) : null}
+
+              <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowAddOffer(false); resetOfferForm(); }}>
+                  <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, opacity: savingOffer ? 0.5 : 1, flex: 1 }]} onPress={handleSaveOffer} disabled={savingOffer}>
+                  <Text style={styles.buttonText}>{savingOffer ? '...' : t('common.save')}</Text>
                 </TouchableOpacity>
               </View>
             </ScrollView>

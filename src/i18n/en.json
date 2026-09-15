@@ -1486,6 +1486,20 @@
     "itemsAdded": "items added",
     "receiptNoItems": "No items found",
     "receiptNoItemsText": "Could not read items from the receipt. Try again with a clearer image.",
-    "uploadReceipt": "Upload receipt"
+    "uploadReceipt": "Upload receipt",
+    "offers": "Offers",
+    "addOffer": "Add offer",
+    "editOffer": "Edit offer",
+    "noOffers": "No offers yet",
+    "vendorRequired": "Please enter vendor name",
+    "vendorName": "Vendor name",
+    "vendorNamePlaceholder": "e.g. Plumber AS",
+    "vendorPhone": "Phone",
+    "vendorPhonePlaceholder": "e.g. 123 45 678",
+    "offerPrice": "Price",
+    "offerItems": "Description",
+    "offerItemsPlaceholder": "e.g. Heater, incl. installation",
+    "totalOffers": "Total offers",
+    "totalOfferCost": "Total offer cost"
   }
 }

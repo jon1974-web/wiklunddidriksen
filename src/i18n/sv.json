@@ -1486,6 +1486,20 @@
     "itemsAdded": "varor tillagda",
     "receiptNoItems": "Inga varor hittade",
     "receiptNoItemsText": "Kunde inte läsa varor från kvittot. Försök igen med en tydligare bild.",
-    "uploadReceipt": "Ladda upp kvitto"
+    "uploadReceipt": "Ladda upp kvitto",
+    "offers": "Offerter",
+    "addOffer": "Lägg till offert",
+    "editOffer": "Redigera offert",
+    "noOffers": "Inga offert ännu",
+    "vendorRequired": "Vänligen skriv in leverantörens namn",
+    "vendorName": "Leverantörens namn",
+    "vendorNamePlaceholder": "t.ex. VVS AB",
+    "vendorPhone": "Telefon",
+    "vendorPhonePlaceholder": "t.ex. 123 45 678",
+    "offerPrice": "Pris",
+    "offerItems": "Beskrivning",
+    "offerItemsPlaceholder": "t.ex. Värmepanna, inkl. installation",
+    "totalOffers": "Antal offerter",
+    "totalOfferCost": "Total offertkostnad"
   }
 }

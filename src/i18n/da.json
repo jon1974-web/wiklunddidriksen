@@ -1486,6 +1486,20 @@
     "itemsAdded": "varer tilføjet",
     "receiptNoItems": "Ingen varer fundet",
     "receiptNoItemsText": "Kunne ikke læse varer fra kvitteringen. Prøv igen med et tydeligere billede.",
-    "uploadReceipt": "Upload kvittering"
+    "uploadReceipt": "Upload kvittering",
+    "offers": "Tilbud",
+    "addOffer": "Tilføj tilbud",
+    "editOffer": "Rediger tilbud",
+    "noOffers": "Ingen tilbud endnu",
+    "vendorRequired": "Venligst indtast leverandørnavn",
+    "vendorName": "Leverandørnavn",
+    "vendorNamePlaceholder": "f.eks. VVS A/S",
+    "vendorPhone": "Telefon",
+    "vendorPhonePlaceholder": "f.eks. 123 45 678",
+    "offerPrice": "Pris",
+    "offerItems": "Beskrivelse",
+    "offerItemsPlaceholder": "f.eks. Varmepumpe, inkl. montering",
+    "totalOffers": "Antal tilbud",
+    "totalOfferCost": "Total tilbudskostnad"
   }
 }

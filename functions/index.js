@@ -4437,3 +4437,102 @@ Return ONLY the JSON, no other text.`;
     res.status(500).json({ error: "Failed to extract receipt. Please try again." });
   }
 });
+
+exports.homeExtractOffer = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!(await checkRateLimit(uid, "homeExtractOffer"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const { imageBase64 } = req.body;
+
+    if (!imageBase64) {
+      return res.status(400).json({ error: "No image data received" });
+    }
+
+    const systemPrompt = `You are a contractor offer/invoice reader. Analyze this document and extract offer information.
+
+Look for:
+- Vendor/company name
+- Phone number (if visible)
+- Total price (the final amount to pay, including VAT/moms)
+- List of items/services described in the offer
+
+Return your response as JSON:
+{
+  "vendorName": "Company or contractor name",
+  "vendorPhone": "Phone number if visible, empty string if not",
+  "price": 12345,
+  "items": "Brief description of what the offer covers (e.g. 'Montering av nytt gulv og lister')"
+}
+
+- price should be a number (no currency symbol)
+- items should be a brief summary, not a full itemized list
+- If you cannot find something, use an empty string or 0
+- Be thorough but concise
+
+Return ONLY the JSON, no other text.`;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: [
+            {
+              type: "image_url",
+              image_url: { url: `data:image/jpeg;base64,${imageBase64}`, detail: "high" },
+            },
+            {
+              type: "text",
+              text: "Read this contractor offer/invoice and extract the information. Return only JSON.",
+            },
+          ],
+        },
+      ],
+      max_tokens: 500,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+
+    let offerData;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      offerData = jsonMatch ? JSON.parse(jsonMatch[0]) : { vendorName: "", vendorPhone: "", price: 0, items: "" };
+    } catch (parseError) {
+      offerData = { vendorName: "", vendorPhone: "", price: 0, items: content };
+    }
+
+    res.json({
+      vendorName: offerData.vendorName || "",
+      vendorPhone: offerData.vendorPhone || "",
+      price: Math.max(0, parseFloat(offerData.price) || 0),
+      items: offerData.items || "",
+    });
+  } catch (error) {
+    console.error("homeExtractOffer error:", error);
+    res.status(500).json({ error: "Failed to extract offer. Please try again." });
+  }
+});

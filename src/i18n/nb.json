@@ -1486,6 +1486,20 @@
     "itemsAdded": "varer lagt til",
     "receiptNoItems": "Ingen varer funnet",
     "receiptNoItemsText": "Kunne ikke lese varer fra kvitteringen. Prøv igjen med et tydeligere bilde.",
-    "uploadReceipt": "Last opp kvittering"
+    "uploadReceipt": "Last opp kvittering",
+    "offers": "Tilbud",
+    "addOffer": "Legg til tilbud",
+    "editOffer": "Rediger tilbud",
+    "noOffers": "Ingen tilbud ennå",
+    "vendorRequired": "Vennligst skriv inn leverandørnavn",
+    "vendorName": "Leverandørnavn",
+    "vendorNamePlaceholder": "F.eks. Rørlegger AS",
+    "vendorPhone": "Telefon",
+    "vendorPhonePlaceholder": "F.eks. 123 45 678",
+    "offerPrice": "Pris",
+    "offerItems": "Beskrivelse",
+    "offerItemsPlaceholder": "F.eks. Varmeovn, inkl. montering",
+    "totalOffers": "Antall tilbud",
+    "totalOfferCost": "Total tilbudskostnad"
   }
 }

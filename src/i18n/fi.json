@@ -1486,6 +1486,20 @@
     "itemsAdded": "tuotetta lisätty",
     "receiptNoItems": "Ei tuotteita",
     "receiptNoItemsText": "Tuotteita ei voitu lukea kuitista. Yritä uudella kirkkaammalla kuvalla.",
-    "uploadReceipt": "Lataa kuitti"
+    "uploadReceipt": "Lataa kuitti",
+    "offers": "Tarjoukset",
+    "addOffer": "Lisää tarjous",
+    "editOffer": "Muokkaa tarjousta",
+    "noOffers": "Ei tarjouksia vielä",
+    "vendorRequired": "Kirjoita toimittajan nimi",
+    "vendorName": "Toimittajan nimi",
+    "vendorNamePlaceholder": "esim. PUTKI OY",
+    "vendorPhone": "Puhelin",
+    "vendorPhonePlaceholder": "esim. 123 45 678",
+    "offerPrice": "Hinta",
+    "offerItems": "Kuvaus",
+    "offerItemsPlaceholder": "esim. Lämpöpumppu, asennus mukana",
+    "totalOffers": "Tarjouksia yhteensä",
+    "totalOfferCost": "Tarjousten kokonaiskustannus"
   }
 }
