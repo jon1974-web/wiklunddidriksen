@@ -1438,6 +1438,7 @@
     "unnamed": "Nimetön",
     "extractedColor": "Poimittu väri",
     "photoTag": "Kuvaa tunnus",
-    "photoWall": "Kuvaa seinä"
+    "photoWall": "Kuvaa seinä",
+    "fetchColor": "Hae väri"
   }
 }

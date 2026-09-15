@@ -1438,6 +1438,7 @@
     "unnamed": "Namnlös",
     "extractedColor": "Extraherad färg",
     "photoTag": "Fotografera etikett",
-    "photoWall": "Fotografera vägg"
+    "photoWall": "Fotografera vägg",
+    "fetchColor": "Hämta färg"
   }
 }

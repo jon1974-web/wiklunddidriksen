@@ -1438,6 +1438,7 @@
     "unnamed": "Unavngivet",
     "extractedColor": "Udtrukket farve",
     "photoTag": "Fotografér etiket",
-    "photoWall": "Fotografér væg"
+    "photoWall": "Fotografér væg",
+    "fetchColor": "Hent farve"
   }
 }

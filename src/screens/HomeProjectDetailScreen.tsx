@@ -312,13 +312,48 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
 
               <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('homes.colorCode')}</Text>
-                <TextInput
-                  style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-                  value={colorCode}
-                  onChangeText={setColorCode}
-                  placeholder={t('homes.colorCodePlaceholder')}
-                  placeholderTextColor={colors.textDisabled}
-                />
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.surface, color: colors.text, flex: 1 }]}
+                    value={colorCode}
+                    onChangeText={setColorCode}
+                    placeholder={t('homes.colorCodePlaceholder')}
+                    placeholderTextColor={colors.textDisabled}
+                  />
+                  <TouchableOpacity
+                    style={[styles.fetchButton, { backgroundColor: HOME_THEME, opacity: (extracting || !colorCode.trim()) ? 0.5 : 1 }]}
+                    disabled={extracting || !colorCode.trim()}
+                    onPress={async () => {
+                      if (!colorCode.trim()) return;
+                      setExtracting(true);
+                      try {
+                        const CLOUD_FUNCTION_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/homeExtractColor';
+                        const { auth } = await import('../services/firebase');
+                        const idToken = await auth.currentUser?.getIdToken();
+                        if (!idToken) return;
+
+                        const res = await fetch(CLOUD_FUNCTION_URL, {
+                          method: 'POST',
+                          headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ colorCode: colorCode.trim() }),
+                        });
+                        const data = await res.json();
+                        if (data.hexColor) setColorHex(data.hexColor);
+                        if (data.name && !colorName) setColorName(data.name);
+                      } catch (error) {
+                        crossAlert(t('common.error'), getErrorMessage(error));
+                      } finally {
+                        setExtracting(false);
+                      }
+                    }}
+                  >
+                    {extracting ? (
+                      <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                      <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600' }}>{t('homes.fetchColor')}</Text>
+                    )}
+                  </TouchableOpacity>
+                </View>
               </View>
 
               <View style={{ flexDirection: 'row', gap: 12 }}>
@@ -382,6 +417,7 @@ const styles = StyleSheet.create({
   colorCode: { fontSize: 12 },
   colorRoom: { fontSize: 11, marginTop: 2 },
   aiButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12, borderRadius: 10, borderWidth: 1 },
+  fetchButton: { paddingHorizontal: 16, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
   modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginBottom: 16 },

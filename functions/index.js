@@ -4123,12 +4123,55 @@ exports.homeExtractColor = onRequest({ region: "us-central1", memory: "256MB" },
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
   try {
-    const { imageBase64 } = req.body;
+    const { imageBase64, colorCode } = req.body;
 
-    if (!imageBase64) {
-      return res.status(400).json({ error: "No image data received" });
+    if (!imageBase64 && !colorCode) {
+      return res.status(400).json({ error: "No image data or color code received" });
     }
 
+    // Text-based code lookup
+    if (colorCode && !imageBase64) {
+      const systemPrompt = `You are a paint color expert. Given a paint color code, return the color name, brand, and approximate hex color.
+
+Known paint systems: Jotun, NCS, RAL, Dyrup, Beckers, Histor, Sigma, Alcro,纂
+
+Return your response as JSON:
+{
+  "name": "Color name (e.g. 'Klassisk Hvit')",
+  "code": "The code provided",
+  "brand": "Brand if identifiable",
+  "hexColor": "Approximate hex color code (e.g. '#F5F0EB')"
+}
+
+Be as accurate as possible with the hex color. If uncertain, give your best approximation.`;
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Look up this paint color code and return the hex color: ${colorCode}` },
+        ],
+        max_tokens: 300,
+      });
+
+      const content = response.choices[0]?.message?.content || "";
+      let colorData;
+      try {
+        const jsonMatch = content.match(/\{[\s\S]*\}/);
+        colorData = jsonMatch ? JSON.parse(jsonMatch[0]) : { name: "", code: colorCode, brand: "", hexColor: "" };
+      } catch (e) {
+        colorData = { name: "", code: colorCode, brand: "", hexColor: "" };
+      }
+
+      return res.json({
+        name: colorData.name || "",
+        code: colorData.code || colorCode,
+        brand: colorData.brand || "",
+        hexColor: colorData.hexColor || "",
+      });
+    }
+
+    // Image-based extraction
     const systemPrompt = `You are a color analysis expert. Analyze this image and extract paint color information.
 
 Look for:

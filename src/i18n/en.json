@@ -1438,6 +1438,7 @@
     "unnamed": "Unnamed",
     "extractedColor": "Extracted color",
     "photoTag": "Photo tag",
-    "photoWall": "Photo wall"
+    "photoWall": "Photo wall",
+    "fetchColor": "Get color"
   }
 }
