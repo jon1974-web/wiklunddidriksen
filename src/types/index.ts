@@ -757,3 +757,19 @@ export interface HomeInstruction {
   familyId: string;
   createdAt: number;
 }
+
+export interface HomeService {
+  id: string;
+  homeId: string;
+  title: string;
+  description: string;
+  dateFrom: string;
+  dateTo?: string;
+  startTime: string;
+  endTime?: string;
+  reminder: number;
+  frequency: 'once' | 'monthly' | 'quarterly' | 'yearly';
+  status: 'planned' | 'completed';
+  familyId: string;
+  createdAt: number;
+}

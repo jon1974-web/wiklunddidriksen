@@ -44,15 +44,12 @@
 - [ ] Mulighet til å laste opp bilder av instruksjoner
 
 ### Phase 3.6: Vedlikehold
-- [ ] Farger-seksjon (gjenbruk komponent fra Prosjekter)
-- [ ] Serviceavtaler/intervaller:
-  - [ ] Legg til service med type, dato, intervall
-  - [ ] Type service (f.eks. ventilasjon, varmepumpe, peis, etc.)
-  - [ ] Når det skal skje og hvor ofte
-  - [ ] Serviceavtaler vises som event-kort i hendelseslisten
-  - [ ] Serviceavtaler vises i kalendervisningen på hendelsessiden
-  - [ ] Serviceavtaler vises i ukesoversikten (WeeklySummary)
-  - [ ] Bruk eksisterende kalender- og hendelsesvisning — ingen ny kalender
+- [x] Serviceavtaler-seksjon med kalender-ikon
+- [x] Legg til/rediger/slett service med type, dato, intervall, påminnelse
+- [x] Intervall: en gang, månedlig, kvartalsvis, årlig
+- [x] Påminnelser: Ingen, 30 min, 1 time, 2 timer, 1 dag, 1 uke
+- [x] Farger-seksjon med AI foto-uttrekk og "Hent farge"
+- [x] Custom ikoner for vedlikehold-seksjonene
 
 ### Phase 4: Handleliste + Tilbud
 - [ ] Handleliste per prosjekt med priser og totalberegning

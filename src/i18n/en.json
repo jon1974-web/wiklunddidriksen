@@ -1453,6 +1453,22 @@
     "instructionContentPlaceholder": "Enter instructions here...",
     "section": "Section",
     "scanNote": "Scan note",
-    "scanFromGallery": "Scan from gallery"
+    "scanFromGallery": "Scan from gallery",
+    "serviceAppointments": "Service appointments",
+    "addService": "Add service",
+    "editService": "Edit service",
+    "serviceTitle": "Title",
+    "serviceTitlePlaceholder": "e.g. Heat pump service",
+    "serviceTitleRequired": "Please enter a title",
+    "dateFrom": "Date from",
+    "dateTo": "Date to",
+    "timeFrom": "Time from",
+    "timeTo": "Time to",
+    "frequency": "Frequency",
+    "freqOnce": "Once",
+    "freqMonthly": "Monthly",
+    "freqQuarterly": "Quarterly",
+    "freqYearly": "Yearly",
+    "noServices": "No service appointments yet"
   }
 }

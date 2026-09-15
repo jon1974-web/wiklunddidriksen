@@ -1453,6 +1453,22 @@
     "instructionContentPlaceholder": "Skriv instruktionerna här...",
     "section": "Sektion",
     "scanNote": "Skanna anteckning",
-    "scanFromGallery": "Skanna från galleri"
+    "scanFromGallery": "Skanna från galleri",
+    "serviceAppointments": "Serviceavtal",
+    "addService": "Lägg till service",
+    "editService": "Redigera service",
+    "serviceTitle": "Titel",
+    "serviceTitlePlaceholder": "t.ex. Värmepump service",
+    "serviceTitleRequired": "Vänligen ange en titel",
+    "dateFrom": "Datum från",
+    "dateTo": "Datum till",
+    "timeFrom": "Tid från",
+    "timeTo": "Tid till",
+    "frequency": "Intervall",
+    "freqOnce": "En gång",
+    "freqMonthly": "Månadsvis",
+    "freqQuarterly": "Kvartalsvis",
+    "freqYearly": "Årsvis",
+    "noServices": "Inga serviceavtal ännu"
   }
 }

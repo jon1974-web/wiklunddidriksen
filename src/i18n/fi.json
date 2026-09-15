@@ -1453,6 +1453,22 @@
     "instructionContentPlaceholder": "Kirjoita ohjeet tähän...",
     "section": "Osio",
     "scanNote": "Skannaa muistiinpano",
-    "scanFromGallery": "Skannaa galleriasta"
+    "scanFromGallery": "Skannaa galleriasta",
+    "serviceAppointments": "Huoltokäynnit",
+    "addService": "Lisää huolto",
+    "editService": "Muokkaa huoltoa",
+    "serviceTitle": "Otsikko",
+    "serviceTitlePlaceholder": "esim. Lämpöpumpun huolto",
+    "serviceTitleRequired": "Anna otsikko",
+    "dateFrom": "Pvm alkaen",
+    "dateTo": "Pvm asti",
+    "timeFrom": "Kello alkaen",
+    "timeTo": "Kello asti",
+    "frequency": "Tiheys",
+    "freqOnce": "Kerran",
+    "freqMonthly": "Kuukausittain",
+    "freqQuarterly": "Neljännesvuosittain",
+    "freqYearly": "Vuosittain",
+    "noServices": "Ei vielä huoltokäyntejä"
   }
 }

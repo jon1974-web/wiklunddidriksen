@@ -36,6 +36,15 @@
       ]
     },
     {
+      "collectionGroup": "homeServices",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "familyId", "order": "ASCENDING" },
+        { "fieldPath": "homeId", "order": "ASCENDING" },
+        { "fieldPath": "dateFrom", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "events",
       "queryScope": "COLLECTION",
       "fields": [

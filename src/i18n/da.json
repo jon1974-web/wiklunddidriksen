@@ -1453,6 +1453,22 @@
     "instructionContentPlaceholder": "Skriv instruktionerne her...",
     "section": "Afsnit",
     "scanNote": "Scan note",
-    "scanFromGallery": "Scan fra galleri"
+    "scanFromGallery": "Scan fra galleri",
+    "serviceAppointments": "Serviceaftaler",
+    "addService": "Tilføj service",
+    "editService": "Rediger service",
+    "serviceTitle": "Titel",
+    "serviceTitlePlaceholder": "f.eks. Varmepumpe service",
+    "serviceTitleRequired": "Indtast venligst en titel",
+    "dateFrom": "Dato fra",
+    "dateTo": "Dato til",
+    "timeFrom": "Tid fra",
+    "timeTo": "Tid til",
+    "frequency": "Interval",
+    "freqOnce": "En gang",
+    "freqMonthly": "Månedlig",
+    "freqQuarterly": "Kvartalsvis",
+    "freqYearly": "Årlig",
+    "noServices": "Ingen serviceaftaler endnu"
   }
 }
