@@ -1,6 +1,6 @@
 # Våre hjem — Utviklingsplan
 
-## Status: Phase 4 fullført, Phase 5 gjenstående
+## Status: Phase 5 fullført, mindre forbedringer gjenstående
 
 ---
 
@@ -9,7 +9,7 @@
 ### Phase 1: Core
 - [x] Home type med `homeType` (house, summerCabin, winterCabin, apartment)
 - [x] Custom SVG-ikoner for alle typer + `instruksjon` + `paintColor` + `vedlikehold` + `comingHome` + `leavingHome`
-- [x] `homeService.ts` med full CRUD for hjem, prosjekter, fargekoder, instruksjoner, service, handleliste, tilbud
+- [x] `homeService.ts` med full CRUD for hjem, prosjekter, fargekoder, instruksjoner, service, handleliste, tilbud, oppgaver
 - [x] HomeSpaceScreen — legg til/rediger/slett hjem med bilde, adresse, kart
 - [x] HomeDetailScreen — tile-grid med Instruksjoner, Vedlikehold og Prosjekter
 - [x] Tile-kort: ikon → navn → beskrivelse → bilde → kart
@@ -30,6 +30,7 @@
 - [x] "Hent farge"-knapp — skriv inn en kode, AI slår opp hex-farge
 - [x] Farge-swatch-visning med hex-farge
 - [x] Lang-press for å slette farger
+- [x] Prosjektnavn vises på farger i Vedlikehold
 - [ ] Manuelt hex-farge-input-felt
 
 ### Phase 3.5: Instruksjoner
@@ -54,28 +55,29 @@
 - [x] Kvitteringsskanning: AI leser kvittering og legger til varer automatisk
 - [x] Kvitteringsopplasting per vare
 
----
-
-## 📋 Gjenstående
-
 ### Phase 5: Oppgavetavle (Kanban)
 - [x] Tavle med 3 kolonner: Todo → Pågående → Ferdig
 - [x] Kompakte oppgavekort med tittel
 - [x] Pilknapper for å flytte oppgaver mellom kolonner
 - [x] Tapp på oppgave → detaljvisning med tittel, beskrivelse, status
 - [x] Lang-press → rediger/slett
-- [ ] Koble oppgaver til handleliste-varer
-- [ ] Legg til oppgaver direkte fra handleliste
+- [x] Opprett oppgave fra handleliste-varer
+- [x] Opprett oppgave fra tilbud-varer
+- [x] Opprett oppgave fra fargekoder
 
 ### AI-funksjoner
 - [x] Fargeuttrekk fra bilder (etiketter + vegger)
 - [x] Fargeoppslag fra kode (Jotun, NCS, RAL)
 - [x] Instruksjoner fra håndskrevne notater
 - [x] Kvitteringsskanning for handleliste
+- [x] Tilbud-OCR (leverandør, pris, varer)
 - [ ] Prosjektforslag basert på prosjekt-tittel
-- [ ] Handleliste fra bilde/kvittering (utenfor prosjekt)
 
-### Mindre forbedringer
-- [ ] Manuelt hex-farge-input-felt
+---
+
+## 📋 Gjenstående (mindre forbedringer)
+
+- [ ] Manuelt hex-farge-input-felt (så brukere kan skrive hex uten AI)
 - [ ] Fargevelger for visuell valg
 - [ ] Mulighet til å laste opp bilder av instruksjoner
+- [ ] Prosjektforslag basert på prosjekt-tittel
