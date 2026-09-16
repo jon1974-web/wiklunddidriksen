@@ -1365,6 +1365,15 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                           <View style={{ flex: 1 }}>
                             <Text style={{ fontSize: 13, fontWeight: '600', color: colors.text }}>{task.title}</Text>
                             {task.description ? <Text style={{ fontSize: 11, color: colors.textSecondary }} numberOfLines={1}>{task.description}</Text> : null}
+                            {task.shoppingItems && task.shoppingItems.length > 0 && (
+                              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                                {task.shoppingItems.map((itemName, i) => (
+                                  <View key={i} style={{ backgroundColor: HOME_THEME + '20', paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6 }}>
+                                    <Text style={{ fontSize: 10, color: HOME_THEME }}>{itemName}</Text>
+                                  </View>
+                                ))}
+                              </View>
+                            )}
                           </View>
                         </TouchableOpacity>
                       ))}
