@@ -3261,6 +3261,13 @@ async function createGoogleCalendarEvent(uid, event) {
     calendarEvent.location = event.location;
   }
 
+  if (event.reminderMinutes && event.reminderMinutes > 0) {
+    calendarEvent.reminders = {
+      useDefault: false,
+      overrides: [{ method: "popup", minutes: event.reminderMinutes }],
+    };
+  }
+
   const response = await fetch(
     "https://www.googleapis.com/calendar/v3/calendars/primary/events",
     {
@@ -3310,6 +3317,7 @@ exports.onEventCreatedForCalendar = onDocumentCreated({ region: "us-central1", d
       startDateTime,
       endDateTime,
       location: data.address || "",
+      reminderMinutes: data.reminderMinutes || 0,
     });
 
     // Store the calendar event ID for future updates/deletions
@@ -3418,6 +3426,7 @@ exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-
       startDateTime,
       endDateTime,
       location: data.location || "",
+      reminderMinutes: data.reminder || 0,
     });
 
     await db.collection("health").doc(familyId).collection("appointments").doc(event.params.docId).update({
@@ -3467,6 +3476,7 @@ exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-centra
       startDateTime,
       endDateTime,
       location: data.location || "",
+      reminderMinutes: data.reminder || 0,
     });
 
     await db.collection("petVetVisits").doc(event.params.docId).update({
@@ -3809,6 +3819,7 @@ exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "us-cen
       startDateTime,
       endDateTime,
       location: data.location || "",
+      reminderMinutes: data.reminder || 0,
     });
 
     await db.collection("schoolActivities").doc(familyId).collection("activities").doc(event.params.docId).update({
@@ -3916,6 +3927,7 @@ exports.onKindergartenActivityCreatedForCalendar = onDocumentCreated({ region: "
       startDateTime,
       endDateTime,
       location: data.location || "",
+      reminderMinutes: data.reminder || 0,
     });
 
     await db.collection("kindergartenActivities").doc(familyId).collection("activities").doc(event.params.docId).update({
@@ -4684,6 +4696,7 @@ exports.onHomeServiceCreatedForCalendar = onDocumentCreated({ region: "us-centra
       startDateTime,
       endDateTime,
       location: "",
+      reminderMinutes: data.reminder || 0,
     });
 
     await db.collection("homeServices").doc(event.params.serviceId).update({
