@@ -19,8 +19,19 @@ import { ActionModal } from '../components/ActionModal';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { syncEventToCalendar } from '../services/calendarService';
 import { getUserProfile, notifyNewEvent } from '../services/familyService';
+import { DocumentUpload } from '../components/DocumentUpload';
+import { ScheduleModal } from '../components/ScheduleModal';
+import { addDoc as firestoreAddDoc, collection as firestoreCollection, query as firestoreQuery, where as firestoreWhere, getDocs as firestoreGetDocs, deleteDoc as firestoreDeleteDoc, doc as firestoreDoc } from 'firebase/firestore';
 
 const HOME_THEME = MODULE_COLORS.home;
+
+function getWeekNumber(date: Date): number {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() + 3 - (d.getDay() + 6) % 7);
+  const week1 = new Date(d.getFullYear(), 0, 4);
+  return 1 + Math.round(((d.getTime() - week1.getTime()) / 86400000 - 3 + (week1.getDay() + 6) % 7) / 7);
+}
 
 const FREQUENCY_OPTIONS = [
   { value: 'once', labelKey: 'homes.freqOnce' },
@@ -61,6 +72,12 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
   const [svcReminder, setSvcReminder] = useState(60);
   const [svcFrequency, setSvcFrequency] = useState<'once' | 'monthly' | 'quarterly' | 'yearly'>('once');
   const [saving, setSaving] = useState(false);
+  const [svcDocuments, setSvcDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>([]);
+  const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
+  const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
+  const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
+  const [preloadedWeeks, setPreloadedWeeks] = useState<number>(4);
+  const [preloadedWeekType, setPreloadedWeekType] = useState<string>('all');
 
   const [colorName, setColorName] = useState('');
   const [colorCode, setColorCode] = useState('');
@@ -102,6 +119,8 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         setSvcEndTime(svc.endTime || svc.startTime);
         setSvcReminder(svc.reminder);
         setSvcFrequency(svc.frequency);
+        setSvcDocuments(svc.documents || []);
+        setRepeatScheduleConfig(null);
         setEditingService(svc.id);
         setShowAddService(true);
         navigation.setParams({ editServiceId: undefined });
@@ -118,6 +137,8 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     setSvcEndTime('11:00');
     setSvcReminder(60);
     setSvcFrequency('once');
+    setSvcDocuments([]);
+    setRepeatScheduleConfig(null);
     setEditingService(null);
   };
 
@@ -141,17 +162,62 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         frequency: svcFrequency,
         status: 'planned' as const,
         familyId,
+        documents: svcDocuments.length > 0 ? svcDocuments : (editingService ? undefined : []),
       };
-      let savedId: string;
+      let savedId: string | undefined;
       if (editingService) {
         await updateHomeService(editingService, data);
         savedId = editingService;
+        if (repeatScheduleConfig) {
+          const editingSvc = services.find((s) => s.id === editingService);
+          if (editingSvc?.scheduleGroupId) {
+            const q = firestoreQuery(firestoreCollection(db, 'homeServices'), firestoreWhere('familyId', '==', familyId), firestoreWhere('homeId', '==', home.id), firestoreWhere('scheduleGroupId', '==', editingSvc.scheduleGroupId));
+            const snapshot = await firestoreGetDocs(q);
+            let deletedCount = 0;
+            for (const d of snapshot.docs) {
+              const svc = d.data();
+              const dateField = svc.dateFrom || svc.date;
+              if (dateField) {
+                const svcDate = new Date(dateField);
+                if (!repeatScheduleConfig.days.includes(svcDate.getDay())) {
+                  await firestoreDeleteDoc(firestoreDoc(db, 'homeServices', d.id));
+                  deletedCount++;
+                }
+              }
+            }
+            if (deletedCount > 0) {
+              crossAlert(t('homes.scheduleUpdated'), `${deletedCount} ${t('homes.servicesDeletedForRemovedDays')}`);
+            }
+          }
+        }
+      } else if (repeatScheduleConfig) {
+        const startDate = new Date(svcDateFrom);
+        for (let w = 0; w < repeatScheduleConfig.weeks; w++) {
+          const weekNum = getWeekNumber(startDate) + w;
+          if (repeatScheduleConfig.weekType === 'odd' && weekNum % 2 === 0) continue;
+          if (repeatScheduleConfig.weekType === 'even' && weekNum % 2 !== 0) continue;
+
+          for (let d = 0; d < 7; d++) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + w * 7 + d);
+            if (repeatScheduleConfig.days.includes(date.getDay())) {
+              const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+              await firestoreAddDoc(firestoreCollection(db, 'homeServices'), {
+                ...data,
+                dateFrom: dateStr,
+                dateTo: dateStr,
+                scheduleGroupId: repeatScheduleConfig.groupId,
+                createdAt: Date.now(),
+              });
+            }
+          }
+        }
       } else {
         savedId = await addHomeService(data);
       }
 
       try {
-        if (user) {
+        if (user && savedId) {
           const profile = await getUserProfile(user.uid);
           if (profile?.calendarId) {
             const calEventId = await syncEventToCalendar({
@@ -163,7 +229,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
               endTime: svcEndTime,
               calendarId: profile.calendarId,
             });
-            if (calEventId) {
+            if (calEventId && !editingService) {
               await updateDoc(doc(db, 'homeServices', savedId), { calendarEventId: calEventId });
             }
           }
@@ -209,6 +275,8 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
       setSvcEndTime(svc.endTime || svc.startTime);
       setSvcReminder(svc.reminder);
       setSvcFrequency(svc.frequency);
+      setSvcDocuments(svc.documents || []);
+      setRepeatScheduleConfig(null);
       setShowAddService(true);
     }
     setServiceActionModal({ visible: false, id: '', title: '' });
@@ -478,6 +546,94 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
                 </View>
               </View>
 
+              {/* Schedule */}
+              <View style={styles.field}>
+                {repeatScheduleConfig ? (
+                  <View style={{ padding: 12, borderRadius: 10, backgroundColor: HOME_THEME + '15', borderWidth: 1, borderColor: HOME_THEME + '40' }}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                      <AppIcon name="schedule" size={18} color={HOME_THEME} />
+                      <Text style={{ color: HOME_THEME, fontSize: 14, fontWeight: '700' }}>{t('homes.repeatSchedule')}</Text>
+                    </View>
+                    <Text style={{ color: colors.text, fontSize: 13, marginBottom: 4 }}>
+                      {repeatScheduleConfig.days.map((d) => ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'][d]).join(', ')} {t('homes.inWeeks', { count: repeatScheduleConfig.weeks })}
+                    </Text>
+                    <TouchableOpacity onPress={() => setRepeatScheduleConfig(null)}>
+                      <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>{t('homes.removeSchedule')}</Text>
+                    </TouchableOpacity>
+                  </View>
+                ) : (
+                  <TouchableOpacity
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border }}
+                    onPress={async () => {
+                      if (editingService) {
+                        const editingSvc = services.find((s) => s.id === editingService);
+                        if (editingSvc?.scheduleGroupId && familyId) {
+                          try {
+                            const groupId = editingSvc.scheduleGroupId;
+                            const q = firestoreQuery(firestoreCollection(db, 'homeServices'), firestoreWhere('familyId', '==', familyId), firestoreWhere('homeId', '==', home.id), firestoreWhere('scheduleGroupId', '==', groupId));
+                            const snapshot = await firestoreGetDocs(q);
+                            const daySet = new Set<number>();
+                            const weekNums = new Set<number>();
+                            let minDate = Infinity;
+                            let maxDate = -Infinity;
+                            for (const d of snapshot.docs) {
+                              const svc = d.data();
+                              const dateField = svc.dateFrom || svc.date;
+                              if (dateField) {
+                                const dt = new Date(dateField);
+                                daySet.add(dt.getDay());
+                                weekNums.add(getWeekNumber(dt));
+                                const ts = dt.getTime();
+                                if (ts < minDate) minDate = ts;
+                                if (ts > maxDate) maxDate = ts;
+                              }
+                            }
+                            const days = Array.from(daySet).sort((a, b) => a - b);
+                            const weeks = Math.max(1, Math.round((maxDate - minDate) / (7 * 86400000)) + 1);
+                            const hasOdd = Array.from(weekNums).some((w) => w % 2 !== 0);
+                            const hasEven = Array.from(weekNums).some((w) => w % 2 === 0);
+                            setPreloadedDays(days);
+                            setPreloadedWeeks(weeks);
+                            setPreloadedWeekType(hasOdd && hasEven ? 'all' : hasOdd ? 'odd' : hasEven ? 'even' : 'all');
+                          } catch {
+                            setPreloadedDays([1]);
+                            setPreloadedWeeks(4);
+                            setPreloadedWeekType('all');
+                          }
+                        }
+                      }
+                      setShowRepeatSchedule(true);
+                    }}
+                  >
+                    <AppIcon name="schedule" size={18} color={HOME_THEME} />
+                    <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{editingService && services.find((s) => s.id === editingService)?.scheduleGroupId ? t('homes.editSchedule') : t('homes.planSchedule')}</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+
+              {/* Documents */}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.documents')}</Text>
+                <DocumentUpload
+                  storagePath={`home-services/${editingService || 'new'}/documents`}
+                  onUploaded={(doc) => setSvcDocuments((prev) => [...prev, doc])}
+                  accentColor={HOME_THEME}
+                />
+                {svcDocuments.length > 0 && (
+                  <View style={{ marginTop: 8 }}>
+                    {svcDocuments.map((doc, i) => (
+                      <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <Text style={{ color: colors.text, fontSize: 13, flex: 1 }}>{doc.type === 'image' ? '🖼️' : '📄'} {doc.fileName}</Text>
+                        <TouchableOpacity onPress={() => setSvcDocuments((prev) => prev.filter((_, idx) => idx !== i))}>
+                          <Text style={{ color: colors.danger, fontSize: 12 }}>{t('common.delete')}</Text>
+                        </TouchableOpacity>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+
               <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
                 <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowAddService(false); resetServiceForm(); }}>
                   <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
@@ -557,6 +713,21 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
       </Modal>
 
       <DatePickerModal visible={activePicker !== null} title={activePicker === 'dateFrom' ? t('homes.dateFrom') : activePicker === 'dateTo' ? t('homes.dateTo') : activePicker === 'startTime' ? t('homes.timeFrom') : t('homes.timeTo')} mode={isTimePicker ? 'time' : 'date'} dateOffset={isTimePicker ? 0 : -30} dateCount={isTimePicker ? 48 : 760} selectedValue={activePicker === 'dateFrom' ? svcDateFrom : activePicker === 'dateTo' ? svcDateTo : activePicker === 'startTime' ? svcStartTime : svcEndTime} onSelect={handlePickerSelect} onClose={() => setActivePicker(null)} />
+
+      <ScheduleModal
+        visible={showRepeatSchedule}
+        onClose={() => setShowRepeatSchedule(false)}
+        onConfirm={(config) => {
+          setRepeatScheduleConfig(config);
+          setShowRepeatSchedule(false);
+        }}
+        startDate={svcDateFrom}
+        moduleColor={HOME_THEME}
+        preselectedDays={preloadedDays}
+        preselectedWeeks={preloadedWeeks}
+        preselectedWeekType={preloadedWeekType}
+        isEditing={!!editingService}
+      />
     </SafeAreaView>
   );
 };

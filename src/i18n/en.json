@@ -1530,6 +1530,14 @@
     "noUnlinkedItems": "No unlinked items",
     "noUnlinkedItemsText": "All shopping items are already linked to tasks.",
     "itemsLinked": "items linked",
-    "service": "Service"
+    "service": "Service",
+    "repeatSchedule": "Repeat schedule",
+    "inWeeks": "in {{count}} week|weeks",
+    "removeSchedule": "Remove schedule",
+    "editSchedule": "Edit schedule",
+    "planSchedule": "Plan schedule",
+    "documents": "Documents",
+    "scheduleUpdated": "Schedule updated",
+    "servicesDeletedForRemovedDays": "services were deleted for removed days."
   }
 }

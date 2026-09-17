@@ -1530,6 +1530,14 @@
     "noUnlinkedItems": "Ingen ubundne varer",
     "noUnlinkedItemsText": "Alle handlelisteelementer er allerede bundet til oppgaver.",
     "itemsLinked": "elementer koblet",
-    "service": "Service"
+    "service": "Service",
+    "repeatSchedule": "Gjentakelse",
+    "inWeeks": "i {{count}} uke|uker",
+    "removeSchedule": "Fjern gjentakelse",
+    "editSchedule": "Rediger gjentakelse",
+    "planSchedule": "Planlegg gjentakelse",
+    "documents": "Dokumenter",
+    "scheduleUpdated": "Gjentakelse oppdatert",
+    "servicesDeletedForRemovedDays": "tjenester ble slettet for fjernede dager."
   }
 }

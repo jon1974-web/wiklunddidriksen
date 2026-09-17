@@ -1530,6 +1530,14 @@
     "noUnlinkedItems": "Ingen utilknyttede varer",
     "noUnlinkedItemsText": "Alle indkøbslisteelementer er allerede tilknyttet til opgaver.",
     "itemsLinked": "elementer tilknyttet",
-    "service": "Service"
+    "service": "Service",
+    "repeatSchedule": "Gentagelse",
+    "inWeeks": "i {{count}} uge|uger",
+    "removeSchedule": "Fjern gentagelse",
+    "editSchedule": "Rediger gentagelse",
+    "planSchedule": "Planlæg gentagelse",
+    "documents": "Dokumenter",
+    "scheduleUpdated": "Gentagelse opdateret",
+    "servicesDeletedForRemovedDays": "tjenester blev slettet for fjernede dage."
   }
 }

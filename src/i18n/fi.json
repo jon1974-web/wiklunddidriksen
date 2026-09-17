@@ -1530,6 +1530,14 @@
     "noUnlinkedItems": "Ei liittämättömiä tuotteita",
     "noUnlinkedItemsText": "Kaikki ostoslistakohteet on jo liitetty tehtäviin.",
     "itemsLinked": "kohdetta liitetty",
-    "service": "Palvelu"
+    "service": "Palvelu",
+    "repeatSchedule": "Toisto",
+    "inWeeks": "{{count}} viikossa|viikossa",
+    "removeSchedule": "Poista toisto",
+    "editSchedule": "Muokkaa toistoa",
+    "planSchedule": "Suunnittele toisto",
+    "documents": "Asiakirjat",
+    "scheduleUpdated": "Toisto päivitetty",
+    "servicesDeletedForRemovedDays": "palvelua poistettiin poistettujen päivien osalta."
   }
 }

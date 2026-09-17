@@ -775,6 +775,7 @@ export interface HomeService {
   frequency: 'once' | 'monthly' | 'quarterly' | 'yearly';
   status: 'planned' | 'completed';
   documents?: SchoolActivityDocument[];
+  scheduleGroupId?: string;
   familyId: string;
   createdAt: number;
 }

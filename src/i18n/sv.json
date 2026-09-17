@@ -1530,6 +1530,14 @@
     "noUnlinkedItems": "Inga okopplade varor",
     "noUnlinkedItemsText": "Alla inköpslistelement är redan kopplade till uppgifter.",
     "itemsLinked": "element kopplade",
-    "service": "Service"
+    "service": "Service",
+    "repeatSchedule": "Upprepning",
+    "inWeeks": "i {{count}} vecka|veckor",
+    "removeSchedule": "Ta bort upprepning",
+    "editSchedule": "Redigera upprepning",
+    "planSchedule": "Planera upprepning",
+    "documents": "Dokument",
+    "scheduleUpdated": "Upprepning uppdaterad",
+    "servicesDeletedForRemovedDays": "tjänster togs bort för borttagna dagar."
   }
 }
