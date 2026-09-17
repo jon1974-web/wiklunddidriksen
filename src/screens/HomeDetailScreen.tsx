@@ -11,13 +11,13 @@ const HOME_THEME = MODULE_COLORS.home;
 
 interface HomeDetailScreenProps {
   navigation: any;
-  route: { params: { home: Home } };
+  route: { params: { home: Home; openAddSection?: string } };
 }
 
 export const HomeDetailScreen: React.FC<HomeDetailScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { home } = route.params;
+  const { home, openAddSection } = route.params;
 
   const tiles = [
     { id: 'instructions', icon: 'instruksjon', label: t('homes.instructions'), screen: 'HomeInstructions', disabled: false },
@@ -49,7 +49,7 @@ export const HomeDetailScreen: React.FC<HomeDetailScreenProps> = ({ navigation, 
             key={tile.id}
             style={[styles.tile, { backgroundColor: colors.surface, opacity: tile.disabled ? 0.5 : 1 }]}
             disabled={tile.disabled}
-            onPress={() => navigation.navigate(tile.screen, { home })}
+            onPress={() => navigation.navigate(tile.screen, { home, openAddSection })}
           >
             <View style={[styles.tileIcon, { backgroundColor: HOME_THEME }]}>
               <AppIcon name={tile.icon as any} size={24} color="#fff" />

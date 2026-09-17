@@ -42,7 +42,7 @@ const FREQUENCY_OPTIONS = [
 
 interface HomeMaintenanceScreenProps {
   navigation: any;
-  route: { params: { home: Home; editServiceId?: string } };
+  route: { params: { home: Home; editServiceId?: string; openAddSection?: string } };
 }
 
 export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ navigation, route }) => {
@@ -128,6 +128,14 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
       }
     }
   }, [route.params?.editServiceId, services]);
+
+  useEffect(() => {
+    if (route.params?.openAddSection === 'services') {
+      resetServiceForm();
+      setShowAddService(true);
+      navigation.setParams({ openAddSection: undefined });
+    }
+  }, [route.params?.openAddSection]);
 
   const resetServiceForm = () => {
     setSvcTitle('');

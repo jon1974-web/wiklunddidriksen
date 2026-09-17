@@ -196,7 +196,7 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
                 <TouchableOpacity
                   key={home.id}
                   style={[styles.homeCard, { backgroundColor: colors.surface }]}
-                  onPress={() => navigation.navigate('HomeDetail', { home })}
+                  onPress={() => navigation.navigate('HomeDetail', { home, openAddSection: route?.params?.openAddSection })}
                   onLongPress={() => setHomeActionModal({ visible: true, id: home.id, title: home.name })}
                 >
                   <View style={styles.homeCardIcon}>
