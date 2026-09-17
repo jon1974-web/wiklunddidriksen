@@ -251,7 +251,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       {/* Documents */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionLabel, { color: PET_COLOR }]}>{t('homes.documents')}</Text>
-        {documents && documents.length > 0 ? (
+        {documents && documents.length > 0 && (
           documents.map((doc, i) => (
             <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
               {doc.type === 'image' ? (
@@ -267,19 +267,18 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
               </View>
             </TouchableOpacity>
           ))
-        ) : (
-          <View style={{ marginTop: 8 }}>
-            <DocumentUpload
-              storagePath={`petVetVisits/${visit.id}/documents`}
-              onUploaded={async (doc) => {
-                const docs = [...(documents || []), doc];
-                await updateVetVisit(visit.id, { documents: docs });
-                setDocuments(docs);
-              }}
-              accentColor={PET_COLOR}
-            />
-          </View>
         )}
+        <View style={{ marginTop: 8 }}>
+          <DocumentUpload
+            storagePath={`petVetVisits/${visit.id}/documents`}
+            onUploaded={async (doc) => {
+              const docs = [...(documents || []), doc];
+              await updateVetVisit(visit.id, { documents: docs });
+              setDocuments(docs);
+            }}
+            accentColor={PET_COLOR}
+          />
+        </View>
       </View>
 
       {/* Button box */}

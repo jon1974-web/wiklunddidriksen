@@ -253,7 +253,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
       {/* Documents */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>{t('homes.documents')}</Text>
-        {documents && documents.length > 0 ? (
+        {documents && documents.length > 0 && (
           documents.map((doc, i) => (
             <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
               {doc.type === 'image' ? (
@@ -269,19 +269,18 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
               </View>
             </TouchableOpacity>
           ))
-        ) : (
-          <View style={{ marginTop: 8 }}>
-            <DocumentUpload
-              storagePath={`health/${familyId}/${appointment.id}/documents`}
-              onUploaded={async (doc) => {
-                const docs = [...(documents || []), doc];
-                await updateHealthAppointment(familyId || '', appointment.id, { documents: docs });
-                setDocuments(docs);
-              }}
-              accentColor={HEALTH_COLOR}
-            />
-          </View>
         )}
+        <View style={{ marginTop: 8 }}>
+          <DocumentUpload
+            storagePath={`health/${familyId}/${appointment.id}/documents`}
+            onUploaded={async (doc) => {
+              const docs = [...(documents || []), doc];
+              await updateHealthAppointment(familyId || '', appointment.id, { documents: docs });
+              setDocuments(docs);
+            }}
+            accentColor={HEALTH_COLOR}
+          />
+        </View>
       </View>
 
       {/* Button box */}
