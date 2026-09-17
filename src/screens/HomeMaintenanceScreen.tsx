@@ -161,7 +161,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     if (!familyId) return;
     setSaving(true);
     try {
-      const data = {
+      const data: any = {
         homeId: home.id,
         title: svcTitle.trim(),
         description: svcDescription.trim(),
@@ -174,8 +174,12 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         status: 'planned' as const,
         createdBy: user?.uid || null,
         familyId,
-        documents: svcDocuments.length > 0 ? svcDocuments : (editingService ? undefined : []),
       };
+      if (svcDocuments.length > 0) {
+        data.documents = svcDocuments;
+      } else if (!editingService) {
+        data.documents = [];
+      }
       let savedId: string | undefined;
       if (editingService) {
         await updateHomeService(editingService, data);
