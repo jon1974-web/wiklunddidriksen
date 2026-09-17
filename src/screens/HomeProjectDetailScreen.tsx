@@ -653,9 +653,9 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppIcon name="activities" size={28} color={HOME_THEME} />
           <Text style={[styles.screenTitle, { color: colors.text }]} numberOfLines={1}>{project.title}</Text>
-          <View style={{ flex: 1 }} />
-          <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
         </View>
+        <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>{home.name}</Text>
+        <Text style={{ fontSize: 13, color: colors.textSecondary }}>Munkis</Text>
         {project.budget > 0 && (
           <View style={[styles.budgetSummary, { backgroundColor: colors.inputBackground }]}>
             <View style={{ flex: 1 }}>

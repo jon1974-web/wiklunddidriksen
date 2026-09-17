@@ -232,9 +232,8 @@ export const HomeInstructionsScreen: React.FC<HomeInstructionsScreenProps> = ({ 
               </View>
             </View>
           </TouchableOpacity>
-          <View style={{ flex: 1 }} />
-          <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
         </View>
+        <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>{home.name}</Text>
       </View>
       <ScrollView style={styles.content}>
         {/* Coming home */}

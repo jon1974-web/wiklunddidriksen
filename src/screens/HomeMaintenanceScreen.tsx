@@ -443,9 +443,8 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
               </View>
             </View>
           </TouchableOpacity>
-          <View style={{ flex: 1 }} />
-          <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
         </View>
+        <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>{home.name}</Text>
       </View>
       <ScrollView style={styles.content}>
         {/* Service Appointments */}
