@@ -55,6 +55,14 @@
       ]
     },
     {
+      "collectionGroup": "homeServices",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "familyId", "order": "ASCENDING" },
+        { "fieldPath": "dateFrom", "order": "ASCENDING" }
+      ]
+    },
+    {
       "collectionGroup": "homeShoppingItems",
       "queryScope": "COLLECTION",
       "fields": [

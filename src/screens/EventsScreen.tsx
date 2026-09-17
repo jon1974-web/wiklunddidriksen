@@ -296,7 +296,9 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     try {
       const data = await getAllHomeServices(familyId);
       setHomeServices(data);
-    } catch {}
+    } catch (error) {
+      console.log('Failed to load home services:', error);
+    }
   }, [familyId]);
 
   useEffect(() => {
@@ -307,7 +309,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     loadHomeServicesData();
     const unsubscribe = navigation.addListener('focus', () => { loadTrips(); loadHealth(); loadPets(); loadHolidays(); loadHomeServicesData(); });
     return unsubscribe;
-  }, [navigation, loadTrips, loadHealth, loadHolidays, loadHomeServicesData]);
+  }, [navigation, loadTrips, loadHealth, loadPets, loadHolidays, loadHomeServicesData]);
 
   useEffect(() => {
     if (!familyId) return;
