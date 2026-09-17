@@ -30,6 +30,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [paintColors, setPaintColors] = useState<HomePaintColor[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddColor, setShowAddColor] = useState(false);
+  const [editingColorId, setEditingColorId] = useState<string | null>(null);
   const [colorActionModal, setColorActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
 
   const [colorName, setColorName] = useState('');
@@ -193,7 +194,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     if (!familyId) return;
     setSaving(true);
     try {
-      await addHomePaintColor({
+      const data = {
         homeId: project.homeId,
         projectId: project.id,
         name: colorName.trim(),
@@ -202,9 +203,15 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         room: colorRoom.trim(),
         hexColor: colorHex,
         familyId,
-      });
+      };
+      if (editingColorId) {
+        await updateHomePaintColor(editingColorId, data);
+      } else {
+        await addHomePaintColor(data);
+      }
       resetForm();
       setShowAddColor(false);
+      setEditingColorId(null);
       loadData();
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
@@ -222,6 +229,20 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     }
+  };
+
+  const handleEditColor = () => {
+    const color = paintColors.find((c) => c.id === colorActionModal.id);
+    if (color) {
+      setEditingColorId(color.id);
+      setColorName(color.name);
+      setColorCode(color.code);
+      setColorBrand(color.brand || '');
+      setColorRoom(color.room || '');
+      setColorHex(color.hexColor || '');
+      setShowAddColor(true);
+    }
+    setColorActionModal({ visible: false, id: '', title: '' });
   };
 
   const resetItemForm = () => { setItemName(''); setItemQuantity('1'); setItemUnitPrice(''); setEditingItem(null); };
@@ -928,6 +949,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       <ActionModal
         visible={colorActionModal.visible}
         title={colorActionModal.title}
+        onEdit={handleEditColor}
         onDelete={handleDeleteColor}
         onCancel={() => setColorActionModal({ visible: false, id: '', title: '' })}
         accentColor={HOME_THEME}

@@ -462,7 +462,11 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
           ) : paintColors.map((color) => {
             const project = color.projectId ? projects.find((p) => p.id === color.projectId) : null;
             return (
-            <TouchableOpacity key={color.id} style={[styles.colorItem, { borderBottomColor: colors.border }]} onLongPress={() => setColorActionModal({ visible: true, id: color.id, title: color.name || color.code })}>
+            <TouchableOpacity key={color.id} style={[styles.colorItem, { borderBottomColor: colors.border }]} onLongPress={() => {
+              if (!color.projectId) {
+                setColorActionModal({ visible: true, id: color.id, title: color.name || color.code });
+              }
+            }}>
               {color.hexColor ? <View style={[styles.colorSwatch, { backgroundColor: color.hexColor }]} /> : <View style={[styles.colorSwatch, { backgroundColor: colors.inputBackground }]}><Text style={{ fontSize: 10, color: colors.textDisabled }}>🎨</Text></View>}
               <View style={{ flex: 1 }}>
                 <Text style={[styles.colorName, { color: colors.text }]} numberOfLines={1}>{color.name || t('homes.unnamed')}</Text>
