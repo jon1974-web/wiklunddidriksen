@@ -1190,7 +1190,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       return (
         <TouchableOpacity
           style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: HOME_COLOR }]}
-          onPress={() => navigation.navigate('Trips', { screen: 'HomeServiceDetail', params: { service: item } })}
+          onPress={() => navigation.navigate('Trips', { screen: 'HomeServiceDetail', params: { service: item, home: homes.find((h) => h.id === (item as any).homeId) } })}
         >
           <View style={styles.spondCardRow}>
             <View style={styles.spondCalIcon}>
