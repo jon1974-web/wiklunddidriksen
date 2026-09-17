@@ -167,6 +167,39 @@ export const HomeServiceDetailScreen: React.FC<Props> = ({ navigation, route }) 
         ) : null}
       </View>
 
+      {/* Documents */}
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: HOME_COLOR }]}>{t('homes.documents')}</Text>
+        {service.documents && service.documents.length > 0 && (
+          service.documents.map((doc, i) => (
+            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (service.documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
+              {doc.type === 'image' ? (
+                <Image source={{ uri: doc.url }} style={{ width: 48, height: 48, borderRadius: 8 }} resizeMode="cover" />
+              ) : (
+                <View style={{ width: 48, height: 48, borderRadius: 8, backgroundColor: '#FFF3E0', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 20 }}>📄</Text>
+                </View>
+              )}
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }} numberOfLines={1}>{doc.fileName}</Text>
+                <Text style={{ fontSize: 12, color: HOME_COLOR }}>{t('documents.open')} →</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        )}
+        <View style={{ marginTop: 8 }}>
+          <DocumentUpload
+            storagePath={`home-services/${service.id}/documents`}
+            onUploaded={async (doc) => {
+              const docs = [...(service.documents || []), doc];
+              await updateHomeService(service.id, { documents: docs });
+              navigation.setParams({ service: { ...service, documents: docs } });
+            }}
+            accentColor={HOME_COLOR}
+          />
+        </View>
+      </View>
+
       {/* Button box */}
       <View style={[styles.card, { marginTop: 10, backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', gap: 8 }}>
@@ -184,40 +217,6 @@ export const HomeServiceDetailScreen: React.FC<Props> = ({ navigation, route }) 
             </TouchableOpacity>
           )}
         </View>
-      </View>
-
-      {/* Documents */}
-      <View style={[styles.card, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionLabel, { color: HOME_COLOR }]}>{t('homes.documents')}</Text>
-        {service.documents && service.documents.length > 0 ? (
-          service.documents.map((doc, i) => (
-            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (service.documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
-              {doc.type === 'image' ? (
-                <Image source={{ uri: doc.url }} style={{ width: 48, height: 48, borderRadius: 8 }} resizeMode="cover" />
-              ) : (
-                <View style={{ width: 48, height: 48, borderRadius: 8, backgroundColor: '#FFF3E0', alignItems: 'center', justifyContent: 'center' }}>
-                  <Text style={{ fontSize: 20 }}>📄</Text>
-                </View>
-              )}
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }} numberOfLines={1}>{doc.fileName}</Text>
-                <Text style={{ fontSize: 12, color: HOME_COLOR }}>{t('documents.open')} →</Text>
-              </View>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <View style={{ marginTop: 8 }}>
-            <DocumentUpload
-              storagePath={`home-services/${service.id}/documents`}
-              onUploaded={async (doc) => {
-                const docs = [...(service.documents || []), doc];
-                await updateHomeService(service.id, { documents: docs });
-                navigation.setParams({ service: { ...service, documents: docs } });
-              }}
-              accentColor={HOME_COLOR}
-            />
-          </View>
-        )}
       </View>
 
       <ActionModal
