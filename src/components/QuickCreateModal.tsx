@@ -88,7 +88,7 @@ const SECTIONS: Section[] = [
   {
     key: 'homeService',
     color: MODULE_COLORS.home,
-    moduleIcon: 'vedlikehold',
+    moduleIcon: 'house',
     labelKey: 'quickCreate.homeService',
     items: [
       { icon: 'pencil' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HomeSpace', params: { openAddSection: 'services', _t: Date.now() } }), labelKey: 'quickCreate.addService' },
