@@ -86,6 +86,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
   const [colorHex, setColorHex] = useState('');
   const [extracting, setExtracting] = useState(false);
   const [savingColor, setSavingColor] = useState(false);
+  const [editingColorId, setEditingColorId] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     if (!familyId) return;
@@ -289,6 +290,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     setColorBrand('');
     setColorRoom('');
     setColorHex('');
+    setEditingColorId(null);
   };
 
   const handleExtractColor = async (fromCamera: boolean) => {
@@ -352,9 +354,15 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     if (!familyId) return;
     setSavingColor(true);
     try {
-      await addHomePaintColor({ homeId: home.id, name: colorName.trim(), code: colorCode.trim(), brand: colorBrand.trim(), room: colorRoom.trim(), hexColor: colorHex, familyId });
+      const data = { homeId: home.id, name: colorName.trim(), code: colorCode.trim(), brand: colorBrand.trim(), room: colorRoom.trim(), hexColor: colorHex, familyId };
+      if (editingColorId) {
+        await updateHomePaintColor(editingColorId, data);
+      } else {
+        await addHomePaintColor(data);
+      }
       resetColorForm();
       setShowAddColor(false);
+      setEditingColorId(null);
       loadData();
     } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
     finally { setSavingColor(false); }
@@ -364,6 +372,20 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     if (!colorActionModal.id) return;
     try { await deleteHomePaintColor(colorActionModal.id); setColorActionModal({ visible: false, id: '', title: '' }); loadData(); }
     catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const handleEditColor = () => {
+    const color = paintColors.find((c) => c.id === colorActionModal.id);
+    if (color) {
+      setEditingColorId(color.id);
+      setColorName(color.name);
+      setColorCode(color.code);
+      setColorBrand(color.brand || '');
+      setColorRoom(color.room || '');
+      setColorHex(color.hexColor || '');
+      setShowAddColor(true);
+    }
+    setColorActionModal({ visible: false, id: '', title: '' });
   };
 
   const isTimePicker = activePicker === 'startTime' || activePicker === 'endTime';
@@ -483,7 +505,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
       </ScrollView>
 
       <ActionModal visible={serviceActionModal.visible} title={serviceActionModal.title} onEdit={handleEditService} onDelete={handleDeleteService} onCancel={() => setServiceActionModal({ visible: false, id: '', title: '' })} accentColor={HOME_THEME} />
-      <ActionModal visible={colorActionModal.visible} title={colorActionModal.title} onDelete={handleDeleteColor} onCancel={() => setColorActionModal({ visible: false, id: '', title: '' })} accentColor={HOME_THEME} />
+      <ActionModal visible={colorActionModal.visible} title={colorActionModal.title} onEdit={handleEditColor} onDelete={handleDeleteColor} onCancel={() => setColorActionModal({ visible: false, id: '', title: '' })} accentColor={HOME_THEME} />
 
       {/* Add/Edit Service Modal */}
       <Modal visible={showAddService} transparent animationType="slide" onRequestClose={() => setShowAddService(false)}>
