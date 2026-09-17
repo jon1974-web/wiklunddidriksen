@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
+import { updateDoc, doc } from 'firebase/firestore';
+import { db } from '../services/firebase';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
@@ -15,6 +17,8 @@ import { Home, HomeService, HomePaintColor, HomeProject } from '../types';
 import { getHomeServices, addHomeService, updateHomeService, deleteHomeService, getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeProjects } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 import { DatePickerModal } from '../components/DatePickerModal';
+import { syncEventToCalendar } from '../services/calendarService';
+import { getUserProfile, notifyNewEvent } from '../services/familyService';
 
 const HOME_THEME = MODULE_COLORS.home;
 
@@ -119,11 +123,40 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         status: 'planned' as const,
         familyId,
       };
+      let savedId: string;
       if (editingService) {
         await updateHomeService(editingService, data);
+        savedId = editingService;
       } else {
-        await addHomeService(data);
+        savedId = await addHomeService(data);
       }
+
+      try {
+        if (user) {
+          const profile = await getUserProfile(user.uid);
+          if (profile?.calendarId) {
+            const calEventId = await syncEventToCalendar({
+              title: svcTitle.trim(),
+              description: svcDescription.trim(),
+              date: svcDateFrom,
+              time: svcStartTime,
+              endDate: svcDateTo,
+              endTime: svcEndTime,
+              calendarId: profile.calendarId,
+            });
+            if (calEventId) {
+              await updateDoc(doc(db, 'homeServices', savedId), { calendarEventId: calEventId });
+            }
+          }
+        }
+      } catch {}
+
+      try {
+        if (familyId && user) {
+          notifyNewEvent(familyId, svcTitle.trim(), svcDateFrom, svcStartTime, user.displayName || 'En i familien').catch(() => {});
+        }
+      } catch {}
+
       resetServiceForm();
       setShowAddService(false);
       loadData();
@@ -255,6 +288,20 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     setActivePicker(null);
   };
 
+  const getDaysUntilBadge = (dateStr: string) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const target = new Date(dateStr);
+    target.setHours(0, 0, 0, 0);
+    const diff = Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+    if (diff === 0) return { text: t('homes.today'), color: '#43A047', bg: '#E8F5E9' };
+    if (diff === 1) return { text: t('homes.tomorrow'), color: '#FB8C00', bg: '#FFF3E0' };
+    if (diff > 0) return { text: t('homes.inXDays', { count: diff }), color: '#1976D2', bg: '#E3F2FD' };
+    const absDiff = Math.abs(diff);
+    if (absDiff === 1) return { text: t('homes.yesterday'), color: '#C62828', bg: '#FFEBEE' };
+    return { text: t('homes.xDaysAgo', { count: absDiff }), color: '#C62828', bg: '#FFEBEE' };
+  };
+
   if (loading) {
     return (<SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}><ActivityIndicator size="large" color={HOME_THEME} style={{ marginTop: 100 }} /></SafeAreaView>);
   }
@@ -292,11 +339,14 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
             <Text style={{ fontSize: 13, color: colors.textDisabled, textAlign: 'center', padding: 16 }}>{t('homes.noServices')}</Text>
           ) : services.map((svc) => {
             const freqLabel = FREQUENCY_OPTIONS.find((f) => f.value === svc.frequency);
+            const badge = getDaysUntilBadge(svc.dateFrom);
             return (
-              <TouchableOpacity key={svc.id} style={[styles.serviceCard, { backgroundColor: colors.inputBackground }]} onLongPress={() => setServiceActionModal({ visible: true, id: svc.id, title: svc.title })}>
+              <TouchableOpacity key={svc.id} style={[styles.serviceCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('HomeServiceDetail', { service: svc, home })} onLongPress={() => setServiceActionModal({ visible: true, id: svc.id, title: svc.title })}>
                 <View style={styles.serviceCardHeader}>
                   <Text style={[styles.serviceCardTitle, { color: colors.text }]}>{svc.title}</Text>
-                  {svc.status === 'completed' && <View style={[styles.statusBadge, { backgroundColor: '#E8F5E9' }]}><Text style={{ fontSize: 10, fontWeight: '600', color: '#43A047' }}>✓ {t('homes.projectCompleted')}</Text></View>}
+                  <View style={[styles.daysBadge, { backgroundColor: badge.bg }]}>
+                    <Text style={{ fontSize: 10, fontWeight: '700', color: badge.color }}>{badge.text}</Text>
+                  </View>
                 </View>
                 <View style={styles.serviceCardDetails}>
                   <Text style={{ fontSize: 12, color: colors.textSecondary }}>📅 {formatDate(svc.dateFrom)}</Text>
@@ -506,6 +556,7 @@ const styles = StyleSheet.create({
   serviceCard: { borderRadius: 10, padding: 12, marginBottom: 8 },
   serviceCardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 },
   serviceCardTitle: { fontSize: 14, fontWeight: '700', flex: 1 },
+  daysBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
   serviceCardDetails: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
   colorItem: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingVertical: 10, borderBottomWidth: 1 },

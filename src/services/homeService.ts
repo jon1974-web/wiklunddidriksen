@@ -94,6 +94,12 @@ export async function getHomeServices(familyId: string, homeId: string): Promise
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HomeService));
 }
 
+export async function getAllHomeServices(familyId: string): Promise<HomeService[]> {
+  const q = query(collection(db, 'homeServices'), where('familyId', '==', familyId), orderBy('dateFrom', 'asc'));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HomeService));
+}
+
 export async function addHomeService(data: Omit<HomeService, 'id' | 'createdAt'>): Promise<string> {
   const docRef = await addDoc(collection(db, 'homeServices'), { ...data, createdAt: Date.now() });
   return docRef.id;

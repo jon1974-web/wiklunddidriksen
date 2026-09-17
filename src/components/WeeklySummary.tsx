@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
-import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity } from '../types';
+import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity, HomeService } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +34,7 @@ interface WeeklySummaryProps {
   kindergartenActivities?: KindergartenActivity[];
   schoolChildren?: SchoolChild[];
   kindergartenChildren?: KindergartenChild[];
+  homeServices?: HomeService[];
 }
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
@@ -96,7 +97,7 @@ const statStyles = StyleSheet.create({
   label: { fontSize: 8, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.3 },
 });
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {}, schoolHolidays = [], kindergartenHolidays = [], schoolChildren = [], kindergartenChildren = [], schoolActivities = [], kindergartenActivities = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {}, schoolHolidays = [], kindergartenHolidays = [], schoolChildren = [], kindergartenChildren = [], schoolActivities = [], kindergartenActivities = [], homeServices = [] }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
@@ -128,6 +129,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     let holidayCount = 0;
     let schoolActivityCount = 0;
     let kindergartenActivityCount = 0;
+    let homeServiceCount = 0;
 
     // Build days with items
     const days: { date: Date; dayName: string; dayNameShort: string; dateNum: number; monthStr: string; items: { type: string; icon: string; iconBg: string; title: string; time: string }[] }[] = [];
@@ -274,6 +276,16 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
         }
       });
 
+      // Home services
+      homeServices.forEach((s) => {
+        const end = s.dateTo || s.dateFrom;
+        if (dateStr >= s.dateFrom && dateStr <= end) {
+          const time = s.endTime ? `${s.startTime || ''} – ${s.endTime}` : s.startTime || '';
+          items.push({ type: 'homeService', icon: 'vedlikehold', iconBg: MODULE_COLORS.home, title: s.title, time });
+          homeServiceCount++;
+        }
+      });
+
       // Sort: events/activities/trips by startTime first, then health/pet/holidays, then birthdays at bottom
       const birthdaysItems = items.filter(i => i.type === 'birthday');
       const otherItems = items.filter(i => i.type !== 'birthday');
@@ -295,8 +307,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
       });
     }
 
-    return { weekNum, days, eventCount, healthCount, petCount, tripCount, birthdayCount, holidayCount, schoolActivityCount, kindergartenActivityCount, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
-  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolHolidays, kindergartenHolidays, schoolChildren, kindergartenChildren, schoolActivities, kindergartenActivities, t, i18nInstance, langKey]);
+    return { weekNum, days, eventCount, healthCount, petCount, tripCount, birthdayCount, holidayCount, schoolActivityCount, kindergartenActivityCount, homeServiceCount, startLabel: start.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long' }), endLabel: end.toLocaleDateString(getLocale(i18n.language), { day: 'numeric', month: 'long', year: 'numeric' }) };
+  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolHolidays, kindergartenHolidays, schoolChildren, kindergartenChildren, schoolActivities, kindergartenActivities, homeServices, t, i18nInstance, langKey]);
 
   // Meal plan data
   const mealData = useMemo(() => {
@@ -348,6 +360,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             {weekData.tripCount > 0 && <StatChip count={weekData.tripCount} label={t('weekly.trips')} color={MODULE_COLORS.trips} />}
             {weekData.schoolActivityCount > 0 && <StatChip count={weekData.schoolActivityCount} label={t('weekly.schoolActivities')} color={MODULE_COLORS.school} />}
             {weekData.kindergartenActivityCount > 0 && <StatChip count={weekData.kindergartenActivityCount} label={t('weekly.kindergartenActivities')} color={MODULE_COLORS.kindergarten} />}
+            {weekData.homeServiceCount > 0 && <StatChip count={weekData.homeServiceCount} label={t('homes.serviceAppointments')} color={MODULE_COLORS.home} />}
             {weekData.birthdayCount > 0 && <StatChip count={weekData.birthdayCount} label={t('birthdays.title')} color={MODULE_COLORS.birthdays} />}
           </View>
 
@@ -360,7 +373,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                   <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={colors.accent} />
                   <View style={styles.dayCardItems}>
                     {day.items.length > 0 ? day.items.map((item, i) => {
-                      const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'schoolActivity' ? MODULE_COLORS.school : item.type === 'kindergartenActivity' ? MODULE_COLORS.kindergarten : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : MODULE_COLORS.birthdays;
+                      const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'schoolActivity' ? MODULE_COLORS.school : item.type === 'kindergartenActivity' ? MODULE_COLORS.kindergarten : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : item.type === 'homeService' ? MODULE_COLORS.home : MODULE_COLORS.birthdays;
                       const isEmoji = item.icon && item.icon.length <= 2 && /[\u{1F000}-\u{1FFFF}]/u.test(item.icon);
                       return (
                         <View key={i} style={styles.itemRow}>

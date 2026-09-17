@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity, HomeService } from '../types';
 import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
@@ -21,6 +21,7 @@ import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications }
 import { getUserProfile } from '../services/familyService';
 import { getSchoolActivities } from '../services/schoolService';
 import { getKindergartenActivities } from '../services/kindergartenService';
+import { getAllHomeServices } from '../services/homeService';
 import { AddEventModal } from '../components/AddEventModal';
 import { getAllSchoolHolidays, getSchoolChildren } from '../services/schoolService';
 import { getAllKindergartenHolidays, getKindergartenChildren } from '../services/kindergartenService';
@@ -132,6 +133,7 @@ type UnifiedItem =
   | (PetVaccination & { _type: 'petVaccination'; title: string; address?: string; time: string; icon?: string })
   | (SchoolActivity & { _type: 'schoolActivity'; time: string; address?: string; icon?: string })
   | (KindergartenActivity & { _type: 'kindergartenActivity'; time: string; address?: string; icon?: string })
+  | (HomeService & { _type: 'homeService'; time: string; address?: string; icon?: string })
   | (Birthday & { _type: 'birthday'; title: string; date: string; time: string });
 
 export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route }) => {
@@ -153,6 +155,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
   const [kindergartenChildren, setKindergartenChildren] = useState<KindergartenChild[]>([]);
   const [schoolActivities, setSchoolActivities] = useState<SchoolActivity[]>([]);
   const [kindergartenActivities, setKindergartenActivities] = useState<KindergartenActivity[]>([]);
+  const [homeServices, setHomeServices] = useState<HomeService[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
@@ -288,14 +291,23 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     }
   }, [familyId]);
 
+  const loadHomeServicesData = useCallback(async () => {
+    if (!familyId) return;
+    try {
+      const data = await getAllHomeServices(familyId);
+      setHomeServices(data);
+    } catch {}
+  }, [familyId]);
+
   useEffect(() => {
     loadTrips();
     loadHealth();
     loadPets();
     loadHolidays();
-    const unsubscribe = navigation.addListener('focus', () => { loadTrips(); loadHealth(); loadPets(); loadHolidays(); });
+    loadHomeServicesData();
+    const unsubscribe = navigation.addListener('focus', () => { loadTrips(); loadHealth(); loadPets(); loadHolidays(); loadHomeServicesData(); });
     return unsubscribe;
-  }, [navigation, loadTrips, loadHealth, loadHolidays]);
+  }, [navigation, loadTrips, loadHealth, loadHolidays, loadHomeServicesData]);
 
   useEffect(() => {
     if (!familyId) return;
@@ -518,7 +530,13 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       }).map((b) => ({
         ...b, _type: 'birthday' as const, title: `🎂 ${b.name}`, date: selectedDate, birthDate: b.date, time: '',
       }));
-      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities, ...dayBirthdays];
+      const dayHomeServices = homeServices.filter((s) => {
+        const end = s.dateTo || s.dateFrom;
+        return selectedDate >= s.dateFrom && selectedDate <= end;
+      }).map((s) => ({
+        ...s, _type: 'homeService' as const, time: s.startTime || '09:00', title: s.title, icon: 'vedlikehold',
+      }));
+      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities, ...dayHomeServices, ...dayBirthdays];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
       else if (filterModule === 'health') dayItems = dayItems.filter((i) => i._type === 'healthAppointment');
       else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
@@ -526,6 +544,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       else if (filterModule === 'school') dayItems = dayItems.filter((i) => i._type === 'schoolActivity');
       else if (filterModule === 'kindergarten') dayItems = dayItems.filter((i) => i._type === 'kindergartenActivity');
       else if (filterModule === 'birthday') dayItems = dayItems.filter((i) => i._type === 'birthday');
+      else if (filterModule === 'home') dayItems = dayItems.filter((i) => i._type === 'homeService');
       else if (filterSource && filterSource !== 'app') dayItems = dayItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
       else if (filterSource === 'app') dayItems = dayItems.filter((i) => i._type === 'event' || i._type === 'trip');
       dayItems.sort(sortByDate);
@@ -595,6 +614,16 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         description: a.activityType,
         icon: 'kindergarten',
       })),
+      ...homeServices.filter(s => s.dateFrom).map((s) => ({
+        ...s,
+        _type: 'homeService' as const,
+        time: s.startTime || '09:00',
+        address: '',
+        title: s.title,
+        date: s.dateFrom,
+        description: s.description || '',
+        icon: 'vedlikehold',
+      })),
       ...birthdays.map((b) => {
         const bDate = new Date(b.date);
         const bMonthDay = `${String(bDate.getMonth() + 1).padStart(2, '0')}-${String(bDate.getDate()).padStart(2, '0')}`;
@@ -617,6 +646,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     else if (filterModule === 'school') filtered = allItems.filter((i) => i._type === 'schoolActivity');
     else if (filterModule === 'kindergarten') filtered = allItems.filter((i) => i._type === 'kindergartenActivity');
     else if (filterModule === 'birthday') filtered = allItems.filter((i) => i._type === 'birthday');
+    else if (filterModule === 'home') filtered = allItems.filter((i) => i._type === 'homeService');
     else if (filterSource && filterSource !== 'app') filtered = allItems.filter((i) => i._type === 'spond' && i.groupName === filterSource);
     else if (filterSource === 'app') filtered = allItems.filter((i) => i._type === 'event' || i._type === 'trip' || i._type === 'birthday');
     const upcoming = filtered.filter((i) => getDateStr(i) >= today);
@@ -624,7 +654,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     return showPastEvents
       ? [...upcoming.sort(sortByDate), ...past.sort(sortByDate).reverse()]
       : upcoming.sort(sortByDate);
-  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolActivities, kindergartenActivities, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource, filterModule]);
+  }, [events, trips, spondEvents, birthdays, healthAppointments, healthVaccinations, petVetVisits, petVaccinations, schoolActivities, kindergartenActivities, homeServices, viewMode, selectedDate, showPastEvents, today, threeMonthsAgo, filterSource, filterModule]);
 
   const hasPastItems = useMemo(() => {
     const getDateStr = (item: UnifiedItem): string => {
@@ -795,9 +825,19 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       }
     });
 
+    // Home service dots
+    homeServices.forEach((s) => {
+      if (!s.dateFrom) return;
+      if (!marks[s.dateFrom]) {
+        marks[s.dateFrom] = { marked: true, dotColor: MODULE_COLORS.home };
+      } else {
+        marks[s.dateFrom] = { ...marks[s.dateFrom], marked: true, dotColor: MODULE_COLORS.home };
+      }
+    });
+
     marks[selectedDate] = { ...marks[selectedDate], selected: true, selectedColor: colors.accent };
     return marks;
-  }, [events, trips, spondEvents, birthdays, healthAppointments, schoolActivities, kindergartenActivities, petVetVisits, selectedDate, colors.accent]);
+  }, [events, trips, spondEvents, birthdays, healthAppointments, schoolActivities, kindergartenActivities, petVetVisits, homeServices, selectedDate, colors.accent]);
 
   const currentWeek = useMemo(() => getWeekNumber(new Date(selectedDate)), [selectedDate]);
 
@@ -1129,6 +1169,47 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         </TouchableOpacity>
       );
     }
+    if (item._type === 'homeService') {
+      const HOME_COLOR = MODULE_COLORS.home;
+      const d = toDateSafe((item as any).dateFrom);
+      const calDay = d ? d.getDate() : '?';
+      const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
+      const calMonth = d ? MONTHS_SV[d.getMonth()] : '';
+      const calDayName = d ? t(DAY_KEYS[d.getDay()]) : '';
+      const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
+      return (
+        <TouchableOpacity
+          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: HOME_COLOR }]}
+          onPress={() => navigation.navigate('Trips', { screen: 'HomeServiceDetail', params: { service: item } })}
+        >
+          <View style={styles.spondCardRow}>
+            <View style={styles.spondCalIcon}>
+              <View style={[styles.spondCalTopBar, { backgroundColor: HOME_COLOR }]}>
+                <Text style={styles.spondCalYear}>{calDayName}</Text>
+              </View>
+              <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
+              <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
+            </View>
+            <View style={styles.spondCardContent}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+                <AppIcon name="vedlikehold" size={14} color={HOME_COLOR} />
+                <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
+              </View>
+              <View style={styles.spondTimeRow}>
+                <View style={styles.spondClockOuter}>
+                  <View style={styles.spondClockHandV} />
+                  <View style={styles.spondClockHandH} />
+                </View>
+                <Text style={[styles.spondCardTime, { color: colors.text }]}>{timeText}</Text>
+              </View>
+              {item.description ? (
+                <Text style={[styles.spondCardAddress, { color: colors.textSecondary }]} numberOfLines={1}>{item.description}</Text>
+              ) : null}
+            </View>
+          </View>
+        </TouchableOpacity>
+      );
+    }
     if (item._type === 'birthday') {
       const BIRTHDAY_COLOR = MODULE_COLORS.birthdays;
       const MONTHS_SV = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
@@ -1305,6 +1386,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
               >
                 <AppIcon name="kindergarten" size={18} color={filterModule === 'kindergarten' ? '#fff' : MODULE_COLORS.kindergarten} />
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sortIconBtn, { borderColor: colors.border }, filterModule === 'home' && { backgroundColor: MODULE_COLORS.home, borderColor: MODULE_COLORS.home }]}
+                onPress={() => { const v = filterModule === 'home' ? null : 'home'; setFilterModule(v); setShowSortPanel(false); }}
+              >
+                <AppIcon name="vedlikehold" size={18} color={filterModule === 'home' ? '#fff' : MODULE_COLORS.home} />
+              </TouchableOpacity>
             </View>
             {Object.keys(spondGroupLogos).length > 0 && (
               <>
@@ -1413,6 +1500,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         kindergartenActivities={kindergartenActivities}
         schoolChildren={schoolChildren}
         kindergartenChildren={kindergartenChildren}
+        homeServices={homeServices}
       />
 
       <ActionModal
