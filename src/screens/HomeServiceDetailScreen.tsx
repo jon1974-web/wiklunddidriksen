@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, Linking } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
-import { HomeService, Home } from '../types';
+import { HomeService, Home, SchoolActivityDocument } from '../types';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { formatDate } from '../utils/dateUtils';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
@@ -12,6 +12,8 @@ import { AppIcon } from '../components/AppIcon';
 import { deleteHomeService } from '../services/homeService';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
+import { DocumentUpload } from '../components/DocumentUpload';
+import { updateHomeService } from '../services/homeService';
 
 interface Props {
   navigation: any;
@@ -171,10 +173,10 @@ export const HomeServiceDetailScreen: React.FC<Props> = ({ navigation, route }) 
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: HOME_COLOR, flex: 1 }]}
             onPress={() => {
-              navigation.goBack();
+              navigation.navigate('HomeMaintenance', { home, editServiceId: service.id });
             }}
           >
-            <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.close')}</Text>
+            <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.edit')}</Text>
           </TouchableOpacity>
           {canDelete && (
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#fff', borderColor: colors.danger, borderWidth: 1.5, flex: 1 }]} onPress={() => setShowDeleteModal(true)}>
@@ -182,6 +184,40 @@ export const HomeServiceDetailScreen: React.FC<Props> = ({ navigation, route }) 
             </TouchableOpacity>
           )}
         </View>
+      </View>
+
+      {/* Documents */}
+      <View style={[styles.card, { backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: HOME_COLOR }]}>{t('homes.documents')}</Text>
+        {service.documents && service.documents.length > 0 ? (
+          service.documents.map((doc, i) => (
+            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (service.documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
+              {doc.type === 'image' ? (
+                <Image source={{ uri: doc.url }} style={{ width: 48, height: 48, borderRadius: 8 }} resizeMode="cover" />
+              ) : (
+                <View style={{ width: 48, height: 48, borderRadius: 8, backgroundColor: '#FFF3E0', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 20 }}>📄</Text>
+                </View>
+              )}
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }} numberOfLines={1}>{doc.fileName}</Text>
+                <Text style={{ fontSize: 12, color: HOME_COLOR }}>{t('documents.open')} →</Text>
+              </View>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <View style={{ marginTop: 8 }}>
+            <DocumentUpload
+              storagePath={`home-services/${service.id}/documents`}
+              onUploaded={async (doc) => {
+                const docs = [...(service.documents || []), doc];
+                await updateHomeService(service.id, { documents: docs });
+                navigation.setParams({ service: { ...service, documents: docs } });
+              }}
+              accentColor={HOME_COLOR}
+            />
+          </View>
+        )}
       </View>
 
       <ActionModal

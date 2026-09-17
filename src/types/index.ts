@@ -774,6 +774,7 @@ export interface HomeService {
   reminder: number;
   frequency: 'once' | 'monthly' | 'quarterly' | 'yearly';
   status: 'planned' | 'completed';
+  documents?: SchoolActivityDocument[];
   familyId: string;
   createdAt: number;
 }

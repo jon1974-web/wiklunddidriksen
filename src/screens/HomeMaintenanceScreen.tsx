@@ -31,7 +31,7 @@ const FREQUENCY_OPTIONS = [
 
 interface HomeMaintenanceScreenProps {
   navigation: any;
-  route: { params: { home: Home } };
+  route: { params: { home: Home; editServiceId?: string } };
 }
 
 export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ navigation, route }) => {
@@ -89,6 +89,25 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
   }, [familyId, home.id]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  useEffect(() => {
+    if (route.params?.editServiceId && services.length > 0) {
+      const svc = services.find((s) => s.id === route.params.editServiceId);
+      if (svc) {
+        setSvcTitle(svc.title);
+        setSvcDescription(svc.description);
+        setSvcDateFrom(svc.dateFrom);
+        setSvcDateTo(svc.dateTo || svc.dateFrom);
+        setSvcStartTime(svc.startTime);
+        setSvcEndTime(svc.endTime || svc.startTime);
+        setSvcReminder(svc.reminder);
+        setSvcFrequency(svc.frequency);
+        setEditingService(svc.id);
+        setShowAddService(true);
+        navigation.setParams({ editServiceId: undefined });
+      }
+    }
+  }, [route.params?.editServiceId, services]);
 
   const resetServiceForm = () => {
     setSvcTitle('');
