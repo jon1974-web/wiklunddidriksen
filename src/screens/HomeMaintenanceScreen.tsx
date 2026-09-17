@@ -435,10 +435,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppIcon name="vedlikehold" size={28} color={HOME_THEME} />
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.screenTitle, { color: colors.text }]}>{t('homes.maintenance')}</Text>
-            <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
-          </View>
+          <Text style={[styles.screenTitle, { color: colors.text }]}>{t('homes.maintenance')}</Text>
           <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
@@ -446,6 +443,8 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
               </View>
             </View>
           </TouchableOpacity>
+          <View style={{ flex: 1 }} />
+          <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
         </View>
       </View>
       <ScrollView style={styles.content}>

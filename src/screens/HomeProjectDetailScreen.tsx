@@ -652,10 +652,9 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppIcon name="activities" size={28} color={HOME_THEME} />
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.screenTitle, { color: colors.text }]} numberOfLines={1}>{project.title}</Text>
-            <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
-          </View>
+          <Text style={[styles.screenTitle, { color: colors.text }]} numberOfLines={1}>{project.title}</Text>
+          <View style={{ flex: 1 }} />
+          <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
         </View>
         {project.budget > 0 && (
           <View style={[styles.budgetSummary, { backgroundColor: colors.inputBackground }]}>
