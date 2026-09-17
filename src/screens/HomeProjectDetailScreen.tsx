@@ -654,8 +654,6 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           <AppIcon name="activities" size={28} color={HOME_THEME} />
           <Text style={[styles.screenTitle, { color: colors.text }]} numberOfLines={1}>{project.title}</Text>
         </View>
-        <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>{home.name}</Text>
-        <Text style={{ fontSize: 13, color: colors.textSecondary }}>Munkis</Text>
         {project.budget > 0 && (
           <View style={[styles.budgetSummary, { backgroundColor: colors.inputBackground }]}>
             <View style={{ flex: 1 }}>
