@@ -198,6 +198,7 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
                   style={[styles.homeCard, { backgroundColor: colors.surface }]}
                   onPress={() => {
                   if (route?.params?.openAddSection === 'services') {
+                    navigation.setParams({ openAddSection: undefined });
                     navigation.navigate('HomeMaintenance', { home, openAddSection: 'services' });
                   } else {
                     navigation.navigate('HomeDetail', { home });
