@@ -484,7 +484,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
           ) : paintColors.map((color) => {
             const project = color.projectId ? projects.find((p) => p.id === color.projectId) : null;
             return (
-            <TouchableOpacity key={color.id} style={[styles.colorItem, { borderBottomColor: colors.border }]} onLongPress={() => {
+            <TouchableOpacity key={color.id} style={[styles.colorItem, { borderBottomColor: colors.border }]} onPress={() => navigation.navigate('HomeColorDetail', { color })} onLongPress={() => {
               if (!color.projectId) {
                 setColorActionModal({ visible: true, id: color.id, title: color.name || color.code });
               }

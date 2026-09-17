@@ -715,6 +715,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
             paintColors.map((color) => (
               <TouchableOpacity
                 key={color.id}
+                onPress={() => navigation.navigate('HomeColorDetail', { color, project })}
                 style={[styles.colorItem, { borderBottomColor: colors.border }]}
                 onLongPress={() => setColorActionModal({ visible: true, id: color.id, title: color.name || color.code })}
               >
