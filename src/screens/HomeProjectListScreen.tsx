@@ -15,6 +15,7 @@ import i18n from '../i18n';
 import { Home, HomeProject } from '../types';
 import { getHomeProjects, addHomeProject, updateHomeProject, deleteHomeProject } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
+import { HelpCenter } from '../components/HelpCenter';
 
 const HOME_THEME = MODULE_COLORS.home;
 
@@ -48,6 +49,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
   const [formStartDate, setFormStartDate] = useState('');
   const [formStatus, setFormStatus] = useState<'active' | 'completed' | 'on-hold'>('active');
   const [activePicker, setActivePicker] = useState<'startDate' | null>(null);
+  const [showHelp, setShowHelp] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const loadProjects = useCallback(async () => {
@@ -162,6 +164,13 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
             <AppIcon name="activities" size={28} color={HOME_THEME} />
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('homes.projects')}</Text>
           </View>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
+            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
           <TouchableOpacity
             style={[styles.addButton, { backgroundColor: HOME_THEME }]}
             onPress={() => { resetForm(); setShowAddModal(true); }}
@@ -316,6 +325,16 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
           </View>
         </View>
       </Modal>
+
+      <HelpCenter
+        visible={showHelp}
+        onClose={() => setShowHelp(false)}
+        title={t('homes.prosjektHelpTitle')}
+        sections={[
+          { icon: '📋', title: t('homes.prosjektHelpWhat'), text: t('homes.prosjektHelpWhatText') },
+          { icon: '👉', title: t('homes.prosjektHelpHow'), text: t('homes.prosjektHelpHowText'), tip: t('homes.prosjektHelpTip') },
+        ]}
+      />
 
       <DatePickerModal
         visible={activePicker !== null}

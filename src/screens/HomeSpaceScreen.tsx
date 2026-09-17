@@ -179,7 +179,7 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppIcon name="house" size={28} color={HOME_THEME} />
           <Text style={[styles.screenTitle, { color: colors.text }]}>{t('spaces.home')}</Text>
-          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: HOME_THEME, alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
             <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: HOME_THEME, alignItems: 'center', justifyContent: 'center' }}>
                 <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
