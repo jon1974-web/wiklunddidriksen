@@ -833,6 +833,9 @@
     "kindergartenActivityTitle": "Photo to kindergarten activity",
     "kindergartenActivityInstruction": "Take or choose a photo to create a new kindergarten activity",
     "kindergartenActivityCreated": "Kindergarten activity created!",
+    "homeServiceTitle": "Photo to service appointment",
+    "homeServiceInstruction": "Take or choose a photo to create a new service appointment",
+    "homeServiceCreated": "Service appointment created!",
     "noActivities": "No activities found in the image",
     "activitiesFound": "activities found",
     "singleCreated": "activity created",
@@ -1272,7 +1275,11 @@
     "voiceSchool": "Voice",
     "photoSchool": "Photo",
     "voiceKindergarten": "Voice",
-    "photoKindergarten": "Photo"
+    "photoKindergarten": "Photo",
+    "homeService": "Our homes",
+    "addService": "Manual",
+    "voiceService": "Voice",
+    "photoService": "Photo"
   },
   "tabs": {
     "events": "Events",
@@ -1325,7 +1332,9 @@
     "voiceHealthTitle": "Voice to health appointment",
     "voiceVetTitle": "Voice to vet visit",
     "voiceSchoolTitle": "Voice to school activity",
-    "voiceKindergartenTitle": "Voice to kindergarten activity"
+    "voiceKindergartenTitle": "Voice to kindergarten activity",
+    "voiceServiceExample": "e.g. \"Service appointment for heat pump on Thursday at 10am\"",
+    "voiceServiceTitle": "Voice to service appointment"
   },
   "admin": {
     "title": "Admin Panel",

@@ -833,6 +833,9 @@
     "kindergartenActivityTitle": "Foto til barnehageaktivitet",
     "kindergartenActivityInstruction": "Ta eller velg et bilde for å opprette en ny barnehageaktivitet",
     "kindergartenActivityCreated": "Barnehageaktivitet opprettet!",
+    "homeServiceTitle": "Foto til serviceavtale",
+    "homeServiceInstruction": "Ta eller velg et bilde for å opprette en ny serviceavtale",
+    "homeServiceCreated": "Serviceavtale opprettet!",
     "noActivities": "Ingen aktiviteter funnet i bildet",
     "activitiesFound": "aktiviteter funnet",
     "singleCreated": "aktivitet opprettet",
@@ -1272,7 +1275,11 @@
     "voiceSchool": "Tale",
     "photoSchool": "Foto",
     "voiceKindergarten": "Tale",
-    "photoKindergarten": "Foto"
+    "photoKindergarten": "Foto",
+    "homeService": "Våre hjem",
+    "addService": "Manuelt",
+    "voiceService": "Tale",
+    "photoService": "Foto"
   },
   "tabs": {
     "events": "Avtaler",
@@ -1325,7 +1332,9 @@
     "voiceHealthTitle": "Tale til helsetime",
     "voiceVetTitle": "Tale til veterinærtime",
     "voiceSchoolTitle": "Tale til skoleaktivitet",
-    "voiceKindergartenTitle": "Tale til barnehageaktivitet"
+    "voiceKindergartenTitle": "Tale til barnehageaktivitet",
+    "voiceServiceExample": "F.eks. \"Serviceavtale for varmepumpe på torsdag klokken 10\"",
+    "voiceServiceTitle": "Tale til serviceavtale"
   },
   "admin": {
     "title": "Adminpanel",

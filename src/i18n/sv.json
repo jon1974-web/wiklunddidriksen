@@ -889,6 +889,9 @@
     "kindergartenActivityTitle": "Foto till förskoleaktivitet",
     "kindergartenActivityInstruction": "Ta eller välj ett foto för att skapa en ny förskoleaktivitet",
     "kindergartenActivityCreated": "Förskoleaktivitet skapad!",
+    "homeServiceTitle": "Foto till serviceavtal",
+    "homeServiceInstruction": "Ta eller välj ett foto för att skapa ett nytt serviceavtal",
+    "homeServiceCreated": "Serviceavtal skapat!",
     "noActivities": "Inga aktiviteter hittades i bilden",
     "activitiesFound": "aktiviteter hittades",
     "singleCreated": "aktivitet skapad",
@@ -1272,7 +1275,11 @@
     "voiceSchool": "Tal",
     "photoSchool": "Foto",
     "voiceKindergarten": "Tal",
-    "photoKindergarten": "Foto"
+    "photoKindergarten": "Foto",
+    "homeService": "Våra hem",
+    "addService": "Manuellt",
+    "voiceService": "Tal",
+    "photoService": "Foto"
   },
   "tabs": {
     "events": "Evenemang",
@@ -1325,7 +1332,9 @@
     "voiceHealthTitle": "Tal till hälsovård",
     "voiceVetTitle": "Tal till veterinär",
     "voiceSchoolTitle": "Tal till skolaktivitet",
-    "voiceKindergartenTitle": "Tal till förskoleaktivitet"
+    "voiceKindergartenTitle": "Tal till förskoleaktivitet",
+    "voiceServiceExample": "t.ex. \"Serviceavtal för värmepump på torsdag klockan 10\"",
+    "voiceServiceTitle": "Tal till serviceavtal"
   },
   "admin": {
     "title": "Adminpanel",

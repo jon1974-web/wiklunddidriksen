@@ -5,6 +5,7 @@ import { addHealthAppointment } from '../services/healthService';
 import { addVetVisit } from '../services/petService';
 import { addSchoolActivity } from '../services/schoolService';
 import { addKindergartenActivity } from '../services/kindergartenService';
+import { addHomeService } from '../services/homeService';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
@@ -14,7 +15,7 @@ import { auth } from '../services/firebase';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 
-type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity';
+type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService';
 
 interface VoiceActivityScreenProps {
   navigation: any;
@@ -41,6 +42,7 @@ const ACTIVITY_LABELS: Record<ActivityType, string> = {
   vetVisit: 'veterinærbesøk',
   schoolActivity: 'skoleaktivitet',
   kindergartenActivity: 'barnehageaktivitet',
+  homeService: 'serviceavtale',
 };
 
 const ACTIVITY_EXAMPLE_KEYS: Record<ActivityType, string> = {
@@ -48,6 +50,7 @@ const ACTIVITY_EXAMPLE_KEYS: Record<ActivityType, string> = {
   vetVisit: 'voiceActivity.voiceVetExample',
   schoolActivity: 'voiceActivity.voiceSchoolExample',
   kindergartenActivity: 'voiceActivity.voiceKindergartenExample',
+  homeService: 'voiceActivity.voiceServiceExample',
 };
 
 const ACTIVITY_TITLE_KEYS: Record<ActivityType, string> = {
@@ -55,6 +58,7 @@ const ACTIVITY_TITLE_KEYS: Record<ActivityType, string> = {
   vetVisit: 'voiceActivity.voiceVetTitle',
   schoolActivity: 'voiceActivity.voiceSchoolTitle',
   kindergartenActivity: 'voiceActivity.voiceKindergartenTitle',
+  homeService: 'voiceActivity.voiceServiceTitle',
 };
 
 const ACTIVITY_TYPE_OPTIONS: Array<{ value: 'tur' | 'aktivitet' | 'møte'; label: string }> = [
@@ -106,6 +110,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
   const showPerson = type === 'healthAppointment';
   const showActivityType = type === 'schoolActivity' || type === 'kindergartenActivity';
   const showDoctor = type === 'healthAppointment' || type === 'vetVisit';
+  const isHomeService = type === 'homeService';
 
   const accentColor = moduleColor;
 
@@ -299,6 +304,18 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           note: '',
           reminder: parsedData.reminder,
           createdBy: user.uid,
+        });
+      } else if (type === 'homeService') {
+        await addHomeService({
+          homeId: '',
+          title: parsedData.title,
+          description: '',
+          dateFrom: parsedData.dateFrom,
+          startTime: parsedData.startTime,
+          reminder: parsedData.reminder,
+          frequency: 'once',
+          status: 'planned',
+          familyId: familyId || '',
         });
       }
 

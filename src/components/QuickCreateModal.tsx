@@ -86,6 +86,17 @@ const SECTIONS: Section[] = [
     ],
   },
   {
+    key: 'homeService',
+    color: MODULE_COLORS.home,
+    moduleIcon: 'vedlikehold',
+    labelKey: 'quickCreate.homeService',
+    items: [
+      { icon: 'pencil' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HomeSpace', params: { openAddSection: 'services', _t: Date.now() } }), labelKey: 'quickCreate.addService' },
+      { icon: 'microphone' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HomeSpace', params: { openAddSection: 'services', _t: Date.now() } }), labelKey: 'quickCreate.voiceService' },
+      { icon: 'camera' as IconName, nav: (n: any) => n.navigate('Trips', { screen: 'HomeSpace', params: { openAddSection: 'services', _t: Date.now() } }), labelKey: 'quickCreate.photoService' },
+    ],
+  },
+  {
     key: 'trips',
     color: MODULE_COLORS.trips,
     moduleIcon: 'transport',

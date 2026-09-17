@@ -889,6 +889,9 @@
     "kindergartenActivityTitle": "Valokuva päiväkotiaktiviteetiksi",
     "kindergartenActivityInstruction": "Ota tai valitse kuva luodaksesi uuden päiväkotiaktiviteetin",
     "kindergartenActivityCreated": "Päiväkotiaktiviteetti luotu!",
+    "homeServiceTitle": "Valokuva huoltoajanvaraukseksi",
+    "homeServiceInstruction": "Ota tai valitse kuva luodaksesi uuden huoltoajanvarauksen",
+    "homeServiceCreated": "Huoltoajanvaraus luotu!",
     "noActivities": "Ei aktiviteetteja löytynyt kuvasta",
     "activitiesFound": "aktiviteettia löytynyt",
     "singleCreated": "aktiviteetti luotu",
@@ -1272,7 +1275,11 @@
     "voiceSchool": "Puhe",
     "photoSchool": "Valokuva",
     "voiceKindergarten": "Puhe",
-    "photoKindergarten": "Valokuva"
+    "photoKindergarten": "Valokuva",
+    "homeService": "Kotimme",
+    "addService": "Manuaalinen",
+    "voiceService": "Puhe",
+    "photoService": "Valokuva"
   },
   "tabs": {
     "events": "Tapahtumamme",
@@ -1325,7 +1332,9 @@
     "voiceHealthTitle": "Puhe terveysaikaan",
     "voiceVetTitle": "Puhe eläinlääkärille",
     "voiceSchoolTitle": "Puhe koulutoimintaan",
-    "voiceKindergartenTitle": "Puhe päiväkotitoimintaan"
+    "voiceKindergartenTitle": "Puhe päiväkotitoimintaan",
+    "voiceServiceExample": "esim. \"Huoltoajan lämpöpumpulle torstaina klo 10\"",
+    "voiceServiceTitle": "Puhe huoltoajanvaraukseen"
   },
   "admin": {
     "title": "Ylläpitopaneeli",

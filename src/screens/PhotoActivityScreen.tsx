@@ -8,6 +8,7 @@ import { addHealthAppointment } from '../services/healthService';
 import { addVetVisit } from '../services/petService';
 import { addSchoolActivity } from '../services/schoolService';
 import { addKindergartenActivity } from '../services/kindergartenService';
+import { addHomeService } from '../services/homeService';
 import { getReminderOptions } from '../constants/eventOptions';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
@@ -18,7 +19,7 @@ import { sanitizeInput } from '../utils/validation';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { auth } from '../services/firebase';
 
-type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity';
+type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService';
 
 interface PhotoActivityScreenProps {
   navigation: any;
@@ -94,6 +95,14 @@ const ACTIVITY_TYPE_CONFIG: Record<ActivityType, {
     hasPerson: false,
     hasDoctor: false,
     hasActivityType: true,
+  },
+  homeService: {
+    titleKey: 'photoActivity.homeServiceTitle',
+    instructionKey: 'photoActivity.homeServiceInstruction',
+    createSuccessKey: 'photoActivity.homeServiceCreated',
+    hasPerson: false,
+    hasDoctor: false,
+    hasActivityType: false,
   },
 };
 
@@ -280,6 +289,18 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           note: activity.description ? sanitizeInput(activity.description) : undefined,
           reminder: activity.reminder || undefined,
           createdBy: user.uid,
+        });
+      } else if (type === 'homeService') {
+        await addHomeService({
+          homeId: '',
+          title: sanitizeInput(activity.title),
+          description: activity.description ? sanitizeInput(activity.description) : '',
+          dateFrom: activity.dateFrom,
+          startTime: activity.startTime,
+          reminder: activity.reminder || 0,
+          frequency: 'once',
+          status: 'planned',
+          familyId: familyId || '',
         });
       }
 
