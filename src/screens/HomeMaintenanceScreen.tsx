@@ -172,6 +172,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         reminder: svcReminder,
         frequency: svcFrequency,
         status: 'planned' as const,
+        createdBy: user?.uid || null,
         familyId,
         documents: svcDocuments.length > 0 ? svcDocuments : (editingService ? undefined : []),
       };

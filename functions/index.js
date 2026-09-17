@@ -4648,3 +4648,104 @@ Return ONLY the JSON, no other text.`;
     res.status(500).json({ error: "Failed to generate suggestions. Please try again." });
   }
 });
+
+// Cloud Function: Auto-sync home service appointments to Google Calendar
+exports.onHomeServiceCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "homeServices/{serviceId}" }, async (event) => {
+  const snap = event.data;
+  if (!snap) return;
+
+  const data = snap.data();
+  const uid = data.createdBy;
+  console.log(`onHomeServiceCreatedForCalendar: triggered for doc ${event.params.serviceId}, uid: ${uid}`);
+
+  if (!uid) {
+    console.log("No createdBy field, skipping");
+    return;
+  }
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
+      console.log(`User ${uid} not connected to Google Calendar`);
+      return;
+    }
+
+    const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
+    const endDateTime = data.endTime
+      ? `${data.dateTo || data.dateFrom}T${data.endTime}:00`
+      : `${data.dateTo || data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
+
+    const eventId = await createGoogleCalendarEvent(uid, {
+      title: `🔧 ${data.title}`,
+      description: data.description || "",
+      startDateTime,
+      endDateTime,
+      location: "",
+    });
+
+    await db.collection("homeServices").doc(event.params.serviceId).update({
+      calendarEventId: eventId,
+    });
+
+    console.log(`onHomeServiceCreatedForCalendar: synced ${event.params.serviceId}`);
+  } catch (error) {
+    console.error(`onHomeServiceCreatedForCalendar error:`, error);
+  }
+});
+
+exports.onHomeServiceUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "homeServices/{serviceId}" }, async (event) => {
+  const after = event.data?.after?.data();
+  if (!after) return;
+
+  const uid = after.createdBy;
+  const calendarEventId = after.calendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
+    const endDateTime = after.endTime
+      ? `${after.dateTo || after.dateFrom}T${after.endTime}:00`
+      : `${after.dateTo || after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
+
+    await updateGoogleCalendarEvent(uid, calendarEventId, {
+      title: `🔧 ${after.title}`,
+      description: after.description || "",
+      startDateTime,
+      endDateTime,
+      location: "",
+    });
+
+    console.log(`onHomeServiceUpdatedForCalendar: updated ${event.params.serviceId}`);
+  } catch (error) {
+    console.error(`onHomeServiceUpdatedForCalendar error:`, error);
+  }
+});
+
+exports.onHomeServiceDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "homeServices/{serviceId}" }, async (event) => {
+  const data = event.data?.data();
+  if (!data) return;
+
+  const uid = data.createdBy;
+  const calendarEventId = data.calendarEventId;
+  if (!uid || !calendarEventId) return;
+
+  try {
+    const db = getFirestore();
+    const userDoc = await db.collection("users").doc(uid).get();
+    const userData = userDoc.data();
+    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+
+    await deleteGoogleCalendarEvent(uid, calendarEventId);
+    console.log(`onHomeServiceDeletedForCalendar: deleted ${event.params.serviceId}`);
+  } catch (error) {
+    console.error(`onHomeServiceDeletedForCalendar error:`, error);
+  }
+});
