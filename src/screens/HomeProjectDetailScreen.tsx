@@ -12,6 +12,7 @@ import { getErrorMessage } from '../utils/validation';
 import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer, HomeTask, HomeTaskStatus } from '../types';
 import { getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
+import { HelpCenter } from '../components/HelpCenter';
 
 const HOME_THEME = MODULE_COLORS.home;
 
@@ -69,6 +70,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [showTaskDetail, setShowTaskDetail] = useState<HomeTask | null>(null);
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [taskActionModal, setTaskActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [showHelp, setShowHelp] = useState(false);
   const [addTaskStatus, setAddTaskStatus] = useState<HomeTaskStatus>('todo');
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -657,6 +659,13 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
             <Text style={[styles.screenTitle, { color: colors.text }]} numberOfLines={1}>{project.title}</Text>
             <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
           </View>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: HOME_THEME, alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
+            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: HOME_THEME, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
         {project.budget > 0 && (
           <View style={[styles.budgetSummary, { backgroundColor: colors.inputBackground }]}>
@@ -1432,6 +1441,16 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           </View>
         </View>
       </Modal>
+
+      <HelpCenter
+        visible={showHelp}
+        onClose={() => setShowHelp(false)}
+        title={t('homes.prosjektHelpTitle')}
+        sections={[
+          { icon: '🏗️', title: t('homes.prosjektHelpWhat'), text: t('homes.prosjektHelpWhatText') },
+          { icon: '👉', title: t('homes.prosjektHelpHow'), text: t('homes.prosjektHelpHowText'), tip: t('homes.prosjektHelpTip') },
+        ]}
+      />
     </SafeAreaView>
   );
 };

@@ -1550,6 +1550,24 @@
     "scheduleUpdated": "Toisto päivitetty",
     "servicesDeletedForRemovedDays": "palvelua poistettiin poistettujen päivien osalta.",
     "tomorrow": "Huomenna",
-    "hexColor": "Hex-värikoodi"
+    "hexColor": "Hex-värikoodi",
+    "instruksjonerHelpTitle": "Ohjeet",
+    "instruksjonerHelpWhat": "Mitä ovat Ohjeet?",
+    "instruksjonerHelpWhatText": "Ohjeet mahdollistavat kotisi tärkeiden tietojen tallentamisen, joita voit jakaa perheellesi. Jaa ohjeita \"Kotiin tulemisesta\" ja \"Kodista lähtemisestä\" — kuten hälytyskoodit, WLAN-salasanat, avainten sijainnit ja muuta.",
+    "instruksjonerHelpHow": "Käytä Ohjeita",
+    "instruksjonerHelpHowText": "Ava (+) kohdassa lisätäksesi ohjeen. Voit kirjoittaa otsikon ja sisällön manuaalesti tai käyttää AI-skannausta poimimaan tekstin kirjoitetuista muistiinpanoista. Paina pitkään ohjetta muokataksesi tai poistaaksesi sen.",
+    "instruksjonerHelpTip": "Käytä kameraominaisuutta skannataksesi kirjoitettuja muistiinpanoja — AI lukee tekstin ja täyttää kentät automaattisesti.",
+    "vedlikeholdHelpTitle": "Kunnossapito",
+    "vedlikeholdHelpWhat": "Mitä on Kunnossapito?",
+    "vedlikeholdHelpWhatText": "Kunnossapito auttaa seuraamaan huoltosopimuksia ja värikoodteja kotillesi. Suunnittele toistuvia huoltoja, aseta muistutuksia ja tallenna värikoodit hex-värillä, merkillä ja huoneella.",
+    "vedlikeholdHelpHow": "Käytä Kunnossapitoa",
+    "vedlikeholdHelpHowText": "Huoltosopimukset: Paina (+) lisätäksesi sopimuksen otsikolla, ajankohtalla, kellonajalla, toistuvuudella ja muistutuksella. Käytä suunnittelijaa luodaksesi toistuvia sopimuksia tietyinä viikonpäivinä.\n\nVärikoodit: Paina (+) lisätäksesi värin. Käytä AI-kuvatunnistusta tunnistamaasi värejä kuvista tai syötä värikoodi ja paina \"Hae väri\" hakeaksesi sen automaattisesti.",
+    "vedlikeholdHelpTip": "Paina pitkään huoltosopimusta tai värikoodia muokataksesi tai poistaaksesi sitä.",
+    "prosjektHelpTitle": "Projektin tiedot",
+    "prosjektHelpWhat": "Mitä on Projekti?",
+    "prosjektHelpWhatText": "Projekti kerää kaiken remonttiin tai kunnossapitoon liittyvän: värikoodit, ostoslista hinnoilla, tarjoukset toimittajilta, tehtävätaulukko ja budjettikatsaus.",
+    "prosjektHelpHow": "Käytä Projekteja",
+    "prosjektHelpHowText": "AI-ehdotukset: Paina AI-painiketta saadaksesi ehdotuksia tehtävistä ja ostoslistasta projektin otsikon perusteella. Ostoslista: Lisää tuotteita määrällä ja yksikköhinnalla. Merkitse ruksilla ostetut tuotteet. Tarjoukset: Lisää tarjouksia toimittajilta tai skannaa kuitteja AI:lla lisätäksesi tuotteet automaattisesti. Tehtävätaulukko: Siirrä tehtäviä \"Tehtävä\", \"Käynnissä\" ja \"Valmis\" -listojen välillä nuolinapeilla. Budjetti: Aseta budjetti projektin asetuksissa nähdäksesi kulujen yhteenvedon.",
+    "prosjektHelpTip": "Yhdistä ostoslistan tuotteet tehtäviin pitääksesi kirjaa siitä, mitä kuhunkin tehtävään tarvitaan."
   }
 }

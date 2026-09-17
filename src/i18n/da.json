@@ -1550,6 +1550,24 @@
     "scheduleUpdated": "Gentagelse opdateret",
     "servicesDeletedForRemovedDays": "tjenester blev slettet for fjernede dage.",
     "tomorrow": "I morgen",
-    "hexColor": "Hex-farvekode"
+    "hexColor": "Hex-farvekode",
+    "instruksjonerHelpTitle": "Instruktioner",
+    "instruksjonerHelpWhat": "Hvad er Instruktioner?",
+    "instruksjonerHelpWhatText": "Instruktioner lader dig gemme vigtig information om dit hjem, som du kan dele med familien. Del instruktioner for \"Komme hjem\" og \"Forlade hjem\" — f.eks. alarmkoder, WIFI-adgangskoder, nøglesteder og mere.",
+    "instruksjonerHelpHow": "Hvordan bruge Instruktioner",
+    "instruksjonerHelpHowText": "Tryk på + i en sektion for at tilføje en instruktion. Du kan indtaste titel og indhold manuelt, eller bruge AI-scanning til at udtrække tekst fra håndskrevne noter. Tryk længe på en instruktion for at redigere eller slette den.",
+    "instruksjonerHelpTip": "Brug kamerafunktionen til at scanne håndskrevne noter — AI'en læser teksten og udfylder felterne automatisk.",
+    "vedlikeholdHelpTitle": "Vedligeholdelse",
+    "vedlikeholdHelpWhat": "Hvad er Vedligeholdelse?",
+    "vedlikeholdHelpWhatText": "Vedligeholdelse hjælper dig med at holde styr på serviceaftaler og farvekoder til dit hjem. Planlæg gentagende service, sæt påmindelser, og gem farvekoder med hex-farve, mærke og rum.",
+    "vedlikeholdHelpHow": "Hvordan bruge Vedligeholdelse",
+    "vedlikeholdHelpHowText": "For serviceaftaler: Tryk på + for at tilføje en aftale med titel, dato, tid, frekvens og påmindelse. Brug planlæggeren til at oprette gentagende aftaler på bestemte ugedage.\n\nFor farvekoder: Tryk på + for at tilføje en farve. Brug AI-foto-mærkning til at identificere farver fra billeder, eller indtast en farvekod og tryk \"Hent farve\" for at slå den op automatisk.",
+    "vedlikeholdHelpTip": "Tryk længe på en serviceaftale eller farvekod for at redigere eller slette den.",
+    "prosjektHelpTitle": "Projektdetaljer",
+    "prosjektHelpWhat": "Hvad er et Projekt?",
+    "prosjektHelpWhatText": "Et projekt samler alt relateret til et renoverings- eller vedligeholdelsesprojekt: farvekoder, indkøbsliste med priser, tilbud fra leverandører, opgavetavle og budgetoversigt.",
+    "prosjektHelpHow": "Hvordan bruge Projekter",
+    "prosjektHelpHowText": "AI-forslag: Tryk på AI-knappen for at få forslag til opgaver og indkøbsliste baseret på projekttitlen. Indkøbsliste: Tilføj varer med antal og enhedspris. Afkryds for at spore hvad du har købt. Tilbud: Tilføj tilbud fra leverandører, eller scan kvitteringer med AI for at tilføje varer automatisk. Opgavetavle: Flyt opgaver mellem \"Todo\", \"I gang\" og \"Færdig\" med pilknapperne. Budget: Sæt et budget i projektindstillingerne for at se en oversigt over forbrug.",
+    "prosjektHelpTip": "Kobl indkøbslisteposter til opgaver for at holde styr på hvad der er brug for til hver opgave."
   }
 }

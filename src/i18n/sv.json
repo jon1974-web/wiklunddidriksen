@@ -1550,6 +1550,24 @@
     "scheduleUpdated": "Upprepning uppdaterad",
     "servicesDeletedForRemovedDays": "tjänster togs bort för borttagna dagar.",
     "tomorrow": "Imorgon",
-    "hexColor": "Hex-färgkod"
+    "hexColor": "Hex-färgkod",
+    "instruksjonerHelpTitle": "Instruktioner",
+    "instruksjonerHelpWhat": "Vad är Instruktioner?",
+    "instruksjonerHelpWhatText": "Instruktioner låter dig spara viktig information om ditt hem som du kan dela med familjen. Dela instruktioner för \"Komma hem\" och \"Lämna hem\" — t.ex. alarmkoder, WIFI-lösenord, nyckelplatser och mer.",
+    "instruksjonerHelpHow": "Hur man använder Instruktioner",
+    "instruksjonerHelpHowText": "Tryck på + i en sektion för att lägga till en instruktion. Du kan skriva in titel och innehåll manuellt, eller använda AI-skanning för att extrahera text från handskrivna anteckningar. Tryck länge på en instruktion för att redigera eller ta bort den.",
+    "instruksjonerHelpTip": "Använd kamerafunktionen för att skanna handskrivna anteckningar — AI:n läser texten och fyller i fälten automatiskt.",
+    "vedlikeholdHelpTitle": "Underhåll",
+    "vedlikeholdHelpWhat": "Vad är Underhåll?",
+    "vedlikeholdHelpWhatText": "Underhåll hjälper dig hålla koll på serviceavtal och färgkoder för ditt hem. Planera återkommande service, ställ påminnelser och spara färgkoder med hex-färg, märke och rum.",
+    "vedlikeholdHelpHow": "Hur man använder Underhåll",
+    "vedlikeholdHelpHowText": "För serviceavtal: Tryck på + för att lägga till ett avtal med titel, datum, tid, frekvens och påminnelse. Använd planeraren för att skapa återkommande avtal på bestämda veckodagar.\n\nFör färgkoder: Tryck på + för att lägga till en färg. Använd AI-fotomärkning för att identifiera färger från bilder, eller skriv in färgkod och tryck \"Hämta färg\" för att slå upp den automatiskt.",
+    "vedlikeholdHelpTip": "Tryck länge på ett serviceavtal eller en färgkod för att redigera eller ta bort den.",
+    "prosjektHelpTitle": "Projektdetaljer",
+    "prosjektHelpWhat": "Vad är ett Projekt?",
+    "prosjektHelpWhatText": "Ett projekt samlar allt som hör till ett renoverings- eller underhållsprojekt: färgkoder, inköpslista med priser, offerter från leverantörer, uppgiftstavla och budgetöversikt.",
+    "prosjektHelpHow": "Hur man använder Projekt",
+    "prosjektHelpHowText": "AI-förslag: Tryck på AI-knappen för att få förslag på uppgifter och inköpslista baserat på projektstiteln. Inköpslista: Lägg till varor med antal och enhetspris. Bocka av för att spara vad du har köpt. Offerter: Lägg till offerter från leverantörer, eller skanna kvitton med AI för att lägga till varor automatiskt. Uppgiftstavla: Flytta uppgifter mellan \"Todo\", \"Pågående\" och \"Klart\" med pilknapparna. Budget: Ställ in en budget i projektinställningarna för att se en översikt över utgifter.",
+    "prosjektHelpTip": "Koppla inköpslisteposter till uppgifter för att hålla koll på vad som behövs för varje uppgift."
   }
 }

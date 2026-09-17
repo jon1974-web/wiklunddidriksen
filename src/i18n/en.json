@@ -1550,6 +1550,24 @@
     "scheduleUpdated": "Schedule updated",
     "servicesDeletedForRemovedDays": "services were deleted for removed days.",
     "tomorrow": "Tomorrow",
-    "hexColor": "Hex color code"
+    "hexColor": "Hex color code",
+    "instruksjonerHelpTitle": "Instructions",
+    "instruksjonerHelpWhat": "What are Instructions?",
+    "instruksjonerHelpWhatText": "Instructions let you save important information about your home that you can share with your family. Share instructions for \"Coming home\" and \"Leaving home\" — such as alarm codes, WiFi passwords, key locations, and more.",
+    "instruksjonerHelpHow": "How to use Instructions",
+    "instruksjonerHelpHowText": "Tap + in a section to add an instruction. You can enter the title and content manually, or use AI scanning to extract text from handwritten notes. Long-press an instruction to edit or delete it.",
+    "instruksjonerHelpTip": "Use the camera feature to scan handwritten notes — the AI reads the text and fills in the fields automatically.",
+    "vedlikeholdHelpTitle": "Maintenance",
+    "vedlikeholdHelpWhat": "What is Maintenance?",
+    "vedlikeholdHelpWhatText": "Maintenance helps you keep track of service agreements and paint colors for your home. Plan recurring services, set reminders, and save paint colors with hex color, brand, and room.",
+    "vedlikeholdHelpHow": "How to use Maintenance",
+    "vedlikeholdHelpHowText": "For service appointments: Tap + to add an appointment with title, date, time, frequency, and reminder. Use the planner to create recurring appointments on specific weekdays.\n\nFor paint colors: Tap + to add a color. Use AI photo tagging to identify colors from images, or enter a color code and tap \"Fetch color\" to look it up automatically.",
+    "vedlikeholdHelpTip": "Long-press a service appointment or paint color to edit or delete it.",
+    "prosjektHelpTitle": "Project Details",
+    "prosjektHelpWhat": "What is a Project?",
+    "prosjektHelpWhatText": "A project gathers everything related to a renovation or maintenance project: paint colors, shopping list with prices, offers from suppliers, task board, and budget overview.",
+    "prosjektHelpHow": "How to use Projects",
+    "prosjektHelpHowText": "AI suggestions: Tap the AI button to get task and shopping list suggestions based on the project title. Shopping list: Add items with quantity and unit price. Check off items to track what you have purchased. Offers: Add offers from suppliers, or scan receipts with AI to add items automatically. Task board: Move tasks between \"Todo\", \"In Progress\", and \"Done\" using the arrow buttons. Budget: Set a budget in project settings to see an overview of spending.",
+    "prosjektHelpTip": "Link shopping list items to tasks to keep track of what is needed for each task."
   }
 }

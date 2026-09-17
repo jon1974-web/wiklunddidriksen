@@ -12,6 +12,7 @@ import { getErrorMessage } from '../utils/validation';
 import { Home, HomeInstruction } from '../types';
 import { getHomeInstructions, addHomeInstruction, updateHomeInstruction, deleteHomeInstruction } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
+import { HelpCenter } from '../components/HelpCenter';
 
 const HOME_THEME = MODULE_COLORS.home;
 
@@ -33,6 +34,7 @@ export const HomeInstructionsScreen: React.FC<HomeInstructionsScreenProps> = ({ 
   const [editingInstruction, setEditingInstruction] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<'coming' | 'leaving'>('coming');
   const [actionModal, setActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [showHelp, setShowHelp] = useState(false);
 
   const [formTitle, setFormTitle] = useState('');
   const [formContent, setFormContent] = useState('');
@@ -226,6 +228,13 @@ export const HomeInstructionsScreen: React.FC<HomeInstructionsScreenProps> = ({ 
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('homes.instructions')}</Text>
             <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
           </View>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: HOME_THEME, alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
+            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: HOME_THEME, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
       <ScrollView style={styles.content}>
@@ -371,6 +380,16 @@ export const HomeInstructionsScreen: React.FC<HomeInstructionsScreenProps> = ({ 
           </View>
         </View>
       </Modal>
+
+      <HelpCenter
+        visible={showHelp}
+        onClose={() => setShowHelp(false)}
+        title={t('homes.instruksjonerHelpTitle')}
+        sections={[
+          { icon: '📋', title: t('homes.instruksjonerHelpWhat'), text: t('homes.instruksjonerHelpWhatText') },
+          { icon: '👉', title: t('homes.instruksjonerHelpHow'), text: t('homes.instruksjonerHelpHowText'), tip: t('homes.instruksjonerHelpTip') },
+        ]}
+      />
     </SafeAreaView>
   );
 };

@@ -17,6 +17,7 @@ import { Home, HomeService, HomePaintColor, HomeProject } from '../types';
 import { getHomeServices, addHomeService, updateHomeService, deleteHomeService, getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeProjects } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 import { DatePickerModal } from '../components/DatePickerModal';
+import { HelpCenter } from '../components/HelpCenter';
 import { syncEventToCalendar } from '../services/calendarService';
 import { getUserProfile, notifyNewEvent } from '../services/familyService';
 import { DocumentUpload } from '../components/DocumentUpload';
@@ -61,6 +62,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
   const [editingService, setEditingService] = useState<string | null>(null);
   const [serviceActionModal, setServiceActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [colorActionModal, setColorActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [showHelp, setShowHelp] = useState(false);
   const [activePicker, setActivePicker] = useState<'dateFrom' | 'dateTo' | 'startTime' | 'endTime' | null>(null);
 
   const [svcTitle, setSvcTitle] = useState('');
@@ -437,6 +439,13 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('homes.maintenance')}</Text>
             <Text style={{ fontSize: 13, color: colors.textSecondary }}>{home.name}</Text>
           </View>
+          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: HOME_THEME, alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
+            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: HOME_THEME, alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
         </View>
       </View>
       <ScrollView style={styles.content}>
@@ -779,6 +788,16 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         preselectedWeeks={preloadedWeeks}
         preselectedWeekType={preloadedWeekType}
         isEditing={!!editingService}
+      />
+
+      <HelpCenter
+        visible={showHelp}
+        onClose={() => setShowHelp(false)}
+        title={t('homes.vedlikeholdHelpTitle')}
+        sections={[
+          { icon: '🔧', title: t('homes.vedlikeholdHelpWhat'), text: t('homes.vedlikeholdHelpWhatText') },
+          { icon: '👉', title: t('homes.vedlikeholdHelpHow'), text: t('homes.vedlikeholdHelpHowText'), tip: t('homes.vedlikeholdHelpTip') },
+        ]}
       />
     </SafeAreaView>
   );
