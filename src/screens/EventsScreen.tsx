@@ -1213,7 +1213,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
                 <Text style={[styles.spondCardTime, { color: colors.text }]}>{timeText}</Text>
               </View>
               {getHomeName((item as any).homeId) ? (
-                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>🏠 {getHomeName((item as any).homeId)}</Text>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 2 }}>
+                  <AppIcon name="house" size={14} color={HOME_COLOR} />
+                  <Text style={{ fontSize: 11, color: colors.textSecondary }}>{getHomeName((item as any).homeId)}</Text>
+                </View>
               ) : null}
             </View>
           </View>
