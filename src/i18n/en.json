@@ -1529,6 +1529,7 @@
     "linkToShoppingList": "Link to shopping list",
     "noUnlinkedItems": "No unlinked items",
     "noUnlinkedItemsText": "All shopping items are already linked to tasks.",
-    "itemsLinked": "items linked"
+    "itemsLinked": "items linked",
+    "service": "Service"
   }
 }

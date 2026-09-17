@@ -1529,6 +1529,7 @@
     "linkToShoppingList": "Tilknyt til indkøbsliste",
     "noUnlinkedItems": "Ingen utilknyttede varer",
     "noUnlinkedItemsText": "Alle indkøbslisteelementer er allerede tilknyttet til opgaver.",
-    "itemsLinked": "elementer tilknyttet"
+    "itemsLinked": "elementer tilknyttet",
+    "service": "Service"
   }
 }

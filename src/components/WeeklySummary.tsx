@@ -360,7 +360,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             {weekData.tripCount > 0 && <StatChip count={weekData.tripCount} label={t('weekly.trips')} color={MODULE_COLORS.trips} />}
             {weekData.schoolActivityCount > 0 && <StatChip count={weekData.schoolActivityCount} label={t('weekly.schoolActivities')} color={MODULE_COLORS.school} />}
             {weekData.kindergartenActivityCount > 0 && <StatChip count={weekData.kindergartenActivityCount} label={t('weekly.kindergartenActivities')} color={MODULE_COLORS.kindergarten} />}
-            {weekData.homeServiceCount > 0 && <StatChip count={weekData.homeServiceCount} label={t('homes.serviceAppointments')} color={MODULE_COLORS.home} />}
+            {weekData.homeServiceCount > 0 && <StatChip count={weekData.homeServiceCount} label={t('homes.service')} color={MODULE_COLORS.home} />}
             {weekData.birthdayCount > 0 && <StatChip count={weekData.birthdayCount} label={t('birthdays.title')} color={MODULE_COLORS.birthdays} />}
           </View>
 

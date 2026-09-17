@@ -21,7 +21,7 @@ import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications }
 import { getUserProfile } from '../services/familyService';
 import { getSchoolActivities } from '../services/schoolService';
 import { getKindergartenActivities } from '../services/kindergartenService';
-import { getAllHomeServices } from '../services/homeService';
+import { getAllHomeServices, getHomes } from '../services/homeService';
 import { AddEventModal } from '../components/AddEventModal';
 import { getAllSchoolHolidays, getSchoolChildren } from '../services/schoolService';
 import { getAllKindergartenHolidays, getKindergartenChildren } from '../services/kindergartenService';
@@ -156,6 +156,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
   const [schoolActivities, setSchoolActivities] = useState<SchoolActivity[]>([]);
   const [kindergartenActivities, setKindergartenActivities] = useState<KindergartenActivity[]>([]);
   const [homeServices, setHomeServices] = useState<HomeService[]>([]);
+  const [homes, setHomes] = useState<Home[]>([]);
   const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
@@ -296,6 +297,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     try {
       const data = await getAllHomeServices(familyId);
       setHomeServices(data);
+      const homesData = await getHomes(familyId);
+      setHomes(homesData);
     } catch (error) {
       console.log('Failed to load home services:', error);
     }
@@ -464,6 +467,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       max: `${max.getFullYear()}-${String(max.getMonth() + 1).padStart(2, '0')}-${String(max.getDate()).padStart(2, '0')}`,
     };
   }, []);
+
+  const getHomeName = useCallback((homeId: string): string => {
+    const home = homes.find((h) => h.id === homeId);
+    return home?.name || '';
+  }, [homes]);
 
   const handleMonthChange = useCallback((year: number, month: number) => {
     const newDate = `${year}-${String(month + 1).padStart(2, '0')}-01`;
@@ -1192,7 +1200,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
               <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
               <Text style={[styles.spondCalMonth, { color: colors.textSecondary }]}>{calMonth}</Text>
             </View>
-            <View style={styles.spondCardContent}>
+              <View style={styles.spondCardContent}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <AppIcon name="vedlikehold" size={14} color={HOME_COLOR} />
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
@@ -1204,8 +1212,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
                 </View>
                 <Text style={[styles.spondCardTime, { color: colors.text }]}>{timeText}</Text>
               </View>
-              {item.description ? (
-                <Text style={[styles.spondCardAddress, { color: colors.textSecondary }]} numberOfLines={1}>{item.description}</Text>
+              {getHomeName((item as any).homeId) ? (
+                <Text style={{ fontSize: 11, color: colors.textSecondary, marginTop: 2 }}>🏠 {getHomeName((item as any).homeId)}</Text>
               ) : null}
             </View>
           </View>

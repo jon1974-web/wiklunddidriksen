@@ -1529,6 +1529,7 @@
     "linkToShoppingList": "Koble til handleliste",
     "noUnlinkedItems": "Ingen ubundne varer",
     "noUnlinkedItemsText": "Alle handlelisteelementer er allerede bundet til oppgaver.",
-    "itemsLinked": "elementer koblet"
+    "itemsLinked": "elementer koblet",
+    "service": "Service"
   }
 }

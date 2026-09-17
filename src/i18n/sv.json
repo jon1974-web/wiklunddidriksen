@@ -1529,6 +1529,7 @@
     "linkToShoppingList": "Koppla till inköpslista",
     "noUnlinkedItems": "Inga okopplade varor",
     "noUnlinkedItemsText": "Alla inköpslistelement är redan kopplade till uppgifter.",
-    "itemsLinked": "element kopplade"
+    "itemsLinked": "element kopplade",
+    "service": "Service"
   }
 }
