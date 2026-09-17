@@ -416,10 +416,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         )}
 
         {/* Documents */}
-        {eventData.documents && eventData.documents.length > 0 && (
-          <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#3b5a75' }]}>
-            <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>📎 Dokumenter ({eventData.documents.length})</Text>
-            {eventData.documents.map((doc, i) => (
+        <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#3b5a75' }]}>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>{t('homes.documents')}</Text>
+          {eventData.documents && eventData.documents.length > 0 ? (
+            eventData.documents.map((doc, i) => (
               <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (eventData.documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
                 {doc.type === 'image' ? (
                   <Image source={{ uri: doc.url }} style={{ width: 48, height: 48, borderRadius: 8 }} resizeMode="cover" />
@@ -433,9 +433,21 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                   <Text style={{ fontSize: 12, color: '#3b5a75' }}>{t('documents.open')} →</Text>
                 </View>
               </TouchableOpacity>
-            ))}
-          </View>
-        )}
+            ))
+          ) : (
+            <View style={{ marginTop: 8 }}>
+              <DocumentUpload
+                storagePath={`events/${event.id}/documents`}
+                onUploaded={async (uploadedDoc) => {
+                  const docs = [...(eventData.documents || []), uploadedDoc];
+                  await updateDoc(doc(db, 'events', event.id), { documents: docs });
+                  setEventData({ ...eventData, documents: docs });
+                }}
+                accentColor="#3b5a75"
+              />
+            </View>
+          )}
+        </View>
 
         {/* Button box */}
         <View style={[styles.detailCard, { marginTop: 10 }]}>

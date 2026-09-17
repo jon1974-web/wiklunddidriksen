@@ -10,7 +10,8 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { formatDate, toDateSafe } from '../utils/dateUtils';
 import { ActionModal } from '../components/ActionModal';
 import { AppIcon } from '../components/AppIcon';
-import { deleteHealthAppointment } from '../services/healthService';
+import { deleteHealthAppointment, updateHealthAppointment } from '../services/healthService';
+import { DocumentUpload } from '../components/DocumentUpload';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -30,6 +31,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   const familyRole = useUserStore((state) => state.familyRole);
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [documents, setDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(appointment.documents || []);
   const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
 
 
@@ -249,11 +251,11 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
       )}
 
       {/* Documents */}
-      {appointment.documents && appointment.documents.length > 0 && (
-        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: HEALTH_COLOR, marginBottom: 8 }}>📎 Dokumenter ({appointment.documents.length})</Text>
-          {appointment.documents.map((doc, i) => (
-            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (appointment.documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>{t('homes.documents')}</Text>
+        {documents && documents.length > 0 ? (
+          documents.map((doc, i) => (
+            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
               {doc.type === 'image' ? (
                 <Image source={{ uri: doc.url }} style={{ width: 48, height: 48, borderRadius: 8 }} resizeMode="cover" />
               ) : (
@@ -266,9 +268,21 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
                 <Text style={{ fontSize: 12, color: HEALTH_COLOR }}>{t('documents.open')} →</Text>
               </View>
             </TouchableOpacity>
-          ))}
-        </View>
-      )}
+          ))
+        ) : (
+          <View style={{ marginTop: 8 }}>
+            <DocumentUpload
+              storagePath={`health/${familyId}/${appointment.id}/documents`}
+              onUploaded={async (doc) => {
+                const docs = [...(documents || []), doc];
+                await updateHealthAppointment(familyId || '', appointment.id, { documents: docs });
+                setDocuments(docs);
+              }}
+              accentColor={HEALTH_COLOR}
+            />
+          </View>
+        )}
+      </View>
 
       {/* Button box */}
       <View style={[styles.card, { marginTop: 10, backgroundColor: colors.surface }]}>

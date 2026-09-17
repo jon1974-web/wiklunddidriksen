@@ -9,7 +9,8 @@ import { SchoolActivity } from '../types';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { ActionModal } from '../components/ActionModal';
 import { AppIcon } from '../components/AppIcon';
-import { deleteSchoolActivity } from '../services/schoolService';
+import { deleteSchoolActivity, updateSchoolActivity } from '../services/schoolService';
+import { DocumentUpload } from '../components/DocumentUpload';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -30,6 +31,7 @@ export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route 
   const familyRole = useUserStore((state) => state.familyRole);
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [documents, setDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(activity.documents || []);
   const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
 
 
@@ -230,11 +232,11 @@ const handleCopy = useCallback(() => {
       )}
 
       {/* Documents */}
-      {activity.documents && activity.documents.length > 0 && (
-        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: SCHOOL_COLOR, backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionLabel, { color: SCHOOL_COLOR }]}>📎 {t('school.activityDocuments')} ({activity.documents.length})</Text>
-          {activity.documents.map((doc, i) => (
-            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (activity.documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: SCHOOL_COLOR, backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: SCHOOL_COLOR }]}>{t('homes.documents')}</Text>
+        {documents && documents.length > 0 ? (
+          documents.map((doc, i) => (
+            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
               {doc.type === 'image' ? (
                 <Image source={{ uri: doc.url }} style={{ width: 48, height: 48, borderRadius: 8 }} resizeMode="cover" />
               ) : (
@@ -247,9 +249,21 @@ const handleCopy = useCallback(() => {
                 <Text style={{ fontSize: 12, color: SCHOOL_COLOR }}>{t('documents.open')} →</Text>
               </View>
             </TouchableOpacity>
-          ))}
-        </View>
-      )}
+          ))
+        ) : (
+          <View style={{ marginTop: 8 }}>
+            <DocumentUpload
+              storagePath={`schoolActivities/${activity.familyId}/${activity.id}/documents`}
+              onUploaded={async (doc) => {
+                const docs = [...(documents || []), doc];
+                await updateSchoolActivity(activity.familyId || familyId || '', activity.id, { documents: docs });
+                setDocuments(docs);
+              }}
+              accentColor={SCHOOL_COLOR}
+            />
+          </View>
+        )}
+      </View>
 
       {/* Button box */}
       <View style={[styles.card, { marginTop: 10, backgroundColor: colors.surface }]}>

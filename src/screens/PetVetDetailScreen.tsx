@@ -11,7 +11,8 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { formatDate } from '../utils/dateUtils';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { ActionModal } from '../components/ActionModal';
-import { deleteVetVisit } from '../services/petService';
+import { deleteVetVisit, updateVetVisit } from '../services/petService';
+import { DocumentUpload } from '../components/DocumentUpload';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 
@@ -30,6 +31,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const familyRole = useUserStore((state) => state.familyRole);
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [documents, setDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(visit.documents || []);
   const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
 
   const familyId = useUserStore((state) => state.familyId);
@@ -247,11 +249,11 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       )}
 
       {/* Documents */}
-      {visit.documents && visit.documents.length > 0 && (
-        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, backgroundColor: colors.surface }]}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: PET_COLOR, marginBottom: 8 }}>📎 Dokumenter ({visit.documents.length})</Text>
-          {visit.documents.map((doc, i) => (
-            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (visit.documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: PET_COLOR }]}>{t('homes.documents')}</Text>
+        {documents && documents.length > 0 ? (
+          documents.map((doc, i) => (
+            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
               {doc.type === 'image' ? (
                 <Image source={{ uri: doc.url }} style={{ width: 48, height: 48, borderRadius: 8 }} resizeMode="cover" />
               ) : (
@@ -264,9 +266,21 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
                 <Text style={{ fontSize: 12, color: PET_COLOR }}>{t('documents.open')} →</Text>
               </View>
             </TouchableOpacity>
-          ))}
-        </View>
-      )}
+          ))
+        ) : (
+          <View style={{ marginTop: 8 }}>
+            <DocumentUpload
+              storagePath={`petVetVisits/${visit.id}/documents`}
+              onUploaded={async (doc) => {
+                const docs = [...(documents || []), doc];
+                await updateVetVisit(visit.id, { documents: docs });
+                setDocuments(docs);
+              }}
+              accentColor={PET_COLOR}
+            />
+          </View>
+        )}
+      </View>
 
       {/* Button box */}
       <View style={[styles.card, { marginTop: 10, backgroundColor: colors.surface }]}>

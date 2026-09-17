@@ -9,7 +9,8 @@ import { KindergartenActivity } from '../types';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { ActionModal } from '../components/ActionModal';
 import { AppIcon } from '../components/AppIcon';
-import { deleteKindergartenActivity } from '../services/kindergartenService';
+import { deleteKindergartenActivity, updateKindergartenActivity } from '../services/kindergartenService';
+import { DocumentUpload } from '../components/DocumentUpload';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -30,6 +31,7 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
   const familyRole = useUserStore((state) => state.familyRole);
   const [showFullNote, setShowFullNote] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [documents, setDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>(activity.documents || []);
   const [scheduleInfo, setScheduleInfo] = useState<{ weekType: string; startDate: string; endDate: string } | null>(null);
 
 
@@ -230,11 +232,11 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
       )}
 
       {/* Documents */}
-      {activity.documents && activity.documents.length > 0 && (
-        <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: KINDERGARTEN_COLOR, backgroundColor: colors.surface }]}>
-          <Text style={[styles.sectionLabel, { color: KINDERGARTEN_COLOR }]}>📎 {t('school.activityDocuments')} ({activity.documents.length})</Text>
-          {activity.documents.map((doc, i) => (
-            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (activity.documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: KINDERGARTEN_COLOR, backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: KINDERGARTEN_COLOR }]}>{t('homes.documents')}</Text>
+        {documents && documents.length > 0 ? (
+          documents.map((doc, i) => (
+            <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
               {doc.type === 'image' ? (
                 <Image source={{ uri: doc.url }} style={{ width: 48, height: 48, borderRadius: 8 }} resizeMode="cover" />
               ) : (
@@ -247,9 +249,21 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
                 <Text style={{ fontSize: 12, color: KINDERGARTEN_COLOR }}>{t('documents.open')} →</Text>
               </View>
             </TouchableOpacity>
-          ))}
-        </View>
-      )}
+          ))
+        ) : (
+          <View style={{ marginTop: 8 }}>
+            <DocumentUpload
+              storagePath={`kindergartenActivities/${activity.familyId}/${activity.id}/documents`}
+              onUploaded={async (doc) => {
+                const docs = [...(documents || []), doc];
+                await updateKindergartenActivity(activity.familyId || familyId || '', activity.id, { documents: docs });
+                setDocuments(docs);
+              }}
+              accentColor={KINDERGARTEN_COLOR}
+            />
+          </View>
+        )}
+      </View>
 
       {/* Button box */}
       <View style={[styles.card, { marginTop: 10, backgroundColor: colors.surface }]}>
