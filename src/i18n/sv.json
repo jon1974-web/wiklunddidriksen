@@ -89,7 +89,8 @@
     "reminder": "Påminnelse",
     "saved": "sparad",
     "activityType": "Aktivitetstyp",
-    "creating": "Skapar..."
+    "creating": "Skapar...",
+    "details": "Detaljer"
   },
   "auth": {
     "title": "Fampad",
@@ -1538,6 +1539,8 @@
     "planSchedule": "Planera upprepning",
     "documents": "Dokument",
     "scheduleUpdated": "Upprepning uppdaterad",
-    "servicesDeletedForRemovedDays": "tjänster togs bort för borttagna dagar."
+    "servicesDeletedForRemovedDays": "tjänster togs bort för borttagna dagar.",
+    "tomorrow": "Imorgon",
+    "hexColor": "Hex-färgkod"
   }
 }

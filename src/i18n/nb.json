@@ -89,7 +89,8 @@
     "reminder": "Påminnelse",
     "saved": "lagret",
     "activityType": "Aktivitetstype",
-    "creating": "Oppretter..."
+    "creating": "Oppretter...",
+    "details": "Detaljer"
   },
   "auth": {
     "title": "Fampad",
@@ -1538,6 +1539,8 @@
     "planSchedule": "Planlegg gjentakelse",
     "documents": "Dokumenter",
     "scheduleUpdated": "Gjentakelse oppdatert",
-    "servicesDeletedForRemovedDays": "tjenester ble slettet for fjernede dager."
+    "servicesDeletedForRemovedDays": "tjenester ble slettet for fjernede dager.",
+    "tomorrow": "I morgen",
+    "hexColor": "Hex-fargekode"
   }
 }

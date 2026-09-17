@@ -89,7 +89,8 @@
     "reminder": "Reminder",
     "saved": "saved",
     "activityType": "Activity type",
-    "creating": "Creating..."
+    "creating": "Creating...",
+    "details": "Details"
   },
   "auth": {
     "title": "Fampad",
@@ -1538,6 +1539,8 @@
     "planSchedule": "Plan schedule",
     "documents": "Documents",
     "scheduleUpdated": "Schedule updated",
-    "servicesDeletedForRemovedDays": "services were deleted for removed days."
+    "servicesDeletedForRemovedDays": "services were deleted for removed days.",
+    "tomorrow": "Tomorrow",
+    "hexColor": "Hex color code"
   }
 }

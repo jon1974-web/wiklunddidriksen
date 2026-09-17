@@ -89,7 +89,8 @@
     "reminder": "Muistutus",
     "saved": "tallennettu",
     "activityType": "Toimintatyyppi",
-    "creating": "Luodaan..."
+    "creating": "Luodaan...",
+    "details": "Tiedot"
   },
   "auth": {
     "title": "Fampad",
@@ -1538,6 +1539,8 @@
     "planSchedule": "Suunnittele toisto",
     "documents": "Asiakirjat",
     "scheduleUpdated": "Toisto päivitetty",
-    "servicesDeletedForRemovedDays": "palvelua poistettiin poistettujen päivien osalta."
+    "servicesDeletedForRemovedDays": "palvelua poistettiin poistettujen päivien osalta.",
+    "tomorrow": "Huomenna",
+    "hexColor": "Hex-värikoodi"
   }
 }

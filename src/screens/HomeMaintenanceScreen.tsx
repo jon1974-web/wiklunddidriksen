@@ -688,6 +688,24 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
                 </View>
               </View>
 
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.hexColor')}</Text>
+                <View style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
+                  {colorHex ? (
+                    <View style={[styles.colorSwatch, { backgroundColor: colorHex, width: 36, height: 36 }]} />
+                  ) : (
+                    <View style={[styles.colorSwatch, { backgroundColor: colors.inputBackground, width: 36, height: 36 }]} />
+                  )}
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.surface, color: colors.text, flex: 1 }]}
+                    value={colorHex}
+                    onChangeText={setColorHex}
+                    placeholder="#F5F0EB"
+                    placeholderTextColor={colors.textDisabled}
+                  />
+                </View>
+              </View>
+
               <View style={{ flexDirection: 'row', gap: 12 }}>
                 <View style={[styles.field, { flex: 1 }]}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('homes.colorBrand')}</Text>
