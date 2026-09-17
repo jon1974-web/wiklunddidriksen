@@ -159,26 +159,26 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
         </TouchableOpacity>
       </View>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-          <AppIcon name="activities" size={28} color={HOME_THEME} />
-          <Text style={[styles.screenTitle, { color: colors.text }]}>{t('homes.projects')}</Text>
-          <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
-            <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
-                    <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <AppIcon name="activities" size={28} color={HOME_THEME} />
+            <Text style={[styles.screenTitle, { color: colors.text }]}>{t('homes.projects')}</Text>
+            <TouchableOpacity style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
+              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 9, height: 9, borderRadius: 4.5, backgroundColor: '#3b5a75', alignItems: 'center', justifyContent: 'center' }}>
+                      <Text style={{ color: '#fff', fontSize: 7, fontWeight: '800' }}>i</Text>
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={[styles.addButton, { backgroundColor: HOME_THEME }]}
+            onPress={() => { resetForm(); setShowAddModal(true); }}
+          >
+            <Text style={{ color: '#fff', fontSize: 22, fontWeight: '600', textAlign: 'center', lineHeight: 36 }}>+</Text>
           </TouchableOpacity>
         </View>
         <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 4 }}>{home.name}</Text>
-      </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'flex-end', paddingHorizontal: 16, marginTop: 8 }}>
-        <TouchableOpacity
-          style={[styles.addButton, { backgroundColor: HOME_THEME }]}
-          onPress={() => { resetForm(); setShowAddModal(true); }}
-        >
-          <Text style={{ color: '#fff', fontSize: 22, fontWeight: '600', textAlign: 'center', lineHeight: 36 }}>+</Text>
-        </TouchableOpacity>
       </View>
       <ScrollView style={styles.content}>
         {projects.map((project) => {

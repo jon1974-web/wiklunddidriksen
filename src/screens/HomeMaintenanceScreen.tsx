@@ -231,14 +231,18 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         if (user && savedId) {
           const profile = await getUserProfile(user.uid);
           if (profile?.calendarId) {
-            const calEventId = await syncEventToCalendar({
+            const [startH, startM] = svcStartTime.split(':').map(Number);
+            const eventStartDate = new Date(svcDateFrom);
+            eventStartDate.setHours(startH, startM, 0, 0);
+            const [endH, endM] = svcEndTime.split(':').map(Number);
+            const eventEndDate = new Date(svcDateTo);
+            eventEndDate.setHours(endH, endM, 0, 0);
+            const calEventId = await syncEventToCalendar(profile.calendarId, {
               title: svcTitle.trim(),
               description: svcDescription.trim(),
-              date: svcDateFrom,
-              time: svcStartTime,
-              endDate: svcDateTo,
-              endTime: svcEndTime,
-              calendarId: profile.calendarId,
+              startDate: eventStartDate,
+              endDate: eventEndDate,
+              reminderMinutes: svcReminder,
             });
             if (calEventId && !editingService) {
               await updateDoc(doc(db, 'homeServices', savedId), { calendarEventId: calEventId });
