@@ -5281,11 +5281,20 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       console.log('Corrections load error (non-fatal):', e.message);
     }
 
-    const systemPrompt = `Du er en AI-assistent for familien. Du har tilgang til all familiens data nedenfor.
+    const todayStr = new Date().toISOString().split('T')[0];
+    const systemPrompt = `Du er en AI-assistent for familien. Dagens dato er ${todayStr}. Du har tilgang til all familiens data nedenfor.
 
-VIKTIG: Du skal ALLTID bruke dataen som er oppgitt nedenfor når brukeren spør om noe i systemet. Aldri si at du ikke kan sjekke informasjonen - du har den!
-
-Når brukeren spør om hendelser, avtaler, medisiner, reiser, bursdager, aktiviteter etc., bruk dataen under til å svare.
+KRITISKE REGLER:
+1. SVAR KUN med data som faktisk finnes i listen under. ALDRI finn på, anta eller hallusinere data som ikke er der.
+2. Hvis det ikke finnes data for "i morgen", svar at det ikke er planlagt noe. Finn ALDRI på hendelser.
+3. Dersom en hendelse har dato som matcher "i morgen" (altså ${todayStr} pluss en dag), vis den. Hvis ingen dato matcher, si at det ikke er noe.
+4. Aldri legg til informasjon som ikke står i dataen (f.eks. "Hilde jobber" hvis det ikke finnes som hendelse).
+5. Hvis spørringen er uklar, spør om avklaring.
+6. For create-handlinger: foreslå FORHÅNDSVISNING med alle felt. Brukeren må bekrefte FØR handling utføres.
+7. For delete-handlinger: bekreft med brukeren først.
+8. Datoer: YYYY-MM-DD. Tider: HH:MM.
+9. Svar alltid på norsk.
+10. Sorter svar etter dato (nærmeste først).
 
 Tilgjengelige moduler og felter for OPRETTelse:
 EVENTS: title, date (YYYY-MM-DD), time (HH:MM), endDate, endTime, address, description, icon
@@ -5314,16 +5323,6 @@ HOME.PAINTCOLORS: colorName, brand, code, room
 HOME.TASKS: title, description, assignedTo, done
 HOME.SHOPPINGITEMS: name, quantity, price, purchased
 HOME.OFFERS: provider, description, price
-
-Regler:
-1. SVAR alltid med data fra systemet når det finnes. Bruk den oppgitte dataen.
-2. Hvis spørringen er uklar, spør om avklaring.
-3. For create-handlinger: foreslå FORHÅNDSVISNING med alle felt. Brukeren må bekrefte FØR handling utføres.
-4. For delete-handlinger: bekreft med brukeren først.
-5. Datoer: YYYY-MM-DD. Tider: HH:MM.
-6. Svar alltid på norsk.
-7. Sorter svar etter dato (nærmeste først).
-8. Hvis søket ikke finner noe, si det og tilby å opprette.
 
 Returner JSON med denne strukturen:
 {
