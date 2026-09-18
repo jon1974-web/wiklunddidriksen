@@ -4762,3 +4762,297 @@ exports.onHomeServiceDeletedForCalendar = onDocumentDeleted({ region: "us-centra
     console.error(`onHomeServiceDeletedForCalendar error:`, error);
   }
 });
+
+// AI Assistant: Search + Actions
+exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+  if (!(await checkRateLimit(uid, "aiAssistant"))) return res.status(429).json({ error: "Too many requests" });
+  if (!OPENAI_API_KEY) return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const { message, familyId, history, actions } = req.body;
+
+    // Handle confirmation
+    if (message === '__CONFIRM__' && actions && actions.length > 0) {
+      const results = [];
+      for (const action of actions) {
+        try {
+          await executeAction(uid, familyId, action);
+          results.push(`✓ ${action.description || 'Handling utført'}`);
+        } catch (error) {
+          results.push(`✗ Feil: ${error.message}`);
+        }
+      }
+      return res.json({ reply: results.join('\n'), actions: [] });
+    }
+
+    const systemPrompt = `Du er en AI-assistent for familien. Du kan søke i og utføre handlinger på tvers av alle modulene i appen.
+
+Tilgjengelige moduler og felter:
+
+EVENTS (Hendelser):
+- Felter: title, date (YYYY-MM-DD), time (HH:MM), endDate, endTime, address, description, icon
+- Handlinger: create, update, delete
+
+HEALTH.APPOINTMENTS (Helseavtaler):
+- Felter: title, person, doctor, dateFrom, dateTo, startTime, endTime, location, reminder (minutter)
+- Handlinger: create, update, delete
+
+HEALTH.MEDICATIONS (Medisiner):
+- Felter: name, person, dosage, frequency, timeSlots
+- Handlinger: create, update, delete
+
+HEALTH.VACCINATIONS (Vaksiner):
+- Felter: name, person, date, nextDue, reminder
+- Handlinger: create, update, delete
+
+SCHOOL.ACTIVITIES (Skoleaktiviteter):
+- Felter: title, activityType (tur/aktivitet/møte), dateFrom, dateTo, startTime, endTime, location
+- Handlinger: create, update, delete
+
+KINDERGARTEN.ACTIVITIES (Barnehageaktiviteter):
+- Felter: title, activityType (tur/aktivitet/møte), dateFrom, dateTo, startTime, endTime, location
+- Handlinger: create, update, delete
+
+PETS.VETVISITS (Veterinærbesøk):
+- Felter: title, doctor, dateFrom, dateTo, startTime, endTime, location
+- Handlinger: create, update, delete
+
+SERVICE.APPOINTMENTS (Serviceavtaler):
+- Felter: title, dateFrom, dateTo, startTime, endTime, frequency (once/monthly/quarterly/yearly)
+- Handlinger: create, update, delete
+
+BIRTHDAYS (Bursdager):
+- Felter: name, date (full birth date YYYY-MM-DD)
+- Handlinger: create, update, delete
+
+TRIPS (Reiser):
+- Felter: title, city, country, startDate, endDate, startTime, endTime
+- Handlinger: create, update, delete
+
+SHOPPING (Handlelister):
+- Felter: title, items
+- Handlinger: create, update, delete
+
+Regler:
+1. Hvis forespørselen er uklar, spør om avklaring. Ikke gjett.
+2. For create-handlinger: foreslå alltid en FORHÅNDSVISNING med alle felt fylt inn. Brukeren må bekrefte FØRHandlingen utføres.
+3. For delete-handlinger: bekreft alltid med brukeren først.
+4. Aldri utfør en handling uten brukerens bekreftelse.
+5. For søk: returner treffene klart og tydelig.
+6. Datoer skal være i format YYYY-MM-DD. Tider skal være i format HH:MM.
+7. Når du foreslår en handling, returner ALLTID actions-feltet med typen og dataene.
+8. Svaret ditt skal alltid være på norsk.
+
+Returner alltid JSON med denne strukturen:
+{
+  "reply": "Ditt svar til brukeren",
+  "actions": [
+    {
+      "type": "create|update|delete",
+      "module": "health.appointments|events|etc",
+      "data": { ...felter },
+      "description": "Kort beskrivelse av handlingen"
+    }
+  ]
+}
+
+Hvis det ikke er noen handlinger, returner actions: []
+Hvis du trenger avklaring, returner en melding uten actions og brukeren svarer.`;
+
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...(history || []).map((m) => ({ role: m.role, content: m.content })),
+      { role: "user", content: message },
+    ];
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages,
+      max_tokens: 1000,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+
+    let result;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      result = jsonMatch ? JSON.parse(jsonMatch[0]) : { reply: content, actions: [] };
+    } catch (e) {
+      result = { reply: content, actions: [] };
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error("aiAssistant error:", error);
+    res.status(500).json({ error: "Failed to process request" });
+  }
+});
+
+async function executeAction(uid, familyId, action) {
+  const db = getFirestore();
+
+  if (action.type === 'create') {
+    if (action.module === 'health.appointments') {
+      const ref = await db.collection("health").doc(familyId).collection("appointments").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'health.medications') {
+      const ref = await db.collection("health").doc(familyId).collection("medications").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'health.vaccinations') {
+      const ref = await db.collection("health").doc(familyId).collection("vaccinations").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'events') {
+      const ref = await db.collection("events").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'school.activities') {
+      const ref = await db.collection("schoolActivities").doc(familyId).collection("activities").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'kindergarten.activities') {
+      const ref = await db.collection("kindergartenActivities").doc(familyId).collection("activities").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'pets.vetVisits') {
+      const ref = await db.collection("petVetVisits").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'service.appointments') {
+      const ref = await db.collection("homeServices").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'birthdays') {
+      const ref = await db.collection("birthdays").add({
+        ...action.data,
+        addedBy: uid,
+        addedByName: "",
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'trips') {
+      const ref = await db.collection("trips").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+    if (action.module === 'shopping') {
+      const ref = await db.collection("shoppingLists").add({
+        ...action.data,
+        createdBy: uid,
+        familyId,
+        createdAt: Date.now(),
+      });
+      return { id: ref.id };
+    }
+
+    throw new Error(`Unknown module: ${action.module}`);
+  }
+
+  if (action.type === 'delete') {
+    const { module, data } = action;
+    if (module === 'health.appointments') {
+      await db.collection("health").doc(familyId).collection("appointments").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'health.medications') {
+      await db.collection("health").doc(familyId).collection("medications").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'health.vaccinations') {
+      await db.collection("health").doc(familyId).collection("vaccinations").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'events') {
+      await db.collection("events").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'school.activities') {
+      await db.collection("schoolActivities").doc(familyId).collection("activities").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'kindergarten.activities') {
+      await db.collection("kindergartenActivities").doc(familyId).collection("activities").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'pets.vetVisits') {
+      await db.collection("petVetVisits").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'service.appointments') {
+      await db.collection("homeServices").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'birthdays') {
+      await db.collection("birthdays").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'trips') {
+      await db.collection("trips").doc(data.id).delete();
+      return { id: data.id };
+    }
+    if (module === 'shopping') {
+      await db.collection("shoppingLists").doc(data.id).delete();
+      return { id: data.id };
+    }
+
+    throw new Error(`Unknown module: ${module}`);
+  }
+
+  throw new Error(`Unknown action type: ${action.type}`);
+}

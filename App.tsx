@@ -39,6 +39,7 @@ import { HomeProjectListScreen } from './src/screens/HomeProjectListScreen';
 import { HomeProjectDetailScreen } from './src/screens/HomeProjectDetailScreen';
 import { HomeInstructionsScreen } from './src/screens/HomeInstructionsScreen';
 import { HomeMaintenanceScreen } from './src/screens/HomeMaintenanceScreen';
+import { AIAssistantScreen } from './src/screens/AIAssistantScreen';
 import { HomeServiceDetailScreen } from './src/screens/HomeServiceDetailScreen';
 import { HomeColorDetailScreen } from './src/screens/HomeColorDetailScreen';
 import { PetVetDetailScreen } from './src/screens/PetVetDetailScreen';
@@ -108,6 +109,7 @@ type RootStackParamList = {
   HomeColorDetail: { color: import('./src/types').HomePaintColor; project?: import('./src/types').HomeProject };
   HomeInstructions: { home: import('./src/types').Home };
   HomeMaintenance: { home: import('./src/types').Home };
+  AIAssistant: { _t?: number };
   HomeServiceDetail: { service: import('./src/types').HomeService; home?: import('./src/types').Home };
   PetVetDetail: { visit: import('./src/types').PetVetVisit; petName?: string };
   PetVaccDetail: { vaccination: import('./src/types').PetVaccination; petName?: string };
@@ -322,6 +324,11 @@ const TripsStack = () => {
         <Stack.Screen
           name="HomeMaintenance"
           component={HomeMaintenanceScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="AIAssistant"
+          component={AIAssistantScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

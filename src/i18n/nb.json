@@ -1279,7 +1279,9 @@
     "homeService": "Service avtale",
     "addService": "Manuelt",
     "voiceService": "Tale",
-    "photoService": "Foto"
+    "photoService": "Foto",
+    "quickCreate.aiAssistant": "AI-assistent",
+    "quickCreate.openAssistant": "Start"
   },
   "tabs": {
     "events": "Avtaler",

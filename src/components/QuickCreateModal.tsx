@@ -31,6 +31,13 @@ interface Section {
 
 const SECTIONS: Section[] = [
   {
+    key: 'aiAssistant',
+    color: MODULE_COLORS.home,
+    moduleIcon: 'ai',
+    labelKey: 'quickCreate.aiAssistant',
+    items: [],
+  },
+  {
     key: 'events',
     color: '#3b5a75',
     moduleIcon: 'calendar',
@@ -141,14 +148,23 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                     </View>
                     <Text style={[styles.moduleName, { color: section.color }]}>{t(section.labelKey)}</Text>
                     <View style={styles.actionChips}>
-                      {section.items.map((item, i) => (
-                        <TouchableOpacity key={i} style={styles.actionChip} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
+                      {section.key === 'aiAssistant' ? (
+                        <TouchableOpacity style={styles.actionChip} onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'AIAssistant', params: { _t: Date.now() } }))} activeOpacity={0.6}>
                           <View style={styles.actionIconWrap}>
-                            <AppIcon name={item.icon} size={20} color={section.color} />
+                            <AppIcon name="ai" size={20} color={section.color} />
                           </View>
-                          <Text style={[styles.actionLabel, { color: section.color }]}>{t(item.labelKey)}</Text>
+                          <Text style={[styles.actionLabel, { color: section.color }]}>{t('quickCreate.openAssistant')}</Text>
                         </TouchableOpacity>
-                      ))}
+                      ) : (
+                        section.items.map((item, i) => (
+                          <TouchableOpacity key={i} style={styles.actionChip} onPress={() => navigateAndClose(() => item.nav(navigation))} activeOpacity={0.6}>
+                            <View style={styles.actionIconWrap}>
+                              <AppIcon name={item.icon} size={20} color={section.color} />
+                            </View>
+                            <Text style={[styles.actionLabel, { color: section.color }]}>{t(item.labelKey)}</Text>
+                          </TouchableOpacity>
+                        ))
+                      )}
                     </View>
                   </View>
                 ))}

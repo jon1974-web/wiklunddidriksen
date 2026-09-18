@@ -1279,7 +1279,9 @@
     "homeService": "Palveluille",
     "addService": "Manuaalinen",
     "voiceService": "Puhe",
-    "photoService": "Valokuva"
+    "photoService": "Valokuva",
+    "quickCreate.aiAssistant": "AI-avustaja",
+    "quickCreate.openAssistant": "Aloita"
   },
   "tabs": {
     "events": "Tapahtumamme",

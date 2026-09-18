@@ -1279,7 +1279,9 @@
     "homeService": "Service appointment",
     "addService": "Manual",
     "voiceService": "Voice",
-    "photoService": "Photo"
+    "photoService": "Photo",
+    "quickCreate.aiAssistant": "AI Assistant",
+    "quickCreate.openAssistant": "Start"
   },
   "tabs": {
     "events": "Events",

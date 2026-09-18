@@ -1279,7 +1279,9 @@
     "homeService": "Serviceaftale",
     "addService": "Manuelt",
     "voiceService": "Tale",
-    "photoService": "Foto"
+    "photoService": "Foto",
+    "quickCreate.aiAssistant": "AI-assistent",
+    "quickCreate.openAssistant": "Start"
   },
   "tabs": {
     "events": "Vores begivenheder",
