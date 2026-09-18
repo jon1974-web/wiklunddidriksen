@@ -227,7 +227,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
               <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowConfirm(false); setConfirmActions([]); }}>
                 <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{t('common.cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: HOME_THEME, flex: 1 }]} onPress={handleConfirm}>
+              <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: HOME_COLOR, flex: 1 }]} onPress={handleConfirm}>
                 <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{t('common.confirm')}</Text>
               </TouchableOpacity>
             </View>
@@ -248,7 +248,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
             returnKeyType="send"
           />
           <TouchableOpacity
-            style={[styles.sendBtn, { backgroundColor: input.trim() ? HOME_THEME : colors.textDisabled }]}
+            style={[styles.sendBtn, { backgroundColor: input.trim() ? HOME_COLOR : colors.textDisabled }]}
             onPress={() => sendMessage(input)}
             disabled={!input.trim() || loading}
           >
