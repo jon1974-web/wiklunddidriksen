@@ -209,7 +209,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
-  sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '70%' },
+  sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   handle: { width: 36, height: 4, borderRadius: 2, backgroundColor: '#ddd', alignSelf: 'center', marginTop: 10 },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, paddingBottom: 8 },
   title: { fontSize: 20, fontWeight: '700' },
