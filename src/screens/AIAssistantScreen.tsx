@@ -37,6 +37,9 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
   const [confirmActions, setConfirmActions] = useState<any[]>([]);
+  const [correctionMsgId, setCorrectionMsgId] = useState<string | null>(null);
+  const [correctionText, setCorrectionText] = useState('');
+  const [correctionQuery, setCorrectionQuery] = useState('');
   const scrollRef = useRef<ScrollView>(null);
 
   const messagesRef = useRef<Message[]>([]);
@@ -169,6 +172,50 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
     }
   };
 
+  const sendCorrection = async (originalQuery: string, correctAnswer: string) => {
+    if (!familyId || !correctAnswer.trim()) return;
+    setCorrectionMsgId(null);
+    setCorrectionText('');
+    setCorrectionQuery('');
+    setLoading(true);
+
+    try {
+      const { auth } = await import('../services/firebase');
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) return;
+
+      await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/aiAssistant', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${idToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: '__CORRECTION__',
+          originalQuery,
+          correctAnswer,
+          familyId,
+        }),
+      });
+
+      const thanksMsg: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: 'Takk! Jeg har lært dette for fremtiden. 🧠',
+        timestamp: Date.now(),
+      };
+      setMessages((prev) => {
+        const updated = [...prev, thanksMsg];
+        messagesRef.current = updated;
+        return updated;
+      });
+    } catch (error) {
+      console.log('Correction error:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
@@ -195,14 +242,58 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
         )}
 
         {messages.map((msg) => (
-          <View key={msg.id} style={[styles.messageBubble, msg.role === 'user' ? styles.userBubble : styles.assistantBubble, { backgroundColor: msg.role === 'user' ? colors.accent : colors.surface }]}>
-            {msg.role === 'assistant' && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-                <AppIcon name="ai" size={14} color={HOME_COLOR} />
-                <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>AI-assistent</Text>
+          <View key={msg.id}>
+            <View style={[styles.messageBubble, msg.role === 'user' ? styles.userBubble : styles.assistantBubble, { backgroundColor: msg.role === 'user' ? colors.accent : colors.surface }]}>
+              {msg.role === 'assistant' && (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                  <AppIcon name="ai" size={14} color={HOME_COLOR} />
+                  <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>AI-assistent</Text>
+                </View>
+              )}
+              <Text style={{ fontSize: 14, color: msg.role === 'user' ? '#fff' : colors.text, lineHeight: 20 }}>{msg.content}</Text>
+            </View>
+            {msg.role === 'assistant' && !loading && (
+              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8, marginBottom: 4, gap: 6 }}>
+                {correctionMsgId !== msg.id && (
+                  <TouchableOpacity
+                    onPress={() => {
+                      setCorrectionMsgId(msg.id);
+                      const userMsg = messages.find((m, i) => {
+                        const msgIndex = messages.indexOf(msg);
+                        return i < msgIndex && m.role === 'user';
+                      });
+                      setCorrectionQuery(userMsg?.content || '');
+                    }}
+                    style={{ paddingVertical: 2, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
+                  >
+                    <Text style={{ fontSize: 10, color: colors.textSecondary }}>Var dette riktig?</Text>
+                  </TouchableOpacity>
+                )}
+                {correctionMsgId === msg.id && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 }}>
+                    <TextInput
+                      style={{ flex: 1, fontSize: 13, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: colors.inputBackground, color: colors.text }}
+                      value={correctionText}
+                      onChangeText={setCorrectionText}
+                      placeholder="Skriv riktig svar..."
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                    <TouchableOpacity
+                      onPress={() => sendCorrection(correctionQuery, correctionText)}
+                      style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: HOME_COLOR }}
+                    >
+                      <Text style={{ fontSize: 11, color: '#fff', fontWeight: '600' }}>OK</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      onPress={() => { setCorrectionMsgId(null); setCorrectionText(''); }}
+                      style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
+                    >
+                      <Text style={{ fontSize: 11, color: colors.textSecondary }}>✕</Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
               </View>
             )}
-            <Text style={{ fontSize: 14, color: msg.role === 'user' ? '#fff' : colors.text, lineHeight: 20 }}>{msg.content}</Text>
           </View>
         ))}
 

@@ -4763,6 +4763,233 @@ exports.onHomeServiceDeletedForCalendar = onDocumentDeleted({ region: "us-centra
   }
 });
 
+async function searchFamilyData(db, familyId, userMessage) {
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+  const next30 = new Date(today);
+  next30.setDate(next30.getDate() + 30);
+  const next30Str = next30.toISOString().split('T')[0];
+  const past90 = new Date(today);
+  past90.setDate(past90.getDate() - 90);
+  const past90Str = past90.toISOString().split('T')[0];
+  const results = {};
+
+  async function safeGet(q) {
+    try { const s = await q.get(); return s.docs.map(d => ({ id: d.id, ...d.data() })); } catch(e) { console.log('searchFamilyData safeGet error:', e.message); return []; }
+  }
+
+  // EVENTS - upcoming + recent (index: familyId ASC, date ASC)
+  results.events = await safeGet(
+    db.collection('events').where('familyId', '==', familyId).where('date', '>=', past90Str).where('date', '<=', next30Str).orderBy('date', 'asc').limit(50)
+  );
+
+  // TRIPS - all with endDate (no orderBy to avoid index issues, sort in code)
+  results.trips = await safeGet(
+    db.collection('trips').where('familyId', '==', familyId).limit(30)
+  );
+  results.trips.sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''));
+
+  // BIRTHDAYS - all (index: familyId ASC, date ASC)
+  results.birthdays = await safeGet(
+    db.collection('birthdays').where('familyId', '==', familyId).orderBy('date', 'asc').limit(50)
+  );
+
+  // HEALTH appointments (subcollection, no familyId field - just dateFrom filter)
+  results.healthAppointments = await safeGet(
+    db.collection('health').doc(familyId).collection('appointments').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(30)
+  );
+  results.healthAppointments.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+
+  // HEALTH medications
+  results.healthMedications = await safeGet(
+    db.collection('health').doc(familyId).collection('medications').limit(20)
+  );
+
+  // HEALTH vaccinations
+  results.healthVaccinations = await safeGet(
+    db.collection('health').doc(familyId).collection('vaccinations').limit(20)
+  );
+  results.healthVaccinations.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  // PET vet visits (index: familyId ASC, dateFrom DESC)
+  results.petVetVisits = await safeGet(
+    db.collection('petVetVisits').where('familyId', '==', familyId).where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
+  );
+  results.petVetVisits.sort((a, b) => (b.dateFrom || '').localeCompare(a.dateFrom || ''));
+
+  // PETS
+  results.pets = await safeGet(
+    db.collection('pets').where('familyId', '==', familyId).limit(20)
+  );
+
+  // SERVICE APPOINTMENTS (home services) (index: familyId ASC, dateFrom ASC)
+  results.serviceAppointments = await safeGet(
+    db.collection('homeServices').where('familyId', '==', familyId).where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
+  );
+  results.serviceAppointments.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+
+  // SCHOOL activities (subcollection)
+  results.schoolActivities = await safeGet(
+    db.collection('schoolActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
+  );
+  results.schoolActivities.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+
+  // KINDERGARTEN activities (subcollection)
+  results.kindergartenActivities = await safeGet(
+    db.collection('kindergartenActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
+  );
+  results.kindergartenActivities.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+
+  // SHOPPING LISTS (index: familyId ASC, createdAt DESC)
+  results.shoppingLists = await safeGet(
+    db.collection('shoppingLists').where('familyId', '==', familyId).limit(10)
+  );
+
+  // SCHOOL holidays
+  results.schoolHolidays = await safeGet(
+    db.collection('schoolHolidays').where('familyId', '==', familyId).limit(50)
+  );
+
+  // KINDERGARTEN holidays
+  results.kindergartenHolidays = await safeGet(
+    db.collection('kindergartenHolidays').where('familyId', '==', familyId).limit(50)
+  );
+
+  // HOMES + PROJECTS
+  results.homes = await safeGet(
+    db.collection('homes').where('familyId', '==', familyId).limit(10)
+  );
+  results.homeProjects = await safeGet(
+    db.collection('homeProjects').where('familyId', '==', familyId).limit(20)
+  );
+  results.homeProjects.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  return results;
+}
+
+function formatDataForGPT(data) {
+  const lines = [];
+  const today = new Date().toISOString().split('T')[0];
+
+  if (data.trips && data.trips.length > 0) {
+    lines.push('--- REISER ---');
+    data.trips.forEach(t => {
+      const status = t.startDate > today ? 'Planlagt' : t.endDate < today ? 'Fullført' : 'Pågående';
+      lines.push(`• ${t.title || t.destination || 'Uten navn'} | ${t.startDate || '?'} → ${t.endDate || '?'} | Status: ${status}`);
+    });
+  }
+
+  if (data.events && data.events.length > 0) {
+    lines.push('--- HENDELSER ---');
+    data.events.forEach(e => {
+      lines.push(`• ${e.title || 'Uten navn'} | ${e.date || '?'} ${e.time || ''} → ${e.endDate || ''} ${e.endTime || ''} | ${e.address || ''}`);
+    });
+  }
+
+  if (data.healthAppointments && data.healthAppointments.length > 0) {
+    lines.push('--- HELSEAVTALER ---');
+    data.healthAppointments.forEach(a => {
+      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} ${a.startTime || ''} | Lege: ${a.doctor || ''} | Sted: ${a.location || ''}`);
+    });
+  }
+
+  if (data.healthMedications && data.healthMedications.length > 0) {
+    lines.push('--- MEDISINER ---');
+    data.healthMedications.forEach(m => {
+      lines.push(`• ${m.name || '?'} | Dosering: ${m.dosage || ''} | Frekvens: ${m.frequency || ''}`);
+    });
+  }
+
+  if (data.healthVaccinations && data.healthVaccinations.length > 0) {
+    lines.push('--- VAKSINER ---');
+    data.healthVaccinations.forEach(v => {
+      lines.push(`• ${v.name || '?'} | Dato: ${v.date || ''} | Neste: ${v.nextDue || ''}`);
+    });
+  }
+
+  if (data.pets && data.pets.length > 0) {
+    lines.push('--- KJÆLEDYR ---');
+    data.pets.forEach(p => {
+      lines.push(`• ${p.name || '?'} | ${p.species || ''} ${p.breed || ''}`);
+    });
+  }
+
+  if (data.petVetVisits && data.petVetVisits.length > 0) {
+    lines.push('--- VETERINÆRBESØK ---');
+    data.petVetVisits.forEach(v => {
+      lines.push(`• ${v.name || 'Uten navn'} | ${v.dateFrom || '?'} ${v.startTime || ''} | Lege: ${v.doctor || ''}`);
+    });
+  }
+
+  if (data.serviceAppointments && data.serviceAppointments.length > 0) {
+    lines.push('--- SERVICEAVTALER ---');
+    data.serviceAppointments.forEach(s => {
+      lines.push(`• ${s.title || s.name || 'Uten navn'} | ${s.dateFrom || '?'} ${s.startTime || ''} | Frekvens: ${s.frequency || ''}`);
+    });
+  }
+
+  if (data.schoolActivities && data.schoolActivities.length > 0) {
+    lines.push('--- SKOLEAKTIVITETER ---');
+    data.schoolActivities.forEach(a => {
+      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}`);
+    });
+  }
+
+  if (data.kindergartenActivities && data.kindergartenActivities.length > 0) {
+    lines.push('--- BARNEHAGEAKTIVITETER ---');
+    data.kindergartenActivities.forEach(a => {
+      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}`);
+    });
+  }
+
+  if (data.birthdays && data.birthdays.length > 0) {
+    lines.push('--- BURSDAGER ---');
+    data.birthdays.forEach(b => {
+      lines.push(`• ${b.name || '?'} | ${b.date || '?'} (fødselsdag)`);
+    });
+  }
+
+  if (data.shoppingLists && data.shoppingLists.length > 0) {
+    lines.push('--- HANDLELISTER ---');
+    data.shoppingLists.forEach(s => {
+      const count = s.items ? s.items.length : 0;
+      const unchecked = s.items ? s.items.filter(i => !i.checked).length : 0;
+      lines.push(`• ${s.title || 'Uten navn'} | ${unchecked}/${count} gjenstående`);
+    });
+  }
+
+  if (data.schoolHolidays && data.schoolHolidays.length > 0) {
+    lines.push('--- SKOLEFRIE ---');
+    data.schoolHolidays.forEach(h => {
+      lines.push(`• ${h.title || '?'} | ${h.dateFrom || '?'} → ${h.dateTo || ''}`);
+    });
+  }
+
+  if (data.kindergartenHolidays && data.kindergartenHolidays.length > 0) {
+    lines.push('--- BARNEHAGEFRIE ---');
+    data.kindergartenHolidays.forEach(h => {
+      lines.push(`• ${h.title || '?'} | ${h.dateFrom || '?'} → ${h.dateTo || ''}`);
+    });
+  }
+
+  if (data.homes && data.homes.length > 0) {
+    lines.push('--- HJEM ---');
+    data.homes.forEach(h => {
+      lines.push(`• ${h.name || '?'} | ${h.address || ''} | Type: ${h.type || ''}`);
+    });
+  }
+
+  if (data.homeProjects && data.homeProjects.length > 0) {
+    lines.push('--- PROSJEKTER ---');
+    data.homeProjects.forEach(p => {
+      lines.push(`• ${p.name || '?'} | Status: ${p.status || ''} | ${p.startDate || ''} → ${p.endDate || ''}`);
+    });
+  }
+
+  if (lines.length === 0) return 'Ingen data funnet i systemet.';
+  return lines.join('\n');
+}
+
 // AI Assistant: Search + Actions
 exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
@@ -4793,90 +5020,94 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       return res.json({ reply: results.join('\n'), actions: [] });
     }
 
-    const systemPrompt = `Du er en AI-assistent for familien. Du kan søke i og utføre handlinger på tvers av alle modulene i appen.
+    const db = getFirestore();
 
-Tilgjengelige moduler og felter:
+    // Handle correction — store learning
+    if (message === '__CORRECTION__' && req.body.originalQuery && req.body.correctAnswer) {
+      await db.collection('aiLearnedCorrections').add({
+        familyId,
+        query: req.body.originalQuery,
+        correctAnswer: req.body.correctAnswer,
+        createdBy: uid,
+        createdAt: Date.now(),
+      });
+      return res.json({ reply: 'Takk! Jeg har lært dette for fremtiden.', actions: [] });
+    }
 
-EVENTS (Hendelser):
-- Felter: title, date (YYYY-MM-DD), time (HH:MM), endDate, endTime, address, description, icon
-- Handlinger: create, update, delete
+    // STEP 1: Search all family data
+    const familyData = await searchFamilyData(db, familyId, message);
+    const dataContext = formatDataForGPT(familyData);
 
-HEALTH.APPOINTMENTS (Helseavtaler):
-- Felter: title, person, doctor, dateFrom, dateTo, startTime, endTime, location, reminder (minutter)
-- Handlinger: create, update, delete
+    // STEP 1.5: Load relevant corrections (top 5)
+    let correctionContext = '';
+    try {
+      const correctionsSnap = await db.collection('aiLearnedCorrections')
+        .where('familyId', '==', familyId)
+        .orderBy('createdAt', 'desc')
+        .limit(50)
+        .get();
+      const corrections = correctionsSnap.docs.map(d => d.data());
+      const msgWords = message.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+      const relevant = corrections.filter(c => {
+        const cq = (c.query || '').toLowerCase();
+        return msgWords.some(w => cq.includes(w));
+      }).slice(0, 5);
+      if (relevant.length > 0) {
+        correctionContext = '\n\nTIDLIGERE KORRIGERINGER fra brukeren (BRUK DISSE når de er relevante):\n' +
+          relevant.map(c => `- Sporsmal: "${c.query}" -> Riktig svar: "${c.correctAnswer}"`).join('\n');
+      }
+    } catch (e) {
+      console.log('Corrections load error (non-fatal):', e.message);
+    }
 
-HEALTH.MEDICATIONS (Medisiner):
-- Felter: name, person, dosage, frequency, timeSlots
-- Handlinger: create, update, delete
+    const systemPrompt = `Du er en AI-assistent for familien. Du har tilgang til all familiens data nedenfor.
 
-HEALTH.VACCINATIONS (Vaksiner):
-- Felter: name, person, date, nextDue, reminder
-- Handlinger: create, update, delete
+VIKTIG: Du skal ALLTID bruke dataen som er oppgitt nedenfor når brukeren spør om noe i systemet. Aldri si at du ikke kan sjekke informasjonen - du har den!
 
-SCHOOL.ACTIVITIES (Skoleaktiviteter):
-- Felter: title, activityType (tur/aktivitet/møte), dateFrom, dateTo, startTime, endTime, location
-- Handlinger: create, update, delete
+Når brukeren spør om hendelser, avtaler, medisiner, reiser, bursdager, aktiviteter etc., bruk dataen under til å svare.
 
-KINDERGARTEN.ACTIVITIES (Barnehageaktiviteter):
-- Felter: title, activityType (tur/aktivitet/møte), dateFrom, dateTo, startTime, endTime, location
-- Handlinger: create, update, delete
-
-PETS.VETVISITS (Veterinærbesøk):
-- Felter: title, doctor, dateFrom, dateTo, startTime, endTime, location
-- Handlinger: create, update, delete
-
-SERVICE.APPOINTMENTS (Serviceavtaler):
-- Felter: title, dateFrom, dateTo, startTime, endTime, frequency (once/monthly/quarterly/yearly)
-- Handlinger: create, update, delete
-
-BIRTHDAYS (Bursdager):
-- Felter: name, date (full birth date YYYY-MM-DD)
-- Handlinger: create, update, delete
-
-TRIPS (Reiser):
-- Felter: title, city, country, startDate, endDate, startTime, endTime
-- Handlinger: create, update, delete
-
-SHOPPING (Handlelister):
-- Felter: title, items
-- Handlinger: create, update, delete
+Tilgjengelige moduler og felter for OPRETT else:
+EVENTS: title, date (YYYY-MM-DD), time (HH:MM), endDate, endTime, address, description, icon
+HEALTH.APPOINTMENTS: name, dateFrom, dateTo, startTime, endTime, doctor, location
+HEALTH.MEDICATIONS: name, dosage, frequency, timeSlots
+HEALTH.VACCINATIONS: name, date, nextDue
+SCHOOL.ACTIVITIES: name, dateFrom, dateTo, startTime, endTime, location
+KINDERGARTEN.ACTIVITIES: name, dateFrom, dateTo, startTime, endTime, location
+PETS.VETVISITS: name, doctor, dateFrom, dateTo, startTime, endTime, location
+SERVICE.APPOINTMENTS (homeServices): title, dateFrom, dateTo, startTime, endTime, frequency
+BIRTHDAYS: name, date (YYYY-MM-DD)
+TRIPS: title, destination, startDate, endDate
+SHOPPING: title, items (array)
 
 Regler:
-1. Hvis forespørselen er uklar, spør om avklaring. Ikke gjett.
-2. For create-handlinger: foreslå alltid en FORHÅNDSVISNING med alle felt fylt inn. Brukeren må bekrefte FØRHandlingen utføres.
-3. For delete-handlinger: bekreft alltid med brukeren først.
-4. Aldri utfør en handling uten brukerens bekreftelse.
-5. For søk: returner treffene klart og tydelig.
-6. Datoer skal være i format YYYY-MM-DD. Tider skal være i format HH:MM.
-7. Når du foreslår en handling, returner ALLTID actions-feltet med typen og dataene.
-8. Svaret ditt skal alltid være på norsk.
+1. SVAR alltid med data fra systemet når det finnes. Bruk den oppgitte dataen.
+2. Hvis spørringen er uklar, spør om avklaring.
+3. For create-handlinger: foreslå FORHÅNDSVISNING med alle felt. Brukeren må bekrefte FØR handling utføres.
+4. For delete-handlinger: bekreft med brukeren først.
+5. Datoer: YYYY-MM-DD. Tider: HH:MM.
+6. For挪威-språk - svar alltid på norsk.
+7. Sorter svar etter dato (nærmeste først).
+8. Hvis søket ikke finner noe, si det og tilby å opprette.
 
-Returner alltid JSON med denne strukturen:
+Returner JSON med denne strukturen:
 {
-  "reply": "Ditt svar til brukeren",
-  "actions": [
-    {
-      "type": "create|update|delete",
-      "module": "health.appointments|events|etc",
-      "data": { ...felter },
-      "description": "Kort beskrivelse av handlingen"
-    }
-  ]
+  "reply": "Svaret ditt med faktiske data fra systemet",
+  "actions": [{ "type": "create|update|delete", "module": "...", "data": {}, "description": "..." }]
 }
+Hvis ingen handlinger: actions: []`;
 
-Hvis det ikke er noen handlinger, returner actions: []
-Hvis du trenger avklaring, returner en melding uten actions og brukeren svarer.`;
+    const dataMessage = `Familiens data i systemet:\n${dataContext}${correctionContext}\n\nBrukerens sporsmal: ${message}`;
 
     const messages = [
       { role: "system", content: systemPrompt },
       ...(history || []).map((m) => ({ role: m.role, content: m.content })),
-      { role: "user", content: message },
+      { role: "user", content: dataMessage },
     ];
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages,
-      max_tokens: 1000,
+      max_tokens: 1500,
     });
 
     const content = response.choices[0]?.message?.content || "";

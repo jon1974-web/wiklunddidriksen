@@ -312,6 +312,14 @@
         { "fieldPath": "childId", "order": "ASCENDING" },
         { "fieldPath": "dateFrom", "order": "DESCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "aiLearnedCorrections",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "familyId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
     }
   ],
   "fieldOverrides": []
