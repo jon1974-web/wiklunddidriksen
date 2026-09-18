@@ -51,6 +51,7 @@ import { LANGUAGES } from '../constants/languages';
 import i18n from '../i18n';
 import { HelpCenter } from '../components/HelpCenter';
 import { AppIcon } from '../components/AppIcon';
+import { ActionModal } from '../components/ActionModal';
 
 export const ProfileScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -100,6 +101,8 @@ export const ProfileScreen: React.FC = () => {
   const [showHelpFamily, setShowHelpFamily] = useState(false);
   const [showHelpMembers, setShowHelpMembers] = useState(false);
   const [showHelpSpond, setShowHelpSpond] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showDisconnectSpondModal, setShowDisconnectSpondModal] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -615,39 +618,30 @@ export const ProfileScreen: React.FC = () => {
 
   const handleDisconnectSpond = useCallback(async () => {
     if (!familyId) return;
-    crossAlert('Koble fra Spond', 'Er du sikker?', [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Koble fra',
-        style: 'destructive',
-        onPress: async () => {
-          await saveSpondConfig(familyId, { email: '', password: '', groups: [], respondents: [] });
-          setSpondEmail('');
-          setSpondPassword('');
-          setSpondGroups([]);
-          setSpondSelectedGroups([]);
-          setSpondAllMembers([]);
-          setSpondRespondents([]);
-          setSpondConnected(false);
-          clearSpondToken();
-        },
-      },
-    ]);
+    setShowDisconnectSpondModal(true);
+  }, [familyId]);
+
+  const performDisconnectSpond = useCallback(async () => {
+    if (!familyId) return;
+    await saveSpondConfig(familyId, { email: '', password: '', groups: [], respondents: [] });
+    setSpondEmail('');
+    setSpondPassword('');
+    setSpondGroups([]);
+    setSpondSelectedGroups([]);
+    setSpondAllMembers([]);
+    setSpondRespondents([]);
+    setSpondConnected(false);
+    clearSpondToken();
   }, [familyId]);
 
   const handleLogout = async () => {
-    crossAlert('Logg ut', 'Er du sikker på at du vil logge ut?', [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Logg ut',
-        style: 'destructive',
-        onPress: async () => {
-          await signOut(auth);
-          setUser(null);
-          setFamily(null, null);
-        },
-      },
-    ]);
+    setShowLogoutModal(true);
+  };
+
+  const performLogout = async () => {
+    await signOut(auth);
+    setUser(null);
+    setFamily(null, null);
   };
 
   if (loading) {
@@ -1416,6 +1410,21 @@ export const ProfileScreen: React.FC = () => {
         { icon: '⚽', title: t('profile.helpSpondWhat'), text: t('profile.helpSpondWhatText') },
         { icon: '👉', title: t('profile.helpSpondHow'), text: t('profile.helpSpondHowText'), tip: t('profile.helpSpondTip') },
       ]} />
+
+      <ActionModal
+        visible={showLogoutModal}
+        title={t('profile.logout')}
+        subtitle="Er du sikker på at du vil logge ut?"
+        onDelete={performLogout}
+        onCancel={() => setShowLogoutModal(false)}
+      />
+      <ActionModal
+        visible={showDisconnectSpondModal}
+        title="Koble fra Spond"
+        subtitle="Er du sikker?"
+        onDelete={performDisconnectSpond}
+        onCancel={() => setShowDisconnectSpondModal(false)}
+      />
 
     </SafeAreaView>
   );

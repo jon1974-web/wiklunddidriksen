@@ -9,6 +9,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
+import { ActionModal } from '../components/ActionModal';
 
 const generateId = () => Date.now().toString(36) + Math.random().toString(36).substr(2);
 
@@ -34,6 +35,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   const [renameModalVisible, setRenameModalVisible] = useState(false);
   const [renamingItem, setRenamingItem] = useState<ShoppingItem | null>(null);
   const [renameValue, setRenameValue] = useState('');
+  const [showDeleteListModal, setShowDeleteListModal] = useState(false);
   const newItemInputRef = useRef<TextInput>(null);
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
@@ -63,21 +65,16 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   }, [routeList?.id]);
 
   const handleDeleteList = useCallback(() => {
-    crossAlert('Slett liste', 'Er du sikker på at du vil slette denne listen?', [
-      { text: 'Avbryt', style: 'cancel' },
-      {
-        text: 'Slett',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await deleteDoc(doc(db, 'shoppingLists', routeList.id));
-            navigation.goBack();
-          } catch (error) {
-            crossAlert('Error', getErrorMessage(error));
-          }
-        },
-      },
-    ]);
+    setShowDeleteListModal(true);
+  }, []);
+
+  const performDeleteList = useCallback(async () => {
+    try {
+      await deleteDoc(doc(db, 'shoppingLists', routeList.id));
+      navigation.goBack();
+    } catch (error) {
+      crossAlert('Error', getErrorMessage(error));
+    }
   }, [routeList?.id, navigation]);
 
   const handleCopyList = useCallback(async () => {
@@ -262,6 +259,14 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
           </View>
         </View>
       </Modal>
+
+      <ActionModal
+        visible={showDeleteListModal}
+        title="Slett liste"
+        subtitle="Er du sikker på at du vil slette denne listen?"
+        onDelete={performDeleteList}
+        onCancel={() => setShowDeleteListModal(false)}
+      />
     </View>
   );
 };
