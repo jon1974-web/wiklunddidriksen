@@ -4775,87 +4775,52 @@ async function searchFamilyData(db, familyId, userMessage) {
   const results = {};
 
   async function safeGet(q) {
-    try { const s = await q.get(); return s.docs.map(d => ({ id: d.id, ...d.data() })); } catch(e) { console.log('searchFamilyData safeGet error:', e.message); return []; }
+    try { const s = await q.get(); return s.docs.map(d => ({ id: d.id, ...d.data() })); } catch(e) { return []; }
   }
 
-  // EVENTS - upcoming + recent (index: familyId ASC, date ASC)
+  // FLAT COLLECTIONS
   results.events = await safeGet(
     db.collection('events').where('familyId', '==', familyId).where('date', '>=', past90Str).where('date', '<=', next30Str).orderBy('date', 'asc').limit(50)
   );
-
-  // TRIPS - all with endDate (no orderBy to avoid index issues, sort in code)
   results.trips = await safeGet(
     db.collection('trips').where('familyId', '==', familyId).limit(30)
   );
   results.trips.sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''));
-
-  // BIRTHDAYS - all (index: familyId ASC, date ASC)
   results.birthdays = await safeGet(
     db.collection('birthdays').where('familyId', '==', familyId).orderBy('date', 'asc').limit(50)
   );
-
-  // HEALTH appointments (subcollection, no familyId field - just dateFrom filter)
-  results.healthAppointments = await safeGet(
-    db.collection('health').doc(familyId).collection('appointments').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(30)
+  results.gifts = await safeGet(
+    db.collection('gifts').where('familyId', '==', familyId).limit(50)
   );
-  results.healthAppointments.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
-
-  // HEALTH medications
-  results.healthMedications = await safeGet(
-    db.collection('health').doc(familyId).collection('medications').limit(20)
+  results.pets = await safeGet(
+    db.collection('pets').where('familyId', '==', familyId).limit(20)
   );
-
-  // HEALTH vaccinations
-  results.healthVaccinations = await safeGet(
-    db.collection('health').doc(familyId).collection('vaccinations').limit(20)
-  );
-  results.healthVaccinations.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-
-  // PET vet visits (index: familyId ASC, dateFrom DESC)
   results.petVetVisits = await safeGet(
     db.collection('petVetVisits').where('familyId', '==', familyId).where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
   );
   results.petVetVisits.sort((a, b) => (b.dateFrom || '').localeCompare(a.dateFrom || ''));
-
-  // PETS
-  results.pets = await safeGet(
-    db.collection('pets').where('familyId', '==', familyId).limit(20)
+  results.petMedications = await safeGet(
+    db.collection('petMedications').where('familyId', '==', familyId).limit(20)
   );
-
-  // SERVICE APPOINTMENTS (home services) (index: familyId ASC, dateFrom ASC)
+  results.petFood = await safeGet(
+    db.collection('petFood').where('familyId', '==', familyId).limit(20)
+  );
+  results.petGrooming = await safeGet(
+    db.collection('petGrooming').where('familyId', '==', familyId).limit(20)
+  );
+  results.petVaccinations = await safeGet(
+    db.collection('petVaccinations').where('familyId', '==', familyId).limit(20)
+  );
+  results.petInsurance = await safeGet(
+    db.collection('petInsurance').where('familyId', '==', familyId).limit(20)
+  );
   results.serviceAppointments = await safeGet(
     db.collection('homeServices').where('familyId', '==', familyId).where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
   );
   results.serviceAppointments.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
-
-  // SCHOOL activities (subcollection)
-  results.schoolActivities = await safeGet(
-    db.collection('schoolActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
-  );
-  results.schoolActivities.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
-
-  // KINDERGARTEN activities (subcollection)
-  results.kindergartenActivities = await safeGet(
-    db.collection('kindergartenActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
-  );
-  results.kindergartenActivities.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
-
-  // SHOPPING LISTS (index: familyId ASC, createdAt DESC)
   results.shoppingLists = await safeGet(
     db.collection('shoppingLists').where('familyId', '==', familyId).limit(10)
   );
-
-  // SCHOOL holidays
-  results.schoolHolidays = await safeGet(
-    db.collection('schoolHolidays').where('familyId', '==', familyId).limit(50)
-  );
-
-  // KINDERGARTEN holidays
-  results.kindergartenHolidays = await safeGet(
-    db.collection('kindergartenHolidays').where('familyId', '==', familyId).limit(50)
-  );
-
-  // HOMES + PROJECTS
   results.homes = await safeGet(
     db.collection('homes').where('familyId', '==', familyId).limit(10)
   );
@@ -4863,6 +4828,90 @@ async function searchFamilyData(db, familyId, userMessage) {
     db.collection('homeProjects').where('familyId', '==', familyId).limit(20)
   );
   results.homeProjects.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  results.homeInstructions = await safeGet(
+    db.collection('homeInstructions').where('familyId', '==', familyId).limit(30)
+  );
+  results.homePaintColors = await safeGet(
+    db.collection('homePaintColors').where('familyId', '==', familyId).limit(30)
+  );
+  results.homeTasks = await safeGet(
+    db.collection('homeTasks').where('familyId', '==', familyId).limit(30)
+  );
+  results.homeShoppingItems = await safeGet(
+    db.collection('homeShoppingItems').where('familyId', '==', familyId).limit(30)
+  );
+  results.homeOffers = await safeGet(
+    db.collection('homeOffers').where('familyId', '==', familyId).limit(20)
+  );
+  results.schoolChildren = await safeGet(
+    db.collection('schoolChildren').where('familyId', '==', familyId).limit(20)
+  );
+  results.schoolContacts = await safeGet(
+    db.collection('schoolContacts').where('familyId', '==', familyId).limit(30)
+  );
+  results.schoolSchedules = await safeGet(
+    db.collection('schoolSchedules').where('familyId', '==', familyId).limit(50)
+  );
+  results.schoolHolidays = await safeGet(
+    db.collection('schoolHolidays').where('familyId', '==', familyId).limit(50)
+  );
+  results.kindergartenChildren = await safeGet(
+    db.collection('kindergartenChildren').where('familyId', '==', familyId).limit(20)
+  );
+  results.kindergartenContacts = await safeGet(
+    db.collection('kindergartenContacts').where('familyId', '==', familyId).limit(30)
+  );
+  results.kindergartenSchedules = await safeGet(
+    db.collection('kindergartenSchedules').where('familyId', '==', familyId).limit(50)
+  );
+  results.kindergartenHolidays = await safeGet(
+    db.collection('kindergartenHolidays').where('familyId', '==', familyId).limit(50)
+  );
+  results.recipes = await safeGet(
+    db.collection('recipes').where('familyId', '==', familyId).limit(50)
+  );
+  results.mealPlans = await safeGet(
+    db.collection('mealPlans').where('familyId', '==', familyId).limit(10)
+  );
+
+  // SUBCOLLECTIONS
+  results.healthAppointments = await safeGet(
+    db.collection('health').doc(familyId).collection('appointments').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(30)
+  );
+  results.healthAppointments.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+  results.healthMedications = await safeGet(
+    db.collection('health').doc(familyId).collection('medications').limit(20)
+  );
+  results.healthVaccinations = await safeGet(
+    db.collection('health').doc(familyId).collection('vaccinations').limit(20)
+  );
+  results.healthVaccinations.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+  results.healthAllergies = await safeGet(
+    db.collection('health').doc(familyId).collection('allergies').limit(20)
+  );
+  results.healthGrowth = await safeGet(
+    db.collection('health').doc(familyId).collection('growth').limit(20)
+  );
+  results.schoolActivities = await safeGet(
+    db.collection('schoolActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
+  );
+  results.schoolActivities.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+  results.kindergartenActivities = await safeGet(
+    db.collection('kindergartenActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
+  );
+  results.kindergartenActivities.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+
+  // TRIP SUB-COLLECTIONS (for each trip)
+  results.tripDetails = {};
+  for (const trip of results.trips) {
+    const details = {};
+    details.hotels = await safeGet(db.collection('trips').doc(trip.id).collection('hotels').limit(10));
+    details.activities = await safeGet(db.collection('trips').doc(trip.id).collection('activities').limit(20));
+    details.transport = await safeGet(db.collection('trips').doc(trip.id).collection('transport').limit(10));
+    details.restaurants = await safeGet(db.collection('trips').doc(trip.id).collection('restaurants').limit(10));
+    details.packingLists = await safeGet(db.collection('trips').doc(trip.id).collection('packingLists').limit(10));
+    results.tripDetails[trip.id] = details;
+  }
 
   return results;
 }
@@ -4876,6 +4925,28 @@ function formatDataForGPT(data) {
     data.trips.forEach(t => {
       const status = t.startDate > today ? 'Planlagt' : t.endDate < today ? 'Fullført' : 'Pågående';
       lines.push(`• ${t.title || t.destination || 'Uten navn'} | ${t.startDate || '?'} → ${t.endDate || '?'} | Status: ${status}`);
+      const details = data.tripDetails && data.tripDetails[t.id];
+      if (details) {
+        if (details.hotels && details.hotels.length > 0) {
+          details.hotels.forEach(h => lines.push(`  🏨 Hotell: ${h.name || '?'} | Inn: ${h.checkIn || '?'} → Ut: ${h.checkOut || '?'} | ${h.address || ''}`));
+        }
+        if (details.transport && details.transport.length > 0) {
+          details.transport.forEach(tr => lines.push(`  ✈️ Transport: ${tr.type || '?'} | ${tr.depDate || '?'} ${tr.depTime || ''} → ${tr.arrDate || ''} ${tr.arrTime || ''} | ${tr.carrier || ''} ${tr.flightNumber || tr.trainNumber || ''}`));
+        }
+        if (details.activities && details.activities.length > 0) {
+          details.activities.forEach(a => lines.push(`  🎯 Aktivitet: ${a.name || '?'} | ${a.date || '?'} ${a.time || ''} | ${a.address || ''}`));
+        }
+        if (details.restaurants && details.restaurants.length > 0) {
+          details.restaurants.forEach(r => lines.push(`  🍽️ Restaurant: ${r.name || '?'} | ${r.address || ''}`));
+        }
+        if (details.packingLists && details.packingLists.length > 0) {
+          details.packingLists.forEach(pl => {
+            const items = pl.items || [];
+            const unchecked = items.filter(i => !i.checked).length;
+            lines.push(`  🧳 Pakkeliste: ${pl.title || '?'} | ${unchecked}/${items.length} gjenstående`);
+          });
+        }
+      }
     });
   }
 
@@ -4889,35 +4960,84 @@ function formatDataForGPT(data) {
   if (data.healthAppointments && data.healthAppointments.length > 0) {
     lines.push('--- HELSEAVTALER ---');
     data.healthAppointments.forEach(a => {
-      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} ${a.startTime || ''} | Lege: ${a.doctor || ''} | Sted: ${a.location || ''}`);
+      lines.push(`• ${a.title || 'Uten navn'} | Person: ${a.person || '?'} | ${a.dateFrom || '?'} ${a.startTime || ''} | Lege: ${a.doctor || ''} | Sted: ${a.location || ''}`);
     });
   }
 
   if (data.healthMedications && data.healthMedications.length > 0) {
     lines.push('--- MEDISINER ---');
     data.healthMedications.forEach(m => {
-      lines.push(`• ${m.name || '?'} | Dosering: ${m.dosage || ''} | Frekvens: ${m.frequency || ''}`);
+      lines.push(`• ${m.name || '?'} | Person: ${m.person || '?'} | Dosering: ${m.dosage || ''} | Frekvens: ${m.frequency || ''}`);
     });
   }
 
   if (data.healthVaccinations && data.healthVaccinations.length > 0) {
     lines.push('--- VAKSINER ---');
     data.healthVaccinations.forEach(v => {
-      lines.push(`• ${v.name || '?'} | Dato: ${v.date || ''} | Neste: ${v.nextDue || ''}`);
+      lines.push(`• ${v.name || '?'} | Person: ${v.person || '?'} | Dato: ${v.date || ''} | Neste: ${v.nextDue || ''}`);
+    });
+  }
+
+  if (data.healthAllergies && data.healthAllergies.length > 0) {
+    lines.push('--- ALLERGIER ---');
+    data.healthAllergies.forEach(a => {
+      lines.push(`• ${a.name || '?'} | Person: ${a.person || '?'} | Alvorlighet: ${a.severity || ''}`);
+    });
+  }
+
+  if (data.healthGrowth && data.healthGrowth.length > 0) {
+    lines.push('--- VEKSTDATA ---');
+    data.healthGrowth.forEach(g => {
+      lines.push(`• Person: ${g.person || '?'} | Dato: ${g.date || '?'} | Vekt: ${g.weight || ''} kg | Høyde: ${g.height || ''} cm`);
     });
   }
 
   if (data.pets && data.pets.length > 0) {
     lines.push('--- KJÆLEDYR ---');
     data.pets.forEach(p => {
-      lines.push(`• ${p.name || '?'} | ${p.species || ''} ${p.breed || ''}`);
+      lines.push(`• ${p.name || '?'} | ${p.species || ''} ${p.breed || ''} | Født: ${p.birthday || ''}`);
     });
   }
 
   if (data.petVetVisits && data.petVetVisits.length > 0) {
     lines.push('--- VETERINÆRBESØK ---');
     data.petVetVisits.forEach(v => {
-      lines.push(`• ${v.name || 'Uten navn'} | ${v.dateFrom || '?'} ${v.startTime || ''} | Lege: ${v.doctor || ''}`);
+      lines.push(`• ${v.name || 'Uten navn'} | ${v.dateFrom || '?'} ${v.startTime || ''} | Lege: ${v.doctor || ''} | ${v.reason || ''}`);
+    });
+  }
+
+  if (data.petMedications && data.petMedications.length > 0) {
+    lines.push('--- KJÆLEDYRMEDISINER ---');
+    data.petMedications.forEach(m => {
+      lines.push(`• ${m.name || '?'} | Dosering: ${m.dosage || ''} | Frekvens: ${m.frequency || ''}`);
+    });
+  }
+
+  if (data.petFood && data.petFood.length > 0) {
+    lines.push('--- KJÆLEDYRFOR ---');
+    data.petFood.forEach(f => {
+      lines.push(`• ${f.brand || '?'} | Type: ${f.type || ''} | Mengde: ${f.amount || ''}`);
+    });
+  }
+
+  if (data.petGrooming && data.petGrooming.length > 0) {
+    lines.push('--- PLEIE ---');
+    data.petGrooming.forEach(g => {
+      lines.push(`• ${g.type || '?'} | Frekvens: ${g.frequency || ''} | Sist: ${g.lastDate || ''} | Neste: ${g.nextDate || ''}`);
+    });
+  }
+
+  if (data.petVaccinations && data.petVaccinations.length > 0) {
+    lines.push('--- KJÆLEDYRVAKSINER ---');
+    data.petVaccinations.forEach(v => {
+      lines.push(`• ${v.name || '?'} | Dato: ${v.date || ''} | Neste: ${v.nextDue || ''}`);
+    });
+  }
+
+  if (data.petInsurance && data.petInsurance.length > 0) {
+    lines.push('--- KJÆLEDYRFORSIKRING ---');
+    data.petInsurance.forEach(i => {
+      lines.push(`• ${i.provider || '?'} | Polise: ${i.policyNumber || ''} | Utløp: ${i.expiryDate || ''}`);
     });
   }
 
@@ -4928,6 +5048,13 @@ function formatDataForGPT(data) {
     });
   }
 
+  if (data.schoolChildren && data.schoolChildren.length > 0) {
+    lines.push('--- SKOLEBARN ---');
+    data.schoolChildren.forEach(c => {
+      lines.push(`• ${c.name || '?'} | Skole: ${c.schoolName || ''} | Trinn: ${c.grade || ''}`);
+    });
+  }
+
   if (data.schoolActivities && data.schoolActivities.length > 0) {
     lines.push('--- SKOLEAKTIVITETER ---');
     data.schoolActivities.forEach(a => {
@@ -4935,26 +5062,17 @@ function formatDataForGPT(data) {
     });
   }
 
-  if (data.kindergartenActivities && data.kindergartenActivities.length > 0) {
-    lines.push('--- BARNEHAGEAKTIVITETER ---');
-    data.kindergartenActivities.forEach(a => {
-      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}`);
+  if (data.schoolContacts && data.schoolContacts.length > 0) {
+    lines.push('--- SKOLEKONTAKTER ---');
+    data.schoolContacts.forEach(c => {
+      lines.push(`• ${c.name || '?'} | Type: ${c.type || ''} | Tlf: ${c.phone || ''} | E-post: ${c.email || ''}`);
     });
   }
 
-  if (data.birthdays && data.birthdays.length > 0) {
-    lines.push('--- BURSDAGER ---');
-    data.birthdays.forEach(b => {
-      lines.push(`• ${b.name || '?'} | ${b.date || '?'} (fødselsdag)`);
-    });
-  }
-
-  if (data.shoppingLists && data.shoppingLists.length > 0) {
-    lines.push('--- HANDLELISTER ---');
-    data.shoppingLists.forEach(s => {
-      const count = s.items ? s.items.length : 0;
-      const unchecked = s.items ? s.items.filter(i => !i.checked).length : 0;
-      lines.push(`• ${s.title || 'Uten navn'} | ${unchecked}/${count} gjenstående`);
+  if (data.schoolSchedules && data.schoolSchedules.length > 0) {
+    lines.push('--- SKOLEDAGER ---');
+    data.schoolSchedules.forEach(s => {
+      lines.push(`• ${s.day || '?'} | ${s.startTime || ''} → ${s.endTime || ''} | ${s.subject || ''}`);
     });
   }
 
@@ -4965,10 +5083,61 @@ function formatDataForGPT(data) {
     });
   }
 
+  if (data.kindergartenChildren && data.kindergartenChildren.length > 0) {
+    lines.push('--- BARNEHAGEBARN ---');
+    data.kindergartenChildren.forEach(c => {
+      lines.push(`• ${c.name || '?'} | Barnehage: ${c.kindergartenName || ''}`);
+    });
+  }
+
+  if (data.kindergartenActivities && data.kindergartenActivities.length > 0) {
+    lines.push('--- BARNEHAGEAKTIVITETER ---');
+    data.kindergartenActivities.forEach(a => {
+      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}`);
+    });
+  }
+
+  if (data.kindergartenContacts && data.kindergartenContacts.length > 0) {
+    lines.push('--- BARNEHAGEKONTAKTER ---');
+    data.kindergartenContacts.forEach(c => {
+      lines.push(`• ${c.name || '?'} | Type: ${c.type || ''} | Tlf: ${c.phone || ''} | E-post: ${c.email || ''}`);
+    });
+  }
+
+  if (data.kindergartenSchedules && data.kindergartenSchedules.length > 0) {
+    lines.push('--- BARNEHAGEDAGER ---');
+    data.kindergartenSchedules.forEach(s => {
+      lines.push(`• ${s.day || '?'} | ${s.startTime || ''} → ${s.endTime || ''} | ${s.activity || ''}`);
+    });
+  }
+
   if (data.kindergartenHolidays && data.kindergartenHolidays.length > 0) {
     lines.push('--- BARNEHAGEFRIE ---');
     data.kindergartenHolidays.forEach(h => {
       lines.push(`• ${h.title || '?'} | ${h.dateFrom || '?'} → ${h.dateTo || ''}`);
+    });
+  }
+
+  if (data.birthdays && data.birthdays.length > 0) {
+    lines.push('--- BURSDAGER ---');
+    data.birthdays.forEach(b => {
+      lines.push(`• ${b.name || '?'} | ${b.date || '?'} (fødselsdag)`);
+    });
+  }
+
+  if (data.gifts && data.gifts.length > 0) {
+    lines.push('--- GAVEØNSKER ---');
+    data.gifts.forEach(g => {
+      lines.push(`• ${g.title || '?'} | Pris: ${g.price || '?'} kr | Kjøpt: ${g.purchased ? 'Ja' : 'Nei'}`);
+    });
+  }
+
+  if (data.shoppingLists && data.shoppingLists.length > 0) {
+    lines.push('--- HANDLELISTER ---');
+    data.shoppingLists.forEach(s => {
+      const count = s.items ? s.items.length : 0;
+      const unchecked = s.items ? s.items.filter(i => !i.checked).length : 0;
+      lines.push(`• ${s.title || 'Uten navn'} | ${unchecked}/${count} gjenstående`);
     });
   }
 
@@ -4982,7 +5151,59 @@ function formatDataForGPT(data) {
   if (data.homeProjects && data.homeProjects.length > 0) {
     lines.push('--- PROSJEKTER ---');
     data.homeProjects.forEach(p => {
-      lines.push(`• ${p.name || '?'} | Status: ${p.status || ''} | ${p.startDate || ''} → ${p.endDate || ''}`);
+      lines.push(`• ${p.name || '?'} | Status: ${p.status || ''} | Budget: ${p.budget || '?'} kr | ${p.startDate || ''} → ${p.endDate || ''}`);
+    });
+  }
+
+  if (data.homeInstructions && data.homeInstructions.length > 0) {
+    lines.push('--- INSTRUKSJONER ---');
+    data.homeInstructions.forEach(i => {
+      lines.push(`• ${i.title || '?'} | Kategori: ${i.category || ''}`);
+    });
+  }
+
+  if (data.homePaintColors && data.homePaintColors.length > 0) {
+    lines.push('--- FARGER ---');
+    data.homePaintColors.forEach(c => {
+      lines.push(`• ${c.colorName || '?'} | Merke: ${c.brand || ''} | Kode: ${c.code || ''} | Rom: ${c.room || ''}`);
+    });
+  }
+
+  if (data.homeTasks && data.homeTasks.length > 0) {
+    const undone = data.homeTasks.filter(t => !t.done);
+    const done = data.homeTasks.filter(t => t.done);
+    lines.push(`--- HJEMOPPGAVER (${undone.length} ugjort, ${done.length} gjort) ---`);
+    undone.forEach(t => {
+      lines.push(`• ${t.title || '?'} | Tildelt: ${t.assignedTo || ''}`);
+    });
+  }
+
+  if (data.homeShoppingItems && data.homeShoppingItems.length > 0) {
+    const unpurchased = data.homeShoppingItems.filter(i => !i.purchased);
+    lines.push(`--- HJEMHANDLELISTE (${unpurchased.length} igjen) ---`);
+    unpurchased.forEach(i => {
+      lines.push(`• ${i.name || '?'} | Antall: ${i.quantity || 1} | Pris: ${i.price || '?'} kr`);
+    });
+  }
+
+  if (data.homeOffers && data.homeOffers.length > 0) {
+    lines.push('--- TILBUD ---');
+    data.homeOffers.forEach(o => {
+      lines.push(`• ${o.provider || '?'} | ${o.description || ''} | Pris: ${o.price || '?'} kr`);
+    });
+  }
+
+  if (data.recipes && data.recipes.length > 0) {
+    lines.push('--- OPPSKRIFTER ---');
+    data.recipes.forEach(r => {
+      lines.push(`• ${r.name || '?'} | Tid: ${(r.prepTime || 0) + (r.cookTime || 0)} min | Porsjoner: ${r.servings || '?'} | ${r.isFavorite ? '★' : ''}`);
+    });
+  }
+
+  if (data.mealPlans && data.mealPlans.length > 0) {
+    lines.push('--- UKEMATPLANER ---');
+    data.mealPlans.forEach(mp => {
+      lines.push(`• Uke: ${mp.weekStart || '?'} | Måltider: ${mp.meals ? Object.keys(mp.meals).length : 0}`);
     });
   }
 
@@ -5066,18 +5287,33 @@ VIKTIG: Du skal ALLTID bruke dataen som er oppgitt nedenfor når brukeren spør 
 
 Når brukeren spør om hendelser, avtaler, medisiner, reiser, bursdager, aktiviteter etc., bruk dataen under til å svare.
 
-Tilgjengelige moduler og felter for OPRETT else:
+Tilgjengelige moduler og felter for OPRETTelse:
 EVENTS: title, date (YYYY-MM-DD), time (HH:MM), endDate, endTime, address, description, icon
-HEALTH.APPOINTMENTS: name, dateFrom, dateTo, startTime, endTime, doctor, location
-HEALTH.MEDICATIONS: name, dosage, frequency, timeSlots
-HEALTH.VACCINATIONS: name, date, nextDue
+TRIPS: title, destination, startDate, endDate
+TRIPS.HOTELS: name, address, checkIn, checkOut, notes
+TRIPS.ACTIVITIES: name, date, time, address
+TRIPS.TRANSPORT: type (fly/tog/bil/boat/taxi/ferry), depDate, depTime, arrDate, arrTime, carrier, flightNumber
+TRIPS.RESTAURANTS: name, address, notes
+BIRTHDAYS: name, date (YYYY-MM-DD)
+HEALTH.APPOINTMENTS: title, person, dateFrom, dateTo, startTime, endTime, doctor, location
+HEALTH.MEDICATIONS: name, person, dosage, frequency, timeSlots
+HEALTH.VACCINATIONS: name, person, date, nextDue
+HEALTH.ALLERGIES: name, person, severity, description
 SCHOOL.ACTIVITIES: name, dateFrom, dateTo, startTime, endTime, location
 KINDERGARTEN.ACTIVITIES: name, dateFrom, dateTo, startTime, endTime, location
-PETS.VETVISITS: name, doctor, dateFrom, dateTo, startTime, endTime, location
+PETS: name, species, breed, birthday
+PETS.VETVISITS: name, dateFrom, dateTo, doctor, reason, location
+PETS.MEDICATIONS: name, dosage, frequency
 SERVICE.APPOINTMENTS (homeServices): title, dateFrom, dateTo, startTime, endTime, frequency
-BIRTHDAYS: name, date (YYYY-MM-DD)
-TRIPS: title, destination, startDate, endDate
 SHOPPING: title, items (array)
+RECIPES: name, description, ingredients, instructions, servings, prepTime, cookTime
+HOMES: name, address, type
+HOME.PROJECTS: name, description, status, budget, startDate, endDate
+HOME.INSTRUCTIONS: title, content, category
+HOME.PAINTCOLORS: colorName, brand, code, room
+HOME.TASKS: title, description, assignedTo, done
+HOME.SHOPPINGITEMS: name, quantity, price, purchased
+HOME.OFFERS: provider, description, price
 
 Regler:
 1. SVAR alltid med data fra systemet når det finnes. Bruk den oppgitte dataen.
@@ -5085,7 +5321,7 @@ Regler:
 3. For create-handlinger: foreslå FORHÅNDSVISNING med alle felt. Brukeren må bekrefte FØR handling utføres.
 4. For delete-handlinger: bekreft med brukeren først.
 5. Datoer: YYYY-MM-DD. Tider: HH:MM.
-6. For挪威-språk - svar alltid på norsk.
+6. Svar alltid på norsk.
 7. Sorter svar etter dato (nærmeste først).
 8. Hvis søket ikke finner noe, si det og tilby å opprette.
 
