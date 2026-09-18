@@ -1280,8 +1280,8 @@
     "addService": "Manuaalinen",
     "voiceService": "Puhe",
     "photoService": "Valokuva",
-    "quickCreate.aiAssistant": "AI-avustaja",
-    "quickCreate.openAssistant": "Aloita"
+    "aiAssistant": "AI-avustaja",
+    "openAssistant": "Aloita"
   },
   "tabs": {
     "events": "Tapahtumamme",

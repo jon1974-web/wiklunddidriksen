@@ -1280,8 +1280,8 @@
     "addService": "Manuellt",
     "voiceService": "Tal",
     "photoService": "Foto",
-    "quickCreate.aiAssistant": "AI-assistent",
-    "quickCreate.openAssistant": "Start"
+    "aiAssistant": "AI-assistent",
+    "openAssistant": "Start"
   },
   "tabs": {
     "events": "Evenemang",
