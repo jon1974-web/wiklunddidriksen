@@ -1281,7 +1281,19 @@
     "voiceService": "Puhe",
     "photoService": "Valokuva",
     "aiAssistant": "AI-avustaja",
-    "openAssistant": "Aloita"
+    "openAssistant": "Aloita",
+    "createNew": "Luo uusi",
+    "back": "Takaisin",
+    "modeManual": "Manuaalinen",
+    "modeVoice": "Puhe",
+    "modePhoto": "Valokuva",
+    "moduleEvent": "Tapahtuma",
+    "moduleHealth": "Terveys",
+    "moduleVet": "Eläinlääkäri",
+    "moduleSchool": "Koulu",
+    "moduleKindergarten": "Päiväkoti",
+    "moduleService": "Huolto",
+    "moduleTrip": "Matka"
   },
   "tabs": {
     "events": "Tapahtumamme",

@@ -1281,7 +1281,19 @@
     "voiceService": "Tale",
     "photoService": "Foto",
     "aiAssistant": "AI-assistent",
-    "openAssistant": "Start"
+    "openAssistant": "Start",
+    "createNew": "Opret nyt",
+    "back": "Tilbage",
+    "modeManual": "Manuelt",
+    "modeVoice": "Tale",
+    "modePhoto": "Foto",
+    "moduleEvent": "Begivenhed",
+    "moduleHealth": "Sundhed",
+    "moduleVet": "Dyrlæge",
+    "moduleSchool": "Skole",
+    "moduleKindergarten": "Børnehave",
+    "moduleService": "Service",
+    "moduleTrip": "Rejse"
   },
   "tabs": {
     "events": "Vores begivenheder",

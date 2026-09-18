@@ -1281,7 +1281,19 @@
     "voiceService": "Tale",
     "photoService": "Foto",
     "aiAssistant": "AI-assistent",
-    "openAssistant": "Start"
+    "openAssistant": "Start",
+    "createNew": "Opprett ny",
+    "back": "Tilbake",
+    "modeManual": "Manuelt",
+    "modeVoice": "Tale",
+    "modePhoto": "Foto",
+    "moduleEvent": "Avtale",
+    "moduleHealth": "Helsetime",
+    "moduleVet": "Veterinærtime",
+    "moduleSchool": "Skoleaktivitet",
+    "moduleKindergarten": "Barnehageaktivitet",
+    "moduleService": "Serviceavtale",
+    "moduleTrip": "Reise"
   },
   "tabs": {
     "events": "Avtaler",

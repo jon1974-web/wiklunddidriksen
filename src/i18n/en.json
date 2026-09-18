@@ -1281,7 +1281,19 @@
     "voiceService": "Voice",
     "photoService": "Photo",
     "aiAssistant": "AI Assistant",
-    "openAssistant": "Start"
+    "openAssistant": "Start",
+    "createNew": "Create new",
+    "back": "Back",
+    "modeManual": "Manual",
+    "modeVoice": "Voice",
+    "modePhoto": "Photo",
+    "moduleEvent": "Event",
+    "moduleHealth": "Health",
+    "moduleVet": "Vet visit",
+    "moduleSchool": "School",
+    "moduleKindergarten": "Kindergarten",
+    "moduleService": "Service",
+    "moduleTrip": "Trip"
   },
   "tabs": {
     "events": "Events",

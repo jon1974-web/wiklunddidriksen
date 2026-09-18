@@ -1281,7 +1281,19 @@
     "voiceService": "Tal",
     "photoService": "Foto",
     "aiAssistant": "AI-assistent",
-    "openAssistant": "Start"
+    "openAssistant": "Start",
+    "createNew": "Skapa nytt",
+    "back": "Tillbaka",
+    "modeManual": "Manuellt",
+    "modeVoice": "Tal",
+    "modePhoto": "Foto",
+    "moduleEvent": "Händelse",
+    "moduleHealth": "Hälsa",
+    "moduleVet": "Djurläkare",
+    "moduleSchool": "Skola",
+    "moduleKindergarten": "Dagis",
+    "moduleService": "Service",
+    "moduleTrip": "Resa"
   },
   "tabs": {
     "events": "Evenemang",
