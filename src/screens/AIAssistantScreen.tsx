@@ -39,6 +39,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
   const [confirmActions, setConfirmActions] = useState<any[]>([]);
   const scrollRef = useRef<ScrollView>(null);
 
+  const messagesRef = useRef<Message[]>([]);
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || loading) return;
     if (!familyId) {
@@ -52,7 +53,11 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
       content: text,
       timestamp: Date.now(),
     };
-    setMessages((prev) => [...prev, userMsg]);
+    setMessages((prev) => {
+      const updated = [...prev, userMsg];
+      messagesRef.current = updated;
+      return updated;
+    });
     setInput('');
     setLoading(true);
 
@@ -70,7 +75,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
         body: JSON.stringify({
           message: text,
           familyId,
-          history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          history: messagesRef.current.slice(-10).map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
@@ -112,7 +117,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
     } finally {
       setLoading(false);
     }
-  }, [messages, familyId, loading]);
+  }, [familyId, loading]);
 
   const handleConfirm = async () => {
     setShowConfirm(false);
@@ -133,7 +138,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
           message: '__CONFIRM__',
           actions: confirmActions,
           familyId,
-          history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
+          history: messagesRef.current.slice(-10).map((m) => ({ role: m.role, content: m.content })),
         }),
       });
 
@@ -145,7 +150,11 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
         content: data.reply || 'Handlinger utført.',
         timestamp: Date.now(),
       };
-      setMessages((prev) => [...prev, confirmMsg]);
+      setMessages((prev) => {
+        const updated = [...prev, confirmMsg];
+        messagesRef.current = updated;
+        return updated;
+      });
     } catch (error) {
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
