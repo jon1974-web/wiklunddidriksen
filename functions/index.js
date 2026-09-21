@@ -5275,11 +5275,11 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, asyn
           const destination = trip.destination || trip.title;
           if (!destination) continue;
 
-          // Geocode destination
-          const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(destination)}&count=1`);
+          // Geocode destination with Google
+          const geoRes = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(destination)}&key=${process.env.GOOGLE_MAPS_API_KEY}`);
           const geoData = await geoRes.json();
-          if (!geoData.results || geoData.results.length === 0) continue;
-          const { latitude, longitude } = geoData.results[0];
+          if (geoData.status !== 'OK' || !geoData.results || geoData.results.length === 0) continue;
+          const { lat: latitude, lng: longitude } = geoData.results[0].geometry.location;
 
           // Fetch Google Weather forecast
           const weatherRes = await fetch(`https://weather.googleapis.com/v1/forecast/days:lookup?key=${process.env.GOOGLE_MAPS_API_KEY}&location.latitude=${latitude}&location.longitude=${longitude}&days=10&languageCode=no`);

@@ -1,7 +1,7 @@
 import { WeatherDay } from '../types';
 import { GOOGLE_MAPS_API_KEY } from '../constants/api';
 
-const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
+const GOOGLE_GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 const GOOGLE_WEATHER_URL = 'https://weather.googleapis.com/v1/forecast/days:lookup';
 const HISTORICAL_URL = 'https://archive-api.open-meteo.com/v1/archive';
 
@@ -36,46 +36,25 @@ export async function geocodeCity(city: string): Promise<{ latitude: number; lon
   const cached = getCached<{ latitude: number; longitude: number }>(key);
   if (cached) return cached;
 
-  const countryCodeMap: Record<string, string> = {
-    'Norway': 'NO', 'Sverige': 'SE', 'Sweden': 'SE', 'Danmark': 'DK', 'Denmark': 'DK',
-    'Finland': 'FI', 'Suomi': 'FI', 'Australia': 'AU', 'USA': 'US', 'United States': 'US',
-    'Storbritannia': 'GB', 'United Kingdom': 'GB', 'Tyskland': 'DE', 'Germany': 'DE',
-    'Frankrike': 'FR', 'France': 'FR', 'Spania': 'ES', 'Spain': 'ES', 'Italia': 'IT', 'Italy': 'IT',
-    'Hellas': 'GR', 'Greece': 'GR', 'Kroatia': 'HR', 'Croatia': 'HR', 'Thailand': 'TH',
-    'Japan': 'JP', 'Kina': 'CN', 'China': 'CN', 'Brasil': 'BR', 'Brazil': 'BR',
-    'India': 'IN', 'Mexico': 'MX', 'Canada': 'CA', 'New Zealand': 'NZ', 'Sør-Afrika': 'ZA',
-    'South Africa': 'ZA', 'Singapore': 'SG', 'Sør-Korea': 'KR', 'South Korea': 'KR',
-  };
-
   const tryGeocode = async (query: string): Promise<{ latitude: number; longitude: number } | null> => {
     try {
-      const res = await fetch(`${GEOCODING_URL}?name=${encodeURIComponent(query)}&count=1&language=no`);
+      const res = await fetch(`${GOOGLE_GEOCODE_URL}?address=${encodeURIComponent(query)}&key=${GOOGLE_MAPS_API_KEY}`);
       const data = await res.json();
-      if (data.results && data.results.length > 0) {
-        const result = data.results[0];
-        return { latitude: result.latitude, longitude: result.longitude };
+      if (data.status === 'OK' && data.results && data.results.length > 0) {
+        const loc = data.results[0].geometry.location;
+        return { latitude: loc.lat, longitude: loc.lng };
       }
     } catch {}
     return null;
   };
 
-  const countryPart = city.includes(',') ? city.split(',').pop()?.trim() : null;
-  const cityPart = city.includes(',') ? city.split(',').slice(0, -1).join(',').trim() : city;
-  const fullQuery = countryPart ? `${cityPart}, ${countryPart}` : city;
-  let coords = await tryGeocode(fullQuery);
+  // Try full query first (e.g., "Vaset, Norway")
+  let coords = await tryGeocode(city);
   if (coords) { setCache(key, coords); return coords; }
 
-  const cityName = cityPart.split(/\s+/)[0];
+  // Try just the city name
+  const cityName = city.includes(',') ? city.split(',')[0].trim() : city;
   coords = await tryGeocode(cityName);
-  if (coords) { setCache(key, coords); return coords; }
-
-  if (countryPart) {
-    const code = countryCodeMap[countryPart] || countryPart.substring(0, 2).toUpperCase();
-    coords = await tryGeocode(`${cityName}, ${code}`);
-    if (coords) { setCache(key, coords); return coords; }
-  }
-
-  coords = await tryGeocode(city);
   if (coords) { setCache(key, coords); return coords; }
 
   return null;
