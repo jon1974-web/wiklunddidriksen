@@ -4960,7 +4960,8 @@ function formatDataForGPT(data) {
   if (data.healthAppointments && data.healthAppointments.length > 0) {
     lines.push('--- HELSEAVTALER ---');
     data.healthAppointments.forEach(a => {
-      lines.push(`• ${a.title || 'Uten navn'} | Person: ${a.person || '?'} | ${a.dateFrom || '?'} ${a.startTime || ''} | Lege: ${a.doctor || ''} | Sted: ${a.location || ''}`);
+      const timeRange = a.endTime ? `${a.startTime || ''}-${a.endTime}` : (a.startTime || '');
+      lines.push(`• ${a.title || 'Uten navn'} | Person: ${a.person || '?'} | ${a.dateFrom || '?'} ${timeRange} | Lege: ${a.doctor || ''} | Sted: ${a.location || ''} | ID: ${a.id}`);
     });
   }
 
@@ -5383,13 +5384,20 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, asyn
 
 KRITISKE REGLER:
 1. SVAR KUN med data som faktisk finnes i listen under. ALDRI finn på, anta eller hallusinere data som ikke er der.
-2. Hvis det ikke finnes data for "i morgen", svar at det ikke er planlagt noe. Finn ALDRI på hendelser.
+2. Når du refererer til en hendelse, kan du sitere nøyaktig dato, tid og person fra dataen. Hvis du ikke finner nøyaktig treff, si det ærlig.
 3. Aldri legg til informasjon som ikke står i dataen.
 4. Hvis spørringen er uklar, spør om avklaring.
 5. For create-handlinger: foreslå FORHÅNDSVISNING med alle felt. Brukeren må bekrefte FØR handling utføres.
 6. For delete-handlinger: bekreft med brukeren først.
 7. Svar alltid på norsk.
 8. Sorter svar etter dato (nærmeste først).
+
+OPPRETT-REGEL (viktig for å unngå hallusinasjon):
+Når brukeren ber om å opprette noe nytt (f.eks. "Ny helsetime", "Legg til", "Opprett"):
+- Hvis brukeren sier "ny" eller "leg til ny": Vis FORHÅNDSVISNING og spør "Skal jeg opprette denne?" uten å nevne duplikater.
+- Hvis brukeren IKKE sier "ny" og du finner en EKSAKT match i dataen (samme person + samme dato + samme tid + samme lege): Vis info om den eksisterende og spør om brukeren vil opprette en ny likevel.
+- EN EKSAKT MATCH betyr: Alle feltene (person, dato, tid, lege) stemmer overens med dataen. "Lignende" teller ikke.
+- Hvis du IKKE finner en eksakt match: Anta at det ikke finnes og opprett uten å nevne duplikater.
 
 DATO-INTELLIGENS:
 - "i morgen" = ${tomorrowStr}
