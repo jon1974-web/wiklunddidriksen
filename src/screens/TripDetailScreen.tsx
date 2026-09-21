@@ -1109,13 +1109,13 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                         ) : hourly ? (
                           <View style={{ gap: 4 }}>
                             <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: colors.border + '30' }}>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textDisabled, width: 28 }}></Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textDisabled, width: 75 }}></Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textDisabled, width: 28, textAlign: 'center' }}>Vær</Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textDisabled, width: 36, textAlign: 'center' }}>Temp</Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textDisabled, width: 40, textAlign: 'center' }}>Regn</Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textDisabled, width: 36, textAlign: 'center' }}>Vind</Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: colors.textDisabled, width: 30, textAlign: 'center' }}>UV</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 28 }}></Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 75 }}></Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 28, textAlign: 'center' }}>Vær</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 36, textAlign: 'center' }}>Temp</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 40, textAlign: 'center' }}>Regn</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 36, textAlign: 'center' }}>Vind</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 30, textAlign: 'center' }}>UV</Text>
                             </View>
                             {hourly.map((h) => (
                               <View key={h.period} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4, paddingHorizontal: 4, borderRadius: 6, backgroundColor: i % 2 === 0 ? MODULE_COLORS.tripsBg : colors.surface }}>
