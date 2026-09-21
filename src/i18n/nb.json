@@ -809,7 +809,9 @@
     "youSaid": "Du sa:",
     "micPermission": "Mikrofontilgang kreves for å bruke taleopptak",
     "tryAgain": "Prøv igjen",
-    "processing": "Behandler tale..."
+    "processing": "Behandler tale...",
+    "tapToStop": "Trykk for å stoppe",
+    "transcribing": "Transkriberer..."
   },
   "photoEvent": {
     "title": "Foto til arrangement",

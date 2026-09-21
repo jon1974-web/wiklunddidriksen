@@ -1,6 +1,5 @@
 import React, { useState, useRef, useCallback } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Modal, TouchableWithoutFeedback } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
@@ -8,6 +7,7 @@ import { AppIcon } from '../components/AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
+import Svg, { Line } from 'react-native-svg';
 
 const HOME_COLOR = MODULE_COLORS.home;
 
@@ -20,11 +20,12 @@ interface Message {
 }
 
 interface AIAssistantScreenProps {
+  visible: boolean;
+  onClose: () => void;
   navigation: any;
-  route?: { params?: { title?: string } };
 }
 
-export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation }) => {
+export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, onClose, navigation }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
@@ -40,9 +41,11 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
   const [correctionMsgId, setCorrectionMsgId] = useState<string | null>(null);
   const [correctionText, setCorrectionText] = useState('');
   const [correctionQuery, setCorrectionQuery] = useState('');
+  const [recording, setRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
-
   const messagesRef = useRef<Message[]>([]);
+
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || loading) return;
     if (!familyId) {
@@ -102,62 +105,46 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
         actions: data.actions || [],
         timestamp: Date.now(),
       };
-      setMessages((prev) => [...prev, assistantMsg]);
+      setMessages((prev) => {
+        const updated = [...prev, assistantMsg];
+        messagesRef.current = updated;
+        return updated;
+      });
 
       const allActions = data.actions || [];
       const navigateActions = allActions.filter((a: any) => a.type === 'navigate');
       const confirmableActions = allActions.filter((a: any) => a.type !== 'navigate');
 
-      // Execute navigate actions immediately
       for (const nav of navigateActions) {
         if (nav.screen) {
           const screenConfig = nav.screen;
           const targetScreen = screenConfig.screen;
-
-          // Map to correct navigation with params
-          if (targetScreen === 'SchoolSpace') {
-            setTimeout(() => {
-              navigation.navigate('Trips', { screen: 'SchoolSpace', params: { childId: screenConfig.childId, openAddSection: screenConfig.childId ? undefined : undefined } });
-            }, 100);
-          } else if (targetScreen === 'KindergartenSpace') {
-            setTimeout(() => {
+          onClose();
+          setTimeout(() => {
+            if (targetScreen === 'SchoolSpace') {
+              navigation.navigate('Trips', { screen: 'SchoolSpace', params: { childId: screenConfig.childId } });
+            } else if (targetScreen === 'KindergartenSpace') {
               navigation.navigate('Trips', { screen: 'KindergartenSpace', params: { childId: screenConfig.childId } });
-            }, 100);
-          } else if (targetScreen === 'PetSpace') {
-            setTimeout(() => {
+            } else if (targetScreen === 'PetSpace') {
               navigation.navigate('Trips', { screen: 'PetSpace', params: { petId: screenConfig.petId } });
-            }, 100);
-          } else if (targetScreen === 'HomeSpace') {
-            setTimeout(() => {
+            } else if (targetScreen === 'HomeSpace') {
               navigation.navigate('Trips', { screen: 'HomeSpace', params: { homeId: screenConfig.homeId } });
-            }, 100);
-          } else if (targetScreen === 'HealthSpace') {
-            setTimeout(() => {
+            } else if (targetScreen === 'HealthSpace') {
               navigation.navigate('Trips', { screen: 'HealthSpace' });
-            }, 100);
-          } else if (targetScreen === 'Events') {
-            setTimeout(() => {
+            } else if (targetScreen === 'Events') {
               navigation.navigate('Events');
-            }, 100);
-          } else if (targetScreen === 'Trips') {
-            setTimeout(() => {
+            } else if (targetScreen === 'Trips') {
               navigation.navigate('Trips', { screen: 'SpacesList' });
-            }, 100);
-          } else if (targetScreen === 'HomeMaintenance' && screenConfig.home) {
-            setTimeout(() => {
+            } else if (targetScreen === 'HomeMaintenance' && screenConfig.home) {
               navigation.navigate('Trips', { screen: 'HomeMaintenance', params: { home: screenConfig.home } });
-            }, 100);
-          } else {
-            // Fallback: navigate to Trips tab
-            setTimeout(() => {
+            } else {
               navigation.navigate('Trips', { screen: targetScreen });
-            }, 100);
-          }
+            }
+          }, 300);
           return;
         }
       }
 
-      // Show confirmation for create/delete actions
       if (confirmableActions.length > 0) {
         setConfirmMessage(data.reply);
         setConfirmActions(allActions);
@@ -174,7 +161,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
     } finally {
       setLoading(false);
     }
-  }, [familyId, loading]);
+  }, [familyId, loading, navigation, onClose]);
 
   const handleConfirm = async () => {
     setShowConfirm(false);
@@ -213,10 +200,10 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
         return updated;
       });
 
-      // Navigate if any action had a screen
       const navAction = confirmActions.find((a: any) => a.screen);
       if (navAction?.screen) {
         const screenConfig = navAction.screen;
+        onClose();
         setTimeout(() => {
           if (screenConfig.screen === 'SchoolSpace') {
             navigation.navigate('Trips', { screen: 'SchoolSpace', params: { childId: screenConfig.childId } });
@@ -253,7 +240,99 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
     }
   };
 
-  const sendCorrection = async (originalQuery: string, correctAnswer: string) => {
+  const startVoiceInput = useCallback(async () => {
+    if (recording || transcribing) return;
+    setRecording(true);
+    try {
+      const { Audio } = await import('expo-av');
+      const { status } = await Audio.requestPermissionsAsync();
+      if (status !== 'granted') {
+        crossAlert(t('common.error'), 'Mikrofontilgang er nødvendig');
+        setRecording(false);
+        return;
+      }
+
+      const recordingObj = new Audio.Recording();
+      await recordingObj.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+      await recordingObj.startAsync();
+
+      const timer = setTimeout(async () => {
+        try {
+          await recordingObj.stopAndUnloadAsync();
+          const uri = recordingObj.getURI();
+          if (!uri) { setRecording(false); return; }
+
+          setRecording(false);
+          setTranscribing(true);
+
+          const { auth } = await import('../services/firebase');
+          const idToken = await auth.currentUser?.getIdToken();
+          if (!idToken) { setTranscribing(false); return; }
+
+          const formData = new FormData();
+          formData.append('audio', { uri, type: 'audio/m4a', name: 'recording.m4a' } as any);
+
+          const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${idToken}` },
+            body: formData,
+          });
+          const data = await res.json();
+          if (data.text) {
+            setInput(data.text);
+          }
+        } catch (e) {
+          crossAlert(t('common.error'), 'Feil under transkribering');
+        } finally {
+          setTranscribing(false);
+        }
+      }, 15000);
+
+      const stopRecording = async () => {
+        clearTimeout(timer);
+        try {
+          if (recordingObj.getStatus() === 1) {
+            await recordingObj.stopAndUnloadAsync();
+            const uri = recordingObj.getURI();
+            if (!uri) { setRecording(false); return; }
+
+            setRecording(false);
+            setTranscribing(true);
+
+            const { auth } = await import('../services/firebase');
+            const idToken = await auth.currentUser?.getIdToken();
+            if (!idToken) { setTranscribing(false); return; }
+
+            const formData = new FormData();
+            formData.append('audio', { uri, type: 'audio/m4a', name: 'recording.m4a' } as any);
+
+            const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent', {
+              method: 'POST',
+              headers: { 'Authorization': `Bearer ${idToken}` },
+              body: formData,
+            });
+            const data = await res.json();
+            if (data.text) {
+              setInput(data.text);
+            }
+          }
+        } catch (e) {
+          crossAlert(t('common.error'), 'Feil under transkribering');
+        } finally {
+          setTranscribing(false);
+        }
+      };
+
+      setStopRecording(() => stopRecording);
+    } catch (error) {
+      crossAlert(t('common.error'), 'Kunne ikke starte opptak');
+      setRecording(false);
+    }
+  }, [recording, transcribing, t]);
+
+  const [stopRecording, setStopRecording] = useState<(() => Promise<void>) | null>(null);
+
+  const sendCorrection = useCallback(async (originalQuery: string, correctAnswer: string) => {
     if (!familyId || !correctAnswer.trim()) return;
     setCorrectionMsgId(null);
     setCorrectionText('');
@@ -295,148 +374,179 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
     } finally {
       setLoading(false);
     }
-  };
+  }, [familyId]);
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: colors.accent }]}>
-          <Text style={{ color: colors.accent, fontSize: 18 }}>←</Text>
-        </TouchableOpacity>
-        <AppIcon name="ai" size={28} color={HOME_COLOR} />
-        <Text style={[styles.headerTitle, { color: colors.text }]}>AI-assistent</Text>
-      </View>
-
-      <ScrollView
-        ref={scrollRef}
-        style={styles.messagesContainer}
-        contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
-        onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
-      >
-        {messages.length === 0 && (
-          <View style={styles.emptyState}>
-            <AppIcon name="ai" size={48} color={HOME_COLOR} />
-            <Text style={[styles.emptyTitle, { color: colors.text }]}>Hei! 👋</Text>
-            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>Hva kan jeg hjelpe deg med?</Text>
-            <Text style={[styles.emptyHint, { color: colors.textDisabled }]}>Prøv: "Når er neste tannlegetime?" eller "Legg til fotballtrening for Mina på fredag"</Text>
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <View style={styles.overlay}>
+        <TouchableWithoutFeedback onPress={onClose}>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
+        <View style={[styles.sheet, { backgroundColor: colors.background }]}>
+          <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+            <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { borderColor: colors.textSecondary }]}>
+              <Svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke={colors.textSecondary} strokeWidth="2.5" strokeLinecap="round">
+                <Line x1="18" y1="6" x2="6" y2="18"/>
+                <Line x1="6" y1="6" x2="18" y2="18"/>
+              </Svg>
+            </TouchableOpacity>
+            <AppIcon name="ai" size={24} color={HOME_COLOR} />
+            <Text style={[styles.headerTitle, { color: colors.text }]}>AI-assistent</Text>
+            <View style={{ width: 32 }} />
           </View>
-        )}
 
-        {messages.map((msg) => (
-          <View key={msg.id}>
-            <View style={[styles.messageBubble, msg.role === 'user' ? styles.userBubble : styles.assistantBubble, { backgroundColor: msg.role === 'user' ? colors.accent : colors.surface }]}>
-              {msg.role === 'assistant' && (
+          <ScrollView
+            ref={scrollRef}
+            style={styles.messagesContainer}
+            contentContainerStyle={{ padding: 16, paddingBottom: 20 }}
+            onContentSizeChange={() => scrollRef.current?.scrollToEnd({ animated: true })}
+          >
+            {messages.length === 0 && (
+              <View style={styles.emptyState}>
+                <AppIcon name="ai" size={48} color={HOME_COLOR} />
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>Hei! 👋</Text>
+                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>Hva kan jeg hjelpe deg med?</Text>
+                <Text style={[styles.emptyHint, { color: colors.textDisabled }]}>Prøv: "Når er neste tannlegetime?" eller "Legg til fotballtrening for Mina på fredag"</Text>
+              </View>
+            )}
+
+            {messages.map((msg) => (
+              <View key={msg.id}>
+                <View style={[styles.messageBubble, msg.role === 'user' ? styles.userBubble : styles.assistantBubble, { backgroundColor: msg.role === 'user' ? colors.accent : colors.surface }]}>
+                  {msg.role === 'assistant' && (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
+                      <AppIcon name="ai" size={14} color={HOME_COLOR} />
+                      <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>AI-assistent</Text>
+                    </View>
+                  )}
+                  <Text style={{ fontSize: 14, color: msg.role === 'user' ? '#fff' : colors.text, lineHeight: 20 }}>{msg.content}</Text>
+                </View>
+                {msg.role === 'assistant' && !loading && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8, marginBottom: 4, gap: 6 }}>
+                    {correctionMsgId !== msg.id && (
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCorrectionMsgId(msg.id);
+                          const userMsg = messages.find((m, i) => {
+                            const msgIndex = messages.indexOf(msg);
+                            return i < msgIndex && m.role === 'user';
+                          });
+                          setCorrectionQuery(userMsg?.content || '');
+                        }}
+                        style={{ paddingVertical: 2, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
+                      >
+                        <Text style={{ fontSize: 10, color: colors.textSecondary }}>Var dette riktig?</Text>
+                      </TouchableOpacity>
+                    )}
+                    {correctionMsgId === msg.id && (
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 }}>
+                        <TextInput
+                          style={{ flex: 1, fontSize: 13, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: colors.inputBackground, color: colors.text }}
+                          value={correctionText}
+                          onChangeText={setCorrectionText}
+                          placeholder="Skriv riktig svar..."
+                          placeholderTextColor={colors.textDisabled}
+                        />
+                        <TouchableOpacity
+                          onPress={() => sendCorrection(correctionQuery, correctionText)}
+                          style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: HOME_COLOR }}
+                        >
+                          <Text style={{ fontSize: 11, color: '#fff', fontWeight: '600' }}>OK</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => { setCorrectionMsgId(null); setCorrectionText(''); }}
+                          style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
+                        >
+                          <Text style={{ fontSize: 11, color: colors.textSecondary }}>✕</Text>
+                        </TouchableOpacity>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </View>
+            ))}
+
+            {loading && (
+              <View style={[styles.messageBubble, styles.assistantBubble, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
                   <AppIcon name="ai" size={14} color={HOME_COLOR} />
                   <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>AI-assistent</Text>
                 </View>
-              )}
-              <Text style={{ fontSize: 14, color: msg.role === 'user' ? '#fff' : colors.text, lineHeight: 20 }}>{msg.content}</Text>
-            </View>
-            {msg.role === 'assistant' && !loading && (
-              <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8, marginBottom: 4, gap: 6 }}>
-                {correctionMsgId !== msg.id && (
-                  <TouchableOpacity
-                    onPress={() => {
-                      setCorrectionMsgId(msg.id);
-                      const userMsg = messages.find((m, i) => {
-                        const msgIndex = messages.indexOf(msg);
-                        return i < msgIndex && m.role === 'user';
-                      });
-                      setCorrectionQuery(userMsg?.content || '');
-                    }}
-                    style={{ paddingVertical: 2, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
-                  >
-                    <Text style={{ fontSize: 10, color: colors.textSecondary }}>Var dette riktig?</Text>
-                  </TouchableOpacity>
-                )}
-                {correctionMsgId === msg.id && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 }}>
-                    <TextInput
-                      style={{ flex: 1, fontSize: 13, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: colors.inputBackground, color: colors.text }}
-                      value={correctionText}
-                      onChangeText={setCorrectionText}
-                      placeholder="Skriv riktig svar..."
-                      placeholderTextColor={colors.textDisabled}
-                    />
-                    <TouchableOpacity
-                      onPress={() => sendCorrection(correctionQuery, correctionText)}
-                      style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: HOME_COLOR }}
-                    >
-                      <Text style={{ fontSize: 11, color: '#fff', fontWeight: '600' }}>OK</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      onPress={() => { setCorrectionMsgId(null); setCorrectionText(''); }}
-                      style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
-                    >
-                      <Text style={{ fontSize: 11, color: colors.textSecondary }}>✕</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
+                <ActivityIndicator size="small" color={HOME_COLOR} />
               </View>
             )}
-          </View>
-        ))}
+          </ScrollView>
 
-        {loading && (
-          <View style={[styles.messageBubble, styles.assistantBubble, { backgroundColor: colors.surface }]}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
-              <AppIcon name="ai" size={14} color={HOME_COLOR} />
-              <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>AI-assistent</Text>
+          {showConfirm && (
+            <View style={styles.confirmOverlay}>
+              <View style={[styles.confirmBox, { backgroundColor: colors.surface }]}>
+                <AppIcon name="ai" size={32} color={HOME_COLOR} />
+                <Text style={[styles.confirmTitle, { color: colors.text }]}>{confirmMessage}</Text>
+                <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
+                  <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowConfirm(false); setConfirmActions([]); }}>
+                    <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: HOME_COLOR, flex: 1 }]} onPress={handleConfirm}>
+                    <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{t('common.confirm')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-            <ActivityIndicator size="small" color={HOME_COLOR} />
-          </View>
-        )}
-      </ScrollView>
+          )}
 
-      {/* Confirm modal */}
-      {showConfirm && (
-        <View style={styles.confirmOverlay}>
-          <View style={[styles.confirmBox, { backgroundColor: colors.surface }]}>
-            <AppIcon name="ai" size={32} color={HOME_COLOR} />
-            <Text style={[styles.confirmTitle, { color: colors.text }]}>{confirmMessage}</Text>
-            <View style={{ flexDirection: 'row', gap: 12, marginTop: 16 }}>
-              <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowConfirm(false); setConfirmActions([]); }}>
-                <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{t('common.cancel')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.confirmBtn, { backgroundColor: HOME_COLOR, flex: 1 }]} onPress={handleConfirm}>
-                <Text style={{ color: '#fff', fontSize: 14, fontWeight: '600' }}>{t('common.confirm')}</Text>
-              </TouchableOpacity>
+          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+            <View style={[styles.inputBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
+              {recording || transcribing ? (
+                <TouchableOpacity
+                  style={[styles.micRecordingBtn]}
+                  onPress={() => stopRecording?.()}
+                >
+                  <AppIcon name="microphone" size={20} color="#fff" />
+                  <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginLeft: 6 }}>
+                    {transcribing ? 'Transkriberer...' : 'Trykk for å stoppe'}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <>
+                  <TouchableOpacity
+                    style={[styles.micBtn, { backgroundColor: colors.inputBackground }]}
+                    onPress={startVoiceInput}
+                  >
+                    <AppIcon name="microphone" size={20} color={HOME_COLOR} />
+                  </TouchableOpacity>
+                  <TextInput
+                    style={[styles.textInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
+                    value={input}
+                    onChangeText={setInput}
+                    placeholder="Skriv en melding..."
+                    placeholderTextColor={colors.textDisabled}
+                    onSubmitEditing={() => sendMessage(input)}
+                    returnKeyType="send"
+                  />
+                  <TouchableOpacity
+                    style={[styles.sendBtn, { backgroundColor: input.trim() ? HOME_COLOR : colors.textDisabled }]}
+                    onPress={() => sendMessage(input)}
+                    disabled={!input.trim() || loading}
+                  >
+                    <AppIcon name="send" size={18} color="#fff" />
+                  </TouchableOpacity>
+                </>
+              )}
             </View>
-          </View>
+          </KeyboardAvoidingView>
         </View>
-      )}
-
-      {/* Input bar */}
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View style={[styles.inputBar, { backgroundColor: colors.surface, borderTopColor: colors.border }]}>
-          <TextInput
-            style={[styles.textInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
-            value={input}
-            onChangeText={setInput}
-            placeholder="Skriv en melding..."
-            placeholderTextColor={colors.textDisabled}
-            onSubmitEditing={() => sendMessage(input)}
-            returnKeyType="send"
-          />
-          <TouchableOpacity
-            style={[styles.sendBtn, { backgroundColor: input.trim() ? HOME_COLOR : colors.textDisabled }]}
-            onPress={() => sendMessage(input)}
-            disabled={!input.trim() || loading}
-          >
-            <AppIcon name="send" size={18} color="#fff" />
-          </TouchableOpacity>
-        </View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+      </View>
+    </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  overlay: { flex: 1, justifyContent: 'flex-end' },
+  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.5)' },
+  sheet: { flex: 1, borderTopLeftRadius: 20, borderTopRightRadius: 20 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1 },
-  backBtn: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 20, fontWeight: '700', flex: 1 },
+  closeBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  headerTitle: { fontSize: 18, fontWeight: '700', flex: 1 },
   messagesContainer: { flex: 1 },
   emptyState: { alignItems: 'center', marginTop: 80, gap: 8 },
   emptyTitle: { fontSize: 22, fontWeight: '700' },
@@ -450,6 +560,8 @@ const styles = StyleSheet.create({
   confirmTitle: { fontSize: 16, fontWeight: '600', textAlign: 'center' },
   confirmBtn: { paddingVertical: 12, paddingHorizontal: 24, borderRadius: 10 },
   inputBar: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderTopWidth: 1 },
+  micBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
+  micRecordingBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', backgroundColor: '#E53935', paddingVertical: 12, borderRadius: 20 },
   textInput: { flex: 1, padding: 12, borderRadius: 12, fontSize: 16 },
   sendBtn: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center' },
 });

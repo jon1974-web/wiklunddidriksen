@@ -865,7 +865,9 @@
     "youSaid": "Du sagde:",
     "micPermission": "Mikrofontilladelse er nødvendig for optagelse",
     "tryAgain": "Prøv igen",
-    "processing": "Behandler tale..."
+    "processing": "Behandler tale...",
+    "tapToStop": "Tryk for at stoppe",
+    "transcribing": "Transskriberer..."
   },
   "photoEvent": {
     "title": "Foto til begivenhed",

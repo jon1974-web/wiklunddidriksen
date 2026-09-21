@@ -10,6 +10,7 @@ interface QuickCreateModalProps {
   visible: boolean;
   onClose: () => void;
   navigation: any;
+  onOpenAI?: () => void;
 }
 
 type IconName = React.ComponentProps<typeof AppIcon>['name'];
@@ -95,7 +96,7 @@ const MODE_LABELS: Record<Mode, string> = {
   photo: 'quickCreate.modePhoto',
 };
 
-export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ visible, onClose, navigation }) => {
+export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ visible, onClose, navigation, onOpenAI }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
   const [selectedMode, setSelectedMode] = useState<Mode>(null);
@@ -149,7 +150,7 @@ export const QuickCreateModal: React.FC<QuickCreateModalProps> = React.memo(({ v
                 <View style={styles.content}>
                   <TouchableOpacity
                     style={styles.aiRow}
-                    onPress={() => navigateAndClose(() => navigation.navigate('Trips', { screen: 'AIAssistant', params: { _t: Date.now() } }))}
+                    onPress={() => onOpenAI ? onOpenAI() : navigateAndClose(() => navigation.navigate('Trips', { screen: 'AIAssistant', params: { _t: Date.now() } }))}
                     activeOpacity={0.6}
                   >
                     <View style={[styles.aiIconWrap, { backgroundColor: MODULE_COLORS.home + '18' }]}>

@@ -809,7 +809,9 @@
     "youSaid": "You said:",
     "micPermission": "Microphone access is required for voice recording",
     "tryAgain": "Try again",
-    "processing": "Processing speech..."
+    "processing": "Processing speech...",
+    "tapToStop": "Tap to stop",
+    "transcribing": "Transcribing..."
   },
   "photoEvent": {
     "title": "Photo to event",

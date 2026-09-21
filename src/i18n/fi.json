@@ -865,7 +865,9 @@
     "youSaid": "Sanoit:",
     "micPermission": "Mikrofonikäyttö vaaditaan äänitykseen",
     "tryAgain": "Yritä uudelleen",
-    "processing": "Käsitellään puhetta..."
+    "processing": "Käsitellään puhetta...",
+    "tapToStop": "Napauta pysäyttääksesi",
+    "transcribing": "Transkriboi..."
   },
   "photoEvent": {
     "title": "Valokuva tapahtumaksi",

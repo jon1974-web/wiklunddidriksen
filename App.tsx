@@ -327,11 +327,6 @@ const TripsStack = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="AIAssistant"
-          component={AIAssistantScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
           name="HomeServiceDetail"
           component={HomeServiceDetailScreen}
           options={{ headerShown: false }}
@@ -574,6 +569,7 @@ const AppContent = () => {
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
   const [showQuickCreate, setShowQuickCreate] = useState(false);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
@@ -725,6 +721,12 @@ const AppContent = () => {
             <QuickCreateModal
               visible={showQuickCreate}
               onClose={() => setShowQuickCreate(false)}
+              navigation={navigationRef}
+              onOpenAI={() => { setShowQuickCreate(false); setTimeout(() => setShowAIAssistant(true), 300); }}
+            />
+            <AIAssistantScreen
+              visible={showAIAssistant}
+              onClose={() => setShowAIAssistant(false)}
               navigation={navigationRef}
             />
           </>

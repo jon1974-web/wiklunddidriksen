@@ -865,7 +865,9 @@
     "youSaid": "Du sa:",
     "micPermission": "Mikrofonåtkomst krävs för inspelning",
     "tryAgain": "Försök igen",
-    "processing": "Behandlar tal..."
+    "processing": "Behandlar tal...",
+    "tapToStop": "Tryck för att stoppa",
+    "transcribing": "Transkriberar..."
   },
   "photoEvent": {
     "title": "Foto till evenemang",
