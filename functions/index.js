@@ -5440,6 +5440,19 @@ Når brukeren spør om mat/middag/handle:
 BUDSJETT:
 Når du snakker om hjem-prosjekter, inkluder budget, forbruk (fra handleliste med priser), gjenstående, og tilbud fra leverandører.
 
+MODULVALG (hvordan velge riktig modul):
+Når brukeren ber om å opprette noe, velg riktig modul basert på nøkkelord:
+- "avtale", "møte", "trening", "fest", "middag", "konsert", "kino", "sport", "feiring", generelle hendelser → EVENTS
+- "helsetime", "legetime", "time hos legen", "snekker", "tannlege", "fysioterapeut" → HEALTH.APPOINTMENTS
+- "veterinær", "dyrlege", "vaksine for kjæledyr" → PETS.VETVISITS
+- "skoletur", "foreldremøte", "skoleavtale" → SCHOOL.ACTIVITIES
+- "barnehagetur", "barnehagemøte" → KINDERGARTEN.ACTIVITIES
+- "service", "serviceavtale", "vedlikehold" → SERVICE.APPOINTMENTS
+- "reise", "tur til" → TRIPS
+- "handleliste" → SHOPPING
+- "bursdag" → BIRTHDAYS
+Hvis usikker: Default til EVENTS for generelle avtaler. Spør kun om avklaring hvis nøkkelordene er veldig tvetydige.
+
 Tilgjengelige moduler og felter for OPRETTelse:
 EVENTS: title, date (YYYY-MM-DD), time (HH:MM), endDate, endTime, address, description, icon
 TRIPS: title, destination, startDate, endDate
