@@ -188,7 +188,6 @@ export async function getHistoricalWeather(
 
 export interface WeatherHour {
   period: string;
-  label: string;
   emoji: string;
   hour: number;
   temp: number;
@@ -200,11 +199,11 @@ export interface WeatherHour {
 }
 
 const TIME_PERIODS = [
-  { period: 'morning', label: 'Morgen', emoji: '🌅', startHour: 6, endHour: 10, representativeHour: 8 },
-  { period: 'lunch', label: 'Lunsj', emoji: '🍽️', startHour: 10, endHour: 14, representativeHour: 12 },
-  { period: 'afternoon', label: 'Ettermiddag', emoji: '☀️', startHour: 14, endHour: 18, representativeHour: 16 },
-  { period: 'evening', label: 'Kveld', emoji: '🌙', startHour: 18, endHour: 22, representativeHour: 20 },
-  { period: 'night', label: 'Natt', emoji: '🌑', startHour: 22, endHour: 6, representativeHour: 0 },
+  { period: 'morning', emoji: '🌅', startHour: 6, endHour: 10, representativeHour: 8 },
+  { period: 'lunch', emoji: '🍽️', startHour: 10, endHour: 14, representativeHour: 12 },
+  { period: 'afternoon', emoji: '☀️', startHour: 14, endHour: 18, representativeHour: 16 },
+  { period: 'evening', emoji: '🌙', startHour: 18, endHour: 22, representativeHour: 20 },
+  { period: 'night', emoji: '🌑', startHour: 22, endHour: 6, representativeHour: 0 },
 ];
 
 export async function getHourlyForDay(
@@ -244,7 +243,6 @@ export async function getHourlyForDay(
       if (!bestHour) {
         return {
           period: tp.period,
-          label: tp.label,
           emoji: tp.emoji,
           hour: tp.representativeHour,
           temp: 0,
@@ -258,7 +256,6 @@ export async function getHourlyForDay(
 
       return {
         period: tp.period,
-        label: tp.label,
         emoji: tp.emoji,
         hour: bestHour.displayDateTime.hours,
         temp: Math.round(bestHour.temperature?.degrees ?? 0),

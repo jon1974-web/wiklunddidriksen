@@ -601,7 +601,7 @@
   "weather": {
     "title": "Sää",
     "loading": "Haetaan säädataa...",
-    "noData": "Ei säädataa saatavilla",
+    "noData": "Saatavilla ei ole säädataa",
     "refresh": "Päivitä",
     "day": "Päivä",
     "weather": "Sää",
@@ -610,7 +610,19 @@
     "water": "Vesi",
     "previous": "Edellinen",
     "next": "Seuraava",
-    "refreshing": "Päivitetään..."
+    "refreshing": "Päivitetään...",
+    "dayThroughDay": "Sää päivän aikana",
+    "tapToClose": "napauta sulkeaksesi ▼",
+    "colWeather": "Sää",
+    "colTemp": "Lämpö",
+    "colRain": "Sade",
+    "colWind": "Tuuli",
+    "noHourlyData": "Ei tuntitietoja",
+    "morning": "Aamu",
+    "lunch": "Lounas",
+    "afternoon": "Iltapäivä",
+    "evening": "Ilta",
+    "night": "Yö"
   },
   "tips": {
     "title": "Kohdevinkit",

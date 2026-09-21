@@ -600,7 +600,7 @@
   },
   "weather": {
     "title": "Weather",
-    "loading": "Loading weather data...",
+    "loading": "Loading weather...",
     "noData": "No weather data available",
     "refresh": "Refresh",
     "refreshing": "Refreshing...",
@@ -610,7 +610,19 @@
     "uv": "UV",
     "water": "Water",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "dayThroughDay": "Weather through the day",
+    "tapToClose": "tap to close ▼",
+    "colWeather": "Weather",
+    "colTemp": "Temp",
+    "colRain": "Rain",
+    "colWind": "Wind",
+    "noHourlyData": "No hourly data",
+    "morning": "Morning",
+    "lunch": "Lunch",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "night": "Night"
   },
   "tips": {
     "title": "Destination tips",

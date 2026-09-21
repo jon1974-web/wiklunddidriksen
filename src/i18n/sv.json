@@ -600,8 +600,8 @@
   },
   "weather": {
     "title": "Väder",
-    "loading": "Hämtar väderdata...",
-    "noData": "Inga väderdata tillgängliga",
+    "loading": "Hämtar väder...",
+    "noData": "Ingen väderdata tillgängligt",
     "refresh": "Uppdatera",
     "day": "Dag",
     "weather": "Väder",
@@ -610,7 +610,19 @@
     "water": "Vatten",
     "previous": "Föregående",
     "next": "Nästa",
-    "refreshing": "Uppdaterar..."
+    "refreshing": "Uppdaterar...",
+    "dayThroughDay": "Väder under dagen",
+    "tapToClose": "tryck för att stänga ▼",
+    "colWeather": "Väder",
+    "colTemp": "Temp",
+    "colRain": "Regn",
+    "colWind": "Vind",
+    "noHourlyData": "Ingen timdata",
+    "morning": "Morgon",
+    "lunch": "Lunch",
+    "afternoon": "Eftermiddag",
+    "evening": "Kväll",
+    "night": "Natt"
   },
   "tips": {
     "title": "Destinationstips",

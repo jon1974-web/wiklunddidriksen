@@ -1057,9 +1057,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             )}
           </View>
           {weatherLoading ? (
-            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Henter værdata...</Text>
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('weather.loading')}</Text>
           ) : weather.length === 0 ? (
-            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen værdata tilgjengelig</Text>
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('weather.noData')}</Text>
           ) : (
             <>
               <View style={styles.weatherHeaderRow}>
@@ -1101,8 +1101,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     {isExpanded && (
                       <View style={{ backgroundColor: colors.surface, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: 12, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: colors.border }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: colors.border + '40', marginBottom: 6 }}>
-                          <Text style={{ fontSize: 12, fontWeight: '700', color: MODULE_COLORS.trips, textTransform: 'uppercase', letterSpacing: 0.5 }}>Vær gjennom dagen</Text>
-                          <Text style={{ fontSize: 11, color: colors.textDisabled }}>trykk for å lukke ▼</Text>
+                          <Text style={{ fontSize: 12, fontWeight: '700', color: MODULE_COLORS.trips, textTransform: 'uppercase', letterSpacing: 0.5 }}>{t('weather.dayThroughDay')}</Text>
+                          <Text style={{ fontSize: 11, color: colors.textDisabled }}>{t('weather.tapToClose')}</Text>
                         </View>
                         {hourlyLoading === day.date ? (
                           <ActivityIndicator size="small" color={MODULE_COLORS.trips} style={{ marginVertical: 8 }} />
@@ -1111,16 +1111,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                             <View style={{ flexDirection: 'row', alignItems: 'center', paddingHorizontal: 4, paddingBottom: 4, borderBottomWidth: 1, borderBottomColor: colors.border + '30' }}>
                               <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 28 }}></Text>
                               <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 75 }}></Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 28, textAlign: 'center' }}>Vær</Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 36, textAlign: 'center' }}>Temp</Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 40, textAlign: 'center' }}>Regn</Text>
-                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 36, textAlign: 'center' }}>Vind</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 28, textAlign: 'center' }}>{t('weather.colWeather')}</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 36, textAlign: 'center' }}>{t('weather.colTemp')}</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 40, textAlign: 'center' }}>{t('weather.colRain')}</Text>
+                              <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 36, textAlign: 'center' }}>{t('weather.colWind')}</Text>
                               <Text style={{ fontSize: 10, fontWeight: '600', color: MODULE_COLORS.trips, width: 30, textAlign: 'center' }}>UV</Text>
                             </View>
                             {hourly.map((h) => (
                               <View key={h.period} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4, paddingHorizontal: 4, borderRadius: 6, backgroundColor: i % 2 === 0 ? MODULE_COLORS.tripsBg : colors.surface }}>
                                 <Text style={{ fontSize: 16, width: 28 }}>{h.emoji}</Text>
-                                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.text, width: 75 }}>{h.label}</Text>
+                                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.text, width: 75 }}>{t(`weather.${h.period}`)}</Text>
                                 <Text style={{ fontSize: 16, width: 28, textAlign: 'center' }}>{wmoToEmoji(h.weatherCode)}</Text>
                                 <Text style={{ fontSize: 13, fontWeight: '500', color: tempColor(h.temp), width: 36, textAlign: 'center' }}>{h.temp}°</Text>
                                 <Text style={{ fontSize: 12, color: h.rainPercent >= 50 ? '#1E88E5' : colors.textSecondary, width: 40, textAlign: 'center' }}>{h.rainPercent}%</Text>
@@ -1130,7 +1130,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                             ))}
                           </View>
                         ) : (
-                          <Text style={{ fontSize: 12, color: colors.textDisabled, paddingVertical: 8, textAlign: 'center' }}>Ingen timedata</Text>
+                          <Text style={{ fontSize: 12, color: colors.textDisabled, paddingVertical: 8, textAlign: 'center' }}>{t('weather.noHourlyData')}</Text>
                         )}
                       </View>
                     )}

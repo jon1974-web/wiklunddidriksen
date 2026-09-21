@@ -85,7 +85,6 @@ export interface WeatherDay {
 
 export interface WeatherHour {
   period: string;
-  label: string;
   emoji: string;
   hour: number;
   temp: number;

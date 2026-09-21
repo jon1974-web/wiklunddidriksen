@@ -610,7 +610,19 @@
     "uv": "UV",
     "water": "Vann",
     "previous": "Forrige",
-    "next": "Neste"
+    "next": "Neste",
+    "dayThroughDay": "Vær gjennom dagen",
+    "tapToClose": "trykk for å lukke ▼",
+    "colWeather": "Vær",
+    "colTemp": "Temp",
+    "colRain": "Regn",
+    "colWind": "Vind",
+    "noHourlyData": "Ingen timedata",
+    "morning": "Morgen",
+    "lunch": "Lunsj",
+    "afternoon": "Ettermiddag",
+    "evening": "Kveld",
+    "night": "Natt"
   },
   "tips": {
     "title": "Destinasjonstips",

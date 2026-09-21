@@ -601,7 +601,7 @@
   "weather": {
     "title": "Vejr",
     "loading": "Henter vejrdata...",
-    "noData": "Ingen vejrdata tilgængelige",
+    "noData": "Ingen vejrdata tilgængelig",
     "refresh": "Opdater",
     "day": "Dag",
     "weather": "Vejr",
@@ -610,7 +610,19 @@
     "water": "Vand",
     "previous": "Forrige",
     "next": "Næste",
-    "refreshing": "Opdaterer..."
+    "refreshing": "Opdaterer...",
+    "dayThroughDay": "Vejr i løbet af dagen",
+    "tapToClose": "tryk for at lukke ▼",
+    "colWeather": "Vejr",
+    "colTemp": "Temp",
+    "colRain": "Regn",
+    "colWind": "Vind",
+    "noHourlyData": "Ingen timedata",
+    "morning": "Morgen",
+    "lunch": "Frokost",
+    "afternoon": "Eftermiddag",
+    "evening": "Aften",
+    "night": "Nat"
   },
   "tips": {
     "title": "Destinationstips",
