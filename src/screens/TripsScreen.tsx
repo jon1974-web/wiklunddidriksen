@@ -62,7 +62,10 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
     let lat = trip.latitude;
     let lon = trip.longitude;
     if (!lat || !lon) {
-      const locationQuery = trip.country ? `${trip.city}, ${trip.country}` : trip.city;
+      const locationQuery = trip.city
+        ? (trip.country ? `${trip.city}, ${trip.country}` : trip.city)
+        : trip.title;
+      if (!locationQuery) return;
       const coords = await geocodeCity(locationQuery);
       if (!coords) return;
       lat = coords.latitude;
@@ -165,6 +168,12 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
                   {' / '}
                   <Text style={{ color: tempColor(weather[0].tempMax) }}>{weather[0].tempMax}°</Text>
                 </Text>
+                {weather[0].uvIndex > 0 && (
+                  <Text style={[styles.weatherDetail, { color: weather[0].uvIndex >= 8 ? '#E53935' : colors.textSecondary }]}>UV {weather[0].uvIndex}</Text>
+                )}
+                {weather[0].precipitationProbability != null && weather[0].precipitationProbability > 0 && (
+                  <Text style={[styles.weatherDetail, { color: '#1E88E5' }]}>🌧 {weather[0].precipitationProbability}%</Text>
+                )}
                 {isActive && (
                   <TouchableOpacity
                     onPress={() => handleRefreshWeather(item)}
@@ -362,6 +371,11 @@ const styles = StyleSheet.create({
   weatherTemp: {
     fontSize: 13,
     fontWeight: '500',
+  },
+  weatherDetail: {
+    fontSize: 11,
+    fontWeight: '500',
+    marginLeft: 4,
   },
   refreshIcon: {
     fontSize: 12,

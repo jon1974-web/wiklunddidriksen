@@ -127,7 +127,7 @@ export async function getForecast(
     const res = await fetch(
       `${GOOGLE_WEATHER_URL}?key=${GOOGLE_MAPS_API_KEY}` +
       `&location.latitude=${latitude}&location.longitude=${longitude}` +
-      `&days=${days}&languageCode=no`
+      `&days=${days}&pageSize=${days}&languageCode=no`
     );
     const data = await res.json();
     if (!data.forecastDays) return [];
