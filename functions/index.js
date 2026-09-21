@@ -5259,7 +5259,54 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, asyn
     const familyData = await searchFamilyData(db, familyId, message);
     const dataContext = formatDataForGPT(familyData);
 
-    // STEP 1.5: Load relevant corrections (top 5)
+    // STEP 1.5: Weather lookup for trip-related weather queries
+    let weatherContext = '';
+    const weatherKeywords = ['vær', 'weather', 'temperatur', 'regn', 'sol', 'snø', ' vind', 'skyet', 'overskyet', 'grad'];
+    const isWeatherQuery = weatherKeywords.some(kw => message.toLowerCase().includes(kw));
+    if (isWeatherQuery && familyData.trips && familyData.trips.length > 0) {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        // Find upcoming trips
+        const upcomingTrips = familyData.trips
+          .filter(t => t.endDate >= today)
+          .sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''))
+          .slice(0, 3);
+        
+        for (const trip of upcomingTrips) {
+          const destination = trip.destination || trip.title;
+          if (!destination) continue;
+          const locationQuery = encodeURIComponent(destination);
+          const wttrRes = await fetch(`https://wttr.in/${locationQuery}?format=j1&lang=no`);
+          if (wttrRes.ok) {
+            const wttrData = await wttrRes.json();
+            const forecast = wttrData.weather || [];
+            const tripStart = trip.startDate;
+            const tripEnd = trip.endDate;
+            // Filter forecast days that overlap with trip dates
+            const relevantDays = forecast.filter(day => {
+              const d = day.date;
+              return d >= tripStart && d <= tripEnd;
+            });
+            if (relevantDays.length > 0) {
+              weatherContext += `\n--- VÆR for "${trip.title || destination}" (${tripStart} → ${tripEnd}) ---\n`;
+              for (const day of relevantDays) {
+                const desc = day.hourly?.[4]?.weatherDesc?.[0]?.value || day.hourly?.[0]?.weatherDesc?.[0]?.value || '';
+                const maxT = day.maxtempC || '?';
+                const minT = day.mintempC || '?';
+                const rain = day.hourly?.[4]?.chanceofrain || '0';
+                weatherContext += `${day.date}: ${desc}, ${minT}°C → ${maxT}°C, regnsjanse: ${rain}%\n`;
+              }
+            } else {
+              weatherContext += `\n--- VÆR for "${trip.title || destination}" ---\nIngen værdata tilgjengelig for disse datoene ennå (wttr.in gir kun 3-dagers prognose).\n`;
+            }
+          }
+        }
+      } catch (e) {
+        console.log('Weather lookup error (non-fatal):', e.message);
+      }
+    }
+
+    // STEP 1.6: Load relevant corrections (top 5)
     let correctionContext = '';
     try {
       const correctionsSnap = await db.collection('aiLearnedCorrections')
@@ -5326,6 +5373,8 @@ HOME.OFFERS: provider, description, price
 
 SKOLE/KINDERGARTEN DOKUMENTER: Skoletimeplaner og barnehageplaner er opplastede bilder/dokumenter. Du kan ikke vise dem direkte, men du kan navigere brukeren til riktig sted der de kan se dem.
 
+VÆR: Hvis brukeren spør om vær for en reise, er værdata allerede hentet og inkludert i konteksten under "VÆR for ...". Bruk denne dataen til å svare. Hvis vær bare er tilgjengelig for de nærmeste 3 dagene og reisen er lenger frem i tid, forklar dette og si hva som er tilgjengelig.
+
 NAVIGASJON (action type: "navigate") - brukeren kan be om å navigere til skjermer:
 - school.children → { screen: 'SchoolSpace', params: { childId: 'ID' } } (naviger til et barns skoleside)
 - kindergarten.children → { screen: 'KindergartenSpace', params: { childId: 'ID' } } (naviger til et barns barnehageside)
@@ -5351,7 +5400,7 @@ Returner JSON med denne strukturen:
 For navigate-actions: bruk module for å beskrive hva det er, og screen for navigasjonen.
 Hvis ingen handlinger: actions: []`;
 
-    const dataMessage = `Familiens data i systemet:\n${dataContext}${correctionContext}\n\nBrukerens sporsmal: ${message}`;
+    const dataMessage = `Familiens data i systemet:\n${dataContext}${correctionContext}${weatherContext}\n\nBrukerens sporsmal: ${message}`;
 
     const messages = [
       { role: "system", content: systemPrompt },
