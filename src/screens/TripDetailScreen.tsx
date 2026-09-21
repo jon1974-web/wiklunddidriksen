@@ -294,7 +294,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     let lat = trip.latitude;
     let lon = trip.longitude;
     if (!lat || !lon) {
-      const locationQuery = trip.country ? `${trip.city}, ${trip.country}` : trip.city;
+      const locationQuery = trip.city
+        ? (trip.country ? `${trip.city}, ${trip.country}` : trip.city)
+        : trip.title;
+      if (!locationQuery) { setWeatherLoading(false); return; }
       const coords = await geocodeCity(locationQuery);
       if (!coords) { setWeatherLoading(false); return; }
       lat = coords.latitude;
@@ -303,7 +306,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     if (showRefresh) setRefreshingWeather(true);
     try {
       if (isActive) {
-        const forecast = await getForecast(lat, lon, 16);
+        const forecast = await getForecast(lat, lon, 10);
         setWeather(forecast);
       } else if (trip.weatherSummary && trip.weatherSummary.length > 0) {
         setWeather(trip.weatherSummary);
@@ -1006,7 +1009,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       </TouchableOpacity>
 
       {/* Vær */}
-      {trip.city && (
+      {(trip.city || trip.latitude || trip.title) && (
         <View style={[styles.weatherCard, { backgroundColor: colors.surface }]}>
           <View style={styles.sectionHeader}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
