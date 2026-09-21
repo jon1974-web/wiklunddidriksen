@@ -83,6 +83,19 @@ export interface WeatherDay {
   precipitationProbability?: number;
 }
 
+export interface WeatherHour {
+  period: string;
+  label: string;
+  emoji: string;
+  hour: number;
+  temp: number;
+  weatherCode: number;
+  rainPercent: number;
+  windSpeed: number;
+  humidity: number;
+  uvIndex: number;
+}
+
 export interface DestinationTips {
   overview: string;
   thingsToDo: string[];

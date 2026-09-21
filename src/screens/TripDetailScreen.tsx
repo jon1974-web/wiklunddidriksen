@@ -66,8 +66,8 @@ import { ActionModal } from '../components/ActionModal';
 import { CurrencyConverter } from '../components/CurrencyConverter';
 import { TRIP_ICONS } from '../constants/tripIcons';
 import { MODULE_COLORS } from '../constants/moduleColors';
-import { getForecast, getHistoricalWeather, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
-import { WeatherDay } from '../types';
+import { getForecast, getHistoricalWeather, getHourlyForDay, wmoToEmoji, geocodeCity, tempColor } from '../services/weatherService';
+import { WeatherDay, WeatherHour } from '../types';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
@@ -285,6 +285,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [weatherPage, setWeatherPage] = useState(0);
   const [weatherLoading, setWeatherLoading] = useState(true);
   const [refreshingWeather, setRefreshingWeather] = useState(false);
+  const [expandedWeatherDay, setExpandedWeatherDay] = useState<string | null>(null);
+  const [hourlyData, setHourlyData] = useState<Record<string, WeatherHour[]>>({});
+  const [hourlyLoading, setHourlyLoading] = useState<string | null>(null);
   const WEATHER_PAGE_SIZE = 5;
 
   const today = getTodayLocal();
@@ -325,6 +328,33 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   }, [trip, isActive]);
 
   useEffect(() => { fetchWeather(); }, [fetchWeather]);
+
+  const toggleWeatherDay = useCallback(async (date: string) => {
+    if (expandedWeatherDay === date) {
+      setExpandedWeatherDay(null);
+      return;
+    }
+    setExpandedWeatherDay(date);
+    if (hourlyData[date]) return;
+    let lat = trip.latitude;
+    let lon = trip.longitude;
+    if (!lat || !lon) {
+      const locationQuery = trip.city
+        ? (trip.country ? `${trip.city}, ${trip.country}` : trip.city)
+        : trip.title;
+      if (!locationQuery) return;
+      const coords = await geocodeCity(locationQuery);
+      if (!coords) return;
+      lat = coords.latitude;
+      lon = coords.longitude;
+    }
+    setHourlyLoading(date);
+    try {
+      const hourly = await getHourlyForDay(lat, lon, date);
+      setHourlyData((prev) => ({ ...prev, [date]: hourly }));
+    } catch {}
+    finally { setHourlyLoading(null); }
+  }, [expandedWeatherDay, hourlyData, trip]);
 
   const pagedWeather = weather.slice(weatherPage * WEATHER_PAGE_SIZE, (weatherPage + 1) * WEATHER_PAGE_SIZE);
   const weatherPages = Math.ceil(weather.length / WEATHER_PAGE_SIZE);
@@ -1042,24 +1072,56 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               </View>
               {pagedWeather.map((day, i) => {
                 const isToday = day.date === today;
+                const isExpanded = expandedWeatherDay === day.date;
+                const hourly = hourlyData[day.date];
                 return (
-                  <View key={day.date} style={[
-                    styles.weatherRow,
-                    isToday && styles.weatherTodayRow,
-                    !isToday && i % 2 === 0 && { backgroundColor: colors.surface },
-                    !isToday && i % 2 !== 0 && { backgroundColor: MODULE_COLORS.tripsBg },
-                  ]}>
-                    <Text style={[styles.weatherDayText, { color: colors.text, flex: 3, ...(isToday && { fontWeight: '600' }) }]} numberOfLines={1}>{formatShortDate(day.date)}</Text>
-                    <Text style={{ flex: 1, textAlign: 'center', fontSize: 22 }}>{wmoToEmoji(day.weatherCode)}</Text>
-                    <Text style={[styles.weatherDayText, { color: colors.text, flex: 2, textAlign: 'center' }]} numberOfLines={1}>
-                      <Text style={{ color: tempColor(day.tempMin) }}>{day.tempMin}°</Text>
-                      {' / '}
-                      <Text style={{ color: tempColor(day.tempMax) }}>{day.tempMax}°</Text>
-                    </Text>
-                    <Text style={[styles.weatherDayText, { color: day.uvIndex >= 8 ? '#E53935' : colors.text, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{day.uvIndex}</Text>
-                    <Text style={[styles.weatherDayText, { color: (day.precipitationProbability ?? 0) >= 50 ? '#1E88E5' : colors.textSecondary, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{day.precipitationProbability != null ? `${day.precipitationProbability}%` : '—'}</Text>
-                    <Text style={[styles.weatherDayText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]} numberOfLines={1}>{day.windSpeed != null ? `${day.windSpeed}` : '—'}</Text>
-                  </View>
+                  <React.Fragment key={day.date}>
+                    <TouchableOpacity
+                      onPress={() => toggleWeatherDay(day.date)}
+                      activeOpacity={0.7}
+                      style={[
+                        styles.weatherRow,
+                        isToday && styles.weatherTodayRow,
+                        !isToday && i % 2 === 0 && { backgroundColor: colors.surface },
+                        !isToday && i % 2 !== 0 && { backgroundColor: MODULE_COLORS.tripsBg },
+                        isExpanded && { borderBottomLeftRadius: 0, borderBottomRightRadius: 0 },
+                      ]}
+                    >
+                      <Text style={[styles.weatherDayText, { color: colors.text, flex: 3, ...(isToday && { fontWeight: '600' }) }]} numberOfLines={1}>{formatShortDate(day.date)}{isExpanded ? ' ▲' : ' ▼'}</Text>
+                      <Text style={{ flex: 1, textAlign: 'center', fontSize: 22 }}>{wmoToEmoji(day.weatherCode)}</Text>
+                      <Text style={[styles.weatherDayText, { color: colors.text, flex: 2, textAlign: 'center' }]} numberOfLines={1}>
+                        <Text style={{ color: tempColor(day.tempMin) }}>{day.tempMin}°</Text>
+                        {' / '}
+                        <Text style={{ color: tempColor(day.tempMax) }}>{day.tempMax}°</Text>
+                      </Text>
+                      <Text style={[styles.weatherDayText, { color: day.uvIndex >= 8 ? '#E53935' : colors.text, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{day.uvIndex}</Text>
+                      <Text style={[styles.weatherDayText, { color: (day.precipitationProbability ?? 0) >= 50 ? '#1E88E5' : colors.textSecondary, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{day.precipitationProbability != null ? `${day.precipitationProbability}%` : '—'}</Text>
+                      <Text style={[styles.weatherDayText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]} numberOfLines={1}>{day.windSpeed != null ? `${day.windSpeed}` : '—'}</Text>
+                    </TouchableOpacity>
+                    {isExpanded && (
+                      <View style={{ backgroundColor: colors.surface, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: 12, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                        {hourlyLoading === day.date ? (
+                          <ActivityIndicator size="small" color={MODULE_COLORS.trips} style={{ marginVertical: 8 }} />
+                        ) : hourly ? (
+                          <View style={{ gap: 4, paddingTop: 6 }}>
+                            {hourly.map((h) => (
+                              <View key={h.period} style={{ flexDirection: 'row', alignItems: 'center', paddingVertical: 4, paddingHorizontal: 4, borderRadius: 6, backgroundColor: i % 2 === 0 ? MODULE_COLORS.tripsBg : colors.surface }}>
+                                <Text style={{ fontSize: 16, width: 28 }}>{h.emoji}</Text>
+                                <Text style={{ fontSize: 12, fontWeight: '600', color: colors.text, width: 75 }}>{h.label}</Text>
+                                <Text style={{ fontSize: 16, width: 28, textAlign: 'center' }}>{wmoToEmoji(h.weatherCode)}</Text>
+                                <Text style={{ fontSize: 13, fontWeight: '500', color: tempColor(h.temp), width: 36, textAlign: 'center' }}>{h.temp}°</Text>
+                                <Text style={{ fontSize: 12, color: h.rainPercent >= 50 ? '#1E88E5' : colors.textSecondary, width: 40, textAlign: 'center' }}>{h.rainPercent}%</Text>
+                                <Text style={{ fontSize: 12, color: colors.textSecondary, width: 36, textAlign: 'center' }}>{h.windSpeed}</Text>
+                                <Text style={{ fontSize: 12, color: h.uvIndex >= 8 ? '#E53935' : colors.textSecondary, width: 30, textAlign: 'center' }}>{h.uvIndex}</Text>
+                              </View>
+                            ))}
+                          </View>
+                        ) : (
+                          <Text style={{ fontSize: 12, color: colors.textDisabled, paddingVertical: 8, textAlign: 'center' }}>Ingen timedata</Text>
+                        )}
+                      </View>
+                    )}
+                  </React.Fragment>
                 );
               })}
               {weatherPages > 1 && (

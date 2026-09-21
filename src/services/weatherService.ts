@@ -3,6 +3,7 @@ import { GOOGLE_MAPS_API_KEY } from '../constants/api';
 
 const GOOGLE_GEOCODE_URL = 'https://maps.googleapis.com/maps/api/geocode/json';
 const GOOGLE_WEATHER_URL = 'https://weather.googleapis.com/v1/forecast/days:lookup';
+const GOOGLE_HOURLY_URL = 'https://weather.googleapis.com/v1/forecast/hours:lookup';
 const HISTORICAL_URL = 'https://archive-api.open-meteo.com/v1/archive';
 
 interface CacheEntry {
@@ -177,6 +178,97 @@ export async function getHistoricalWeather(
       weatherCode: data.daily.weather_code[i],
       uvIndex: 0,
     }));
+
+    setCache(key, result);
+    return result;
+  } catch {
+    return [];
+  }
+}
+
+export interface WeatherHour {
+  period: string;
+  label: string;
+  emoji: string;
+  hour: number;
+  temp: number;
+  weatherCode: number;
+  rainPercent: number;
+  windSpeed: number;
+  humidity: number;
+  uvIndex: number;
+}
+
+const TIME_PERIODS = [
+  { period: 'morning', label: 'Morgen', emoji: '🌅', startHour: 6, endHour: 10, representativeHour: 8 },
+  { period: 'lunch', label: 'Lunsj', emoji: '🍽️', startHour: 10, endHour: 14, representativeHour: 12 },
+  { period: 'afternoon', label: 'Ettermiddag', emoji: '☀️', startHour: 14, endHour: 18, representativeHour: 16 },
+  { period: 'evening', label: 'Kveld', emoji: '🌙', startHour: 18, endHour: 22, representativeHour: 20 },
+  { period: 'night', label: 'Natt', emoji: '🌑', startHour: 22, endHour: 6, representativeHour: 0 },
+];
+
+export async function getHourlyForDay(
+  latitude: number,
+  longitude: number,
+  date: string
+): Promise<WeatherHour[]> {
+  const key = getCacheKey('hourly', latitude, longitude, date);
+  const cached = getCached<WeatherHour[]>(key);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(
+      `${GOOGLE_HOURLY_URL}?key=${GOOGLE_MAPS_API_KEY}` +
+      `&location.latitude=${latitude}&location.longitude=${longitude}` +
+      `&hours=48&pageSize=48&languageCode=no`
+    );
+    const data = await res.json();
+    if (!data.forecastHours) return [];
+
+    const dayHours = data.forecastHours.filter((h: any) => {
+      const d = h.displayDateTime;
+      return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}` === date;
+    });
+
+    const result: WeatherHour[] = TIME_PERIODS.map((tp) => {
+      let bestHour = dayHours[0];
+      let bestDiff = 999;
+      for (const h of dayHours) {
+        const diff = Math.abs(h.displayDateTime.hours - tp.representativeHour);
+        if (diff < bestDiff) {
+          bestDiff = diff;
+          bestHour = h;
+        }
+      }
+
+      if (!bestHour) {
+        return {
+          period: tp.period,
+          label: tp.label,
+          emoji: tp.emoji,
+          hour: tp.representativeHour,
+          temp: 0,
+          weatherCode: 0,
+          rainPercent: 0,
+          windSpeed: 0,
+          humidity: 0,
+          uvIndex: 0,
+        };
+      }
+
+      return {
+        period: tp.period,
+        label: tp.label,
+        emoji: tp.emoji,
+        hour: bestHour.displayDateTime.hours,
+        temp: Math.round(bestHour.temperature?.degrees ?? 0),
+        weatherCode: googleTypeToCode(bestHour.weatherCondition?.type ?? ''),
+        rainPercent: bestHour.precipitation?.probability?.percent ?? 0,
+        windSpeed: bestHour.wind?.speed?.value ?? 0,
+        humidity: bestHour.relativeHumidity ?? 0,
+        uvIndex: bestHour.uvIndex ?? 0,
+      };
+    });
 
     setCache(key, result);
     return result;
