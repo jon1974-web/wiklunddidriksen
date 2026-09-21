@@ -145,6 +145,17 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   useEffect(() => { loadPets(); }, [loadPets]);
   useEffect(() => { if (selectedPet) loadPetData(); }, [selectedPet, loadPetData]);
 
+  // Auto-select pet when navigated with petId param (from AI assistant)
+  useEffect(() => {
+    if (route?.params?.petId && pets.length > 0 && !selectedPet) {
+      const pet = pets.find(p => p.id === route.params!.petId);
+      if (pet) {
+        setSelectedPet(pet);
+        navigation.setParams({ petId: undefined } as any);
+      }
+    }
+  }, [route?.params?.petId, pets, selectedPet]);
+
   useEffect(() => {
     if ((route?.params?.openAddSection || route?.params?.openVoiceForType || route?.params?.openPhotoForType) && pets.length > 0 && !selectedPet) {
       if (pets.length === 1) {

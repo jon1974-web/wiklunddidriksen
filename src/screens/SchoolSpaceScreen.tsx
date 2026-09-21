@@ -251,6 +251,17 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     }
   }, [years, selectedChild]);
 
+  // Auto-select child when navigated with childId param (from AI assistant)
+  useEffect(() => {
+    if (route?.params?.childId && children.length > 0 && !selectedChild) {
+      const child = children.find(c => c.id === route.params!.childId);
+      if (child) {
+        setSelectedChild(child);
+        navigation.setParams({ childId: undefined } as any);
+      }
+    }
+  }, [route?.params?.childId, children, selectedChild]);
+
   const handleSaveChild = async () => {
     if (!familyId) return;
     if (!childForm.name.trim()) { crossAlert('Error', t('school.enterChildName')); return; }

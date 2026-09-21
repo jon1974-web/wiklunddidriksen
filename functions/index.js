@@ -5433,29 +5433,31 @@ SKOLE/KINDERGARTEN DOKUMENTER: Skoletimeplaner og barnehageplaner er opplastede 
 
 VÆR: Hvis brukeren spør om vær for en reise, er værdata allerede hentet og inkludert i konteksten under "VÆR for ...". Dataen inkluderer temperatur, UV-indeks, regnsjanse, vind og luftfuktighet. Bruk denne dataen til å svare. Hvis reisen er lenger frem i tid enn 10 dager, forklar at Google Weather gir opptil 10 dagers prognose og at du kan vise data når reisen nærmer seg.
 
-NAVIGASJON (action type: "navigate") - brukeren kan be om å navigere til skjermer:
-- school.children → { screen: 'SchoolSpace', params: { childId: 'ID' } } (naviger til et barns skoleside)
-- kindergarten.children → { screen: 'KindergartenSpace', params: { childId: 'ID' } } (naviger til et barns barnehageside)
-- pets → { screen: 'PetSpace', params: { petId: 'ID' } } (naviger til et kjæledyrs side)
-- homes → { screen: 'HomeSpace', params: { homeId: 'ID' } } (naviger til et hjem)
-- health → { screen: 'HealthSpace' } (naviger til helseoversikten)
-- events → { screen: 'EventDetail', params: { eventId: 'ID' } } (naviger til en hendelse)
-- trips → { screen: 'TripDetail', params: { tripId: 'ID' } } (naviger til en reise)
-- homeMaintenance → { screen: 'HomeMaintenance', params: { home: {OBJEKT} } } (naviger til serviceoversikten for et hjem)
+NAVIGASJON (action type: "navigate") - brukeren kan be om å navigere til skjermer.
+Når brukeren ber om å navigere, returner en navigate-action.
 
-Når brukeren ber om å navigere, returner en navigate-action med riktig screen og params basert på dataen du finner. Du trenger IKKE brukerbekreftelse for navigasjon.
+Tilgjengelige skjermer og riktig bruk:
+- school.children → { screen: 'SchoolSpace', childId: 'ID' } (navigerer til et barns skoleside)
+- kindergarten.children → { screen: 'KindergartenSpace', childId: 'ID' } (navigerer til et barns barnehageside)
+- pets → { screen: 'PetSpace', petId: 'ID' } (navigerer til et kjæledyrs side)
+- homes → { screen: 'HomeSpace', homeId: 'ID' } (navigerer til et hjem)
+- health → { screen: 'HealthSpace' } (navigerer til helseoversikten)
+- events → { screen: 'Events', subScreen: 'EventsList' } (navigerer til hendelseslisten - du kan IKKE navigere direkte til EventDetail uten objektet)
+- trips → { screen: 'Trips', subScreen: 'TripsList' } (navigerer til reiselisten - du kan IKKE navigere direkte til TripDetail uten objektet)
+- service → { screen: 'HomeMaintenance', home: {OBJEKT} } (navigerer til serviceoversikten)
 
-Når du oppretter noe (create), kan du også returnere en navigate-action i tillegg slik at brukeren navigeres dit etter opprettelse. F.eks: opprett hendelse + naviger til den.
+VIKTIG: For events og trips, naviger ALLTID til listen (EventsList/TripsList), aldri direkte til detaljene. Brukeren finner elementet i listen.
+
+Når du oppretter noe (create), kan du også returnere en navigate-action i tillegg.
 
 Returner JSON med denne strukturen:
 {
-  "reply": "Svaret ditt med faktiske data fra systemet",
+  "reply": "Svaret ditt",
   "actions": [
-    { "type": "create|delete|navigate", "module": "...", "data": {}, "description": "...",
-      "screen": { "screen": "ScreenName", "params": {} } }
+    { "type": "navigate|create|delete", "module": "...", "data": {}, "description": "...",
+      "screen": { "screen": "ScreenName", "childId": "ID", "petId": "ID", ... } }
   ]
 }
-For navigate-actions: bruk module for å beskrive hva det er, og screen for navigasjonen.
 Hvis ingen handlinger: actions: []`;
 
     const dataMessage = `Familiens data i systemet:\n${dataContext}${correctionContext}${weatherContext}\n\nBrukerens sporsmal: ${message}`;
@@ -5469,15 +5471,17 @@ Hvis ingen handlinger: actions: []`;
     const response = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages,
-      max_tokens: 1500,
+      max_tokens: 2000,
+      response_format: { type: "json_object" },
     });
 
     const content = response.choices[0]?.message?.content || "";
 
     let result;
     try {
-      const jsonMatch = content.match(/\{[\s\S]*\}/);
-      result = jsonMatch ? JSON.parse(jsonMatch[0]) : { reply: content, actions: [] };
+      result = JSON.parse(content);
+      if (!result.reply) result.reply = content;
+      if (!result.actions) result.actions = [];
     } catch (e) {
       result = { reply: content, actions: [] };
     }
@@ -5488,6 +5492,27 @@ Hvis ingen handlinger: actions: []`;
     res.status(500).json({ error: "Failed to process request" });
   }
 });
+
+async function validateAction(action, familyData) {
+  if (action.type === 'navigate' && action.screen) {
+    const s = action.screen;
+    if (s.childId) {
+      const exists = (familyData.schoolChildren || []).some(c => c.id === s.childId) ||
+                     (familyData.kindergartenChildren || []).some(c => c.id === s.childId);
+      if (!exists) return { valid: false, error: 'Barnet ble ikke funnet i systemet.' };
+    }
+    if (s.petId) {
+      const exists = (familyData.pets || []).some(p => p.id === s.petId);
+      if (!exists) return { valid: false, error: 'Kjæledyret ble ikke funnet i systemet.' };
+    }
+    if (s.homeId) {
+      const home = (familyData.homes || []).find(h => h.id === s.homeId);
+      if (!home) return { valid: false, error: 'Hjemmet ble ikke funnet i systemet.' };
+      s.home = home;
+    }
+  }
+  return { valid: true };
+}
 
 async function executeAction(uid, familyId, action) {
   const db = getFirestore();

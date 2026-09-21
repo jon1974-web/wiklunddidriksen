@@ -111,10 +111,48 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
       // Execute navigate actions immediately
       for (const nav of navigateActions) {
         if (nav.screen) {
-          onClose();
-          setTimeout(() => {
-            navigation.navigate('Trips', nav.screen);
-          }, 300);
+          const screenConfig = nav.screen;
+          const targetScreen = screenConfig.screen;
+
+          // Map to correct navigation with params
+          if (targetScreen === 'SchoolSpace') {
+            setTimeout(() => {
+              navigation.navigate('Trips', { screen: 'SchoolSpace', params: { childId: screenConfig.childId, openAddSection: screenConfig.childId ? undefined : undefined } });
+            }, 100);
+          } else if (targetScreen === 'KindergartenSpace') {
+            setTimeout(() => {
+              navigation.navigate('Trips', { screen: 'KindergartenSpace', params: { childId: screenConfig.childId } });
+            }, 100);
+          } else if (targetScreen === 'PetSpace') {
+            setTimeout(() => {
+              navigation.navigate('Trips', { screen: 'PetSpace', params: { petId: screenConfig.petId } });
+            }, 100);
+          } else if (targetScreen === 'HomeSpace') {
+            setTimeout(() => {
+              navigation.navigate('Trips', { screen: 'HomeSpace', params: { homeId: screenConfig.homeId } });
+            }, 100);
+          } else if (targetScreen === 'HealthSpace') {
+            setTimeout(() => {
+              navigation.navigate('Trips', { screen: 'HealthSpace' });
+            }, 100);
+          } else if (targetScreen === 'Events') {
+            setTimeout(() => {
+              navigation.navigate('Events');
+            }, 100);
+          } else if (targetScreen === 'Trips') {
+            setTimeout(() => {
+              navigation.navigate('Trips', { screen: 'SpacesList' });
+            }, 100);
+          } else if (targetScreen === 'HomeMaintenance' && screenConfig.home) {
+            setTimeout(() => {
+              navigation.navigate('Trips', { screen: 'HomeMaintenance', params: { home: screenConfig.home } });
+            }, 100);
+          } else {
+            // Fallback: navigate to Trips tab
+            setTimeout(() => {
+              navigation.navigate('Trips', { screen: targetScreen });
+            }, 100);
+          }
           return;
         }
       }
@@ -178,10 +216,28 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
       // Navigate if any action had a screen
       const navAction = confirmActions.find((a: any) => a.screen);
       if (navAction?.screen) {
+        const screenConfig = navAction.screen;
         setTimeout(() => {
-          navigation.navigate('Trips', navAction.screen);
-          onClose();
-        }, 500);
+          if (screenConfig.screen === 'SchoolSpace') {
+            navigation.navigate('Trips', { screen: 'SchoolSpace', params: { childId: screenConfig.childId } });
+          } else if (screenConfig.screen === 'KindergartenSpace') {
+            navigation.navigate('Trips', { screen: 'KindergartenSpace', params: { childId: screenConfig.childId } });
+          } else if (screenConfig.screen === 'PetSpace') {
+            navigation.navigate('Trips', { screen: 'PetSpace', params: { petId: screenConfig.petId } });
+          } else if (screenConfig.screen === 'HomeSpace') {
+            navigation.navigate('Trips', { screen: 'HomeSpace', params: { homeId: screenConfig.homeId } });
+          } else if (screenConfig.screen === 'HealthSpace') {
+            navigation.navigate('Trips', { screen: 'HealthSpace' });
+          } else if (screenConfig.screen === 'Events') {
+            navigation.navigate('Events');
+          } else if (screenConfig.screen === 'Trips') {
+            navigation.navigate('Trips', { screen: 'SpacesList' });
+          } else if (screenConfig.screen === 'HomeMaintenance' && screenConfig.home) {
+            navigation.navigate('Trips', { screen: 'HomeMaintenance', params: { home: screenConfig.home } });
+          } else {
+            navigation.navigate('Trips', { screen: screenConfig.screen });
+          }
+        }, 300);
       }
     } catch (error) {
       const errorMsg: Message = {

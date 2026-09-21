@@ -244,6 +244,16 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     }
   }, [years, selectedChild]);
 
+  useEffect(() => {
+    if (route?.params?.childId && children.length > 0 && !selectedChild) {
+      const child = children.find(c => c.id === route.params!.childId);
+      if (child) {
+        setSelectedChild(child);
+        navigation.setParams({ childId: undefined } as any);
+      }
+    }
+  }, [route?.params?.childId, children, selectedChild]);
+
   const handleSaveChild = async () => {
     if (!familyId) return;
     if (!childForm.name.trim()) { crossAlert('Error', t('kindergarten.enterChildName')); return; }
