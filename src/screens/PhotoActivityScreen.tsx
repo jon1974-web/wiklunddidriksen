@@ -9,6 +9,7 @@ import { addVetVisit } from '../services/petService';
 import { addSchoolActivity } from '../services/schoolService';
 import { addKindergartenActivity } from '../services/kindergartenService';
 import { addHomeService } from '../services/homeService';
+import { addTrip } from '../services/tripService';
 import { getReminderOptions } from '../constants/eventOptions';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
@@ -19,7 +20,7 @@ import { sanitizeInput } from '../utils/validation';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { auth } from '../services/firebase';
 
-type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService';
+type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService' | 'trip';
 
 interface PhotoActivityScreenProps {
   navigation: any;
@@ -30,6 +31,8 @@ interface PhotoActivityScreenProps {
       petId?: string;
       childId?: string;
       yearId?: string;
+      homeId?: string;
+      home?: any;
     };
   };
 }
@@ -104,6 +107,14 @@ const ACTIVITY_TYPE_CONFIG: Record<ActivityType, {
     hasDoctor: false,
     hasActivityType: false,
   },
+  trip: {
+    titleKey: 'photoActivity.tripTitle',
+    instructionKey: 'photoActivity.tripInstruction',
+    createSuccessKey: 'photoActivity.tripCreated',
+    hasPerson: false,
+    hasDoctor: false,
+    hasActivityType: false,
+  },
 };
 
 export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ navigation, route }) => {
@@ -112,7 +123,7 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
 
-  const { type, moduleColor, petId, childId, yearId } = route.params;
+  const { type, moduleColor, petId, childId, yearId, homeId, home } = route.params;
   const config = ACTIVITY_TYPE_CONFIG[type];
 
   const [imageUri, setImageUri] = useState<string | null>(null);
@@ -292,7 +303,7 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
         });
       } else if (type === 'homeService') {
         await addHomeService({
-          homeId: '',
+          homeId: homeId || '',
           title: sanitizeInput(activity.title),
           description: activity.description ? sanitizeInput(activity.description) : '',
           dateFrom: activity.dateFrom,
@@ -302,6 +313,17 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           status: 'planned',
           familyId: familyId || '',
         });
+      } else if (type === 'trip') {
+        await addTrip({
+          title: sanitizeInput(activity.title),
+          destination: activity.location ? sanitizeInput(activity.location) : '',
+          startDate: activity.dateFrom,
+          endDate: activity.showEndDate && activity.dateTo ? activity.dateTo : activity.dateFrom,
+          startTime: activity.startTime,
+          endTime: activity.showEndTime && activity.endTime ? activity.endTime : undefined,
+          familyId: familyId || '',
+          createdBy: user.uid,
+        }, familyId || '');
       }
 
       if (showSuccess) {
@@ -678,7 +700,14 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
         visible={successModal.visible}
         title={successModal.title}
         subtitle={successModal.subtitle}
-        onCancel={() => { setSuccessModal({ visible: false, title: '', subtitle: '' }); navigation.goBack(); }}
+        onCancel={() => {
+          setSuccessModal({ visible: false, title: '', subtitle: '' });
+          if (type === 'homeService' && home) {
+            navigation.navigate('HomeMaintenance', { home });
+          } else {
+            navigation.goBack();
+          }
+        }}
       />
     </SafeAreaView>
   );

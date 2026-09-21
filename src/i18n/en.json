@@ -852,7 +852,10 @@
     "takePhoto": "Take photo",
     "pickImage": "Pick from gallery",
     "processing2": "Processing...",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "tripTitle": "Photo to trip",
+    "tripInstruction": "Take a photo describing the trip",
+    "tripCreated": "Trip created!"
   },
   "photoRecipe": {
     "title": "Photo to recipe",
@@ -1348,7 +1351,9 @@
     "voiceSchoolTitle": "Voice to school activity",
     "voiceKindergartenTitle": "Voice to kindergarten activity",
     "voiceServiceExample": "e.g. \"Service appointment for heat pump on Thursday at 10am\"",
-    "voiceServiceTitle": "Voice to service appointment"
+    "voiceServiceTitle": "Voice to service appointment",
+    "voiceTripExample": "E.g. \"Trip to Spain June 20 to June 27\"",
+    "voiceTripTitle": "Voice to trip"
   },
   "admin": {
     "title": "Admin Panel",

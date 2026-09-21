@@ -471,6 +471,16 @@ const TripsStack = () => {
           component={PhotoRecipeScreen}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="VoiceActivity"
+          component={VoiceActivityScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="PhotoActivity"
+          component={PhotoActivityScreen}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </Suspense>
   );

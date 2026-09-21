@@ -69,18 +69,22 @@ const MODULES: ModuleOption[] = [
 
 function getVoiceNav(mod: ModuleOption): (n: any) => void {
   if (mod.labelKey === 'quickCreate.moduleHealth') return (n) => n.navigate('Events', { screen: 'VoiceActivity', params: { type: 'healthAppointment', moduleColor: MODULE_COLORS.health, _t: Date.now() } });
-  if (mod.labelKey === 'quickCreate.moduleVet') return (n) => n.navigate('Events', { screen: 'VoiceActivity', params: { type: 'vetVisit', moduleColor: MODULE_COLORS.pets, _t: Date.now() } });
-  if (mod.labelKey === 'quickCreate.moduleSchool') return (n) => n.navigate('Events', { screen: 'VoiceActivity', params: { type: 'schoolActivity', moduleColor: MODULE_COLORS.school, _t: Date.now() } });
-  if (mod.labelKey === 'quickCreate.moduleKindergarten') return (n) => n.navigate('Events', { screen: 'VoiceActivity', params: { type: 'kindergartenActivity', moduleColor: MODULE_COLORS.kindergarten, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleVet') return (n) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', openVoiceForType: 'vetVisit', moduleColor: MODULE_COLORS.pets, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleSchool') return (n) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', openVoiceForType: 'schoolActivity', moduleColor: MODULE_COLORS.school, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleKindergarten') return (n) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', openVoiceForType: 'kindergartenActivity', moduleColor: MODULE_COLORS.kindergarten, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleService') return (n) => n.navigate('Trips', { screen: 'HomeSpace', params: { openAddSection: 'services', openVoiceForType: 'homeService', moduleColor: MODULE_COLORS.home, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleTrip') return (n) => n.navigate('Trips', { screen: 'VoiceActivity', params: { type: 'trip', moduleColor: MODULE_COLORS.trips, _t: Date.now() } });
   if (mod.labelKey === 'quickCreate.moduleEvent') return (n) => n.navigate('Events', { screen: 'VoiceEvent', params: { _t: Date.now() } });
   return mod.nav;
 }
 
 function getPhotoNav(mod: ModuleOption): (n: any) => void {
   if (mod.labelKey === 'quickCreate.moduleHealth') return (n) => n.navigate('Events', { screen: 'PhotoActivity', params: { type: 'healthAppointment', moduleColor: MODULE_COLORS.health, _t: Date.now() } });
-  if (mod.labelKey === 'quickCreate.moduleVet') return (n) => n.navigate('Events', { screen: 'PhotoActivity', params: { type: 'vetVisit', moduleColor: MODULE_COLORS.pets, _t: Date.now() } });
-  if (mod.labelKey === 'quickCreate.moduleSchool') return (n) => n.navigate('Events', { screen: 'PhotoActivity', params: { type: 'schoolActivity', moduleColor: MODULE_COLORS.school, _t: Date.now() } });
-  if (mod.labelKey === 'quickCreate.moduleKindergarten') return (n) => n.navigate('Events', { screen: 'PhotoActivity', params: { type: 'kindergartenActivity', moduleColor: MODULE_COLORS.kindergarten, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleVet') return (n) => n.navigate('Trips', { screen: 'PetSpace', params: { openAddSection: 'vetVisits', openPhotoForType: 'vetVisit', moduleColor: MODULE_COLORS.pets, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleSchool') return (n) => n.navigate('Trips', { screen: 'SchoolSpace', params: { openAddSection: 'activities', openPhotoForType: 'schoolActivity', moduleColor: MODULE_COLORS.school, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleKindergarten') return (n) => n.navigate('Trips', { screen: 'KindergartenSpace', params: { openAddSection: 'activities', openPhotoForType: 'kindergartenActivity', moduleColor: MODULE_COLORS.kindergarten, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleService') return (n) => n.navigate('Trips', { screen: 'HomeSpace', params: { openAddSection: 'services', openPhotoForType: 'homeService', moduleColor: MODULE_COLORS.home, _t: Date.now() } });
+  if (mod.labelKey === 'quickCreate.moduleTrip') return (n) => n.navigate('Trips', { screen: 'PhotoActivity', params: { type: 'trip', moduleColor: MODULE_COLORS.trips, _t: Date.now() } });
   if (mod.labelKey === 'quickCreate.moduleEvent') return (n) => n.navigate('Events', { screen: 'PhotoEvent', params: { _t: Date.now() } });
   return mod.nav;
 }

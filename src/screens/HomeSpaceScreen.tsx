@@ -197,7 +197,13 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
                   key={home.id}
                   style={[styles.homeCard, { backgroundColor: colors.surface }]}
                   onPress={() => {
-                  if (route?.params?.openAddSection === 'services') {
+                  if (route?.params?.openVoiceForType) {
+                    navigation.setParams({ openVoiceForType: undefined });
+                    navigation.navigate('VoiceActivity', { type: 'homeService', homeId: home.id, home, moduleColor: route.params.moduleColor, _t: Date.now() });
+                  } else if (route?.params?.openPhotoForType) {
+                    navigation.setParams({ openPhotoForType: undefined });
+                    navigation.navigate('PhotoActivity', { type: 'homeService', homeId: home.id, home, moduleColor: route.params.moduleColor, _t: Date.now() });
+                  } else if (route?.params?.openAddSection === 'services') {
                     navigation.setParams({ openAddSection: undefined });
                     navigation.navigate('HomeMaintenance', { home, openAddSection: 'services' });
                   } else {

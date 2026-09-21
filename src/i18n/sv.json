@@ -908,7 +908,10 @@
     "takePhoto": "Ta bild",
     "pickImage": "Välj från galleri",
     "processing2": "Behandlar...",
-    "tryAgain": "Försök igen"
+    "tryAgain": "Försök igen",
+    "tripTitle": "Foto till resa",
+    "tripInstruction": "Ta ett foto som beskriver resan",
+    "tripCreated": "Resan skapades!"
   },
   "photoRecipe": {
     "title": "Foto till recept",
@@ -1348,7 +1351,9 @@
     "voiceSchoolTitle": "Tal till skolaktivitet",
     "voiceKindergartenTitle": "Tal till förskoleaktivitet",
     "voiceServiceExample": "t.ex. \"Serviceavtal för värmepump på torsdag klockan 10\"",
-    "voiceServiceTitle": "Tal till serviceavtal"
+    "voiceServiceTitle": "Tal till serviceavtal",
+    "voiceTripExample": "F.eks. \"Resa till Spanien 20 juni till 27 juni\"",
+    "voiceTripTitle": "Tal till resa"
   },
   "admin": {
     "title": "Adminpanel",

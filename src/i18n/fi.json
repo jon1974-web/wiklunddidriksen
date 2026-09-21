@@ -908,7 +908,10 @@
     "takePhoto": "Ota kuva",
     "pickImage": "Valitse galleriasta",
     "processing2": "Käsitellään...",
-    "tryAgain": "Yritä uudelleen"
+    "tryAgain": "Yritä uudelleen",
+    "tripTitle": "Valokuva matkaksi",
+    "tripInstruction": "Ota kuva matkaa kuvaavasta asiasta",
+    "tripCreated": "Matka luotu!"
   },
   "photoRecipe": {
     "title": "Valokuva reseptiksi",
@@ -1348,7 +1351,9 @@
     "voiceSchoolTitle": "Puhe koulutoimintaan",
     "voiceKindergartenTitle": "Puhe päiväkotitoimintaan",
     "voiceServiceExample": "esim. \"Huoltoajan lämpöpumpulle torstaina klo 10\"",
-    "voiceServiceTitle": "Puhe huoltoajanvaraukseen"
+    "voiceServiceTitle": "Puhe huoltoajanvaraukseen",
+    "voiceTripExample": "F.eks. \"Matka Espanjaan 20. kesäkuuta - 27. kesäkuuta\"",
+    "voiceTripTitle": "Puhe matkaksi"
   },
   "admin": {
     "title": "Ylläpitopaneeli",

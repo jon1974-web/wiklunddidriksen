@@ -6,6 +6,7 @@ import { addVetVisit } from '../services/petService';
 import { addSchoolActivity } from '../services/schoolService';
 import { addKindergartenActivity } from '../services/kindergartenService';
 import { addHomeService } from '../services/homeService';
+import { addTrip } from '../services/tripService';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
@@ -15,11 +16,11 @@ import { auth } from '../services/firebase';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 
-type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService';
+type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService' | 'trip';
 
 interface VoiceActivityScreenProps {
   navigation: any;
-  route: { params: { type: ActivityType; moduleColor: string } };
+  route: { params: { type: ActivityType; moduleColor: string; petId?: string; childId?: string; yearId?: string; homeId?: string; home?: any } };
 }
 
 interface ParsedData {
@@ -43,6 +44,7 @@ const ACTIVITY_LABELS: Record<ActivityType, string> = {
   schoolActivity: 'skoleaktivitet',
   kindergartenActivity: 'barnehageaktivitet',
   homeService: 'serviceavtale',
+  trip: 'reise',
 };
 
 const ACTIVITY_EXAMPLE_KEYS: Record<ActivityType, string> = {
@@ -51,6 +53,7 @@ const ACTIVITY_EXAMPLE_KEYS: Record<ActivityType, string> = {
   schoolActivity: 'voiceActivity.voiceSchoolExample',
   kindergartenActivity: 'voiceActivity.voiceKindergartenExample',
   homeService: 'voiceActivity.voiceServiceExample',
+  trip: 'voiceActivity.voiceTripExample',
 };
 
 const ACTIVITY_TITLE_KEYS: Record<ActivityType, string> = {
@@ -59,6 +62,7 @@ const ACTIVITY_TITLE_KEYS: Record<ActivityType, string> = {
   schoolActivity: 'voiceActivity.voiceSchoolTitle',
   kindergartenActivity: 'voiceActivity.voiceKindergartenTitle',
   homeService: 'voiceActivity.voiceServiceTitle',
+  trip: 'voiceActivity.voiceTripTitle',
 };
 
 const ACTIVITY_TYPE_OPTIONS: Array<{ value: 'tur' | 'aktivitet' | 'møte'; label: string }> = [
@@ -259,7 +263,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
         }, user.uid);
       } else if (type === 'vetVisit') {
         await addVetVisit({
-          petId: '',
+          petId: route.params?.petId || '',
           familyId: familyId || '',
           title: parsedData.title,
           doctor: parsedData.doctor,
@@ -276,8 +280,8 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
       } else if (type === 'schoolActivity') {
         await addSchoolActivity({
           familyId: familyId || '',
-          childId: '',
-          yearId: '',
+          childId: route.params?.childId || '',
+          yearId: route.params?.yearId || '',
           title: parsedData.title,
           activityType: parsedData.activityType || 'aktivitet',
           dateFrom: parsedData.dateFrom,
@@ -292,8 +296,8 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
       } else if (type === 'kindergartenActivity') {
         await addKindergartenActivity({
           familyId: familyId || '',
-          childId: '',
-          yearId: '',
+          childId: route.params?.childId || '',
+          yearId: route.params?.yearId || '',
           title: parsedData.title,
           activityType: parsedData.activityType || 'aktivitet',
           dateFrom: parsedData.dateFrom,
@@ -307,7 +311,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
         });
       } else if (type === 'homeService') {
         await addHomeService({
-          homeId: '',
+          homeId: route.params?.homeId || '',
           title: parsedData.title,
           description: '',
           dateFrom: parsedData.dateFrom,
@@ -317,15 +321,31 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           status: 'planned',
           familyId: familyId || '',
         });
+      } else if (type === 'trip') {
+        await addTrip({
+          title: parsedData.title,
+          destination: parsedData.location || '',
+          startDate: parsedData.dateFrom,
+          endDate: parsedData.dateTo || parsedData.dateFrom,
+          startTime: parsedData.startTime,
+          endTime: parsedData.endTime,
+          familyId: familyId || '',
+          createdBy: user.uid,
+        }, familyId || '');
       }
 
       crossAlert(t('common.success'), `"${parsedData.title}" ${t('common.saved')}!`);
-      navigation.goBack();
+
+      if (type === 'homeService' && route.params?.home) {
+        navigation.navigate('HomeMaintenance', { home: route.params.home });
+      } else {
+        navigation.goBack();
+      }
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
       setCreating(false);
     }
-  }, [parsedData, user, navigation, creating, type, familyId]);
+  }, [parsedData, user, navigation, creating, type, familyId, route.params]);
 
   const handleReset = useCallback(() => {
     setTranscript(null);

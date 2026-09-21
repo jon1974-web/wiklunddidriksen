@@ -146,15 +146,23 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   useEffect(() => { if (selectedPet) loadPetData(); }, [selectedPet, loadPetData]);
 
   useEffect(() => {
-    if (route?.params?.openAddSection && pets.length > 0 && !selectedPet) {
+    if ((route?.params?.openAddSection || route?.params?.openVoiceForType || route?.params?.openPhotoForType) && pets.length > 0 && !selectedPet) {
       if (pets.length === 1) {
         setSelectedPet(pets[0]);
         setTimeout(() => {
-          setActiveSection(route.params!.openAddSection!);
-          setEditingItem(null);
-          resetItemForms();
-          setShowItemModal(true);
-          navigation.setParams({ openAddSection: undefined });
+          if (route.params?.openVoiceForType) {
+            navigation.navigate('VoiceActivity', { type: route.params.openVoiceForType, petId: pets[0].id, moduleColor: route.params.moduleColor, _t: Date.now() });
+            navigation.setParams({ openVoiceForType: undefined });
+          } else if (route.params?.openPhotoForType) {
+            navigation.navigate('PhotoActivity', { type: route.params.openPhotoForType, petId: pets[0].id, moduleColor: route.params.moduleColor, _t: Date.now() });
+            navigation.setParams({ openPhotoForType: undefined });
+          } else {
+            setActiveSection(route.params!.openAddSection!);
+            setEditingItem(null);
+            resetItemForms();
+            setShowItemModal(true);
+            navigation.setParams({ openAddSection: undefined });
+          }
         }, 500);
       }
     }
@@ -454,7 +462,17 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
               style={[styles.gridTile, { backgroundColor: colors.surface }]}
               onPress={() => {
                 setSelectedPet(pet);
-                if (route?.params?.openAddSection) {
+                if (route?.params?.openVoiceForType) {
+                  setTimeout(() => {
+                    navigation.navigate('VoiceActivity', { type: route.params!.openVoiceForType, petId: pet.id, moduleColor: route.params!.moduleColor, _t: Date.now() });
+                    navigation.setParams({ openVoiceForType: undefined });
+                  }, 300);
+                } else if (route?.params?.openPhotoForType) {
+                  setTimeout(() => {
+                    navigation.navigate('PhotoActivity', { type: route.params!.openPhotoForType, petId: pet.id, moduleColor: route.params!.moduleColor, _t: Date.now() });
+                    navigation.setParams({ openPhotoForType: undefined });
+                  }, 300);
+                } else if (route?.params?.openAddSection) {
                   setTimeout(() => {
                     setActiveSection(route.params!.openAddSection!);
                     setEditingItem(null);

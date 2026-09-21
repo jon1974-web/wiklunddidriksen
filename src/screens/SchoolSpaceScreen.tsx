@@ -216,6 +216,14 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   }, [route?.params?.editContactId, contacts]);
 
   useEffect(() => {
+    if (route?.params?.openVoiceForType && familyId && selectedYear && selectedChild) {
+      navigation.navigate('VoiceActivity', { type: route.params.openVoiceForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, _t: Date.now() });
+      navigation.setParams({ openVoiceForType: undefined });
+    }
+    if (route?.params?.openPhotoForType && familyId && selectedYear && selectedChild) {
+      navigation.navigate('PhotoActivity', { type: route.params.openPhotoForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, _t: Date.now() });
+      navigation.setParams({ openPhotoForType: undefined });
+    }
     if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild) {
       setEditingActivityId(null);
       setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
