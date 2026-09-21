@@ -245,14 +245,18 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   }, [years, selectedChild]);
 
   useEffect(() => {
-    if (route?.params?.childId && children.length > 0 && !selectedChild) {
-      const child = children.find(c => c.id === route.params!.childId);
-      if (child) {
-        setSelectedChild(child);
-        navigation.setParams({ childId: undefined } as any);
+    const unsubscribe = navigation.addListener('focus', () => {
+      const childId = route?.params?.childId;
+      if (childId && children.length > 0) {
+        const child = children.find(c => c.id === childId);
+        if (child) {
+          setSelectedChild(child);
+          navigation.setParams({ childId: undefined } as any);
+        }
       }
-    }
-  }, [route?.params?.childId, children, selectedChild]);
+    });
+    return unsubscribe;
+  }, [navigation, route?.params?.childId, children]);
 
   const handleSaveChild = async () => {
     if (!familyId) return;

@@ -5120,8 +5120,24 @@ function formatDataForGPT(data) {
 
   if (data.birthdays && data.birthdays.length > 0) {
     lines.push('--- BURSDAGER ---');
+    const now = new Date();
+    const thisYear = now.getFullYear();
+    const todayStr2 = now.toISOString().split('T')[0];
+    const monthNames = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
     data.birthdays.forEach(b => {
-      lines.push(`• ${b.name || '?'} | ${b.date || '?'} (fødselsdag)`);
+      if (!b.date) { lines.push(`• ${b.name || '?'} | Dato ukjent`); return; }
+      const monthDay = b.date.substring(5); // "09-03"
+      let nextDate = `${thisYear}${monthDay}`;
+      let age = thisYear - parseInt(b.date.substring(0, 4));
+      if (nextDate < todayStr2) {
+        nextDate = `${thisYear + 1}${monthDay}`;
+        age += 1;
+      }
+      const month = parseInt(monthDay.substring(0, 2)) - 1;
+      const day = parseInt(monthDay.substring(3, 5));
+      const nextDateObj = new Date(nextDate);
+      const dayOfWeek = ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'][nextDateObj.getDay()];
+      lines.push(`• ${b.name || '?'} | ${dayOfWeek} ${day}. ${monthNames[month]} ${nextDateObj.getFullYear()} | Fyller ${age} år`);
     });
   }
 
@@ -5150,8 +5166,22 @@ function formatDataForGPT(data) {
 
   if (data.homeProjects && data.homeProjects.length > 0) {
     lines.push('--- PROSJEKTER ---');
+    const items = data.homeShoppingItems || [];
+    const offers = data.homeOffers || [];
     data.homeProjects.forEach(p => {
-      lines.push(`• ${p.name || '?'} | Status: ${p.status || ''} | Budget: ${p.budget || '?'} kr | ${p.startDate || ''} → ${p.endDate || ''}`);
+      const projectItems = items.filter(i => i.projectId === p.id);
+      const projectOffers = offers.filter(o => o.projectId === p.id);
+      const itemCost = projectItems.reduce((sum, i) => sum + ((i.unitPrice || i.price || 0) * (i.quantity || 1)), 0);
+      const offerCost = projectOffers.reduce((sum, o) => sum + (o.price || 0), 0);
+      const totalCost = itemCost + offerCost;
+      const budget = p.budget || 0;
+      const remaining = budget > 0 ? budget - totalCost : null;
+      let line = `• ${p.name || '?'} | Status: ${p.status || ''}`;
+      if (budget > 0) line += ` | Budget: ${budget} kr`;
+      if (totalCost > 0) line += ` | Forbruk: ${totalCost} kr`;
+      if (remaining !== null) line += ` | Gjenstående: ${remaining} kr`;
+      line += ` | ${p.startDate || ''} → ${p.endDate || ''}`;
+      lines.push(line);
     });
   }
 
@@ -5182,14 +5212,15 @@ function formatDataForGPT(data) {
     const unpurchased = data.homeShoppingItems.filter(i => !i.purchased);
     lines.push(`--- HJEMHANDLELISTE (${unpurchased.length} igjen) ---`);
     unpurchased.forEach(i => {
-      lines.push(`• ${i.name || '?'} | Antall: ${i.quantity || 1} | Pris: ${i.price || '?'} kr`);
+      const cost = (i.unitPrice || i.price || 0) * (i.quantity || 1);
+      lines.push(`• ${i.name || '?'} | Antall: ${i.quantity || 1} | Pris: ${i.unitPrice || i.price || '?'} kr | Totalt: ${cost} kr | Prosjekt: ${i.projectId || 'ingen'}`);
     });
   }
 
   if (data.homeOffers && data.homeOffers.length > 0) {
     lines.push('--- TILBUD ---');
     data.homeOffers.forEach(o => {
-      lines.push(`• ${o.provider || '?'} | ${o.description || ''} | Pris: ${o.price || '?'} kr`);
+      lines.push(`• ${o.provider || o.vendorName || '?'} | ${o.description || o.items || ''} | Pris: ${o.price || '?'} kr | Prosjekt: ${o.projectId || 'ingen'}`);
     });
   }
 
@@ -5516,161 +5547,41 @@ async function validateAction(action, familyData) {
 
 async function executeAction(uid, familyId, action) {
   const db = getFirestore();
+  const mod = (action.module || action.data?.module || '').toLowerCase().replace(/[\s_]+/g, '.');
+  const type = action.type;
+  const data = action.data || {};
 
-  if (action.type === 'create') {
-    if (action.module === 'health.appointments') {
-      const ref = await db.collection("health").doc(familyId).collection("appointments").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'health.medications') {
-      const ref = await db.collection("health").doc(familyId).collection("medications").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'health.vaccinations') {
-      const ref = await db.collection("health").doc(familyId).collection("vaccinations").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'events') {
-      const ref = await db.collection("events").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'school.activities') {
-      const ref = await db.collection("schoolActivities").doc(familyId).collection("activities").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'kindergarten.activities') {
-      const ref = await db.collection("kindergartenActivities").doc(familyId).collection("activities").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'pets.vetVisits') {
-      const ref = await db.collection("petVetVisits").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'service.appointments') {
-      const ref = await db.collection("homeServices").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'birthdays') {
-      const ref = await db.collection("birthdays").add({
-        ...action.data,
-        addedBy: uid,
-        addedByName: "",
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'trips') {
-      const ref = await db.collection("trips").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
-    if (action.module === 'shopping') {
-      const ref = await db.collection("shoppingLists").add({
-        ...action.data,
-        createdBy: uid,
-        familyId,
-        createdAt: Date.now(),
-      });
-      return { id: ref.id };
-    }
+  const MODULE_MAP = {
+    'health.appointments': { col: () => db.collection("health").doc(familyId).collection("appointments"), field: 'createdBy' },
+    'health.medications': { col: () => db.collection("health").doc(familyId).collection("medications"), field: 'createdBy' },
+    'health.vaccinations': { col: () => db.collection("health").doc(familyId).collection("vaccinations"), field: 'createdBy' },
+    'events': { col: () => db.collection("events"), field: 'createdBy' },
+    'school.activities': { col: () => db.collection("schoolActivities").doc(familyId).collection("activities"), field: 'createdBy' },
+    'kindergarten.activities': { col: () => db.collection("kindergartenActivities").doc(familyId).collection("activities"), field: 'createdBy' },
+    'pets.vetvisits': { col: () => db.collection("petVetVisits"), field: 'createdBy' },
+    'service.appointments': { col: () => db.collection("homeServices"), field: 'createdBy' },
+    'birthdays': { col: () => db.collection("birthdays"), field: 'addedBy' },
+    'trips': { col: () => db.collection("trips"), field: 'createdBy' },
+    'shopping': { col: () => db.collection("shoppingLists"), field: 'createdBy' },
+  };
 
-    throw new Error(`Unknown module: ${action.module}`);
+  const config = MODULE_MAP[mod];
+  if (!config) throw new Error(`Unknown module: ${action.module}`);
+
+  if (type === 'create') {
+    const ref = await config.col().add({
+      ...data,
+      [config.field]: uid,
+      familyId,
+      createdAt: Date.now(),
+    });
+    return { id: ref.id };
   }
 
-  if (action.type === 'delete') {
-    const { module, data } = action;
-    if (module === 'health.appointments') {
-      await db.collection("health").doc(familyId).collection("appointments").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'health.medications') {
-      await db.collection("health").doc(familyId).collection("medications").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'health.vaccinations') {
-      await db.collection("health").doc(familyId).collection("vaccinations").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'events') {
-      await db.collection("events").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'school.activities') {
-      await db.collection("schoolActivities").doc(familyId).collection("activities").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'kindergarten.activities') {
-      await db.collection("kindergartenActivities").doc(familyId).collection("activities").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'pets.vetVisits') {
-      await db.collection("petVetVisits").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'service.appointments') {
-      await db.collection("homeServices").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'birthdays') {
-      await db.collection("birthdays").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'trips') {
-      await db.collection("trips").doc(data.id).delete();
-      return { id: data.id };
-    }
-    if (module === 'shopping') {
-      await db.collection("shoppingLists").doc(data.id).delete();
-      return { id: data.id };
-    }
-
-    throw new Error(`Unknown module: ${module}`);
+  if (type === 'delete') {
+    await config.col().doc(data.id).delete();
+    return { id: data.id };
   }
 
-  throw new Error(`Unknown action type: ${action.type}`);
+  throw new Error(`Unknown action type: ${type}`);
 }
