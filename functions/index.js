@@ -5266,39 +5266,49 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, asyn
     if (isWeatherQuery && familyData.trips && familyData.trips.length > 0) {
       try {
         const today = new Date().toISOString().split('T')[0];
-        // Find upcoming trips
         const upcomingTrips = familyData.trips
           .filter(t => t.endDate >= today)
           .sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''))
           .slice(0, 3);
-        
+
         for (const trip of upcomingTrips) {
           const destination = trip.destination || trip.title;
           if (!destination) continue;
-          const locationQuery = encodeURIComponent(destination);
-          const wttrRes = await fetch(`https://wttr.in/${locationQuery}?format=j1&lang=no`);
-          if (wttrRes.ok) {
-            const wttrData = await wttrRes.json();
-            const forecast = wttrData.weather || [];
-            const tripStart = trip.startDate;
-            const tripEnd = trip.endDate;
-            // Filter forecast days that overlap with trip dates
-            const relevantDays = forecast.filter(day => {
-              const d = day.date;
-              return d >= tripStart && d <= tripEnd;
-            });
-            if (relevantDays.length > 0) {
-              weatherContext += `\n--- VÆR for "${trip.title || destination}" (${tripStart} → ${tripEnd}) ---\n`;
-              for (const day of relevantDays) {
-                const desc = day.hourly?.[4]?.weatherDesc?.[0]?.value || day.hourly?.[0]?.weatherDesc?.[0]?.value || '';
-                const maxT = day.maxtempC || '?';
-                const minT = day.mintempC || '?';
-                const rain = day.hourly?.[4]?.chanceofrain || '0';
-                weatherContext += `${day.date}: ${desc}, ${minT}°C → ${maxT}°C, regnsjanse: ${rain}%\n`;
-              }
-            } else {
-              weatherContext += `\n--- VÆR for "${trip.title || destination}" ---\nIngen værdata tilgjengelig for disse datoene ennå (wttr.in gir kun 3-dagers prognose).\n`;
+
+          // Geocode destination
+          const geoRes = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(destination)}&count=1`);
+          const geoData = await geoRes.json();
+          if (!geoData.results || geoData.results.length === 0) continue;
+          const { latitude, longitude } = geoData.results[0];
+
+          // Fetch Google Weather forecast
+          const weatherRes = await fetch(`https://weather.googleapis.com/v1/forecast/days:lookup?key=${process.env.GOOGLE_MAPS_API_KEY}&location.latitude=${latitude}&location.longitude=${longitude}&days=10&languageCode=no`);
+          if (!weatherRes.ok) continue;
+          const weatherData = await weatherRes.json();
+
+          const tripStart = trip.startDate;
+          const tripEnd = trip.endDate;
+          const forecastDays = weatherData.forecastDays || [];
+          const relevantDays = forecastDays.filter(day => {
+            const d = `${day.displayDate.year}-${String(day.displayDate.month).padStart(2, '0')}-${String(day.displayDate.day).padStart(2, '0')}`;
+            return d >= tripStart && d <= tripEnd;
+          });
+
+          if (relevantDays.length > 0) {
+            weatherContext += `\n--- VÆR for "${trip.title || destination}" (${tripStart} → ${tripEnd}) ---\n`;
+            for (const day of relevantDays) {
+              const d = `${day.displayDate.year}-${String(day.displayDate.month).padStart(2, '0')}-${String(day.displayDate.day).padStart(2, '0')}`;
+              const desc = day.daytimeForecast?.weatherCondition?.description?.text || '';
+              const maxT = day.maxTemperature?.degrees || '?';
+              const minT = day.minTemperature?.degrees || '?';
+              const rain = day.daytimeForecast?.precipitation?.probability?.percent || 0;
+              const uv = day.daytimeForecast?.uvIndex || 0;
+              const wind = day.daytimeForecast?.wind?.speed?.value || 0;
+              const humidity = day.daytimeForecast?.relativeHumidity || 0;
+              weatherContext += `${d}: ${desc}, ${minT}°C → ${maxT}°C, UV: ${uv}, regn: ${rain}%, vind: ${wind} km/t, luftfuktighet: ${humidity}%\n`;
             }
+          } else {
+            weatherContext += `\n--- VÆR for "${trip.title || destination}" ---\nIngen værdata tilgjengelig for disse datoene ennå (Google Weather gir opptil 10 dagers prognose).\n`;
           }
         }
       } catch (e) {
@@ -5421,7 +5431,7 @@ HOME.OFFERS: provider, description, price
 
 SKOLE/KINDERGARTEN DOKUMENTER: Skoletimeplaner og barnehageplaner er opplastede bilder/dokumenter. Du kan ikke vise dem direkte, men du kan navigere brukeren til riktig sted der de kan se dem.
 
-VÆR: Hvis brukeren spør om vær for en reise, er værdata allerede hentet og inkludert i konteksten under "VÆR for ...". Bruk denne dataen til å svare. Hvis vær bare er tilgjengelig for de nærmeste 3 dagene og reisen er lenger frem i tid, forklar dette og si hva som er tilgjengelig.
+VÆR: Hvis brukeren spør om vær for en reise, er værdata allerede hentet og inkludert i konteksten under "VÆR for ...". Dataen inkluderer temperatur, UV-indeks, regnsjanse, vind og luftfuktighet. Bruk denne dataen til å svare. Hvis reisen er lenger frem i tid enn 10 dager, forklar at Google Weather gir opptil 10 dagers prognose og at du kan vise data når reisen nærmer seg.
 
 NAVIGASJON (action type: "navigate") - brukeren kan be om å navigere til skjermer:
 - school.children → { screen: 'SchoolSpace', params: { childId: 'ID' } } (naviger til et barns skoleside)

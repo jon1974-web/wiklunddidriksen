@@ -78,6 +78,9 @@ export interface WeatherDay {
   weatherCode: number;
   uvIndex: number;
   waterTemp?: number;
+  humidity?: number;
+  windSpeed?: number;
+  precipitationProbability?: number;
 }
 
 export interface DestinationTips {

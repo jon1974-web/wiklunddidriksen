@@ -1034,7 +1034,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{t('weather.weather')}</Text>
                 <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 2, textAlign: 'center' }]} numberOfLines={1}>{t('weather.temp')}</Text>
                 <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{t('weather.uv')}</Text>
-                <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 1, textAlign: 'right' }]} numberOfLines={1}>{t('weather.water')}</Text>
+                <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 1, textAlign: 'center' }]} numberOfLines={1}>🌧</Text>
+                <Text style={[styles.weatherHeaderText, { color: MODULE_COLORS.trips, flex: 1, textAlign: 'right' }]} numberOfLines={1}>💨</Text>
               </View>
               {pagedWeather.map((day, i) => {
                 const isToday = day.date === today;
@@ -1053,7 +1054,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       <Text style={{ color: tempColor(day.tempMax) }}>{day.tempMax}°</Text>
                     </Text>
                     <Text style={[styles.weatherDayText, { color: day.uvIndex >= 8 ? '#E53935' : colors.text, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{day.uvIndex}</Text>
-                    <Text style={[styles.weatherDayText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]} numberOfLines={1}>{day.waterTemp != null ? `${day.waterTemp}°` : '—'}</Text>
+                    <Text style={[styles.weatherDayText, { color: (day.precipitationProbability ?? 0) >= 50 ? '#1E88E5' : colors.textSecondary, flex: 1, textAlign: 'center' }]} numberOfLines={1}>{day.precipitationProbability != null ? `${day.precipitationProbability}%` : '—'}</Text>
+                    <Text style={[styles.weatherDayText, { color: colors.textSecondary, flex: 1, textAlign: 'right' }]} numberOfLines={1}>{day.windSpeed != null ? `${day.windSpeed}` : '—'}</Text>
                   </View>
                 );
               })}
