@@ -5324,11 +5324,31 @@ HOME.TASKS: title, description, assignedTo, done
 HOME.SHOPPINGITEMS: name, quantity, price, purchased
 HOME.OFFERS: provider, description, price
 
+SKOLE/KINDERGARTEN DOKUMENTER: Skoletimeplaner og barnehageplaner er opplastede bilder/dokumenter. Du kan ikke vise dem direkte, men du kan navigere brukeren til riktig sted der de kan se dem.
+
+NAVIGASJON (action type: "navigate") - brukeren kan be om å navigere til skjermer:
+- school.children → { screen: 'SchoolSpace', params: { childId: 'ID' } } (naviger til et barns skoleside)
+- kindergarten.children → { screen: 'KindergartenSpace', params: { childId: 'ID' } } (naviger til et barns barnehageside)
+- pets → { screen: 'PetSpace', params: { petId: 'ID' } } (naviger til et kjæledyrs side)
+- homes → { screen: 'HomeSpace', params: { homeId: 'ID' } } (naviger til et hjem)
+- health → { screen: 'HealthSpace' } (naviger til helseoversikten)
+- events → { screen: 'EventDetail', params: { eventId: 'ID' } } (naviger til en hendelse)
+- trips → { screen: 'TripDetail', params: { tripId: 'ID' } } (naviger til en reise)
+- homeMaintenance → { screen: 'HomeMaintenance', params: { home: {OBJEKT} } } (naviger til serviceoversikten for et hjem)
+
+Når brukeren ber om å navigere, returner en navigate-action med riktig screen og params basert på dataen du finner. Du trenger IKKE brukerbekreftelse for navigasjon.
+
+Når du oppretter noe (create), kan du også returnere en navigate-action i tillegg slik at brukeren navigeres dit etter opprettelse. F.eks: opprett hendelse + naviger til den.
+
 Returner JSON med denne strukturen:
 {
   "reply": "Svaret ditt med faktiske data fra systemet",
-  "actions": [{ "type": "create|update|delete", "module": "...", "data": {}, "description": "..." }]
+  "actions": [
+    { "type": "create|delete|navigate", "module": "...", "data": {}, "description": "...",
+      "screen": { "screen": "ScreenName", "params": {} } }
+  ]
 }
+For navigate-actions: bruk module for å beskrive hva det er, og screen for navigasjonen.
 Hvis ingen handlinger: actions: []`;
 
     const dataMessage = `Familiens data i systemet:\n${dataContext}${correctionContext}\n\nBrukerens sporsmal: ${message}`;

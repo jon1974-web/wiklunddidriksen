@@ -104,9 +104,25 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
       };
       setMessages((prev) => [...prev, assistantMsg]);
 
-      if (data.actions && data.actions.length > 0) {
+      const allActions = data.actions || [];
+      const navigateActions = allActions.filter((a: any) => a.type === 'navigate');
+      const confirmableActions = allActions.filter((a: any) => a.type !== 'navigate');
+
+      // Execute navigate actions immediately
+      for (const nav of navigateActions) {
+        if (nav.screen) {
+          onClose();
+          setTimeout(() => {
+            navigation.navigate('Trips', nav.screen);
+          }, 300);
+          return;
+        }
+      }
+
+      // Show confirmation for create/delete actions
+      if (confirmableActions.length > 0) {
         setConfirmMessage(data.reply);
-        setConfirmActions(data.actions);
+        setConfirmActions(allActions);
         setShowConfirm(true);
       }
     } catch (error) {
@@ -158,6 +174,15 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ navigation
         messagesRef.current = updated;
         return updated;
       });
+
+      // Navigate if any action had a screen
+      const navAction = confirmActions.find((a: any) => a.screen);
+      if (navAction?.screen) {
+        setTimeout(() => {
+          navigation.navigate('Trips', navAction.screen);
+          onClose();
+        }, 500);
+      }
     } catch (error) {
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
