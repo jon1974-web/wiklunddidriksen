@@ -1100,6 +1100,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </TouchableOpacity>
                     {isExpanded && (
                       <View style={{ backgroundColor: colors.surface, borderBottomLeftRadius: 12, borderBottomRightRadius: 12, paddingHorizontal: 12, paddingBottom: 10, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 8, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: colors.border + '40', marginBottom: 6 }}>
+                          <Text style={{ fontSize: 12, fontWeight: '700', color: MODULE_COLORS.trips, textTransform: 'uppercase', letterSpacing: 0.5 }}>Vær gjennom dagen</Text>
+                          <Text style={{ fontSize: 11, color: colors.textDisabled }}>trykk for å lukke ▼</Text>
+                        </View>
                         {hourlyLoading === day.date ? (
                           <ActivityIndicator size="small" color={MODULE_COLORS.trips} style={{ marginVertical: 8 }} />
                         ) : hourly ? (
