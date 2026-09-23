@@ -189,7 +189,7 @@ export async function getHistoricalWeather(
     const res = await fetch(
       `${HISTORICAL_URL}?latitude=${latitude}&longitude=${longitude}` +
       `&start_date=${startDate}&end_date=${endDate}` +
-      `&daily=weather_code,temperature_2m_max,temperature_2m_min` +
+      `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,windspeed_10m_max` +
       `&timezone=auto`
     );
     const data = await res.json();
@@ -201,6 +201,8 @@ export async function getHistoricalWeather(
       tempMax: Math.round(data.daily.temperature_2m_max[i]),
       weatherCode: data.daily.weather_code[i],
       uvIndex: 0,
+      precipitationProbability: data.daily.precipitation_sum[i] > 0 ? Math.min(Math.round(data.daily.precipitation_sum[i] * 20), 100) : 0,
+      windSpeed: Math.round(data.daily.windspeed_10m_max[i] || 0),
     }));
 
     setCache(key, result);
