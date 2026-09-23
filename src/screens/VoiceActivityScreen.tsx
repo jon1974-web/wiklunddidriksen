@@ -452,6 +452,32 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
             <View style={[styles.formCard, { backgroundColor: colors.surface }]}>
               <Text style={[styles.formCardLabel, { color: accentColor }]}>{t('voice.editBeforeSave')}</Text>
 
+              {showActivityType && (
+                <>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.activityType')}</Text>
+                  <View style={styles.activityTypeRow}>
+                    {ACTIVITY_TYPE_OPTIONS.map((opt) => (
+                      <TouchableOpacity
+                        key={opt.value}
+                        style={[
+                          styles.activityTypeButton,
+                          {
+                            backgroundColor: parsedData.activityType === opt.value ? accentColor : colors.inputBackground,
+                            borderColor: parsedData.activityType === opt.value ? accentColor : colors.border,
+                          },
+                        ]}
+                        onPress={() => handleFieldChange('activityType', opt.value)}
+                      >
+                        <Text style={[
+                          styles.activityTypeButtonText,
+                          { color: parsedData.activityType === opt.value ? '#fff' : colors.text },
+                        ]}>{opt.label}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </>
+              )}
+
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.title')}</Text>
               <TextInput
                 style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
@@ -486,6 +512,48 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
                 </>
               )}
 
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateFrom')}</Text>
+                  <TouchableOpacity
+                    style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                    onPress={() => setActivePicker('dateFrom')}
+                  >
+                    <Text style={[styles.dateText, { color: parsedData.dateFrom ? colors.text : colors.textDisabled }]}>{parsedData.dateFrom || t('common.pickDate')}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateTo')}</Text>
+                  <TouchableOpacity
+                    style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                    onPress={() => setActivePicker('dateTo')}
+                  >
+                    <Text style={[styles.dateText, { color: parsedData.dateTo ? colors.text : colors.textDisabled }]}>{parsedData.dateTo || t('common.pickDate')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.startTime')}</Text>
+                  <TouchableOpacity
+                    style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                    onPress={() => setActivePicker('startTime')}
+                  >
+                    <Text style={[styles.dateText, { color: parsedData.startTime ? colors.text : colors.textDisabled }]}>{parsedData.startTime || t('common.pickTime')}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.endTime')}</Text>
+                  <TouchableOpacity
+                    style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                    onPress={() => setActivePicker('endTime')}
+                  >
+                    <Text style={[styles.dateText, { color: parsedData.endTime ? colors.text : colors.textDisabled }]}>{parsedData.endTime || t('common.pickTime')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
               {showDoctor && (
                 <>
                   <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{type === 'vetVisit' ? t('pet.veterinarian') : t('health.doctor')}</Text>
@@ -499,64 +567,6 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
                 </>
               )}
 
-              {showActivityType && (
-                <>
-                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.activityType')}</Text>
-                  <View style={styles.activityTypeRow}>
-                    {ACTIVITY_TYPE_OPTIONS.map((opt) => (
-                      <TouchableOpacity
-                        key={opt.value}
-                        style={[
-                          styles.activityTypeButton,
-                          {
-                            backgroundColor: parsedData.activityType === opt.value ? accentColor : colors.inputBackground,
-                            borderColor: parsedData.activityType === opt.value ? accentColor : colors.border,
-                          },
-                        ]}
-                        onPress={() => handleFieldChange('activityType', opt.value)}
-                      >
-                        <Text style={[
-                          styles.activityTypeButtonText,
-                          { color: parsedData.activityType === opt.value ? '#fff' : colors.text },
-                        ]}>{opt.label}</Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                </>
-              )}
-
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateFrom')}</Text>
-              <TouchableOpacity
-                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
-                onPress={() => setActivePicker('dateFrom')}
-              >
-                <Text style={[styles.dateText, { color: parsedData.dateFrom ? colors.text : colors.textDisabled }]}>{parsedData.dateFrom || t('common.pickDate')}</Text>
-              </TouchableOpacity>
-
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateTo')}</Text>
-              <TouchableOpacity
-                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
-                onPress={() => setActivePicker('dateTo')}
-              >
-                <Text style={[styles.dateText, { color: parsedData.dateTo ? colors.text : colors.textDisabled }]}>{parsedData.dateTo || t('common.pickDate')}</Text>
-              </TouchableOpacity>
-
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.startTime')}</Text>
-              <TouchableOpacity
-                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
-                onPress={() => setActivePicker('startTime')}
-              >
-                <Text style={[styles.dateText, { color: parsedData.startTime ? colors.text : colors.textDisabled }]}>{parsedData.startTime || t('common.pickTime')}</Text>
-              </TouchableOpacity>
-
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.endTime')}</Text>
-              <TouchableOpacity
-                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
-                onPress={() => setActivePicker('endTime')}
-              >
-                <Text style={[styles.dateText, { color: parsedData.endTime ? colors.text : colors.textDisabled }]}>{parsedData.endTime || t('common.pickTime')}</Text>
-              </TouchableOpacity>
-
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.location')}</Text>
               <GooglePlacesInput
                 placeholder={t('common.location')}
@@ -564,15 +574,31 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
                 onChangeText={(v: string) => handleFieldChange('location', v)}
               />
 
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.note')}</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
-                value={parsedData.note || ''}
-                onChangeText={(v) => handleFieldChange('note', v)}
-                placeholder={t('common.note')}
-                placeholderTextColor={colors.textDisabled}
-                multiline
-              />
+              {type === 'homeService' ? (
+                <>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.description')}</Text>
+                  <TextInput
+                    style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
+                    value={parsedData.note || ''}
+                    onChangeText={(v) => handleFieldChange('note', v)}
+                    placeholder={t('common.description')}
+                    placeholderTextColor={colors.textDisabled}
+                    multiline
+                  />
+                </>
+              ) : (
+                <>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.note')}</Text>
+                  <TextInput
+                    style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
+                    value={parsedData.note || ''}
+                    onChangeText={(v) => handleFieldChange('note', v)}
+                    placeholder={t('common.note')}
+                    placeholderTextColor={colors.textDisabled}
+                    multiline
+                  />
+                </>
+              )}
 
               {type === 'homeService' && (
                 <>

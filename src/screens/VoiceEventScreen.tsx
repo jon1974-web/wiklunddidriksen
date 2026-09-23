@@ -315,6 +315,43 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
                 placeholderTextColor={colors.textDisabled}
               />
 
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateFrom')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('dateFrom')}>
+                    <Text style={{ fontSize: 16, color: parsedEvent.date ? colors.text : colors.textDisabled }}>{parsedEvent.date || t('common.pickDate')}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateTo')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('dateTo')}>
+                    <Text style={{ fontSize: 16, color: parsedEvent.endDate ? colors.text : colors.textDisabled }}>{parsedEvent.endDate || parsedEvent.date || t('common.pickDate')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.startTime')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('timeFrom')}>
+                    <Text style={{ fontSize: 16, color: parsedEvent.time ? colors.text : colors.textDisabled }}>{parsedEvent.time || t('common.pickTime')}</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.endTime')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('timeTo')}>
+                    <Text style={{ fontSize: 16, color: parsedEvent.endTime ? colors.text : colors.textDisabled }}>{parsedEvent.endTime || t('common.pickTime')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.location')}</Text>
+              <GooglePlacesInput
+                placeholder={t('common.location')}
+                value={parsedEvent.address}
+                onChangeText={(v: string) => setParsedEvent((p) => p ? { ...p, address: v } : null)}
+              />
+
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.description')}</Text>
               <TextInput
                 style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
@@ -323,55 +360,6 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
                 placeholder={t('common.description')}
                 placeholderTextColor={colors.textDisabled}
                 multiline
-              />
-
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateFrom')}</Text>
-              <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('dateFrom')}>
-                <Text style={{ fontSize: 16, color: parsedEvent.date ? colors.text : colors.textDisabled }}>{parsedEvent.date || t('common.pickDate')}</Text>
-              </TouchableOpacity>
-
-              {showEndDate ? (
-                <>
-                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateTo')}</Text>
-                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('dateTo')}>
-                    <Text style={{ fontSize: 16, color: parsedEvent.endDate ? colors.text : colors.textDisabled }}>{parsedEvent.endDate || t('common.pickDate')}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { setShowEndDate(false); setParsedEvent((p) => p ? { ...p, endDate: null } : null); }}>
-                    <Text style={{ fontSize: 12, color: colors.danger }}>{t('events.removeEndDate')}</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <TouchableOpacity onPress={() => { setShowEndDate(true); setParsedEvent((p) => p ? { ...p, endDate: parsedEvent.date } : null); }}>
-                  <Text style={{ fontSize: 12, color: colors.accent }}>+ {t('events.addEndDate')}</Text>
-                </TouchableOpacity>
-              )}
-
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.startTime')}</Text>
-              <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('timeFrom')}>
-                <Text style={{ fontSize: 16, color: parsedEvent.time ? colors.text : colors.textDisabled }}>{parsedEvent.time || t('common.pickTime')}</Text>
-              </TouchableOpacity>
-
-              {showEndTime ? (
-                <>
-                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.endTime')}</Text>
-                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('timeTo')}>
-                    <Text style={{ fontSize: 16, color: parsedEvent.endTime ? colors.text : colors.textDisabled }}>{parsedEvent.endTime || t('common.pickTime')}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={() => { setShowEndTime(false); setParsedEvent((p) => p ? { ...p, endTime: null } : null); }}>
-                    <Text style={{ fontSize: 12, color: colors.danger }}>{t('events.removeEndTime')}</Text>
-                  </TouchableOpacity>
-                </>
-              ) : (
-                <TouchableOpacity onPress={() => { setShowEndTime(true); setParsedEvent((p) => p ? { ...p, endTime: '' } : null); }}>
-                  <Text style={{ fontSize: 12, color: colors.accent }}>+ {t('events.addEndTime')}</Text>
-                </TouchableOpacity>
-              )}
-
-              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.location')}</Text>
-              <GooglePlacesInput
-                placeholder={t('common.location')}
-                value={parsedEvent.address}
-                onChangeText={(v: string) => setParsedEvent((p) => p ? { ...p, address: v } : null)}
               />
             </View>
 
