@@ -7,6 +7,7 @@ import { AppIcon } from '../components/AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
+import { auth } from '../services/firebase';
 import Svg, { Line } from 'react-native-svg';
 
 const HOME_COLOR = MODULE_COLORS.home;
@@ -43,6 +44,8 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
   const [correctionQuery, setCorrectionQuery] = useState('');
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
   const scrollRef = useRef<ScrollView>(null);
   const messagesRef = useRef<Message[]>([]);
 
@@ -242,95 +245,94 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
 
   const startVoiceInput = useCallback(async () => {
     if (recording || transcribing) return;
-    setRecording(true);
     try {
-      const { Audio } = await import('expo-av');
-      const { status } = await Audio.requestPermissionsAsync();
-      if (status !== 'granted') {
-        crossAlert(t('common.error'), 'Mikrofontilgang er nødvendig');
-        setRecording(false);
-        return;
+      if (Platform.OS === 'web') {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        let mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
+        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
+        const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+        chunksRef.current = [];
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) chunksRef.current.push(event.data);
+        };
+        mediaRecorderRef.current = mediaRecorder;
+        mediaRecorder.start();
+        setRecording(true);
+      } else {
+        const { Audio } = await import('expo-av');
+        const { status } = await Audio.requestPermissionsAsync();
+        if (status !== 'granted') {
+          crossAlert(t('common.error'), 'Mikrofontilgang er nødvendig');
+          return;
+        }
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+        const { recording: newRecording } = await Audio.Recording.createAsync(
+          Audio.RecordingOptionsPresets.HIGH_QUALITY
+        );
+        (globalThis as any).__aiRecording = newRecording;
+        (globalThis as any).__aiAudio = Audio;
+        setRecording(true);
       }
-
-      const recordingObj = new Audio.Recording();
-      await recordingObj.prepareToRecordAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
-      await recordingObj.startAsync();
-
-      const timer = setTimeout(async () => {
-        try {
-          await recordingObj.stopAndUnloadAsync();
-          const uri = recordingObj.getURI();
-          if (!uri) { setRecording(false); return; }
-
-          setRecording(false);
-          setTranscribing(true);
-
-          const { auth } = await import('../services/firebase');
-          const idToken = await auth.currentUser?.getIdToken();
-          if (!idToken) { setTranscribing(false); return; }
-
-          const formData = new FormData();
-          formData.append('audio', { uri, type: 'audio/m4a', name: 'recording.m4a' } as any);
-
-          const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent', {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${idToken}` },
-            body: formData,
-          });
-          const data = await res.json();
-          if (data.text) {
-            setInput(data.text);
-          }
-        } catch (e) {
-          crossAlert(t('common.error'), 'Feil under transkribering');
-        } finally {
-          setTranscribing(false);
-        }
-      }, 15000);
-
-      const stopRecording = async () => {
-        clearTimeout(timer);
-        try {
-          if (recordingObj.getStatus() === 1) {
-            await recordingObj.stopAndUnloadAsync();
-            const uri = recordingObj.getURI();
-            if (!uri) { setRecording(false); return; }
-
-            setRecording(false);
-            setTranscribing(true);
-
-            const { auth } = await import('../services/firebase');
-            const idToken = await auth.currentUser?.getIdToken();
-            if (!idToken) { setTranscribing(false); return; }
-
-            const formData = new FormData();
-            formData.append('audio', { uri, type: 'audio/m4a', name: 'recording.m4a' } as any);
-
-            const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent', {
-              method: 'POST',
-              headers: { 'Authorization': `Bearer ${idToken}` },
-              body: formData,
-            });
-            const data = await res.json();
-            if (data.text) {
-              setInput(data.text);
-            }
-          }
-        } catch (e) {
-          crossAlert(t('common.error'), 'Feil under transkribering');
-        } finally {
-          setTranscribing(false);
-        }
-      };
-
-      setStopRecording(() => stopRecording);
     } catch (error) {
       crossAlert(t('common.error'), 'Kunne ikke starte opptak');
       setRecording(false);
     }
   }, [recording, transcribing, t]);
 
-  const [stopRecording, setStopRecording] = useState<(() => Promise<void>) | null>(null);
+  const stopAndTranscribe = useCallback(async () => {
+    if (!recording) return;
+    setRecording(false);
+    setTranscribing(true);
+
+    try {
+      let audioBlob: Blob;
+
+      if (Platform.OS === 'web') {
+        const mediaRecorder = mediaRecorderRef.current;
+        if (!mediaRecorder) throw new Error('No MediaRecorder');
+        await new Promise<void>((resolve) => {
+          mediaRecorder.onstop = () => resolve();
+          mediaRecorder.stop();
+        });
+        mediaRecorder.stream.getTracks().forEach((track) => track.stop());
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        audioBlob = new Blob(chunksRef.current, { type: mimeType });
+      } else {
+        const Audio = (globalThis as any).__aiAudio;
+        const rec = (globalThis as any).__aiRecording;
+        await rec.stopAndUnloadAsync();
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+        const uri = rec.getURI();
+        const response = await fetch(uri);
+        audioBlob = await response.blob();
+      }
+
+      const ext = audioBlob.type.includes('mp4') ? 'm4a' : 'webm';
+      const headers: Record<string, string> = {
+        'Content-Type': audioBlob.type || 'audio/webm',
+        'X-Filename': `recording.${ext}`,
+      };
+      const idToken = await auth.currentUser?.getIdToken();
+      if (idToken) headers['Authorization'] = `Bearer ${idToken}`;
+
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent', {
+        method: 'POST',
+        headers,
+        body: audioBlob,
+      });
+      const data = await res.json();
+      if (data.text) {
+        setInput(data.text);
+      } else {
+        crossAlert(t('common.error'), 'Kunne ikke transkribere');
+      }
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    } finally {
+      setTranscribing(false);
+    }
+  }, [recording, t]);
 
   const sendCorrection = useCallback(async (originalQuery: string, correctAnswer: string) => {
     if (!familyId || !correctAnswer.trim()) return;
@@ -499,7 +501,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
               {recording || transcribing ? (
                 <TouchableOpacity
                   style={[styles.micRecordingBtn]}
-                  onPress={() => stopRecording?.()}
+                  onPress={stopAndTranscribe}
                 >
                   <AppIcon name="microphone" size={20} color="#fff" />
                   <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginLeft: 6 }}>
