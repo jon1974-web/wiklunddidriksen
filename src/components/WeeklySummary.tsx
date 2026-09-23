@@ -9,7 +9,7 @@ import { getLocale } from '../constants/languages';
 import { AppIcon } from './AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import Svg, { Line } from 'react-native-svg';
-import { getForecast, geocodeCity, reverseGeocode, wmoToEmoji } from '../services/weatherService';
+import { getForecast, geocodeCity, reverseGeocode, wmoToEmoji, getHistoricalWeather } from '../services/weatherService';
 
 interface WeeklySummaryProps {
   visible: boolean;
@@ -143,15 +143,25 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
 
       if (lat === null || lon === null || cancelled) return;
 
-      // Get city name + forecast in parallel
-      const [name, forecast] = await Promise.all([
+      // Get city name + forecast + historical in parallel
+      const { start: weekStart } = getWeekRange(new Date());
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6);
+      const todayDate = new Date();
+      todayDate.setHours(0, 0, 0, 0);
+
+      const [name, forecast, historical] = await Promise.all([
         reverseGeocode(lat, lon),
-        getForecast(lat, lon, 7),
+        getForecast(lat, lon, 10),
+        todayDate > weekStart ? getHistoricalWeather(lat, lon, toLocalDateStr(weekStart), toLocalDateStr(todayDate < weekEnd ? todayDate : weekEnd)) : Promise.resolve([]),
       ]);
 
       if (!cancelled) {
         setCityName(name);
-        setWeather(forecast);
+        // Merge: historical for past days, forecast for today+future
+        const merged = [...historical, ...forecast];
+        const unique = merged.filter((w, i, arr) => arr.findIndex(x => x.date === w.date) === i);
+        setWeather(unique);
       }
     };
 
@@ -455,8 +465,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                 </View>
                 {(() => {
                   const dayDateStr = toLocalDateStr(day.date);
-                  const isFutureOrToday = dayDateStr >= todayStr;
-                  const dayWeather = isFutureOrToday ? weather.find(w => w.date === dayDateStr) : null;
+                  const dayWeather = weather.find(w => w.date === dayDateStr);
                   if (dayWeather) {
                     return (
                       <View style={styles.weatherRow}>
