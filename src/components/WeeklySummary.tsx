@@ -455,7 +455,8 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                 </View>
                 {(() => {
                   const dayDateStr = toLocalDateStr(day.date);
-                  const dayWeather = weather.find(w => w.date === dayDateStr);
+                  const isFutureOrToday = dayDateStr >= todayStr;
+                  const dayWeather = isFutureOrToday ? weather.find(w => w.date === dayDateStr) : null;
                   if (dayWeather) {
                     return (
                       <View style={styles.weatherRow}>
