@@ -216,18 +216,42 @@ export async function getHourlyForDay(
   if (cached) return cached;
 
   try {
-    const res = await fetch(
-      `${GOOGLE_HOURLY_URL}?key=${GOOGLE_MAPS_API_KEY}` +
-      `&location.latitude=${latitude}&location.longitude=${longitude}` +
-      `&hours=48&pageSize=48&languageCode=no`
-    );
-    const data = await res.json();
-    if (!data.forecastHours) return [];
+    // Request up to 120 hours (5 days) to cover dates further out
+    let allHours: any[] = [];
+    let pageToken: string | undefined;
 
-    const dayHours = data.forecastHours.filter((h: any) => {
+    // First page
+    const url1 = `${GOOGLE_HOURLY_URL}?key=${GOOGLE_MAPS_API_KEY}` +
+      `&location.latitude=${latitude}&location.longitude=${longitude}` +
+      `&hours=120&pageSize=48&languageCode=no`;
+    const res1 = await fetch(url1);
+    const data1 = await res1.json();
+    if (data1.forecastHours) allHours.push(...data1.forecastHours);
+    pageToken = data1.nextPageToken;
+
+    // Fetch additional pages if needed and we haven't covered the target date
+    const targetDate = new Date(date);
+    const lastHour = allHours.length > 0 ? allHours[allHours.length - 1] : null;
+    const lastDateStr = lastHour ? `${lastHour.displayDateTime.year}-${String(lastHour.displayDateTime.month).padStart(2, '0')}-${String(lastHour.displayDateTime.day).padStart(2, '0')}` : '';
+
+    if (pageToken && lastDateStr < date) {
+      const url2 = `${GOOGLE_HOURLY_URL}?key=${GOOGLE_MAPS_API_KEY}` +
+        `&location.latitude=${latitude}&location.longitude=${longitude}` +
+        `&hours=120&pageSize=48&languageCode=no&pageToken=${pageToken}`;
+      const res2 = await fetch(url2);
+      const data2 = await res2.json();
+      if (data2.forecastHours) allHours.push(...data2.forecastHours);
+    }
+
+    if (allHours.length === 0) return [];
+
+    const dayHours = allHours.filter((h: any) => {
       const d = h.displayDateTime;
       return `${d.year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}` === date;
     });
+
+    // If no hours found for this date (too far out), return empty
+    if (dayHours.length === 0) return [];
 
     const result: WeatherHour[] = TIME_PERIODS.map((tp) => {
       let bestHour = dayHours[0];
