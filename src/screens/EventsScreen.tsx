@@ -1514,6 +1514,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         schoolChildren={schoolChildren}
         kindergartenChildren={kindergartenChildren}
         homeServices={homeServices}
+        homeAddress={homes.length > 0 ? [homes[0].address, homes[0].postNumber, homes[0].postCity].filter(Boolean).join(', ') : undefined}
       />
 
       <ActionModal

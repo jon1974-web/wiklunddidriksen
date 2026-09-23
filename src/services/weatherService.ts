@@ -61,6 +61,30 @@ export async function geocodeCity(city: string): Promise<{ latitude: number; lon
   return null;
 }
 
+export async function reverseGeocode(lat: number, lon: number): Promise<string | null> {
+  const key = getCacheKey('revgeo', lat, lon);
+  const cached = getCached<string>(key);
+  if (cached) return cached;
+
+  try {
+    const res = await fetch(
+      `${GOOGLE_GEOCODE_URL}?latlng=${lat},${lon}&key=${GOOGLE_MAPS_API_KEY}`
+    );
+    const data = await res.json();
+    if (data.status === 'OK' && data.results && data.results.length > 0) {
+      const components = data.results[0].address_components;
+      const sublocality = components.find((c: any) => c.types.includes('sublocality'));
+      const locality = components.find((c: any) => c.types.includes('locality'));
+      const name = sublocality?.long_name || locality?.long_name || null;
+      if (name) { setCache(key, name); }
+      return name;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function googleTypeToCode(type: string): number {
   const map: Record<string, number> = {
     CLEAR: 0, MOSTLY_CLEAR: 1, PARTLY_CLOUDY: 2, MOSTLY_CLOUDY: 3, OVERCAST: 4,

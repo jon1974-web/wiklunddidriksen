@@ -1,6 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image } from 'react-native';
-import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity, HomeService } from '../types';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal, Image, Platform } from 'react-native';
+import { Event, Trip, SpondEvent, Birthday, MealPlan, Recipe, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity, HomeService, WeatherDay } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getWeekNumber, formatTime, formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { useTranslation } from 'react-i18next';
@@ -9,6 +9,7 @@ import { getLocale } from '../constants/languages';
 import { AppIcon } from './AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import Svg, { Line } from 'react-native-svg';
+import { getForecast, geocodeCity, reverseGeocode, wmoToEmoji } from '../services/weatherService';
 
 interface WeeklySummaryProps {
   visible: boolean;
@@ -35,6 +36,7 @@ interface WeeklySummaryProps {
   schoolChildren?: SchoolChild[];
   kindergartenChildren?: KindergartenChild[];
   homeServices?: HomeService[];
+  homeAddress?: string;
 }
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAI','JUN','JUL','AUG','SEP','OKT','NOV','DES'];
@@ -97,16 +99,65 @@ const statStyles = StyleSheet.create({
   label: { fontSize: 8, fontWeight: '600', marginTop: 3, textTransform: 'uppercase', letterSpacing: 0.3 },
 });
 
-export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {}, schoolHolidays = [], kindergartenHolidays = [], schoolChildren = [], kindergartenChildren = [], schoolActivities = [], kindergartenActivities = [], homeServices = [] }) => {
+export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible, onClose, events, trips, spondEvents, birthdays = [], mealPlan = null, recipes = [], groupLogos = {}, healthAppointments = [], healthMedications = [], healthVaccinations = [], petVetVisits = [], petVaccinations = [], petMedications = [], sectionSettings = {}, schoolHolidays = [], kindergartenHolidays = [], schoolChildren = [], kindergartenChildren = [], schoolActivities = [], kindergartenActivities = [], homeServices = [], homeAddress }) => {
   const { t, i18n: i18nInstance } = useTranslation();
   const { colors } = useTheme();
   const [langKey, setLangKey] = useState(0);
+  const [weather, setWeather] = useState<WeatherDay[]>([]);
+  const [cityName, setCityName] = useState<string | null>(null);
 
   useEffect(() => {
     const handler = () => setLangKey(k => k + 1);
     i18nInstance.on('languageChanged', handler);
     return () => i18nInstance.off('languageChanged', handler);
   }, [i18nInstance]);
+
+  // Fetch weather when modal opens
+  useEffect(() => {
+    if (!visible) return;
+    let cancelled = false;
+
+    const fetchWeather = async () => {
+      let lat: number | null = null;
+      let lon: number | null = null;
+
+      // Step 1: Try browser Geolocation
+      if (Platform.OS === 'web' && navigator.geolocation) {
+        try {
+          const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 5000, enableHighAccuracy: false });
+          });
+          lat = pos.coords.latitude;
+          lon = pos.coords.longitude;
+        } catch {}
+      }
+
+      // Step 2: Fallback to home address
+      if (lat === null && homeAddress) {
+        const coords = await geocodeCity(homeAddress);
+        if (coords && !cancelled) {
+          lat = coords.latitude;
+          lon = coords.longitude;
+        }
+      }
+
+      if (lat === null || lon === null || cancelled) return;
+
+      // Get city name + forecast in parallel
+      const [name, forecast] = await Promise.all([
+        reverseGeocode(lat, lon),
+        getForecast(lat, lon, 7),
+      ]);
+
+      if (!cancelled) {
+        setCityName(name);
+        setWeather(forecast);
+      }
+    };
+
+    fetchWeather();
+    return () => { cancelled = true; };
+  }, [visible, homeAddress]);
 
   const today = useMemo(() => new Date(), [visible]);
   const todayStr = toLocalDateStr(today);
@@ -342,6 +393,11 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
               {t('weekdays.week')} {weekData.weekNum} · {weekData.startLabel} – {weekData.endLabel}
             </Text>
+            {cityName && weather.length > 0 && (
+              <Text style={[styles.headerWeather, { color: MODULE_COLORS.trips }]}>
+                {cityName} · {wmoToEmoji(weather[0].weatherCode)} {weather[0].tempMin}°/{weather[0].tempMax}°
+              </Text>
+            )}
           </View>
           <TouchableOpacity onPress={onClose} style={[styles.closeBtn, { borderColor: colors.accent }]}>
             <Svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke={colors.accent} strokeWidth="2.5" strokeLinecap="round">
@@ -370,7 +426,22 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             return (
               <View key={idx} style={[styles.dayCard, isToday && { borderColor: colors.accent, borderWidth: 2 }]}>
                 <View style={styles.dayCardHeader}>
-                  <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={colors.accent} />
+                  <View style={{ alignItems: 'center', width: 48 }}>
+                    {(() => {
+                      const dayDateStr = toLocalDateStr(day.date);
+                      const dayWeather = weather.find(w => w.date === dayDateStr);
+                      if (dayWeather) {
+                        return (
+                          <View style={styles.weatherChip}>
+                            <Text style={styles.weatherEmoji}>{wmoToEmoji(dayWeather.weatherCode)}</Text>
+                            <Text style={styles.weatherTemp}>{dayWeather.tempMax}°</Text>
+                          </View>
+                        );
+                      }
+                      return null;
+                    })()}
+                    <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={colors.accent} />
+                  </View>
                   <View style={styles.dayCardItems}>
                     {day.items.length > 0 ? day.items.map((item, i) => {
                       const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'schoolActivity' ? MODULE_COLORS.school : item.type === 'kindergartenActivity' ? MODULE_COLORS.kindergarten : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : item.type === 'homeService' ? MODULE_COLORS.home : MODULE_COLORS.birthdays;
@@ -468,6 +539,7 @@ const styles = StyleSheet.create({
   headerContent: { flex: 1 },
   headerTitle: { fontSize: 18, fontWeight: '700' },
   headerSubtitle: { fontSize: 12, marginTop: 2 },
+  headerWeather: { fontSize: 11, marginTop: 2, fontWeight: '500' },
   closeBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   closeBtnText: { fontSize: 14, fontWeight: '600' },
   scrollView: { flex: 1 },
@@ -475,6 +547,9 @@ const styles = StyleSheet.create({
   statsRow: { flexDirection: 'row', gap: 4, marginBottom: 12 },
   dayCard: { backgroundColor: '#fff', borderRadius: 12, marginBottom: 8, borderWidth: 1, borderColor: '#e8e8e8', overflow: 'hidden' },
   dayCardHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, padding: 10 },
+  weatherChip: { alignItems: 'center', marginBottom: 4 },
+  weatherEmoji: { fontSize: 14 },
+  weatherTemp: { fontSize: 10, fontWeight: '600', color: '#666' },
   dayCardItems: { flex: 1, gap: 4 },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   itemIcon: { width: 24, height: 24, alignItems: 'center', justifyContent: 'center' },
