@@ -1166,7 +1166,7 @@ exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       return res.status(400).json({ error: "No image data received" });
     }
 
-    if (type !== "event" && type !== "recipe" && type !== "classlist" && type !== "holidays" && type !== "healthAppointment" && type !== "vetVisit" && type !== "schoolActivity" && type !== "kindergartenActivity") {
+    if (type !== "event" && type !== "recipe" && type !== "classlist" && type !== "holidays" && type !== "healthAppointment" && type !== "vetVisit" && type !== "schoolActivity" && type !== "kindergartenActivity" && type !== "homeService" && type !== "trip") {
       return res.status(400).json({ error: "Invalid type." });
     }
 
@@ -1386,6 +1386,35 @@ For each activity found, extract:
 
 Return ONLY valid JSON: { "events": [ { "title", "activityType", "date", "dateTo", "startTime", "endTime", "location", "reminderMinutes" } ] }`;
       userText = "Extract all kindergarten activities visible in this image.";
+    } else if (type === "homeService") {
+      systemPrompt = `You are a service appointment parser. Extract appointment details from this image (could be a letter, invoice, or calendar entry).
+
+Today's date is ${today}.
+
+For each appointment found, extract:
+- title: Service title (e.g. "Varmepumpe service", "Renhold", "Elektriker")
+- description: Description if visible, or empty string
+- date: Date as YYYY-MM-DD
+- startTime: Start time as HH:MM (default "09:00")
+- frequency: "once" for one-time, "monthly", "quarterly", or "yearly"
+
+Return ONLY valid JSON: { "events": [ { "title", "description", "date", "startTime", "frequency" } ] }`;
+      userText = "Extract all service appointments visible in this image.";
+    } else if (type === "trip") {
+      systemPrompt = `You are a trip parser. Extract trip details from this image (could be a booking confirmation, itinerary, or travel plan).
+
+Today's date is ${today}.
+
+For each trip found, extract:
+- title: Trip title (e.g. "Ferie i Spania", "Jobbtur til Oslo")
+- destination: Destination/city if visible, or empty string
+- startDate: Start date as YYYY-MM-DD
+- endDate: End date as YYYY-MM-DD or same as startDate
+- startTime: Start time as HH:MM or empty string
+- endTime: End time as HH:MM or empty string
+
+Return ONLY valid JSON: { "events": [ { "title", "destination", "startDate", "endDate", "startTime", "endTime" } ] }`;
+      userText = "Extract all trips visible in this image.";
     } else {
       return res.status(400).json({ error: "Invalid type" });
     }
@@ -1478,6 +1507,78 @@ Return ONLY valid JSON: { "events": [ { "title", "activityType", "date", "dateTo
         timeTo: h.timeTo || "",
       }));
       return res.status(200).json({ holidays: normalized });
+    } else if (type === "healthAppointment") {
+      const items = Array.isArray(result.events) ? result.events : [];
+      const normalized = items.map((e) => ({
+        title: e.title || "",
+        person: e.person || "",
+        doctor: e.doctor || "",
+        dateFrom: e.dateFrom || today,
+        dateTo: e.dateTo || null,
+        startTime: e.startTime || "09:00",
+        endTime: e.endTime || null,
+        location: e.location || "",
+        note: e.note || "",
+      }));
+      return res.status(200).json({ events: normalized });
+    } else if (type === "vetVisit") {
+      const items = Array.isArray(result.events) ? result.events : [];
+      const normalized = items.map((e) => ({
+        title: e.title || "",
+        doctor: e.doctor || "",
+        dateFrom: e.dateFrom || today,
+        dateTo: e.dateTo || null,
+        startTime: e.startTime || "09:00",
+        endTime: e.endTime || null,
+        location: e.location || "",
+        reason: e.reason || "",
+      }));
+      return res.status(200).json({ events: normalized });
+    } else if (type === "schoolActivity") {
+      const items = Array.isArray(result.events) ? result.events : [];
+      const normalized = items.map((e) => ({
+        title: e.title || "",
+        activityType: e.activityType || "aktivitet",
+        dateFrom: e.dateFrom || today,
+        dateTo: e.dateTo || null,
+        startTime: e.startTime || "10:00",
+        endTime: e.endTime || null,
+        location: e.location || "",
+      }));
+      return res.status(200).json({ events: normalized });
+    } else if (type === "kindergartenActivity") {
+      const items = Array.isArray(result.events) ? result.events : [];
+      const normalized = items.map((e) => ({
+        title: e.title || "",
+        activityType: e.activityType || "aktivitet",
+        dateFrom: e.dateFrom || today,
+        dateTo: e.dateTo || null,
+        startTime: e.startTime || "10:00",
+        endTime: e.endTime || null,
+        location: e.location || "",
+      }));
+      return res.status(200).json({ events: normalized });
+    } else if (type === "homeService") {
+      const items = Array.isArray(result.events) ? result.events : [];
+      const normalized = items.map((e) => ({
+        title: e.title || "",
+        description: e.description || "",
+        dateFrom: e.dateFrom || today,
+        startTime: e.startTime || "09:00",
+        frequency: e.frequency || "once",
+      }));
+      return res.status(200).json({ events: normalized });
+    } else if (type === "trip") {
+      const items = Array.isArray(result.events) ? result.events : [];
+      const normalized = items.map((e) => ({
+        title: e.title || "",
+        destination: e.destination || "",
+        startDate: e.startDate || today,
+        endDate: e.endDate || e.startDate || today,
+        startTime: e.startTime || "",
+        endTime: e.endTime || "",
+      }));
+      return res.status(200).json({ events: normalized });
     }
   } catch (error) {
     console.error("Photo to data error:", error.message, error.stack);
