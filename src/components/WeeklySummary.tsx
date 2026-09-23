@@ -426,22 +426,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
             return (
               <View key={idx} style={[styles.dayCard, isToday && { borderColor: colors.accent, borderWidth: 2 }]}>
                 <View style={styles.dayCardHeader}>
-                  <View style={{ alignItems: 'center', width: 48 }}>
-                    {(() => {
-                      const dayDateStr = toLocalDateStr(day.date);
-                      const dayWeather = weather.find(w => w.date === dayDateStr);
-                      if (dayWeather) {
-                        return (
-                          <View style={styles.weatherChip}>
-                            <Text style={styles.weatherEmoji}>{wmoToEmoji(dayWeather.weatherCode)}</Text>
-                            <Text style={styles.weatherTemp}>{dayWeather.tempMax}°</Text>
-                          </View>
-                        );
-                      }
-                      return null;
-                    })()}
-                    <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={colors.accent} />
-                  </View>
+                  <CalendarIcon dayName={day.dayName} dayNum={day.dateNum} monthStr={day.monthStr} isToday={isToday} accentColor={colors.accent} />
                   <View style={styles.dayCardItems}>
                     {day.items.length > 0 ? day.items.map((item, i) => {
                       const itemColor = item.type === 'event' ? MODULE_COLORS.home : item.type === 'health' ? MODULE_COLORS.health : item.type === 'pet' ? MODULE_COLORS.pets : item.type === 'trip' ? MODULE_COLORS.trips : item.type === 'schoolHoliday' ? MODULE_COLORS.school : item.type === 'schoolActivity' ? MODULE_COLORS.school : item.type === 'kindergartenActivity' ? MODULE_COLORS.kindergarten : item.type === 'kindergartenHoliday' ? MODULE_COLORS.kindergarten : item.type === 'homeService' ? MODULE_COLORS.home : MODULE_COLORS.birthdays;
@@ -468,6 +453,23 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
                     )}
                   </View>
                 </View>
+                {(() => {
+                  const dayDateStr = toLocalDateStr(day.date);
+                  const dayWeather = weather.find(w => w.date === dayDateStr);
+                  if (dayWeather) {
+                    return (
+                      <View style={styles.weatherRow}>
+                        <Text style={styles.weatherEmoji}>{wmoToEmoji(dayWeather.weatherCode)}</Text>
+                        <Text style={[styles.weatherTemp, { color: colors.text }]}>{dayWeather.tempMin}° / {dayWeather.tempMax}°</Text>
+                        <Text style={[styles.weatherDetail, { color: colors.textSecondary }]}>
+                          {dayWeather.precipitationProbability != null && dayWeather.precipitationProbability > 0 ? `🌧 ${dayWeather.precipitationProbability}%` : ''}
+                          {dayWeather.windSpeed != null && dayWeather.windSpeed > 0 ? ` 💨${dayWeather.windSpeed}` : ''}
+                        </Text>
+                      </View>
+                    );
+                  }
+                  return null;
+                })()}
               </View>
             );
           })}
@@ -550,6 +552,8 @@ const styles = StyleSheet.create({
   weatherChip: { alignItems: 'center', marginBottom: 4 },
   weatherEmoji: { fontSize: 14 },
   weatherTemp: { fontSize: 10, fontWeight: '600', color: '#666' },
+  weatherRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
+  weatherDetail: { fontSize: 10 },
   dayCardItems: { flex: 1, gap: 4 },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   itemIcon: { width: 24, height: 24, alignItems: 'center', justifyContent: 'center' },
