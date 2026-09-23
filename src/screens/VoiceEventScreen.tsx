@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
@@ -11,6 +11,8 @@ import { syncEventToCalendar } from '../services/calendarService';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
+import { DatePickerModal } from '../components/DatePickerModal';
+import { GooglePlacesInput } from '../components/GooglePlacesInput';
 
 interface VoiceEventScreenProps {
   navigation: any;
@@ -23,6 +25,7 @@ interface ParsedEvent {
   endDate: string | null;
   time: string;
   endTime: string | null;
+  address: string;
   reminderMinutes: number;
 }
 
@@ -35,6 +38,9 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
   const [transcript, setTranscript] = useState<string | null>(null);
   const [parsedEvent, setParsedEvent] = useState<ParsedEvent | null>(null);
   const [creating, setCreating] = useState(false);
+  const [activePicker, setActivePicker] = useState<string | null>(null);
+  const [showEndDate, setShowEndDate] = useState(false);
+  const [showEndTime, setShowEndTime] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const { colors } = useTheme();
@@ -169,7 +175,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         endTime: parsedEvent.endTime,
         reminderMinutes: parsedEvent.reminderMinutes,
         reminderAt: reminderAt.toISOString(),
-        address: '',
+        address: parsedEvent.address || '',
         createdBy: user.uid,
         familyId: familyId || null,
         createdAt: Date.now(),
@@ -300,16 +306,73 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
             )}
 
             <View style={[styles.eventCard, { backgroundColor: colors.surface }]}>
-              <Text style={[styles.eventTitle, { color: colors.text }]}>{parsedEvent.title}</Text>
-              {parsedEvent.description ? (
-                <Text style={[styles.eventDesc, { color: colors.textSecondary }]}>{parsedEvent.description}</Text>
-              ) : null}
-              <Text style={[styles.eventDetail, { color: colors.text }]}>
-                📅 {parsedEvent.date}{parsedEvent.endDate ? ` → ${parsedEvent.endDate}` : ''}
-              </Text>
-              <Text style={[styles.eventDetail, { color: colors.text }]}>
-                🕐 {parsedEvent.time}{parsedEvent.endTime ? ` → ${parsedEvent.endTime}` : ''}
-              </Text>
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.title')}</Text>
+              <TextInput
+                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
+                value={parsedEvent.title}
+                onChangeText={(v) => setParsedEvent((p) => p ? { ...p, title: v } : null)}
+                placeholder={t('common.title')}
+                placeholderTextColor={colors.textDisabled}
+              />
+
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.description')}</Text>
+              <TextInput
+                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
+                value={parsedEvent.description}
+                onChangeText={(v) => setParsedEvent((p) => p ? { ...p, description: v } : null)}
+                placeholder={t('common.description')}
+                placeholderTextColor={colors.textDisabled}
+                multiline
+              />
+
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateFrom')}</Text>
+              <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('dateFrom')}>
+                <Text style={{ fontSize: 16, color: parsedEvent.date ? colors.text : colors.textDisabled }}>{parsedEvent.date || t('common.pickDate')}</Text>
+              </TouchableOpacity>
+
+              {showEndDate ? (
+                <>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateTo')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('dateTo')}>
+                    <Text style={{ fontSize: 16, color: parsedEvent.endDate ? colors.text : colors.textDisabled }}>{parsedEvent.endDate || t('common.pickDate')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { setShowEndDate(false); setParsedEvent((p) => p ? { ...p, endDate: null } : null); }}>
+                    <Text style={{ fontSize: 12, color: colors.danger }}>{t('events.removeEndDate')}</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity onPress={() => { setShowEndDate(true); setParsedEvent((p) => p ? { ...p, endDate: parsedEvent.date } : null); }}>
+                  <Text style={{ fontSize: 12, color: colors.accent }}>+ {t('events.addEndDate')}</Text>
+                </TouchableOpacity>
+              )}
+
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.startTime')}</Text>
+              <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('timeFrom')}>
+                <Text style={{ fontSize: 16, color: parsedEvent.time ? colors.text : colors.textDisabled }}>{parsedEvent.time || t('common.pickTime')}</Text>
+              </TouchableOpacity>
+
+              {showEndTime ? (
+                <>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.endTime')}</Text>
+                  <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]} onPress={() => setActivePicker('timeTo')}>
+                    <Text style={{ fontSize: 16, color: parsedEvent.endTime ? colors.text : colors.textDisabled }}>{parsedEvent.endTime || t('common.pickTime')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity onPress={() => { setShowEndTime(false); setParsedEvent((p) => p ? { ...p, endTime: null } : null); }}>
+                    <Text style={{ fontSize: 12, color: colors.danger }}>{t('events.removeEndTime')}</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <TouchableOpacity onPress={() => { setShowEndTime(true); setParsedEvent((p) => p ? { ...p, endTime: '' } : null); }}>
+                  <Text style={{ fontSize: 12, color: colors.accent }}>+ {t('events.addEndTime')}</Text>
+                </TouchableOpacity>
+              )}
+
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.location')}</Text>
+              <GooglePlacesInput
+                placeholder={t('common.location')}
+                value={parsedEvent.address}
+                onChangeText={(v: string) => setParsedEvent((p) => p ? { ...p, address: v } : null)}
+              />
             </View>
 
             <View style={styles.resultActions}>
@@ -336,6 +399,24 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
           </View>
         )}
       </View>
+
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={activePicker === 'dateFrom' ? 'Startdato' : activePicker === 'dateTo' ? 'Sluttdato' : activePicker === 'timeFrom' ? 'Starttid' : 'Sluttid'}
+        mode={activePicker?.startsWith('time') ? 'time' : 'date'}
+        dateOffset={activePicker?.startsWith('time') ? 0 : -365}
+        dateCount={activePicker?.startsWith('time') ? 48 : 730}
+        selectedValue={activePicker === 'dateFrom' ? parsedEvent?.date || '' : activePicker === 'dateTo' ? parsedEvent?.endDate || '' : activePicker === 'timeFrom' ? parsedEvent?.time || '' : parsedEvent?.endTime || ''}
+        onSelect={(value) => {
+          if (!parsedEvent || !activePicker) return;
+          if (activePicker === 'dateFrom') setParsedEvent({ ...parsedEvent, date: value });
+          else if (activePicker === 'dateTo') setParsedEvent({ ...parsedEvent, endDate: value });
+          else if (activePicker === 'timeFrom') setParsedEvent({ ...parsedEvent, time: value });
+          else if (activePicker === 'timeTo') setParsedEvent({ ...parsedEvent, endTime: value });
+          setActivePicker(null);
+        }}
+        onClose={() => setActivePicker(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -390,6 +471,22 @@ const styles = StyleSheet.create({
   },
   micButtonActive: {
     transform: [{ scale: 1.1 }],
+  },
+  fieldLabel: {
+    fontSize: 13,
+    marginBottom: 4,
+    marginTop: 8,
+  },
+  textInput: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+    fontSize: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
   },
   micIcon: {
     fontSize: 48,

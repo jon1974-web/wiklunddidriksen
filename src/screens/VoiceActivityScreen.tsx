@@ -15,6 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { auth } from '../services/firebase';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
+import { DatePickerModal } from '../components/DatePickerModal';
+import { GooglePlacesInput } from '../components/GooglePlacesInput';
 
 type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService' | 'trip';
 
@@ -32,8 +34,10 @@ interface ParsedData {
   startTime: string;
   endTime?: string;
   location?: string;
+  note?: string;
   reminder: number;
   activityType?: 'tur' | 'aktivitet' | 'møte';
+  frequency?: string;
 }
 
 const CLOUD_FUNCTION_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent';
@@ -79,6 +83,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
   const [transcript, setTranscript] = useState<string | null>(null);
   const [parsedData, setParsedData] = useState<ParsedData | null>(null);
   const [creating, setCreating] = useState(false);
+  const [activePicker, setActivePicker] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
   const { colors } = useTheme();
@@ -241,6 +246,36 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
     setParsedData((prev) => (prev ? { ...prev, [field]: value } : null));
   }, []);
 
+  const handlePickerSelect = useCallback((value: string) => {
+    if (!activePicker || !parsedData) return;
+    handleFieldChange(activePicker as keyof ParsedData, value);
+    setActivePicker(null);
+  }, [activePicker, parsedData, handleFieldChange]);
+
+  const isTimePicker = activePicker?.includes('time') || activePicker === 'endTime';
+  const getPickerTitle = () => {
+    if (activePicker === 'dateFrom') return t('common.startDate');
+    if (activePicker === 'dateTo') return t('common.endDate');
+    if (activePicker === 'startTime') return t('common.startTime');
+    if (activePicker === 'endTime') return t('common.endTime');
+    return '';
+  };
+  const getPickerValue = () => {
+    if (!parsedData || !activePicker) return '';
+    if (activePicker === 'dateFrom') return parsedData.dateFrom;
+    if (activePicker === 'dateTo') return parsedData.dateTo || '';
+    if (activePicker === 'startTime') return parsedData.startTime;
+    if (activePicker === 'endTime') return parsedData.endTime || '';
+    return '';
+  };
+
+  const FREQUENCY_OPTIONS = [
+    { value: 'once', label: t('home.oneTime') },
+    { value: 'monthly', label: t('home.monthly') },
+    { value: 'quarterly', label: t('home.quarterly') },
+    { value: 'yearly', label: t('home.yearly') },
+  ];
+
   const handleCreate = useCallback(async () => {
     if (!parsedData || !user || creating) return;
     setCreating(true);
@@ -256,7 +291,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           startTime: parsedData.startTime,
           endTime: parsedData.endTime,
           location: parsedData.location,
-          note: '',
+          note: parsedData.note || '',
           reminder: parsedData.reminder,
           addToCalendar: true,
           status: 'planned',
@@ -272,7 +307,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           startTime: parsedData.startTime,
           endTime: parsedData.endTime,
           location: parsedData.location,
-          note: '',
+          note: parsedData.note || '',
           reminder: parsedData.reminder,
           addToCalendar: true,
           status: 'planned',
@@ -289,7 +324,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           startTime: parsedData.startTime,
           endTime: parsedData.endTime,
           location: parsedData.location,
-          note: '',
+          note: parsedData.note || '',
           reminder: parsedData.reminder,
           createdBy: user.uid,
         });
@@ -305,7 +340,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           startTime: parsedData.startTime,
           endTime: parsedData.endTime,
           location: parsedData.location,
-          note: '',
+          note: parsedData.note || '',
           reminder: parsedData.reminder,
           createdBy: user.uid,
         });
@@ -313,11 +348,11 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
         await addHomeService({
           homeId: route.params?.homeId || '',
           title: parsedData.title,
-          description: '',
+          description: parsedData.note || '',
           dateFrom: parsedData.dateFrom,
           startTime: parsedData.startTime,
           reminder: parsedData.reminder,
-          frequency: 'once',
+          frequency: parsedData.frequency || 'once',
           status: 'planned',
           familyId: familyId || '',
         });
@@ -491,49 +526,70 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
               )}
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateFrom')}</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
-                value={parsedData.dateFrom}
-                onChangeText={(v) => handleFieldChange('dateFrom', v)}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.textDisabled}
-              />
+              <TouchableOpacity
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                onPress={() => setActivePicker('dateFrom')}
+              >
+                <Text style={[styles.dateText, { color: parsedData.dateFrom ? colors.text : colors.textDisabled }]}>{parsedData.dateFrom || t('common.pickDate')}</Text>
+              </TouchableOpacity>
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.dateTo')}</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
-                value={parsedData.dateTo || ''}
-                onChangeText={(v) => handleFieldChange('dateTo', v)}
-                placeholder="YYYY-MM-DD"
-                placeholderTextColor={colors.textDisabled}
-              />
+              <TouchableOpacity
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                onPress={() => setActivePicker('dateTo')}
+              >
+                <Text style={[styles.dateText, { color: parsedData.dateTo ? colors.text : colors.textDisabled }]}>{parsedData.dateTo || t('common.pickDate')}</Text>
+              </TouchableOpacity>
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.startTime')}</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
-                value={parsedData.startTime}
-                onChangeText={(v) => handleFieldChange('startTime', v)}
-                placeholder="HH:MM"
-                placeholderTextColor={colors.textDisabled}
-              />
+              <TouchableOpacity
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                onPress={() => setActivePicker('startTime')}
+              >
+                <Text style={[styles.dateText, { color: parsedData.startTime ? colors.text : colors.textDisabled }]}>{parsedData.startTime || t('common.pickTime')}</Text>
+              </TouchableOpacity>
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.endTime')}</Text>
-              <TextInput
-                style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
-                value={parsedData.endTime || ''}
-                onChangeText={(v) => handleFieldChange('endTime', v)}
-                placeholder="HH:MM"
-                placeholderTextColor={colors.textDisabled}
-              />
+              <TouchableOpacity
+                style={[styles.input, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
+                onPress={() => setActivePicker('endTime')}
+              >
+                <Text style={[styles.dateText, { color: parsedData.endTime ? colors.text : colors.textDisabled }]}>{parsedData.endTime || t('common.pickTime')}</Text>
+              </TouchableOpacity>
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.location')}</Text>
+              <GooglePlacesInput
+                placeholder={t('common.location')}
+                value={parsedData.location || ''}
+                onChangeText={(v: string) => handleFieldChange('location', v)}
+              />
+
+              <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.note')}</Text>
               <TextInput
                 style={[styles.textInput, { borderColor: colors.border, color: colors.text, backgroundColor: colors.inputBackground }]}
-                value={parsedData.location || ''}
-                onChangeText={(v) => handleFieldChange('location', v)}
-                placeholder={t('common.location')}
+                value={parsedData.note || ''}
+                onChangeText={(v) => handleFieldChange('note', v)}
+                placeholder={t('common.note')}
                 placeholderTextColor={colors.textDisabled}
+                multiline
               />
+
+              {type === 'homeService' && (
+                <>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('home.frequency')}</Text>
+                  <View style={styles.personRow}>
+                    {FREQUENCY_OPTIONS.map((opt) => (
+                      <TouchableOpacity
+                        key={opt.value}
+                        style={[styles.personChip, { backgroundColor: parsedData.frequency === opt.value ? accentColor : colors.inputBackground }]}
+                        onPress={() => handleFieldChange('frequency', opt.value)}
+                      >
+                        <Text style={{ color: parsedData.frequency === opt.value ? '#fff' : colors.text, fontSize: 13 }}>{opt.label}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </>
+              )}
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.reminder')}</Text>
               <View style={styles.personRow}>
@@ -567,6 +623,17 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           </View>
         )}
       </ScrollView>
+
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={getPickerTitle()}
+        mode={isTimePicker ? 'time' : 'date'}
+        dateOffset={isTimePicker ? 0 : -365}
+        dateCount={isTimePicker ? 48 : 730}
+        selectedValue={getPickerValue()}
+        onSelect={handlePickerSelect}
+        onClose={() => setActivePicker(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -714,6 +781,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     padding: 10,
+    fontSize: 16,
+  },
+  input: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 10,
+  },
+  dateText: {
     fontSize: 16,
   },
   activityTypeRow: {
