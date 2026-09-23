@@ -359,7 +359,8 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
       } else if (type === 'trip') {
         await addTrip({
           title: parsedData.title,
-          destination: parsedData.location || '',
+          city: parsedData.location || '',
+          country: '',
           startDate: parsedData.dateFrom,
           endDate: parsedData.dateTo || parsedData.dateFrom,
           startTime: parsedData.startTime,

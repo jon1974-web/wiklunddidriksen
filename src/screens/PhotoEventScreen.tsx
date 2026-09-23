@@ -8,6 +8,7 @@ import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
 import { getUserProfile, notifyNewEvent } from '../services/familyService';
 import { syncEventToCalendar } from '../services/calendarService';
+import { scheduleEventReminder } from '../services/notificationService';
 import { getReminderOptions } from '../constants/eventOptions';
 import { EVENT_ICONS } from '../constants/eventIcons';
 import { getErrorMessage } from '../utils/validation';
@@ -192,16 +193,30 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
       const docRef = await addDoc(collection(db, 'events'), eventData);
 
       try {
+        const notifId = await scheduleEventReminder(
+          eventData.title,
+          eventData.description || 'Arrangement starter snart',
+          eventStartDate,
+          eventData.reminderMinutes
+        );
+        if (notifId) {
+          const { updateDoc, doc: docFn } = await import('firebase/firestore');
+          await updateDoc(docFn(db, 'events', docRef.id), { notificationId: notifId });
+        }
+      } catch {}
+
+      try {
         const profile = await getUserProfile(user.uid);
         if (profile?.calendarId) {
-          const calEventId = await syncEventToCalendar({
+          const eventStartDate = new Date(`${event.date}T${event.time}`);
+          const eventEndDate = event.endTime ? new Date(`${event.endDate || event.date}T${event.endTime}`) : undefined;
+          const calEventId = await syncEventToCalendar(profile.calendarId, {
             title: eventData.title,
             description: eventData.description,
-            date: eventData.date,
-            time: eventData.time,
-            endDate: eventData.endDate,
-            endTime: eventData.endTime,
-            calendarId: profile.calendarId,
+            address: eventData.address,
+            startDate: eventStartDate,
+            endDate: eventEndDate,
+            reminderMinutes: eventData.reminderMinutes,
           });
           if (calEventId) {
             const { updateDoc, doc: docFn } = await import('firebase/firestore');

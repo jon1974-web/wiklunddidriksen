@@ -201,14 +201,14 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
       try {
         const profile = await getUserProfile(user.uid);
         if (profile?.calendarId) {
-          const calEventId = await syncEventToCalendar({
+          const eventEndDate = parsedEvent.endTime ? new Date(`${parsedEvent.endDate || parsedEvent.date}T${parsedEvent.endTime}`) : undefined;
+          const calEventId = await syncEventToCalendar(profile.calendarId, {
             title: eventData.title,
             description: eventData.description,
-            date: eventData.date,
-            time: eventData.time,
-            endDate: eventData.endDate || undefined,
-            endTime: eventData.endTime || undefined,
-            calendarId: profile.calendarId,
+            address: eventData.address,
+            startDate: eventStartDate,
+            endDate: eventEndDate,
+            reminderMinutes: eventData.reminderMinutes,
           });
           if (calEventId) {
             const { updateDoc, doc } = await import('firebase/firestore');

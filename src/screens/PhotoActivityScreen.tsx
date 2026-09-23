@@ -252,6 +252,7 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           location: activity.location ? sanitizeInput(activity.location) : undefined,
           note: activity.description ? sanitizeInput(activity.description) : undefined,
           reminder: activity.reminder || undefined,
+          addToCalendar: true,
           status: 'planned',
         }, user.uid);
       } else if (type === 'vetVisit') {
@@ -267,6 +268,7 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           location: activity.location ? sanitizeInput(activity.location) : undefined,
           note: activity.description ? sanitizeInput(activity.description) : undefined,
           reminder: activity.reminder || undefined,
+          addToCalendar: true,
           status: 'planned',
         }, user.uid);
       } else if (type === 'schoolActivity') {
@@ -316,7 +318,8 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
       } else if (type === 'trip') {
         await addTrip({
           title: sanitizeInput(activity.title),
-          destination: activity.location ? sanitizeInput(activity.location) : '',
+          city: activity.location ? sanitizeInput(activity.location) : '',
+          country: '',
           startDate: activity.dateFrom,
           endDate: activity.showEndDate && activity.dateTo ? activity.dateTo : activity.dateFrom,
           startTime: activity.startTime,
