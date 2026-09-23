@@ -562,7 +562,7 @@ const styles = StyleSheet.create({
   weatherChip: { alignItems: 'center', marginBottom: 4 },
   weatherEmoji: { fontSize: 14 },
   weatherTemp: { fontSize: 10, fontWeight: '600', color: '#666' },
-  weatherRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingBottom: 6, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
+  weatherRow: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingHorizontal: 10, paddingBottom: 4 },
   weatherDetail: { fontSize: 10 },
   dayCardItems: { flex: 1, gap: 4 },
   itemRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
