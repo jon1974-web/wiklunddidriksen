@@ -411,6 +411,25 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
         <Image source={{ uri: imageUri }} style={styles.previewImage} resizeMode="contain" />
       )}
 
+      {config.hasActivityType && (
+        <View style={styles.field}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('school.activityType')}</Text>
+          <View style={styles.activityTypeRow}>
+            {(['tur', 'aktivitet', 'møte'] as const).map((at) => (
+              <TouchableOpacity
+                key={at}
+                style={[styles.activityTypeChip, { backgroundColor: colors.inputBackground, borderColor: colors.border }, activity.activityType === at && { backgroundColor: moduleColor, borderColor: moduleColor }]}
+                onPress={() => updateActivity(index, { activityType: at })}
+              >
+                <Text style={[styles.activityTypeText, { color: activity.activityType === at ? '#fff' : colors.text }]}>
+                  {at === 'tur' ? t('school.activityTypeTur') : at === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      )}
+
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
         <TextInput
@@ -435,6 +454,48 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
         </View>
       )}
 
+      <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 16 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('common.startDate')}</Text>
+          <TouchableOpacity
+            style={[styles.input, { backgroundColor: colors.inputBackground }]}
+            onPress={() => setActivePicker({ activityIndex: index, field: 'dateFrom' })}
+          >
+            <Text style={[styles.dateText, { color: colors.text }]}>{activity.dateFrom}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('common.endDate')}</Text>
+          <TouchableOpacity
+            style={[styles.input, { backgroundColor: colors.inputBackground }]}
+            onPress={() => setActivePicker({ activityIndex: index, field: 'dateTo' })}
+          >
+            <Text style={[styles.dateText, { color: colors.text }]}>{activity.dateTo || t('common.pickDate')}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
+      <View style={{ flexDirection: 'row', gap: 12, paddingHorizontal: 16 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('common.startTime')}</Text>
+          <TouchableOpacity
+            style={[styles.input, { backgroundColor: colors.inputBackground }]}
+            onPress={() => setActivePicker({ activityIndex: index, field: 'startTime' })}
+          >
+            <Text style={[styles.dateText, { color: colors.text }]}>{activity.startTime}</Text>
+          </TouchableOpacity>
+        </View>
+        <View style={{ flex: 1 }}>
+          <Text style={[styles.label, { color: colors.text }]}>{t('common.endTime')}</Text>
+          <TouchableOpacity
+            style={[styles.input, { backgroundColor: colors.inputBackground }]}
+            onPress={() => setActivePicker({ activityIndex: index, field: 'endTime' })}
+          >
+            <Text style={[styles.dateText, { color: colors.text }]}>{activity.endTime || t('common.pickTime')}</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+
       {config.hasDoctor && (
         <View style={styles.field}>
           <Text style={[styles.label, { color: colors.text }]}>{t('health.doctor')}</Text>
@@ -448,24 +509,16 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
         </View>
       )}
 
-      {config.hasActivityType && (
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>{t('school.activityType')}</Text>
-          <View style={styles.activityTypeRow}>
-            {(['tur', 'aktivitet', 'møte'] as const).map((at) => (
-              <TouchableOpacity
-                key={at}
-                style={[styles.activityTypeChip, { backgroundColor: colors.inputBackground, borderColor: colors.border }, activity.activityType === at && { backgroundColor: moduleColor, borderColor: moduleColor }]}
-                onPress={() => updateActivity(index, { activityType: at })}
-              >
-                <Text style={[styles.activityTypeText, { color: activity.activityType === at ? '#fff' : colors.text }]}>
-                  {at === 'tur' ? t('school.activityTypeTur') : at === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      )}
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
+          value={activity.location}
+          onChangeText={(text) => updateActivity(index, { location: text })}
+          placeholder={t('common.address')}
+          placeholderTextColor={colors.textDisabled}
+        />
+      </View>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
@@ -479,75 +532,6 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           numberOfLines={3}
         />
       </View>
-
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('common.address')}</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-          value={activity.location}
-          onChangeText={(text) => updateActivity(index, { location: text })}
-          placeholder={t('common.address')}
-          placeholderTextColor={colors.textDisabled}
-        />
-      </View>
-
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('common.startDate')}</Text>
-        <TouchableOpacity
-          style={[styles.input, { backgroundColor: colors.inputBackground }]}
-          onPress={() => setActivePicker({ activityIndex: index, field: 'dateFrom' })}
-        >
-          <Text style={[styles.dateText, { color: colors.text }]}>{activity.dateFrom}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {!activity.showEndDate ? (
-        <TouchableOpacity onPress={() => updateActivity(index, { showEndDate: true })}>
-          <Text style={[styles.addLink, { color: moduleColor }]}>+ {t('events.addEndDate')}</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>{t('common.endDate')}</Text>
-          <TouchableOpacity
-            style={[styles.input, { backgroundColor: colors.inputBackground }]}
-            onPress={() => setActivePicker({ activityIndex: index, field: 'dateTo' })}
-          >
-            <Text style={[styles.dateText, { color: colors.text }]}>{activity.dateTo || t('common.pickDate')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => updateActivity(index, { showEndDate: false, dateTo: null })}>
-            <Text style={[styles.removeLink, { color: colors.danger }]}>{t('events.removeEndDate')}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
-
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>{t('common.startTime')}</Text>
-        <TouchableOpacity
-          style={[styles.input, { backgroundColor: colors.inputBackground }]}
-          onPress={() => setActivePicker({ activityIndex: index, field: 'startTime' })}
-        >
-          <Text style={[styles.dateText, { color: colors.text }]}>{activity.startTime}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {!activity.showEndTime ? (
-        <TouchableOpacity onPress={() => updateActivity(index, { showEndTime: true })}>
-          <Text style={[styles.addLink, { color: moduleColor }]}>+ {t('events.addEndTime')}</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>{t('common.endTime')}</Text>
-          <TouchableOpacity
-            style={[styles.input, { backgroundColor: colors.inputBackground }]}
-            onPress={() => setActivePicker({ activityIndex: index, field: 'endTime' })}
-          >
-            <Text style={[styles.dateText, { color: colors.text }]}>{activity.endTime || t('common.pickTime')}</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => updateActivity(index, { showEndTime: false, endTime: null })}>
-            <Text style={[styles.removeLink, { color: colors.danger }]}>{t('events.removeEndTime')}</Text>
-          </TouchableOpacity>
-        </View>
-      )}
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('events.reminder')}</Text>
