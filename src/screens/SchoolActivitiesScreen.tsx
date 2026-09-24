@@ -25,11 +25,11 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
   const [activities, setActivities] = useState<SchoolActivity[]>([]);
 
   const loadActivities = useCallback(async () => {
-    if (!familyId || !selectedYear) return;
+    if (!familyId || !child) return;
     const { getSchoolActivities: load } = await import('../services/schoolService');
-    const data = await load(familyId, selectedYear.id);
+    const data = await load(familyId, child.id);
     setActivities(data);
-  }, [familyId, selectedYear]);
+  }, [familyId, child]);
 
   useEffect(() => { loadActivities(); }, [loadActivities]);
 
