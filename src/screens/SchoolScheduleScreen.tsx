@@ -131,7 +131,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
       const fileName = `schedule_${semester}_${Date.now()}.jpg`;
 
       const { webUploadFile } = await import('../services/webStorage');
-      const downloadURL = await webUploadFile(`school-schedules/${familyId}/${fileName}`, blob);
+      const downloadURL = await webUploadFile(`school-schedules/${familyId}_${fileName}`, blob);
 
       const scheduleId = await addSchoolSchedule({
         yearId: selectedYear!.id,
