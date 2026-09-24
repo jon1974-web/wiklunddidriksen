@@ -90,7 +90,8 @@
     "saved": "lagret",
     "activityType": "Aktivitetstype",
     "creating": "Oppretter...",
-    "details": "Detaljer"
+    "details": "Detaljer",
+    "found": "funnet"
   },
   "auth": {
     "title": "Fampad",
@@ -136,7 +137,7 @@
     "title": "Våre avtaler",
     "addEvent": "Nytt arrangement",
     "noEvents": "Ingen kommende arrangementer. Legg til et nytt!",
-    "noEventsDay": "Ingen arrangementer på denne dagen",
+    "noEventsDay": "Ingen hendelser denne dagen",
     "pastEvents": "Se tidligere arrangementer",
     "hidePast": "Skjul tidligere arrangementer",
     "deleteTitle": "Slett arrangement",
@@ -163,7 +164,9 @@
     "endTime90": "1.5 timer",
     "endTime120": "2 timer",
     "sortBy": "Sorter etter",
-    "spondGroups": "Spond grupper"
+    "spondGroups": "Spond grupper",
+    "upcoming": "Kommende",
+    "past": "Tidligere"
   },
   "trips": {
     "title": "Våre reiser",
@@ -346,7 +349,7 @@
     "name": "Navn",
     "namePlaceholder": "F.eks. Emma",
     "kindergarten": "Barnehage",
-    "group": "Avdeling",
+    "group": "Gruppe",
     "year": "År",
     "yearPlaceholder": "F.eks. 2025-2026",
     "kindergartenYears": "Barnehageår",
@@ -373,7 +376,7 @@
     "holidayDateTo": "Til dato",
     "holidayTimeFrom": "Fra tid",
     "holidayTimeTo": "Til tid",
-    "noHolidays": "Ingen fridager lagt til",
+    "noHolidays": "Ingen fridager",
     "importFromImage": "Importer fra bilde",
     "importFromUrl": "Importer fra URL",
     "urlDescription": "Lim inn lenke til fridager-side",

@@ -44,8 +44,8 @@ export const SchoolHolidaysScreen: React.FC<Props> = ({ navigation, route }) => 
   useEffect(() => { loadHolidays(); }, [loadHolidays]);
 
   const today = new Date().toISOString().split('T')[0];
-  const upcoming = holidays.filter(h => (h.dateTo || h.dateFrom) >= today);
-  const past = holidays.filter(h => (h.dateTo || h.dateFrom) < today);
+  const upcoming = holidays.filter(h => (h.dateTo || h.dateFrom) >= today).sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+  const past = holidays.filter(h => (h.dateTo || h.dateFrom) < today).sort((a, b) => (b.dateFrom || '').localeCompare(a.dateFrom || ''));
 
   const handleSave = async () => {
     if (!familyId || !selectedYear || !form.title.trim()) return;

@@ -90,7 +90,8 @@
     "saved": "sparad",
     "activityType": "Aktivitetstyp",
     "creating": "Skapar...",
-    "details": "Detaljer"
+    "details": "Detaljer",
+    "found": "hittade"
   },
   "auth": {
     "title": "Fampad",
@@ -136,7 +137,7 @@
     "title": "Evenemang",
     "addEvent": "Nytt evenemang",
     "noEvents": "Inga kommande evenemang. Lägg till ett nytt!",
-    "noEventsDay": "Inga evenemang på denna dag",
+    "noEventsDay": "Inga händelser denna dagen",
     "pastEvents": "Visa tidigare evenemang",
     "hidePast": "Dölj tidigare evenemang",
     "deleteTitle": "Ta bort evenemang",
@@ -163,7 +164,9 @@
     "addEndTime": "Lägg till sluttid",
     "listView": "Lista",
     "calendarView": "Kalender",
-    "weeklySummary": "Min vecka"
+    "weeklySummary": "Min vecka",
+    "upcoming": "Kommande",
+    "past": "Tidigare"
   },
   "trips": {
     "title": "Våra resor",
@@ -345,8 +348,8 @@
     "childName": "Barnets namn",
     "name": "Namn",
     "namePlaceholder": "t.ex. Emma",
-    "kindergarten": "Förskola",
-    "group": "Avdelning",
+    "kindergarten": "Dagis",
+    "group": "Grupp",
     "year": "År",
     "yearPlaceholder": "t.ex. 2025-2026",
     "kindergartenYears": "Förskoleår",
@@ -373,7 +376,7 @@
     "holidayDateTo": "Till datum",
     "holidayTimeFrom": "Från tid",
     "holidayTimeTo": "Till tid",
-    "noHolidays": "Inga lediga dagar tillagda",
+    "noHolidays": "Inga lediga dagar",
     "importFromImage": "Importera från bild",
     "importFromUrl": "Importera från URL",
     "urlDescription": "Klistra in länk till lediga dagar-sida",

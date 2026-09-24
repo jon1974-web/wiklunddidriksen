@@ -90,7 +90,8 @@
     "saved": "tallennettu",
     "activityType": "Toimintatyyppi",
     "creating": "Luodaan...",
-    "details": "Tiedot"
+    "details": "Tiedot",
+    "found": "löydetty"
   },
   "auth": {
     "title": "Fampad",
@@ -163,7 +164,9 @@
     "addEndTime": "Lisää lopetusaika",
     "listView": "Lista",
     "calendarView": "Kalenteri",
-    "weeklySummary": "Oma viikko"
+    "weeklySummary": "Oma viikko",
+    "upcoming": "Tulevat",
+    "past": "Aikaisemmat"
   },
   "trips": {
     "title": "Matkamme",
@@ -345,7 +348,7 @@
     "childName": "Lapsen nimi",
     "name": "Nimi",
     "namePlaceholder": "esim. Emma",
-    "kindergarten": "Päiväkotimme",
+    "kindergarten": "Päiväkoti",
     "group": "Ryhmä",
     "year": "Vuosi",
     "yearPlaceholder": "esim. 2025-2026",
@@ -373,7 +376,7 @@
     "holidayDateTo": "Lopetuspäivä",
     "holidayTimeFrom": "Aloitusaika",
     "holidayTimeTo": "Lopetusaika",
-    "noHolidays": "Ei vapaapäiviä lisätty",
+    "noHolidays": "Ei vapaapäiviä",
     "importFromImage": "Tuo kuvasta",
     "importFromUrl": "Tuo URL-osoitteesta",
     "urlDescription": "Liitä linkki vapaapäivä-sivulle",

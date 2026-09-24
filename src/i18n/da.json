@@ -90,7 +90,8 @@
     "saved": "gemt",
     "activityType": "Aktivitetstype",
     "creating": "Opretter...",
-    "details": "Detaljer"
+    "details": "Detaljer",
+    "found": "fundet"
   },
   "auth": {
     "title": "Fampad",
@@ -163,7 +164,9 @@
     "addEndTime": "Tilføj sluttid",
     "listView": "Liste",
     "calendarView": "Kalender",
-    "weeklySummary": "Min uge"
+    "weeklySummary": "Min uge",
+    "upcoming": "Kommende",
+    "past": "Tidligere"
   },
   "trips": {
     "title": "Vore rejser",
@@ -345,7 +348,7 @@
     "childName": "Barnets navn",
     "name": "Navn",
     "namePlaceholder": "f.eks. Emma",
-    "kindergarten": "Vores børnehave",
+    "kindergarten": "Børnehave",
     "group": "Gruppe",
     "year": "År",
     "yearPlaceholder": "f.eks. 2025-2026",
@@ -373,7 +376,7 @@
     "holidayDateTo": "Til dato",
     "holidayTimeFrom": "Fra tid",
     "holidayTimeTo": "Til tid",
-    "noHolidays": "Ingen fridage tilføjet",
+    "noHolidays": "Ingen fridage",
     "importFromImage": "Importer fra billede",
     "importFromUrl": "Importer fra URL",
     "urlDescription": "Indsæt link til fridage-side",

@@ -90,7 +90,8 @@
     "saved": "saved",
     "activityType": "Activity type",
     "creating": "Creating...",
-    "details": "Details"
+    "details": "Details",
+    "found": "found"
   },
   "auth": {
     "title": "Fampad",
@@ -136,7 +137,7 @@
     "title": "Events",
     "addEvent": "New event",
     "noEvents": "No upcoming events. Add a new one!",
-    "noEventsDay": "No events on this day",
+    "noEventsDay": "No events this day",
     "pastEvents": "Show past events",
     "hidePast": "Hide past events",
     "deleteTitle": "Delete event",
@@ -163,7 +164,9 @@
     "endTime90": "1.5 hours",
     "endTime120": "2 hours",
     "sortBy": "Sort by",
-    "spondGroups": "Spond groups"
+    "spondGroups": "Spond groups",
+    "upcoming": "Upcoming",
+    "past": "Past"
   },
   "trips": {
     "title": "Our Trips",
@@ -373,7 +376,7 @@
     "holidayDateTo": "To date",
     "holidayTimeFrom": "From time",
     "holidayTimeTo": "To time",
-    "noHolidays": "No days off added",
+    "noHolidays": "No holidays",
     "importFromImage": "Import from image",
     "importFromUrl": "Import from URL",
     "urlDescription": "Paste link to days off page",
