@@ -122,10 +122,8 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
       const ext = asset.uri.split('.').pop() || 'jpg';
       const fileName = `schedule_${semester}_${Date.now()}.${ext}`;
 
-      const { ref, uploadBytes, getDownloadURL } = await import('firebase/storage');
-      const storageRef = ref(`school-schedules/${familyId}/${fileName}`);
-      await uploadBytes(storageRef, blob);
-      const downloadURL = await getDownloadURL(storageRef);
+      const { webUploadFile } = await import('../services/webStorage');
+      const downloadURL = await webUploadFile(`school-schedules/${familyId}/${fileName}`, blob);
 
       const scheduleId = await addSchoolSchedule({
         yearId: selectedYear!.id,
