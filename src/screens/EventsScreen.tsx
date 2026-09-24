@@ -1405,6 +1405,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
               >
                 <AppIcon name="vedlikehold" size={18} color={filterModule === 'home' ? '#fff' : MODULE_COLORS.home} />
               </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.sortIconBtn, { borderColor: colors.border }, filterModule === 'birthday' && { backgroundColor: MODULE_COLORS.birthdays, borderColor: MODULE_COLORS.birthdays }]}
+                onPress={() => { const v = filterModule === 'birthday' ? null : 'birthday'; setFilterModule(v); setShowSortPanel(false); }}
+              >
+                <AppIcon name="birthday" size={18} color={filterModule === 'birthday' ? '#fff' : MODULE_COLORS.birthdays} />
+              </TouchableOpacity>
             </View>
             {Object.keys(spondGroupLogos).length > 0 && (
               <>
