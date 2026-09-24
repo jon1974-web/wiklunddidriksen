@@ -60,10 +60,10 @@ export const SchoolDetailScreen: React.FC<SchoolDetailScreenProps> = ({ navigati
   };
 
   const tiles = [
-    { id: 'contacts', icon: 'contacts' as any, label: t('school.contacts'), color: MODULE_COLORS.school, screen: 'SchoolContacts' },
-    { id: 'schedule', icon: 'schedule' as any, label: t('school.schedule'), color: MODULE_COLORS.trips, screen: 'SchoolSchedule' },
-    { id: 'activities', icon: 'activities' as any, label: t('school.activities'), color: MODULE_COLORS.health, screen: 'SchoolActivities' },
-    { id: 'holidays', icon: 'fri' as any, label: t('school.holidays'), color: MODULE_COLORS.pets, screen: 'SchoolHolidays' },
+    { id: 'contacts', icon: 'contacts' as any, label: t('school.contacts'), screen: 'SchoolContacts' },
+    { id: 'schedule', icon: 'schedule' as any, label: t('school.schedule'), screen: 'SchoolSchedule' },
+    { id: 'activities', icon: 'activities' as any, label: t('school.activities'), screen: 'SchoolActivities' },
+    { id: 'holidays', icon: 'fri' as any, label: t('school.holidays'), screen: 'SchoolHolidays' },
   ];
 
   return (
@@ -115,7 +115,7 @@ export const SchoolDetailScreen: React.FC<SchoolDetailScreenProps> = ({ navigati
             style={[styles.tile, { backgroundColor: colors.surface }]}
             onPress={() => selectedYear && navigation.navigate(tile.screen, { child, selectedYear, years })}
           >
-            <View style={[styles.tileIcon, { backgroundColor: tile.color }]}>
+            <View style={[styles.tileIcon, { backgroundColor: SCHOOL_THEME }]}>
               <AppIcon name={tile.icon} size={24} color="#fff" />
             </View>
             <Text style={[styles.tileLabel, { color: colors.text }]}>{tile.label}</Text>
