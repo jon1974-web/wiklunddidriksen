@@ -7,7 +7,7 @@ import { AppIcon } from '../components/AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { SchoolChild, SchoolYear, SchoolActivity } from '../types';
 import { useUserStore } from '../store/userStore';
-import { getSchoolActivities } from '../services/schoolService';
+import { getSchoolActivities, addSchoolActivity } from '../services/schoolService';
 import { formatDate } from '../utils/dateUtils';
 
 const SCHOOL_THEME = MODULE_COLORS.school;

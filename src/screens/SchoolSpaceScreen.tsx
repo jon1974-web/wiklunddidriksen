@@ -224,11 +224,22 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       navigation.navigate('PhotoActivity', { type: route.params.openPhotoForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, _t: Date.now() });
       navigation.setParams({ openPhotoForType: undefined });
     }
-    if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && selectedChild && !route?.params?.openVoiceForType && !route?.params?.openPhotoForType) {
-      setEditingActivityId(null);
-      setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
-      setShowAddActivityModal(true);
-      navigation.setParams({ openAddSection: undefined });
+    if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && !route?.params?.openVoiceForType && !route?.params?.openPhotoForType) {
+      // Auto-select child if childId is passed
+      if (route?.params?.childId && children.length > 0 && !selectedChild) {
+        const child = children.find(c => c.id === route.params!.childId);
+        if (child) {
+          setSelectedChild(child);
+          navigation.setParams({ childId: undefined } as any);
+        }
+      }
+      // Open modal when child is selected
+      if (selectedChild) {
+        setEditingActivityId(null);
+        setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
+        setShowAddActivityModal(true);
+        navigation.setParams({ openAddSection: undefined });
+      }
     }
     if (route?.params?.editActivityId) {
       // Auto-select the child if passed
