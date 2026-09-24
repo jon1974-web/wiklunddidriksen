@@ -245,14 +245,14 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
             </View>
           ))}
 
-          {entries.length === 0 && currentSchedule && (
+          {(currentSchedule?.entries || []).length === 0 && currentSchedule && (
             <View style={[styles.imageCard, { backgroundColor: colors.surface }]}>
               <Text style={[styles.imageTitle, { color: colors.textSecondary }]}>{t('school.originalPhoto')}</Text>
               <Image source={{ uri: currentSchedule.imageUrl }} style={styles.scheduleImage} resizeMode="contain" />
             </View>
           )}
 
-          {entries.length === 0 && !currentSchedule && !uploading && (
+          {(currentSchedule?.entries || []).length === 0 && !currentSchedule && !uploading && (
             <View style={styles.emptyState}>
               <AppIcon name="ai" size={48} color={colors.textDisabled} />
               <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>{t('school.noSchedule')}</Text>
