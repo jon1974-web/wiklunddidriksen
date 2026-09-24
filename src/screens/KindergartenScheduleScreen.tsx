@@ -5,29 +5,29 @@ import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { AppIcon } from '../components/AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
-import { SchoolChild, SchoolYear, SchoolSchedule, SchoolScheduleEntry } from '../types';
+import { KindergartenChild, KindergartenYear, KindergartenSchedule, SchoolScheduleEntry } from '../types';
 import { useUserStore } from '../store/userStore';
-import { getSchoolSchedules, addSchoolSchedule, updateSchoolSchedule, deleteSchoolSchedule } from '../services/schoolService';
+import { getKindergartenSchedules, addKindergartenSchedule, updateKindergartenSchedule, deleteKindergartenSchedule } from '../services/kindergartenService';
 import { crossAlert } from '../utils/alert';
 import * as ImagePicker from 'expo-image-picker';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { auth } from '../services/firebase';
 import { ActionModal } from '../components/ActionModal';
 
-const SCHOOL_THEME = MODULE_COLORS.school;
+const KG_THEME = MODULE_COLORS.kindergarten;
 const DAYS = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag'];
 
 interface Props {
   navigation: any;
-  route: { params: { child: SchoolChild; selectedYear: SchoolYear | null } };
+  route: { params: { child: KindergartenChild; selectedYear: KindergartenYear | null } };
 }
 
-export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => {
+export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { child, selectedYear } = route.params;
   const familyId = useUserStore((state) => state.familyId);
-  const [schedules, setSchedules] = useState<SchoolSchedule[]>([]);
+  const [schedules, setSchedules] = useState<KindergartenSchedule[]>([]);
   const [semester, setSemester] = useState<'høst' | 'vår'>('høst');
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
@@ -41,7 +41,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
 
   const loadSchedules = useCallback(async () => {
     if (!familyId || !selectedYear) return;
-    const data = await getSchoolSchedules(familyId, selectedYear.id);
+    const data = await getKindergartenSchedules(familyId, selectedYear.id);
     setSchedules(data);
   }, [familyId, selectedYear]);
 
@@ -49,7 +49,6 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
 
   const currentSchedule = schedules.find(s => s.semester === semester);
 
-  // Group entries by day for read view
   const grouped = DAYS.map(day => ({
     day,
     items: (currentSchedule?.entries || []).filter(e => e.day?.toLowerCase() === day.toLowerCase()).sort((a, b) => (a.time || '').localeCompare(b.time || '')),
@@ -68,7 +67,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
     const allEntries: SchoolScheduleEntry[] = [];
     DAYS.forEach(d => { (editEntries[d] || []).forEach(e => allEntries.push(e)); });
     try {
-      await updateSchoolSchedule(currentSchedule.id, { entries: allEntries });
+      await updateKindergartenSchedule(currentSchedule.id, { entries: allEntries });
       setEditMode(false);
       loadSchedules();
     } catch (e) {
@@ -133,9 +132,9 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
       const fileName = `schedule_${semester}_${Date.now()}.jpg`;
 
       const { webUploadFile } = await import('../services/webStorage');
-      const downloadURL = await webUploadFile(`school-schedules/${familyId}/${fileName}`, blob);
+      const downloadURL = await webUploadFile(`kindergarten-schedules/${familyId}/${fileName}`, blob);
 
-      const scheduleId = await addSchoolSchedule({
+      const scheduleId = await addKindergartenSchedule({
         yearId: selectedYear!.id,
         childId: child.id,
         semester,
@@ -163,7 +162,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
           const data = await aiRes.json();
           console.log('AI response data:', JSON.stringify(data).substring(0, 200));
           if (data.schedule && Array.isArray(data.schedule) && data.schedule.length > 0) {
-            await updateSchoolSchedule(scheduleId, { entries: data.schedule });
+            await updateKindergartenSchedule(scheduleId, { entries: data.schedule });
             crossAlert(t('common.success'), `${data.schedule.length} ${t('school.entriesExtracted')}`);
           } else {
             crossAlert(t('school.noDataFound'), t('school.tryAgainPhoto'));
@@ -190,7 +189,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
   const handleDeleteSchedule = async () => {
     if (!currentSchedule) return;
     try {
-      await deleteSchoolSchedule(currentSchedule.id);
+      await deleteKindergartenSchedule(currentSchedule.id);
       setShowDeleteModal(false);
       loadSchedules();
     } catch (e) {
@@ -198,15 +197,14 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
     }
   };
 
-  // READ VIEW
   if (!editMode) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
         <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: SCHOOL_THEME }]}>
-            <Text style={{ color: SCHOOL_THEME, fontSize: 18 }}>←</Text>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: KG_THEME }]}>
+            <Text style={{ color: KG_THEME, fontSize: 18 }}>←</Text>
           </TouchableOpacity>
-          <AppIcon name="schedule" size={24} color={SCHOOL_THEME} />
+          <AppIcon name="schedule" size={24} color={KG_THEME} />
           <Text style={[styles.headerTitle, { color: colors.text }]}>{t('school.schedule')} — {child.name}</Text>
           {currentSchedule && (
             <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={{ padding: 8 }}>
@@ -217,16 +215,15 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
 
         <View style={[styles.semesterRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
           {(['høst', 'vår'] as const).map(s => (
-            <TouchableOpacity key={s} style={[styles.semesterTab, { backgroundColor: semester === s ? SCHOOL_THEME : 'transparent' }]} onPress={() => setSemester(s)}>
+            <TouchableOpacity key={s} style={[styles.semesterTab, { backgroundColor: semester === s ? KG_THEME : 'transparent' }]} onPress={() => setSemester(s)}>
               <Text style={{ color: semester === s ? '#fff' : colors.text, fontWeight: '600', fontSize: 14 }}>{s === 'høst' ? t('school.autumn') : t('school.spring')}</Text>
             </TouchableOpacity>
           ))}
         </View>
 
         <ScrollView style={{ flex: 1, padding: 12 }}>
-          {/* AI Upload + Edit buttons */}
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
-            <TouchableOpacity style={[styles.uploadBtn, { backgroundColor: SCHOOL_THEME, flex: 1 }]} onPress={handleUploadPhoto} disabled={uploading || analyzing}>
+            <TouchableOpacity style={[styles.uploadBtn, { backgroundColor: KG_THEME, flex: 1 }]} onPress={handleUploadPhoto} disabled={uploading || analyzing}>
               {uploading || analyzing ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
@@ -244,11 +241,10 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
             )}
           </View>
 
-          {/* Monday-Friday grid */}
           {grouped.map(({ day, items }) => (
             <View key={day} style={[styles.daySection, { backgroundColor: colors.surface }]}>
-              <View style={[styles.dayHeader, { backgroundColor: SCHOOL_THEME + '15' }]}>
-                <Text style={[styles.dayTitle, { color: SCHOOL_THEME }]}>{day}</Text>
+              <View style={[styles.dayHeader, { backgroundColor: KG_THEME + '15' }]}>
+                <Text style={[styles.dayTitle, { color: KG_THEME }]}>{day}</Text>
                 <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{items.length} {items.length === 1 ? 'time' : 'timer'}</Text>
               </View>
               {items.length > 0 ? items.map((item, i) => (
@@ -286,16 +282,15 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
     );
   }
 
-  // EDIT VIEW
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => setEditMode(false)} style={[styles.backBtn, { borderColor: SCHOOL_THEME }]}>
-          <Text style={{ color: SCHOOL_THEME, fontSize: 18 }}>←</Text>
+        <TouchableOpacity onPress={() => setEditMode(false)} style={[styles.backBtn, { borderColor: KG_THEME }]}>
+          <Text style={{ color: KG_THEME, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
-        <AppIcon name="pencil" size={24} color={SCHOOL_THEME} />
+        <AppIcon name="pencil" size={24} color={KG_THEME} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>{t('school.editSchedule')} — {child.name}</Text>
-        <TouchableOpacity onPress={handleSaveEdit} style={[styles.saveBtn, { backgroundColor: SCHOOL_THEME }]}>
+        <TouchableOpacity onPress={handleSaveEdit} style={[styles.saveBtn, { backgroundColor: KG_THEME }]}>
           <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>{t('common.save')}</Text>
         </TouchableOpacity>
       </View>
@@ -303,9 +298,9 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
       <ScrollView style={{ flex: 1, padding: 12 }}>
         {DAYS.map(day => (
           <View key={day} style={[styles.daySection, { backgroundColor: colors.surface }]}>
-            <View style={[styles.dayHeader, { backgroundColor: SCHOOL_THEME + '15' }]}>
-              <Text style={[styles.dayTitle, { color: SCHOOL_THEME }]}>{day}</Text>
-              <TouchableOpacity onPress={() => handleAddToDay(day)} style={[styles.addDayBtn, { backgroundColor: SCHOOL_THEME }]}>
+            <View style={[styles.dayHeader, { backgroundColor: KG_THEME + '15' }]}>
+              <Text style={[styles.dayTitle, { color: KG_THEME }]}>{day}</Text>
+              <TouchableOpacity onPress={() => handleAddToDay(day)} style={[styles.addDayBtn, { backgroundColor: KG_THEME }]}>
                 <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>+ {t('school.addEntry')}</Text>
               </TouchableOpacity>
             </View>
@@ -325,7 +320,6 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
         ))}
       </ScrollView>
 
-      {/* Add Entry Modal */}
       {newEntryDay && (
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
@@ -340,7 +334,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => setNewEntryDay(null)}>
                 <Text style={{ color: colors.text, fontWeight: '600' }}>{t('common.cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: SCHOOL_THEME, flex: 1 }]} onPress={confirmAddEntry}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: KG_THEME, flex: 1 }]} onPress={confirmAddEntry}>
                 <Text style={{ color: '#fff', fontWeight: '600' }}>{t('common.add')}</Text>
               </TouchableOpacity>
             </View>

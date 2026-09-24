@@ -52,6 +52,11 @@ import { SchoolContactsScreen } from './src/screens/SchoolContactsScreen';
 import { SchoolScheduleScreen } from './src/screens/SchoolScheduleScreen';
 import { SchoolActivitiesScreen } from './src/screens/SchoolActivitiesScreen';
 import { SchoolHolidaysScreen } from './src/screens/SchoolHolidaysScreen';
+import { KindergartenDetailScreen } from './src/screens/KindergartenDetailScreen';
+import { KindergartenContactsScreen } from './src/screens/KindergartenContactsScreen';
+import { KindergartenScheduleScreen } from './src/screens/KindergartenScheduleScreen';
+import { KindergartenActivitiesScreen } from './src/screens/KindergartenActivitiesScreen';
+import { KindergartenHolidaysScreen } from './src/screens/KindergartenHolidaysScreen';
 import { SchoolActivityDetailScreen } from './src/screens/SchoolActivityDetailScreen';
 import { KindergartenActivityDetailScreen } from './src/screens/KindergartenActivityDetailScreen';
 import { HealthMedDetailScreen } from './src/screens/HealthMedDetailScreen';
@@ -134,6 +139,11 @@ type RootStackParamList = {
   SchoolActivities: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null };
   SchoolHolidays: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null };
   KindergartenSpace: undefined;
+  KindergartenDetail: { child: import('./src/types').KindergartenChild; selectedYear?: import('./src/types').KindergartenYear | null };
+  KindergartenContacts: { child: import('./src/types').KindergartenChild; selectedYear: import('./src/types').KindergartenYear | null; years: import('./src/types').KindergartenYear[] };
+  KindergartenSchedule: { child: import('./src/types').KindergartenChild; selectedYear: import('./src/types').KindergartenYear | null };
+  KindergartenActivities: { child: import('./src/types').KindergartenChild; selectedYear: import('./src/types').KindergartenYear | null };
+  KindergartenHolidays: { child: import('./src/types').KindergartenChild; selectedYear: import('./src/types').KindergartenYear | null };
   SchoolAI: { childId: string; yearId: string; familyId: string };
   SchoolContactDetail: { contact: any };
   AddTrip: undefined;
@@ -424,6 +434,31 @@ const TripsStack = () => {
         <Stack.Screen
           name="KindergartenSpace"
           component={KindergartenSpaceScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="KindergartenDetail"
+          component={KindergartenDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="KindergartenContacts"
+          component={KindergartenContactsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="KindergartenSchedule"
+          component={KindergartenScheduleScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="KindergartenActivities"
+          component={KindergartenActivitiesScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="KindergartenHolidays"
+          component={KindergartenHolidaysScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen

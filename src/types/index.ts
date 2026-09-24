@@ -729,6 +729,7 @@ export interface KindergartenSchedule {
   semester: 'høst' | 'vår';
   imageUrl: string;
   fileName: string;
+  entries?: SchoolScheduleEntry[];
   familyId: string;
   createdAt: number;
 }
