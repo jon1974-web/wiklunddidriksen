@@ -26,8 +26,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
 
   const loadActivities = useCallback(async () => {
     if (!familyId || !child) return;
-    const { getSchoolActivities: load } = await import('../services/schoolService');
-    const data = await load(familyId, child.id);
+    const data = await getSchoolActivities(familyId, child.id);
     setActivities(data);
   }, [familyId, child]);
 
@@ -78,28 +77,28 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
             </TouchableOpacity>
           </View>
           {sorted.map(a => {
-          const isPast = (a.dateTo || a.dateFrom) < today;
-          return (
-            <TouchableOpacity key={a.id} style={[styles.activityCard, { backgroundColor: colors.surface, opacity: isPast ? 0.6 : 1 }]} onPress={() => navigation.navigate('SchoolActivityDetail', { activity: a, childId: child.id, yearId: selectedYear?.id })}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <View style={[styles.activityIcon, { backgroundColor: SCHOOL_THEME + '15' }]}>
-                  <AppIcon name="activities" size={20} color={SCHOOL_THEME} />
+            const isPast = (a.dateTo || a.dateFrom) < today;
+            return (
+              <TouchableOpacity key={a.id} style={[styles.activityCard, { backgroundColor: colors.surface, opacity: isPast ? 0.6 : 1 }]} onPress={() => navigation.navigate('SchoolActivityDetail', { activity: a, childId: child.id, yearId: selectedYear?.id })}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                  <View style={[styles.activityIcon, { backgroundColor: SCHOOL_THEME + '15' }]}>
+                    <AppIcon name="activities" size={20} color={SCHOOL_THEME} />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''} {a.startTime ? `${a.startTime}–${a.endTime || ''}` : ''}</Text>
+                  </View>
+                  <Text style={[styles.badge, { backgroundColor: isPast ? '#E8F5E9' : '#FFF3E0', color: isPast ? '#43A047' : '#FB8C00' }]}>{isPast ? t('health.completed') : getDaysUntil(a.dateFrom)}</Text>
                 </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
-                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''} {a.startTime ? `${a.startTime}–${a.endTime || ''}` : ''}</Text>
-                </View>
-                <Text style={[styles.badge, { backgroundColor: isPast ? '#E8F5E9' : '#FFF3E0', color: isPast ? '#43A047' : '#FB8C00' }]}>{isPast ? t('health.completed') : getDaysUntil(a.dateFrom)}</Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
-        {activities.length === 0 && (
-          <View style={styles.emptyState}>
-            <AppIcon name="activities" size={48} color={colors.textDisabled} />
-            <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>{t('school.noActivities')}</Text>
-          </View>
-        )}
+              </TouchableOpacity>
+            );
+          })}
+          {activities.length === 0 && (
+            <View style={styles.emptyState}>
+              <AppIcon name="activities" size={48} color={colors.textDisabled} />
+              <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>{t('school.noActivities')}</Text>
+            </View>
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -110,10 +109,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   header: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1 },
   screenTitle: { fontSize: 22, fontWeight: '700' },
-  backBtn: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-  headerTitle: { fontSize: 16, fontWeight: '700', flex: 1 },
-  addBtn: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
-  sectionLabel: { fontSize: 12, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
+  addBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
   activityCard: { padding: 12, borderRadius: 10, marginBottom: 6 },
   activityIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   emptyState: { alignItems: 'center', marginTop: 60 },
@@ -121,5 +117,4 @@ const styles = StyleSheet.create({
   section: { borderRadius: 12, marginBottom: 10, overflow: 'hidden' },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderBottomWidth: 1, borderBottomColor: '#e8e8e8' },
   sectionTitle: { fontSize: 15, fontWeight: '700' },
-  addBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
 });
