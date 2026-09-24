@@ -34,8 +34,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
   useEffect(() => { loadActivities(); }, [loadActivities]);
 
   const today = new Date().toISOString().split('T')[0];
-  const upcoming = activities.filter(a => (a.dateTo || a.dateFrom) >= today).sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
-  const past = activities.filter(a => (a.dateTo || a.dateFrom) < today).sort((a, b) => (b.dateFrom || '').localeCompare(a.dateFrom || ''));
+  const sorted = [...activities].sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
 
   const getDaysUntil = (dateStr: string): string => {
     const diff = Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
@@ -47,56 +46,36 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: KG_THEME }]}>
+      <View style={{ paddingHorizontal: 16, paddingTop: 12 }}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: KG_THEME, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: KG_THEME, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
-        <AppIcon name="activities" size={24} color={KG_THEME} />
-        <Text style={[styles.headerTitle, { color: colors.text }]}>{t('school.activities')} — {child.name}</Text>
-        <TouchableOpacity style={[styles.addBtn, { backgroundColor: KG_THEME }]} onPress={() => navigation.navigate('KindergartenSpace', { openAddSection: 'activities', childId: child.id, yearId: selectedYear?.id })}>
-          <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
-        </TouchableOpacity>
+      </View>
+      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <AppIcon name="activities" size={28} color={KG_THEME} />
+          <Text style={[styles.screenTitle, { color: colors.text }]}>{t('school.activities')}</Text>
+        </View>
       </View>
 
       <ScrollView style={{ flex: 1, padding: 12 }}>
-        {upcoming.length > 0 && (
-          <>
-            <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>{t('events.upcoming')} ({upcoming.length})</Text>
-            {upcoming.map(a => (
-              <TouchableOpacity key={a.id} style={[styles.activityCard, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('KindergartenActivityDetail', { activity: a, childId: child.id, yearId: selectedYear?.id })}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={[styles.activityIcon, { backgroundColor: KG_THEME + '15' }]}>
-                    <AppIcon name="activities" size={20} color={KG_THEME} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
-                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''} {a.startTime ? `${a.startTime}–${a.endTime || ''}` : ''}</Text>
-                  </View>
-                  <Text style={[styles.badge, { backgroundColor: '#FFF3E0', color: '#FB8C00' }]}>{getDaysUntil(a.dateFrom)}</Text>
+        {sorted.map(a => {
+          const isPast = (a.dateTo || a.dateFrom) < today;
+          return (
+            <TouchableOpacity key={a.id} style={[styles.activityCard, { backgroundColor: colors.surface, opacity: isPast ? 0.6 : 1 }]} onPress={() => navigation.navigate('KindergartenActivityDetail', { activity: a, childId: child.id, yearId: selectedYear?.id })}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <View style={[styles.activityIcon, { backgroundColor: KG_THEME + '15' }]}>
+                  <AppIcon name="activities" size={20} color={KG_THEME} />
                 </View>
-              </TouchableOpacity>
-            ))}
-          </>
-        )}
-        {past.length > 0 && (
-          <>
-            <Text style={[styles.sectionLabel, { color: colors.textSecondary, marginTop: 16 }]}>{t('events.past')} ({past.length})</Text>
-            {past.map(a => (
-              <TouchableOpacity key={a.id} style={[styles.activityCard, { backgroundColor: colors.surface, opacity: 0.6 }]} onPress={() => navigation.navigate('KindergartenActivityDetail', { activity: a, childId: child.id, yearId: selectedYear?.id })}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <View style={[styles.activityIcon, { backgroundColor: KG_THEME + '15' }]}>
-                    <AppIcon name="activities" size={20} color={KG_THEME} />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
-                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''}</Text>
-                  </View>
-                  <Text style={[styles.badge, { backgroundColor: '#E8F5E9', color: '#43A047' }]}>{t('health.completed')}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
+                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''} {a.startTime ? `${a.startTime}–${a.endTime || ''}` : ''}</Text>
                 </View>
-              </TouchableOpacity>
-            ))}
-          </>
-        )}
+                <Text style={[styles.badge, { backgroundColor: isPast ? '#E8F5E9' : '#FFF3E0', color: isPast ? '#43A047' : '#FB8C00' }]}>{isPast ? t('health.completed') : getDaysUntil(a.dateFrom)}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
         {activities.length === 0 && (
           <View style={styles.emptyState}>
             <AppIcon name="activities" size={48} color={colors.textDisabled} />
