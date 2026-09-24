@@ -224,37 +224,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       navigation.navigate('PhotoActivity', { type: route.params.openPhotoForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, _t: Date.now() });
       navigation.setParams({ openPhotoForType: undefined });
     }
-    if (route?.params?.openAddSection === 'activities' && familyId && selectedYear && !route?.params?.openVoiceForType && !route?.params?.openPhotoForType) {
-      // Auto-select child if childId is passed
-      if (route?.params?.childId && children.length > 0 && !selectedChild) {
-        const child = children.find(c => c.id === route.params!.childId);
-        if (child) {
-          setSelectedChild(child);
-          navigation.setParams({ childId: undefined } as any);
-        }
-      }
-      // Open modal when child is selected
-      if (selectedChild) {
-        setEditingActivityId(null);
-        setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
-        setShowAddActivityModal(true);
-        navigation.setParams({ openAddSection: undefined });
-      }
-    }
-    if (route?.params?.editActivityId) {
-      // Auto-select the child if passed
-      if (route?.params?.childId && (!selectedChild || selectedChild.id !== route.params.childId)) {
-        const child = children.find(c => c.id === route.params!.childId);
-        if (child) { setSelectedChild(child); return; }
-      }
-      if (selectedChild) {
-        setEditingActivityId(route.params!.editActivityId);
-        setActivityForm(route.params!.editActivityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: '', documents: [] });
-        setShowAddActivityModal(true);
-        navigation.setParams({ editActivityId: undefined, editActivityData: undefined, childId: undefined });
-      }
-    }
-  }, [route?.params?.openAddSection, route?.params?.editActivityId, familyId, selectedYear, selectedChild, children]);
+  }, [route?.params?.openVoiceForType, route?.params?.openPhotoForType, familyId, selectedYear, selectedChild]);
 
   useEffect(() => {
     if (selectedChild && years.length > 0 && !selectedYear) {
@@ -262,20 +232,36 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     }
   }, [years, selectedChild]);
 
-  // Auto-select child when navigated with childId param (from AI assistant)
+  // Auto-select child when navigated with childId param (from AI assistant or detail screen)
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       const childId = route?.params?.childId;
-      if (childId && children.length > 0) {
-        const child = children.find(c => c.id === childId);
-        if (child) {
-          setSelectedChild(child);
-          navigation.setParams({ childId: undefined } as any);
+      const editId = route?.params?.editActivityId;
+      if ((childId || editId) && children.length > 0) {
+        // Auto-select child if needed
+        if (childId && (!selectedChild || selectedChild.id !== childId)) {
+          const child = children.find(c => c.id === childId);
+          if (child) setSelectedChild(child);
+        }
+        // Open edit modal if editActivityId is passed
+        if (editId && selectedChild) {
+          const activityData = route?.params?.editActivityData;
+          setEditingActivityId(editId);
+          setActivityForm(activityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: '', documents: [] });
+          setShowAddActivityModal(true);
+          navigation.setParams({ editActivityId: undefined, editActivityData: undefined, childId: undefined } as any);
+        }
+        // Open add modal if openAddSection is set
+        if (route?.params?.openAddSection === 'activities' && selectedChild) {
+          setEditingActivityId(null);
+          setActivityForm({ title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
+          setShowAddActivityModal(true);
+          navigation.setParams({ openAddSection: undefined, childId: undefined } as any);
         }
       }
     });
     return unsubscribe;
-  }, [navigation, route?.params?.childId, children]);
+  }, [navigation, route?.params?.childId, route?.params?.editActivityId, route?.params?.openAddSection, children, selectedChild]);
 
   const handleSaveChild = async () => {
     if (!familyId) return;

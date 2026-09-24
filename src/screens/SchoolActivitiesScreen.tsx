@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, TouchableWithoutFeedback } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,11 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { SchoolChild, SchoolYear, SchoolActivity } from '../types';
 import { useUserStore } from '../store/userStore';
 import { getSchoolActivities, addSchoolActivity } from '../services/schoolService';
-import { formatDate } from '../utils/dateUtils';
+import { formatDate, getTodayLocal } from '../utils/dateUtils';
+import { crossAlert } from '../utils/alert';
+import { REMINDER_OPTIONS } from '../constants/reminderOptions';
+import { GooglePlacesInput } from '../components/GooglePlacesInput';
+import { DatePickerModal } from '../components/DatePickerModal';
 
 const SCHOOL_THEME = MODULE_COLORS.school;
 
@@ -22,7 +26,17 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
   const { colors } = useTheme();
   const { child, selectedYear } = route.params;
   const familyId = useUserStore((state) => state.familyId);
+  const user = useUserStore((state) => state.user);
   const [activities, setActivities] = useState<SchoolActivity[]>([]);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [activePicker, setActivePicker] = useState<string | null>(null);
+  const [activityForm, setActivityForm] = useState({
+    title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte',
+    dateFrom: getTodayLocal(), dateTo: getTodayLocal(),
+    startTime: '10:00', endTime: '11:00',
+    location: '', note: '', reminder: 0,
+    documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[],
+  });
 
   const loadActivities = useCallback(async () => {
     if (!familyId || !child) return;
@@ -31,6 +45,36 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
   }, [familyId, child]);
 
   useEffect(() => { loadActivities(); }, [loadActivities]);
+
+  // Auto-open modal when navigated with openAddSection
+  useEffect(() => {
+    if (route?.params?.openAddSection === 'activities' && route?.params?.childId === child.id) {
+      setShowAddModal(true);
+      navigation.setParams({ openAddSection: undefined, childId: undefined } as any);
+    }
+  }, [route?.params?.openAddSection, route?.params?.childId]);
+
+  const handleSave = async () => {
+    if (!familyId || !selectedYear || !child) return;
+    if (!activityForm.title.trim() || !activityForm.dateFrom) {
+      crossAlert(t('common.error'), t('health.enterTitleAndDate'));
+      return;
+    }
+    try {
+      await addSchoolActivity({
+        ...activityForm,
+        childId: child.id,
+        yearId: selectedYear.id,
+        familyId,
+        createdBy: user?.uid || '',
+      });
+      setShowAddModal(false);
+      setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
+      loadActivities();
+    } catch (e) {
+      crossAlert(t('common.error'), t('common.error'));
+    }
+  };
 
   const today = new Date().toISOString().split('T')[0];
   const sorted = [...activities].sort((a, b) => {
@@ -48,6 +92,19 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
     if (diff === 0) return t('health.today');
     if (diff === 1) return t('health.tomorrow');
     return t('health.inDays', { count: diff });
+  };
+
+  const isTimePicker = activePicker?.includes('time') || activePicker === 'endTime';
+  const getPickerTitle = () => {
+    if (activePicker === 'dateFrom') return t('school.activityDateFrom');
+    if (activePicker === 'dateTo') return t('school.activityDateTo');
+    if (activePicker === 'startTime') return t('school.activityStartTime');
+    if (activePicker === 'endTime') return t('school.activityEndTime');
+    return '';
+  };
+  const getPickerValue = () => {
+    if (!activePicker) return '';
+    return activityForm[activePicker as keyof typeof activityForm] as string || '';
   };
 
   return (
@@ -72,7 +129,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
               <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.activities')}</Text>
               <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({activities.length})</Text>
             </View>
-            <TouchableOpacity style={[styles.addBtn, { backgroundColor: SCHOOL_THEME }]} onPress={() => navigation.navigate('SchoolSpace', { openAddSection: 'activities', childId: child.id, yearId: selectedYear?.id })}>
+            <TouchableOpacity style={[styles.addBtn, { backgroundColor: SCHOOL_THEME }]} onPress={() => setShowAddModal(true)}>
               <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
             </TouchableOpacity>
           </View>
@@ -101,6 +158,108 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
           )}
         </View>
       </ScrollView>
+
+      {/* Add Activity Modal */}
+      <Modal visible={showAddModal} transparent animationType="slide">
+        <TouchableWithoutFeedback onPress={() => setShowAddModal(false)}>
+          <View style={styles.modalOverlay}>
+            <TouchableWithoutFeedback>
+              <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '85%' }]}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('school.addActivity')}</Text>
+                <ScrollView>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('school.activityType')}</Text>
+                    <View style={{ flexDirection: 'row', gap: 8 }}>
+                      {(['tur', 'aktivitet', 'møte'] as const).map((type) => (
+                        <TouchableOpacity key={type} style={[styles.personChip, { backgroundColor: activityForm.activityType === type ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setActivityForm(f => ({ ...f, activityType: type }))}>
+                          <Text style={{ color: activityForm.activityType === type ? '#fff' : colors.text, fontSize: 13 }}>{type === 'tur' ? t('school.activityTypeTur') : type === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte')}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('school.activityTitle')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.title} onChangeText={(v) => setActivityForm(f => ({ ...f, title: v }))} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDateFrom')}</Text>
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('dateFrom')}>
+                        <Text style={{ color: activityForm.dateFrom ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.dateFrom || 'Velg dato'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityDateTo')}</Text>
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('dateTo')}>
+                        <Text style={{ color: activityForm.dateTo ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.dateTo || '—'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={{ flexDirection: 'row', gap: 12 }}>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityStartTime')}</Text>
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('startTime')}>
+                        <Text style={{ color: activityForm.startTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.startTime || 'Velg tid'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                    <View style={[styles.field, { flex: 1 }]}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('school.activityEndTime')}</Text>
+                      <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActivePicker('endTime')}>
+                        <Text style={{ color: activityForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.endTime || 'Velg tid'}</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('school.activityLocation')}</Text>
+                    <GooglePlacesInput
+                      value={activityForm.location}
+                      onChangeText={(v) => setActivityForm(f => ({ ...f, location: v }))}
+                      placeholder="Søk etter adresse..."
+                      onSelect={(v) => setActivityForm(f => ({ ...f, location: v }))}
+                    />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('school.activityNote')}</Text>
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.note} onChangeText={(v) => setActivityForm(f => ({ ...f, note: v }))} placeholderTextColor={colors.textDisabled} multiline numberOfLines={3} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                      {REMINDER_OPTIONS.map((option) => (
+                        <TouchableOpacity key={option.value} style={[styles.personChip, { backgroundColor: activityForm.reminder === option.value ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setActivityForm(f => ({ ...f, reminder: option.value }))}>
+                          <Text style={{ color: activityForm.reminder === option.value ? '#fff' : colors.text, fontSize: 13 }}>{option.label}</Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                </ScrollView>
+                <View style={{ flexDirection: 'row', gap: 10, marginTop: 16, paddingHorizontal: 16 }}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => setShowAddModal(false)}>
+                    <Text style={{ color: colors.text, fontWeight: '600' }}>{t('common.cancel')}</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: SCHOOL_THEME, flex: 1 }]} onPress={handleSave}>
+                    <Text style={{ color: '#fff', fontWeight: '600' }}>{t('common.save')}</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      <DatePickerModal
+        visible={activePicker !== null}
+        title={getPickerTitle()}
+        mode={isTimePicker ? 'time' : 'date'}
+        dateOffset={isTimePicker ? 0 : -365}
+        dateCount={isTimePicker ? 48 : 730}
+        selectedValue={getPickerValue()}
+        onSelect={(v) => {
+          if (activePicker) setActivityForm(f => ({ ...f, [activePicker]: v }));
+          setActivePicker(null);
+        }}
+        onClose={() => setActivePicker(null)}
+      />
     </SafeAreaView>
   );
 };
@@ -117,4 +276,12 @@ const styles = StyleSheet.create({
   section: { borderRadius: 12, marginBottom: 10, overflow: 'hidden' },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderBottomWidth: 1, borderBottomColor: '#e8e8e8' },
   sectionTitle: { fontSize: 15, fontWeight: '700' },
+  field: { marginBottom: 10 },
+  label: { fontSize: 13, fontWeight: '600', marginBottom: 4, marginTop: 8 },
+  input: { borderWidth: 1, borderRadius: 8, padding: 10, fontSize: 16, borderColor: '#e0e0e0' },
+  personChip: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, padding: 20 },
+  modalTitle: { fontSize: 18, fontWeight: '700', marginBottom: 16 },
+  modalBtn: { paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
 });
