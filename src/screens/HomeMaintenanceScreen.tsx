@@ -562,6 +562,23 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
               </View>
 
               <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {persons.map(p => {
+                    const isSelected = svcPersons.includes(p);
+                    return (
+                      <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? HOME_THEME : colors.surface, borderColor: isSelected ? HOME_THEME : colors.border, borderWidth: 1.5 }]} onPress={() => setSvcPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}>
+                        <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                {svcPersons.length === 0 && (
+                  <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
+                )}
+              </View>
+
+              <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('homes.description')}</Text>
                 <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, { minHeight: 60, textAlignVertical: 'top' }]} value={svcDescription} onChangeText={setSvcDescription} placeholder={t('homes.descriptionPlaceholder')} placeholderTextColor={colors.textDisabled} multiline numberOfLines={2} />
               </View>
@@ -600,23 +617,6 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
                     );
                   })}
                 </View>
-              </View>
-
-              <View style={styles.field}>
-                <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
-                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
-                  {persons.map(p => {
-                    const isSelected = svcPersons.includes(p);
-                    return (
-                      <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? HOME_THEME : colors.surface, borderColor: isSelected ? HOME_THEME : colors.border, borderWidth: 1.5 }]} onPress={() => setSvcPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}>
-                        <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-                {svcPersons.length === 0 && (
-                  <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
-                )}
               </View>
 
               <View style={styles.field}>

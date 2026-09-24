@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useUserStore } from '../store/userStore';
@@ -11,6 +11,8 @@ import { TRIP_ICONS } from '../constants/tripIcons';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { geocodeCity } from '../services/weatherService';
 import { useTranslation } from 'react-i18next';
+import { getFamilyMembersWithRoles } from '../services/familyService';
+import { crossAlert } from '../utils/alert';
 
 interface AddTripScreenProps {
   navigation: any;
@@ -27,21 +29,34 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   const [endTime, setEndTime] = useState('');
   const [icon, setIcon] = useState('✈️');
   const [activePicker, setActivePicker] = useState<'start' | 'end' | 'startTime' | 'endTime' | null>(null);
+  const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
+  const [persons, setPersons] = useState<string[]>([]);
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
 
+  useEffect(() => {
+    if (!familyId) return;
+    getFamilyMembersWithRoles(familyId).then((members) => {
+      setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+    }).catch(() => {});
+  }, [familyId]);
+
   const handleSave = useCallback(async () => {
     if (!title.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en tittel');
+      crossAlert('Error', 'Vennligst skriv en tittel');
+      return;
+    }
+    if (selectedPersons.length === 0) {
+      crossAlert(t('common.error'), t('trips.personRequired'));
       return;
     }
     if (!city.trim()) {
-      Alert.alert('Error', 'Vennligst skriv en by');
+      crossAlert('Error', 'Vennligst skriv en by');
       return;
     }
     if (endDate < startDate) {
-      Alert.alert('Error', 'Sluttdato kan ikke være før startdato');
+      crossAlert('Error', 'Sluttdato kan ikke være før startdato');
       return;
     }
 
@@ -56,6 +71,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         ...(startTime ? { startTime } : {}),
         ...(endTime ? { endTime } : {}),
         icon,
+        persons: selectedPersons,
         ...(coords ? { latitude: coords.latitude, longitude: coords.longitude } : {}),
         createdBy: user?.uid || '',
       }, familyId || '');
@@ -63,7 +79,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
-  }, [title, city, country, startDate, endDate, startTime, endTime, icon, user, familyId, navigation]);
+  }, [title, city, country, startDate, endDate, startTime, endTime, icon, selectedPersons, user, familyId, navigation]);
 
   return (
     <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.tripsBg }]}>
@@ -77,18 +93,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         <Text style={[styles.screenTitle, { color: colors.text }]}>{t('trips.addTrip')}</Text>
       </View>
 
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-          value={title}
-          onChange={setTitle}
-          onChangeText={setTitle}
-          placeholder="F.eks. Sommerferie i Spania"
-          placeholderTextColor={colors.textDisabled}
-        />
-      </View>
-
+      {/* Icon selection - at top */}
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
         <View style={styles.iconGrid}>
@@ -102,6 +107,36 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
             </TouchableOpacity>
           ))}
         </View>
+      </View>
+
+      {/* Title */}
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+          value={title}
+          onChangeText={setTitle}
+          placeholder="F.eks. Sommerferie i Spania"
+          placeholderTextColor={colors.textDisabled}
+        />
+      </View>
+
+      {/* Person selector - under title */}
+      <View style={styles.field}>
+        <Text style={[styles.label, { color: colors.text }]}>{t('trips.personLabel')}</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+          {persons.map(p => {
+            const isSelected = selectedPersons.includes(p);
+            return (
+              <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? MODULE_COLORS.trips : colors.surface, borderColor: isSelected ? MODULE_COLORS.trips : colors.border, borderWidth: 1.5 }]} onPress={() => setSelectedPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}>
+                <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+        {selectedPersons.length === 0 && (
+          <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('trips.personRequired')}</Text>
+        )}
       </View>
 
       <View style={styles.field}>
@@ -268,5 +303,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+  },
+  personChip: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
   },
 });

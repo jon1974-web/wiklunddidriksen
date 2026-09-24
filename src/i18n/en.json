@@ -180,7 +180,9 @@
     "allYears": "All",
     "startTime": "Start time",
     "endTime": "End time",
-    "optional": "optional"
+    "optional": "optional",
+    "personLabel": "Who is this trip for?",
+    "personRequired": "Select at least one person"
   },
   "spaces": {
     "title": "Our Places",

@@ -180,7 +180,9 @@
     "allYears": "Alle",
     "startTime": "Starttid",
     "endTime": "Sluttid",
-    "optional": "valgfritt"
+    "optional": "valgfritt",
+    "personLabel": "Hvem gjelder reisen for?",
+    "personRequired": "Velg minst én person"
   },
   "spaces": {
     "title": "Våre steder",

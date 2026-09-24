@@ -180,7 +180,9 @@
     "allYears": "Alla",
     "startTime": "Starttid",
     "endTime": "Sluttid",
-    "optional": "valfritt"
+    "optional": "valfritt",
+    "personLabel": "Vem gäller resan för?",
+    "personRequired": "Välj minst en person"
   },
   "spaces": {
     "title": "Våra platser",

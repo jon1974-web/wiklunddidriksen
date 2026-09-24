@@ -180,7 +180,9 @@
     "allYears": "Kaikki",
     "startTime": "Aloitusaika",
     "endTime": "Lopetusaika",
-    "optional": "valinnainen"
+    "optional": "valinnainen",
+    "personLabel": "Kenelle tämä matka koskee?",
+    "personRequired": "Valitse vähintään yksi henkilö"
   },
   "spaces": {
     "title": "Paikkamme",
