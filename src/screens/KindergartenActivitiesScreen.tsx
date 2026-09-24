@@ -34,8 +34,16 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
   useEffect(() => { loadActivities(); }, [loadActivities]);
 
   const today = new Date().toISOString().split('T')[0];
-  const upcoming = activities.filter(a => (a.dateTo || a.dateFrom) >= today);
-  const past = activities.filter(a => (a.dateTo || a.dateFrom) < today);
+  const upcoming = activities.filter(a => (a.dateTo || a.dateFrom) >= today).sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+  const past = activities.filter(a => (a.dateTo || a.dateFrom) < today).sort((a, b) => (b.dateFrom || '').localeCompare(a.dateFrom || ''));
+
+  const getDaysUntil = (dateStr: string): string => {
+    const diff = Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+    if (diff < 0) return t('health.past');
+    if (diff === 0) return t('health.today');
+    if (diff === 1) return t('health.tomorrow');
+    return t('health.inDays', { count: diff });
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
@@ -64,6 +72,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
                     <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
                     <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''} {a.startTime ? `${a.startTime}–${a.endTime || ''}` : ''}</Text>
                   </View>
+                  <Text style={[styles.badge, { backgroundColor: '#FFF3E0', color: '#FB8C00' }]}>{getDaysUntil(a.dateFrom)}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -82,6 +91,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
                     <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
                     <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''}</Text>
                   </View>
+                  <Text style={[styles.badge, { backgroundColor: '#E8F5E9', color: '#43A047' }]}>{t('health.completed')}</Text>
                 </View>
               </TouchableOpacity>
             ))}
@@ -108,4 +118,5 @@ const styles = StyleSheet.create({
   activityCard: { padding: 12, borderRadius: 10, marginBottom: 6 },
   activityIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   emptyState: { alignItems: 'center', marginTop: 60 },
+  badge: { fontSize: 11, fontWeight: '600', paddingVertical: 2, paddingHorizontal: 8, borderRadius: 10 },
 });
