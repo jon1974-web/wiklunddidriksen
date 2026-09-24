@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { auth } from '../services/firebase';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 
@@ -278,6 +279,10 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
 
   const handleCreate = useCallback(async () => {
     if (!parsedData || !user || creating) return;
+    if (showPerson && (!parsedData.person || parsedData.person.trim() === '')) {
+      crossAlert(t('common.error'), t('health.personRequired'));
+      return;
+    }
     setCreating(true);
 
     try {
@@ -493,7 +498,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
 
               {showPerson && (
                 <>
-                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('health.person')}</Text>
+                  <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('health.personLabel')}</Text>
                   <View style={styles.personRow}>
                     {persons.map(p => {
                       const selectedPersons = (parsedData.person || '').split(',').map(s => s.trim()).filter(Boolean);
@@ -501,7 +506,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
                       return (
                         <TouchableOpacity
                           key={p}
-                          style={[styles.personChip, { backgroundColor: isSelected ? accentColor : colors.inputBackground }]}
+                          style={[styles.personChip, { backgroundColor: isSelected ? MODULE_COLORS.health : colors.inputBackground }]}
                           onPress={() => {
                             const current = (parsedData.person || '').split(',').map(s => s.trim()).filter(Boolean);
                             const updated = isSelected ? current.filter(x => x !== p) : [...current, p];

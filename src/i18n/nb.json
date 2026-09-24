@@ -458,6 +458,8 @@
     "medicationName": "Navn på medisin",
     "medicationNamePlaceholder": "F.eks. Paracet 500mg",
     "person": "Person",
+    "personLabel": "Hvem gjelder avtalen for?",
+    "personRequired": "Velg minst én person",
     "dosage": "Dose",
     "dosagePlaceholder": "F.eks. 1 tablett",
     "frequency": "Frekvens",

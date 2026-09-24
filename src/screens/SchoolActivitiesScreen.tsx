@@ -13,6 +13,7 @@ import { crossAlert } from '../utils/alert';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
+import { getFamilyMembersWithRoles } from '../services/familyService';
 
 const SCHOOL_THEME = MODULE_COLORS.school;
 
@@ -30,6 +31,8 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
   const [activities, setActivities] = useState<SchoolActivity[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
   const [activePicker, setActivePicker] = useState<string | null>(null);
+  const [persons, setPersons] = useState<string[]>([]);
+  const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
   const [activityForm, setActivityForm] = useState({
     title: '', activityType: 'tur' as 'tur' | 'aktivitet' | 'møte',
     dateFrom: getTodayLocal(), dateTo: getTodayLocal(),
@@ -46,10 +49,21 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
 
   useEffect(() => { loadActivities(); }, [loadActivities]);
 
+  useEffect(() => {
+    if (familyId) {
+      getFamilyMembersWithRoles(familyId).then((members) => {
+        setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+      }).catch(() => {});
+    }
+  }, [familyId]);
+
   // Auto-open modal when navigated with openAddSection
   useEffect(() => {
     if (route?.params?.openAddSection === 'activities') {
       setShowAddModal(true);
+      if (child?.name) {
+        setSelectedPersons([child.name.split(' ')[0]]);
+      }
       navigation.setParams({ openAddSection: undefined, childId: undefined } as any);
     }
   }, [route?.params?.openAddSection]);
@@ -60,6 +74,10 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
       crossAlert(t('common.error'), t('health.enterTitleAndDate'));
       return;
     }
+    if (selectedPersons.length === 0) {
+      crossAlert(t('common.error'), t('health.personRequired'));
+      return;
+    }
     try {
       await addSchoolActivity({
         ...activityForm,
@@ -67,9 +85,11 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
         yearId: selectedYear.id,
         familyId,
         createdBy: user?.uid || '',
+        selectedPersons,
       });
       setShowAddModal(false);
       setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
+      setSelectedPersons([]);
       loadActivities();
     } catch (e) {
       crossAlert(t('common.error'), t('common.error'));
@@ -180,6 +200,24 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('school.activityTitle')}</Text>
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={activityForm.title} onChangeText={(v) => setActivityForm(f => ({ ...f, title: v }))} placeholderTextColor={colors.textDisabled} />
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                      {persons.map(p => {
+                        const isSelected = selectedPersons.includes(p);
+                        return (
+                          <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => {
+                            setSelectedPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p]);
+                          }}>
+                            <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                    {selectedPersons.length === 0 && (
+                      <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
+                    )}
                   </View>
                   <View style={{ flexDirection: 'row', gap: 12 }}>
                     <View style={[styles.field, { flex: 1 }]}>

@@ -17,6 +17,8 @@ import { useTranslation } from 'react-i18next';
 import { DocumentUpload } from './DocumentUpload';
 import { AppIcon } from './AppIcon';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
+import { getFamilyMembersWithRoles } from '../services/familyService';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 interface AddEventModalProps {
   visible: boolean;
@@ -69,9 +71,19 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
+  const [persons, setPersons] = useState<string[]>([]);
+  const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
 
   type AddPickerField = 'dateFrom' | 'dateTo' | 'time' | 'endTime' | null;
   const [activePicker, setActivePicker] = useState<AddPickerField>(null);
+
+  useEffect(() => {
+    if (familyId) {
+      getFamilyMembersWithRoles(familyId).then((members) => {
+        setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+      }).catch(() => {});
+    }
+  }, [familyId]);
 
   useEffect(() => {
     if (visible && prefill) {
@@ -98,6 +110,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
       setIcon('');
       setDocuments([]);
       setScheduleConfig(null);
+      setSelectedPersons([]);
     }
   }, [visible]);
 
@@ -122,6 +135,10 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
     if (saving) return;
     if (!title.trim()) {
       crossAlert('Error', 'Vennligst skriv en tittel');
+      return;
+    }
+    if (selectedPersons.length === 0) {
+      crossAlert('Error', t('health.personRequired'));
       return;
     }
 
@@ -163,6 +180,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                 icon: icon || null,
                 documents: documents.length > 0 ? documents : [],
                 scheduleGroupId: scheduleConfig.groupId,
+                selectedPersons,
               });
             }
           }
@@ -192,6 +210,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
           createdAt: Date.now(),
           icon: icon || null,
           documents: documents.length > 0 ? documents : [],
+          selectedPersons,
         };
 
         eventData.endDate = dateTo;
@@ -231,7 +250,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
     } finally {
       setSaving(false);
     }
-  }, [title, address, dateFrom, dateTo, time, endTime, note, reminderMinutes, user, icon, documents, familyId, onClose, onSaved, saving, scheduleConfig]);
+  }, [title, address, dateFrom, dateTo, time, endTime, note, reminderMinutes, user, icon, documents, familyId, onClose, onSaved, saving, scheduleConfig, selectedPersons]);
 
   const handleScheduleConfirm = useCallback((config: { days: number[]; weeks: number; weekType: string; groupId: string }) => {
     setScheduleConfig(config);
@@ -290,6 +309,26 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                     placeholder="F.eks. Familiemiddag"
                     placeholderTextColor={colors.textDisabled}
                   />
+                </View>
+
+                {/* Person selector */}
+                <View style={styles.field}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                    {persons.map(p => {
+                      const isSelected = selectedPersons.includes(p);
+                      return (
+                        <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? MODULE_COLORS.health : colors.surface, borderColor: isSelected ? MODULE_COLORS.health : colors.border, borderWidth: 1, paddingVertical: 8, paddingHorizontal: 14, borderRadius: 20 }]} onPress={() => {
+                          setSelectedPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p]);
+                        }}>
+                          <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </View>
+                  {selectedPersons.length === 0 && (
+                    <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
+                  )}
                 </View>
 
                 {/* Date from / Date to */}
@@ -475,4 +514,5 @@ const styles = StyleSheet.create({
   reminderOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   reminderOption: { paddingVertical: 8, paddingHorizontal: 12, borderRadius: 10, borderWidth: 1 },
   reminderText: { fontSize: 13, fontWeight: '600' },
+  personChip: { paddingVertical: 8, paddingHorizontal: 14, borderRadius: 20 },
 });

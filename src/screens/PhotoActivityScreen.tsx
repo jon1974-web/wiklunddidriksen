@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, TextInput, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -19,6 +19,8 @@ import { ActionModal } from '../components/ActionModal';
 import { sanitizeInput } from '../utils/validation';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { auth } from '../services/firebase';
+import { getFamilyMembersWithRoles } from '../services/familyService';
+import { MODULE_COLORS } from '../constants/moduleColors';
 
 type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService' | 'trip';
 
@@ -133,6 +135,15 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
   const [activePicker, setActivePicker] = useState<{ activityIndex: number; field: 'dateFrom' | 'startTime' | 'dateTo' | 'endTime' } | null>(null);
   const [successModal, setSuccessModal] = useState<{ visible: boolean; title: string; subtitle: string }>({ visible: false, title: '', subtitle: '' });
+  const [persons, setPersons] = useState<string[]>([]);
+
+  useEffect(() => {
+    if (familyId) {
+      getFamilyMembersWithRoles(familyId).then((members) => {
+        setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+      }).catch(() => {});
+    }
+  }, [familyId]);
 
   const toEditableActivity = (a: ParsedActivity): EditableActivity => ({
     ...a,
@@ -237,6 +248,10 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
 
   const handleCreateActivity = useCallback(async (activity: EditableActivity, showSuccess = false) => {
     if (!user || creating) return;
+    if (config.hasPerson && (!activity.person || activity.person.trim() === '')) {
+      crossAlert(t('common.error'), t('health.personRequired'));
+      return;
+    }
     setCreating(true);
 
     try {
@@ -446,14 +461,29 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
 
       {config.hasPerson && (
         <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
-          <TextInput
-            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
-            value={activity.person || ''}
-            onChangeText={(text) => updateActivity(index, { person: text })}
-            placeholder={t('health.person')}
-            placeholderTextColor={colors.textDisabled}
-          />
+          <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+            {persons.map(p => {
+              const currentPersons = (activity.person || '').split(',').map(s => s.trim()).filter(Boolean);
+              const isSelected = currentPersons.includes(p);
+              return (
+                <TouchableOpacity
+                  key={p}
+                  style={[styles.activityTypeChip, { backgroundColor: isSelected ? MODULE_COLORS.health : colors.inputBackground, borderColor: isSelected ? MODULE_COLORS.health : colors.border }]}
+                  onPress={() => {
+                    const current = (activity.person || '').split(',').map(s => s.trim()).filter(Boolean);
+                    const updated = isSelected ? current.filter(x => x !== p) : [...current, p];
+                    updateActivity(index, { person: updated.join(', ') });
+                  }}
+                >
+                  <Text style={[styles.activityTypeText, { color: isSelected ? '#fff' : colors.text }]}>{p}</Text>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
+          {(!activity.person || activity.person.trim() === '') && (
+            <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
+          )}
         </View>
       )}
 

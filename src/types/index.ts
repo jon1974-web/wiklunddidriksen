@@ -651,6 +651,7 @@ export interface SchoolActivity {
   createdBy?: string;
   scheduleGroupId?: string;
   googleCalendarEventId?: string;
+  selectedPersons?: string[];
   createdAt: number;
 }
 
@@ -673,6 +674,7 @@ export interface KindergartenActivity {
   createdBy?: string;
   scheduleGroupId?: string;
   googleCalendarEventId?: string;
+  selectedPersons?: string[];
   createdAt: number;
 }
 

@@ -458,6 +458,8 @@
     "medicationName": "Läikeen nimi",
     "medicationNamePlaceholder": "esim. Burana 500mg",
     "person": "Henkilö",
+    "personLabel": "Kenelle tämä koskee?",
+    "personRequired": "Valitse vähintään yksi henkilö",
     "dosage": "Annos",
     "dosagePlaceholder": "esim. 1 tabletti",
     "frequency": "Tiheys",

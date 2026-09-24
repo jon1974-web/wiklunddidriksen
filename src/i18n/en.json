@@ -458,6 +458,8 @@
     "medicationName": "Medication name",
     "medicationNamePlaceholder": "e.g. Paracet 500mg",
     "person": "Person",
+    "personLabel": "Who is this for?",
+    "personRequired": "Select at least one person",
     "dosage": "Dosage",
     "dosagePlaceholder": "e.g. 1 tablet",
     "frequency": "Frequency",

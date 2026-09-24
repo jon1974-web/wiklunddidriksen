@@ -163,6 +163,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
       } else if (activeSection === 'appointments') {
         if (!apptForm.title.trim() || !apptForm.dateFrom) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
+        if (!Array.isArray(apptForm.person) || apptForm.person.length === 0) { crossAlert('Error', t('health.personRequired')); return; }
         const user = useUserStore.getState().user;
         const apptData: any = { ...apptForm };
         if (apptForm.reminder > 0 && apptForm.dateFrom) {
@@ -594,7 +595,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                     <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={apptForm.title} onChangeText={(v) => setApptForm(f => ({ ...f, title: v }))} placeholder={t('health.appointmentTitlePlaceholder')} placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>{t('health.person')}</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
                     <View style={styles.personRow}>
                       {persons.map(p => {
                         const isSelected = Array.isArray(apptForm.person) && apptForm.person.includes(p);
@@ -609,6 +610,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                         );
                       })}
                     </View>
+                    {Array.isArray(apptForm.person) && apptForm.person.length === 0 && (
+                      <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
+                    )}
                   </View>
                   <View style={{ flexDirection: 'row', gap: 12 }}>
                     <View style={[styles.field, { flex: 1 }]}>
