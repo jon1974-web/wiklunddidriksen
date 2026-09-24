@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
   tile: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 14, marginBottom: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.06, shadowRadius: 3, elevation: 1 },
   tileIcon: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
   tileLabel: { fontSize: 16, fontWeight: '600', flex: 1 },
-  yearTab: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 10, marginRight: 8, alignItems: 'center', minWidth: 80 },
+  yearTab: { paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, marginRight: 8, alignItems: 'center', minWidth: 70 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
   modalContent: { width: '85%', borderRadius: 16, padding: 20 },
   modalTitle: { fontSize: 18, fontWeight: '700', marginBottom: 16, textAlign: 'center' },
