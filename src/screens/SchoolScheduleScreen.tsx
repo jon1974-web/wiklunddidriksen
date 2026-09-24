@@ -117,10 +117,18 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
     setUploading(true);
 
     try {
-      const response = await fetch(asset.uri);
-      const blob = await response.blob();
-      const ext = asset.uri.split('.').pop() || 'jpg';
-      const fileName = `schedule_${semester}_${Date.now()}.${ext}`;
+      let blob: Blob;
+      if (asset.uri.startsWith('data:')) {
+        const byteString = atob(asset.uri.split(',')[1]);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+        blob = new Blob([ab], { type: 'image/jpeg' });
+      } else {
+        const response = await fetch(asset.uri);
+        blob = await response.blob();
+      }
+      const fileName = `schedule_${semester}_${Date.now()}.jpg`;
 
       const { webUploadFile } = await import('../services/webStorage');
       const downloadURL = await webUploadFile(`school-schedules/${familyId}/${fileName}`, blob);
@@ -148,16 +156,25 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
           body: JSON.stringify({ imageBase64: base64, type: 'timetable' }),
         });
 
+        console.log('AI response status:', aiRes.status);
         if (aiRes.ok) {
           const data = await aiRes.json();
+          console.log('AI response data:', JSON.stringify(data).substring(0, 200));
           if (data.schedule && Array.isArray(data.schedule) && data.schedule.length > 0) {
             await updateSchoolSchedule(scheduleId, { entries: data.schedule });
             crossAlert(t('common.success'), `${data.schedule.length} ${t('school.entriesExtracted')}`);
           } else {
             crossAlert(t('school.noDataFound'), t('school.tryAgainPhoto'));
           }
+        } else {
+          const errorText = await aiRes.text();
+          console.log('AI error response:', errorText);
+          crossAlert(t('common.error'), `AI-feil: ${aiRes.status}`);
         }
-      } catch (e) { /* AI failed, image still saved */ }
+      } catch (e) {
+        console.log('AI analysis error:', e);
+        crossAlert(t('common.error'), `AI-feil: ${e.message || e}`);
+      }
 
       loadSchedules();
     } catch (error) {
