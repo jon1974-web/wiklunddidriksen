@@ -61,7 +61,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, marginTop: 8 }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <AppIcon name="activities" size={28} color={KG_THEME} />
-          <Text style={[styles.screenTitle, { color: colors.text }]}>{t('school.activities')}</Text>
+          <Text style={[styles.screenTitle, { color: colors.text }]}>{t('school.activities')} {child.name}</Text>
         </View>
       </View>
 
@@ -108,7 +108,8 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
 
 const styles = StyleSheet.create({
   container: { flex: 1 },
-  header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1 },
+  header: { paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1 },
+  screenTitle: { fontSize: 22, fontWeight: '700' },
   backBtn: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 16, fontWeight: '700', flex: 1 },
   addBtn: { width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center' },
