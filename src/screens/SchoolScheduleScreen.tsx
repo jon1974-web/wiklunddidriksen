@@ -219,7 +219,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
                 </>
               )}
             </TouchableOpacity>
-            {currentSchedule && (currentSchedule.entries || []).length > 0 && (
+            {currentSchedule && (
               <TouchableOpacity style={[styles.editBtn, { backgroundColor: colors.inputBackground }]} onPress={startEdit}>
                 <AppIcon name="pencil" size={18} color={colors.text} />
                 <Text style={{ color: colors.text, fontSize: 12, fontWeight: '600' }}>{t('common.edit')}</Text>
