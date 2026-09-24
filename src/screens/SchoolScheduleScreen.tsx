@@ -106,7 +106,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
       return;
     }
     const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ImagePicker.MediaType.Images,
       quality: IMAGE_QUALITY,
       allowsEditing: false,
       base64: true,
