@@ -35,9 +35,12 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
 
   const today = new Date().toISOString().split('T')[0];
   const sorted = [...activities].sort((a, b) => {
-    const dateA = a.dateFrom || '';
-    const dateB = b.dateFrom || '';
-    return dateA.localeCompare(dateB);
+    const aPast = (a.dateTo || a.dateFrom) < today;
+    const bPast = (b.dateTo || b.dateFrom) < today;
+    if (aPast && !bPast) return 1;
+    if (!aPast && bPast) return -1;
+    if (aPast && bPast) return (b.dateFrom || '').localeCompare(a.dateFrom || '');
+    return (a.dateFrom || '').localeCompare(b.dateFrom || '');
   });
 
   const getDaysUntil = (dateStr: string): string => {
@@ -63,7 +66,18 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
       </View>
 
       <ScrollView style={{ flex: 1, padding: 12 }}>
-        {sorted.map(a => {
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <View style={styles.sectionHeader}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              <AppIcon name="activities" size={18} color={SCHOOL_THEME} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.activities')}</Text>
+              <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({activities.length})</Text>
+            </View>
+            <TouchableOpacity style={[styles.addBtn, { backgroundColor: SCHOOL_THEME }]} onPress={() => navigation.navigate('SchoolSpace', { openAddSection: 'activities', childId: child.id, yearId: selectedYear?.id })}>
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+            </TouchableOpacity>
+          </View>
+          {sorted.map(a => {
           const isPast = (a.dateTo || a.dateFrom) < today;
           return (
             <TouchableOpacity key={a.id} style={[styles.activityCard, { backgroundColor: colors.surface, opacity: isPast ? 0.6 : 1 }]} onPress={() => navigation.navigate('SchoolActivityDetail', { activity: a, childId: child.id, yearId: selectedYear?.id })}>
@@ -86,6 +100,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
             <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>{t('school.noActivities')}</Text>
           </View>
         )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -102,4 +117,8 @@ const styles = StyleSheet.create({
   activityIcon: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   emptyState: { alignItems: 'center', marginTop: 60 },
   badge: { fontSize: 11, fontWeight: '600', paddingVertical: 2, paddingHorizontal: 8, borderRadius: 10 },
+  section: { borderRadius: 12, marginBottom: 10, overflow: 'hidden' },
+  sectionHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 12, borderBottomWidth: 1, borderBottomColor: '#e8e8e8' },
+  sectionTitle: { fontSize: 15, fontWeight: '700' },
+  addBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
 });
