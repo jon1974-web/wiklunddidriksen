@@ -19,7 +19,7 @@ import { ActionModal } from '../components/ActionModal';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { HelpCenter } from '../components/HelpCenter';
 import { syncEventToCalendar } from '../services/calendarService';
-import { getUserProfile, notifyNewEvent } from '../services/familyService';
+import { getUserProfile, notifyNewEvent, getFamilyMembersWithRoles } from '../services/familyService';
 import { DocumentUpload } from '../components/DocumentUpload';
 import { ScheduleModal } from '../components/ScheduleModal';
 import { addDoc as firestoreAddDoc, collection as firestoreCollection, query as firestoreQuery, where as firestoreWhere, getDocs as firestoreGetDocs, deleteDoc as firestoreDeleteDoc, doc as firestoreDoc } from 'firebase/firestore';
@@ -75,6 +75,8 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
   const [svcFrequency, setSvcFrequency] = useState<'once' | 'monthly' | 'quarterly' | 'yearly'>('once');
   const [saving, setSaving] = useState(false);
   const [svcDocuments, setSvcDocuments] = useState<{ url: string; fileName: string; type: 'image' | 'document' }[]>([]);
+  const [svcPersons, setSvcPersons] = useState<string[]>([]);
+  const [persons, setPersons] = useState<string[]>([]);
   const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
   const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
   const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
@@ -111,6 +113,13 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
   useEffect(() => { loadData(); }, [loadData]);
 
   useEffect(() => {
+    if (!familyId) return;
+    getFamilyMembersWithRoles(familyId).then((members) => {
+      setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+    }).catch(() => {});
+  }, [familyId]);
+
+  useEffect(() => {
     if (route.params?.editServiceId && services.length > 0) {
       const svc = services.find((s) => s.id === route.params.editServiceId);
       if (svc) {
@@ -123,6 +132,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         setSvcReminder(svc.reminder);
         setSvcFrequency(svc.frequency);
         setSvcDocuments(svc.documents || []);
+        setSvcPersons(svc.persons || []);
         setRepeatScheduleConfig(null);
         setEditingService(svc.id);
         setShowAddService(true);
@@ -149,6 +159,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     setSvcReminder(60);
     setSvcFrequency('once');
     setSvcDocuments([]);
+    setSvcPersons([]);
     setRepeatScheduleConfig(null);
     setEditingService(null);
   };
@@ -156,6 +167,10 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
   const handleSaveService = async () => {
     if (!svcTitle.trim()) {
       crossAlert(t('common.error'), t('homes.serviceTitleRequired'));
+      return;
+    }
+    if (svcPersons.length === 0) {
+      crossAlert(t('common.error'), t('health.personRequired'));
       return;
     }
     if (!familyId) return;
@@ -171,6 +186,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         endTime: svcEndTime,
         reminder: svcReminder,
         frequency: svcFrequency,
+        persons: svcPersons,
         status: 'planned' as const,
         createdBy: user?.uid || null,
         familyId,
@@ -296,6 +312,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
       setSvcReminder(svc.reminder);
       setSvcFrequency(svc.frequency);
       setSvcDocuments(svc.documents || []);
+      setSvcPersons(svc.persons || []);
       setRepeatScheduleConfig(null);
       setShowAddService(true);
     }
@@ -586,6 +603,23 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
               </View>
 
               <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {persons.map(p => {
+                    const isSelected = svcPersons.includes(p);
+                    return (
+                      <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? HOME_THEME : colors.surface, borderColor: isSelected ? HOME_THEME : colors.border, borderWidth: 1.5 }]} onPress={() => setSvcPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}>
+                        <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                {svcPersons.length === 0 && (
+                  <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
+                )}
+              </View>
+
+              <View style={styles.field}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('events.reminder')}</Text>
                 <View style={styles.reminderOptions}>
                   {REMINDER_OPTIONS.map((opt) => (
@@ -838,6 +872,7 @@ const styles = StyleSheet.create({
   freqOption: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5 },
   reminderOptions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   reminderOption: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5 },
+  personChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
   modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
   modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginBottom: 16 },

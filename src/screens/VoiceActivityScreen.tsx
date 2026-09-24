@@ -117,7 +117,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
     });
   }, []);
 
-  const showPerson = type === 'healthAppointment';
+  const showPerson = type === 'healthAppointment' || type === 'vetVisit' || type === 'homeService';
   const showActivityType = type === 'schoolActivity' || type === 'kindergartenActivity';
   const showDoctor = type === 'healthAppointment' || type === 'vetVisit';
   const isHomeService = type === 'homeService';

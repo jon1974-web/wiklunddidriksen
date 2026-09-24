@@ -11,7 +11,7 @@ import { DatePickerModal } from '../components/DatePickerModal';
 import { crossAlert } from '../utils/alert';
 import { DocumentUpload } from '../components/DocumentUpload';
 import { getErrorMessage } from '../utils/validation';
-import { notifyHealthItem, getUserProfile } from '../services/familyService';
+import { notifyHealthItem, getUserProfile, getFamilyMembersWithRoles } from '../services/familyService';
 import { db } from '../services/firebase';
 import { addDoc, collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import {
@@ -84,6 +84,8 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
 
   const [vetForm, setVetForm] = useState({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' as 'planned' | 'completed', documents: [] as { url: string; fileName: string; type: 'image' | 'document' }[] });
+  const [vetPersons, setVetPersons] = useState<string[]>([]);
+  const [persons, setPersons] = useState<string[]>([]);
   const [showRepeatSchedule, setShowRepeatSchedule] = useState(false);
   const [repeatScheduleConfig, setRepeatScheduleConfig] = useState<{ days: number[]; weeks: number; weekType: string; groupId: string } | null>(null);
   const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
@@ -144,6 +146,13 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
 
   useEffect(() => { loadPets(); }, [loadPets]);
   useEffect(() => { if (selectedPet) loadPetData(); }, [selectedPet, loadPetData]);
+
+  useEffect(() => {
+    if (!familyId) return;
+    getFamilyMembersWithRoles(familyId).then((members) => {
+      setPersons(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+    }).catch(() => {});
+  }, [familyId]);
 
   // Auto-select pet when navigated with petId param (from AI assistant)
   useEffect(() => {
@@ -209,6 +218,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
     if (section === 'vetVisits') {
       const item = vetVisits.find(v => v.id === id);
       if (item) setVetForm({ title: item.title, doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || 0, status: item.status, documents: item.documents || [] });
+      if (item) setVetPersons(item.persons || []);
     } else if (section === 'medications') {
       const item = medications.find(m => m.id === id);
       if (item) setMedForm({ name: item.name, dosage: item.dosage, frequency: item.frequency || 1, timeSlots: item.timeSlots || [{ time: '08:00', reminderMinutes: 15 }], dateFrom: item.dateFrom || '', dateTo: item.dateTo || '', note: item.note || '' });
@@ -274,8 +284,9 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
       const isEditing = editingItem !== null;
       if (activeSection === 'vetVisits') {
         if (!vetForm.title.trim() || !vetForm.dateFrom) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
+        if (vetPersons.length === 0) { crossAlert('Error', t('health.personRequired')); return; }
         if (isEditing) {
-          await updateVetVisit(editingItem.id, vetForm);
+          await updateVetVisit(editingItem.id, { ...vetForm, persons: vetPersons });
           if (repeatScheduleConfig) {
             const editingVisit = vetVisits.find(v => v.id === editingItem.id);
             if (editingVisit?.scheduleGroupId) {
@@ -312,6 +323,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 const dateStr = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
                 await addDoc(collection(db, 'petVetVisits'), {
                   ...vetForm,
+                  persons: vetPersons,
                   dateFrom: dateStr,
                   dateTo: dateStr,
                   petId: selectedPet.id,
@@ -325,7 +337,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           }
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         } else {
-          await addVetVisit({ ...vetForm, petId: selectedPet.id, familyId }, user?.uid);
+          await addVetVisit({ ...vetForm, persons: vetPersons, petId: selectedPet.id, familyId }, user?.uid);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
         setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' });
@@ -420,6 +432,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
 
   const resetItemForms = () => {
     setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned', documents: [] });
+    setVetPersons([]);
     setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
     setFoodForm({ name: '', time: '', amount: '', note: '' });
     setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
@@ -882,6 +895,22 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                     <View style={styles.field}>
                       <Text style={[styles.label, { color: colors.text }]}>{t('pets.vetTitle')}</Text>
                       <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={vetForm.title} onChangeText={(v) => setVetForm(f => ({ ...f, title: v }))} placeholder={t('pets.vetTitlePlaceholder')} placeholderTextColor={colors.textDisabled} />
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
+                      <View style={styles.personRow}>
+                        {persons.map(p => {
+                          const isSelected = vetPersons.includes(p);
+                          return (
+                            <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? PET_THEME : colors.inputBackground }]} onPress={() => setVetPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}>
+                              <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                            </TouchableOpacity>
+                          );
+                        })}
+                      </View>
+                      {vetPersons.length === 0 && (
+                        <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
+                      )}
                     </View>
                     <View style={{ flexDirection: 'row', gap: 12 }}>
                       <View style={[styles.field, { flex: 1 }]}>
