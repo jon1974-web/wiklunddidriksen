@@ -331,7 +331,11 @@
     "tryAgainPhoto": "Try with a clearer photo",
     "entriesExtracted": "entries extracted",
     "deleteSchedule": "Delete timetable",
-    "editEntry": "Edit"
+    "editEntry": "Edit",
+    "addEntry": "Add",
+    "day": "Day",
+    "editSchedule": "Edit timetable",
+    "holiday": "Holiday"
   },
   "kindergarten": {
     "title": "Our Kindergarten",

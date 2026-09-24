@@ -331,7 +331,11 @@
     "tryAgainPhoto": "Prøv med et tydeligere billede",
     "entriesExtracted": "poster extraheret",
     "deleteSchedule": "Slet køreplan",
-    "editEntry": "Rediger"
+    "editEntry": "Rediger",
+    "addEntry": "Tilføj",
+    "day": "Dag",
+    "editSchedule": "Rediger køreplan",
+    "holiday": "Fridag"
   },
   "kindergarten": {
     "title": "Vores børnehave",

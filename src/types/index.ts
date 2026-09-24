@@ -598,6 +598,7 @@ export interface SchoolScheduleEntry {
   day: string;
   time: string;
   subject: string;
+  teacher?: string;
 }
 
 export interface SchoolSchedule {

@@ -331,7 +331,11 @@
     "tryAgainPhoto": "Yritä selkeämmällä kuvalla",
     "entriesExtracted": "merkintää poimittu",
     "deleteSchedule": "Poista aikataulu",
-    "editEntry": "Muokkaa"
+    "editEntry": "Muokkaa",
+    "addEntry": "Lisää",
+    "day": "Päivä",
+    "editSchedule": "Muokkaa aikataulua",
+    "holiday": "Vapaapäivä"
   },
   "kindergarten": {
     "title": "Päiväkotimme",

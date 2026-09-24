@@ -37,6 +37,7 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
   const [newEntryDay, setNewEntryDay] = useState<string | null>(null);
   const [newEntryTime, setNewEntryTime] = useState('');
   const [newEntrySubject, setNewEntrySubject] = useState('');
+  const [newEntryTeacher, setNewEntryTeacher] = useState('');
 
   const loadSchedules = useCallback(async () => {
     if (!familyId || !selectedYear) return;
@@ -85,11 +86,12 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
     if (!newEntryDay || !newEntryTime.trim() || !newEntrySubject.trim()) return;
     setEditEntries(prev => ({
       ...prev,
-      [newEntryDay]: [...(prev[newEntryDay] || []), { day: newEntryDay, time: newEntryTime, subject: newEntrySubject }],
+      [newEntryDay]: [...(prev[newEntryDay] || []), { day: newEntryDay, time: newEntryTime, subject: newEntrySubject, teacher: newEntryTeacher }],
     }));
     setNewEntryDay(null);
     setNewEntryTime('');
     setNewEntrySubject('');
+    setNewEntryTeacher('');
   };
 
   const removeEntry = (day: string, index: number) => {
@@ -252,7 +254,10 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
               {items.length > 0 ? items.map((item, i) => (
                 <View key={i} style={[styles.scheduleItem, { borderBottomWidth: i < items.length - 1 ? 1 : 0, borderBottomColor: colors.border }]}>
                   <Text style={[styles.scheduleTime, { color: colors.text }]}>{item.time || ''}</Text>
-                  <Text style={[styles.scheduleSubject, { color: colors.text, flex: 1 }]}>{item.subject || ''}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.scheduleSubject, { color: colors.text }]}>{item.subject || ''}</Text>
+                    {item.teacher ? <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{item.teacher}</Text> : null}
+                  </View>
                 </View>
               )) : (
                 <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noSchedule')}</Text>
@@ -329,6 +334,8 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
             <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntryTime} onChangeText={setNewEntryTime} placeholder="08:00-09:00" placeholderTextColor={colors.textDisabled} autoFocus />
             <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>{t('school.subject')}</Text>
             <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntrySubject} onChangeText={setNewEntrySubject} placeholder={t('school.subject')} placeholderTextColor={colors.textDisabled} />
+            <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>{t('school.teacher')}</Text>
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntryTeacher} onChangeText={setNewEntryTeacher} placeholder={t('school.teacher')} placeholderTextColor={colors.textDisabled} />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => setNewEntryDay(null)}>
                 <Text style={{ color: colors.text, fontWeight: '600' }}>{t('common.cancel')}</Text>

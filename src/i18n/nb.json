@@ -331,7 +331,11 @@
     "tryAgainPhoto": "Prøv med et tydeligere bilde",
     "entriesExtracted": "oppføringer extrahert",
     "deleteSchedule": "Slett timeplan",
-    "editEntry": "Rediger"
+    "editEntry": "Rediger",
+    "addEntry": "Legg til",
+    "day": "Dag",
+    "editSchedule": "Rediger timeplan",
+    "holiday": "Fridag"
   },
   "kindergarten": {
     "title": "Vår barnehage",

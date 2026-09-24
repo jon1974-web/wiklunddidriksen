@@ -331,7 +331,11 @@
     "tryAgainPhoto": "Försök med en tydligare bild",
     "entriesExtracted": "poster extraherade",
     "deleteSchedule": "Ta bort schema",
-    "editEntry": "Redigera"
+    "editEntry": "Redigera",
+    "addEntry": "Lägg till",
+    "day": "Dag",
+    "editSchedule": "Redigera schema",
+    "holiday": "Ledig dag"
   },
   "kindergarten": {
     "title": "Vår förskola",

@@ -1424,8 +1424,9 @@ For each class/lesson found, extract:
 - day: Day of the week in Norwegian (Mandag, Tirsdag, Onsdag, Torsdag, Fredag)
 - time: Time slot (e.g. "08:00-09:00" or "08:00")
 - subject: Subject name (e.g. "Matematikk", "Norsk", "Engelsk")
+- teacher: Teacher name if visible (e.g. "Hansen", "Lærer Olsen")
 
-Return ONLY valid JSON: { "schedule": [ { "day", "time", "subject" } ] }
+Return ONLY valid JSON: { "schedule": [ { "day", "time", "subject", "teacher" } ] }
 Important: day must be exactly one of: Mandag, Tirsdag, Onsdag, Torsdag, Fredag`;
       userText = "Extract the weekly timetable from this image. The timetable is likely in a table format.";
     } else {
@@ -1598,6 +1599,7 @@ Important: day must be exactly one of: Mandag, Tirsdag, Onsdag, Torsdag, Fredag`
         day: s.day || "",
         time: s.time || "",
         subject: s.subject || "",
+        teacher: s.teacher || "",
       }));
       return res.status(200).json({ schedule: normalized });
     }
