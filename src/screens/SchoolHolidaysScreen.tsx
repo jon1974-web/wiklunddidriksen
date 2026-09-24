@@ -127,18 +127,12 @@ export const SchoolHolidaysScreen: React.FC<Props> = ({ navigation, route }) => 
         {/* AI + URL import buttons */}
         <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
           <TouchableOpacity style={[styles.aiCard, { backgroundColor: MODULE_COLORS.schoolBg, flex: 1 }]} onPress={() => navigation.navigate('SchoolAI', { childId: child.id, yearId: selectedYear?.id || '', familyId: familyId || '', mode: 'holidays' })}>
-            <Text style={{ fontSize: 20 }}>📸</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: MODULE_COLORS.school, fontWeight: '600', fontSize: 13 }}>{t('kindergarten.importFromImage')}</Text>
-              <Text style={{ color: MODULE_COLORS.school, fontSize: 11 }}>{t('kindergarten.aiFridagDescription')}</Text>
-            </View>
+            <AppIcon name="ai" size={20} color={MODULE_COLORS.school} />
+            <Text style={{ color: MODULE_COLORS.school, fontWeight: '600', fontSize: 13 }}>{t('kindergarten.importFromImage')}</Text>
           </TouchableOpacity>
           <TouchableOpacity style={[styles.aiCard, { backgroundColor: MODULE_COLORS.tripsBg, flex: 1 }]} onPress={() => { setUrlInput(''); setUrlResults([]); setShowUrlModal(true); }}>
-            <Text style={{ fontSize: 20 }}>🔗</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: MODULE_COLORS.trips, fontWeight: '600', fontSize: 13 }}>{t('kindergarten.importFromUrl')}</Text>
-              <Text style={{ color: MODULE_COLORS.trips, fontSize: 11 }}>{t('kindergarten.urlDescription')}</Text>
-            </View>
+            <AppIcon name="ai" size={20} color={MODULE_COLORS.trips} />
+            <Text style={{ color: MODULE_COLORS.trips, fontWeight: '600', fontSize: 13 }}>{t('kindergarten.importFromUrl')}</Text>
           </TouchableOpacity>
         </View>
 
