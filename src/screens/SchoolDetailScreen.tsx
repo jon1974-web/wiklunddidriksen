@@ -113,7 +113,7 @@ export const SchoolDetailScreen: React.FC<SchoolDetailScreenProps> = ({ navigati
           <TouchableOpacity
             key={tile.id}
             style={[styles.tile, { backgroundColor: colors.surface }]}
-            onPress={() => navigation.navigate(tile.screen, { child, selectedYear, years })}
+            onPress={() => selectedYear && navigation.navigate(tile.screen, { child, selectedYear, years })}
           >
             <View style={[styles.tileIcon, { backgroundColor: SCHOOL_THEME }]}>
               <AppIcon name={tile.icon} size={24} color="#fff" />

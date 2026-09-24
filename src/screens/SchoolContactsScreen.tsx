@@ -48,7 +48,7 @@ export const SchoolContactsScreen: React.FC<Props> = ({ navigation, route }) => 
   const [actionModal, setActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
 
   const loadContacts = useCallback(async () => {
-    if (!familyId || !selectedYear) return;
+    if (!familyId || !selectedYear?.id) return;
     const data = await getSchoolContacts(familyId, selectedYear.id);
     setContacts(data);
   }, [familyId, selectedYear]);

@@ -8,7 +8,7 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { SchoolChild, SchoolYear, SchoolHoliday } from '../types';
 import { useUserStore } from '../store/userStore';
 import { getSchoolHolidays } from '../services/schoolService';
-import { formatShortDate } from '../utils/dateUtils';
+import { formatDate } from '../utils/dateUtils';
 
 const SCHOOL_THEME = MODULE_COLORS.school;
 
@@ -56,7 +56,7 @@ export const SchoolHolidaysScreen: React.FC<Props> = ({ route }) => {
                 <Text style={{ fontSize: 18 }}>🎉</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{h.title}</Text>
-                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatShortDate(h.dateFrom)} → {formatShortDate(h.dateTo || h.dateFrom)}</Text>
+                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(h.dateFrom)} → {formatDate(h.dateTo || h.dateFrom)}</Text>
                 </View>
               </View>
             ))}
@@ -70,7 +70,7 @@ export const SchoolHolidaysScreen: React.FC<Props> = ({ route }) => {
                 <Text style={{ fontSize: 18 }}>🎉</Text>
                 <View style={{ flex: 1 }}>
                   <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{h.title}</Text>
-                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatShortDate(h.dateFrom)} → {formatShortDate(h.dateTo || h.dateFrom)}</Text>
+                  <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(h.dateFrom)} → {formatDate(h.dateTo || h.dateFrom)}</Text>
                 </View>
               </View>
             ))}

@@ -8,7 +8,7 @@ import { MODULE_COLORS } from '../constants/moduleColors';
 import { SchoolChild, SchoolYear, SchoolActivity } from '../types';
 import { useUserStore } from '../store/userStore';
 import { getSchoolActivities } from '../services/schoolService';
-import { formatShortDate } from '../utils/dateUtils';
+import { formatDate } from '../utils/dateUtils';
 
 const SCHOOL_THEME = MODULE_COLORS.school;
 
@@ -62,7 +62,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
-                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatShortDate(a.dateFrom)}{a.dateTo ? ` → ${formatShortDate(a.dateTo)}` : ''} {a.startTime ? `${a.startTime}–${a.endTime || ''}` : ''}</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''} {a.startTime ? `${a.startTime}–${a.endTime || ''}` : ''}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
@@ -80,7 +80,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
                   </View>
                   <View style={{ flex: 1 }}>
                     <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{a.title}</Text>
-                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatShortDate(a.dateFrom)}{a.dateTo ? ` → ${formatShortDate(a.dateTo)}` : ''}</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{formatDate(a.dateFrom)}{a.dateTo ? ` → ${formatDate(a.dateTo)}` : ''}</Text>
                   </View>
                 </View>
               </TouchableOpacity>
