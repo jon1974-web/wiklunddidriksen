@@ -811,7 +811,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             <TouchableOpacity
               key={child.id}
               style={[styles.gridTile, { backgroundColor: colors.surface }]}
-              onPress={() => setSelectedChild(child)}
+              onPress={() => navigation.navigate('SchoolDetail', { child, selectedYear })}
               onLongPress={() => setChildActionModal({ visible: true, id: child.id, title: child.name })}
             >
               {child.photoUrl ? (
@@ -1708,7 +1708,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.schoolBg }]} edges={['top']}>
-      {selectedChild ? renderDetail() : renderGrid()}
+      {renderGrid()}
 
       {/* Full-screen image viewer */}
       <Modal visible={viewingImage !== null} transparent animationType="fade">

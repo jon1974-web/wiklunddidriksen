@@ -47,6 +47,11 @@ import { PetVaccDetailScreen } from './src/screens/PetVaccDetailScreen';
 import { PetMedDetailScreen } from './src/screens/PetMedDetailScreen';
 import { PetGroomDetailScreen } from './src/screens/PetGroomDetailScreen';
 import { HealthApptDetailScreen } from './src/screens/HealthApptDetailScreen';
+import { SchoolDetailScreen } from './src/screens/SchoolDetailScreen';
+import { SchoolContactsScreen } from './src/screens/SchoolContactsScreen';
+import { SchoolScheduleScreen } from './src/screens/SchoolScheduleScreen';
+import { SchoolActivitiesScreen } from './src/screens/SchoolActivitiesScreen';
+import { SchoolHolidaysScreen } from './src/screens/SchoolHolidaysScreen';
 import { SchoolActivityDetailScreen } from './src/screens/SchoolActivityDetailScreen';
 import { KindergartenActivityDetailScreen } from './src/screens/KindergartenActivityDetailScreen';
 import { HealthMedDetailScreen } from './src/screens/HealthMedDetailScreen';
@@ -123,6 +128,11 @@ type RootStackParamList = {
   HealthMedDetail: { medication: import('./src/types').HealthMedication };
   HealthVaccDetail: { vaccination: import('./src/types').HealthVaccination };
   SchoolSpace: undefined;
+  SchoolDetail: { child: import('./src/types').SchoolChild; selectedYear?: import('./src/types').SchoolYear | null };
+  SchoolContacts: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null; years: import('./src/types').SchoolYear[] };
+  SchoolSchedule: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null };
+  SchoolActivities: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null };
+  SchoolHolidays: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null };
   KindergartenSpace: undefined;
   SchoolAI: { childId: string; yearId: string; familyId: string };
   SchoolContactDetail: { contact: any };
@@ -384,6 +394,31 @@ const TripsStack = () => {
         <Stack.Screen
           name="SchoolSpace"
           component={SchoolSpaceScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SchoolDetail"
+          component={SchoolDetailScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SchoolContacts"
+          component={SchoolContactsScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SchoolSchedule"
+          component={SchoolScheduleScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SchoolActivities"
+          component={SchoolActivitiesScreen}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
+          name="SchoolHolidays"
+          component={SchoolHolidaysScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
