@@ -48,11 +48,11 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
 
   // Auto-open modal when navigated with openAddSection
   useEffect(() => {
-    if (route?.params?.openAddSection === 'activities' && route?.params?.childId === child.id) {
+    if (route?.params?.openAddSection === 'activities') {
       setShowAddModal(true);
       navigation.setParams({ openAddSection: undefined, childId: undefined } as any);
     }
-  }, [route?.params?.openAddSection, route?.params?.childId]);
+  }, [route?.params?.openAddSection]);
 
   const handleSave = async () => {
     if (!familyId || !selectedYear || !child) return;

@@ -43,6 +43,14 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
     return (a.dateFrom || '').localeCompare(b.dateFrom || '');
   });
 
+  // Auto-open modal when navigated with openAddSection
+  useEffect(() => {
+    if (route?.params?.openAddSection === 'activities') {
+      setShowAddModal(true);
+      navigation.setParams({ openAddSection: undefined, childId: undefined } as any);
+    }
+  }, [route?.params?.openAddSection]);
+
   const getDaysUntil = (dateStr: string): string => {
     const diff = Math.ceil((new Date(dateStr).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
     if (diff < 0) return t('health.past');
