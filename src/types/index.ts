@@ -594,6 +594,12 @@ export interface SchoolContact {
   createdAt: number;
 }
 
+export interface SchoolScheduleEntry {
+  day: string;
+  time: string;
+  subject: string;
+}
+
 export interface SchoolSchedule {
   id: string;
   yearId: string;
@@ -601,6 +607,7 @@ export interface SchoolSchedule {
   semester: 'høst' | 'vår';
   imageUrl: string;
   fileName: string;
+  entries?: SchoolScheduleEntry[];
   familyId: string;
   createdAt: number;
 }

@@ -319,7 +319,12 @@
     "noActivities": "Ingen aktiviteter",
     "holidays": "Fridager",
     "noHolidays": "Ingen fridager",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "uploadScheduleHint": "Ta bilde av timeplanen — AI leser den automatisk",
+    "analyzing": "Analyserer med AI...",
+    "aiExtracted": "AI-extrahert timeplan",
+    "autumnSchedule": "Høsttimeplan",
+    "springSchedule": "Vårtidplan"
   },
   "kindergarten": {
     "title": "Vår barnehage",

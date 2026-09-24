@@ -319,7 +319,12 @@
     "noActivities": "Ingen aktiviteter",
     "holidays": "Fridage",
     "noHolidays": "Ingen fridage",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "uploadScheduleHint": "Tag et billede af køreplanen — AI læser den automatisk",
+    "analyzing": "Analyserer med AI...",
+    "aiExtracted": "AI-udtrukket køreplan",
+    "autumnSchedule": "Efterårskøreplan",
+    "springSchedule": "Forårskøreplan"
   },
   "kindergarten": {
     "title": "Vores børnehave",

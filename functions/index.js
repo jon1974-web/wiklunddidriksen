@@ -1166,7 +1166,7 @@ exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       return res.status(400).json({ error: "No image data received" });
     }
 
-    if (type !== "event" && type !== "recipe" && type !== "classlist" && type !== "holidays" && type !== "healthAppointment" && type !== "vetVisit" && type !== "schoolActivity" && type !== "kindergartenActivity" && type !== "homeService" && type !== "trip") {
+    if (type !== "event" && type !== "recipe" && type !== "classlist" && type !== "holidays" && type !== "healthAppointment" && type !== "vetVisit" && type !== "schoolActivity" && type !== "kindergartenActivity" && type !== "homeService" && type !== "trip" && type !== "timetable") {
       return res.status(400).json({ error: "Invalid type." });
     }
 
@@ -1415,6 +1415,19 @@ For each trip found, extract:
 
 Return ONLY valid JSON: { "events": [ { "title", "destination", "startDate", "endDate", "startTime", "endTime" } ] }`;
       userText = "Extract all trips visible in this image.";
+    } else if (type === "timetable") {
+      systemPrompt = `You are a school timetable parser. Extract the schedule from this image (could be a photo of a printed timetable, whiteboard, or digital schedule).
+
+The timetable is usually in a table format with days as columns or rows.
+
+For each class/lesson found, extract:
+- day: Day of the week in Norwegian (Mandag, Tirsdag, Onsdag, Torsdag, Fredag)
+- time: Time slot (e.g. "08:00-09:00" or "08:00")
+- subject: Subject name (e.g. "Matematikk", "Norsk", "Engelsk")
+
+Return ONLY valid JSON: { "schedule": [ { "day", "time", "subject" } ] }
+Important: day must be exactly one of: Mandag, Tirsdag, Onsdag, Torsdag, Fredag`;
+      userText = "Extract the weekly timetable from this image. The timetable is likely in a table format.";
     } else {
       return res.status(400).json({ error: "Invalid type" });
     }
@@ -1579,6 +1592,14 @@ Return ONLY valid JSON: { "events": [ { "title", "destination", "startDate", "en
         endTime: e.endTime || "",
       }));
       return res.status(200).json({ events: normalized });
+    } else if (type === "timetable") {
+      const items = Array.isArray(result.schedule) ? result.schedule : [];
+      const normalized = items.map((s) => ({
+        day: s.day || "",
+        time: s.time || "",
+        subject: s.subject || "",
+      }));
+      return res.status(200).json({ schedule: normalized });
     }
   } catch (error) {
     console.error("Photo to data error:", error.message, error.stack);

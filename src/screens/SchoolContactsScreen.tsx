@@ -97,6 +97,16 @@ export const SchoolContactsScreen: React.FC<Props> = ({ navigation, route }) => 
 
   const toggleSection = (key: string) => setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
 
+  // Auto-expand sections when search has results
+  useEffect(() => {
+    if (!search.trim()) return;
+    setExpandedSections({
+      teachers: filteredTeachers.length > 0,
+      admins: filteredAdmins.length > 0,
+      classmates: filteredClassmates.length > 0,
+    });
+  }, [search]);
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>

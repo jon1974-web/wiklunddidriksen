@@ -278,7 +278,7 @@
     "searchContacts": "Search name, parent, phone...",
     "schedule": "Timetable",
     "noSchedule": "No schedule",
-    "autumn": "Fall",
+    "autumn": "Autumn",
     "spring": "Spring",
     "importFromImage": "Import from image",
     "importClassList": "Import class list",
@@ -319,7 +319,12 @@
     "noActivities": "No activities",
     "holidays": "Holidays",
     "noHolidays": "No holidays",
-    "contact": "Contact"
+    "contact": "Contact",
+    "uploadScheduleHint": "Take a photo of the timetable — AI reads it automatically",
+    "analyzing": "Analyzing with AI...",
+    "aiExtracted": "AI-extracted timetable",
+    "autumnSchedule": "Autumn timetable",
+    "springSchedule": "Spring timetable"
   },
   "kindergarten": {
     "title": "Our Kindergarten",

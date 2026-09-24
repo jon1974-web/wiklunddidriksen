@@ -319,7 +319,12 @@
     "noActivities": "Ei toimintoja",
     "holidays": "Vapaapäivät",
     "noHolidays": "Ei vapaapäiviä",
-    "contact": "Yhteystieto"
+    "contact": "Yhteystieto",
+    "uploadScheduleHint": "Ota kuva aikataulusta — AI lukee sen automaattisesti",
+    "analyzing": "Analysoidaan AI:lla...",
+    "aiExtracted": "AI-poimittu aikataulu",
+    "autumnSchedule": "Syksyn aikataulu",
+    "springSchedule": "Kevään aikataulu"
   },
   "kindergarten": {
     "title": "Päiväkotimme",

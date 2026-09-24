@@ -319,7 +319,12 @@
     "noActivities": "Inga aktiviteter",
     "holidays": "Lediga dagar",
     "noHolidays": "Inga lediga dagar",
-    "contact": "Kontakt"
+    "contact": "Kontakt",
+    "uploadScheduleHint": "Ta ett foto av schema — AI läser det automatiskt",
+    "analyzing": "Analyserar med AI...",
+    "aiExtracted": "AI-extraherat schema",
+    "autumnSchedule": "Höstschema",
+    "springSchedule": "Vårschema"
   },
   "kindergarten": {
     "title": "Vår förskola",
