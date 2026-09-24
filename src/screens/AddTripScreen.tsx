@@ -158,13 +158,22 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('trips.country')}</Text>
-        <TextInput
-          style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
-          value={country}
-          onChangeText={setCountry}
-          placeholder="F.eks. Spania"
-          placeholderTextColor={colors.textDisabled}
-        />
+        {country ? (
+          <View style={[styles.input, { backgroundColor: colors.surface, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }]}>
+            <Text style={{ color: colors.text, fontSize: 16 }}>{country}</Text>
+            <TouchableOpacity onPress={() => setCountry('')} hitSlate={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+              <Text style={{ color: colors.textDisabled, fontSize: 12 }}>✕</Text>
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
+            value={country}
+            onChangeText={setCountry}
+            placeholder="F.eks. Spania"
+            placeholderTextColor={colors.textDisabled}
+          />
+        )}
       </View>
 
       <View style={styles.field}>
