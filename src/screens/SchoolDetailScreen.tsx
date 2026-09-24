@@ -95,16 +95,14 @@ export const SchoolDetailScreen: React.FC<SchoolDetailScreenProps> = ({ navigati
         </View>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 12, paddingVertical: 10 }}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ paddingHorizontal: 12, maxHeight: 44 }} contentContainerStyle={{ alignItems: 'center' }}>
         {years.map(y => (
           <TouchableOpacity key={y.id} style={[styles.yearTab, { backgroundColor: selectedYear?.id === y.id ? SCHOOL_THEME : colors.inputBackground }]} onPress={() => setSelectedYear(y)} onLongPress={() => setYearActionModal({ visible: true, id: y.id, title: y.year })}>
-            {y.school ? <Text style={{ color: selectedYear?.id === y.id ? 'rgba(255,255,255,0.7)' : colors.textSecondary, fontSize: 10 }}>{y.school}</Text> : null}
-            {y.grade ? <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>{y.grade}</Text> : null}
-            <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.text, fontSize: 12, fontWeight: '700' }}>{y.year}</Text>
+            <Text style={{ color: selectedYear?.id === y.id ? '#fff' : colors.text, fontSize: 12, fontWeight: '600' }}>{y.grade ? `${y.year} · ${y.grade}` : y.year}</Text>
           </TouchableOpacity>
         ))}
         <TouchableOpacity style={[styles.yearTab, { borderWidth: 1.5, borderColor: SCHOOL_THEME, borderStyle: 'dashed' }]} onPress={() => { setYearForm({ year: '', grade: '', school: '' }); setEditingYearId(null); setShowAddYearModal(true); }}>
-          <Text style={{ color: SCHOOL_THEME, fontSize: 18, fontWeight: '700' }}>+</Text>
+          <Text style={{ color: SCHOOL_THEME, fontSize: 14, fontWeight: '700' }}>+</Text>
         </TouchableOpacity>
       </ScrollView>
 
