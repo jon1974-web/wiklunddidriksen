@@ -22,7 +22,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const [title, setTitle] = useState('');
   const [city, setCity] = useState('');
-  const [country, setCountry] = useState('Norge');
+  const [country, setCountry] = useState('');
   const [startDate, setStartDate] = useState(getTodayLocal());
   const [endDate, setEndDate] = useState(getTodayLocal());
   const [startTime, setStartTime] = useState('');
