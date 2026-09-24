@@ -374,6 +374,9 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
 
       if (type === 'homeService' && route.params?.home) {
         navigation.navigate('HomeMaintenance', { home: route.params.home });
+      } else if (route.params?.returnTo) {
+        // Navigate back to the source screen (e.g., SchoolActivities)
+        navigation.navigate(route.params.returnTo, { child: route.params.child, selectedYear: route.params.selectedYear });
       } else {
         navigation.goBack();
       }

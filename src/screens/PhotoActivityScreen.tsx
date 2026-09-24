@@ -691,6 +691,8 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           setSuccessModal({ visible: false, title: '', subtitle: '' });
           if (type === 'homeService' && home) {
             navigation.navigate('HomeMaintenance', { home });
+          } else if (route.params?.returnTo) {
+            navigation.navigate(route.params.returnTo, { child: route.params.child, selectedYear: route.params.selectedYear });
           } else {
             navigation.goBack();
           }

@@ -217,11 +217,11 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
   useEffect(() => {
     if (route?.params?.openVoiceForType && familyId && selectedYear && selectedChild) {
-      navigation.navigate('VoiceActivity', { type: route.params.openVoiceForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, _t: Date.now() });
+      navigation.navigate('VoiceActivity', { type: route.params.openVoiceForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, returnTo: 'SchoolActivities', child, selectedYear, _t: Date.now() });
       navigation.setParams({ openVoiceForType: undefined });
     }
     if (route?.params?.openPhotoForType && familyId && selectedYear && selectedChild) {
-      navigation.navigate('PhotoActivity', { type: route.params.openPhotoForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, _t: Date.now() });
+      navigation.navigate('PhotoActivity', { type: route.params.openPhotoForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, returnTo: 'SchoolActivities', child, selectedYear, _t: Date.now() });
       navigation.setParams({ openPhotoForType: undefined });
     }
   }, [route?.params?.openVoiceForType, route?.params?.openPhotoForType, familyId, selectedYear, selectedChild]);
@@ -808,7 +808,16 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
             <TouchableOpacity
               key={child.id}
               style={[styles.gridTile, { backgroundColor: colors.surface }]}
-              onPress={() => navigation.navigate('SchoolDetail', { child, selectedYear })}
+              onPress={() => {
+                if (route?.params?.openAddSection === 'activities') {
+                  navigation.navigate('SchoolActivities', { child, selectedYear, years, openAddSection: 'activities' });
+                } else if (route?.params?.openVoiceForType || route?.params?.openPhotoForType) {
+                  // Voice/photo: just select child, modal will open via useEffect
+                  setSelectedChild(child);
+                } else {
+                  navigation.navigate('SchoolDetail', { child, selectedYear });
+                }
+              }}
               onLongPress={() => setChildActionModal({ visible: true, id: child.id, title: child.name })}
             >
               {child.photoUrl ? (
