@@ -324,7 +324,14 @@
     "analyzing": "Analyserer med AI...",
     "aiExtracted": "AI-extrahert timeplan",
     "autumnSchedule": "Høsttimeplan",
-    "springSchedule": "Vårtidplan"
+    "springSchedule": "Vårtidplan",
+    "aiScheduleHint": "Ta bilde av timeplanen — AI leser den automatisk",
+    "originalPhoto": "Originalt bilde",
+    "noDataFound": "Ingen data funnet",
+    "tryAgainPhoto": "Prøv med et tydeligere bilde",
+    "entriesExtracted": "oppføringer extrahert",
+    "deleteSchedule": "Slett timeplan",
+    "editEntry": "Rediger"
   },
   "kindergarten": {
     "title": "Vår barnehage",

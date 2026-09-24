@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, ActivityIndicator, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { AppIcon } from '../components/AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
-import { SchoolChild, SchoolYear, SchoolSchedule } from '../types';
+import { SchoolChild, SchoolYear, SchoolSchedule, SchoolScheduleEntry } from '../types';
 import { useUserStore } from '../store/userStore';
-import { getSchoolSchedules, addSchoolSchedule, updateSchoolSchedule } from '../services/schoolService';
+import { getSchoolSchedules, addSchoolSchedule, updateSchoolSchedule, deleteSchoolSchedule } from '../services/schoolService';
 import { crossAlert } from '../utils/alert';
 import * as ImagePicker from 'expo-image-picker';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { auth } from '../services/firebase';
-import { formatShortDate } from '../utils/dateUtils';
+import { ActionModal } from '../components/ActionModal';
 
 const SCHOOL_THEME = MODULE_COLORS.school;
 const DAYS = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag'];
@@ -22,7 +22,7 @@ interface Props {
   route: { params: { child: SchoolChild; selectedYear: SchoolYear | null } };
 }
 
-export const SchoolScheduleScreen: React.FC<Props> = ({ route }) => {
+export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const { child, selectedYear } = route.params;
@@ -31,6 +31,12 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ route }) => {
   const [semester, setSemester] = useState<'høst' | 'vår'>('høst');
   const [uploading, setUploading] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [editEntries, setEditEntries] = useState<Record<string, SchoolScheduleEntry[]>>({});
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [newEntryDay, setNewEntryDay] = useState<string | null>(null);
+  const [newEntryTime, setNewEntryTime] = useState('');
+  const [newEntrySubject, setNewEntrySubject] = useState('');
 
   const loadSchedules = useCallback(async () => {
     if (!familyId || !selectedYear) return;
@@ -41,13 +47,57 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ route }) => {
   useEffect(() => { loadSchedules(); }, [loadSchedules]);
 
   const currentSchedule = schedules.find(s => s.semester === semester);
-  const entries = currentSchedule?.entries || [];
 
-  // Group entries by day
+  // Group entries by day for read view
   const grouped = DAYS.map(day => ({
     day,
-    items: entries.filter(e => e.day?.toLowerCase() === day.toLowerCase()).sort((a, b) => (a.time || '').localeCompare(b.time || '')),
+    items: (currentSchedule?.entries || []).filter(e => e.day?.toLowerCase() === day.toLowerCase()).sort((a, b) => (a.time || '').localeCompare(b.time || '')),
   }));
+
+  const startEdit = () => {
+    const entries = currentSchedule?.entries || [];
+    const grouped: Record<string, SchoolScheduleEntry[]> = {};
+    DAYS.forEach(d => { grouped[d] = entries.filter(e => e.day?.toLowerCase() === d.toLowerCase()); });
+    setEditEntries(grouped);
+    setEditMode(true);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!currentSchedule) return;
+    const allEntries: SchoolScheduleEntry[] = [];
+    DAYS.forEach(d => { (editEntries[d] || []).forEach(e => allEntries.push(e)); });
+    try {
+      await updateSchoolSchedule(currentSchedule.id, { entries: allEntries });
+      setEditMode(false);
+      loadSchedules();
+    } catch (e) {
+      crossAlert(t('common.error'), t('common.error'));
+    }
+  };
+
+  const handleAddToDay = (day: string) => {
+    setNewEntryDay(day);
+    setNewEntryTime('');
+    setNewEntrySubject('');
+  };
+
+  const confirmAddEntry = () => {
+    if (!newEntryDay || !newEntryTime.trim() || !newEntrySubject.trim()) return;
+    setEditEntries(prev => ({
+      ...prev,
+      [newEntryDay]: [...(prev[newEntryDay] || []), { day: newEntryDay, time: newEntryTime, subject: newEntrySubject }],
+    }));
+    setNewEntryDay(null);
+    setNewEntryTime('');
+    setNewEntrySubject('');
+  };
+
+  const removeEntry = (day: string, index: number) => {
+    setEditEntries(prev => ({
+      ...prev,
+      [day]: (prev[day] || []).filter((_, i) => i !== index),
+    }));
+  };
 
   const handleUploadPhoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -77,7 +127,6 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ route }) => {
       await uploadBytes(storageRef, blob);
       const downloadURL = await getDownloadURL(storageRef);
 
-      // Save schedule image
       const scheduleId = await addSchoolSchedule({
         yearId: selectedYear!.id,
         childId: child.id,
@@ -87,7 +136,6 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ route }) => {
         familyId: familyId || '',
       });
 
-      // Analyze with AI
       setAnalyzing(true);
       const base64 = asset.base64;
       const idToken = await auth.currentUser?.getIdToken();
@@ -105,16 +153,13 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ route }) => {
         if (aiRes.ok) {
           const data = await aiRes.json();
           if (data.schedule && Array.isArray(data.schedule) && data.schedule.length > 0) {
-            // Save extracted entries to the schedule
             await updateSchoolSchedule(scheduleId, { entries: data.schedule });
             crossAlert(t('common.success'), `${data.schedule.length} ${t('school.entriesExtracted')}`);
           } else {
             crossAlert(t('school.noDataFound'), t('school.tryAgainPhoto'));
           }
         }
-      } catch (e) {
-        // AI analysis failed, image is still saved
-      }
+      } catch (e) { /* AI failed, image still saved */ }
 
       loadSchedules();
     } catch (error) {
@@ -125,81 +170,161 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ route }) => {
     }
   };
 
+  const handleDeleteSchedule = async () => {
+    if (!currentSchedule) return;
+    try {
+      await deleteSchoolSchedule(currentSchedule.id);
+      setShowDeleteModal(false);
+      loadSchedules();
+    } catch (e) {
+      crossAlert(t('common.error'), t('common.error'));
+    }
+  };
+
+  // READ VIEW
+  if (!editMode) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+        <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: SCHOOL_THEME }]}>
+            <Text style={{ color: SCHOOL_THEME, fontSize: 18 }}>←</Text>
+          </TouchableOpacity>
+          <AppIcon name="schedule" size={24} color={SCHOOL_THEME} />
+          <Text style={[styles.headerTitle, { color: colors.text }]}>{t('school.schedule')} — {child.name}</Text>
+          {currentSchedule && (
+            <TouchableOpacity onPress={() => setShowDeleteModal(true)} style={{ padding: 8 }}>
+              <Text style={{ color: colors.danger, fontSize: 12 }}>{t('school.deleteSchedule')}</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+
+        <View style={[styles.semesterRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+          {(['høst', 'vår'] as const).map(s => (
+            <TouchableOpacity key={s} style={[styles.semesterTab, { backgroundColor: semester === s ? SCHOOL_THEME : 'transparent' }]} onPress={() => setSemester(s)}>
+              <Text style={{ color: semester === s ? '#fff' : colors.text, fontWeight: '600', fontSize: 14 }}>{s === 'høst' ? t('school.autumn') : t('school.spring')}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <ScrollView style={{ flex: 1, padding: 12 }}>
+          {/* AI Upload + Edit buttons */}
+          <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
+            <TouchableOpacity style={[styles.uploadBtn, { backgroundColor: SCHOOL_THEME, flex: 1 }]} onPress={handleUploadPhoto} disabled={uploading || analyzing}>
+              {uploading || analyzing ? (
+                <ActivityIndicator size="small" color="#fff" />
+              ) : (
+                <>
+                  <AppIcon name="ai" size={18} color="#fff" />
+                  <Text style={styles.uploadBtnText}>{t('school.aiScheduleHint')}</Text>
+                </>
+              )}
+            </TouchableOpacity>
+            {currentSchedule && (currentSchedule.entries || []).length > 0 && (
+              <TouchableOpacity style={[styles.editBtn, { backgroundColor: colors.inputBackground }]} onPress={startEdit}>
+                <AppIcon name="pencil" size={18} color={colors.text} />
+                <Text style={{ color: colors.text, fontSize: 12, fontWeight: '600' }}>{t('common.edit')}</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+
+          {/* Monday-Friday grid */}
+          {grouped.map(({ day, items }) => (
+            <View key={day} style={[styles.daySection, { backgroundColor: colors.surface }]}>
+              <View style={[styles.dayHeader, { backgroundColor: SCHOOL_THEME + '15' }]}>
+                <Text style={[styles.dayTitle, { color: SCHOOL_THEME }]}>{day}</Text>
+                <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{items.length} {items.length === 1 ? 'time' : 'timer'}</Text>
+              </View>
+              {items.length > 0 ? items.map((item, i) => (
+                <View key={i} style={[styles.scheduleItem, { borderBottomWidth: i < items.length - 1 ? 1 : 0, borderBottomColor: colors.border }]}>
+                  <Text style={[styles.scheduleTime, { color: colors.text }]}>{item.time || ''}</Text>
+                  <Text style={[styles.scheduleSubject, { color: colors.text, flex: 1 }]}>{item.subject || ''}</Text>
+                </View>
+              )) : (
+                <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noSchedule')}</Text>
+              )}
+            </View>
+          ))}
+
+          {entries.length === 0 && currentSchedule && (
+            <View style={[styles.imageCard, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.imageTitle, { color: colors.textSecondary }]}>{t('school.originalPhoto')}</Text>
+              <Image source={{ uri: currentSchedule.imageUrl }} style={styles.scheduleImage} resizeMode="contain" />
+            </View>
+          )}
+
+          {entries.length === 0 && !currentSchedule && !uploading && (
+            <View style={styles.emptyState}>
+              <AppIcon name="ai" size={48} color={colors.textDisabled} />
+              <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>{t('school.noSchedule')}</Text>
+              <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 4 }}>{t('school.uploadScheduleHint')}</Text>
+            </View>
+          )}
+        </ScrollView>
+
+        <ActionModal visible={showDeleteModal} title={t('school.deleteSchedule')} subtitle={semester === 'høst' ? t('school.autumnSchedule') : t('school.springSchedule')} onDelete={handleDeleteSchedule} onCancel={() => setShowDeleteModal(false)} />
+      </SafeAreaView>
+    );
+  }
+
+  // EDIT VIEW
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: SCHOOL_THEME }]}>
+        <TouchableOpacity onPress={() => setEditMode(false)} style={[styles.backBtn, { borderColor: SCHOOL_THEME }]}>
           <Text style={{ color: SCHOOL_THEME, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
-        <AppIcon name="schedule" size={24} color={SCHOOL_THEME} />
-        <Text style={[styles.headerTitle, { color: colors.text }]}>{t('school.schedule')} — {child.name}</Text>
-        <View style={{ width: 32 }} />
-      </View>
-
-      {/* Semester tabs */}
-      <View style={[styles.semesterRow, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        {(['høst', 'vår'] as const).map(s => (
-          <TouchableOpacity
-            key={s}
-            style={[styles.semesterTab, { backgroundColor: semester === s ? SCHOOL_THEME : 'transparent' }]}
-            onPress={() => setSemester(s)}
-          >
-            <Text style={{ color: semester === s ? '#fff' : colors.text, fontWeight: '600', fontSize: 14 }}>{s === 'høst' ? t('school.autumn') : t('school.spring')}</Text>
-          </TouchableOpacity>
-        ))}
+        <AppIcon name="pencil" size={24} color={SCHOOL_THEME} />
+        <Text style={[styles.headerTitle, { color: colors.text }]}>{t('school.editSchedule')} — {child.name}</Text>
+        <TouchableOpacity onPress={handleSaveEdit} style={[styles.saveBtn, { backgroundColor: SCHOOL_THEME }]}>
+          <Text style={{ color: '#fff', fontSize: 13, fontWeight: '700' }}>{t('common.save')}</Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={{ flex: 1, padding: 12 }}>
-        {/* AI Upload button */}
-        <TouchableOpacity
-          style={[styles.uploadBtn, { backgroundColor: SCHOOL_THEME }]}
-          onPress={handleUploadPhoto}
-          disabled={uploading || analyzing}
-        >
-          {uploading || analyzing ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <>
-              <AppIcon name="ai" size={20} color="#fff" />
-              <Text style={styles.uploadBtnText}>{t('school.aiScheduleHint')}</Text>
-            </>
-          )}
-        </TouchableOpacity>
-
-        {/* Monday-Friday schedule grid */}
-        {grouped.map(({ day, items }) => (
+        {DAYS.map(day => (
           <View key={day} style={[styles.daySection, { backgroundColor: colors.surface }]}>
             <View style={[styles.dayHeader, { backgroundColor: SCHOOL_THEME + '15' }]}>
               <Text style={[styles.dayTitle, { color: SCHOOL_THEME }]}>{day}</Text>
-              <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{items.length} {items.length === 1 ? 'time' : 'timer'}</Text>
+              <TouchableOpacity onPress={() => handleAddToDay(day)} style={[styles.addDayBtn, { backgroundColor: SCHOOL_THEME }]}>
+                <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>+ {t('school.addEntry')}</Text>
+              </TouchableOpacity>
             </View>
-            {items.length > 0 ? items.map((item, i) => (
-              <View key={i} style={[styles.scheduleItem, { borderBottomWidth: i < items.length - 1 ? 1 : 0, borderBottomColor: colors.border }]}>
-                <Text style={[styles.scheduleTime, { color: colors.text }]}>{item.time || ''}</Text>
-                <Text style={[styles.scheduleSubject, { color: colors.text, flex: 1 }]}>{item.subject || ''}</Text>
+            {(editEntries[day] || []).map((entry, i) => (
+              <View key={i} style={[styles.scheduleItem, { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+                <Text style={[styles.scheduleTime, { color: colors.text }]}>{entry.time || ''}</Text>
+                <Text style={[styles.scheduleSubject, { color: colors.text, flex: 1 }]}>{entry.subject || ''}</Text>
+                <TouchableOpacity onPress={() => removeEntry(day, i)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
+                  <Text style={{ color: colors.danger, fontSize: 16, fontWeight: '600' }}>✕</Text>
+                </TouchableOpacity>
               </View>
-            )) : (
+            ))}
+            {(editEntries[day] || []).length === 0 && (
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noSchedule')}</Text>
             )}
           </View>
         ))}
-
-        {/* Show uploaded image if no entries */}
-        {entries.length === 0 && currentSchedule && (
-          <View style={[styles.imageCard, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.imageTitle, { color: colors.textSecondary }]}>{t('school.originalPhoto')}</Text>
-            <Image source={{ uri: currentSchedule.imageUrl }} style={styles.scheduleImage} resizeMode="contain" />
-          </View>
-        )}
-
-        {entries.length === 0 && !currentSchedule && !uploading && (
-          <View style={styles.emptyState}>
-            <AppIcon name="ai" size={48} color={colors.textDisabled} />
-            <Text style={{ color: colors.textSecondary, fontSize: 14, marginTop: 8 }}>{t('school.noSchedule')}</Text>
-            <Text style={{ color: colors.textDisabled, fontSize: 12, marginTop: 4 }}>{t('school.uploadScheduleHint')}</Text>
-          </View>
-        )}
       </ScrollView>
+
+      {/* Add Entry Modal */}
+      {newEntryDay && (
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('school.addEntry')} — {newEntryDay}</Text>
+            <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>{t('common.time')}</Text>
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntryTime} onChangeText={setNewEntryTime} placeholder="08:00-09:00" placeholderTextColor={colors.textDisabled} autoFocus />
+            <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>{t('school.subject')}</Text>
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntrySubject} onChangeText={setNewEntrySubject} placeholder={t('school.subject')} placeholderTextColor={colors.textDisabled} />
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => setNewEntryDay(null)}>
+                <Text style={{ color: colors.text, fontWeight: '600' }}>{t('common.cancel')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: SCHOOL_THEME, flex: 1 }]} onPress={confirmAddEntry}>
+                <Text style={{ color: '#fff', fontWeight: '600' }}>{t('common.add')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -209,18 +334,28 @@ const styles = StyleSheet.create({
   header: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1 },
   backBtn: { width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
   headerTitle: { fontSize: 16, fontWeight: '700', flex: 1 },
+  saveBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 },
   semesterRow: { flexDirection: 'row', paddingHorizontal: 12, paddingVertical: 8, gap: 8, borderBottomWidth: 1 },
   semesterTab: { paddingHorizontal: 20, paddingVertical: 8, borderRadius: 20 },
-  uploadBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 14, borderRadius: 12, marginBottom: 12 },
-  uploadBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
+  uploadBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 14, borderRadius: 12 },
+  uploadBtnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  editBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 14, borderRadius: 12 },
   daySection: { borderRadius: 12, marginBottom: 10, overflow: 'hidden' },
   dayHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: 10 },
   dayTitle: { fontSize: 15, fontWeight: '700' },
+  addDayBtn: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   scheduleItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8, paddingHorizontal: 10, gap: 12 },
   scheduleTime: { fontSize: 13, fontWeight: '600', width: 100 },
-  scheduleSubject: { fontSize: 14 },
+  scheduleSubject: { fontSize: 14, flex: 1 },
+  emptyText: { fontSize: 13, fontStyle: 'italic', textAlign: 'center', padding: 8 },
   imageCard: { borderRadius: 12, padding: 12, marginBottom: 12 },
   imageTitle: { fontSize: 12, marginBottom: 8 },
   scheduleImage: { width: '100%', height: 250, borderRadius: 8 },
   emptyState: { alignItems: 'center', marginTop: 60 },
+  modalOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0,0,0,0.5)', padding: 20, justifyContent: 'flex-end' },
+  modalContent: { borderRadius: 16, padding: 20 },
+  modalTitle: { fontSize: 18, fontWeight: '700', marginBottom: 12 },
+  modalLabel: { fontSize: 12, marginBottom: 4, marginTop: 8 },
+  modalInput: { borderWidth: 1, borderRadius: 8, padding: 10, fontSize: 16, borderColor: '#e0e0e0' },
+  modalBtn: { paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
 });

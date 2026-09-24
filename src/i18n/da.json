@@ -324,7 +324,14 @@
     "analyzing": "Analyserer med AI...",
     "aiExtracted": "AI-udtrukket køreplan",
     "autumnSchedule": "Efterårskøreplan",
-    "springSchedule": "Forårskøreplan"
+    "springSchedule": "Forårskøreplan",
+    "aiScheduleHint": "Tag et billede af køreplanen — AI læser den automatisk",
+    "originalPhoto": "Originalt billede",
+    "noDataFound": "Ingen data fundet",
+    "tryAgainPhoto": "Prøv med et tydeligere billede",
+    "entriesExtracted": "poster extraheret",
+    "deleteSchedule": "Slet køreplan",
+    "editEntry": "Rediger"
   },
   "kindergarten": {
     "title": "Vores børnehave",

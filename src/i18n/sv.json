@@ -324,7 +324,14 @@
     "analyzing": "Analyserar med AI...",
     "aiExtracted": "AI-extraherat schema",
     "autumnSchedule": "Höstschema",
-    "springSchedule": "Vårschema"
+    "springSchedule": "Vårschema",
+    "aiScheduleHint": "Ta ett foto av schema — AI läser det automatiskt",
+    "originalPhoto": "Originalbild",
+    "noDataFound": "Inga data hittades",
+    "tryAgainPhoto": "Försök med en tydligare bild",
+    "entriesExtracted": "poster extraherade",
+    "deleteSchedule": "Ta bort schema",
+    "editEntry": "Redigera"
   },
   "kindergarten": {
     "title": "Vår förskola",

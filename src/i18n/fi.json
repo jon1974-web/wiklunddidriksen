@@ -324,7 +324,14 @@
     "analyzing": "Analysoidaan AI:lla...",
     "aiExtracted": "AI-poimittu aikataulu",
     "autumnSchedule": "Syksyn aikataulu",
-    "springSchedule": "Kevään aikataulu"
+    "springSchedule": "Kevään aikataulu",
+    "aiScheduleHint": "Ota kuva aikataulusta — AI lukee sen automaattisesti",
+    "originalPhoto": "Alkuperäinen kuva",
+    "noDataFound": "Ei tietoja löytynyt",
+    "tryAgainPhoto": "Yritä selkeämmällä kuvalla",
+    "entriesExtracted": "merkintää poimittu",
+    "deleteSchedule": "Poista aikataulu",
+    "editEntry": "Muokkaa"
   },
   "kindergarten": {
     "title": "Päiväkotimme",

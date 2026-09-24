@@ -324,7 +324,14 @@
     "analyzing": "Analyzing with AI...",
     "aiExtracted": "AI-extracted timetable",
     "autumnSchedule": "Autumn timetable",
-    "springSchedule": "Spring timetable"
+    "springSchedule": "Spring timetable",
+    "aiScheduleHint": "Take a photo of the timetable — AI reads it automatically",
+    "originalPhoto": "Original photo",
+    "noDataFound": "No data found",
+    "tryAgainPhoto": "Try with a clearer photo",
+    "entriesExtracted": "entries extracted",
+    "deleteSchedule": "Delete timetable",
+    "editEntry": "Edit"
   },
   "kindergarten": {
     "title": "Our Kindergarten",
