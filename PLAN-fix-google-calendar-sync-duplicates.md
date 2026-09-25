@@ -74,6 +74,49 @@ surplus Firestore docs (merge documents/notes), or handle manually in the app.
 
 1. Cleanup automatically after dry report, or leave duplicates for manual deletion?
 2. Include Firestore-doc merging in cleanup, or manual?
+3. Sync-on-connect scope: include past events or only upcoming (timeMin = today suggested)?
+
+## Plan D — Sync-on-connect (new member auto-backfill)
+
+> Discovered 2026-09-25: a newly connected member only receives events via a
+> manual backfill re-run by the owner. Connecting Google Calendar itself does
+> nothing (verified: `googleCalendarCallback` at functions/index.js:3261 only
+> stores tokens and redirects — no event sync, no trigger on the users
+> collection).
+
+**Goal:** when a family member connects their Google Calendar, all family events
+are automatically written to their new calendar — self-service, no owner action.
+
+**Implementation (small, in `googleCalendarCallback`):**
+
+- After storing tokens and before redirecting, loop the 7 event collections
+  (events, trips, petVetVisits, homeServices, health/{fid}/appointments,
+  schoolActivities/{fid}/activities, kindergartenActivities/{fid}/activities)
+  and create each event for **the new member only** — scoped, not whole-family.
+- Reuse the same payload builders as `backfillCalendarSync` (factor them into
+  shared functions since Plan A/B also need them).
+- **Duplicate-safe:** requires Plan A's idempotency pre-check — before creating,
+  `events.list` pre-check on the member's calendar (same title, matching start
+  ±1h). If an event already exists there, adopt its ID instead of creating.
+- **Scope decision:** use `timeMin = today` so new members only get upcoming
+  events (better UX than flooding a calendar with years of history). Confirm
+  with product owner before implementation.
+- Large write burst risk: a family can have 100+ events → the HTTP callback
+  could run long. Mitigation: respond to the OAuth redirect immediately and run
+  the sync in a fire-and-forget async continuation (or process with
+  `Promise.all` chunks), plus the same rate-limit/timeout settings as the
+  backfill. Alternative: schedule the per-user sync as a Pub/Sub task instead
+  of inline in the callback.
+
+**UI:** optional toast/badge in Profile after redirect
+(`profile?calendar=connected`) — "Synkroniserer hendelser til kalenderen din…"
+with the sync running in the background.
+
+**Verification:**
+1. New member connects → all upcoming family events appear in their calendar
+   automatically, exactly once per event.
+2. Re-connect (disconnect + connect) → no duplicates (Plan A dedup proves it).
+3. Owner does not need to re-run the manual backfill.
 
 ## Verification steps after implementation
 
