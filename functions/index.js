@@ -5077,7 +5077,9 @@ function formatDataForGPT(data) {
   if (data.events && data.events.length > 0) {
     lines.push('--- HENDELSER ---');
     data.events.forEach(e => {
-      lines.push(`• ${e.title || 'Uten navn'} | ${e.date || '?'} ${e.time || ''} → ${e.endDate || ''} ${e.endTime || ''} | ${e.address || ''}`);
+      const person = e.person || e.selectedPersons || '';
+      const personStr = Array.isArray(person) ? person.join(', ') : person;
+      lines.push(`• ${e.title || 'Uten navn'} | ${e.date || '?'} ${e.time || ''} → ${e.endDate || ''} ${e.endTime || ''} | ${e.address || ''}${personStr ? ' | For: ' + personStr : ''}`);
     });
   }
 
@@ -5127,7 +5129,9 @@ function formatDataForGPT(data) {
   if (data.petVetVisits && data.petVetVisits.length > 0) {
     lines.push('--- VETERINÆRBESØK ---');
     data.petVetVisits.forEach(v => {
-      lines.push(`• ${v.name || 'Uten navn'} | ${v.dateFrom || '?'} ${v.startTime || ''} | Lege: ${v.doctor || ''} | ${v.reason || ''}`);
+      const person = v.person || '';
+      const personStr = Array.isArray(person) ? person.join(', ') : person;
+      lines.push(`• ${v.name || 'Uten navn'} | ${v.dateFrom || '?'} ${v.startTime || ''} | Lege: ${v.doctor || ''}${personStr ? ' | For: ' + personStr : ''}`);
     });
   }
 
@@ -5169,7 +5173,9 @@ function formatDataForGPT(data) {
   if (data.serviceAppointments && data.serviceAppointments.length > 0) {
     lines.push('--- SERVICEAVTALER ---');
     data.serviceAppointments.forEach(s => {
-      lines.push(`• ${s.title || s.name || 'Uten navn'} | ${s.dateFrom || '?'} ${s.startTime || ''} | Frekvens: ${s.frequency || ''}`);
+      const person = s.persons || s.person || '';
+      const personStr = Array.isArray(person) ? person.join(', ') : person;
+      lines.push(`• ${s.title || s.name || 'Uten navn'} | ${s.dateFrom || '?'} ${s.startTime || ''} | Frekvens: ${s.frequency || ''}${personStr ? ' | For: ' + personStr : ''}`);
     });
   }
 
@@ -5183,7 +5189,9 @@ function formatDataForGPT(data) {
   if (data.schoolActivities && data.schoolActivities.length > 0) {
     lines.push('--- SKOLEAKTIVITETER ---');
     data.schoolActivities.forEach(a => {
-      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}`);
+      const person = a.selectedPersons || a.person || '';
+      const personStr = Array.isArray(person) ? person.join(', ') : person;
+      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}${personStr ? ' | For: ' + personStr : ''}`);
     });
   }
 
@@ -5218,7 +5226,9 @@ function formatDataForGPT(data) {
   if (data.kindergartenActivities && data.kindergartenActivities.length > 0) {
     lines.push('--- BARNEHAGEAKTIVITETER ---');
     data.kindergartenActivities.forEach(a => {
-      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}`);
+      const person = a.selectedPersons || a.person || '';
+      const personStr = Array.isArray(person) ? person.join(', ') : person;
+      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}${personStr ? ' | For: ' + personStr : ''}`);
     });
   }
 
@@ -5533,10 +5543,13 @@ DATO-INTELLIGENS:
 - Datoformat til brukeren: "mandag 22. september 2026", "kl. 14:00", "om 3 dager"
 
 PERSON-KONTEKT:
-Når brukeren nevner et navn (f.eks. "Mina", "Jon", "Luna"), finner du personen i dataene og bruker deres ID-er for å filtrere:
-- Barn: schoolChildren/kindergartenChildren → childId → schoolActivities/kindergartenActivities
-- Kjæledyr: pets → petId → petVetVisits, petMedications, petVaccinations
-- Voksne: Health.MEDICATIONS/APPOINTMENTS → person-feltet
+Når brukeren spør om hendelser/avtaler/aktiviteter for en bestemt person, bruk "For:" feltet i dataen til å filtrere. Eksempler:
+- "Hva har Jon av avtaler?" → Filtrer hendelser og helseavtaler der person inkluderer "Jon"
+- "Vis meg alle aktiviteter for Mina" → Filtrer skole/barnehageaktiviteter der selectedPersons inkluderer "Mina"
+- "Hva skal Luna gjøre denne uken?" → Filtrer alle hendelser der person inkluderer "Luna"
+- "Hvilke serviceavtaler har Jon?" → Filtrer serviceavtaler der persons inkluderer "Jon"
+- "Hva er det på planen for hele familien?" → Vis alle hendelser uten personfilter
+
 Svar alltid med personens navn, ikke bare "barnet" eller "kjæledyret".
 
 SAMMENHENG (inkluder relaterte data når du svarer):
