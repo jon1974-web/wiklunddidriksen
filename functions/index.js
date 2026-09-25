@@ -3422,53 +3422,32 @@ exports.onEventCreatedForCalendar = onDocumentCreated({ region: "us-central1", d
 
   const data = snap.data();
   if (!data) return;
-
-  const db = getFirestore();
+  if (!data.familyId) return;
 
   try {
-    // Get all family members who have Google Calendar connected
-    if (!data.familyId) return;
-    const familySnap = await db.collection("families").doc(data.familyId).get();
-    const members = familySnap.data()?.members || {};
-    const memberUids = Object.keys(members);
+    const db = getFirestore();
+    const startDateTime = `${data.date}T${data.time || "09:00"}:00`;
+    const endDateTime = data.endTime
+      ? `${data.date}T${data.endTime}:00`
+      : data.endDate
+        ? `${data.endDate}T${data.time ? incrementTime(data.time) : "10:00"}:00`
+        : `${data.date}T${data.time ? incrementTime(data.time) : "10:00"}:00`;
 
-    const calendarEventIds = {};
-    let firstEventId = null;
+    const payload = {
+      title: data.title,
+      description: data.description || "",
+      startDateTime,
+      endDateTime,
+      location: data.address || "",
+      reminderMinutes: data.reminderMinutes || 0,
+    };
 
-    for (const uid of memberUids) {
-      try {
-        const userDoc = await db.collection("users").doc(uid).get();
-        const userData = userDoc.data();
-        if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) continue;
-
-        const startDateTime = `${data.date}T${data.time || "09:00"}:00`;
-        const endDateTime = data.endTime
-          ? `${data.date}T${data.endTime}:00`
-          : data.endDate
-            ? `${data.endDate}T${data.time ? incrementTime(data.time) : "10:00"}:00`
-            : `${data.date}T${data.time ? incrementTime(data.time) : "10:00"}:00`;
-
-        const eventId = await createGoogleCalendarEvent(uid, {
-          title: data.title,
-          description: data.description || "",
-          startDateTime,
-          endDateTime,
-          location: data.address || "",
-          reminderMinutes: data.reminderMinutes || 0,
-        });
-
-        calendarEventIds[uid] = eventId;
-        if (!firstEventId) firstEventId = eventId;
-      } catch (e) {
-        console.error(`onEventCreatedForCalendar: failed for uid ${uid}:`, e.message);
-      }
-    }
+    const { calendarEventIds, firstEventId } = await familySyncCreate(data.familyId, payload);
 
     if (Object.keys(calendarEventIds).length > 0) {
-      // Store all IDs for future updates/deletions (googleCalendarEventIds kept for creator for backward compat)
       await db.collection("events").doc(event.params.eventId).update({
         googleCalendarEventIds: calendarEventIds,
-        googleCalendarEventId: firstEventId,
+        googleCalendarEventId: calendarEventIds[data.createdBy] || firstEventId,
       });
       console.log(`onEventCreatedForCalendar: synced event ${event.params.eventId} to ${Object.keys(calendarEventIds).length} family calendars`);
     }
@@ -3490,45 +3469,34 @@ exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", do
   if (!snap) return;
 
   const data = snap.data();
-  const uid = data.createdBy;
-  console.log(`onTripCreatedForCalendar: triggered for trip ${event.params.tripId}, uid: ${uid}`);
-
-  if (!uid) {
-    console.log("No createdBy field, skipping");
-    return;
-  }
+  if (!data) return;
+  if (!data.familyId) return;
 
   try {
     const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
-      console.log(`User ${uid} not connected to Google Calendar`);
-      return;
-    }
-
     const startDate = data.startDate;
     const endDate = data.endDate || data.startDate;
     const startTime = data.startTime;
-    const endTime = data.endTime;
-    console.log(`Creating trip: ${data.title}, start: ${startDate}, end: ${endDate}, startTime: ${startTime || 'allDay'}, endTime: ${endTime || 'allDay'}`);
 
-    const eventId = await createGoogleCalendarEvent(uid, {
+    const payload = {
       title: `✈️ ${data.title || data.city || "Reise"}`,
       description: `${data.city || ""}${data.country ? ", " + data.country : ""}`,
       allDay: !startTime,
       startDate,
       endDate,
       ...(startTime ? { startDateTime: `${startDate}T${startTime}:00` } : {}),
-      ...(endTime ? { endDateTime: `${endDate}T${endTime}:00` } : {}),
-    });
+      ...(data.endTime ? { endDateTime: `${endDate}T${data.endTime}:00` } : {}),
+    };
 
-    await db.collection("trips").doc(event.params.tripId).update({
-      googleCalendarEventId: eventId,
-    });
+    const { calendarEventIds, firstEventId } = await familySyncCreate(data.familyId, payload);
 
-    console.log(`onTripCreatedForCalendar: synced trip ${event.params.tripId}`);
+    if (Object.keys(calendarEventIds).length > 0) {
+      await db.collection("trips").doc(event.params.tripId).update({
+        googleCalendarEventIds: calendarEventIds,
+        googleCalendarEventId: calendarEventIds[data.createdBy] || firstEventId,
+      });
+      console.log(`onTripCreatedForCalendar: synced trip ${event.params.tripId} to ${Object.keys(calendarEventIds).length} family calendars`);
+    }
   } catch (error) {
     console.error(`onTripCreatedForCalendar error:`, error);
   }
@@ -3541,45 +3509,33 @@ exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-
 
   const data = snap.data();
   const familyId = event.params.familyId;
-  const uid = data.createdBy;
-  console.log(`onHealthAppointmentCreatedForCalendar: triggered for family ${familyId}, doc ${event.params.docId}, uid: ${uid}`);
-
-  if (!uid) {
-    console.log("No createdBy field, skipping");
-    return;
-  }
+  if (!data) return;
 
   try {
     const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
-      console.log(`User ${uid} not connected to Google Calendar. calendarType: ${userData?.calendarType}`);
-      return;
-    }
-
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
       ? `${data.dateFrom}T${data.endTime}:00`
       : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
-    console.log(`Creating calendar event: ${data.title}, ${startDateTime} - ${endDateTime}`);
-
-    const eventId = await createGoogleCalendarEvent(uid, {
+    const payload = {
       title: `❤️ ${data.title}`,
-      description: data.person || "",
+      description: Array.isArray(data.person) ? data.person.join(", ") : (data.person || ""),
       startDateTime,
       endDateTime,
       location: data.location || "",
       reminderMinutes: data.reminder || 0,
-    });
+    };
 
-    await db.collection("health").doc(familyId).collection("appointments").doc(event.params.docId).update({
-      googleCalendarEventId: eventId,
-    });
+    const { calendarEventIds, firstEventId } = await familySyncCreate(familyId, payload);
 
-    console.log(`onHealthAppointmentCreatedForCalendar: synced ${event.params.docId}`);
+    if (Object.keys(calendarEventIds).length > 0) {
+      await db.collection("health").doc(familyId).collection("appointments").doc(event.params.docId).update({
+        googleCalendarEventIds: calendarEventIds,
+        googleCalendarEventId: calendarEventIds[data.createdBy] || firstEventId,
+      });
+      console.log(`onHealthAppointmentCreatedForCalendar: synced ${event.params.docId} to ${Object.keys(calendarEventIds).length} family calendars`);
+    }
   } catch (error) {
     console.error(`onHealthAppointmentCreatedForCalendar error:`, error);
   }
@@ -3591,45 +3547,34 @@ exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-centra
   if (!snap) return;
 
   const data = snap.data();
-  const uid = data.createdBy;
-  console.log(`onPetVetVisitCreatedForCalendar: triggered for doc ${event.params.docId}, uid: ${uid}`);
-
-  if (!uid) {
-    console.log("No createdBy field, skipping");
-    return;
-  }
+  if (!data) return;
+  if (!data.familyId) return;
 
   try {
     const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
-      console.log(`User ${uid} not connected to Google Calendar`);
-      return;
-    }
-
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
       ? `${data.dateFrom}T${data.endTime}:00`
       : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
-    console.log(`Creating pet vet visit: ${data.title}, ${startDateTime} - ${endDateTime}`);
-
-    const eventId = await createGoogleCalendarEvent(uid, {
+    const payload = {
       title: `🐾 ${data.title}`,
-      description: data.petId || "",
+      description: Array.isArray(data.person) ? data.person.join(", ") : (data.person || ""),
       startDateTime,
       endDateTime,
       location: data.location || "",
       reminderMinutes: data.reminder || 0,
-    });
+    };
 
-    await db.collection("petVetVisits").doc(event.params.docId).update({
-      googleCalendarEventId: eventId,
-    });
+    const { calendarEventIds, firstEventId } = await familySyncCreate(data.familyId, payload);
 
-    console.log(`onPetVetVisitCreatedForCalendar: synced ${event.params.docId}`);
+    if (Object.keys(calendarEventIds).length > 0) {
+      await db.collection("petVetVisits").doc(event.params.docId).update({
+        googleCalendarEventIds: calendarEventIds,
+        googleCalendarEventId: calendarEventIds[data.createdBy] || firstEventId,
+      });
+      console.log(`onPetVetVisitCreatedForCalendar: synced ${event.params.docId} to ${Object.keys(calendarEventIds).length} family calendars`);
+    }
   } catch (error) {
     console.error(`onPetVetVisitCreatedForCalendar error:`, error);
   }
@@ -3704,28 +3649,91 @@ async function deleteGoogleCalendarEvent(uid, calendarEventId) {
   }
 }
 
+// ==================== FAMILY-WIDE SYNC HELPERS ====================
+// Sync calendar events to ALL family members who have Google Calendar connected
+
+// Helper: Create calendar event for all family members
+// Returns { calendarEventIds: {uid: eventId}, firstEventId }
+async function familySyncCreate(familyId, payload) {
+  const db = getFirestore();
+  const familySnap = await db.collection("families").doc(familyId).get();
+  const members = familySnap.data()?.members || {};
+  const memberUids = Object.keys(members);
+  const calendarEventIds = {};
+  let firstEventId = null;
+
+  for (const uid of memberUids) {
+    try {
+      const userDoc = await db.collection("users").doc(uid).get();
+      const userData = userDoc.data();
+      if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) continue;
+      const eventId = await createGoogleCalendarEvent(uid, payload);
+      calendarEventIds[uid] = eventId;
+      if (!firstEventId) firstEventId = eventId;
+    } catch (e) {
+      console.error(`familySyncCreate: failed for uid ${uid}:`, e.message);
+    }
+  }
+  return { calendarEventIds, firstEventId };
+}
+
+// Helper: Update calendar event for all family members it was synced to
+// Supports legacy single-ID format (creator) and new multi-member map
+async function familySyncUpdate(record, payload) {
+  const db = getFirestore();
+  const calendarEventIds = record.googleCalendarEventIds || {};
+  const legacyId = record.googleCalendarEventId;
+  let uids = Object.keys(calendarEventIds);
+  if (uids.length === 0 && record.createdBy && legacyId) uids = [record.createdBy];
+  if (uids.length === 0) return 0;
+
+  let count = 0;
+  for (const uid of uids) {
+    try {
+      const eventIdToUpdate = calendarEventIds[uid] || legacyId;
+      if (!eventIdToUpdate) continue;
+      const userDoc = await db.collection("users").doc(uid).get();
+      const userData = userDoc.data();
+      if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) continue;
+      await updateGoogleCalendarEvent(uid, eventIdToUpdate, payload);
+      count++;
+    } catch (e) {
+      console.error(`familySyncUpdate: failed for uid ${uid}:`, e.message);
+    }
+  }
+  return count;
+}
+
+// Helper: Delete calendar event from all family members' calendars
+// Supports legacy single-ID format (creator) and new multi-member map
+async function familySyncDelete(record) {
+  const calendarEventIds = record.googleCalendarEventIds || {};
+  const legacyId = record.googleCalendarEventId;
+  let uids = Object.keys(calendarEventIds);
+  if (uids.length === 0 && record.createdBy && legacyId) uids = [record.createdBy];
+  if (uids.length === 0) return 0;
+
+  let count = 0;
+  for (const uid of uids) {
+    try {
+      const eventIdToDelete = calendarEventIds[uid] || legacyId;
+      if (!eventIdToDelete) continue;
+      await deleteGoogleCalendarEvent(uid, eventIdToDelete);
+      count++;
+    } catch (e) {
+      console.error(`familySyncDelete: failed for uid ${uid}:`, e.message);
+    }
+  }
+  return count;
+}
+
 // ==================== UPDATE TRIGGERS ====================
 
 exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "events/{eventId}" }, async (event) => {
-  const before = event.data?.before?.data();
   const after = event.data?.after?.data();
   if (!after) return;
 
-  const calendarEventId = after.googleCalendarEventId;
-  const calendarEventIds = after.googleCalendarEventIds || {};
-  const startHandled = after.googleCalendarEventIds || (after.googleCalendarEventId ? {} : null);
-  // Collect all UIDs with calendar IDs (new multi-member format + legacy single ID for creator)
-  const uidsToUpdate = Object.keys(calendarEventIds);
-
-  // Legacy format: single ID on creator
-  if (uidsToUpdate.length === 0 && after.createdBy && calendarEventId) {
-    uidsToUpdate.push(after.createdBy);
-  }
-  if (uidsToUpdate.length === 0) return;
-
   try {
-    const db = getFirestore();
-
     const startDateTime = `${after.date}T${after.time || "09:00"}:00`;
     const endDateTime = after.endTime
       ? `${after.date}T${after.endTime}:00`
@@ -3733,27 +3741,15 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
         ? `${after.endDate}T${after.time ? incrementTime(after.time) : "10:00"}:00`
         : `${after.date}T${after.time ? incrementTime(after.time) : "10:00"}:00`;
 
-    for (const uid of uidsToUpdate) {
-      try {
-        const eventIdToUpdate = calendarEventIds[uid] || calendarEventId;
-        if (!eventIdToUpdate) continue;
-        const userDoc = await db.collection("users").doc(uid).get();
-        const userData = userDoc.data();
-        if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) continue;
+    const count = await familySyncUpdate(after, {
+      title: after.title,
+      description: after.description || "",
+      startDateTime,
+      endDateTime,
+      location: after.address || "",
+    });
 
-        await updateGoogleCalendarEvent(uid, eventIdToUpdate, {
-          title: after.title,
-          description: after.description || "",
-          startDateTime,
-          endDateTime,
-          location: after.address || "",
-        });
-      } catch (e) {
-        console.error(`onEventUpdatedForCalendar: failed for uid ${uid}:`, e.message);
-      }
-    }
-
-    console.log(`onEventUpdatedForCalendar: updated event ${event.params.eventId} on ${uidsToUpdate.length} calendars`);
+    console.log(`onEventUpdatedForCalendar: updated event ${event.params.eventId} on ${count} calendars`);
   } catch (error) {
     console.error(`onEventUpdatedForCalendar error:`, error);
   }
@@ -3763,17 +3759,8 @@ exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", do
   const after = event.data?.after?.data();
   if (!after) return;
 
-  const uid = after.createdBy;
-  const calendarEventId = after.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
-    await updateGoogleCalendarEvent(uid, calendarEventId, {
+    const count = await familySyncUpdate(after, {
       title: `✈️ ${after.title || after.city || "Reise"}`,
       description: `${after.city || ""}${after.country ? ", " + after.country : ""}`,
       allDay: !after.startTime,
@@ -3783,7 +3770,7 @@ exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", do
       ...(after.endTime ? { endDateTime: `${after.endDate || after.startDate}T${after.endTime}:00` } : {}),
     });
 
-    console.log(`onTripUpdatedForCalendar: updated trip ${event.params.tripId}`);
+    console.log(`onTripUpdatedForCalendar: updated trip ${event.params.tripId} on ${count} calendars`);
   } catch (error) {
     console.error(`onTripUpdatedForCalendar error:`, error);
   }
@@ -3793,30 +3780,21 @@ exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-
   const after = event.data?.after?.data();
   if (!after) return;
 
-  const uid = after.createdBy;
-  const calendarEventId = after.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
       ? `${after.dateFrom}T${after.endTime}:00`
       : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
-    await updateGoogleCalendarEvent(uid, calendarEventId, {
+    const count = await familySyncUpdate(after, {
       title: `❤️ ${after.title}`,
-      description: after.person || "",
+      description: Array.isArray(after.person) ? after.person.join(", ") : (after.person || ""),
       startDateTime,
       endDateTime,
       location: after.location || "",
     });
 
-    console.log(`onHealthAppointmentUpdatedForCalendar: updated ${event.params.docId}`);
+    console.log(`onHealthAppointmentUpdatedForCalendar: updated ${event.params.docId} on ${count} calendars`);
   } catch (error) {
     console.error(`onHealthAppointmentUpdatedForCalendar error:`, error);
   }
@@ -3826,30 +3804,21 @@ exports.onPetVetVisitUpdatedForCalendar = onDocumentUpdated({ region: "us-centra
   const after = event.data?.after?.data();
   if (!after) return;
 
-  const uid = after.createdBy;
-  const calendarEventId = after.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
       ? `${after.dateFrom}T${after.endTime}:00`
       : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
-    await updateGoogleCalendarEvent(uid, calendarEventId, {
+    const count = await familySyncUpdate(after, {
       title: `🐾 ${after.title}`,
-      description: after.petId || "",
+      description: Array.isArray(after.person) ? after.person.join(", ") : (after.person || ""),
       startDateTime,
       endDateTime,
       location: after.location || "",
     });
 
-    console.log(`onPetVetVisitUpdatedForCalendar: updated ${event.params.docId}`);
+    console.log(`onPetVetVisitUpdatedForCalendar: updated ${event.params.docId} on ${count} calendars`);
   } catch (error) {
     console.error(`onPetVetVisitUpdatedForCalendar error:`, error);
   }
@@ -3861,30 +3830,9 @@ exports.onEventDeletedForCalendar = onDocumentDeleted({ region: "us-central1", d
   const data = event.data?.data();
   if (!data) return;
 
-  const calendarEventId = data.googleCalendarEventId;
-  const calendarEventIds = data.googleCalendarEventIds || {};
-  const uidsToDelete = Object.keys(calendarEventIds);
-
-  // Legacy format: single ID on creator
-  if (uidsToDelete.length === 0 && data.createdBy && calendarEventId) {
-    uidsToDelete.push(data.createdBy);
-  }
-  if (uidsToDelete.length === 0) return;
-
   try {
-    const db = getFirestore();
-
-    for (const uid of uidsToDelete) {
-      try {
-        const eventIdToDelete = calendarEventIds[uid] || calendarEventId;
-        if (!eventIdToDelete) continue;
-        await deleteGoogleCalendarEvent(uid, eventIdToDelete);
-      } catch (e) {
-        console.error(`onEventDeletedForCalendar: failed for uid ${uid}:`, e.message);
-      }
-    }
-
-    console.log(`onEventDeletedForCalendar: deleted event ${event.params.eventId} from ${uidsToDelete.length} calendars`);
+    const count = await familySyncDelete(data);
+    console.log(`onEventDeletedForCalendar: deleted event ${event.params.eventId} from ${count} calendars`);
   } catch (error) {
     console.error(`onEventDeletedForCalendar error:`, error);
   }
@@ -3894,18 +3842,9 @@ exports.onTripDeletedForCalendar = onDocumentDeleted({ region: "us-central1", do
   const data = event.data?.data();
   if (!data) return;
 
-  const uid = data.createdBy;
-  const calendarEventId = data.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
-    await deleteGoogleCalendarEvent(uid, calendarEventId);
-    console.log(`onTripDeletedForCalendar: deleted trip ${event.params.tripId}`);
+    const count = await familySyncDelete(data);
+    console.log(`onTripDeletedForCalendar: deleted trip ${event.params.tripId} from ${count} calendars`);
   } catch (error) {
     console.error(`onTripDeletedForCalendar error:`, error);
   }
@@ -3915,18 +3854,9 @@ exports.onHealthAppointmentDeletedForCalendar = onDocumentDeleted({ region: "us-
   const data = event.data?.data();
   if (!data) return;
 
-  const uid = data.createdBy;
-  const calendarEventId = data.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
-    await deleteGoogleCalendarEvent(uid, calendarEventId);
-    console.log(`onHealthAppointmentDeletedForCalendar: deleted ${event.params.docId}`);
+    const count = await familySyncDelete(data);
+    console.log(`onHealthAppointmentDeletedForCalendar: deleted ${event.params.docId} from ${count} calendars`);
   } catch (error) {
     console.error(`onHealthAppointmentDeletedForCalendar error:`, error);
   }
@@ -3936,18 +3866,9 @@ exports.onPetVetVisitDeletedForCalendar = onDocumentDeleted({ region: "us-centra
   const data = event.data?.data();
   if (!data) return;
 
-  const uid = data.createdBy;
-  const calendarEventId = data.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
-    await deleteGoogleCalendarEvent(uid, calendarEventId);
-    console.log(`onPetVetVisitDeletedForCalendar: deleted ${event.params.docId}`);
+    const count = await familySyncDelete(data);
+    console.log(`onPetVetVisitDeletedForCalendar: deleted ${event.params.docId} from ${count} calendars`);
   } catch (error) {
     console.error(`onPetVetVisitDeletedForCalendar error:`, error);
   }
@@ -3961,24 +3882,10 @@ exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "us-cen
 
   const data = snap.data();
   const familyId = event.params.familyId;
-  const uid = data.createdBy;
-  console.log(`onSchoolActivityCreatedForCalendar: triggered for family ${familyId}, doc ${event.params.docId}, uid: ${uid}`);
-
-  if (!uid) {
-    console.log("No createdBy field, skipping");
-    return;
-  }
+  if (!data) return;
 
   try {
     const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
-      console.log(`User ${uid} not connected to Google Calendar`);
-      return;
-    }
-
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
       ? `${data.dateFrom}T${data.endTime}:00`
@@ -3986,22 +3893,24 @@ exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "us-cen
 
     const typeLabel = data.activityType === "tur" ? "Tur" : data.activityType === "aktivitet" ? "Aktivitet" : "Møte";
 
-    console.log(`Creating calendar event: ${data.title}, ${startDateTime} - ${endDateTime}`);
-
-    const eventId = await createGoogleCalendarEvent(uid, {
+    const payload = {
       title: `📚 ${typeLabel}: ${data.title}`,
-      description: data.note || "",
+      description: Array.isArray(data.selectedPersons) ? data.selectedPersons.join(", ") : (data.note || ""),
       startDateTime,
       endDateTime,
       location: data.location || "",
       reminderMinutes: data.reminder || 0,
-    });
+    };
 
-    await db.collection("schoolActivities").doc(familyId).collection("activities").doc(event.params.docId).update({
-      googleCalendarEventId: eventId,
-    });
+    const { calendarEventIds, firstEventId } = await familySyncCreate(familyId, payload);
 
-    console.log(`onSchoolActivityCreatedForCalendar: synced ${event.params.docId}`);
+    if (Object.keys(calendarEventIds).length > 0) {
+      await db.collection("schoolActivities").doc(familyId).collection("activities").doc(event.params.docId).update({
+        googleCalendarEventIds: calendarEventIds,
+        googleCalendarEventId: calendarEventIds[data.createdBy] || firstEventId,
+      });
+      console.log(`onSchoolActivityCreatedForCalendar: synced ${event.params.docId} to ${Object.keys(calendarEventIds).length} family calendars`);
+    }
   } catch (error) {
     console.error(`onSchoolActivityCreatedForCalendar error:`, error);
   }
@@ -4011,16 +3920,7 @@ exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-cen
   const after = event.data?.after?.data();
   if (!after) return;
 
-  const uid = after.createdBy;
-  const calendarEventId = after.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
       ? `${after.dateFrom}T${after.endTime}:00`
@@ -4028,15 +3928,15 @@ exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-cen
 
     const typeLabel = after.activityType === "tur" ? "Tur" : after.activityType === "aktivitet" ? "Aktivitet" : "Møte";
 
-    await updateGoogleCalendarEvent(uid, calendarEventId, {
+    const count = await familySyncUpdate(after, {
       title: `📚 ${typeLabel}: ${after.title}`,
-      description: after.note || "",
+      description: Array.isArray(after.selectedPersons) ? after.selectedPersons.join(", ") : (after.note || ""),
       startDateTime,
       endDateTime,
       location: after.location || "",
     });
 
-    console.log(`onSchoolActivityUpdatedForCalendar: updated ${event.params.docId}`);
+    console.log(`onSchoolActivityUpdatedForCalendar: updated ${event.params.docId} on ${count} calendars`);
   } catch (error) {
     console.error(`onSchoolActivityUpdatedForCalendar error:`, error);
   }
@@ -4046,18 +3946,9 @@ exports.onSchoolActivityDeletedForCalendar = onDocumentDeleted({ region: "us-cen
   const data = event.data?.data();
   if (!data) return;
 
-  const uid = data.createdBy;
-  const calendarEventId = data.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
-    await deleteGoogleCalendarEvent(uid, calendarEventId);
-    console.log(`onSchoolActivityDeletedForCalendar: deleted ${event.params.docId}`);
+    const count = await familySyncDelete(data);
+    console.log(`onSchoolActivityDeletedForCalendar: deleted ${event.params.docId} from ${count} calendars`);
   } catch (error) {
     console.error(`onSchoolActivityDeletedForCalendar error:`, error);
   }
@@ -4071,24 +3962,10 @@ exports.onKindergartenActivityCreatedForCalendar = onDocumentCreated({ region: "
 
   const data = snap.data();
   const familyId = event.params.familyId;
-  const uid = data.createdBy;
-  console.log(`onKindergartenActivityCreatedForCalendar: triggered for family ${familyId}, doc ${event.params.docId}, uid: ${uid}`);
-
-  if (!uid) {
-    console.log("No createdBy field, skipping");
-    return;
-  }
+  if (!data) return;
 
   try {
     const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
-      console.log(`User ${uid} not connected to Google Calendar`);
-      return;
-    }
-
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
       ? `${data.dateFrom}T${data.endTime}:00`
@@ -4096,20 +3973,24 @@ exports.onKindergartenActivityCreatedForCalendar = onDocumentCreated({ region: "
 
     const typeLabel = data.activityType === "tur" ? "Tur" : data.activityType === "aktivitet" ? "Aktivitet" : "Møte";
 
-    const eventId = await createGoogleCalendarEvent(uid, {
+    const payload = {
       title: `🎨 ${typeLabel}: ${data.title}`,
-      description: data.note || "",
+      description: Array.isArray(data.selectedPersons) ? data.selectedPersons.join(", ") : (data.note || ""),
       startDateTime,
       endDateTime,
       location: data.location || "",
       reminderMinutes: data.reminder || 0,
-    });
+    };
 
-    await db.collection("kindergartenActivities").doc(familyId).collection("activities").doc(event.params.docId).update({
-      googleCalendarEventId: eventId,
-    });
+    const { calendarEventIds, firstEventId } = await familySyncCreate(familyId, payload);
 
-    console.log(`onKindergartenActivityCreatedForCalendar: synced ${event.params.docId}`);
+    if (Object.keys(calendarEventIds).length > 0) {
+      await db.collection("kindergartenActivities").doc(familyId).collection("activities").doc(event.params.docId).update({
+        googleCalendarEventIds: calendarEventIds,
+        googleCalendarEventId: calendarEventIds[data.createdBy] || firstEventId,
+      });
+      console.log(`onKindergartenActivityCreatedForCalendar: synced ${event.params.docId} to ${Object.keys(calendarEventIds).length} family calendars`);
+    }
   } catch (error) {
     console.error(`onKindergartenActivityCreatedForCalendar error:`, error);
   }
@@ -4119,16 +4000,7 @@ exports.onKindergartenActivityUpdatedForCalendar = onDocumentUpdated({ region: "
   const after = event.data?.after?.data();
   if (!after) return;
 
-  const uid = after.createdBy;
-  const calendarEventId = after.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
       ? `${after.dateFrom}T${after.endTime}:00`
@@ -4136,15 +4008,15 @@ exports.onKindergartenActivityUpdatedForCalendar = onDocumentUpdated({ region: "
 
     const typeLabel = after.activityType === "tur" ? "Tur" : after.activityType === "aktivitet" ? "Aktivitet" : "Møte";
 
-    await updateGoogleCalendarEvent(uid, calendarEventId, {
+    const count = await familySyncUpdate(after, {
       title: `🎨 ${typeLabel}: ${after.title}`,
-      description: after.note || "",
+      description: Array.isArray(after.selectedPersons) ? after.selectedPersons.join(", ") : (after.note || ""),
       startDateTime,
       endDateTime,
       location: after.location || "",
     });
 
-    console.log(`onKindergartenActivityUpdatedForCalendar: updated ${event.params.docId}`);
+    console.log(`onKindergartenActivityUpdatedForCalendar: updated ${event.params.docId} on ${count} calendars`);
   } catch (error) {
     console.error(`onKindergartenActivityUpdatedForCalendar error:`, error);
   }
@@ -4154,18 +4026,9 @@ exports.onKindergartenActivityDeletedForCalendar = onDocumentDeleted({ region: "
   const data = event.data?.data();
   if (!data) return;
 
-  const uid = data.createdBy;
-  const calendarEventId = data.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
-    await deleteGoogleCalendarEvent(uid, calendarEventId);
-    console.log(`onKindergartenActivityDeletedForCalendar: deleted ${event.params.docId}`);
+    const count = await familySyncDelete(data);
+    console.log(`onKindergartenActivityDeletedForCalendar: deleted ${event.params.docId} from ${count} calendars`);
   } catch (error) {
     console.error(`onKindergartenActivityDeletedForCalendar error:`, error);
   }
@@ -4842,43 +4705,34 @@ exports.onHomeServiceCreatedForCalendar = onDocumentCreated({ region: "us-centra
   if (!snap) return;
 
   const data = snap.data();
-  const uid = data.createdBy;
-  console.log(`onHomeServiceCreatedForCalendar: triggered for doc ${event.params.serviceId}, uid: ${uid}`);
-
-  if (!uid) {
-    console.log("No createdBy field, skipping");
-    return;
-  }
+  if (!data) return;
+  if (!data.familyId) return;
 
   try {
     const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) {
-      console.log(`User ${uid} not connected to Google Calendar`);
-      return;
-    }
-
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
       ? `${data.dateTo || data.dateFrom}T${data.endTime}:00`
       : `${data.dateTo || data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
-    const eventId = await createGoogleCalendarEvent(uid, {
+    const payload = {
       title: `🔧 ${data.title}`,
-      description: data.description || "",
+      description: Array.isArray(data.persons) ? data.persons.join(", ") : (data.description || ""),
       startDateTime,
       endDateTime,
       location: "",
       reminderMinutes: data.reminder || 0,
-    });
+    };
 
-    await db.collection("homeServices").doc(event.params.serviceId).update({
-      calendarEventId: eventId,
-    });
+    const { calendarEventIds, firstEventId } = await familySyncCreate(data.familyId, payload);
 
-    console.log(`onHomeServiceCreatedForCalendar: synced ${event.params.serviceId}`);
+    if (Object.keys(calendarEventIds).length > 0) {
+      await db.collection("homeServices").doc(event.params.serviceId).update({
+        calendarEventIds: calendarEventIds,
+        calendarEventId: calendarEventIds[data.createdBy] || firstEventId,
+      });
+      console.log(`onHomeServiceCreatedForCalendar: synced ${event.params.serviceId} to ${Object.keys(calendarEventIds).length} family calendars`);
+    }
   } catch (error) {
     console.error(`onHomeServiceCreatedForCalendar error:`, error);
   }
@@ -4888,30 +4742,21 @@ exports.onHomeServiceUpdatedForCalendar = onDocumentUpdated({ region: "us-centra
   const after = event.data?.after?.data();
   if (!after) return;
 
-  const uid = after.createdBy;
-  const calendarEventId = after.calendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
       ? `${after.dateTo || after.dateFrom}T${after.endTime}:00`
       : `${after.dateTo || after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
-    await updateGoogleCalendarEvent(uid, calendarEventId, {
+    const count = await familySyncUpdate({ ...after, googleCalendarEventIds: after.calendarEventIds }, {
       title: `🔧 ${after.title}`,
-      description: after.description || "",
+      description: Array.isArray(after.persons) ? after.persons.join(", ") : (after.description || ""),
       startDateTime,
       endDateTime,
       location: "",
     });
 
-    console.log(`onHomeServiceUpdatedForCalendar: updated ${event.params.serviceId}`);
+    console.log(`onHomeServiceUpdatedForCalendar: updated ${event.params.serviceId} on ${count} calendars`);
   } catch (error) {
     console.error(`onHomeServiceUpdatedForCalendar error:`, error);
   }
@@ -4921,18 +4766,9 @@ exports.onHomeServiceDeletedForCalendar = onDocumentDeleted({ region: "us-centra
   const data = event.data?.data();
   if (!data) return;
 
-  const uid = data.createdBy;
-  const calendarEventId = data.calendarEventId;
-  if (!uid || !calendarEventId) return;
-
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
-
-    await deleteGoogleCalendarEvent(uid, calendarEventId);
-    console.log(`onHomeServiceDeletedForCalendar: deleted ${event.params.serviceId}`);
+    const count = await familySyncDelete({ ...data, googleCalendarEventIds: data.calendarEventIds });
+    console.log(`onHomeServiceDeletedForCalendar: deleted ${event.params.serviceId} from ${count} calendars`);
   } catch (error) {
     console.error(`onHomeServiceDeletedForCalendar error:`, error);
   }
