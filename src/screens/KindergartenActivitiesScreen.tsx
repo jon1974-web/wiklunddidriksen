@@ -151,7 +151,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
     return t('health.inDays', { count: diff });
   };
 
-  const isTimePicker = activePicker?.includes('time') || activePicker === 'endTime';
+  const isTimePicker = activePicker === 'startTime' || activePicker === 'endTime';
   const getPickerTitle = () => {
     if (activePicker === 'dateFrom') return t('kindergarten.holidayDateFrom');
     if (activePicker === 'dateTo') return t('kindergarten.holidayDateTo');
