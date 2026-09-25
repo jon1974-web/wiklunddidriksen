@@ -3448,7 +3448,7 @@ exports.onEventCreatedForCalendar = onDocumentCreated({ region: "us-central1", d
     const db = getFirestore();
     const startDateTime = `${data.date}T${data.time || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.date}T${data.endTime}:00`
+      ? `${data.endDate || data.date}T${data.endTime}:00`
       : data.endDate
         ? `${data.endDate}T${data.time ? incrementTime(data.time) : "10:00"}:00`
         : `${data.date}T${data.time ? incrementTime(data.time) : "10:00"}:00`;
@@ -3545,7 +3545,7 @@ exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-
     const db = getFirestore();
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.dateFrom}T${data.endTime}:00`
+      ? `${data.dateTo || data.dateFrom}T${data.endTime}:00`
       : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
     const payload = {
@@ -3584,7 +3584,7 @@ exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-centra
     const db = getFirestore();
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.dateFrom}T${data.endTime}:00`
+      ? `${data.dateTo || data.dateFrom}T${data.endTime}:00`
       : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
     const payload = {
@@ -3766,20 +3766,38 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
   try {
     const startDateTime = `${after.date}T${after.time || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.date}T${after.endTime}:00`
+      ? `${after.endDate || after.date}T${after.endTime}:00`
       : after.endDate
         ? `${after.endDate}T${after.time ? incrementTime(after.time) : "10:00"}:00`
         : `${after.date}T${after.time ? incrementTime(after.time) : "10:00"}:00`;
 
-    const count = await familySyncUpdate(after, {
+    const payload = {
       title: after.title,
       description: buildCalendarDescription(after, after.description || ""),
       startDateTime,
       endDateTime,
       location: after.address || "",
-    });
+    };
+
+    const count = await familySyncUpdate(after, payload);
 
     console.log(`onEventUpdatedForCalendar: updated event ${event.params.eventId} on ${count} calendars`);
+
+    // Self-healing: if the event has never been synced (creation failed on a
+    // buggy multi-day event, old pre-sync event), create it now on update.
+    const hasCalendarId = after.googleCalendarEventId ||
+      (after.googleCalendarEventIds && Object.keys(after.googleCalendarEventIds).length > 0);
+    if (count === 0 && !hasCalendarId && after.familyId) {
+      const db = getFirestore();
+      const { calendarEventIds: newIds, firstEventId } = await familySyncCreate(after.familyId, payload);
+      if (Object.keys(newIds).length > 0) {
+        await db.collection("events").doc(event.params.eventId).update({
+          googleCalendarEventIds: newIds,
+          googleCalendarEventId: newIds[after.createdBy] || firstEventId,
+        });
+        console.log(`onEventUpdatedForCalendar: self-healed event ${event.params.eventId} (was never synced)`);
+      }
+    }
   } catch (error) {
     console.error(`onEventUpdatedForCalendar error:`, error);
   }
@@ -3813,7 +3831,7 @@ exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-
   try {
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.dateFrom}T${after.endTime}:00`
+      ? `${after.dateTo || after.dateFrom}T${after.endTime}:00`
       : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
     const count = await familySyncUpdate(after, {
@@ -3837,7 +3855,7 @@ exports.onPetVetVisitUpdatedForCalendar = onDocumentUpdated({ region: "us-centra
   try {
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.dateFrom}T${after.endTime}:00`
+      ? `${after.dateTo || after.dateFrom}T${after.endTime}:00`
       : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
     const count = await familySyncUpdate(after, {
@@ -3918,7 +3936,7 @@ exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "us-cen
     const db = getFirestore();
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.dateFrom}T${data.endTime}:00`
+      ? `${data.dateTo || data.dateFrom}T${data.endTime}:00`
       : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
     const typeLabel = data.activityType === "tur" ? "Tur" : data.activityType === "aktivitet" ? "Aktivitet" : "Møte";
@@ -3953,7 +3971,7 @@ exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-cen
   try {
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.dateFrom}T${after.endTime}:00`
+      ? `${after.dateTo || after.dateFrom}T${after.endTime}:00`
       : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
     const typeLabel = after.activityType === "tur" ? "Tur" : after.activityType === "aktivitet" ? "Aktivitet" : "Møte";
@@ -3998,7 +4016,7 @@ exports.onKindergartenActivityCreatedForCalendar = onDocumentCreated({ region: "
     const db = getFirestore();
     const startDateTime = `${data.dateFrom}T${data.startTime || "09:00"}:00`;
     const endDateTime = data.endTime
-      ? `${data.dateFrom}T${data.endTime}:00`
+      ? `${data.dateTo || data.dateFrom}T${data.endTime}:00`
       : `${data.dateFrom}T${incrementTime(data.startTime || "09:00")}:00`;
 
     const typeLabel = data.activityType === "tur" ? "Tur" : data.activityType === "aktivitet" ? "Aktivitet" : "Møte";
@@ -4033,7 +4051,7 @@ exports.onKindergartenActivityUpdatedForCalendar = onDocumentUpdated({ region: "
   try {
     const startDateTime = `${after.dateFrom}T${after.startTime || "09:00"}:00`;
     const endDateTime = after.endTime
-      ? `${after.dateFrom}T${after.endTime}:00`
+      ? `${after.dateTo || after.dateFrom}T${after.endTime}:00`
       : `${after.dateFrom}T${incrementTime(after.startTime || "09:00")}:00`;
 
     const typeLabel = after.activityType === "tur" ? "Tur" : after.activityType === "aktivitet" ? "Aktivitet" : "Møte";
@@ -4116,7 +4134,7 @@ exports.backfillCalendarSync = onRequest({ region: "us-central1", memory: "512MB
           description: buildCalendarDescription(d, d.description || ""),
           startDateTime: `${d.date}T${d.time || "09:00"}:00`,
           endDateTime: d.endTime
-            ? `${d.date}T${d.endTime}:00`
+            ? `${d.endDate || d.date}T${d.endTime}:00`
             : d.endDate
               ? `${d.endDate}T${d.time ? incrementTime(d.time) : "10:00"}:00`
               : `${d.date}T${d.time ? incrementTime(d.time) : "10:00"}:00`,
@@ -4149,7 +4167,7 @@ exports.backfillCalendarSync = onRequest({ region: "us-central1", memory: "512MB
           description: Array.isArray(d.person) ? d.person.join(", ") : (d.person || ""),
           startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
           endDateTime: d.endTime
-            ? `${d.dateFrom}T${d.endTime}:00`
+            ? `${d.dateTo || d.dateFrom}T${d.endTime}:00`
             : `${d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
           location: d.location || "",
           reminderMinutes: d.reminder || 0,
@@ -4181,7 +4199,7 @@ exports.backfillCalendarSync = onRequest({ region: "us-central1", memory: "512MB
           description: Array.isArray(d.person) ? d.person.join(", ") : (d.person || ""),
           startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
           endDateTime: d.endTime
-            ? `${d.dateFrom}T${d.endTime}:00`
+            ? `${d.dateTo || d.dateFrom}T${d.endTime}:00`
             : `${d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
           location: d.location || "",
           reminderMinutes: d.reminder || 0,
@@ -4197,7 +4215,7 @@ exports.backfillCalendarSync = onRequest({ region: "us-central1", memory: "512MB
           description: Array.isArray(d.selectedPersons) ? d.selectedPersons.join(", ") : (d.note || ""),
           startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
           endDateTime: d.endTime
-            ? `${d.dateFrom}T${d.endTime}:00`
+            ? `${d.dateTo || d.dateFrom}T${d.endTime}:00`
             : `${d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
           location: d.location || "",
           reminderMinutes: d.reminder || 0,
@@ -4213,7 +4231,7 @@ exports.backfillCalendarSync = onRequest({ region: "us-central1", memory: "512MB
           description: Array.isArray(d.selectedPersons) ? d.selectedPersons.join(", ") : (d.note || ""),
           startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
           endDateTime: d.endTime
-            ? `${d.dateFrom}T${d.endTime}:00`
+            ? `${d.dateTo || d.dateFrom}T${d.endTime}:00`
             : `${d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
           location: d.location || "",
           reminderMinutes: d.reminder || 0,
