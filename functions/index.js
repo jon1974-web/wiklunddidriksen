@@ -3640,7 +3640,12 @@ async function updateGoogleCalendarEvent(uid, calendarEventId, event) {
     calendarEvent.location = event.location;
   }
 
-  console.log("Updating calendar event:", calendarEventId, JSON.stringify(calendarEvent));
+  if (event.reminderMinutes && event.reminderMinutes > 0) {
+    calendarEvent.reminders = {
+      useDefault: false,
+      overrides: [{ method: "popup", minutes: event.reminderMinutes }],
+    };
+  }
 
   const response = await fetch(
     `https://www.googleapis.com/calendar/v3/calendars/primary/events/${calendarEventId}`,
@@ -3774,9 +3779,13 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
     const payload = {
       title: after.title,
       description: buildCalendarDescription(after, after.description || ""),
+      allDay: !after.startTime,
+      startDate: after.startDate,
+      endDate: after.endDate || after.startDate,
       startDateTime,
       endDateTime,
       location: after.address || "",
+      reminderMinutes: after.reminderMinutes || 0,
     };
 
     const count = await familySyncUpdate(after, payload);
@@ -3837,9 +3846,13 @@ exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-
     const count = await familySyncUpdate(after, {
       title: `❤️ ${after.title}`,
       description: Array.isArray(after.person) ? after.person.join(", ") : (after.person || ""),
+      allDay: !after.startTime,
+      startDate: after.dateFrom,
+      endDate: after.dateTo || after.dateFrom,
       startDateTime,
       endDateTime,
       location: after.location || "",
+      reminderMinutes: after.reminder || 0,
     });
 
     console.log(`onHealthAppointmentUpdatedForCalendar: updated ${event.params.docId} on ${count} calendars`);
@@ -3861,9 +3874,13 @@ exports.onPetVetVisitUpdatedForCalendar = onDocumentUpdated({ region: "us-centra
     const count = await familySyncUpdate(after, {
       title: `🐾 ${after.title}`,
       description: Array.isArray(after.person) ? after.person.join(", ") : (after.person || ""),
+      allDay: !after.startTime,
+      startDate: after.dateFrom,
+      endDate: after.dateTo || after.dateFrom,
       startDateTime,
       endDateTime,
       location: after.location || "",
+      reminderMinutes: after.reminder || 0,
     });
 
     console.log(`onPetVetVisitUpdatedForCalendar: updated ${event.params.docId} on ${count} calendars`);
@@ -3979,9 +3996,13 @@ exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-cen
     const count = await familySyncUpdate(after, {
       title: `📚 ${typeLabel}: ${after.title}`,
       description: Array.isArray(after.selectedPersons) ? after.selectedPersons.join(", ") : (after.note || ""),
+      allDay: !after.startTime,
+      startDate: after.dateFrom,
+      endDate: after.dateTo || after.dateFrom,
       startDateTime,
       endDateTime,
       location: after.location || "",
+      reminderMinutes: after.reminder || 0,
     });
 
     console.log(`onSchoolActivityUpdatedForCalendar: updated ${event.params.docId} on ${count} calendars`);
@@ -4059,9 +4080,13 @@ exports.onKindergartenActivityUpdatedForCalendar = onDocumentUpdated({ region: "
     const count = await familySyncUpdate(after, {
       title: `🎨 ${typeLabel}: ${after.title}`,
       description: Array.isArray(after.selectedPersons) ? after.selectedPersons.join(", ") : (after.note || ""),
+      allDay: !after.startTime,
+      startDate: after.dateFrom,
+      endDate: after.dateTo || after.dateFrom,
       startDateTime,
       endDateTime,
       location: after.location || "",
+      reminderMinutes: after.reminder || 0,
     });
 
     console.log(`onKindergartenActivityUpdatedForCalendar: updated ${event.params.docId} on ${count} calendars`);
@@ -5042,9 +5067,13 @@ exports.onHomeServiceUpdatedForCalendar = onDocumentUpdated({ region: "us-centra
     const count = await familySyncUpdate({ ...after, googleCalendarEventIds: after.calendarEventIds }, {
       title: `🔧 ${after.title}`,
       description: Array.isArray(after.persons) ? after.persons.join(", ") : (after.description || ""),
+      allDay: !after.startTime,
+      startDate: after.dateFrom,
+      endDate: after.dateTo || after.dateFrom,
       startDateTime,
       endDateTime,
       location: "",
+      reminderMinutes: after.reminder || 0,
     });
 
     console.log(`onHomeServiceUpdatedForCalendar: updated ${event.params.serviceId} on ${count} calendars`);
