@@ -36,6 +36,7 @@ interface AddEventModalProps {
     reminderMinutes?: number;
     icon?: string;
     documents?: { url: string; fileName: string; type: 'image' | 'document' }[];
+    selectedPersons?: string[];
   };
 }
 
@@ -98,6 +99,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
       setIcon(prefill.icon || '');
       setDocuments(prefill.documents || []);
       setScheduleConfig(null);
+      setSelectedPersons(prefill.selectedPersons || []);
     } else if (visible) {
       setTitle('');
       setAddress('');

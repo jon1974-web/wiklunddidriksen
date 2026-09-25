@@ -25,7 +25,7 @@ const SCHOOL_COLOR = MODULE_COLORS.school;
 
 export const SchoolActivityDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
-  const { activity, source } = route.params as { activity: SchoolActivity; source?: string };
+  const { activity, source, child, selectedYear } = route.params as { activity: SchoolActivity; source?: string; child?: any; selectedYear?: any };
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
   const familyRole = useUserStore((state) => state.familyRole);
@@ -269,7 +269,7 @@ const handleCopy = useCallback(() => {
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity
             style={[styles.actionButton, { backgroundColor: SCHOOL_COLOR, flex: 1 }]}
-            onPress={() => navigation.navigate('SchoolSpace', { editActivityId: activity.id, childId: activity.childId, editActivityData: { title: activity.title, activityType: activity.activityType, dateFrom: activity.dateFrom, dateTo: activity.dateTo || '', startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [], scheduleGroupId: activity.scheduleGroupId || '' }, returnToEvents: source === 'events' })}
+            onPress={() => navigation.navigate('SchoolActivities', { child: child || { id: activity.childId, name: '' }, selectedYear: selectedYear || null, editActivityId: activity.id, editActivityData: { title: activity.title, activityType: activity.activityType, dateFrom: activity.dateFrom, dateTo: activity.dateTo || '', startTime: activity.startTime || '', endTime: activity.endTime || '', location: activity.location || '', note: activity.note || '', reminder: activity.reminder || '', documents: activity.documents || [], scheduleGroupId: activity.scheduleGroupId || '', selectedPersons: activity.selectedPersons || [] } })}
           >
             <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('common.edit')}</Text>
           </TouchableOpacity>

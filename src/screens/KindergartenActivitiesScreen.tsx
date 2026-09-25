@@ -7,7 +7,7 @@ import { AppIcon } from '../components/AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { KindergartenChild, KindergartenYear, KindergartenActivity } from '../types';
 import { useUserStore } from '../store/userStore';
-import { getKindergartenActivities, addKindergartenActivity } from '../services/kindergartenService';
+import { getKindergartenActivities, addKindergartenActivity, updateKindergartenActivity } from '../services/kindergartenService';
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { crossAlert } from '../utils/alert';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
@@ -19,7 +19,7 @@ const KG_THEME = MODULE_COLORS.kindergarten;
 
 interface Props {
   navigation: any;
-  route: { params: { child: KindergartenChild; selectedYear: KindergartenYear | null } };
+  route: { params: { child: KindergartenChild; selectedYear: KindergartenYear | null; editActivityId?: string; editActivityData?: any; openAddSection?: string } };
 }
 
 export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, route }) => {
@@ -30,6 +30,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
   const user = useUserStore((state) => state.user);
   const [activities, setActivities] = useState<KindergartenActivity[]>([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingActivityId, setEditingActivityId] = useState<string | null>(null);
   const [activePicker, setActivePicker] = useState<string | null>(null);
   const [persons, setPersons] = useState<string[]>([]);
   const [selectedPersons, setSelectedPersons] = useState<string[]>([]);
@@ -67,6 +68,29 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
     }
   }, [route?.params?.openAddSection]);
 
+  // Handle editActivityId for editing existing activities
+  useEffect(() => {
+    if (route?.params?.editActivityId && route?.params?.editActivityData) {
+      const data = route.params.editActivityData;
+      setActivityForm({
+        title: data.title || '',
+        activityType: data.activityType || 'tur',
+        dateFrom: data.dateFrom || getTodayLocal(),
+        dateTo: data.dateTo || getTodayLocal(),
+        startTime: data.startTime || '10:00',
+        endTime: data.endTime || '11:00',
+        location: data.location || '',
+        note: data.note || '',
+        reminder: data.reminder || 0,
+        documents: data.documents || [],
+      });
+      setSelectedPersons(data.selectedPersons || []);
+      setEditingActivityId(route.params.editActivityId);
+      setShowAddModal(true);
+      navigation.setParams({ editActivityId: undefined, editActivityData: undefined } as any);
+    }
+  }, [route?.params?.editActivityId]);
+
   const handleSave = async () => {
     if (!familyId || !selectedYear || !child) return;
     if (!activityForm.title.trim() || !activityForm.dateFrom) {
@@ -78,17 +102,31 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
       return;
     }
     try {
-      await addKindergartenActivity({
-        ...activityForm,
-        childId: child.id,
-        yearId: selectedYear.id,
-        familyId,
-        createdBy: user?.uid || '',
-        selectedPersons,
-      });
+      if (editingActivityId) {
+        await updateKindergartenActivity(familyId, editingActivityId, {
+          ...activityForm,
+          childId: child.id,
+          yearId: selectedYear.id,
+          familyId,
+          createdBy: user?.uid || '',
+          selectedPersons,
+          reminder: String(activityForm.reminder),
+        } as Partial<KindergartenActivity>);
+      } else {
+        await addKindergartenActivity({
+          ...activityForm,
+          childId: child.id,
+          yearId: selectedYear.id,
+          familyId,
+          createdBy: user?.uid || '',
+          selectedPersons,
+          reminder: String(activityForm.reminder),
+        });
+      }
       setShowAddModal(false);
       setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
       setSelectedPersons([]);
+      setEditingActivityId(null);
       loadActivities();
     } catch (e) {
       crossAlert(t('common.error'), t('common.error'));
@@ -155,7 +193,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
           {sorted.map(a => {
           const isPast = (a.dateTo || a.dateFrom) < today;
           return (
-            <TouchableOpacity key={a.id} style={[styles.activityCard, { backgroundColor: colors.surface, opacity: isPast ? 0.6 : 1 }]} onPress={() => navigation.navigate('KindergartenActivityDetail', { activity: a, childId: child.id, yearId: selectedYear?.id })}>
+            <TouchableOpacity key={a.id} style={[styles.activityCard, { backgroundColor: colors.surface, opacity: isPast ? 0.6 : 1 }]} onPress={() => navigation.navigate('KindergartenActivityDetail', { activity: a, childId: child.id, yearId: selectedYear?.id, child, selectedYear })}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                 <View style={[styles.activityIcon, { backgroundColor: KG_THEME + '15' }]}>
                   <AppIcon name="activities" size={20} color={KG_THEME} />
@@ -184,7 +222,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '85%' }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('kindergarten.addActivity')}</Text>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>{editingActivityId ? t('common.edit') : t('kindergarten.addActivity')}</Text>
                 <ScrollView>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('school.activityType')}</Text>
@@ -271,7 +309,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
                   </View>
                 </ScrollView>
                 <View style={{ flexDirection: 'row', gap: 10, marginTop: 16, paddingHorizontal: 16 }}>
-                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => setShowAddModal(false)}>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => { setShowAddModal(false); setEditingActivityId(null); }}>
                     <Text style={{ color: colors.text, fontWeight: '600' }}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: KG_THEME, flex: 1 }]} onPress={handleSave}>
