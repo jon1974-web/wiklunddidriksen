@@ -5247,6 +5247,25 @@ async function searchFamilyData(db, familyId, userMessage) {
   return results;
 }
 
+// Helper: ISO week number (Monday-start, matching Norwegian calendar weeks)
+function isoWeekNumber(date) {
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+}
+
+// Helper: week tag for AI data context lines, e.g. " (uke 42)"
+// dateStr: "YYYY-MM-DD" or null → returns "" for missing/invalid dates
+function weekTag(dateStr) {
+  if (!dateStr || typeof dateStr !== 'string') return '';
+  const m = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return '';
+  const d = new Date(Date.UTC(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3])));
+  return ` (uke ${isoWeekNumber(d)})`;
+}
+
 function formatDataForGPT(data) {
   const lines = [];
   const today = new Date().toISOString().split('T')[0];
@@ -5255,7 +5274,7 @@ function formatDataForGPT(data) {
     lines.push('--- REISER ---');
     data.trips.forEach(t => {
       const status = t.startDate > today ? 'Planlagt' : t.endDate < today ? 'Fullført' : 'Pågående';
-      lines.push(`• ${t.title || t.destination || 'Uten navn'} | ${t.startDate || '?'} → ${t.endDate || '?'} | Status: ${status}`);
+      lines.push(`• ${t.title || t.destination || 'Uten navn'} | ${t.startDate || '?'} → ${t.endDate || '?'} | Status: ${status}${weekTag(t.startDate)}`);
       const details = data.tripDetails && data.tripDetails[t.id];
       if (details) {
         if (details.hotels && details.hotels.length > 0) {
@@ -5286,7 +5305,7 @@ function formatDataForGPT(data) {
     data.events.forEach(e => {
       const person = e.person || e.selectedPersons || '';
       const personStr = Array.isArray(person) ? person.join(', ') : person;
-      lines.push(`• ${e.title || 'Uten navn'} | ${e.date || '?'} ${e.time || ''} → ${e.endDate || ''} ${e.endTime || ''} | ${e.address || ''}${personStr ? ' | For: ' + personStr : ''}`);
+      lines.push(`• ${e.title || 'Uten navn'} | ${e.date || '?'} ${e.time || ''} → ${e.endDate || ''} ${e.endTime || ''} | ${e.address || ''}${personStr ? ' | For: ' + personStr : ''}${weekTag(e.date)}`);
     });
   }
 
@@ -5294,7 +5313,7 @@ function formatDataForGPT(data) {
     lines.push('--- HELSEAVTALER ---');
     data.healthAppointments.forEach(a => {
       const timeRange = a.endTime ? `${a.startTime || ''}-${a.endTime}` : (a.startTime || '');
-      lines.push(`• ${a.title || 'Uten navn'} | Person: ${a.person || '?'} | ${a.dateFrom || '?'} ${timeRange} | Lege: ${a.doctor || ''} | Sted: ${a.location || ''} | ID: ${a.id}`);
+      lines.push(`• ${a.title || 'Uten navn'} | Person: ${a.person || '?'} | ${a.dateFrom || '?'} ${timeRange} | Lege: ${a.doctor || ''} | Sted: ${a.location || ''} | ID: ${a.id}${weekTag(a.dateFrom)}`);
     });
   }
 
@@ -5338,7 +5357,7 @@ function formatDataForGPT(data) {
     data.petVetVisits.forEach(v => {
       const person = v.person || '';
       const personStr = Array.isArray(person) ? person.join(', ') : person;
-      lines.push(`• ${v.name || 'Uten navn'} | ${v.dateFrom || '?'} ${v.startTime || ''} | Lege: ${v.doctor || ''}${personStr ? ' | For: ' + personStr : ''}`);
+      lines.push(`• ${v.name || 'Uten navn'} | ${v.dateFrom || '?'} ${v.startTime || ''} | Lege: ${v.doctor || ''}${personStr ? ' | For: ' + personStr : ''}${weekTag(v.dateFrom)}`);
     });
   }
 
@@ -5382,7 +5401,7 @@ function formatDataForGPT(data) {
     data.serviceAppointments.forEach(s => {
       const person = s.persons || s.person || '';
       const personStr = Array.isArray(person) ? person.join(', ') : person;
-      lines.push(`• ${s.title || s.name || 'Uten navn'} | ${s.dateFrom || '?'} ${s.startTime || ''} | Frekvens: ${s.frequency || ''}${personStr ? ' | For: ' + personStr : ''}`);
+      lines.push(`• ${s.title || s.name || 'Uten navn'} | ${s.dateFrom || '?'} ${s.startTime || ''} | Frekvens: ${s.frequency || ''}${personStr ? ' | For: ' + personStr : ''}${weekTag(s.dateFrom)}`);
     });
   }
 
@@ -5398,7 +5417,7 @@ function formatDataForGPT(data) {
     data.schoolActivities.forEach(a => {
       const person = a.selectedPersons || a.person || '';
       const personStr = Array.isArray(person) ? person.join(', ') : person;
-      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}${personStr ? ' | For: ' + personStr : ''}`);
+      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}${personStr ? ' | For: ' + personStr : ''}${weekTag(a.dateFrom)}`);
     });
   }
 
@@ -5435,7 +5454,7 @@ function formatDataForGPT(data) {
     data.kindergartenActivities.forEach(a => {
       const person = a.selectedPersons || a.person || '';
       const personStr = Array.isArray(person) ? person.join(', ') : person;
-      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}${personStr ? ' | For: ' + personStr : ''}`);
+      lines.push(`• ${a.name || a.title || 'Uten navn'} | ${a.dateFrom || '?'} → ${a.dateTo || ''} ${a.startTime || ''}${personStr ? ' | For: ' + personStr : ''}${weekTag(a.dateFrom)}`);
     });
   }
 
@@ -5479,7 +5498,7 @@ function formatDataForGPT(data) {
       const day = parseInt(monthDay.substring(3, 5));
       const nextDateObj = new Date(nextDate);
       const dayOfWeek = ['søndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'lørdag'][nextDateObj.getDay()];
-      lines.push(`• ${b.name || '?'} | ${dayOfWeek} ${day}. ${monthNames[month]} ${nextDateObj.getFullYear()} | Fyller ${age} år`);
+      lines.push(`• ${b.name || '?'} | ${dayOfWeek} ${day}. ${monthNames[month]} ${nextDateObj.getFullYear()} | Fyller ${age} år${weekTag(nextDate)}`);
     });
   }
 
@@ -5748,6 +5767,15 @@ DATO-INTELLIGENS:
 - "om X dager" = ${todayStr} + X dager
 - "i høstferien" / "i juleferien" / "i påsken" / "i sommerferien": finn ferien i schoolHolidays/kindergartenHolidays som matcher søkeordet
 - Datoformat til brukeren: "mandag 22. september 2026", "kl. 14:00", "om 3 dager"
+
+UKE-ETIKETTER (kritisk for ukes-filter):
+- Alle dato-bærende linjer i dataen er merket med "(uke N)" — dette er ISO-ukenummeret.
+- Gjeldende uke (denne uken) = uke ${isoWeekNumber(today)}.
+- "neste uke" = uke ${isoWeekNumber(nextMonday)}. ALDRI inkluder hendelser utenfor denne uke-etiketten.
+- "denne uken" = uke ${isoWeekNumber(today)}.
+- "om to uker" = uke ${isoWeekNumber(nextSunday) + 1}. "om tre uker" = uke ${isoWeekNumber(nextSunday) + 2}. Osv. ("om X uker" = uke ${isoWeekNumber(nextSunday)} + X - 1).
+- Når brukeren spør "i neste uke" / "neste uke": inkluder KUN oppføringer merket "(uke ${isoWeekNumber(nextMonday)})". oppføringer merket med en annen uke er IKKE i neste uke, selv om datoen kan virke nær.
+- Regn aldri ut uker selv fra datoer — stol KUN på uke-etiketten i dataen.
 
 PERSON-KONTEKT:
 Når brukeren spør om hendelser/avtaler/aktiviteter for en bestemt person, bruk "For:" feltet i dataen til å filtrere. Eksempler:
