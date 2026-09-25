@@ -3415,41 +3415,63 @@ async function createGoogleCalendarEvent(uid, event) {
 }
 
 // Cloud Function: Auto-sync events to Google Calendar
+// Syncs to ALL family members' calendars (any member with Google Calendar connected)
 exports.onEventCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "events/{eventId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
   const data = snap.data();
-  const uid = data.createdBy;
-  if (!uid) return;
+  if (!data) return;
+
+  const db = getFirestore();
 
   try {
-    const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
+    // Get all family members who have Google Calendar connected
+    if (!data.familyId) return;
+    const familySnap = await db.collection("families").doc(data.familyId).get();
+    const members = familySnap.data()?.members || {};
+    const memberUids = Object.keys(members);
 
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
+    const calendarEventIds = {};
+    let firstEventId = null;
 
-    const startDateTime = `${data.date}T${data.time || "09:00"}:00`;
-    const endDateTime = data.endDate && data.endTime
-      ? `${data.endDate}T${data.endTime}:00`
-      : `${data.date}T${data.time ? incrementTime(data.time) : "10:00"}:00`;
+    for (const uid of memberUids) {
+      try {
+        const userDoc = await db.collection("users").doc(uid).get();
+        const userData = userDoc.data();
+        if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) continue;
 
-    const eventId = await createGoogleCalendarEvent(uid, {
-      title: data.title,
-      description: data.description || "",
-      startDateTime,
-      endDateTime,
-      location: data.address || "",
-      reminderMinutes: data.reminderMinutes || 0,
-    });
+        const startDateTime = `${data.date}T${data.time || "09:00"}:00`;
+        const endDateTime = data.endTime
+          ? `${data.date}T${data.endTime}:00`
+          : data.endDate
+            ? `${data.endDate}T${data.time ? incrementTime(data.time) : "10:00"}:00`
+            : `${data.date}T${data.time ? incrementTime(data.time) : "10:00"}:00`;
 
-    // Store the calendar event ID for future updates/deletions
-    await db.collection("events").doc(event.params.eventId).update({
-      googleCalendarEventId: eventId,
-    });
+        const eventId = await createGoogleCalendarEvent(uid, {
+          title: data.title,
+          description: data.description || "",
+          startDateTime,
+          endDateTime,
+          location: data.address || "",
+          reminderMinutes: data.reminderMinutes || 0,
+        });
 
-    console.log(`onEventCreatedForCalendar: synced event ${event.params.eventId}`);
+        calendarEventIds[uid] = eventId;
+        if (!firstEventId) firstEventId = eventId;
+      } catch (e) {
+        console.error(`onEventCreatedForCalendar: failed for uid ${uid}:`, e.message);
+      }
+    }
+
+    if (Object.keys(calendarEventIds).length > 0) {
+      // Store all IDs for future updates/deletions (googleCalendarEventIds kept for creator for backward compat)
+      await db.collection("events").doc(event.params.eventId).update({
+        googleCalendarEventIds: calendarEventIds,
+        googleCalendarEventId: firstEventId,
+      });
+      console.log(`onEventCreatedForCalendar: synced event ${event.params.eventId} to ${Object.keys(calendarEventIds).length} family calendars`);
+    }
   } catch (error) {
     console.error(`onEventCreatedForCalendar error:`, error);
   }
@@ -3689,15 +3711,20 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
   const after = event.data?.after?.data();
   if (!after) return;
 
-  const uid = after.createdBy;
   const calendarEventId = after.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
+  const calendarEventIds = after.googleCalendarEventIds || {};
+  const startHandled = after.googleCalendarEventIds || (after.googleCalendarEventId ? {} : null);
+  // Collect all UIDs with calendar IDs (new multi-member format + legacy single ID for creator)
+  const uidsToUpdate = Object.keys(calendarEventIds);
+
+  // Legacy format: single ID on creator
+  if (uidsToUpdate.length === 0 && after.createdBy && calendarEventId) {
+    uidsToUpdate.push(after.createdBy);
+  }
+  if (uidsToUpdate.length === 0) return;
 
   try {
     const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
 
     const startDateTime = `${after.date}T${after.time || "09:00"}:00`;
     const endDateTime = after.endTime
@@ -3706,15 +3733,27 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
         ? `${after.endDate}T${after.time ? incrementTime(after.time) : "10:00"}:00`
         : `${after.date}T${after.time ? incrementTime(after.time) : "10:00"}:00`;
 
-    await updateGoogleCalendarEvent(uid, calendarEventId, {
-      title: after.title,
-      description: after.description || "",
-      startDateTime,
-      endDateTime,
-      location: after.address || "",
-    });
+    for (const uid of uidsToUpdate) {
+      try {
+        const eventIdToUpdate = calendarEventIds[uid] || calendarEventId;
+        if (!eventIdToUpdate) continue;
+        const userDoc = await db.collection("users").doc(uid).get();
+        const userData = userDoc.data();
+        if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) continue;
 
-    console.log(`onEventUpdatedForCalendar: updated event ${event.params.eventId}`);
+        await updateGoogleCalendarEvent(uid, eventIdToUpdate, {
+          title: after.title,
+          description: after.description || "",
+          startDateTime,
+          endDateTime,
+          location: after.address || "",
+        });
+      } catch (e) {
+        console.error(`onEventUpdatedForCalendar: failed for uid ${uid}:`, e.message);
+      }
+    }
+
+    console.log(`onEventUpdatedForCalendar: updated event ${event.params.eventId} on ${uidsToUpdate.length} calendars`);
   } catch (error) {
     console.error(`onEventUpdatedForCalendar error:`, error);
   }
@@ -3822,18 +3861,30 @@ exports.onEventDeletedForCalendar = onDocumentDeleted({ region: "us-central1", d
   const data = event.data?.data();
   if (!data) return;
 
-  const uid = data.createdBy;
   const calendarEventId = data.googleCalendarEventId;
-  if (!uid || !calendarEventId) return;
+  const calendarEventIds = data.googleCalendarEventIds || {};
+  const uidsToDelete = Object.keys(calendarEventIds);
+
+  // Legacy format: single ID on creator
+  if (uidsToDelete.length === 0 && data.createdBy && calendarEventId) {
+    uidsToDelete.push(data.createdBy);
+  }
+  if (uidsToDelete.length === 0) return;
 
   try {
     const db = getFirestore();
-    const userDoc = await db.collection("users").doc(uid).get();
-    const userData = userDoc.data();
-    if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) return;
 
-    await deleteGoogleCalendarEvent(uid, calendarEventId);
-    console.log(`onEventDeletedForCalendar: deleted event ${event.params.eventId}`);
+    for (const uid of uidsToDelete) {
+      try {
+        const eventIdToDelete = calendarEventIds[uid] || calendarEventId;
+        if (!eventIdToDelete) continue;
+        await deleteGoogleCalendarEvent(uid, eventIdToDelete);
+      } catch (e) {
+        console.error(`onEventDeletedForCalendar: failed for uid ${uid}:`, e.message);
+      }
+    }
+
+    console.log(`onEventDeletedForCalendar: deleted event ${event.params.eventId} from ${uidsToDelete.length} calendars`);
   } catch (error) {
     console.error(`onEventDeletedForCalendar error:`, error);
   }
