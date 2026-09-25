@@ -201,7 +201,9 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
         {appointment.person && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👤</Text>
-            <Text style={[styles.detailValue, { color: colors.text }]}>{appointment.person}</Text>
+            <Text style={[styles.detailValue, { color: colors.text }]}>
+              {Array.isArray(appointment.person) ? (appointment.person as any[]).join(', ') : appointment.person}
+            </Text>
           </View>
         )}
         {appointment.location && (

@@ -154,6 +154,26 @@ export const HomeServiceDetailScreen: React.FC<Props> = ({ navigation, route }) 
             <Text style={[styles.detailValue, { color: colors.text }]}>{reminderLabel.label}</Text>
           </View>
         )}
+        {(() => {
+          const persons: string[] = [];
+          if ((service as any).persons?.length) {
+            persons.push(...(service as any).persons);
+          }
+          if ((service as any).person) {
+            if (Array.isArray((service as any).person)) {
+              persons.push(...(service as any).person);
+            } else {
+              persons.push((service as any).person);
+            }
+          }
+          if (persons.length === 0) return null;
+          return (
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👤</Text>
+              <Text style={[styles.detailValue, { color: colors.text }]}>{persons.join(', ')}</Text>
+            </View>
+          );
+        })()}
         {service.description ? (
           <View style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>

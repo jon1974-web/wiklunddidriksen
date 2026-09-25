@@ -208,6 +208,23 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
             <Text style={[styles.detailValue, { color: colors.text }]}>{visit.doctor}</Text>
           </View>
         )}
+        {(() => {
+          const persons: string[] = [];
+          if ((visit as any).person) {
+            if (Array.isArray((visit as any).person)) {
+              persons.push(...(visit as any).person);
+            } else {
+              persons.push((visit as any).person);
+            }
+          }
+          if (persons.length === 0) return null;
+          return (
+            <View style={styles.detailRow}>
+              <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👤</Text>
+              <Text style={[styles.detailValue, { color: colors.text }]}>{persons.join(', ')}</Text>
+            </View>
+          );
+        })()}
         {petName && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>🐾</Text>

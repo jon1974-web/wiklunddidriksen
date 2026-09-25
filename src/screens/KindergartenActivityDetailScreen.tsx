@@ -197,6 +197,12 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
             <Text style={[styles.detailValue, { color: colors.text }]} numberOfLines={2}>{activity.location}</Text>
           </View>
         )}
+        {activity.selectedPersons && activity.selectedPersons.length > 0 && (
+          <View style={styles.detailRow}>
+            <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👤</Text>
+            <Text style={[styles.detailValue, { color: colors.text }]}>{activity.selectedPersons.join(', ')}</Text>
+          </View>
+        )}
         {activity.note && (
           <View style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>

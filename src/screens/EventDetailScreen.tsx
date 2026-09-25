@@ -381,6 +381,26 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               {getReminderOptions().find((o) => o.value === eventData.reminderMinutes)?.label || `${eventData.reminderMinutes} min`}
             </Text>
           </View>
+          {(() => {
+            const persons: string[] = [];
+            if ((eventData as any).person) {
+              if (Array.isArray((eventData as any).person)) {
+                persons.push(...(eventData as any).person);
+              } else {
+                persons.push((eventData as any).person);
+              }
+            }
+            if ((eventData as any).selectedPersons?.length) {
+              persons.push(...(eventData as any).selectedPersons);
+            }
+            if (persons.length === 0) return null;
+            return (
+              <View style={styles.viewDetailRow}>
+                <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>👤</Text>
+                <Text style={[styles.viewDetailValue, { color: colors.text }]}>{persons.join(', ')}</Text>
+              </View>
+            );
+          })()}
           {eventData.description && (
             <View style={{ marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
