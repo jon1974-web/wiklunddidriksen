@@ -7,7 +7,7 @@ import { ScheduleModal } from '../components/ScheduleModal';
 import { Event } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { cancelNotification } from '../services/notificationService';
-import { getUserProfile } from '../services/familyService';
+import { getUserProfile, getFamilyMembersWithRoles } from '../services/familyService';
 import { syncEventToCalendar, updateCalendarEvent, deleteCalendarEvent } from '../services/calendarService';
 import { DocumentUpload } from '../components/DocumentUpload';
 import { useUserStore } from '../store/userStore';
@@ -110,9 +110,22 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const [editNote, setEditNote] = useState(event.description || '');
   const [editReminderMinutes, setEditReminderMinutes] = useState(event.reminderMinutes);
   const [editIcon, setEditIcon] = useState(event.icon || '');
+  const [editPersons, setEditPersons] = useState<string[]>(() => {
+    const p = (event as any).selectedPersons || (event as any).person;
+    return Array.isArray(p) ? p : p ? [p] : [];
+  });
+  const [editPersonsList, setEditPersonsList] = useState<string[]>([]);
   const [userCalendarEmail, setUserCalendarEmail] = useState<string | null>(null);
   const [userCalendarProvider, setUserCalendarProvider] = useState<'google' | 'outlook' | null>(null);
   const [showFullNote, setShowFullNote] = useState(false);
+
+  useEffect(() => {
+    const familyId = useUserStore.getState().familyId;
+    if (!familyId) return;
+    getFamilyMembersWithRoles(familyId).then((members) => {
+      setEditPersonsList(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+    }).catch(() => {});
+  }, []);
 
   type EditPickerField = 'dateFrom' | 'dateTo' | 'time' | 'endTime' | null;
   const [editActivePicker, setEditActivePicker] = useState<EditPickerField>(null);
@@ -150,6 +163,10 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       crossAlert('Error', 'Vennligst skriv en tittel');
       return;
     }
+    if (editPersons.length === 0) {
+      crossAlert('Error', t('health.personRequired'));
+      return;
+    }
 
     try {
       const [hours, mins] = editTime.split(':').map(Number);
@@ -169,6 +186,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         reminderAt: reminderAt.toISOString(),
         icon: editIcon || null,
         documents: editDocuments.length > 0 ? editDocuments : [],
+        selectedPersons: editPersons,
       };
 
       await updateDoc(doc(db, 'events', event.id), updateData);
@@ -227,7 +245,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [editTitle, editAddress, editDateFrom, editDateTo, editTime, editEndTime, editNote, editReminderMinutes, editIcon, editDocuments, user, event, editScheduleConfig]);
+  }, [editTitle, editAddress, editDateFrom, editDateTo, editTime, editEndTime, editNote, editReminderMinutes, editIcon, editDocuments, editPersons, user, event, editScheduleConfig]);
 
   const handleCopy = useCallback(() => {
     navigation.navigate('EventsList', {
@@ -523,6 +541,24 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                   placeholder="F.eks. Familiemiddag"
                   placeholderTextColor={colors.textDisabled}
                 />
+              </View>
+
+              {/* Person selector */}
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('health.personLabel')}</Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                  {editPersonsList.map(p => {
+                    const isSelected = editPersons.includes(p);
+                    return (
+                      <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? colors.accent : colors.surface, borderColor: isSelected ? colors.accent : colors.border, borderWidth: 1.5 }]} onPress={() => setEditPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}>
+                        <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+                {editPersons.length === 0 && (
+                  <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('health.personRequired')}</Text>
+                )}
               </View>
 
               {/* Date from / Date to */}
@@ -860,6 +896,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
+  },
+  personChip: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
   },
   iconOption: {
     width: 60,

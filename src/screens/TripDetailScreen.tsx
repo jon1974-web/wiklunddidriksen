@@ -71,6 +71,7 @@ import { WeatherDay, WeatherHour } from '../types';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
+import { getFamilyMembersWithRoles } from '../services/familyService';
 
 interface TripDetailScreenProps {
   navigation: any;
@@ -112,6 +113,16 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [tripStartTime, setTripStartTime] = useState(trip.startTime || '');
   const [tripEndTime, setTripEndTime] = useState(trip.endTime || '');
   const [tripIcon, setTripIcon] = useState(trip.icon || '✈️');
+  const [tripPersons, setTripPersons] = useState<string[]>(Array.isArray((trip as any).persons) ? (trip as any).persons : []);
+  const [tripPersonsList, setTripPersonsList] = useState<string[]>([]);
+
+  useEffect(() => {
+    const familyId = useUserStore.getState().familyId;
+    if (!familyId) return;
+    getFamilyMembersWithRoles(familyId).then((members) => {
+      setTripPersonsList(members.map(m => m.profile.displayName?.split(' ')[0] || 'Medlem'));
+    }).catch(() => {});
+  }, []);
 
   // Form state (consolidated)
   const emptyHotel = { name: '', address: '', phone: '', startDate: '', endDate: '', checkInTime: '', checkOutTime: '', note: '' };
@@ -455,6 +466,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       crossAlert('Error', t('common.enterTitle'));
       return;
     }
+    if (tripPersons.length === 0) {
+      crossAlert('Error', t('trips.personRequired'));
+      return;
+    }
     if (tripEndDate < tripStartDate) {
       crossAlert('Error', t('common.endDateBeforeStart'));
       return;
@@ -471,6 +486,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         startTime: tripStartTime || null,
         endTime: tripEndTime || null,
         icon: tripIcon,
+        persons: tripPersons,
       };
       if (coords) {
         updateData.latitude = coords.latitude;
@@ -482,7 +498,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
-  }, [trip, tripTitle, tripCity, tripCountry, tripStartDate, tripEndDate, tripStartTime, tripEndTime, tripIcon]);
+  }, [trip, tripTitle, tripCity, tripCountry, tripStartDate, tripEndDate, tripStartTime, tripEndTime, tripIcon, tripPersons]);
 
   const openAddModal = (modal: ModalType, transportType?: 'fly' | 'tog' | 'bil' | 'boat' | 'ferry' | 'taxi') => {
     resetForms();
@@ -1569,6 +1585,23 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
 
                   <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('trips.personLabel')}</Text>
+                    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+                      {tripPersonsList.map(p => {
+                        const isSelected = tripPersons.includes(p);
+                        return (
+                          <TouchableOpacity key={p} style={[styles.personChip, { backgroundColor: isSelected ? MODULE_COLORS.trips : colors.surface, borderColor: isSelected ? MODULE_COLORS.trips : colors.border }]} onPress={() => setTripPersons(prev => isSelected ? prev.filter(x => x !== p) : [...prev, p])}>
+                            <Text style={{ color: isSelected ? '#fff' : colors.text, fontSize: 13 }}>{p}</Text>
+                          </TouchableOpacity>
+                        );
+                      })}
+                    </View>
+                    {tripPersons.length === 0 && (
+                      <Text style={{ color: '#E53935', fontSize: 12, marginTop: 4 }}>{t('trips.personRequired')}</Text>
+                    )}
+                  </View>
+
+                  <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('trips.city')}</Text>
                     <GooglePlacesInput
                       value={tripCity}
@@ -2389,6 +2422,12 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  personChip: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+    borderWidth: 1.5,
   },
   iconText: {
     fontSize: 22,

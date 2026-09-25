@@ -3435,7 +3435,7 @@ exports.onEventCreatedForCalendar = onDocumentCreated({ region: "us-central1", d
 
     const payload = {
       title: data.title,
-      description: data.description || "",
+      description: buildCalendarDescription(data, data.description || ""),
       startDateTime,
       endDateTime,
       location: data.address || "",
@@ -3463,6 +3463,16 @@ function incrementTime(time) {
   return `${String(newHours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
+// Helper: Build calendar description including person names ("For: Jon, Mina — note")
+function buildCalendarDescription(record, fallback = "") {
+  const person = record.selectedPersons || record.persons || record.person;
+  const personsStr = Array.isArray(person) ? person.join(", ") : (person || "");
+  const parts = [];
+  if (personsStr) parts.push(`For: ${personsStr}`);
+  if (fallback) parts.push(fallback);
+  return parts.join(" — ");
+}
+
 // Cloud Function: Auto-sync trips to Google Calendar
 exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "trips/{tripId}" }, async (event) => {
   const snap = event.data;
@@ -3480,7 +3490,7 @@ exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", do
 
     const payload = {
       title: `✈️ ${data.title || data.city || "Reise"}`,
-      description: `${data.city || ""}${data.country ? ", " + data.country : ""}`,
+      description: buildCalendarDescription(data, `${data.city || ""}${data.country ? ", " + data.country : ""}`),
       allDay: !startTime,
       startDate,
       endDate,
@@ -3743,7 +3753,7 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
 
     const count = await familySyncUpdate(after, {
       title: after.title,
-      description: after.description || "",
+      description: buildCalendarDescription(after, after.description || ""),
       startDateTime,
       endDateTime,
       location: after.address || "",
@@ -3762,7 +3772,7 @@ exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", do
   try {
     const count = await familySyncUpdate(after, {
       title: `✈️ ${after.title || after.city || "Reise"}`,
-      description: `${after.city || ""}${after.country ? ", " + after.country : ""}`,
+      description: buildCalendarDescription(after, `${after.city || ""}${after.country ? ", " + after.country : ""}`),
       allDay: !after.startTime,
       startDate: after.startDate,
       endDate: after.endDate || after.startDate,
