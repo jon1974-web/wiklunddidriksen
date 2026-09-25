@@ -96,6 +96,7 @@ const RATE_LIMITS = {
   aiRecipeSuggestions: { maxRequests: 10, windowMinutes: 1 },
   importRecipeFromUrl: { maxRequests: 5, windowMinutes: 1 },
   translateRecipe: { maxRequests: 10, windowMinutes: 1 },
+  backfillCalendarSync: { maxRequests: 3, windowMinutes: 10 },
 };
 
 let rateLimitsCache = null;
@@ -3357,6 +3358,25 @@ async function refreshGoogleToken(uid) {
   return tokenData.access_token;
 }
 
+// Helper: Verify a calendar event actually exists in a user's Google Calendar
+// Returns: true (exists), false (404 - deleted/never created), null (unknown error)
+async function calendarEventExists(uid, eventId) {
+  try {
+    const accessToken = await refreshGoogleToken(uid);
+    const response = await fetch(
+      `https://www.googleapis.com/calendar/v3/calendars/primary/events/${eventId}`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    if (response.status === 200) return true;
+    if (response.status === 404) return false;
+    console.error(`calendarEventExists: unexpected status ${response.status} for uid ${uid}`);
+    return null;
+  } catch (error) {
+    console.error(`calendarEventExists error for uid ${uid}:`, error.message);
+    return null;
+  }
+}
+
 // Helper: Create Google Calendar event
 async function createGoogleCalendarEvent(uid, event) {
   const accessToken = await refreshGoogleToken(uid);
@@ -4046,6 +4066,249 @@ exports.onKindergartenActivityDeletedForCalendar = onDocumentDeleted({ region: "
 
 
 // DEBUG: Check user calendar data
+// CLOUD FUNCTION: Backfill family-wide Google Calendar sync (owner only, dry-run supported)
+// Loops all 7 event type collections for a family and ensures every Google-connected
+// family member has each event in their calendar. Duplicate-safe: existing IDs are
+// verified against Google before anything is created.
+exports.backfillCalendarSync = onRequest({ region: "us-central1", memory: "512MB", timeoutSeconds: 540 }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+  if (!(await checkRateLimit(uid, "backfillCalendarSync"))) return res.status(429).json({ error: "Too many requests" });
+
+  const { familyId, dryRun } = req.body || {};
+  if (!familyId) return res.status(400).json({ error: "Missing familyId" });
+
+  const db = getFirestore();
+
+  try {
+    // Owner-only (verified server-side)
+    const familySnap = await db.collection("families").doc(familyId).get();
+    const familyData = familySnap.data();
+    const members = familyData?.members || {};
+    if (familySnap.data()?.members?.[uid]?.role !== "owner") {
+      return res.status(403).json({ error: "Only the family owner can run this" });
+    }
+    const memberUids = Object.keys(members);
+
+    // Find which members are connected to Google Calendar
+    const googleConnectedUids = new Set();
+    for (const mUid of memberUids) {
+      const uDoc = await db.collection("users").doc(mUid).get();
+      const uData = uDoc.data();
+      if (uData?.calendarType === "google" && uData?.calendarRefreshToken) {
+        googleConnectedUids.add(mUid);
+      }
+    }
+
+    // Per-type spec: query + payload builder (copied 1:1 from the live triggers)
+    const TYPES = [
+      {
+        type: "event",
+        query: db.collection("events").where("familyId", "==", familyId).limit(500),
+        idField: "googleCalendarEventId",
+        idsField: "googleCalendarEventIds",
+        build: (d) => ({
+          title: d.title,
+          description: buildCalendarDescription(d, d.description || ""),
+          startDateTime: `${d.date}T${d.time || "09:00"}:00`,
+          endDateTime: d.endTime
+            ? `${d.date}T${d.endTime}:00`
+            : d.endDate
+              ? `${d.endDate}T${d.time ? incrementTime(d.time) : "10:00"}:00`
+              : `${d.date}T${d.time ? incrementTime(d.time) : "10:00"}:00`,
+          location: d.address || "",
+          reminderMinutes: d.reminderMinutes || 0,
+        }),
+      },
+      {
+        type: "trip",
+        query: db.collection("trips").where("familyId", "==", familyId).limit(500),
+        idField: "googleCalendarEventId",
+        idsField: "googleCalendarEventIds",
+        build: (d) => ({
+          title: `✈️ ${d.title || d.city || "Reise"}`,
+          description: buildCalendarDescription(d, `${d.city || ""}${d.country ? ", " + d.country : ""}`),
+          allDay: !d.startTime,
+          startDate: d.startDate,
+          endDate: d.endDate || d.startDate,
+          ...(d.startTime ? { startDateTime: `${d.startDate}T${d.startTime}:00` } : {}),
+          ...(d.endTime ? { endDateTime: `${d.endDate || d.startDate}T${d.endTime}:00` } : {}),
+        }),
+      },
+      {
+        type: "petVetVisit",
+        query: db.collection("petVetVisits").where("familyId", "==", familyId).limit(500),
+        idField: "googleCalendarEventId",
+        idsField: "googleCalendarEventIds",
+        build: (d) => ({
+          title: `🐾 ${d.title}`,
+          description: Array.isArray(d.person) ? d.person.join(", ") : (d.person || ""),
+          startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
+          endDateTime: d.endTime
+            ? `${d.dateFrom}T${d.endTime}:00`
+            : `${d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
+          location: d.location || "",
+          reminderMinutes: d.reminder || 0,
+        }),
+      },
+      {
+        type: "homeService",
+        query: db.collection("homeServices").where("familyId", "==", familyId).limit(500),
+        idField: "calendarEventId",
+        idsField: "calendarEventIds",
+        build: (d) => ({
+          title: `🔧 ${d.title}`,
+          description: Array.isArray(d.persons) ? d.persons.join(", ") : (d.description || ""),
+          startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
+          endDateTime: d.endTime
+            ? `${d.dateTo || d.dateFrom}T${d.endTime}:00`
+            : `${d.dateTo || d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
+          location: "",
+          reminderMinutes: d.reminder || 0,
+        }),
+      },
+      {
+        type: "healthAppointment",
+        query: db.collection("health").doc(familyId).collection("appointments").limit(500),
+        idField: "googleCalendarEventId",
+        idsField: "googleCalendarEventIds",
+        build: (d) => ({
+          title: `❤️ ${d.title}`,
+          description: Array.isArray(d.person) ? d.person.join(", ") : (d.person || ""),
+          startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
+          endDateTime: d.endTime
+            ? `${d.dateFrom}T${d.endTime}:00`
+            : `${d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
+          location: d.location || "",
+          reminderMinutes: d.reminder || 0,
+        }),
+      },
+      {
+        type: "schoolActivity",
+        query: db.collection("schoolActivities").doc(familyId).collection("activities").limit(500),
+        idField: "googleCalendarEventId",
+        idsField: "googleCalendarEventIds",
+        build: (d) => ({
+          title: `📚 ${d.activityType === "tur" ? "Tur" : d.activityType === "aktivitet" ? "Aktivitet" : "Møte"}: ${d.title}`,
+          description: Array.isArray(d.selectedPersons) ? d.selectedPersons.join(", ") : (d.note || ""),
+          startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
+          endDateTime: d.endTime
+            ? `${d.dateFrom}T${d.endTime}:00`
+            : `${d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
+          location: d.location || "",
+          reminderMinutes: d.reminder || 0,
+        }),
+      },
+      {
+        type: "kindergartenActivity",
+        query: db.collection("kindergartenActivities").doc(familyId).collection("activities").limit(500),
+        idField: "googleCalendarEventId",
+        idsField: "googleCalendarEventIds",
+        build: (d) => ({
+          title: `🎨 ${d.activityType === "tur" ? "Tur" : d.activityType === "aktivitet" ? "Aktivitet" : "Møte"}: ${d.title}`,
+          description: Array.isArray(d.selectedPersons) ? d.selectedPersons.join(", ") : (d.note || ""),
+          startDateTime: `${d.dateFrom}T${d.startTime || "09:00"}:00`,
+          endDateTime: d.endTime
+            ? `${d.dateFrom}T${d.endTime}:00`
+            : `${d.dateFrom}T${incrementTime(d.startTime || "09:00")}:00`,
+          location: d.location || "",
+          reminderMinutes: d.reminder || 0,
+        }),
+      },
+    ];
+
+    const summary = { scanned: 0, created: 0, skippedExists: 0, recreated: 0, failed: 0, verifyFailed: 0, notConnected: 0 };
+    const items = [];
+
+    for (const spec of TYPES) {
+      const snap = await spec.query.get();
+      for (const docSnap of snap.docs) {
+        const d = docSnap.data();
+        if (!d) continue;
+        const payload = spec.build(d);
+        if (!payload) continue;
+        summary.scanned++;
+        const perMember = {};
+
+        // Seed the map from legacy single-ID format so the creator isn't duplicated
+        let map = { ...(d[spec.idsField] || {}) };
+        const createdBy = d.createdBy || "";
+        if (createdBy && !map[createdBy] && d[spec.idField]) {
+          map = { ...map, [createdBy]: d[spec.idField] };
+        }
+
+        let mapChanged = false;
+
+        for (const mUid of memberUids) {
+          if (!googleConnectedUids.has(mUid)) {
+            perMember[mUid] = "notConnected";
+            continue;
+          }
+          const existingId = map[mUid];
+          if (existingId) {
+            const exists = await calendarEventExists(mUid, existingId);
+            if (exists === true) {
+              perMember[mUid] = "skippedExists";
+              summary.skippedExists++;
+              continue;
+            }
+            if (exists === null) {
+              perMember[mUid] = "verifyFailed";
+              summary.verifyFailed++;
+              continue;
+            }
+            // 404 -> the event was deleted from their calendar, recreate
+            try {
+              const newId = await createGoogleCalendarEvent(mUid, payload);
+              map = { ...map, [mUid]: newId };
+              mapChanged = true;
+              perMember[mUid] = "recreated";
+              summary.recreated++;
+            } catch (e) {
+              perMember[mUid] = "failed: " + (e.message || e);
+              summary.failed++;
+            }
+          } else {
+            try {
+              const newId = await createGoogleCalendarEvent(mUid, payload);
+              map = { ...map, [mUid]: newId };
+              mapChanged = true;
+              perMember[mUid] = "created";
+              summary.created++;
+            } catch (e) {
+              perMember[mUid] = "failed: " + (e.message || "");
+              summary.failed++;
+            }
+          }
+        }
+
+        // Persist the updated map (real run only, only when something was created/recreated)
+        if (!dryRun && mapChanged) {
+          const updateObj = { [spec.idsField]: map };
+          if (createdBy && map[createdBy]) updateObj[spec.idField] = map[createdBy];
+          try {
+            await docSnap.ref.update(updateObj);
+          } catch (e) {
+            summary.failed++;
+          }
+        }
+
+        items.push({ type: spec.type, id: docSnap.id, title: payload.title, perMember });
+      }
+    }
+
+    const report = { dryRun: !!dryRun, summary, items, memberUids: memberUids, googleConnectedUids: Array.from(googleConnectedUids) };
+    return res.json(report);
+  } catch (error) {
+    console.error("backfillCalendarSync error:", error);
+    return res.status(500).json({ error: error.message || "Internal server error" });
+  }
+});
+
 exports.debugCheckUser = onRequest({ region: "us-central1" }, async (req, res) => {
   const uid = req.query.uid || "jon@wiklunddidriksen.com";
   const db = getFirestore();

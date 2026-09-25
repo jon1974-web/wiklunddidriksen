@@ -102,6 +102,10 @@ export const ProfileScreen: React.FC = () => {
   const [showHelpMembers, setShowHelpMembers] = useState(false);
   const [showHelpSpond, setShowHelpSpond] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [googleSyncBusy, setGoogleSyncBusy] = useState(false);
+  const [googleSyncReport, setGoogleSyncReport] = useState<any>(null);
+  const [googleSyncDone, setGoogleSyncDone] = useState(false);
+  const [showGoogleSyncIssues, setShowGoogleSyncIssues] = useState(false);
   const [showDisconnectSpondModal, setShowDisconnectSpondModal] = useState(false);
 
   useEffect(() => {
@@ -508,6 +512,34 @@ export const ProfileScreen: React.FC = () => {
     }
   }, [user, calendarEmail]);
 
+  const handleGoogleCalendarBackfill = useCallback(async (dryRun: boolean) => {
+    if (!user || !familyId || googleSyncBusy) return;
+    setGoogleSyncBusy(true);
+    try {
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) throw new Error('Ingen tilgang');
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/backfillCalendarSync', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${idToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ familyId, dryRun }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        crossAlert(t('common.error'), data.error);
+        return;
+      }
+      setGoogleSyncReport(data);
+      if (!dryRun) setGoogleSyncDone(true);
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    } finally {
+      setGoogleSyncBusy(false);
+    }
+  }, [user, familyId, googleSyncBusy, t]);
+
   const handleDisconnectCalendarEmail = useCallback(async () => {
     if (!user) return;
     try {
@@ -853,6 +885,77 @@ export const ProfileScreen: React.FC = () => {
           </View>
         )}
       </View>
+
+      {/* Google Calendar backfill sync — family owner only */}
+      {familyRole === 'owner' && (
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.googleSyncSection')}</Text>
+          <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 10 }}>
+            {t('profile.googleSyncDescription')}
+          </Text>
+
+          {!googleSyncReport ? (
+            <TouchableOpacity
+              style={[styles.leaveButton, { borderColor: '#4285F4', opacity: googleSyncBusy ? 0.5 : 1 }]}
+              onPress={() => handleGoogleCalendarBackfill(true)}
+              disabled={googleSyncBusy}
+            >
+              <Text style={[styles.leaveButtonText, { color: '#4285F4' }]}>{googleSyncBusy ? t('profile.googleSyncRunning') : t('profile.dryRunButton')}</Text>
+            </TouchableOpacity>
+          ) : (
+            <View>
+              {/* Summary counts */}
+              <View style={{ backgroundColor: colors.inputBackground, borderRadius: 10, padding: 12, marginBottom: 10 }}>
+                <Text style={{ fontSize: 13, fontWeight: '700', color: colors.text, marginBottom: 6 }}>
+                  {googleSyncReport.dryRun ? t('profile.dryReportTitle') : t('profile.syncReportTitle')}
+                </Text>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 12 }}>
+                  <Text style={{ fontSize: 13, color: colors.text }}>{t('profile.syncScanned')}: {googleSyncReport.summary?.scanned ?? 0}</Text>
+                  <Text style={{ fontSize: 13, color: '#4CAF50' }}>{t('profile.syncCreated')}: {googleSyncReport.summary?.created ?? 0}</Text>
+                  <Text style={{ fontSize: 13, color: '#2E7D32' }}>{t('profile.syncSkipped')}: {googleSyncReport.summary?.skippedExists ?? 0}</Text>
+                  <Text style={{ fontSize: 13, color: '#FB8C00' }}>{t('profile.syncRecreated')}: {googleSyncReport.summary?.recreated ?? 0}</Text>
+                  <Text style={{ fontSize: 13, color: '#E53935' }}>{t('profile.syncFailed')}: {googleSyncReport.summary?.failed ?? 0}</Text>
+                  <Text style={{ fontSize: 13, color: colors.textSecondary }}>{t('profile.syncVerifyFailed')}: {googleSyncReport.summary?.verifyFailed ?? 0}</Text>
+                  <Text style={{ fontSize: 13, color: colors.textSecondary }}>{t('profile.syncNotConnected')}: {googleSyncReport.summary?.notConnected ?? 0}</Text>
+                </View>
+              </View>
+
+              {/* Issues list */}
+              {(googleSyncReport.summary?.failed > 0 || googleSyncReport.summary?.verifyFailed > 0) && (
+                <View>
+                  <TouchableOpacity onPress={() => setShowGoogleSyncIssues(!showGoogleSyncIssues)}>
+                    <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary, marginBottom: 6 }}>
+                      {showGoogleSyncIssues ? '▼' : '▶'} {t('profile.syncIssues')}
+                    </Text>
+                  </TouchableOpacity>
+                  {showGoogleSyncIssues && (googleSyncReport.items || []).filter((it: any) => Object.values(it.perMember).some((v: string) => v.startsWith('failed') || v === 'verifyFailed')).map((it: any) => (
+                    <View key={`${it.type}_${it.id}`} style={{ paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: colors.border }}>
+                      <Text style={{ fontSize: 12, fontWeight: '600', color: colors.text }}>{it.title}</Text>
+                      {Object.entries(it.perMember).filter(([, v]: any) => v.startsWith('failed') || v === 'verifyFailed').map(([m, v]: any) => (
+                        <Text key={m} style={{ fontSize: 11, color: colors.textSecondary }}>• {m}: {v}</Text>
+                      ))}
+                    </View>
+                  ))}
+                </View>
+              )}
+
+              {!googleSyncDone ? (
+                <TouchableOpacity
+                  style={[styles.calendarProviderButton, { backgroundColor: '#4285F4', marginTop: 12, opacity: googleSyncBusy ? 0.6 : 1 }]}
+                  onPress={() => handleGoogleCalendarBackfill(false)}
+                  disabled={googleSyncBusy}
+                >
+                  <Text style={styles.familyButtonText}>{googleSyncBusy ? t('profile.syncRunning') : t('profile.syncRunButton')}</Text>
+                </TouchableOpacity>
+              ) : (
+                <View style={{ backgroundColor: '#E8F5E9', borderRadius: 10, padding: 10, marginTop: 12 }}>
+                  <Text style={{ fontSize: 13, fontWeight: '600', color: '#2E7D32', textAlign: 'center' }}>✓ {t('profile.syncComplete')}</Text>
+                </View>
+              )}
+            </View>
+          )}
+        </View>
+      )}
 
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.theme')}</Text>
