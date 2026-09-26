@@ -393,6 +393,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     return { rows, plannedCount, totalSlots };
   }, [mealPlan, recipes, langKey, sectionSettings]);
 
+
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
       <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -518,7 +519,7 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
           )}
 
           {/* Matplan */}
-          {mealData && (
+          {mealData && sectionSettings.meals !== false && (
             <View style={[styles.section, { backgroundColor: colors.surface }]}>
               <View style={styles.sectionHeader}>
                 <View style={[styles.sectionIcon, { backgroundColor: MODULE_COLORS.mealplan }]}>
