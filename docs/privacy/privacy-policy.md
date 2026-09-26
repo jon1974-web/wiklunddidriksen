@@ -6,7 +6,7 @@
 <h2 align="center">Personvernpolicy / Privacy Policy</h2>
 
 <p align="center">
-  <em>Sist oppdatert / Last updated: August 15, 2026</em>
+  <em>Sist oppdatert / Last updated: September 26, 2026</em>
 </p>
 
 ---
@@ -73,9 +73,13 @@ When you create an account, we collect:
 | Event titles, descriptions, dates, times | Family schedule coordination |
 | Event locations and addresses | Navigation and planning |
 | Reminder settings | Notification scheduling |
-| Calendar integration settings | External calendar sync |
-| Voice recordings (for event creation) | Transcription via AI services |
-| Google Calendar OAuth tokens (if enabled) | Automatic calendar synchronization |
+| Medication time slots and per-dose reminders | Medication reminders |
+| Repeat schedules (days/weeks, odd/even weeks) | Repeating activities |
+| Event icons and assigned persons | Visual organization |
+| Calendar integration settings (phone calendar or Google) | External calendar sync |
+| Voice recordings (for event/activity creation) | Transcription via AI services |
+| Photos (for event, recipe, contact, holiday, home OCR) | Parsing via AI services |
+| Google Calendar OAuth tokens (if enabled) | Two-way calendar synchronization |
 
 ### 3.4 Health Information (Health Space)
 
@@ -127,8 +131,20 @@ When you create an account, we collect:
 | Data Field | Purpose |
 |------------|---------|
 | Shopping lists and items | Grocery coordination |
-| Recipes (ingredients, instructions) | Meal planning |
+| Recipes (ingredients, instructions, calories) | Meal planning |
 | Meal plans (weekly schedules) | Family meal organization |
+| AI recipe search queries | Recipe discovery |
+
+### 3.8b Home Information (Our Homes)
+
+| Data Field | Purpose |
+|------------|---------|
+| Home profiles (type, address, description, photo) | Home management |
+| Service agreements (vendors, dates, frequencies) | Home maintenance planning |
+| Paint colors (extracted via AI from photos) | Home decoration reference |
+| "Coming home" / "Leaving home" instructions | Household instructions |
+| Projects (status, budget, expenses) | Home project tracking |
+| Project shopping lists, offers and receipt scans | Budget management |
 
 ### 3.9 Chat Messages
 
@@ -162,6 +178,9 @@ If you choose to integrate with Spond (a sports team management platform):
 |------------|---------|
 | FCM push notification token | Delivering push notifications |
 | Notification preferences | Controlling notification delivery |
+| Timezone (auto-detected) | Correct reminder and birthday timing |
+| API usage counts | Rate limiting and cost control (Agreement: never sold or shared) |
+| Language preference | Providing translated interface |
 | Device information | Service optimization |
 
 ---
@@ -174,13 +193,18 @@ We use your personal data for the following purposes:
 2. **Account Management**: Creating and managing your account, authenticating users.
 3. **Notifications**: Sending push notifications for event reminders, birthday reminders, and family updates.
 4. **AI-Powered Features**: Using AI services to:
-   - Transcribe voice recordings into events (via OpenAI Whisper)
+   - Transcribe voice recordings into events/activities (via OpenAI Whisper)
    - Generate destination tips for trips (via OpenAI GPT)
-   - Parse photos into events, recipes, and class lists (via OpenAI GPT)
+   - Parse photos into events, recipes, class lists, holidays and timetables (via OpenAI GPT)
    - Suggest recipes based on your preferences (via OpenAI GPT)
-5. **Calendar Integration**: Syncing events with your Google Calendar or Outlook calendar.
-6. **Spond Integration**: Fetching sports events and member information from Spond (if enabled).
-7. **Service Improvement**: Monitoring service performance and reliability.
+   - Estimate recipe calories and translate recipes (via OpenAI GPT)
+   - Answer questions and perform actions via the AI assistant (via OpenAI GPT)
+   - Extract instruction text, paint colors, receipts and offers from home photos (via OpenAI GPT)
+5. **Reminders**: Sending reminders for events, medication time slots, and birthdays (at 08:00 in your timezone).
+6. **Calendar Integration**: Two-way sync with your Google Calendar (via Cloud Functions) or your phone's calendar (via expo-calendar on iOS); Outlook export buttons on web.
+7. **Spond Integration**: Fetching sports events and member information from Spond (if enabled).
+8. **Weather and Currency Data**: Fetching forecasts (Google Weather API, Open-Meteo) and exchange rates (Frankfurter API).
+9. **Service Improvement and Abuse Prevention**: Monitoring service performance, rate limiting API usage, and tracking usage statistics (accessible only in the appOwner Admin panel).
 
 ---
 
@@ -223,14 +247,21 @@ We use the following third-party services to provide fampad:
 - **Purpose**: Displaying locations on maps, address autocomplete
 - **Privacy policy**: [https://policies.google.com/privacy](https://policies.google.com/privacy)
 
-### 5.5 Open-Meteo
+### 5.5 Google Weather API
 
-- **Services used**: Weather Forecast API, Marine API, Geocoding API, Historical Weather API
+- **Services used**: Weather Forecast API (current, hourly, daily), Geocoding API
+- **Data sent**: City names/coordinates from your trips
+- **Purpose**: Trip weather chips, detailed weather tables, weather in "My Week"
+- **Privacy policy**: [https://policies.google.com/privacy](https://policies.google.com/privacy)
+
+### 5.6 Open-Meteo
+
+- **Services used**: Weather Forecast API, Geocoding API, Historical Weather API
 - **Data sent**: Geographic coordinates (latitude/longitude)
-- **Purpose**: Weather forecasts for trips, historical weather data, water temperature
+- **Purpose**: Weather forecasts for trips, historical weather data
 - **Privacy policy**: [https://open-meteo.com/en/terms](https://open-meteo.com/en/terms)
 
-### 5.6 Frankfurter API
+### 5.7 Frankfurter API
 
 - **Services used**: Currency exchange rates
 - **Data sent**: Currency codes (e.g., NOK, EUR)
@@ -367,5 +398,5 @@ We will respond to your inquiry within 30 days.
 ---
 
 <p align="center">
-  <em>This privacy policy is effective as of August 12, 2026.</em>
+  <em>This privacy policy is effective as of September 26, 2026.</em>
 </p>

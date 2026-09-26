@@ -1,69 +1,344 @@
-# Vilkår for bruk
+<p align="center">
+  <img src="../../assets/icon.png" alt="fampad Logo" width="120" height="120" />
+</p>
 
-## Godkjennelse av vilkår
-Ved å bruke fampad godtar du disse vilkårene. Hvis du ikke godtar dem, skal du ikke bruke appen.
+<h1 align="center">fampad</h1>
+<h2 align="center">Vilkår for bruk / Terms of Service</h2>
 
-## Kontoansvar
-- Du er ansvarlig for å holde påloggingsinformasjonen din hemmelig
-- Du skal varsle oss umiddelbart hvis du mistenker uautorisert bruk
-- Du er ansvarlig for all aktivitet på kontoen din
-
-## Dataeierskap
-- All familiemedlemskap og arrangementer eies av familien
-- Helse- og kjæledyrdata eies av den enkelte familien
-- Vi lagrer ikke data lenger enn nødvendig
-- Du kan slette kontoen din når som helst
-
-## Tjenestetilgjengelighet
-- Vi streber etter 99.9% oppetid
-- Vi kan endre eller avslutte tjenester med rimelig varsel
-- Vi er ikke ansvarlige for tap av data som følge av tjenestefeil
-
-## Ansvarsbegrensning
-- Appen leveres "som den er" uten garantier
-- Vi er ikke ansvarlige for indirekte tap
-- Vårt totale ansvar er begrenset til beløpet du har betalt for tjenesten
-
-## Endringer i vilkår
-- Vi kan endre disse vilkårene med rimelig varsel
-- Fortsatt bruk etter endringer godtar de nye vilkårene
-
-## Kontakt
-- E-post: [Din e-post]
-- Sist oppdatert: [Dato]
+<p align="center">
+  <em>Sist oppdatert / Last updated: September 26, 2026</em>
+</p>
 
 ---
 
-# Terms of Service
+## Table of Contents
 
-## Acceptance of Terms
-By using fampad, you agree to these terms. If you do not agree, you should not use the app.
+1. [Acceptance of Terms](#1-acceptance-of-terms)
+2. [Description of Service](#2-description-of-service)
+3. [Account Registration and Responsibilities](#3-account-registration-and-responsibilities)
+4. [Family Roles and Responsibilities](#4-family-roles-and-responsibilities)
+5. [Acceptable Use](#5-acceptable-use)
+6. [Data Ownership](#6-data-ownership)
+7. [Third-Party Services](#7-third-party-services)
+8. [Service Availability](#8-service-availability)
+9. [Privacy and Data Protection](#9-privacy-and-data-protection)
+10. [Intellectual Property](#10-intellectual-property)
+11. [Limitation of Liability](#11-limitation-of-liability)
+12. [Termination](#12-termination)
+13. [Changes to Terms](#13-changes-to-terms)
+14. [Governing Law](#14-governing-law)
+15. [Contact Information](#15-contact-information)
 
-## Account Responsibility
-- You are responsible for keeping your login credentials confidential
-- You must notify us immediately of any unauthorized use
-- You are responsible for all activity on your account
+---
 
-## Data Ownership
-- All family membership and events are owned by the family
-- Health and pet data is owned by the individual family
-- We do not retain data longer than necessary
-- You can delete your account at any time
+## 1. Acceptance of Terms
 
-## Service Availability
-- We strive for 99.9% uptime
-- We may modify or discontinue services with reasonable notice
-- We are not responsible for data loss due to service failures
+By accessing or using fampad ("the Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service.
 
-## Limitation of Liability
-- The app is provided "as is" without warranties
-- We are not liable for indirect damages
-- Our total liability is limited to the amount you paid for the service
+These Terms constitute a legally binding agreement between you ("User," "you," or "your") and fampad ("we," "us," or "our").
 
-## Changes to Terms
-- We may change these terms with reasonable notice
-- Continued use after changes constitutes acceptance of new terms
+---
 
-## Contact
-- Email: [Your email]
-- Last updated: [Date]
+## 2. Description of Service
+
+fampad is a family coordination application that helps families organize their daily lives. The Service provides features including:
+
+- **Family Management**: Create and manage family groups with role-based access (owner, admin, member).
+- **Event Coordination**: Share family events, appointments, and schedules with reminders.
+- **Health Tracking**: Track medications, vaccinations, allergies, and growth for family members.
+- **Pet Management**: Manage pet profiles, vet visits, medications, vaccinations, and grooming.
+- **School and Kindergarten Information**: Organize school/kindergarten contacts, schedules, and academic information.
+- **Travel Planning**: Plan trips with accommodation, transport (flights, trains, rental car, boat, ferry, taxi), activities, weather, currency conversion, destination tips, packing lists, and documents.
+- **Home Management**: Manage homes/cabins, "coming home"/"leaving home" instructions, maintenance and service agreements, paint colors, and home projects with budgets, shopping lists and offers.
+- **Meal Planning**: Create recipes, weekly meal plans, and shopping lists with AI-powered recipe search, import and translation.
+- **Family Chat**: Communicate with family members through in-app messaging with images and reactions.
+- **Birthday Tracking**: Keep track of birthdays, gift ideas and reminders.
+- **Spond Integration** (optional): Sync sports team events from Spond with RSVP support.
+- **Calendar Integration**: Two-way sync with Google Calendar, or insert events into the phone's calendar (iOS); Outlook export buttons on web.
+- **AI Assistant and AI Features**: Voice-to-event conversion, photo parsing (events, recipes, class lists, holidays, home OCR), destination tips, recipe suggestions/translation/calorie estimation, and a conversation-based assistant that can navigate and perform confirmed actions.
+
+---
+
+## 3. Account Registration and Responsibilities
+
+### 3.1 Eligibility
+
+You must be at least 16 years old to create an account. If you are under 16, a parent or legal guardian must create the account on your behalf.
+
+### 3.2 Account Security
+
+You are responsible for:
+- Maintaining the confidentiality of your account credentials.
+- All activities that occur under your account.
+- Notifying us immediately of any unauthorized use of your account.
+
+### 3.3 Accurate Information
+
+You agree to provide accurate, current, and complete information during registration and to keep your account information up to date.
+
+### 3.4 One Account Per Person
+
+Each person may maintain only one fampad account. Creating multiple accounts is not permitted.
+
+---
+
+## 4. Family Roles and Responsibilities
+
+### 4.1 Role System
+
+fampad uses a role-based access system within families:
+
+- **Owner**: The person who created the family. Has full control over family settings, members, and data. Only one owner per family.
+- **Admin**: Can manage members, generate invite codes, and perform most administrative tasks. Cannot transfer ownership.
+- **Member**: Can view and contribute to family data. Cannot manage members or family settings.
+
+### 4.2 Owner Responsibilities
+
+As the family owner, you are responsible for:
+- Managing family membership and roles.
+- Ensuring all family members consent to their data being stored.
+- The overall security of your family's data.
+- Deciding who to invite to your family.
+
+### 4.3 Member Responsibilities
+
+As a family member, you are responsible for:
+- Respecting other family members' privacy.
+- Contributing accurate information.
+- Following the family's agreed-upon usage guidelines.
+- Not sharing family data outside the family.
+
+### 4.4 Invite Codes
+
+Invite codes are generated by owners or admins and are:
+- Valid for 1 hour from creation.
+- Single-use (consumed upon successful join).
+- Case-insensitive (displayed in uppercase).
+
+---
+
+## 5. Acceptable Use
+
+You agree to use fampad only for lawful purposes and in accordance with these Terms. You agree NOT to:
+
+1. **Violate laws**: Use the Service for any unlawful purpose or in violation of any applicable laws.
+2. **Harm others**: Use the Service to harass, bully, threaten, or harm any person.
+3. **Share inappropriate content**: Upload or share content that is offensive, discriminatory, or inappropriate.
+4. **Misuse AI features**: Use AI-powered features (voice transcription, destination tips, recipe suggestions) to generate harmful, misleading, or inappropriate content.
+5. **Share credentials**: Share your account credentials with non-family members or unauthorized persons.
+6. **Circumvent security**: Attempt to bypass security measures, access controls, or data isolation mechanisms.
+7. **Automate access**: Use bots, scrapers, or automated tools to access the Service without written permission.
+8. **Impersonate others**: Create accounts or enter data under false pretenses.
+9. **Spam**: Send unsolicited messages or content through the family chat or other features.
+10. **Reverse engineer**: Reverse engineer, decompile, or disassemble any part of the Service.
+
+---
+
+## 6. Data Ownership
+
+### 6.1 Your Data
+
+You retain full ownership of all data you create and store in fampad. This includes:
+- Profile information
+- Events, appointments, and schedules
+- Health records
+- Pet information
+- School contacts and schedules
+- Travel plans and documents
+- Recipes and meal plans
+- Chat messages
+- Birthday and gift information
+
+### 6.2 Family Data
+
+Family data (events, chat messages, shopping lists, etc.) is shared among family members. All family members have access to this shared data according to their role.
+
+### 6.3 Data Portability
+
+You can export your data at any time. We will provide your data in a machine-readable format (JSON) upon request.
+
+### 6.4 Data Deletion
+
+You can delete your data at any time:
+- Individual items can be deleted through the app interface.
+- Your entire account and associated data can be deleted by contacting us.
+- Leaving a family removes your membership but does not delete data you contributed to the family.
+
+---
+
+## 7. Third-Party Services
+
+### 7.1 Dependencies
+
+fampad relies on the following third-party services:
+
+- **Google Firebase**: Authentication, database, storage, and cloud functions.
+- **OpenAI**: AI features (voice transcription, text generation, image analysis).
+- **Spond** (optional): Sports team event synchronization.
+- **Google Calendar** (optional): Automatic calendar synchronization via OAuth.
+- **Google Maps**: Location services and address autocomplete.
+- **Open-Meteo** and **Google Weather**: Weather forecasts and historical weather data.
+- **Frankfurter API**: Currency exchange rates.
+
+### 7.2 Third-Party Availability
+
+We are not responsible for the availability, accuracy, or reliability of third-party services. If a third-party service becomes unavailable, certain features of fampad may be temporarily unavailable.
+
+### 7.3 Third-Party Terms
+
+Your use of third-party services through fampad is subject to their respective terms of service and privacy policies. We encourage you to review these terms.
+
+### 7.4 Spond Integration
+
+If you choose to enable Spond integration:
+- You authorize fampad to access your Spond account on your behalf.
+- Your Spond credentials are encrypted before storage.
+- We only access data necessary for the integration (groups, events, responses).
+- You can disconnect the integration at any time.
+
+### 7.5 Google Calendar Integration (Optional)
+
+If you choose to enable Google Calendar integration:
+- You authorize fampad to access your Google Calendar on your behalf via OAuth 2.0.
+- OAuth access and refresh tokens are stored securely in Firestore.
+- We create, update, and delete calendar events for: app events, trips and transports, health appointments and medications, pet vet visits, school activities, kindergarten activities, home services, and birthdays.
+- You can disconnect the integration at any time, which revokes the tokens.
+- Spond events are NOT synced (handled by Spond's own calendar integration).
+
+---
+
+## 8. Service Availability
+
+### 8.1 Uptime
+
+We strive to maintain high availability of the Service, but we do not guarantee uninterrupted access. The Service may be temporarily unavailable due to:
+- Scheduled maintenance
+- System updates
+- Third-party service outages
+- Force majeure events
+
+### 8.2 Notifications
+
+We will make reasonable efforts to notify users of scheduled maintenance in advance.
+
+### 8.3 Backup and Recovery
+
+We implement regular backups of your data using Google Firebase's built-in backup mechanisms. However, we recommend that you maintain your own backups of important data.
+
+---
+
+## 9. Privacy and Data Protection
+
+### 9.1 Privacy Policy
+
+Our collection and use of personal data is governed by our [Privacy Policy](./privacy-policy.md), which is incorporated into these Terms by reference.
+
+### 9.2 Data Security
+
+We implement industry-standard security measures to protect your data, including:
+- Firebase Authentication for user identity verification
+- Firestore security rules for data access control
+- Family data isolation with `familyId` scoping
+- AES-256 encryption for sensitive data (Spond passwords)
+- TLS encryption for data in transit
+- Google-managed encryption for data at rest
+
+### 9.3 GDPR Compliance
+
+We comply with the General Data Protection Regulation (GDPR) and applicable data protection laws. For details on your rights, please refer to our Privacy Policy.
+
+---
+
+## 10. Intellectual Property
+
+### 10.1 Service Ownership
+
+fampad and its original content, features, and functionality are owned by us and are protected by international copyright, trademark, patent, trade secret, and other intellectual property laws.
+
+### 10.2 User Content
+
+You grant us a limited, non-exclusive license to store, display, and process your content solely for the purpose of providing the Service to you and your family.
+
+### 10.3 AI-Generated Content
+
+Content generated by AI features (destination tips, recipe suggestions, transcriptions) is provided for your personal use. We do not claim ownership over AI-generated content.
+
+---
+
+## 11. Limitation of Liability
+
+### 11.1 Disclaimer of Warranties
+
+THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+
+### 11.2 Limitation of Damages
+
+TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL WE BE LIABLE FOR:
+- Any indirect, incidental, special, consequential, or punitive damages.
+- Any loss of profits, data, business opportunities, or goodwill.
+- Any damages arising from the use or inability to use the Service.
+- Any damages arising from third-party services integrated with the Service.
+
+### 11.3 Health and Medical Disclaimer
+
+fampad is NOT a medical application. Health tracking features are for informational and organizational purposes only. We are NOT responsible for:
+- Medical decisions made based on data stored in the app.
+- Accuracy of health-related information.
+- Missed appointments, medication reminders, or health notifications.
+- Any health outcomes resulting from reliance on the app's features.
+
+### 11.4 Notification Disclaimer
+
+While we make reasonable efforts to deliver notifications (event reminders, birthday reminders, health reminders), we cannot guarantee that notifications will always be delivered or received. You are responsible for monitoring your own schedule and health needs.
+
+---
+
+## 12. Termination
+
+### 12.1 By You
+
+You may terminate your use of the Service at any time by:
+- Leaving your family through the app settings.
+- Contacting us to request account deletion.
+
+### 12.2 By Us
+
+We may suspend or terminate your access to the Service if:
+- You violate these Terms.
+- You engage in conduct that we reasonably believe is harmful to other users or the Service.
+- Required by law.
+
+### 12.3 Effect of Termination
+
+Upon termination:
+- Your access to the Service will be revoked.
+- Your data will be retained for a limited period to allow for recovery, then deleted.
+- Family data you contributed will remain accessible to other family members unless they also request deletion.
+
+---
+
+## 13. Changes to Terms
+
+We reserve the right to modify these Terms at any time. We will notify you of material changes through the app or by email. Your continued use of the Service after such changes constitutes acceptance of the updated Terms.
+
+We encourage you to review these Terms periodically.
+
+---
+
+## 14. Governing Law
+
+These Terms shall be governed by and construed in accordance with the laws of Norway. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts of Norway.
+
+---
+
+## 15. Contact Information
+
+If you have any questions about these Terms, please contact us:
+
+**Email**: [jon@wiklunddidriksen.com](mailto:jon@wiklunddidriksen.com)
+
+---
+
+<p align="center">
+  <em>These terms of service are effective as of September 26, 2026.</em>
+</p>

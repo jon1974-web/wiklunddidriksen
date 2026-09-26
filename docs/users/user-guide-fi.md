@@ -4,603 +4,619 @@
   <img src="../../assets/icon.png" alt="fampad Logo" width="120" height="120" />
 </p>
 
-<p align="center"><strong>Perheesi kaikki yhdessä organisaatiokeskuksessa</strong></p>
+<p align="center"><strong>Perheen kaiken kattava järjestämisalusta</strong></p>
 
 ---
 
-## Sisällysluettelo
+## Sisältöluettelo
 
-1. [Aloittaminen](#getting-started)
-2. [Navigointikatsaus](#navigation-overview)
-3. [Tapahtumat & Kalenteri](#events--calendar)
-4. [Keskustelu](#chat)
-5. [Pikaluontipainike](#quick-create-button)
-6. [Viikkoyleistävä ("Minun viikko")](#weekly-summary-min-uke)
-7. [Moduulit](#spaces-modules)
-   - [Matkat](#trips--travel)
-   - [Terveys](#health)
-   - [Lemmikit](#pets)
-   - [Koulu](#school)
-   - [Päiväkoti](#kindergarten)
-   - [Syntymäpäivät](#birthdays)
-   - [Ruokavalio](#meal-plan)
-   - [Ostoslistat](#shopping-lists)
-8. [Ääni & Valokuva Tapahtumaan/Toimintaan](#voice--photo-to-eventactivity)
-9. [PäivämääräValitsin & Muistutukset](#datepicker--reminders)
-10. [Profiili & Asetukset](#profile--settings)
-11. [Teemat](#themes)
-12. [Kielituki](#language-support)
-13. [PWA & Asennus](#pwa--install)
-14. [Vinkit & Nikkarit](#tips--tricks)
+1. [Aloittaminen](#aloittaminen)
+2. [Navigointi yleiskatsaus](#navigoinnin-yleiskatsaus)
+3. [Tapahtumat ja kalenteri](#tapahtumat-ja-kalenteri)
+4. [Chat](#chat)
+5. [Nopea luominen -painike (+)](#nopea-luominen-painike)
+6. [AI-assistentti](#ai-assistentti)
+7. [Oma viikkoni](#oma-viikkoni)
+8. [Paikkamme (moduulit)](#paikkamme-moduulit)
+   - [Matkamme](#matkamme)
+   - [Terveys](#terveys)
+   - [Koulu](#koulu)
+   - [Päiväkoti](#päiväkoti)
+   - [Syntymäpäivät](#syntymäpäivät)
+   - [Eläimet](#eläimet)
+   - [Ruokakeskus (Matsenter)](#ruokakeskus)
+   - [Kotimme](#kotimme)
+   - [Ostoslistat](#ostoslistat)
+9. [Luonti puheella ja valokuvalla](#luonti-puheella-ja-valokuvalla)
+10. [Päivämäärävalitsin ja muistutukset](#päivämäärävalitsin-ja-muistutukset)
+11. [Profiili ja asetukset](#profiili-ja-asetukset)
+12. [Kalenterin synkronointi](#kalenterin-synkronointi)
+13. [Teemat](#teemat)
+14. [Kielet](#kielet)
+15. [PWA ja asennus](#pwa-ja-asennus)
+16. [Vinkkejä](#vinkkejä)
 
 ---
 
 ## Aloittaminen
 
-### Luo käyttäjätilisi
+### Tilin luominen
 
-1. Avaa fampad selaimessasi tai asenna se PWA-na
-2. Syötä sähköpostisi ja salasanasi rekisteröityäksesi
-3. Sinut asetetaan automaattisesti uudelle käyttäjätilille
+1. Avaa fampad selaimessa (tai asennettuna PWA:na)
+2. Rekisteröidy sähköpostilla ja salasanalla — tai kirjaudu sisään, jos sinulla on jo tili
+3. Valitse kieli vaiheessa 2 tervetuloa-oppaassa (norja, ruotsi, tanska, englanti, suomi)
+4. Luo tai liity perheeseen vaiheessa 3 — tai ohita ja tee se myöhemmin Profiilissa
 
-### Aseta perheesi
+### Perheen pystytys
 
-Kirjautumisen jälkeen sinun täytyy joko luoa tai liittyä perheeseen:
+Kirjautumisen jälkeen sinun täytyy luoda perhe tai liittyä olemassa olevaan:
 
 **Vaihtoehto A: Luo uusi perhe**
 1. Siirry **Profiili**-välilehdelle
 2. Napauta "Opprett familie" (Luo perhe)
-3. Syötä perheen nimi
+3. Kirjoita perheen nimi
 4. Sinusta tulee perheen **omistaja**
 
 **Vaihtoehto B: Liity olemassa olevaan perheeseen**
-1. Pyydä perheen järjestelmänvalvojaa luomaan kutsukoodi (Profiili > Perhe osio > "Inviter medlem")
-2. Syötä 6-merkkinen koodi profiilinäkymässä
+1. Pyydä omistajaa/ylläpitäjää luomaan kutsukoodi (Profiili > Perhe > "Inviter medlem")
+2. Avaa jaettu kutsulinkki tai kirjoita 6-merkkinen koodi
 3. Liityt **jäsenenä**
 
-### Ymmärrä perheen roolit
+### Perheen roolien ymmärtäminen
 
-| Rooli | Käyttöoikeudet |
-|-------|----------------|
-| **Omistaja** | Täydellinen hallinta. Hallitsee kaikkia jäseniä, voi luoda/poistaa perheen. Ei voi lähteä. |
-| **Järjestelmänvalvoja** voi kutsua jäseniä, poistaa jäseniä, muuttaa rooleja. |
+| Rooli | Oikeudet |
+|-------|-------------|
+| **Omistaja** | Täysi hallinta. Voi hallita kaikkia jäseniä. Ei voi poistua perheestä. |
+| **Admin** | Voi kutsua, poistaa jäseniä ja muuttaa rooleja. |
 | **Jäsen** | Voi luoda ja muokata sisältöä. Ei voi hallita muita jäseniä. |
 
 ---
 
-## Navigointikatsaus
+## Navigoinnin yleiskatsaus
 
-fampad käyttää alareunan välilehtipalkkia, jonka välilehdet on sijoitettu symmetrisesti keskimmäisen "+"-painikkeen ympärille. Keskustelu ja Meidän paikat ovat sijoitettu muiden välilehtien ja keskimmäisen plus-painikkeen välille.
+fampad käyttää alapalkin välilehtiä, neljää välilehteä keskellä olevan "+"-painikkeen ympärillä.
 
-| Välilehti | Kuvake | Kuvaus |
-|-----------|--------|--------|
-| **Kalenteri** | Kalenteri | Tapahtumat kaikista lähteistä (manuaaliset, Spond, terveys, lemmikit) |
-| **Keskustelu** | Keskustelupallo | Perheen viestintä kuvilla ja reaktioilla |
-| **Meidän paikat** | Kompassi/Talo | Moduulikeskus — pääsy kaikkiin moduuleihin |
-| **Profiili** | Henkilö | Asetukset, perheen hallinta, integraatiot |
+| # | Välilehti | Ikon | Kuvaus |
+|---|------|------|-------------|
+| 1 | **Tapahtumat** (Avtaler) | Kalenteri | Yhdistetty kalenteri kaikista perheen lähteistä (manuaaliset tapahtumat, Spond, terveys, eläimet, koulu/päiväkoti, koti, syntymäpäivät) |
+| 2 | **Chat** | Kupla | Perheviestit kuvilla ja reaktioilla |
+| 3 | **Paikkamme** (Våre steder) | Talo | Sisäänkäynti kaikkiin moduuleihin |
+| 4 | **Profiili** | Henkilö | Asetukset, perheenhallinta, integraatiot |
 
-**+ (plus)**-painike keskellä välilehtipalkkia avaa **pikaluontimodaalin** nopeaan sisällön luomiseen.
+Keskimmäinen **+**-painike avaa **Nopea luominen** -valikon. Välilehtipalkki piiloutuu automaattisesti, kun kirjoitat chattta.
 
 ---
 
-## Tapahtumat & Kalenteri
+## Tapahtumat ja kalenteri
 
-Tapahtumavälilehti näyttää yhdistetyn kalenterin kaikista perheen toiminnoista.
+Tapahtumat-välilehti näyttää yhdistetyn kalenterin kaikista perheen aktiviteeteista.
 
-### Tapahtumien katselu
+### Katselu
 
-- **Listanäkymä**: Tapahtumat ryhmiteltyinä päivämäärän mukaan vieritettävässä listassa
-- **Kalenterinäkymä**: Kuukausikalenterin ruudukko näyttää pisteet jokaisella päivällä
-- Napauta kalenterikuvaketta vaihtaaksesi listanäkymän ja kalenterinäkymän välillä
+- **Listanäkymä**: Tapahtumat ryhmiteltyinä päivittäin viikkonumerobannerilla
+- **Kalenterinäkymä**: Kuukausiruudukko pisteillä per päivä — napauta päivää nähdäksesi sen
+- Näytä/piilota menneet tapahtumat
+- Suodata moduulin ja lähteen mukaan (mukaan lukien Spond-ryhmät logoilla)
+- "**Oma viikko**" (Din uke) -painike ylhäällä avaa viikko-yhteenveton (katso oma osio)
 
 ### Tapahtumien lähteet
 
-Tapahtumat tulevat useista lähteistä ja ovat värikoodattuja:
-- **Manuaaliset tapahtumat** jotka luot (vihreä)
-- **Spond-tapahtumat** urheiluseurastasi (punainen)
-- **Terveysajanvaraukset** (#C67B5C)
-- **Eläinlääkärivierailut** (#9B7DB8)
-- **Koulutoiminnot** (#6B8F71)
-- **Päiväkotoiminnot** (#E8836A)
-- **Matkat** aloitus-/loppupäivämäärillä (#7EC8E3)
+Tapahtumat tulevat monista lähteistä ja ovat värikoodattuja moduulin mukaan:
 
-### Luo tapahtuma
+| Lähde | Väri |
+|-------|------|
+| Manuaaliset tapahtumat | #3b5a75 |
+| Matkat | #7EC8E3 |
+| Terveys (aikaismääräykset/lääkkeet/rokotukset) | #C67B5C |
+| Koulutoiminnot ja -lomat | #6B8F71 |
+| Päiväkoti-aktiviteetit | #E8836A |
+| Eläimet (eläinlääkäri/rokotukset) | #9B7DB8 |
+| Syntymäpäivät | #E6A817 |
+| Koti (huoltoaikaasmääräykset) | #6B7B8D |
+| Ateriapaikat (Ruokakeskus) | #E8906C |
+| Spond-tapahtumat | Näytetään ryhmälogolla |
 
-1. Napauta **+**-painiketta välilehtipalkissa
-2. Valitse "Manuelt" (Manuaalinen) tapahtumiosiossa
-3. Täytä tiedot:
+### Tapahtuman luominen
+
+1. Napauta **+** → "Manuelt" → "Avtale" (Tapahtuma)
+2. Täytä:
    - **Otsikko** (pakollinen)
-   - **Päivämäärä** ja valinnainen loppupäivämäärä
+   - **Päivämäärä** ja valinnainen loppupäivä
    - **Aika** ja valinnainen loppuaika
-   - **Osoite** (Google Places -haku)
+   - **Osoite** (Google Places-haku)
+   - **Ikoni** (20 esiasetettua, esim. Middag (middag), Bursdag (syntymäpäivä), Sport, Kino (elokuvat), Trening, Fjelltur (vuoristovaellus))
+   - **Henkilöt** (valitse perheenjäsenet)
    - **Kuvaus** (valinnaiset muistiinpanot)
-   - **Muistutus** (Ei, 30 min, 1 tunti, 2 tuntia, 1 päivä, 1 viikko)
-   - **Dokumentin lataus** (valinnainen)
-4. Napauta "Lagre" (Tallenna)
-
-### Spond-tapahtumat
-
-Jos olet liittänyt Spondin profiiliasetuksiin:
-- Spond-tapahtumat valituista ryhmistäsi ilmestytvät automaattisesti
-- Näet RSVP-tilan (hyväksytty/hylätty/vastaamaton) perheen jäsenille
-- Napauta Spond-tapahtumaa nähdäksesi tiedot ja muuttaaksesi vastauksesi
+   - **Muistutus** (Ingen (ei mikään), 30 min, 1 tunti, 2 tuntia, 1 päivä, 1 viikko)
+   - **Toisto** (ajoita päivät/viikot, pariton ja parillinen viikko — esim. "joka toinen viikko")
+   - **Asiakirjat** (lataa liitteet)
+3. Napauta "Lagre" (Tallenna)
 
 ### Tapahtuman tiedot
 
-Napauta mitä tahansa tapahtumaa nähdäksesi:
-- Täydellinen päivämäärä, aika ja sijainti
-- Staattinen kartta näyttää sijainnin
-- Kuvaus ja muistiinpanot
-- RSVP-tila (Spond-tapahtumille)
-- Ladatut dokumentit
-- Muokkaus ja poisto -vaihtoehdot (pitkä painaminen toimintovalikolle)
+Napauta tapahtumaa nähdäksesi:
+- Täydellinen päivämäärä, aika ja paikka
+- Staattinen kartta + "Avaa Google Maps" (kun osoite on olemassa)
+- Muistiinpanot, asiakirjat, ikoni ja tapahtumaan linkitetyt henkilöt
+- "Lisää Google/Outlook-kalenteriin" -painikkeet (web)
+- Muokkaa/poista pitkällä painalluksella (ActionModal)
+- Spond-tapahtumat: vastaajastatus-merkit (hyväksytty/kielletty/ei vastausta, sisl. lapset) ja mahdollisuus muuttaa omaa vastaustasi
+
+### Spond-tapahtumat
+
+Jos olet yhdistänyt Spondin Profil-asetuksissa:
+- Spond-tapahtumat valituista ryhmistäsi näkyvät automaattisesti
+- Näet vastausstatuksen perheenjäsenille
+- Napauta tapahtumaa nähdäksesi yksityiskohtia ja muuttamaan omaa vastaustasi
+- Ryhmälogot ladataan Profiilissa (custom logo yryhmää kohden)
+- Spond-synkronointi suoritetaan automaattisesti 30 minuutin välein
 
 ---
 
-## Keskustelu
+## Chat
 
-Keskusteluvälilehti tarjoaa perheen viestintärikkailla ominaisuuksilla.
+Chat-välilehti tarjoaa reaaliaikaiset perheviestit.
 
 ### Viestien lähettäminen
 
-1. Kirjoita viestisi tekstikenttään
-2. Napauta lähetysnuolta julkaistaksesi
+1. Kirjoita viestisi (max 500 merkkiä)
+2. Napauta lähetä-painiketta
 
 ### Kuvien jakaminen
 
-1. Napauta kuvaketta tekstikentän vieressä
-2. Valitse valitse galleriasta tai ota valokuva
+1. Napauta kuvikon tekstikentän vieressä
+2. Valitse kirjastosta tai ota kuva
 3. Esikatsele kuva
-4. Napauta lähetä — kuva ladataan Firebase Storageen
+4. Lähetä — kuva ladataan Firebase Storageen
 
 ### Reaktiot
 
-- Pitkä painaminen viestillä lisää reaktion
-- Käytettävissä olevat reaktiot: Tykkää, Hymy, Sydän
-- Reaktiosi näkyvät viestin alla
+- Napauta "+"-painiketta viestin vieressä avataksesi reaktiivalitsimen
+- Käytettävissä olevat reaktiot: Like 👍, Smile 😊, Heart ❤️
+- Määrät näytetään reaktioittain; napauta reaktiobadgea like/unlike
+- Omat reaktiosi ovat korostettuja
 
-### Ominaisuudet
+### Toiminnot
 
-- Reaaliaikaiset päivitykset Firestore-kuulijoilta
-- Viestit vierivät automaattisesti alareunaan
-- Käyttäjäavatarit näkyvät viestien vieressä
-- Kuvat näkyvät linssinä napauttamalla laajenna
-
----
-
-## Pikaluontipainike
-
-**+**-painike keskellä välilehtipalkkia avaa modaalin pikaluontipikakuvakkeilla, jotka on järjestetty moduulittain. Jokainen moduuli tarjoaa kolme luontimenetelmää: **Manuelt** (manuaalinen lomake), **Tale** (ääni-/tallennus) ja **Foto** (kuvantunnistus).
-
-### Tapahtumasektio
-- **Manuelt** — Luo uusi manuaalinen tapahtuma
-- **Tale** — Ääni-tapahtumaan: tallenna puhe, AI muuntaa tapahtumaksi
-- **Foto** — Kuva-tapahtumaan: ota valokuva aikataulusta, AI poimii tapahtumat
-
-### Terveyssektio
-- **Manuelt** — Luo uusi terveydenajanvaraus
-- **Tale** — Ääni-toimintaan: tallenna puhe, AI luo terveydenajanvarauksen
-- **Foto** — Kuva-toimintaan: ota valokuva, AI luo terveydenajanvarauksen
-
-### Lemmikkisektio
-- **Manuelt** — Suunnittele eläinlääkärivierailu
-- **Tale** — Ääni-toimintaan: tallenna puhe, AI luo eläinlääkärivierailun
-- **Foto** — Kuva-toimintaan: ota valokuva, AI luo eläinlääkärivierailun
-
-### Koulusektio
-- **Manuelt** — Luo uusi koulutoiminta (retki/toiminta/kokous)
-- **Tale** — Ääni-toimintaan: tallenna puhe, AI luo koulutoiminnan
-- **Foto** — Kuva-toimintaan: ota valokuva, AI luo koulutoiminnan
-
-### Päiväkotisektio
-- **Manuelt** — Luo uusi päiväkotoiminta
-- **Tale** — Ääni-toimintaan: tallenna puhe, AI luo päiväkotoiminnan
-- **Foto** — Kuva-toimintaan: ota valokuva, AI luo päiväkotoiminnan
-
-### Matkasektio
-- **Manuelt** — Luo uusi matka
+- Reaaliaikaiset päivitykset Fireston kautta
+- Päivityserottimet ("I dag" / "Eilen") viestiryhmien välillä
+- Avatarit viestien vieressä
+- Viimeiset 100 viestiä ladataan, max 500 merkkiä messia kohti
+- Muut perheenjäsenet saavat push-ilmoituksen (Cloud Function `notifyNewChatMessage`)
+- Napauta kuvia koko näytön katselemiseen
+- Välilehtipalkki piiloutuu, kun chat-näppäimistö on aktiivinen
 
 ---
 
-## Viikkoyleistävä ("Minun viikko")
+## Nopea luominen -painike (+)
 
-Viikkoyleistävä näyttää kaiken mikä tapahtuu tällä viikolla yhdessä näkymässä.
+Keskimmäinen "+"-painike avaa Nopea luominen -valikon kahdella vaiheella:
 
-### Pääsy siihen
+**Vaihe 1: Valitse menetelmä**
+- ✏️ **Manuaalinen** — tavallinen lomake
+- 🎤 **Ääni** — kop puhettasi; AI konvertoi kohteeksi valitussa moduulissa
+- 📷 **Kuva** — ota/valitse kirjastosta; AI poimii tiedot kuvista
 
-1. Siirry **Tapahtumat** (Kalenteri) välilehdelle
-2. Napauta "Min uke" (Minun viikko) -painiketta ylhäällä
+**Vaihe 2: Valitse moduuli**
+1. **Tapahtuma** (manuaaliset kalenteritapahtumat)
+2. **Terveysaika**
+3. **Eläinlääkärivierailu**
+4. **Kouluaktiviteetti**
+5. **Päiväkotiaktiviteetti**
+6. **Huoltoaika** (koti)
+7. **Matka**
 
-### Mitä sisältyy
-
-Viikkoyleistävä näyttää nykyisen viikon (maanantai sunnuntaiin) seuraavilla:
-
-- **Yhteenvetokehote**: Viikonnumero ja aikaväli
-- **Päiväaikajana**: Jokainen päivä näyttää kaikki toiminnot kronologisesti
-- **Tilastochipsit**: Nopea laskenta tapahtumista, matkoista ja muista kohteista
-- **Värikoodatut kohteet**: Jokaisella lähteellä on oma värinsä
-
-### Osiot
-
-| Osiso | Sisältö |
-|-------|---------|
-| **Arrangementer** | Manuaaliset tapahtumat viikolle |
-| **Spond** | Urheiluseuran tapahtumat RSVP-tilalla |
-| **Reiser** | Aktiiviset matkat (liikenne, hotellit, ravintolat) |
-| **Helse** | Terveysajanvaraukset ja lääkkeet |
-| **Kjæledyr** | Eläinlääkärivierailut ja rokotukset |
-| **Skole** | Koulutoiminnot (retki, toiminta, kokous) |
-| **Barnehage** | Päiväkotoiminnot |
-| **Bursdager** | Tulevat syntymäpäivät |
-| **Middager** | Viikko ruokavalio (aamiainen, lounas, illallinen)
-
-### Osioiden mukauttaminen
-
-Voit näyttää/piilottaa osioita Profiili > "Min uke" -asetuksista. Mukauta mitä tietoja näkyy viikkonäkymässäsi.
+AI-assistentti-rivi löytyy Nopea luominen -valikon ylhäältä — katso seuraava osio.
 
 ---
 
-## Moduulit
+## AI-assistentti
 
-Pääsy kaikkiin moduuleihin **Meidän paikat** -välilehdeltä. Jokaisella moduulilla on oma korttinsa kuvakkeella, nimellä ja kohteiden määrällä.
+AI-assistentti on keskustelupohjainen apuri sovelluksessa (Nopea luominen -valikon ylhäällä). Se voi:
+- Vastata kysymyksiin (esim. "Mitä tapahtuu keskiviikkona?")
+- Ohjata sinut näytöille (terveys, eläimet, koulu, päiväkoti, koti, tapahtumat, matkat)
+- Suorittaa toimintoja vahvistuksesi jälkeen (esim. "Luo terveysaika tiistai kello 10" → vahvista → luotu)
+- Mikrofonikuvikon kautta: kop puhettasi, joka transkribersoidaan ja lähetetään assistentille
+- Korjata vastauksia: voit kirjoittaa korjauksen, jos assistenti vastaa väärin
 
-### Matkat
+---
 
-**Kuvake**: Kompassi | **Väri**: #7EC8E3 (Sininen)
+## Oma viikkoni
 
-Suunnittele ja järjestä perheen matkoja seuraavilla:
+"Oma viikko" (Din uke) näyttää kaiken, mitä tapahtuu tällä viikolla yhdessä näkymässä.
 
-- **Matkakatsaus**: Luo matkoja määränpääksi, päivämäärillä ja koordinaateilla
-- **Liikenne**: Varaa lentoja, juna-autoja, busseja, veneliikennettä, takseja, lauttoja lähtö-/saapumisajoilla
-- **Hotellit**: Majoitus sisään-/ulostarkistusajoilla ja osoitteilla
-- **Ravintolat**: Varaukset päivämäärillä ja muistiinpanoilla
-- **Toiminnot**: Suunnitellut toiminnot aikatauluilla
-- **Pakkaukset**: Valittavat pakkauslistat
-- **Dokumentit**: Lataa ja tallenna matkadokumentit
-- **Linkit**: Tallenna hyödyllisiä URL:itä
-- **Sää**: AI-haettu sääennuste määränpääsillesi
-- **Määränpäävinkit**: AI-generoidut matkavinkit (tehtävät, ravintolat, paikalliset fraasit, huijausvaroitukset)
+### Avaaminen
 
-**Liikenteen lisääminen**: Jokainen liikennetyyppi (lento, juna, auto, veneliikenne, taksi, lautta) käyttää kaksoislomakemallia lähtö- (utreise) ja saapumis- (hjemreise) välilehdillä. Merkitse "En vei" (yhdensuuntaisesti) piilottaaksesi paluumatkan lomakkeen.
+1. Siirry **Tapahtumat**-välilehdelle
+2. Napauta "Din uke" -painiketta ylhäällä
+
+### Mitä näytetään
+
+- Yhteenveto-otsikko viikkonumerolla ja päivämääräajalla
+- Päivä kortti sДДllikkiin kotiosoitteellesi
+- Tilastopillit (määrät tapahtumia, matkoja, koulu-/päiväkotiaktiviteetteja)
+- Kronologinen päiväagenda, joka yhdistää kaikki lähteet: tapahtumat, Spond, matkat (sisl. kuljetukset/hotellit/ravintolat), terveysajat, lääkkeet, rokotukset, eläinlääkärivierailut ja -rokotukset, koulu/päiväkoti (aktiviteetit ja lomat), syntymäpäivät, kotipalvelut ja viikkomenut-ajat
+
+### Mukauttaminen
+
+Profiili → "Min uke" (Minä viikko) -kohdassa:
+- **Viikkomenu**: näytä/piilota aterioiden osio Oma viikkossa
+- **Ruokakeskus-asetukset** (Frokost (aamiainen) 🥞 / Lunsj (lounas) 🥪 / Middag (middag) 🍽️) ohjaavat, mitkä ateriat näytetään ja lasketaan
+
+---
+
+## Paikkamme (moduulit)
+
+Kaikki moduulit löytyvät **Paikkamme**-välilehdeltä. Jokainen kortti näyttää ikonin, nimen ja kohteiden määrän.
+
+| Moduuli | Väri |
+|-------|-------|
+| Matkamme | #7EC8E3 |
+| Terveys | #C67B5C |
+| Koulu | #6B8F71 |
+| Päiväkoti | #E8836A |
+| Syntymäpäivät | #E6A817 |
+| Eläimet | #9B7DB8 |
+| Ruokakeskus | #E8906C |
+| Kotimme | #6B7B8D |
+
+### Matkamme
+
+Suunnittele ja järjestä perheen matkat:
+
+- **Matka yleiskatsaus**: matkat kaupungin, maan, päivämäärien, aikojen ja perh enjäsenien (pakolliset) kanssa; matkakortit näyttävät staattisen kartan ja sää-pillen kaupunkia kohden
+- **Sää**: 10 päivän sääennuste + tunneittain (aamiainen/lounas/iltapäivä/ilta/yö) ensimmäinen päivä lämpötilalla, UV-indeksilla, sateen todennäköisyydellä, tuulella; historialliset keskiarvot tuleville matkoille; sivuttaminen ja päivitys
+- **Valuuttakalkulaattori**: livekurssit (Frankfurter API), maa→valuutta autovaalinta, vaihda suunta
+- **Kuljetus**: lennot, junat, vuokrausauto (vuokrausauto), vene (vene), ferje (färja) ja tak si omalla lomakkeella tyyppiä kohden (lentokenttä/terminaali, lentonr., varausnr., istuin, vaunu, kuljettaja, reg.nr.) ja lähtö/palu-välilehdillä "En vei"-kytkimellä; kuljetustiedot tukevat karttoja ja linkkejä yhtiöihin (Norwegian, SAS, Vy, Hertz ym.)
+- **Hotellit, ravintolat, aktiviteetit**: lomakkeet päivämäärä/ajalle, osoitteelle (Google Maps) ja muistiinpanoille
+- **Pakkauslistat**: ruksittavat pakkauslistat, uudelleennimeä, kopioi lista, poista
+- **Asiakirjat**: lataa ja säilytä matka-asiakirjat
+- **Hyödylliset linkit**: tallenna linkit favicon-esikatseluilla
+- **Kohteiden vinkit (AI)**: AI:n generoimat vinkit kaupunkia kohden (tehtävää, ravintolat, paikalisfraasit, varoitukset)
+
+**Kuljetuslomake**: jokainen kulkuneuvo (fly/tog/bil/båt/ferje/taxi) käyttää kaksoislomekketta **Utreise/Hjemreise**-välilehdillä ja "En vei"-kytkimellä, joka piilottaa paluumatkan.
 
 ### Terveys
 
-**Kuvake**: Medikaalinen | **Väri**: #C67B5C (Punainen/Ruskea)
+Pidä kirjaa perheen terveydestä:
 
-Seuraa perheen terveysetietoja:
-
-- **Lääkkeet**: Seuraa reseptejä annostuksella ja tiheydellä
-- **Ajanvaraukset**: Suunnittele lääkärivierailuja päivämäärällä, ajalla, sijainnilla
-  - **Henkilö**: Monivalinta — määritä ajanvaraukset useille perheen jäsenille
-  - **Lääkäri**: Lääkärin nimi
-  - **Päivämäärä/Aika**: dateFrom/dateTo automaattisella synkronoinnilla
-  - **Muistutukset**: Ystävälliset nimikkeet (30 min, 1 tunti, 2 tuntia, 1 päivä, 1 viikko)
-- **Rokotukset**: Kirjaa rokotukset seuraavilla määräpäivillä
-- **Allergiat**: Dokumentoi allergiat vakavuustasoilla
-- **Kasvu**: Kirjaa pituus- ja painomittauksia ajan myötä
-
-Jokainen osio on taitettavissa lisää-/muokkaa-/poisto-toiminnallisuudella. Ajanvaraukset sijainneilla näyttävät kartan, joka avaa Google Mapsin napauttamalla.
-
-### Lemmikit
-
-**Kuvake**: Lemmikki | **Väri**: #9B7DB8 (Violetti)
-
-Hallitse lemmikinhoitoa omistetuilla osioilla:
-
-- **Lemmikit**: Lisää lemmikkejä nimellä, tyypillä, rodulla, syntymäpäivällä, čip-numerolla, passinumerolla
-- **Eläinlääkärivierailut**: Suunnittele ja seuraa eläinlääkärivierailuja
-  - **Lääkäri**: Eläinlääkärin nimi
-  - **Päivämäärä/Aika**: dateFrom/dateTo automaattisella synkronoinnilla
-  - **Muistutukset**: Ystävälliset nimikkeet (30 min, 1 tunti, 2 tuntia, 1 päivä, 1 viikko)
-- **Lääkkeet**: Seuraa lemmikkilääkkeitä ja annostuksia
-- **Ruoka**: Kirjaa ruokinta-aikataulut ja määrät
-- **Turkkihoito**: Seuraa turkkihoitoaikataulua seuraavilla määräpäivillä
-- **Rokotukset**: Kirjaa rokotushistoria
-- **Vakuutus**: Tallenna vakuutusyksityiskohdat ja vanhenemispäivät
+- **Aikataulut (ajat)**: päivämäärä, kelloaika, lääkärin nimi, osoite/kartta, muistiinpanot
+  - **Henkilö**: valitse perheenjäseneen (useampikin voi valita)
+  - **Muistutukset**: ystävälliset etiketit (30 min, 1 tunti, 2 tuntia, 1 päivä, 1 viikko)
+- **Lääkkeet**: nimi, vahvuus/dos, frekvenssi (1–4× päivässä) erillisilla ajoilla per paikka ja omat muistutusajat per aika
+- **Rokotukset**: päivämäärä ja seuraava erääntymispäivä
+- **Allergiat**: vaikeusaste (lievä/maltillinen/vakava)
+- **Kasvu**: kirjaa pituus ja paino ajan yli
+- Henkilövalitsin: kaikki kohteet voi omist familjemCBäsenille
+- Asiakirjat voi ladata
+- Aikaismääräykset paikalla näyttävät kartan, joka avaa Google Mapsin
+- Merkit: "I dag" (Tänään), "Om N dager" (N päivän kuluttua)
+- Kaikki uudet pushataan perheelle (Cloud Function `notifyHealthItem`)
+- Puhe/kuvament oluonti toimii myös terveysajoille
 
 ### Koulu
 
-**Kuvake**: Dokumentit | **Väri**: #6B8F71 (Vihreä)
+Järjestä koulutietoja lasta kohden:
 
-Järjestä koulutietoja:
-
-- **Lapset**: Lisää lapsia koulun nimellä ja yhteystiedoilla
-- **Toiminnot**: Luo koulutoimintoja (retki/toiminta/kokous) seuraavilla:
-  - **Tyyppi**: retki, toiminta, kokous
-  - **Aikaväli**: dateFrom/dateTo automaattisella synkronoinnilla (dateTo muuttuu dateFromin mukaan, ei koskaan ennen dateFromia)
-  - **Aikaväli**: Valinnaiset aloitus-/loppuajat
-  - **Muistutukset**: Ystävälliset nimikkeet (Ei, 30 min, 1 tunti, 2 tuntia, 1 päivä, 1 viikko)
-  - **Dokumentit**: Lataa ja tallenna dokumentit (suostumuslomakkeet, aikataulut jne.)
-  - **Kalenterin synkronointi**: Google Calendar -integraatio kaikille toimintatyypeille
-  - **Yhteystiedot**: Opettajat ja luokkatoverit puhelin-/sähköposti-/vanhemmatiedoilla
-  - **Aikataulut**: Lataa lukukauden aikataulukuvia
-
-**AI-tuonti**: Käytä Koulun AI-ominaisuutta:
-1. Ota valokuva luokkalistasta
-2. AI poimii kaikki nimet ja vanhempien yhteystiedot
-3. Käy läpi ja vahvista poimitut tiedot
-4. Yhteystiedot lisätään automaattisesti
+- **Lapset**: lisää lapsia koulun nimen, luokka-asteen ja yhteyden tietojen kanssa
+- **Vuosi-välilehdet**: luo/muokkaa/poista kouluvuodet
+- **Ruudut**: Yhteyshenkilöt, Aikataulu, Aktiviteetit, Lomat
+- **Yhteyshenkilöt**: opettajat, terveys henkilökunta (rehtori ym.), luokkatoverit puhelin/sähköposti/vanh ementiedolla — suorat soita/sähköposti-painikkeet
+- **Aikataulu**: per lukukausi, päivä/aika/ainede/ope taja
+- **Aktiviteetit**: tur (retki)/aktiviteetti (aktiviteetti)/møte (kokous) päivämääräjakson, muistutuksen, a siakirjojen, kuvien ja Google-kalenterisy nsyn kanssa
+- **Lomat**: manuaalinen, AI-tuonti valokuvasta tai tuonti URL-osoitteesta (kouluweb sivulta)
+- **AI-tuonti**: valokuva yhteyslistasta tai lomalistasta → AI poimii → valitse/kumoa valinta kaikki → tallenna
+- Aktiviteetit toisto tukevat ryhmäkoPIOntia
 
 ### Päiväkoti
 
-**Kuvake**: Päiväkoti | **Väri**: #E8836A (Oranssi)
-
-Hallitse päiväkotitietoja samoin ominaisuuksilla kuin Koulu:
-
-- **Lapset**: Lisää lapsia päiväkodin nimellä ja yhteystiedoilla
-- **Toiminnot**: Luo päiväkotoimintoja (retki/toiminta/kokous) päivämäärä-/aikaväleillä, muistutuksilla, dokumenteilla ja kalenterin synkronoinnilla
-- **Yhteystiedot**: Opettajat ja henkilökunta yhteystiedoilla
-- **Aikataulut**: Lataa aikataulukuvia
+Sama toimintojoukko kuin Koulu, mutta päivähoito osalta (lapset, yhteys henkilöt, aikataulu, aktiviteetit, lomat, AI-tuonti).
 
 ### Syntymäpäivät
 
-**Kuvake**: Syntymäpäivä | **Väri**: Oranssi
+Älä koskaan unohda syntymäpäivää:
 
-Muista syntymäpäivät aina:
+- **Syntymäpäivalista**: nimi + päivämäärä, laskurilla ("I dag" (Tänään) / "Om N dager" (N päivän kuluttua)) ja iällä
+- **Lahja ideat**: syntymäpäivän mukaan — lisää lahjoja, rUKS hankitut, näytä edellisten vuosien lahjat
+- **Ilmoitukset**: push 7 päivää ennen ja päivänä (klo 08:00 paikallista aikaa)
+- Maksimi 50 syntymäpäivää
 
-- **Syntymäpäivalista**: Lisää syntymäpäivät nimellä ja päivämäärällä
-- **Lahjaideat**: Lisää lahjaideat jokaiselle syntymäpäivälle ja merkitse ostetuksi
-- **Ilmoitukset**: Vastaanota push-ilmoitukset päivänä ja 7 päivää ennen
+### Eläimet
 
-### Ruokavalio
+Hallitse eläinhoitoa:
 
-**Kuvake**: Bestik | **Väri**: Teal
+- **Eläimet**: nimi, tyyppi (kissa, koira, kala, lintu, kaniini, kilpikonna, hamst eri, hevonen, muu), sukupuoli, rotu, syntymäpäivä, ID-numero, passi, siru-ID + sirupäivä, kuva
+- **Eläinlääkärivierailut**: päivämäärä, eläinlääkäri, paikka (kartta), muistutus, asiakirjat
+- **Lääkkeet**: nimi, dos, frekvenssi
+- **Ruokinta**: määrä/tyyppi
+- **Hoito**: viimeksi tehty / seuraava
+- **Rokotukset**: päivämäärä + seuraava erääntymispäivä
+- **Vakuutus**: yhtiö, polises numero, voimassaolo loppupäivä, asiakirja
+- Puhe/kuvament luonti toimii myös täällä
 
-Suunnittele perheen aterioita seuraavilla:
+### Ruokakeskus (Matsenter)
 
-- **Reseptikirjat**: Selaa, etsi ja suodata reseptejä kategorian mukaan
-- **AI-res eptiehdot**: Kuvaile mitä haluat, saat 3 reseptivaihtoehtoa
-- **Tuonti URL:stä**: Liitä reseptin URL ja AI poimii reseptin
-- **Valokuva reseptiin**: Ota valokuva reseptistä, AI poimii ainesosat ja ohjeet
-- **Reseptin kääntäminen**: Käännä reseptejä norjaksi, ruotsiksi, tanskaksi, englanniksi tai suomeksi
-- **Viikko ruokavalio**: Määritä aamiainen, lounas ja illallinen jokaiselle päivälle
-- **Ostoslistat**: Luo ostoslistat automaattisesti ruokavalioista
+Suunnittele perheen ateriat kolmella alavälilehdellä:
 
-**Reseptikategoriat**: kana, liikala, kala, kasvisruoka, pasta, kattila, keitto, aamiainen, jälkiruoka
+- **Viikkomenu**: menu ma–suntu, aamiainen/lounas/middag-ajat profilestasi; osoita reseptejä ajoiille; navigoi viikkoja; "Kopioi viime viikolta"; "Takaisin nykyiseen viikkoon"; satunnaiset ehdottukset("Tällä viikolla…")
+- **Reseptit**: kerää reseptejä (max 200) kategorioilla (suosikit ❤️, kana, liha, kala, vegetar (vegetar), pasta, gryte (uunipato), suppe (keitto), frokost (aamiainen), sott (jälkiruoka)); hki; AI-resepti haku 22 kielellä; tuonti URL:sta; kuva→resepti (OCR); aika/annokset/muoto/keittö maalipflagilla; automaattinen kaloriarvio (AI), jos ei annettu
+- **Ostoslista**: reaaliaikainen ruksittava ostos lista; kopioi, uudelleennimeä, poista — tuotteet voidaan lisätä suoraan reseptistä (aineosat)
 
 ### Ostoslistat
 
-Luo ja hallitse valittavia ostoslistoja. Kohteita voidaan lisätä ruokavalioista tai manuaalisesti.
+- Luo ja hallitse ruksittavia ostoslistoja (max 100)
+- Tuotteet voi ruksusi pois/päälle
+- Uudelleennimeä, kupioi, poista listoja
+- Tuotteet voidaan lisätä suoraan resepteistä Ruokakesk uksesta
+
+### Kotimme
+
+Hallitse kotia ja mökkejä:
+
+- **Koti**: tyyppi (talo, sommerhytte (kesämökki), vinterhytte (tal vimökki), leilighet (asunto)), osoite (Google Places), postinumero/paikka, kuvaus, kuva, staattinen kartta
+- **Ohjeet**: "Komme hjem" (kotia)- ja "Forlate hjem" (jättää kotiin)-osiot kuvien skannauksella (OCR poimii ohje tekstit ja väri etiketit)
+- **Vedlikehold (huolto) sopimukset Serviceavtale**: päivämäärä/aika/frekvenssi (kerran/kaksi kertaa kuukaudessakvartaaleittain/ikävuosittain)， toisto (päivät/viikot), kalenterisynk + push perheelle
+- **Fargekoder (värikoodit)**: valokuvasetikisesti seinästä → AI poimii nimen/koodin/heksan; margumentti, huone
+- **Prosjekter (projektit)**: status (aktiivinen/odottaa/valmis), budjetti (budjetti/kulutettu/jäljellä), värikoodit OCR llä, sisäiset ostoslistat (nimi, määrä, yksikköhinta, lösummat kokoinoSSAjat), tarjoukset (toimittaja, hinta, kuvit-OCR), tehtävät (tehdä/meneillään/valmis), "K quits yhdistä ostoslistaan", AI-ehdotukset projektiteehtäville ja projekti analyyseille
 
 ---
 
-## Ääni & Valokuva Tapahtumaan/Toimintaan
+## Luonti puheella ja valokuvalla
 
-### Ääni-Tapahtumaan/Toimintaan
+### Puhe → kohde
 
-Luo tapahtumia tai toimintoja puhumalla:
+Luo kohteita puhumalla:
 
-1. Napauta **+**-painiketta > "Tale" missä tahansa moduuliosiossa
-2. Napauta mikrofonia aloittaaksesi tallennuksen
-3. Puhu luonnollisesti, esim.: "Kokous päiväkodin kanssa keskiviikkona kello 14"
-4. Napauta pysäytä kun olet valmis
-5. AI transkriboi puheesi ja poimii:
-   - Tapahtuman/toiminnan otsikko
-   - Päivämäärä (tulkkaa "huomenna", "maanantaina" jne.)
-   - Aika (ymmärtää "puoli kolme", "neljännekshi kaksi" jne.)
-   - Kuvaus
-6. Käy läpi ja muokkaa tarvittaessa
-7. Tallenna
+1. Napauta **+** → "Tale" → valitse moduuli
+2. Napauta mikrofoni aloitaaskesi kopat
+3. Puhu natuurisesti, esim. "KokousFUupäiväkodin kanssa keskiviikkona kello 14"
+4. Napauta stopp
+5. AI transkribersoi ja poimii: otsikko, päivämäärä (ymmärtää "i morgen" ("huomenna"), "på mandag" ("maanantina")), aika (ymmärtää "halv tre" ("puoli kolme"), "kvart over to" ("vartia yli kaksi")), kuvaus
+6. Tarkista ja muokkaa
+7. Tallenna — tapahtumat lisätään myös puhel kesti kalenteriin ja pushataan perheelle
 
-Ääni-tapahtuma toimii kaikille moduuleille:
-- **Tapahtumat**: Luo kalenteritapahtuman
-- **Terveys**: Luo terveydenajanvarauksen
-- **Lemmikit**: Luo eläinlääkärivierailun
-- **Koulu**: Luo koulutoiminnan (retki/toiminta/kokous)
-- **Päiväkoti**: Luo päiväkotoiminnan
+Toimii kohteille: Tapahtuma, Terveysaika, Eläinlääkärivierailu, Kouluaktiviteetti, Päiväkotiaktiviteetti, Huoltoaika (koti), Matka.
 
-### Valokuva-Tapahtumaan/Toimintaan
+### Kuva → kohde
 
-Luo tapahtumia tai toimintoja valokuvista:
+1. Napauta **+** → "Foto" → valitse moduuli
+2. Ota kuva tai valitse kirjastosta
+3. AI poimii kaikki näkyvät kohteet otsikoilla, päivämääriillä ja aijoilla
+4. Tarkista, muokkaa, valitse säilytettävät
+5. Tallenna yksi kerrallaan tai kaikki kerralla
 
-1. Napauta **+**-painiketta > "Foto" missä tahansa moduuliosiossa
-2. Ota valokuva tai valitse galleriasta
-3. AI poimii kaikki näkyvät tapahtumat/toiminnot otsikoilla, päivämäärillä ja ajoilla
-4. Käy läpi poimitut tapahtumat
-5. Tallenna yksittäin tai tallenna kaikki
+### Kuva → resepti
 
-### Valokuva-Reseptiin
-
-Tuo reseptejä valokuvista:
-
-1. Siirry Ruokavalio > napauta kamerakuvaketta
-2. Ota valokuva reseptistä keittokirjasta tai näytöltä
-3. AI poimii: nimen, ainesosat määrillä, ohjeet
-4. Käy läpi ja tallenna reseptikirjaasi
+1. Ruokakeskus → kameraikoni
+2. Kuva reseptistä kokkirasta tai näytöltä
+3. AI poimii nimen, aineosat määrineen, ohjeet
+4. Tallenna reseptikirjaan
 
 ---
 
-## PäivämääräValitsin & Muistutukset
+## Päivämäärävalitsin ja muistutukset
 
 ### DatePickerModal
 
-Kaikki päivämäärä- ja aikasyöttöt käyttävät mukautettua DatePickerModalia seuraavilla ominaisuuksilla:
+Kaikki päivämäärä-/ajaikentät käyttävät mukautettua valitsinta:
 
-- **Vieritettävä lista**: Selaa päivämäärä (365 päivää) tai aikoja (30 minuutin välein)
-- **Hakupalkki**: Syötä päivämäärä (YYYY-MM-DD) tai aika (HH:MM) hypätäksesi suoraan
-- **Manuaalinen päivämääräsyöttö**: Päivämäärävalitsimen alaosassa kirjoita mikä tahansa päivämäärä manuaalisesti — hyödyllinen historiallisille päivämäärille (syntymäpäivät, aiemmat rokotukset jne.)
-- **Automaattinen vieritys**: Kun päivämäärä kirjoitetaan tai valitaan, lista vierittää näyttääksen sen
+- **Skrollavlista**: päivämääräehdotuksia (760 päivää) tai aikoja (30-min-intervallit)
+- **Hakukentä**: kirjoita päivämäärä (YYYY-MM-DD) tai aika (HH:MM) hypätäksesi suoraan
+- **Manua alinen syöttö**: kirjoita meillä tahansa päivämäärä — hyödyllistä historiallisille päivämäärille (syntymäpäivät, aiemmat rokotukset)
+- **Auto-scroll**: lista scrol rautuu valittuun/kirjoitettuun päivään
 
-### dateFrom/dateTo Automaattinen synkronointi
+### dateFrom/dateTo auto-synk
 
-Toiminnoille aikaväleillä (koulu, päiväkoti, terveys, eläinlääkäri):
-- **dateFrom** muuttaminen päivittää automaattisesti **dateTo** vastaamaan
-- **dateTo** ei aseteta koskaan ennen **dateFromia**
-- Voit asettaa eri loppupäivämäärät manuaalisesti
+Aktiviteeteille päivämääräjaksoilla (koulu, päiväkoti, terveys, eläin):
+- **dateFrom** muutos päivittää **dateTo** automaattisesti
+- **dateTo** soa valoa koskaan ennen **dateFrom**
+- Voit asettaa toisen loppupäivän manuaalisesti
 
 ### Muistutusvaihtoehdot
 
-Kaikki moduulit käyttävät samoin muistutusvaihtoehtoja:
-
-| Nimike | Minuuttia |
-|--------|-----------|
-| Ei | 0 |
+| Etiket | Minuutteja |
+|--------|----------|
+| Ingen (Ei mikään) | 0 |
 | 30 min | 30 |
 | 1 tunti | 60 |
 | 2 tuntia | 120 |
 | 1 päivä | 1440 |
 | 1 viikko | 10080 |
 
-Muistutukset lähetetään puhelinilmoituksina ystävällisillä nimikkeillä (ei "60 minuuttia" vaan "1 tunti").
+Muistutukset lähetetään puhelinilmoituksina ystäväll isillä etiketeillä. Ojitus: **1 tunti**. Oletusaika uusille kohteille: **10:00–11:00**.
 
-Oletusmuistutus: **1 tunti** (60 minuuttia)
-Uusien kohteiden oletusaika: **10:00–11:00**
+Lääkkeet tukevat erillisiä aikoja yk sien per (1–4× päivässä) omilla muistutusajoilla per ajankohta.
 
 ---
 
-## Profiili & Asetukset
+## Profiili ja asetukset
 
-Profiilivälilehti sisältää kaikki henkilökohtaiset ja perheen asetukset.
+Profiili-välilehti sisältää kaikki henkilo kohtaiset ja perheen asetukset.
 
-### Henkilökohtaiset asetukset
+### Henkilökohtaiset
 
-- **Nimi**: Muokkaa näyttönimeäsi
-- **Puhelin**: Lisää puhelinnumerosi
-- **Avatar**: Lataa profiilikuva (käytetään keskustelussa)
-- **Kieli**: Valitse norjan, ruotsin, tanskan, englannin ja suomen väliltä
+- **Nimi**: muokka näyttönimeä
+- **Puhelin**: lisää puhelinnumero
+- **Avatar**: lataa profiilikuva (käytt chatissa)
+- **Sähköposti**: (vain luettavissa)
 
-### Perheen hallinta
+### Perhe
 
-- **Luo perhe**: Aloita uusi perhe
-- **Liity perheeseen**: Syötä 6-merkkinen kutsukoodi
-- **Kutsu jäsen**: Luo jaettava kutsukoodi (vain järjestelmänvalvoja/omistaja)
-- **Poista jäsen**: Poista joku perheestä (vain järjestelmänvalvoja/omistaja)
-- **Muuta roolia**: Ylennä/alenna järjestelmänvalvojan ja jäsenen välillä (vain järjestelmänvalvoja/omistaja)
-- **Lähde perheestä**: Lähde nykyisestä perheestä (vain ei-omistajat)
+- **Perhe kortti**: näytä jäsenet ja roolit
+- **Kutsu jäsen**: luokutsukoodi (voimassa 1 tunti, kertakäyt tö) / jaa linkki
+- **Muuta rooli**: ylenennä alasennä adminin ja jäsenen välillä (omistaja/admin)
+- **Poista jäsen** (omistaja/admin)
+- **Poistu perheestä** (ei-omistajat)
+- **Luo perhe**, jos sinulla ei ma
 
-### Kalenterin integraatio
+### Kalenteri
 
-1. Yhdistä Google- tai Outlook-kalenterisi
-2. Valitse mihin kalenteriin tapahtumat synkronoidaan
-3. Kun luot tapahtumia "Lisää kalenteriin" -vaihtoehdolla, tapahtumat viedään
-4. Google Calendar -synkronointi toimii kaikille toimintatyypeille: tapahtumat, koulutoiminnot, päiväkotoiminnot, terveydenajanvaraukset, eläinlääkärivierailut
+- **Kalenterityyppi": valitse **puhelin kalenteri*** tai **Google-kalenteri**
+- **Google-yhdistämine ": OAuth yhdistämine ("Kitteturnousto ✓")void katkaisu
+- **Google Sync paneeli**: Suorita/Dry-run yhteenvedolla (skannattu, luotu, skippedExists (oli jo), uudelleenluotu, epäonnistunut, ei yhteyttä) ja ongelmalista
+- **Puhelinkale nteri**: iOS (expo-calendarin kautta) luo tapahtumia puhelkesti kalenteriin
+- Web: "Lisää Google/Outlook-kalenteriin" -painikkeet kohteelle
 
 ### Ilmoitukset
 
-- Ota push-ilmoitukset käyttöön/pois käytöstä
-- Määritä mitkä osiot näkyvät "Min uke" -viikkoyleistävässä
-- Syntymäpäivämuistutukset lähetetään automaattisesti kello 08:00 Oslon aikaa
-- Toimintamuistutukset käyttävät ystävällisiä nimikkeitä (ei raakoja minuuttimääriä)
+- S kytkä push-ilmoitukset päälle/pois (lupa pyydetään)
+- Lääkemuistutukset per ajankohta, syntymäpäiväilmoitukset (7 päivää ennen + päivänä, klo 08:00 paikallista), aktiviteetimuistutukset
+- Web: näyttää bannerin viimeisten 7 päivän aikananeathart retille muistutuksille (voidaan hylätä)
 
-### Spond-integraatio
+### Oma viikko
 
-1. Syötä Spond-sähköpostisi ja salasanasi
-2. Valitse mitä Spond-ryhmiä synkronoida
-3. Kartoita Spond-jäsenet perheen jäsenille RSVP-seurantaan
-4. Spond-tapahtumat ilmestytvät automaattisesti kalenteriisi
+- Näyt/piilota "Viikkomenu"-osio (ateriat) Oma viikko -nä kymässä
+- Ruokakeskus-kytkimet: Frokost 🥞 / Lunsj 🥪 / Middag 🍽️
+
+### Ruokakeskus
+
+- Kytketytt: Frokost 🥞 / Lunsj 🥪 / Middag 🍽️
+- Ohjaavat viikkomenu sta ja "Oma viikko"
+
+### Spond (omistja/admin)
+
+1. Kirjoita Spond sähköposti ja salasana (salattu tallennettuna)
+2. Valitse, mitkä ryhmät synkisoidaan
+3. Lataa/valitse logo y rymäad kohden (kirjasto tai kamera)
+4. Valhetse, kenet voivat vastata ("vastaajat")
+5. Spond-tapahtumat näkyvät automaattisesti kalenterissa (synk 30 min välein)
+6. Poista Spond tilin yhdistys
+
+### Teema
+
+Kat sosi [ Teemat](#teemat) -osion yksityiskohdolle. (katso oma osio)
+
+### Kieli
+
+Katso [Kielet](#kielet) -osio.
+
+### App (vain webb / web)
+
+- "Last inn på nytt" (Lataa uudelleen) — poista service workers ja välimuisti päivittää
+
+---
+
+## Kalenterin synkronointi
+
+fampad tukee kaksisuuntaista kalenterisynkronointia:
+
+**Google Kalenteri (Cloud Functionien kautta)**: Tapahtumat, matkat, kuljetus, lääkkeet, terveysajat, eläinlääkärivierailut, koulu-/päiväkotiaktiviteetit, kotihuolto-ajat — luonti, päivittä ja poisto synkronoidaan automaattisesti käyttäjille, jotka ovat yhdistäneet Google-kalenterin.
+
+**Puhelin kalenteri**: iOS-sovellus voi luoda tapahtumia suoraan puhelimen kalenteriin (valitse puhelinkalenteri Profiilissa). Web-käyttäjät käyttävät "Lisää Google/Outlook"-painikkeita.
+
+**Backfill (taytonnus)**: Suorita manuaalinen synkronisaatio olemassaolevasta datasta Google Sync paneelista (Dry-run näyttää, mikä tapahtuisi).
 
 ---
 
 ## Teemat
 
-fampad tarjoaa 9 visuaalista teemaa, jotka ovat saatavilla profiiliasetuksista:
+fampad tarjoaa joustavan teemaminen Profiili-asetukset via:
 
-| Teema | Kuvaus |
-|-------|--------|
-| **Vaalea** | Puhtaan valkoinen tausta |
-- **Tumma** | Silmäystävällinen iltakäyttöön
-- **Järjestelmä**: Seuraa laitteesi vaalea/tumma -asetusta
-- **Oranssi**: Lämmin oranssi korostus
-- **Syvä sininen**: Ammattimainen syvänsininen paletti
-- **Hopea**: Eleganterit hopeasävyt
-- **Violetti**: Luova violettiteema
-- **Vaaleanpunainen**: Kiiltävä vaaleanpunainen korostus
-- **Vihreä**: Rauhoittava vihreä väriskeema
+**Rivi 1 — Moduuliväri s** (muuttaa sovelluksen aksentin moduulin väriin):
+- Koulu (#6B8F71), Päiväkoti (#E8836A), Matkat (#7EC8E3), Syntymäpäivät (#E6A817), Eläimet (#9B7DB8), Ateriat (#E8906C), Terveys (#C67B5C)
 
-Teemasi tallennetaan ja säilyvät istuntojen välillä.
+**Rivi 2 — App-värit**:
+- Slategray (siniharmaa, #3b5a75), Dustyrose (hämärärosa, #A37B85)
+
+**Rivi 3 — Tumma tila**:
+- Tumma (#333)-kytkin
+
+Vä ri/Tumma/Järjestelmä noudattaa laitteen vaalea/tumma asetusta, kun"järjestelmä"on valittu. Teema ensisijaisuus tallennetaan ja säilyy istuntojen välillä.
 
 ---
 
-## Kielituki
+## Kielet
 
-fampad tukee 5 kieltä:
+fampad tukee 5 käyttöliittymäkieltä:
 
-1. **Norja (Bokmål)** — Oletus
-2. **Ruotsi**
-3. **Tanska**
-4. **Englanti**
+1. **Norsk (Bokmål) (norja)** — oletus
+2. **Svenska (ruotsi)**
+3. **Dansk (tanska)**
+4. **English (englanti)**
 5. **Suomi**
 
-### Kielen vaihtaminen
+### Vaihda kieli
 
 1. Siirry Profiiliin
 2. Vieritä "Språk" (Kieli) -kohtaan
-3. Valitse haluamasi kieli
-4. Käyttöliittymä päivittyy välittömästi
+3. Valitse kieli lip-painikkeilla
+4. Koko käyttöliittymä päivittyy välittömästi
 
-### Reseptin kääntäminen
+### Reseptihaku ja käännös
 
-Reseptit voidaan kääntää kaikille 5 kielelle:
-1. Avaa resepti
-2. Napauta käännöspainiketta
-3. AI kääntää reseptin nimen, kuvauksen, ainesosat ja ohjeet
-4. Napauta kielivälilehteä nähdäksesi sillä kielellä
+- AI-reseptihaku tukee 17+ AI-hakukieltä ja 22 kieltä (sisl. 5 käyttöliittymäkieltä)
+- Reseptit voidaan kääntää kaikkiin 5 kieleen (nimi, kuvaus, aineosat, ohjeet)
 
 ---
 
-## PWA & Asennus
+## PWA ja asennus
 
 ### Asenna fampad
 
-fampad on Progressive Web App (PWA), jonka voit asentaa laitteeseesi:
+fampad on Progressive Web App (PWA):
 
-**iOS:ssa (Safari):**
-1. Avaa fampad Safarissa
-2. Napauta Jaa-painiketta (neliö nuolella)
-3. Napauta "Lisää Kotivalikkoon"
-4. Nimeä se ja napauta "Lisää"
+**iOS (Safari):**
+1. Avaa fampad Safarin
+2. Napauta Jaa-painiketta
+3. "Lisää kotinäytölle"
+4. Vahvista
 
-**Androidissa (Chrome):**
+**Android (Chrome):**
 1. Avaa fampad Chromessa
-2. Napauta kolmen pisteen valikkoa
-3. Napauta "Lisää Kotivalikkoon"
-4. Vahvista asennus
+2. Napauta kolmen pisteen menu
+3. "Lisää kotinäytölle"
+4. Vahvista
 
-**Tietokoneella:**
-1. Etsi asennuskuvake osoitepalkista
-2. Klikkaa asentaaksesi fampadin tietokonesovelluksena
+**Desktop:**
+1. Etsi asennuskuvake osoitepalkissa
+2. Napauta asentaak sertin
 
 ### Päivitysbanneri
 
-Kun uusi versio on saatavilla, fampad näyttää päivitysbannerin. Napauta päivittääksesi ja saadaksesi uusimman version.
+Kun uusi versio on saatavilla, näytetään banneri ("Uusi versio saat avissa") — napauta ladataksesi. Tarkistus 5 minuutin välein. Web: "Lataa uudelleen" Profiilissa poistaa cache/service workers manuaalisti.
 
 ---
 
-## Vinkit & Nikkarit
+## Vinkkejä
 
 ### Nopea navigointi
 
-- Käytä **+**-painiketta nopeasti luodaksesi tapahtumia, terveydenkohteita, lemmikkivierailuja, koulu-/päiväkotoimintoja tai matkoja
-- Pitkä painaminen kohteilla muokkaus-/poisto-vaihtoehtoja varten
-- Napauta kalenterin pisteitä kalenterinäkymässä nähdäksesi kyseisen päivän tapahtumat
+- Käytä **+**-painiketta nopeaan luomiseen tapahtumia, terveysaikoja, eläinlääkärivierailuja, aktiviteeteja, huolto aikoja tai matkoja
+- Pitkäpainallus kohdte muokkaa/poista -valikolla
+- Napauta kalenteripäiviä nähdäksesi päivän tapahtumat
+- Käytä AI-assistenttia + -valikosta luonnollisiinkysymyksin ja toimiin
 
-### Spond-integraatio
+### Spond
 
-- Yhdistä Spond nähdäksesi kaikki seuran tapahtumat perheen tapahtumien rinnalla
-- RSVP suoraan fampad-sovelluksesta
-- Näe mitkä perheen jäsenet osallistuvat
+- Yhdistä Spond nähdäksesi seurojen tapahtumat perheen tapahtumien rinnalla
+- Vastaa kuts.userInteractionEnableduihin suoraan sovelluksessa (hyväksy/hylkää), sisl. lapsille
+- Näytä, kuka tulee tapahtumaan (merkkien tilan perusteella)
+- Spond-logot näkyvät tapahtumissa ja suodatinpaneelissa
 
-### Ruokavaliosuunnittelu
+### Aterioidensuunnittelu
 
-- Käytä AI-ehdotuksia uusien reseptien löytämiseen
-- Tuo reseptejä mistä tahansa verkkosivustosta liittämällä URL:n
-- Kuvaskannaa reseptejä keittokirjoista
-- Luo ostoslistat viikkorruokavaliostasi
+- Hyödynnä AI-ehdotuksia uusien reseptien löytämiseen
+- Tuo URL:sta tai valokuvasta
+- Luo ostoslista suoraan reseptin aineosista
+- Suunnittele viikkomenut aamiainen/lounas/middag-ajalla; "Kopioi viime viikolta"
+- Kalorit arvioidaan automaattisesti AI:lla, jos ei annettu
 
-### Matkasuunnittelu
+### Matkosuunnittelu
 
-- Lisää sääennusteet määränpääsillesi
-- Saä AI-generoidut määränpäävinkit ja paikalliset fraasit
-- Käytä liikennevälilehtiä (lähtö/saapuminen) kiertomattoja varten
-- Seuraa pakkauslistoja valintaruuduilla
+- Sää: 10 päivän ennuste + tunneittainen + historiallinen tieto kaupunkia kohden
+- AI-matkapäätteen vinkit: kohteita, ravintoloita, fraaseja, varoituksia
+- Valuuttakalkulaattori reaaliaikaisin kurssein
+- Kuljetus Utreise/Hjemreise-välilehdillä ja "En vei"-kytkimellä
+- Pakkauslistat ruksibokseilla
+- Spond-logot näkyvät tapahtumissa ja suodatinpaneelissa
 
 ### Tietoturva
 
-- Kaikki tiedot tallennetaan perheen yksityiseen Firestore-tietokantaan
-- Vain perheen jäsenet näkevät tietosi
-- Kutsukoodit vanhenevat 1 tunnin jälkeen turvallisuussyistä
-- Voit lähteä perheestä milloin tahansa (poistaa käyttöoikeutesi)
+- Kaikki tiedot tallennetaan perheen omiin arkistointeihin
+- Vain perheen jäsenet näkevät tiedot
+- Kutsukoodit vanhenevat tunnin kuluttua ja niitä voi käyttää vain kerran
+- Voit jättää perheen milloin tahansa (poistaa pääsynsi)
 
 ---
 
-*fampad v1.0.0 — Perheesi, järjestetty.*
+*fampad v1.0.0 — Perheesi, järjestettynä.*

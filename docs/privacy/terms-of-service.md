@@ -6,7 +6,7 @@
 <h2 align="center">Vilkår for bruk / Terms of Service</h2>
 
 <p align="center">
-  <em>Sist oppdatert / Last updated: August 15, 2026</em>
+  <em>Sist oppdatert / Last updated: September 26, 2026</em>
 </p>
 
 ---
@@ -48,13 +48,14 @@ fampad is a family coordination application that helps families organize their d
 - **Health Tracking**: Track medications, vaccinations, allergies, and growth for family members.
 - **Pet Management**: Manage pet profiles, vet visits, medications, vaccinations, and grooming.
 - **School and Kindergarten Information**: Organize school/kindergarten contacts, schedules, and academic information.
-- **Travel Planning**: Plan trips with accommodation, transport, activities, and packing lists.
-- **Meal Planning**: Create recipes, meal plans, and shopping lists.
-- **Family Chat**: Communicate with family members through in-app messaging.
-- **Birthday Tracking**: Keep track of birthdays and gift ideas.
-- **Spond Integration** (optional): Sync sports team events from Spond.
-- **Calendar Integration**: Sync events with Google Calendar or Outlook.
-- **AI Features**: Voice-to-event conversion, destination tips, recipe suggestions, and photo parsing.
+- **Travel Planning**: Plan trips with accommodation, transport (flights, trains, rental car, boat, ferry, taxi), activities, weather, currency conversion, destination tips, packing lists, and documents.
+- **Home Management**: Manage homes/cabins, "coming home"/"leaving home" instructions, maintenance and service agreements, paint colors, and home projects with budgets, shopping lists and offers.
+- **Meal Planning**: Create recipes, weekly meal plans, and shopping lists with AI-powered recipe search, import and translation.
+- **Family Chat**: Communicate with family members through in-app messaging with images and reactions.
+- **Birthday Tracking**: Keep track of birthdays, gift ideas and reminders.
+- **Spond Integration** (optional): Sync sports team events from Spond with RSVP support.
+- **Calendar Integration**: Two-way sync with Google Calendar, or insert events into the phone's calendar (iOS); Outlook export buttons on web.
+- **AI Assistant and AI Features**: Voice-to-event conversion, photo parsing (events, recipes, class lists, holidays, home OCR), destination tips, recipe suggestions/translation/calorie estimation, and a conversation-based assistant that can navigate and perform confirmed actions.
 
 ---
 
@@ -176,7 +177,7 @@ fampad relies on the following third-party services:
 - **Spond** (optional): Sports team event synchronization.
 - **Google Calendar** (optional): Automatic calendar synchronization via OAuth.
 - **Google Maps**: Location services and address autocomplete.
-- **Open-Meteo**: Weather forecasts and historical weather data.
+- **Open-Meteo** and **Google Weather**: Weather forecasts and historical weather data.
 - **Frankfurter API**: Currency exchange rates.
 
 ### 7.2 Third-Party Availability
@@ -200,7 +201,7 @@ If you choose to enable Spond integration:
 If you choose to enable Google Calendar integration:
 - You authorize fampad to access your Google Calendar on your behalf via OAuth 2.0.
 - OAuth access and refresh tokens are stored securely in Firestore.
-- We create, update, and delete calendar events for: app events, health appointments, pet vet visits, and trips.
+- We create, update, and delete calendar events for: app events, trips and transports, health appointments and medications, pet vet visits, school activities, kindergarten activities, home services, and birthdays.
 - You can disconnect the integration at any time, which revokes the tokens.
 - Spond events are NOT synced (handled by Spond's own calendar integration).
 
@@ -339,5 +340,5 @@ If you have any questions about these Terms, please contact us:
 ---
 
 <p align="center">
-  <em>These terms of service are effective as of August 12, 2026.</em>
+  <em>These terms of service are effective as of September 26, 2026.</em>
 </p>

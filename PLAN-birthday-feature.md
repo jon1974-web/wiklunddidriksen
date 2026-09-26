@@ -75,14 +75,14 @@ When a birthday falls in the current week, show:
 - **Respects:** `notificationsEnabled !== false` check on each user
 
 ### 5. Firestore Rules
+NOTE: The actual deployed rules are family-scoped (this plan snippet predates the tightening):
 ```
 match /birthdays/{birthdayId} {
-  allow read: if request.auth != null;
-  allow create: if request.auth != null;
-  allow update, delete: if request.auth != null;
+  allow read, update, delete: if isFamilyMember(resource.data.familyId);
+  allow create: if isFamilyMember(request.resource.data.familyId);
 }
 ```
-Family scoping is done client-side via `where('familyId', '==', familyId)` query filter (same pattern as events/trips).
+Where `isFamilyMember()` verifies membership in `families/{familyId}.members`. Family scoping is also done client-side via `where('familyId', '==', familyId)` query filter.
 
 ## Implementation Details
 

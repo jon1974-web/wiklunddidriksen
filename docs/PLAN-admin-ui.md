@@ -4,7 +4,7 @@
 An admin panel for the fampad app to manage system settings, monitor usage, handle administrative tasks, and prepare for subscriptions.
 
 **Access:** Only for users with `appRole: 'appOwner'` (separate from `familyRole`).
-**URL:** `fampad.app/admin`
+**Location:** In-app Profile stack screen (`Admin`) — opened from the Profile tab; not a web `/admin` route.
 **Design:** fampad colors, responsive (mobile + desktop), charts and tables.
 
 ---

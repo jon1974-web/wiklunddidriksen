@@ -31,7 +31,7 @@
 - [x] Farge-swatch-visning med hex-farge
 - [x] Lang-press for å slette farger
 - [x] Prosjektnavn vises på farger i Vedlikehold
-- [ ] Manuelt hex-farge-input-felt
+- [x] Manuelt hex-farge-input-felt
 
 ### Phase 3.5: Instruksjoner
 - [x] Seksjon "Komme hjem" og "Forlate hjem" med custom ikoner
@@ -71,13 +71,13 @@
 - [x] Instruksjoner fra håndskrevne notater
 - [x] Kvitteringsskanning for handleliste
 - [x] Tilbud-OCR (leverandør, pris, varer)
-- [ ] Prosjektforslag basert på prosjekt-tittel
+- [x] Prosjektforslag basert på prosjekt-tittel
 
 ---
 
 ## 📋 Gjenstående (mindre forbedringer)
 
-- [ ] Manuelt hex-farge-input-felt (så brukere kan skrive hex uten AI)
+- [x] Manuelt hex-farge-input-felt (så brukere kan skrive hex uten AI)
 - [ ] Fargevelger for visuell valg
 - [ ] Mulighet til å laste opp bilder av instruksjoner
-- [ ] Prosjektforslag basert på prosjekt-tittel
+- [x] Prosjektforslag basert på prosjekt-tittel

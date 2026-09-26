@@ -47,4 +47,4 @@ Upload a photo (gallery or camera) → AI extracts structured data → Preview s
 - **Total: ~300 lines**
 
 ## Status
-Saved for later implementation.
+Implemented (2026-09): `photoToData` Cloud Function extracts events, recipes, school/kindergarten contacts, holidays and timetables from photos. See `docs/PLAN-hjem.md` for home OCR extensions.

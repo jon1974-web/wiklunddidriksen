@@ -114,7 +114,7 @@ exports.notifyNewEvent = onRequest({ ... }, async (req, res) => {
 
 ### 3. Timezone handling
 
-- **All scheduled functions** use `timeZone: "Europe/Oslo"` (consistent)
+- **All scheduled functions** — the plan proposed `timeZone: "Europe/Oslo"`, but the implementation uses UTC schedules with per-family timezone lookups (e.g. `checkBirthdayReminders` sends at 08:00 in each family's own timezone). This differs from the plan but supports multi-timezone families correctly.
 - **Medication times** stored as local time (Norwegian)
 - **Cloud Function** runs in Oslo time, compares directly
 - **Phone OS** handles display in local time automatically

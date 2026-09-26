@@ -10,596 +10,612 @@
 
 ## Innehållsförteckning
 
-1. [Kom igång](#getting-started)
-2. [Navigeringsöversikt](#navigation-overview)
-3. [Händelser & Kalender](#events--calendar)
-4. [Chatt](#chat)
-5. [Snabbknapp för skapande](#quick-create-button)
-6. [Veckoöversikt ("Min vecka")](#weekly-summary-min-uke)
-7. [Platser (Moduler)](#spaces-modules)
-   - [Resor & Underhåll](#trips--travel)
-   - [Hälsa](#health)
-   - [Djur](#pets)
-   - [Skola](#school)
-   - [Förskola](#kindergarten)
-   - [Födelsedagar](#birthdays)
-   - [Matsedel](#meal-plan)
-   - [Inköpslistor](#shopping-lists)
-8. [Röst & Foto till Händelse/Aktivitet](#voice--photo-to-eventactivity)
-9. [Datumväljare & Påminnelser](#datepicker--reminders)
-10. [Profil & Inställningar](#profile--settings)
-11. [Teman](#themes)
-12. [Språkstöd](#language-support)
-13. [PWA & Installation](#pwa--install)
-14. [Tips & Tricks](#tips--tricks)
+1. [Kom igång](#kom-igång)
+2. [Navigationsöversikt](#navigationsöversikt)
+3. [Evenemang och kalender](#evenemang-och-kalender)
+4. [Chatt](#chatt)
+5. [Snabb­skapa-knappen (+)](#snabb­skapa-knappen)
+6. [AI-assistent](#ai-assistent)
+7. [Min vecka](#min-vecka)
+8. [Våra platser (moduler)](#våra-platser-moduler)
+   - [Våra resor](#våra-resor)
+   - [Vår hälsa](#vår-hälsa)
+   - [Vår skola](#vår-skola)
+   - [Förskolan](#förskolan)
+   - [Våra födelsedagar](#våra-födelsedagar)
+   - [Våra husdjur](#våra-husdjur)
+   - [Måltidscentrum (Matsenter)](#måltidscentrum)
+   - [Våra hem](#våra-hem)
+   - [Inköpslistor](#inköpslistor)
+9. [Skapa med röst och foto](#skapa-med-röst-och-foto)
+10. [Datumväljare och påminnelser](#datumväljare-och-påminnelser)
+11. [Profil och inställningar](#profil-och-inställningar)
+12. [Kalersynk](#kalendersynk)
+13. [Teman](#teman)
+14. [Språk](#språk)
+15. [PWA och installation](#pwa-och-installation)
+16. [Tips och trick](#tips-och-trick)
 
 ---
 
 ## Kom igång
 
-### Skapa ditt konto
+### Skapa konto
 
-1. Öppna fampad i din webbläsare eller installera det som en PWA
-2. Ange din e-post och lösenord för att registrera dig
-3. Du placeras automatiskt i ett nytt konto
+1. Öppna fampad i webbläsaren (eller som installerad PWA)
+2. Registrera dig med e-post och lösenord — eller logga in om du redan har ett konto
+3. Välj språk i steg 2 i välkomstguiden (norska, svenska, danska, engelska, finska)
+4. Skapa eller gå med i en familj i steg 3 — eller hoppa över och gör det senare i Profilen
 
-### Ställ in din familj
+### Konfigurera din familj
 
-Efter inloggning behöver du antingen skapa eller gå med i en familj:
+Efter inloggning behöver du skapa en familj eller gå med i en:
 
-**Alternativ A: Skapa en ny familj**
+**Alternativ A: Skapa ny familj**
 1. Gå till fliken **Profil**
 2. Tryck på "Opprett familie" (Skapa familj)
-3. Ange ditt familjenamn
-4. Du blir **ägaren** av familjen
+3. Ange familjenamnet
+4. Du blir familjens **ägare**
 
-**Alternativ B: Gå med i en befintlig familj**
-1. Be en familjadministratör att generera en inbjudningskod (Profil > Familj > "Inviter medlem")
-2. Ange den 6-teckners koden på profilsidan
-3. Du går med som en **medlem**
+**Alternativ B: Gå med i befintlig familj**
+1. Be en familjens ägare/admin generera en inbjudningskod (Profil > Familj > "Inviter medlem")
+2. Öppna den delade inbjudningslänken eller ange den 6-tecknade koden
+3. Du blir med som **medlem**
 
-### Förstå familjroller
+### Förstå familjeroller
 
 | Roll | Behörigheter |
-|------|--------------|
-| **Ägare** | Fullständig kontroll. Kan hantera alla medlemmar, skapa/ta bort familjen. Kan inte lämna. |
-| **Administratör** | Kan bjuda in medlemmar, ta bort medlemmar, ändra roller. |
-| **Medlem** | Kan skapa och redigera innehåll. Kan inte hantera andra medlemmar. |
+|------|-------------|
+| **Ägare** | Full kontroll. Kan administrera alla medlemmar. Kan inte lämna familjen. |
+| **Admin** | Kan bjuda in, ta bort medlemmar och ändra roller. |
+| **Medlem** | Kan skapa och redigera innehåll. Kan inte administrera andra medlemmar. |
 
 ---
 
-## Navigeringsöversikt
+## Navigationsöversikt
 
-fampad använder en nedre flikrad med flikar placerade symmetriskt runt en central "+"-knapp. Chatt och Våra platser är placerade mellan de andra flikarna och den centrala plusknappen.
+fampad använder en bottenflik rad med fyra flikar runt en central "+"-knapp.
 
-| Flik | Ikon | Beskrivning |
-|------|------|-------------|
-| **Kalender** | Kalender | Händelser från alla källor (manuella, Spond, hälsa, djur) |
-| **Chatt** | Chattbubbla | Familjekommunikation med bilder och reaktioner |
-| **Våra platser** | Kompass/Hus | Platsernav — kom åt alla moduler |
-| **Profil** | Person | Inställningar, familjehantering, integrationer |
+| # | Flik | Ikon | Beskrivning |
+|---|------|------|-------------|
+| 1 | **Evenemang** (Avtaler) | Kalender | Samlad kalender från alla familjekällor (manuella evenemang, Spond, hälsa, husdjur, skola/förskola, hem, födelsedagar) |
+| 2 | **Chatt** | Bubbla | Familjemeddelanden med bilder och reaktioner |
+| 3 | **Våra platser** (Våre steder) | Hus | Ingång till alla moduler |
+| 4 | **Profil** | Person | Inställningar, familjehantering, integrationer |
 
-**+ (plus)**-knappen i centrum av flikraden öppnar modalen för **snabbt skapande** av innehåll.
+Den centrala **+**-knappen öppnar **Snabb­skapa**-menyn. Flikraden döljs automatiskt när du skriver i chatten.
 
 ---
 
-## Händelser & Kalender
+## Evenemang och kalender
 
-Händelsefliken visar en enhetlig kalender för alla familjeaktiviteter.
+Evenemangsfliken visar en samling kalender för hela familjen.
 
-### Visa händelser
+### Visa
 
-- **Listvy**: Händelser grupperade efter datum med en scrollbar lista
-- **Kalendervy**: Månadskalendernät som visar händelse prickar på varje dag
-- Tryck på kalenderikonen för att växla mellan list- och kalendervy
+- **Listvy**: Evenemang grupperade per dag med veckonummerbanner
+- **Kalendervy**: Månadsrutnät med prickar per dag — tryck på en dag för att se den
+- Visa/dölj tidigare evenemang
+- Filtrera på modul och källa (inkl. Spond-grupper med logotyper)
+- Knappen "**Min vecka**" (Din uke) högst upp öppnar veckoöversikten (se egen sektion)
 
-### Händelsekällor
+### Källor till evenemang
 
-Händelser kommer från flera källor och är färgkodade:
-- **Manuella händelser** du skapar (grön)
-- **Spond-händelser** från din sportklubb (röd)
-- **Hälsotidbeställningar** (#C67B5C)
-- **Djurläkarbesök** (#9B7DB8)
-- **Skolaktiviteter** (#6B8F71)
-- **Förskoleaktiviteter** (#E8836A)
-- **Resor** med start-/slutdatum (#7EC8E3)
+Evenemang kommer från många källor och är färgkodade per modul:
 
-### Skapa en händelse
+| Källa | Färg |
+|-------|------|
+| Manuella evenemang | #3b5a75 |
+| Resor | #7EC8E3 |
+| Hälsa (bokningar/mediciner/vaccinationer) | #C67B5C |
+| Skolaktiviteter och -lov | #6B8F71 |
+| Förskoleaktiviteter | #E8836A |
+| Husdjur (veterinär/vaccinationer) | #9B7DB8 |
+| Födelsedagar | #E6A817 |
+| Hem (serviceavtal) | #6B7B8D |
+| Måltidsslots (Måltidscentrum) | #E8906C |
+| Spond-evenemang | Visas med grupplogga |
 
-1. Tryck på **+**-knappen i flikraden
-2. Välj "Manuelt" (Manuellt) i händelseavsnittet
-3. Fyll i detaljerna:
+### Skapa ett evenemang
+
+1. Tryck **+** → "Manuelt" (Manuellt) → "Avtale" (Evenemang)
+2. Fyll i:
    - **Titel** (obligatorisk)
    - **Datum** och valfritt slutdatum
-   - **Tid** och valfritt sluttid
+   - **Tid** och valfri sluttid
    - **Adress** (Google Places-sökning)
+   - **Ikon** (20 fördefinierade, t.ex. Middag (middag), Bursdag (födelsedag), Sport, Kino (bio), Trening, Fjelltur (fjällvandring))
+   - **Personer** (välj familjemedlemmar)
    - **Beskrivning** (valfria anteckningar)
-   - **Påminnelse** (Ingen, 30 min, 1 timme, 2 timmar, 1 dag, 1 vecka)
-   - **Dokumentuppladdning** (valfritt)
-4. Tryck på "Lagre" (Spara)
+   - **Påminnelse** (Ingen, 30 min, 1 tim, 2 tim, 1 dag, 1 vecka)
+   - **Upprepning** (schemalägg dagar/veckor, udda och jämna veckor — t.ex. "varannan vecka")
+   - **Dokument** (ladda upp bilagor)
+3. Tryck "Lagre" (Spara)
 
-### Spond-händelser
+### Evenemangsdetaljer
 
-Om du har anslutit Spond i dina profilinställningar:
-- Spond-händelser från dina valda grupper visas automatiskt
-- Du kan se RSVP-status (accepterad/avvisad/obesvarad) för familjemedlemmar
-- Tryck på en Spond-händelse för att visa detaljer och ändra ditt svar
-
-### Händelsedetaljer
-
-Tryck på valfri händelse för att se:
+Tryck på ett evenemang för att se:
 - Fullständigt datum, tid och plats
-- En statisk karta som visar platsen
-- Beskrivning och anteckningar
-- RSVP-status (för Spond-händelser)
-- Uppladdade dokument
-- Redigera och ta bort alternativ (långtryck för åtgärdsmeny)
+- Statisk karta + "Öppna i Google Maps" (när adress finns)
+- Anteckningar, dokument, ikon och personer kopplade till evenemanget
+- "Lägg till i Google/Outlook-kalender"-knappar (webb)
+- Redigera/ta bort via långtryck (ActionModal)
+- Spond-evenemang: respondentstatus-stämplar (accepterad/avböjd/ej svarat, inkl. barn) och möjlighet att ändra ditt eget svar
+
+### Spond-evenemang
+
+Om du har kopplat Spond i Profilinställningarna:
+- Spond-evenemang från dina valda grupper visas automatiskt
+- Du ser svarstatus för familjemedlemmar
+- Tryck på evenemanget för detaljer och för att ändra ditt eget svar
+- Grupploggor laddas upp i Profilen (egen logga per grupp)
+- Spond-synkroniseringen körs automatiskt var 30:e minut
 
 ---
 
 ## Chatt
 
-Chattfliken erbjuder familjekommunikation med rika funktioner.
+Chattfliken ger familjemeddelanden i realtid.
 
 ### Skicka meddelanden
 
-1. Skriv ditt meddelande i textfältet
-2. Tryck på skicka-pilen för att publicera
+1. Skriv ditt meddelande (max 500 tecken)
+2. Tryck på skicka-knappen
 
 ### Dela bilder
 
 1. Tryck på bildikonen bredvid textfältet
-2. Välj att hämta från galleriet eller ta ett foto
+2. Välj från biblioteket eller ta nytt foto
 3. Förhandsgranska bilden
-4. Tryck på skicka — bilden laddas upp till Firebase Storage
+4. Skicka — bilden laddas upp till Firebase Storage
 
 ### Reaktioner
 
-- Långtryck på ett meddelande för att lägga till en reaktion
-- Tillgängliga reaktioner: Gilla, Leende, Hjärta
-- Dina reaktioner visas under meddelandet
+- Tryck på "+"-knappen bredvid meddelandet för att öppna reaktionsväljaren
+- Tillgängliga reaktioner: Like 👍, Smile 😊, Heart ❤️
+- Antal visas per reaktion; tryck på en reaktionsbricka för att gilla/ta bort
+- Dina egna reaktioner är markerade
 
 ### Funktioner
 
-- Realtidsuppdateringar via Firestore-lyssnare
-- Meddelanden scrollar automatiskt till botten
-- Användaravatarer visas bredvid meddelanden
-- Bilder visas inline med tryck för att expandera
+- Realtidsuppdatering via Firestore
+- Dagsskillnader ("I dag" / "I går") mellan meddelandegrupper
+- Avatarer bredvid meddelanden
+- Senaste 100 meddelandena laddas, max 500 tecken per meddelande
+- Andra familjemedlemmar får pushnotis (Cloud Function `notifyNewChatMessage`)
+- Tryck på bilder för helskärmsvy
+- Flikraden döljs medan chattens tangentbord är aktivt
 
 ---
 
-## Snabbknapp för skapande
+## Snabb­skapa-knappen (+)
 
-**+**-knappen i centrum av flikraden öppnar en modal med snabba skapandealternativ organiserade efter modul. Varje modul erbjuder tre skapandemetoder: **Manuelt** (manuellt formulär), **Tale** (röstinspelning) och **Foto** (fotoigenkänning).
+Den centrala "+"-knappen öppnar Snabb­skapa-menyn med två steg:
 
-### Händelseavsnittet
-- **Manuelt** — Skapa en ny manuell händelse
-- **Tale** — Röst-till-händelse: spela in tal, AI konverterar till händelse
-- **Foto** — Foto-till-händelse: ta ett foto av ett schema, AI extraherar händelser
+**Steg 1: Välj metod**
+- ✏️ **Manuellt** — vanligt formulär
+- 🎤 **Röst** — spela in röst; AI konverterar till ett objekt i vald modul
+- 📷 **Foto** — ta/välj från bibliotek; AI extraherar data från bilden
 
-### Hälsosavsnittet
-- **Manuelt** — Skapa en ny hälsotidbeställning
-- **Tale** — Röst-till-aktivitet: spela in tal, AI skapar hälsotidbeställning
-- **Foto** — Foto-till-aktivitet: ta ett foto, AI skapar hälsotidbeställning
+**Steg 2: Välj modul**
+1. **Evenemang** (manuella kalenderhändelser)
+2. **Hälsotid**
+3. **Veterinärbesök**
+4. **Skolaktivitet**
+5. **Förskoleaktivitet**
+6. **Serviceavtal** (hem)
+7. **Resa**
 
-### Djuravsnittet
-- **Manuelt** — Boka ett djurläkarbesök
-- **Tale** — Röst-till-aktivitet: spela in tal, AI skapar djurläkarbesök
-- **Foto** — Foto-till-aktivitet: ta ett foto, AI skapar djurläkarbesök
-
-### Skolavsnittet
-- **Manuelt** — Skapa en ny skolaktivitet (utflykt/aktivitet/möte)
-- **Tale** — Röst-till-aktivitet: spela in tal, AI skapar skolaktivitet
-- **Foto** — Foto-till-aktivitet: ta ett foto, AI skapar skolaktivitet
-
-### Förskoleavsnittet
-- **Manuelt** — Skapa en ny förskoleaktivitet
-- **Tale** — Röst-till-aktivitet: spela in tal, AI skapar förskoleaktivitet
-- **Foto** — Foto-till-aktivitet: ta ett foto, AI skapar förskoleaktivitet
-
-### Reseavsnittet
-- **Manuelt** — Skapa en ny resa
+AI-assistentraden finns högst upp i Snabb­skapa-menyn — se nästa sektion.
 
 ---
 
-## Veckoöversikt ("Min vecka")
+## AI-assistent
 
-Veckoöversikten visar allt som händer denna vecka i en vy.
-
-### Kom åt den
-
-1. Gå till fliken **Händelser** (Kalender)
-2. Tryck på "Min vecka" -knappen högst upp
-
-### Vad som ingår
-
-Veckoöversikten visar den aktuella veckan (måndag till söndag) med:
-
-- **Sammanfattningshuvud**: Veckonummer och datumintervall
-- **Daglig tidslinje**: Varje dag visar alla aktiviteter kronologiskt
-- **Statuschip**: Snabba räkningar av händelser, resor och andra objekt
-- **Färgkodade objekt**: Varje källa har sin egen färg
-
-### Avsnitt
-
-| Avsnitt | Innehåll |
-|---------|----------|
-| **Arrangementer** | Manuella händelser för veckan |
-| **Spond** | Sportklubbsarrangemang med RSVP-status |
-| **Reiser** | Aktiva resor (transport, hotell, restauranger) |
-| **Helse** | Hälsotidbeställningar och mediciner |
-| **Kjæledyr** | Djurläkarbesök och vaccinationer |
-| **Skole** | Skolaktiviteter (utflykt, aktivitet, möte) |
-| **Barnehage** | Förskoleaktiviteter |
-| **Bursdager** | Kommande födelsedagar |
-| **Middager** | Veckomatsedel (frukost, lunch, middag)
-
-### Anpassa avsnitt
-
-Du kan visa/dölja avsnitt i Profil > "Min vecka"-inställningar. Anpassa vilken information som visas i din veckovy.
+AI-assistenten är en konversationsbaserad hjälpare i appen (högst upp i Snabb­skapa-menyn). Den kan:
+- Svara på frågor (t.ex. "Vad händer på onsdag?")
+- Navigera dig till skärmar (hälsa, husdjur, skola, förskola, hem, evenemang, resor)
+- Utföra åtgärder efter din bekräftelse (t.ex. "Skapa en hälsotid tisdag kl. 10" → bekräfta → skapad)
+- Via mikrofonikonen: spela in tal som transkriberas och skickas till assistenten
+- Rätta svar: du kan skriva in en korrigering om assistenten svarar fel
 
 ---
 
-## Platser (Moduler)
+## Min vecka
 
-Kom åt alla moduler från fliken **Våra platser**. Varje plats har sitt eget kort med en ikon, namn och objektantal.
+"Min vecka" (Din uke) visar allt som händer denna vecka i en vy.
 
-### Resor & Underhåll
+### Öppna den
 
-**Ikon**: Kompass | **Färg**: #7EC8E3 (Blå)
+1. Gå till fliken **Evenemang**
+2. Tryck på "Din uke"-knappen högst upp
 
-Planera och organisera familjeresor med:
+### Vad som visas
 
-- **Reseöversikt**: Skapa resor med destination, datum och koordinater
-- **Transport**: Boka flyg, tåg, bussar, båtar, taxier, färjor med avgång-/ankomsttider
-- **Hotell**: Boende med in-/utcheckningstider och adresser
-- **Restauranger**: Reservationer med datum och anteckningar
-- **Aktiviteter**: Planerade aktiviteter med scheman
-- **Packlistor**: Kryssningsbara packlistor
-- **Dokument**: Ladda upp och lagra resekon
-- **Länkar**: Spara användbara URL:er
-- **Väder**: AI-hämtade väderprognoser för din destination
-- **Destinationstips**: AI-genererade restips (saker att göra, restauranger, lokala fraser, bluffvarningar)
+- Sammanfattningsrubrik med veckonummer och datumperiod
+- Dagkort med väder för din hemadress
+- Statistikbrickor (antal evenemang, resor, skol-/förskoleaktiviteter)
+- Kronologisk agenda per dag som kombinerar alla källor: evenemang, Spond, resor (inkl. transport/hotell/restauranger), hälsotider, mediciner, vaccinationer, veterinärbesök och -vaccinationer, skola/förskola (aktiviteter och lov), födelsedagar, hemtjänster och veckomeny-slots
 
-**Lägg till transport**: Varje transporttyp (fly, tog, bil, båt, taxi, färja) använder ett dubbelmönster med avgång (utreise) och ankomst (hjemreise) flikar. Markera "En väg" för att dölja hemresans formulär.
+### Anpassa
 
-### Hälsa
+Under Profil → "Min vecka" (Min uke):
+- **Veckomeny**: visa/dölj måltidssektionen i Min vecka
+- **Måltidscentrum-inställningarna** (Frukost 🥞 / Lunch 🥪 / Middag (middag) 🍽️) styr vilka måltider som visas och räknas
 
-**Ikon**: Medicinsk | **Färg**: #C67B5C (Röd/Brun)
+---
 
-Spåra familjens hälsoinformation:
+## Våra platser (moduler)
 
-- **Mediciner**: Spåra recept med dosering och frekvens
-- **Tidbeställningar**: Boka läkarbesök med datum, tid, plats
-  - **Person**: Multival — tilldela tidbeställningar till flera familjemedlemmar
-  - **Läkare**: LäkarNamn
-  - **Datum/Tid**: dateFrom/dateTo med automatisk synkronisering
-  - **Påminnelser**: Vänliga etiketter (30 min, 1 timme, 2 timmar, 1 dag, 1 vecka)
-- **Vaccinationer**: Registrera vaccinationer med nästa förfallodatum
-- **Allergier**: Dokumentera allergier med svårighetsgrader
-- **Tillväxt**: Logga längd- och viktmätningar över tid
+Alla moduler nås från fliken **Våra platser**. Varje kort visar ikon, namn och antal objekt.
 
-Varje avsnitt kan vikas ihop med lägg till/redigera/ta bort-funktionalitet. Tidbeställningar med platser visar en karta som öppnar Google Maps vid tryck.
+| Modul | Färg |
+|-------|------|
+| Våra resor | #7EC8E3 |
+| Vår hälsa | #C67B5C |
+| Vår skola | #6B8F71 |
+| Förskolan | #E8836A |
+| Våra födelsedagar | #E6A817 |
+| Våra husdjur | #9B7DB8 |
+| Måltidscentrum | #E8906C |
+| Våra hem | #6B7B8D |
 
-### Djur
+### Våra resor
 
-**Ikon**: Djur | **Färg**: #9B7DB8 (Lila)
+Planera och organisera familjeresor:
 
-Hantera djurvård med dedikerade avsnitt:
+- **Reseöversikt**: resor med stad, land, datum, tider och familjemedlemmar (obligatoriskt); resekort visar statisk karta och väderbricka per stad
+- **Väder**: 10-dagers väderprognos + timme för timme (morgon/lunch/eftermiddag/kväll/natt) per dag med temperatur, UV-index, regnsannolikhet, vind; historiskt genomsnitt för framtida resor; paginering och uppdatering
+- **Valutaväxlare**: livekurser (Frankfurter API), land→valuta autoval, byt riktning
+- **Transport**: flyg, tåg, hyrbil, båt, färja och taxi med eget formulär per typ (flygplats/terminal, flightnr, bokningsnr, säte, vagn, förare, reg.nr.) och avresa/hemresa-flikar med "En vei"-brytare; transportdetaljer stödjer kartor och länkar till bolag (Norwegian, SAS, Vy, Hertz m.fl.)
+- **Hotell, restauranger, aktiviteter**: formulär för datum/tid, adress (Google Maps) och anteckningar
+- **Packlistor**: avbockbara packlistor, byt namn, kopiera lista, radera
+- **Dokument**: ladda upp och spara reisedokument
+- **Användbara länkar**: spara länkar med favicon-förhandsvisning
+- **Destinationstips (AI)**: AI-genererade tips per stad (saker att göra, restauranger, lokala fraser, varningar)
 
-- **Djur**: Lägg till djur med namn, typ, ras, födelsedag, chip-ID, passnummer
-- **Djurläkarbesök**: Boka och spåra veterinärbesök
-  - **Läkare**: VeterinärNamn
-  - **Datum/Tid**: dateFrom/dateTo med automatisk synkronisering
-  - **Påminnelser**: Vänliga etiketter (30 min, 1 timme, 2 timmar, 1 dag, 1 vecka)
-- **Mediciner**: Spåra djurmediciner och doseringar
-- **Föda**: Registrera matningsscheman och mängder
-- **Pälsvård**: Spåra pälsvårdsschema med nästa förfallodatum
-- **Vaccinationer**: Registrera vaccinationshistorik
-- **Försäkring**: Spara försäkringspolicy detaljer och förfallodatum
+**Transportformulär**: varje transportmedel (fly/tog/bil/båt/ferje/taxi) använder dubbelformulär med **Utreise/Hjemreise**-flikar och "En vei"-brytare som döljer hemresan.
 
-### Skola
+### Vår hälsa
 
-**Ikon**: Dokument | **Färg**: #6B8F71 (Grön)
+Håll koll på familjens hälsa:
 
-Organisera skolinformation:
+- **Bokningar (tider)**: datum, klockslag, läkarnamn, adress/karta, anteckningar
+  - **Person**: välj familjemedlem (mer än en kan väljas)
+  - **Påminnelser**: vänliga etiketter (30 min, 1 tim, 2 tim, 1 dag, 1 vecka)
+- **Mediciner**: namn, styrka/dos, frekvens (1–4× dagligen) med separata tider per slot och egna påminnelsetider per slot
+- **Vaccinationer**: datum och nästa förfallodatum
+- **Allergier**: med allvarlighetsgrad (mild/måttlig/svår)
+- **Tillväxt**: logga längd och vikt över tid
+- Personväljare: alla objekt kan tilldelas familjemedlemmar
+- Dokument kan laddas upp
+- Bokningar med plats visar karta som öppnar Google Maps
+- Märken: "I dag", "Om N dagar"
+- Allt nytt pushas till familjen (Cloud Function `notifyHealthItem`)
+- Röst/foto-skapande fungerar även för hälsotider
 
-- **Barn**: Lägg till barn med skolnamn och kontaktinformation
-- **Aktiviteter**: Skapa skolaktiviteter (utflykt/aktivitet/möte) med:
-  - **Typ**: utflykt, aktivitet, möte
-  - **Datumintervall**: dateFrom/dateTo med automatisk synkronisering (dateTo matchar dateFrom vid ändring, aldrig före dateFrom)
-  - **Tidsintervall**: Valfria start-/sluttider
-  - **Påminnelser**: Vänliga etiketter (Ingen, 30 min, 1 timme, 2 timmar, 1 dag, 1 vecka)
-  - **Dokument**: Ladda upp och lagra dokument (samtyckesedlar, scheman osv.)
-  - **Kalendersynkronisering**: Google Calendar-integration för alla aktivitetstyper
-- **Kontakter**: Lärare och klasskamrater med telefon/e-post/föräldrarinformation
-- **Schema**: Ladda upp halvårsschemabilder
+### Vår skola
 
-**AI-import**: Använd Skola-AI-funktionen för att:
-1. Ta ett foto av en klasslista
-2. AI extraherar alla namn och föräldrakontaktinformation
-3. Granska och bekräfta de extraherade uppgifterna
-4. Kontakter läggs till automatiskt
+Organisera skolinformation per barn:
 
-### Förskola
+- **Barn**: lägg till barn med skolnamn, årskurs, kontaktinfo
+- **Års-flikar**: skapa/redigera/ta bort skolår
+- **Rutor**: Kontakter, Schema, Aktiviteter, Lov
+- **Kontakter**: lärare, hälsopersonal (rektor m.fl.), klasskamrater med telefon/e-post/föräldrainfo — direkta ringa/e-posta-knappar
+- **Schema**: per termin, dag/tid/ämne/lärare
+- **Aktiviteter**: tur/aktivitet/möte med datumperiod, påminnelse, dokument, bilder och Google-kalendersynk
+- **Lov**: manuell, AI-import från foto, eller import från URL (skolans webbplats)
+- **AI-import**: foto av kontaktlista eller lovlista → AI extraherar → markera/avmarkera alla → spara
+- Aktiviteter med upprepning stödjer gruppkopiering
 
-**Ikon**: Förskola | **Färg**: #E8836A (Orange)
+### Förskolan
 
-Hantera förskoleinformation med samma funktioner som Skola:
+Samma funktionsuppsättning som Skolan, men för förskolan (barn, kontakter, schema, aktiviteter, lov, AI-import).
 
-- **Barn**: Lägg till barn med förskolenamn och kontaktinformation
-- **Aktiviteter**: Skapa förskoleaktiviteter (utflykt/aktivitet/möte) med datum-/tidsintervall, påminnelser, dokument och kalendersynkronisering
-- **Kontakter**: Lärare och personal med kontaktinformation
-- **Schema**: Ladda upp schemabilder
-
-### Födelsedagar
-
-**Ikon**: Födelsedag | **Färg**: Orange
+### Våra födelsedagar
 
 Glöm aldrig en födelsedag:
 
-- **Födelsedagslista**: Lägg till födelsedagar med namn och datum
-- **Gåvotips**: Lägg till gåvotips för varje födelsedag och markera som köpt
-- **Aviseringar**: Få push-aviseringar på dagen och 7 dagar före
+- **Födelsedagslista**: namn + datum, med nedräkning ("I dag" / "Om N dagar") och ålder
+- **Presenter idéer**: per födelsedag — lägg till presenter, bocka av köpta, se förra årets presenter
+- **Notiser**: push 7 dagar före och på dagen (kl. 08:00 lokal tid)
+- Max 50 födelsedagar
 
-### Matsedel
+### Våra husdjur
 
-**Ikon**: Bestick | **Färg**: Teal
+Hantera husdjursvård:
 
-Planera familjemåltider med:
+- **Husdjur**: namn, typ (katt, hund, fisk, fågel, kanin, sköldpadda, hamster, häst, annat), kön, ras, födelsedag, ID-nummer, pass, chip-ID + chipdatum, foto
+- **Veterinärbesök**: datum, veterinär, plats (karta), påminnelse, dokument
+- **Mediciner**: namn, dos, frekvens
+- **Foder**: mängd/typ
+- **Skötsel**: senast gjort / nästa
+- **Vaccinationer**: datum + nästa förfallodatum
+- **Försäkring**: bolag, policenr, utgångsdatum, dokument
+- Röst/foto-skapande fungerar även här
 
-- **Receptbok**: Bläddra, sök och filtrera recept efter kategori
-- **AI-receptförslag**: Beskriv vad du vill, få 3 receptvariationer
-- **Import från URL**: Klistra in en recept-URL och AI extraherar receptet
-- **Foto till recept**: Ta ett foto av ett recept, AI extraherar ingredienser och instruktioner
-- **Receptöversättning**: Översätt recept till norska, svenska, danska, engelska eller finska
-- **Veckomatsedel**: Tilldela frukost, lunch och middag för varje dag
-- **Inköpslistor**: Generera inköpslistor automatiskt från matsedlar
+### Måltidscentrum (Matsenter)
 
-**Receptkategorier**: kyckling, kött, fisk, vegetariskt, pasta, gryta, soppa, frukost, dessert
+Planera familjens måltider med tre underflikar:
+
+- **Veckomeny**: meny mån–sön, med frukost/lunch/middag-slots från din profil; tilldela recept till slots; navigera veckor; "Kopiera från förra veckan"; "Tillbaka till aktuell vecka"; slumpförslag ("Denna veckan…")
+- **Recept**: samla recept (max 200) med kategorier (favoriter ❤️, kylling (kyckling), kjøtt (kött), fisk, vegetar (vegetariskt), pasta, gryte (gryta), suppe (soppa), frokost (frukost), sott (dessert)); sök; AI-receptsökning på 22 språk; import från URL; foto→recept (OCR); tid/portioner/variant/kök med landsflaggor; automatisk kaloriestimering (AI) om inte angiven
+- **Inköpslista**: realtids-avbockbar inköpslista; kopiera, byt namn, radera — varor kan läggas direkt från recept (ingredienser)
 
 ### Inköpslistor
 
-Skapa och hantera kryssningsbara inköpslistor. Objekt kan läggas till från matsedeln eller manuellt.
+- Skapa och hantera avbockbara inköpslistor (max 100)
+- Varor kan bockas av/på
+- Byt namn, kopiera, radera listor
+- Varor kan läggas direkt från recept i Måltidscentrum
+
+### Våra hem
+
+Hantera hem och stugor:
+
+- **Hem**: typ (hus, sommarstuga, vinterstuga, lägenhet), adress (Google Places), postnummer/ort, beskrivning, foto, statisk karta
+- **Instruktioner**: "Komme hjem" (komma hem)- och "Forlate hjem" (lämna hem)-sektioner med fotoscan (OCR extraherar instruktionstext och färgetiketter)
+- **Underhåll – Serviceavtal**: datum/tid/frekvens (engång/månadsvis/kvartalsvis/årlig), upprepning (dagar/veckor), kalendersynk + push till familjen
+- **Färgkoder**: foto av etikett/vägg → AI extraherar namn/kod/hex; märke, rum
+- **Projekt**: status (aktiv/väntar/klar), budget (budget/förbrukat/återstående), färgkoder med OCR, interna inköpslistor (namn, antal, enhetspris, summa), anbud (leverantör, pris, kvitto-OCR), uppgifter (att göra/pågår/klar), "Koppla till inköpslista", AI-förslag till projektuppgifter och projektanalys
 
 ---
 
-## Röst & Foto till Händelse/Aktivitet
+## Skapa med röst och foto
 
-### Röst-till-Händelse/Aktivitet
+### Röst → objekt
 
-Skapa händelser eller aktiviteter genom att tala:
+Skapa objekt genom att tala:
 
-1. Tryck på **+**-knappen > "Tale" i valfri modulavsnitt
-2. Tryck på mikrofonen för att börja spela in
-3. Tala naturligt, t.ex.: "Möte med förskolan onsdag klockan 14"
-4. Tryck på stopp när du är klar
-5. AI transkriberar ditt tal och extraherar:
-   - Händelse/aktivitetstitel
-   - Datum (tolkar "imorgon", "på måndag" osv.)
-   - Tid (förstår "halv tre", "kvart över två" osv.)
-   - Beskrivning
-6. Granska och redigera vid behov
-7. Spara
+1. Tryck **+** → "Tale" (Röst) → välj modul
+2. Tryck på mikrofonen för att starta inspelning
+3. Tala naturligt, t.ex. "Möte med förskolan på onsdag klockan 14"
+4. Tryck stopp
+5. AI transkriberar och extraherar: titel, datum (förstår "i morgen" ("i morgon"), "på mandag" ("på måndag")), tid (förstår "halv tre", "kvart över två"), beskrivning
+6. Granska och redigera
+7. Spara — evenemang läggs även in i telefonkalendern och pushas till familjen
 
-Röst-till-händelse fungerar för alla moduler:
-- **Händelser**: Skapar en kalenderhändelse
-- **Hälsa**: Skapar en hälsotidbeställning
-- **Djur**: Skapar ett djurläkarbesök
-- **Skola**: Skapar en skolaktivitet (utflykt/aktivitet/möte)
-- **Förskola**: Skapar en förskoleaktivitet
+Fungerar för: Evenemang, Hälsotid, Veterinärbesök, Skolaktivitet, Förskoleaktivitet, Serviceavtal (hem), Resa.
 
-### Foto-till-Händelse/Aktivitet
+### Foto → objekt
 
-Skapa händelser eller aktiviteter från foton:
+1. Tryck **+** → "Foto" → välj modul
+2. Ta foto eller välj från biblioteket
+3. AI extraherar alla synliga objekt med titlar, datum och tider
+4. Granska, redigera, välj de du vill behålla
+5. Spara en och en eller alla på en gång
 
-1. Tryck på **+**-knappen > "Foto" i valfri modulavsnitt
-2. Ta ett foto eller hämta från galleriet
-3. AI extraherar alla synliga händelser/aktiviteter med titlar, datum och tider
-4. Granska de extraherade händelserna
-5. Spara individuellt eller spara alla
+### Foto → recept
 
-### Foto-till-Recept
-
-Importera recept från foton:
-
-1. Gå till Matsedel > tryck på kameraikonen
-2. Ta ett foto av ett recept från en kokbok eller skärm
-3. AI extraherar: namn, ingredienser med mängder, instruktioner
-4. Granska och spara till din receptbok
+1. Måltidscentrum → kameraikon
+2. Foto av recept från kokbok eller skärm
+3. AI extraherar namn, ingredienser med mängder, tillvägagångssätt
+4. Spara i receptboken
 
 ---
 
-## Datumväljare & Påminnelser
+## Datumväljare och påminnelser
 
 ### DatePickerModal
 
-Alla datum- och tidsinmatningar använder en anpassad DatePickerModal med dessa funktioner:
+Alla datum-/tidfält använder en anpassad väljare:
 
-- **Scrollbar lista**: Bläddra genom datum (365 dagar) eller tider (30-minutersintervall)
-- **Sökfält**: Skriv ett datum (YYYY-MM-DD) eller tid (HH:MM) för att hoppa direkt
-- **Manuellt datumfält**: Längst ned i datumväljaren, skriv valfritt datum manuellt — användbart för historiska datum (födelsedagar, tidigare vaccinationer osv.)
-- **Automatisk scrollning**: När ett datum skrivs eller väljs, scrollar listan för att visa det
+- **Rullbar lista**: datoförslag (760 dagar) eller tider (30-min-intervall)
+- **Sökfält**: skriv datum (YYYY-MM-DD) eller tid (HH:MM) för att hoppa direkt
+- **Manuell inmatning**: skriv in valfri dag — användbart för historiska datum (födelsedagar, tidigare vaccinationer)
+- **Auto-scroll**: listan scrollar till vald/skriven dag
 
-### dateFrom/dateTo Automatisk synkronisering
+### dateFrom/dateTo auto-synk
 
-För aktiviteter med datumintervall (skola, förskola, hälsa, veterinär):
-- Ändring av **dateFrom** uppdaterar automatiskt **dateTo** för att matcha
+För aktiviteter med datumperiod (skola, förskola, hälsa, van):
+- Ändring av **dateFrom** uppdaterar **dateTo** automatiskt
 - **dateTo** sätts aldrig före **dateFrom**
-- Du kan ställa in olika slutdatum manuellt
+- Du kan ange annat slutdatum manuellt
 
-### Påminnelsealternativ
-
-Alla moduler använder samma påminnelsealternativ:
+### Påminnelsevalg
 
 | Etikett | Minuter |
 |---------|---------|
 | Ingen | 0 |
 | 30 min | 30 |
-| 1 timme | 60 |
-| 2 timmar | 120 |
+| 1 time (tim) | 60 |
+| 2 timer (tim) | 120 |
 | 1 dag | 1440 |
-| 1 vecka | 10080 |
+| 1 uke (vecka) | 10080 |
 
-Påminnelser skickas som telefonaviseringar med vänliga etiketter (inte "60 minuter" utan "1 timme").
+Påminnelser skickas som telefonnotiser med vänliga etiketter. Standard: **1 timme**. Standardtid för nya objekt: **10:00–11:00**.
 
-Standardpåminnelse: **1 timme** (60 minuter)
-Standardtid för nya objekt: **10:00–11:00**
+Mediciner stödjer egna tider per dos (1–4× dagligen), med separata påminnelsetider per tidpunkt.
 
 ---
 
-## Profil & Inställningar
+## Profil och inställningar
 
-Profilsfliken innehåller alla dina personliga och familjeinställningar.
+Profilfliken innehåller alla personliga och familjeinställningar.
 
-### Personliga inställningar
+### Personligt
 
-- **Namn**: Redigera ditt visningsnamn
-- **Telefon**: Lägg till ditt telefonnummer
-- **Avatar**: Ladda upp en profilbild (används i chatten)
-- **Språk**: Välj mellan norsk, svenska, danska, engelska och finska
+- **Namn**: redigera visningsnamn
+- **Telefon**: lägg till telefonnummer
+- **Avatar**: ladda upp profilbild (används i chatten)
+- **E-post**: (skrivskyddat)
 
-### Familjehantering
+### Familj
 
-- **Skapa familj**: Starta en ny familjegrupp
-- **Gå med i familj**: Ange en 6-teckners inbjudningskod
-- **Bjud in medlem**: Generera en delbar inbjudningskod (endast administratör/ägare)
-- **Ta bort medlem**: Ta bort någon från familjen (endast administratör/ägare)
-- **Ändra roll**: Befordra/nedflytta mellan administratör och medlem (endast administratör/ägare)
-- **Lämna familj**: Lämna den aktuella familjen (endast icke-ägare)
+- **Familjekort**: se medlemmar och roller
+- **Bjud in medlem**: generera inbjudningskod (giltig 1 timme, engångsbruk) / dela länk
+- **Ändra roll**: befordra/degradera mellan admin och medlem (ägare/admin)
+- **Ta bort medlem** (ägare/admin)
+- **Lämna familjen** (icke-ägare)
+- **Skapa familj** om du inte har någon
 
-### Kalenderintegration
+### Kalender
 
-1. Anslut din Google- eller Outlook-kalender
-2. Välj vilken kalender du vill synkronisera händelser till
-3. När du skapar händelser med "Lägg till i kalender" aktiverad, exporteras händelserna
-4. Google Calendar-synkronisering fungerar för alla aktivitetstyper: händelser, skolaktiviteter, förskoleaktiviteter, hälsotidbeställningar, djurläkarbesök
+- **Kalendertyp**: välj **telefonkalender** eller **Google-kalender**
+- **Google-koppling**: OAuth-koppling ("Koblet til ✓" (Ansluten ✓)) och frånkoppling
+- **Google Sync-panel**: Kör/Dry-run med sammanfattning (skannade, skapade, skippedExists (fanns redan), återskapade, misslyckade, inte anslutna) och fellista
+- **Telefonkalender**: iOS (via expo-calendar) lägger in evenemang i telefonens kalender
+- Webb: "Lägg till i Google/Outlook-kalender"-knappar per objekt
 
-### Aviseringar
+### Notiser
 
-- Aktivera/inaktivera push-aviseringar
-- Konfigurera vilka avsnitt som visas i "Min vecka"-veckoöversikten
-- Födelsedagspåminnelser skickas automatiskt kl. 08:00 oslo tid
-- Aktivitetspåminnelser använder vänliga etiketter (inte råa minutsiffror)
+- Slå på/av pushnotiser (behörighet begärs)
+- Medicinpåminnelser per tidpunkt, födelsedagsnotiser (7 dagar före + på dagen, kl. 08:00 lokal tid), aktivitetspåminnelser
+- Webb: visar banner för missade påminnelser de senaste 7 dagarna (kan avfärdas)
 
-### Spond-integration
+### Min vecka
 
-1. Ange din Spond-e-post och lösenord
-2. Välj vilka Spond-grupper du vill synkronisera
-3. Koppla Spond-medlemmar till familjemedlemmar för RSVP-spårning
-4. Spond-händelser visas automatiskt i din kalender
+- Visa/dölj "Veckomeny"-delen (måltider) i Min vecka
+- Måltidscentrum-växlare: Frukost 🥞 / Lunch 🥪 / Middag 🍽️
+
+### Måltidscentrum
+
+- Slot-växlare: Frukost 🥞 / Lunch 🥪 / Middag 🍽️
+- Styr veckomenyn och "Min vecka"
+
+### Spond (ägare/admin)
+
+1. Ange Spond e-post och lösenord (krypterat vid lagring)
+2. Välj vilka grupper som ska synkas
+3. Ladda upp/välj logga per grupp (bibliotek eller kamera)
+4. Välj vem som kan svara ("respondenter")
+5. Spond-evenemang visas automatiskt i kalendern (synk var 30:e minut)
+6. Koppla från Spond-konto
+
+### Tema
+
+Se sektionen [Teman](#teman) för detaljer. (se egen sektion)
+
+### Språk
+
+Se sektionen [Språk](#språk).
+
+### App (endast webb)
+
+- "Ladda om" — ta bort service workers och cache för att tvinga en uppdatering
+
+---
+
+## Kalendersynk
+
+fampad stödjer tvåvägs kalendersynkronisering:
+
+**Google Kalender (via Cloud Functions):** Evenemang, resor, transport, mediciner, hälsobokningar, veterinärbesök, skol-/förskoleaktiviteter, hemtjänst-avtal — skapelse, uppdatering och radering synkroniseras automatiskt för användare som har kopplat Google-kalendern.
+
+**Phone Calendar (Telefonkalender)**: iOS-appen kan lägga in evenemang direkt i telefonens kalender (välj telefonkalender i Profil). Webb-användare använder "Lägg till i Google/Outlook"-knappar per objekt.
+
+**Backfill (Efterfyllnad)**: Kör manuell synkronisering av befintlig data via Google Sync-panelen (Dry-run visar vad som kommer att hända).
 
 ---
 
 ## Teman
 
-fampad erbjuder 9 visuella teman tillgängliga från profilinställningar:
+fampad erbjuder flexibelt temaval via Profilinställningarna:
 
-| Tema | Beskrivning |
-|------|-------------|
-| **Ljust** | Rent vit bakgrund |
-| **Mörkt** | Ögonvänligt för kvällsbruk |
-| **System** | Följer din enhets ljust/mörkt-inställning |
-| **Orange** | Varm orange accent |
-| **Djupt blått** | Professionell djupblå palett |
-| **Silver** | Eleganta silvertoner |
-| **Lila** | Kreativt lila tema |
-| **Rosa** | Vibrerande rosa accenter |
-| **Teal** | Lugnande teal färgschema |
+**Rad 1 — Modulfärger** (ändrar appakcenten till modulens färg):
+- Skola (#6B8F71), Förskola (#E8836A), Resor (#7EC8E3), Födelsedagar (#E6A817), Husdjur (#9B7DB8), Måltider (#E8906C), Hälsa (#C67B5C)
 
-Ditt temapreferens sparas och behålls mellan sessioner.
+**Rad 2 — Appfärger**:
+- Slategray (blågrå, #3b5a75), Dustyrose (dunkelrosa, #A37B85)
+
+**Rad 3 — Mörkt läge**:
+- Mörkt (#333)-växling
+
+Ljus/Mörk/System följer enhetens ljusa/mörka inställning när "system" är valt. Temapreferans sparas och består mellan sessioner.
 
 ---
 
-## Språkstöd
+## Språk
 
-fampad stöder 5 språk:
+fampad stödjer 5 gränssnittsspråk:
 
-1. **Norska (Bokmål)** — Standard
+1. **Norsk (Bokmål)** — standard
 2. **Svenska**
-3. **Danska**
-4. **Engelska**
-5. **Finska**
+3. **Dansk**
+4. **English (Engelska)**
+5. **Suomi (Finska)**
 
-### Ändra språk
+### Byta språk
 
 1. Gå till Profil
-2. Scrolla till "Språk"
-3. Välj ditt önskade språk
-4. Hela användargränssnittet uppdateras omedelbart
+2. Bläddra till "Språk"
+3. Välj språk med flaggknappar
+4. Hela gränssnittet uppdateras omedelbart
 
-### Receptöversättning
+### Receptsök och översättning
 
-Recept kan översättas till alla 5 språk:
-1. Öppna ett recept
-2. Tryck på översättningsknappen
-3. AI översätter receptets namn, beskrivning, ingredienser och instruktioner
-4. Tryck på en språkflik för att visa på det språket
+- AI-receptsökning stöder 17+ AI-sökspråk och 22 språk (inklusive de 5 gränssnittsspråken)
+- Recept kan översättas till alla 5 språk (namn, beskrivning, ingredienser, tillvägagångssätt)
 
 ---
 
-## PWA & Installation
+## PWA och installation
 
 ### Installera fampad
 
-fampad är en Progressive Web App (PWA) som kan installeras på din enhet:
+fampad är en Progressive Web App (PWA):
 
-**På iOS (Safari):**
+**iOS (Safari):**
 1. Öppna fampad i Safari
-2. Tryck på Dela-knappen (fyrkant med pil)
-3. Tryck på "Lägg till på hemskärmen"
-4. Namnge den och tryck på "Lägg till"
+2. Tryck Dela-knappen
+3. "Lägg till på startskärm"
+4. Bekräfta
 
-**På Android (Chrome):**
+**Android (Chrome):**
 1. Öppna fampad i Chrome
-2. Tryck på menyknappen med tre punkter
-3. Tryck på "Lägg till på hemskärmen"
-4. Bekräfta installationen
+2. Tryck tredotsmenyn
+3. "Lägg till på startskärm"
+4. Bekräfta
 
-**På skrivbordet:**
+**Desktop:**
 1. Leta efter installationsikonen i adressfältet
-2. Klicka för att installera fampad som en skrivbordsapp
+2. Klicka för att installera
 
 ### Uppdateringsbanner
 
-När en ny version är tillgänglig visar fampad en uppdateringsbanner. Tryck för att uppdatera och få den senaste versionen.
+När en ny version finns visas en banner ("Ny version tillgänglig") — tryck för att ladda den. Kontrolleras var 5:e minut. Webb: "Ladda om" i Profilen rensar cache/service workers manuellt.
 
 ---
 
-## Tips & Tricks
+## Tips och trick
 
-### Snabb navigation
+### Snabbnavigering
 
-- Använd **+**-knappen för att snabbt skapa händelser, hälsoposter, djurbesök, skol-/förskoleaktiviteter eller resor
-- Långtryck på objekt för redigera/ta bort-alternativ
-- Tryck på kalenderprickar i kalendervy för att se den dagens händelser
+- Använd **+**-knappen för att snabbt skapa evenemang, hälsotider, veterinärbesök, aktiviteter, serviceavtal eller resor
+- Långtryck objekt för redigera/radera-meny
+- Tryck på kalenderdagar för att se dagens evenemang
+- Använd AI-assistenten från + -menyn för naturliga frågor och åtgärder
 
-### Spond-integration
+### Spond
 
-- Anslut Spond för att se alla klubbhändelser bredvid familjehändelser
-- RSVP direkt från fampad-appen
-- Se vilka familjemedlemmar som deltar
+- Koppla Spond för att se klubbevent tillsammans med familjeevenemang
+- Svara på inbjudningar direkt i appen (acceptera/avböja), inkl. för barn
+- Se vem som kommer per evenemang (stämpelstatus)
+- Spond-loggor visas på evenemang och i filterpanelen
 
-### Mats planering
+### Måltidsplanering
 
 - Använd AI-förslag för att upptäcka nya recept
-- Importera recept från vilken webbplats som helst genom att klistra in URL:en
-- Foto-skanna recept från kokböcker
-- Generera inköpslistor från din veckomatsedel
+- Importera från URL eller foto
+- Generera inköpslista direkt från receptingredienser
+- Planera veckomeny med frukost/lunch/middag; "Kopiera från förra veckan"
+- Kalorier estimeras automatiskt med AI om inte angiven
 
-### Resplanering
+### Reseplanering
 
-- Lägg till väderprognoser för din destination
-- Få AI-genererade destinationstips och lokala fraser
-- Använd transportflikar (avgång/ankomst) för rundresor
-- Spåra packlistor med kryssrutor
+- Väder: 10-dagars + timme för timme + historisk data per stad
+- AI-destinationstips: saker att göra, restauranger, fraser, varning
+- Valutaväxlare med livekurser
+- Transport med Utreise/Hjemreise-flikar och "En vei"-växling
+- Packlistor med kryssrutor
+- Spond-loggor visas på evenemang och i filterpanelet
 
-### Dataskydd
+### Data säkerhet
 
-- All data lagras i din familjs privata Firestore-databas
-- Endast familjemedlemmar kan se din data
-- Inbjudningskoder upphör efter 1 timme av säkerhetsskäl
-- Du kan lämna en familj när som helst (tar bort din åtkomst)
+- All data lagras privat per familj (Firestore, familyId-scoping)
+- Endast familjemedlemmar kan se data
+- Inbjudningskoder upphör efter 1 timme och kan bara användas en gång
+- Du kan lämna familjen när som helst (tar bort din åtkomst)
 
 ---
 

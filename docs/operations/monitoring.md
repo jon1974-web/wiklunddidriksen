@@ -62,12 +62,15 @@ fampad is a Firebase-based application. Monitoring relies on:
 
 | Function | Risk Level | Why |
 |----------|------------|-----|
-| `checkReminders` | High | Runs every minute; affects all notifications |
+| `checkReminders` | High | Runs every minute; affects all event notifications |
+| `checkMedicationReminders` | High | Runs every 5 minutes; drives medication reminders |
 | `spondProxy` | High | External API dependency; Spond downtime affects app |
 | `voiceToEvent` | Medium | OpenAI API dependency; audio processing |
-| `photoToData` | Medium | OpenAI API dependency; image processing |
+| `photoToData` | Medium | OpenAI API dependency; image processing (events, recipes, class lists, holidays) |
+| `aiAssistant` | Medium | OpenAI API dependency; used from the global + menu |
 | `notifyNewEvent` | Medium | Affects user experience when events are created |
-| `checkBirthdayReminders` | Low | Runs daily; single failure acceptable |
+| Calendar sync triggers (`on*ForCalendar`) | Medium | Firestore document triggers run on every create/update/delete of synced types |
+| `checkBirthdayReminders` | Low | Runs every 5 minutes but only sends at 08:00 in each family's timezone; single failure acceptable |
 
 ### Firestore
 
@@ -470,7 +473,11 @@ firebase firestore:get /events --project familiesenter-837bb | grep -v familyId
 
 ### Automated Health Checks
 
-The `checkReminders` Cloud Function runs every minute, providing implicit health monitoring. If it fails, notifications stop.
+- The `checkReminders` Cloud Function runs every minute, providing implicit health monitoring. If it fails, event notifications stop.
+- `checkMedicationReminders` runs every 5 minutes (medication time-slot reminders).
+- `checkBirthdayReminders` runs every 5 minutes; sends at 08:00 in each family's timezone.
+- `updateAdminStats` runs hourly and refreshes the Admin dashboard stats.
+- **Usage tracking**: Cloud Functions track per-user usage (`trackUsage`/`getUsageStats`) viewable in the Admin panel, including an estimate of OpenAI cost and last-7-days charts.
 
 ### Manual Health Checks
 
@@ -479,9 +486,11 @@ The `checkReminders` Cloud Function runs every minute, providing implicit health
 - [ ] Check Cloud Function logs for errors
 - [ ] Verify Firestore usage is within expected ranges
 - [ ] Check hosting bandwidth and cache hit rates
-- [ ] Test push notification delivery
-- [ ] Verify Spond integration is working
-- [ ] Test OpenAI-dependent features (voice, photo, recipes)
+- [ ] Test push notification delivery (events, medications, birthdays)
+- [ ] Verify Spond integration is working (sync runs every 30 minutes)
+- [ ] Test OpenAI-dependent features (voice, photo, recipes, AI assistant, home OCR)
+- [ ] Verify Google Calendar sync produces events (or run a backfill dry-run from Profile)
+- [ ] Review Admin panel usage stats for API cost anomalies
 
 #### Pre-Deployment Checklist
 

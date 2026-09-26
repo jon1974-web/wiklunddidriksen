@@ -1,439 +1,421 @@
-# fampad — User Guide
+# fampad — Brukerveiledning
 
 <p align="center">
   <img src="../../assets/icon.png" alt="fampad Logo" width="120" height="120" />
 </p>
 
-<p align="center"><strong>Your family's all-in-one organization hub</strong></p>
+<p align="center"><strong>Familiens alt-i-ett organisasjonshub</strong></p>
 
 ---
 
-## Table of Contents
+## Innholdsfortegnelse
 
-1. [Getting Started](#getting-started)
-2. [Navigation Overview](#navigation-overview)
-3. [Events & Calendar](#events--calendar)
+1. [Kom i gang](#kom-i-gang)
+2. [Navigasjonsoversikt](#navigasjonsoversikt)
+3. [Avtaler og kalender](#avtaler-og-kalender)
 4. [Chat](#chat)
-5. [Quick Create Button](#quick-create-button)
-6. [Weekly Summary ("Min uke")](#weekly-summary-min-uke)
-7. [Spaces (Modules)](#spaces-modules)
-   - [Trips & Travel](#trips--travel)
-   - [Health](#health)
-   - [Pets](#pets)
-   - [School](#school)
-   - [Kindergarten](#kindergarten)
-   - [Birthdays](#birthdays)
-   - [Meal Plan](#meal-plan)
-   - [Shopping Lists](#shopping-lists)
-8. [Voice & Photo to Event/Activity](#voice--photo-to-eventactivity)
-9. [DatePicker & Reminders](#datepicker--reminders)
-10. [Profile & Settings](#profile--settings)
-11. [Themes](#themes)
-12. [Language Support](#language-support)
-13. [PWA & Install](#pwa--install)
-14. [Tips & Tricks](#tips--tricks)
+5. [Hurtigopprett-knappen (+)](#hurtigopprett-knappen)
+6. [AI-assistent](#ai-assistent)
+7. [Din uke](#din-uke)
+8. [Våre steder (moduler)](#våre-steder-moduler)
+   - [Våre reiser](#våre-reiser)
+   - [Vår helse](#vår-helse)
+   - [Vår skole](#vår-skole)
+   - [Vår barnehage](#vår-barnehage)
+   - [Våre bursdager](#våre-bursdager)
+   - [Våre kjæledyr](#våre-kjæledyr)
+   - [Vår mat (Matsenter)](#vår-mat)
+   - [Våre hjem](#våre-hjem)
+   - [Handlelister](#handlelister)
+9. [Tale- og fotooppretting](#tale-og-fotooppretting)
+10. [Datovelger og påminnelser](#datovelger-og-påminnelser)
+11. [Profil og innstillinger](#profil-og-innstillinger)
+12. [Kalendersynk](#kalendersynk)
+13. [Temaer](#temaer)
+14. [Språk](#språk)
+15. [PWA og installasjon](#pwa-og-installasjon)
+16. [Tips og triks](#tips-og-triks)
 
 ---
 
-## Getting Started
+## Kom i gang
 
-### Creating Your Account
+### Opprette konto
 
-1. Open fampad in your browser or install it as a PWA
-2. Enter your email and password to sign up
-3. You will be automatically placed in a new account
+1. Åpne fampad i nettleseren (eller som installert PWA)
+2. Registrer deg med e-post og passord — eller logg inn hvis du allerede har konto
+3. Velg språk i steg 2 i velkomst-guiden (norsk, svensk, dansk, engelsk, finsk)
+4. Opprett eller bli med i en familie i steg 3 — eller hopp over og gjør det senere i Profilen
 
-### Setting Up Your Family
+### Oppsett av familie
 
-After signing in, you need to either create or join a family:
+Etter innlogging må du opprette eller bli med i en familie:
 
-**Option A: Create a new family**
-1. Go to the **Profile** tab
-2. Tap "Opprett familie" (Create family)
-3. Enter your family name
-4. You become the **Owner** of the family
+**Alternativ A: Opprett ny familie**
+1. Gå til **Profil**-fanen
+2. Trykk «Opprett familie»
+3. Skriv inn familienavnet
+4. Du blir familiens **eier**
 
-**Option B: Join an existing family**
-1. Ask a family admin to generate an invite code (Profile > Family section > "Inviter medlem")
-2. Enter the 6-character code in the Profile screen
-3. You join as a **Member**
+**Alternativ B: Bli med i eksisterende familie**
+1. Be en eier/admin generere en invitasjonskode (Profil > Familie > «Inviter medlem»)
+2. Åpne invitasjonslenken som deles, eller skriv inn den 6-tegns koden
+3. Du blir med som **medlem**
 
-### Understanding Family Roles
+### Forstå familieroller
 
-| Role | Permissions |
-|------|-------------|
-| **Owner** | Full control. Can manage all members, create/delete the family. Cannot leave. |
-| **Admin** | Can invite members, remove members, change roles. |
-| **Member** | Can create and edit content. Cannot manage other members. |
-
----
-
-## Navigation Overview
-
-fampad uses a bottom tab bar with tabs positioned symmetrically around a central "+" button. Chat and Våre steder are positioned between the other tabs and the center plus button.
-
-| Tab | Icon | Description |
-|-----|------|-------------|
-| **Kalender** | Calendar | Events from all sources (manual, Spond, health, pets) |
-| **Chat** | Chat bubble | Family messaging with images and reactions |
-| **Våre steder** | Compass/House | Spaces hub — access all modules |
-| **Profil** | Person | Settings, family management, integrations |
-
-The **+ (plus)** button in the center of the tab bar opens the **Quick Create** modal for fast content creation.
+| Rolle | Rettigheter |
+|-------|-------------|
+| **Eier** | Full kontroll. Kan administrere alle medlemmer. Kan ikke forlate familien. |
+| **Admin** | Kan invitere, fjerne medlemmer og endre roller. |
+| **Medlem** | Kan opprette og redigere innhold. Kan ikke administrere andre medlemmer. |
 
 ---
 
-## Events & Calendar
+## Navigasjonsoversikt
 
-The Events tab shows a unified calendar of all family activities.
+fampad bruker en bunntab-bar med fire faner rundt en sentral «+»-knapp.
 
-### Viewing Events
+| # | Fane | Ikon | Beskrivelse |
+|---|------|------|-------------|
+| 1 | **Avtaler** | Kalender | Samlet kalender fra alle familiekilder (manuelle avtaler, Spond, helse, kjæledyr, skole/barnehage, hjem, bursdager) |
+| 2 | **Chat** | Boble | Familiemeldinger med bilder og reaksjoner |
+| 3 | **Våre steder** | Hus | Inngang til alle moduler |
+| 4 | **Profil** | Person | Innstillinger, familieadministrasjon, integrasjoner |
 
-- **List View**: Events are grouped by date with a scrollable list
-- **Calendar View**: Monthly calendar grid showing event dots on each day
-- Tap the calendar icon to switch between list and calendar view
+Den sentrale **+**-knappen åpner **Hurtigopprett**-menyen. Tab-bar skjules automatisk når du skriver i chatten.
 
-### Sources of Events
+---
 
-Events come from multiple sources and are color-coded:
-- **Manual events** you create (green)
-- **Spond events** from your sports club (red)
-- **Health appointments** (#C67B5C)
-- **Pet vet visits** (#9B7DB8)
-- **School activities** (#6B8F71)
-- **Kindergarten activities** (#E8836A)
-- **Trips** with start/end dates (#7EC8E3)
+## Avtaler og kalender
 
-### Creating an Event
+Avtaler-fanen viser en samlet kalender for hele familien.
 
-1. Tap the **+** button in the tab bar
-2. Select "Manuelt" (Manual) in the Events section
-3. Fill in the details:
-   - **Title** (required)
-   - **Date** and optional end date
-   - **Time** and optional end time
-   - **Address** (Google Places search)
-   - **Description** (optional notes)
-   - **Reminder** (Ingen, 30 min, 1 time, 2 timer, 1 dag, 1 uke)
-   - **Document upload** (optional)
-4. Tap "Lagre" (Save)
+### Visning
 
-### Spond Events
+- **Listevisning**: Avtaler gruppert per dag med ukenummer-banner
+- **Kalendervisning**: Månedsvgridd med prikker per dag — trykk på en prikk/dag for å se dagen
+- Vis/skjul tidligere avtaler
+- Filtrér på modul og kilde (inkl. Spond-grupper med logoer)
+- «**Din uke**»-knappen øverst åpner ukentlig oppsummering (se egen seksjon)
 
-If you have connected Spond in your Profile settings:
-- Spond events from your selected groups appear automatically
-- You can see RSVP status (accepted/declined/unanswered) for family members
-- Tap a Spond event to view details and change your response
+### Kilder av avtaler
 
-### Event Details
+Avtaler kommer fra mange kilder og er fargekodet etter modul:
 
-Tap any event to see:
-- Full date, time, and location
-- A static map showing the location
-- Description and notes
-- RSVP status (for Spond events)
-- Uploaded documents
-- Edit and delete options (long-press for action menu)
+| Kilde | Farge |
+|-------|-------|
+| Manuelle avtaler | #3b5a75 |
+| Reiser | #7EC8E3 |
+| Helse (timer/medisiner/vaksiner) | #C67B5C |
+| Skoleaktiviteter og -fridager | #6B8F71 |
+| Barnehageaktiviteter | #E8836A |
+| Kjæledyr (vet/besøk/vaksiner) | #9B7DB8 |
+| Bursdager | #E6A817 |
+| Hjem (serviceavtaler) | #6B7B8D |
+| Måltider (Matsenter) | #E8906C |
+| Spond-arrangementer | Vist med gruppelogo |
+
+### Opprette en avtale
+
+1. Trykk **+** → «Manuelt» → «Avtale»
+2. Fyll ut:
+   - **Tittel** (påkrevd)
+   - **Dato** og valgfri sluttdato
+   - **Tid** og valgfri sluttid
+   - **Adresse** (Google Places-søk)
+   - **Ikon** (20 forhåndsdefinerte, f.eks. Middag, Bursdag, Sport, Kino, Trening, Fjelltur)
+   - **Personer** (velg familiemedlemmer)
+   - **Beskrivelse** (valgfrie notater)
+   - **Påminnelse** (Ingen, 30 min, 1 time, 2 timer, 1 dag, 1 uke)
+   - **Gjentakelse** (planlegg dager/uker, oddetall og partall-uker — f.eks. «annenhver uke»)
+   - **Dokumenter** (last opp vedlegg)
+3. Trykk «Lagre»
+
+### Avtaledetaljer
+
+Trykk på en avtale for å se:
+- Full dato, tid, sted
+- Statisk kart + «Åpne i Google Maps» (når adresse finnes)
+- Notat, dokumenter, ikon og personer koblet til avtalen
+- «Legg til i Google/Outlook-kalender»-knapper (web)
+- Rediger/slett via lang-trykk (ActionModal)
+- Spond-arrangementer: respondentstatus-stempler (akseptert/avslått/ikke svart, inkludert barn) og mulighet til å endre eget svar
+
+### Spond-arrangementer
+
+Hvis du har koblet til Spond i Profil-innstillingene:
+- Spond-arrangementer fra gruppene dine vises automatisk
+- Du ser svarstatus for familiemedlemmer
+- Trykk på arrangementet for detaljer og endre eget svar
+- Gruppelogoer lastes opp i Profilen (egendefinert logo per gruppe)
+- Spond-synkroniseringen kjører automatisk hvert 30. minutt
 
 ---
 
 ## Chat
 
-The Chat tab provides family messaging with rich features.
+Chat-fanen gir familiemeldinger i sanntid.
 
-### Sending Messages
+### Sende meldinger
 
-1. Type your message in the text input
-2. Tap the send arrow to post
+1. Skriv meldingen (maks 500 tegn)
+2. Trykk send-knappen
 
-### Sharing Images
+### Dele bilder
 
-1. Tap the image icon next to the text input
-2. Choose to pick from gallery or take a photo
-3. Preview the image
-4. Tap send — the image uploads to Firebase Storage
+1. Trykk bilde-ikonet ved tekstfeltet
+2. Velg fra bildebibliotek eller ta nytt foto
+3. Forhåndsvis bildet
+4. Send — bildet lastes opp til Firebase Storage
 
-### Reactions
+### Reaksjoner
 
-- Long-press a message to add a reaction
-- Available reactions: Like, Smile, Heart
-- Your reactions appear below the message
+- Trykk «+»-knappen ved meldingen for å åpne reaksjonsvelgeren
+- Tilgjengelige reaksjoner: Like 👍, Smile 😊, Heart ❤️
+- Antall vises per reaksjon; trykk på en reaksjons-badge for å like/ulike
+- Dine egne reaksjoner er uthevede
 
-### Features
+### Funksjoner
 
-- Real-time updates via Firestore listeners
-- Messages scroll automatically to the bottom
-- User avatars are displayed next to messages
-- Images are shown inline with tap-to-expand
-
----
-
-## Quick Create Button
-
-The **+** button in the center of the tab bar opens a modal with quick-create shortcuts organized by module. Each module offers three creation methods: **Manuelt** (manual form), **Tale** (voice recording), and **Foto** (photo recognition).
-
-### Events Section
-- **Manuelt** — Create a new manual event
-- **Tale** — Voice-to-event: record Norwegian speech, AI converts to event
-- **Foto** — Photo-to-event: snap a photo of a schedule, AI extracts events
-
-### Health Section
-- **Manuelt** — Create a new health appointment
-- **Tale** — Voice-to-activity: record speech, AI creates health appointment
-- **Foto** — Photo-to-activity: snap a photo, AI creates health appointment
-
-### Pets Section
-- **Manuelt** — Schedule a vet visit
-- **Tale** — Voice-to-activity: record speech, AI creates vet visit
-- **Foto** — Photo-to-activity: snap a photo, AI creates vet visit
-
-### School Section
-- **Manuelt** — Create a new school activity (tur/aktivitet/møte)
-- **Tale** — Voice-to-activity: record speech, AI creates school activity
-- **Foto** — Photo-to-activity: snap a photo, AI creates school activity
-
-### Kindergarten Section
-- **Manuelt** — Create a new kindergarten activity
-- **Tale** — Voice-to-activity: record speech, AI creates kindergarten activity
-- **Foto** — Photo-to-activity: snap a photo, AI creates kindergarten activity
-
-### Trips Section
-- **Manuelt** — Create a new trip
+- Sanntidsoppdatering via Firestore
+- Dagsskiller «I dag» / «I går» mellom meldingsgrupper
+- Avatare ved meldinger
+- Siste 100 meldinger lastes, maks 500 tegn per melding
+- Andre familiemedlemmer får push-varsling (Cloud Function `notifyNewChatMessage`)
+- Trykk på bilder for fullskjermvisning
+- Tab-bar skjules mens tastaturet er aktivt i chatten
 
 ---
 
-## Weekly Summary ("Min uke")
+## Hurtigopprett-knappen (+)
 
-The Weekly Summary shows everything happening this week in one view.
+Sentrale «+»-knappen åpner Hurtigopprett-menyen med to steg:
 
-### Accessing It
+**Steg 1: Velg metode**
+- ✏️ **Manuelt** — vanlig skjema
+- 🎤 **Tale** — ta opp stemme; AI konverterer til innhold i valgt modul
+- 📷 **Foto** — ta/fra bibliotek; AI trekker ut data fra bildet
 
-1. Go to the **Events** (Kalender) tab
-2. Tap the "Min uke" (My week) button at the top
+**Steg 2: Velg modul**
+1. **Avtale** (manuelle kalenderarrangementer)
+2. **Helsetime**
+3. **Veterinærtime**
+4. **Skoleaktivitet**
+5. **Barnehageaktivitet**
+6. **Serviceavtale** (hjem)
+7. **Reise**
 
-### What's Included
-
-The weekly summary shows the current week (Monday through Sunday) with:
-
-- **Summary header**: Week number and date range
-- **Daily timeline**: Each day shows all activities chronologically
-- **Stat chips**: Quick counts of events, trips, and other items
-- **Color-coded items**: Each source has its own color
-
-### Sections
-
-| Section | Content |
-|---------|---------|
-| **Arrangementer** | Manual events for the week |
-| **Spond** | Sports club events with RSVP status |
-| **Reiser** | Active trips (transport, hotels, restaurants) |
-| **Helse** | Health appointments and medications |
-| **Kjæledyr** | Pet vet visits and vaccinations |
-| **Skole** | School activities (tur, aktivitet, møte) |
-| **Barnehage** | Kindergarten activities |
-| **Bursdager** | Upcoming birthdays |
-| **Middager** | Weekly meal plan (breakfast, lunch, dinner) |
-
-### Customizing Sections
-
-You can show/hide sections in Profile > "Min uke" settings. Customize which information appears in your weekly view.
+AI-assistentraden er øverst i Hurtigopprett-menyen — se neste seksjon.
 
 ---
 
-## Spaces (Modules)
+## AI-assistent
 
-Access all modules from the **Våre steder** tab. Each space has its own card with an icon, name, and item count.
-
-### Trips & Travel
-
-**Icon**: Compass | **Color**: #7EC8E3 (Blue)
-
-Plan and organize family trips with:
-
-- **Trip overview**: Create trips with destination, dates, and coordinates
-- **Transport**: Book flights, trains, buses, boats, taxis, ferries with departure/arrival times
-- **Hotels**: Accommodation with check-in/out times and addresses
-- **Restaurants**: Reservations with dates and notes
-- **Activities**: Planned activities with schedules
-- **Packing Lists**: Checkable packing lists
-- **Documents**: Upload and store trip documents
-- **Links**: Save useful URLs
-- **Weather**: AI-fetched weather forecast for your destination
-- **Destination Tips**: AI-generated travel advice (things to do, restaurants, local phrases, scam warnings)
-
-**Adding transport**: Each transport type (fly, tog, bil, boat, taxi, ferry) uses a dual-form pattern with departure (utreise) and arrival (hjemreise) tabs. Check "En vei" (one way) to hide the return trip form.
-
-### Health
-
-**Icon**: Medical | **Color**: #C67B5C (Red/Brown)
-
-Track family health information:
-
-- **Medications**: Track prescriptions with dosage and frequency
-- **Appointments**: Schedule doctor visits with date, time, location
-  - **Person**: Multi-select — assign appointments to multiple family members
-  - **Doctor**: Doctor name
-  - **Date/Time**: dateFrom/dateTo with auto-sync
-  - **Reminders**: Friendly labels (30 min, 1 time, 2 timer, 1 dag, 1 uke)
-- **Vaccinations**: Record vaccinations with next-due dates
-- **Allergies**: Document allergies with severity levels
-- **Growth**: Log height and weight measurements over time
-
-Each section is collapsible with add/edit/delete functionality. Appointments with locations show a map that opens Google Maps on tap.
-
-### Pets
-
-**Icon**: Pet | **Color**: #9B7DB8 (Purple)
-
-Manage pet care with dedicated sections:
-
-- **Pets**: Add pets with name, type, breed, birthday, chip ID, passport number
-- **Vet Visits**: Schedule and track veterinary appointments
-  - **Doctor**: Veterinarian name
-  - **Date/Time**: dateFrom/dateTo with auto-sync
-  - **Reminders**: Friendly labels (30 min, 1 time, 2 timer, 1 dag, 1 uke)
-- **Medications**: Track pet medications and dosages
-- **Food**: Record feeding schedules and amounts
-- **Grooming**: Track grooming schedule with next-due dates
-- **Vaccinations**: Record vaccination history
-- **Insurance**: Store insurance policy details and expiry dates
-
-### School
-
-**Icon**: Documents | **Color**: #6B8F71 (Green)
-
-Organize school information:
-
-- **Children**: Add children with school name and contact info
-- **Activities**: Create school activities (tur/aktivitet/møte) with:
-  - **Type**: tur (trip), aktivitet (activity), møte (meeting)
-  - **Date range**: dateFrom/dateTo with auto-sync (dateTo matches dateFrom when changed, never before dateFrom)
-  - **Time range**: Optional start/end times
-  - **Reminders**: Friendly labels (Ingen, 30 min, 1 time, 2 timer, 1 dag, 1 uke)
-  - **Documents**: Upload and store documents (permission slips, schedules, etc.)
-  - **Calendar sync**: Google Calendar integration for all activity types
-- **Contacts**: Teachers and classmates with phone/email/parent info
-- **Schedules**: Upload semester schedule images
-
-**AI Import**: Use the School AI feature to:
-1. Take a photo of a class list
-2. AI extracts all names and parent contact information
-3. Review and confirm the extracted data
-4. Contacts are automatically added
-
-### Kindergarten
-
-**Icon**: Kindergarten | **Color**: #E8836A (Orange)
-
-Manage kindergarten information with the same features as School:
-
-- **Children**: Add children with kindergarten name and contact info
-- **Activities**: Create kindergarten activities (tur/aktivitet/møte) with date/time ranges, reminders, documents, and calendar sync
-- **Contacts**: Teachers and staff with contact info
-- **Schedules**: Upload schedule images
-
-### Birthdays
-
-**Icon**: Birthday | **Color**: Orange
-
-Never forget a birthday:
-
-- **Birthday list**: Add birthdays with name and date
-- **Gift ideas**: For each birthday, add gift ideas and mark as purchased
-- **Notifications**: Receive push notifications on the day and 7 days before
-
-### Meal Plan
-
-**Icon**: Utensils | **Color**: Teal
-
-Plan family meals with:
-
-- **Recipe book**: Browse, search, and filter recipes by category
-- **AI recipe suggestions**: Describe what you want, get 3 recipe variations
-- **Import from URL**: Paste a recipe URL and AI extracts the recipe
-- **Photo to recipe**: Snap a photo of a recipe, AI extracts ingredients and instructions
-- **Recipe translation**: Translate recipes to Norwegian, Swedish, Danish, English, or Finnish
-- **Weekly meal plan**: Assign breakfast, lunch, and dinner for each day
-- **Shopping lists**: Auto-generate shopping lists from meal plans
-
-**Recipe Categories**: kylling (chicken), kjoett (meat), fisk (fish), vegetar (vegetarian), pasta, gryte (casserole), suppe (soup), frokost (breakfast), sott (dessert)
-
-### Shopping Lists
-
-Create and manage checkable shopping lists. Items can be added from the meal plan or manually.
+AI-assistenten er en samtalebasert hjelper i appen (øverst i Hurtigopprett-menyen). Den kan:
+- Svare på spørsmål (f.eks. «Hva skjer onsdag?»)
+- Navigere deg til skjermer (helse, kjæledyr, skole, barnehage, hjem, avtaler, reiser)
+- Utføre handlinger etter at du bekrefter (f.eks. «Lag en helsetime tirsdig kl. 10» → bekreft → opprettet)
+- Via mikrofon-ikonet: ta opp tale som transkriberes og sendes til assistenten
+- Korrigere svarene: du kan skrive inn en rettelse hvis assistenten svarer feil
 
 ---
 
-## Voice & Photo to Event/Activity
+## Din uke
 
-### Voice-to-Event/Activity
+«Din uke» viser alt som skjer denne uken i ett view.
 
-Create events or activities by speaking in Norwegian:
+### Åpne den
 
-1. Tap the **+** button > "Tale" in any module section
-2. Tap the microphone to start recording
-3. Speak naturally in Norwegian, e.g.: "Møte med barnehagen på onsdag klokka 14"
-4. Tap stop when done
-5. AI transcribes your speech and extracts:
-   - Event/activity title
-   - Date (resolves "i morgen", "på mandag", etc.)
-   - Time (understands "halv tre", "kvart over to", etc.)
-   - Description
-6. Review and edit if needed
-7. Save
+1. Gå til **Avtaler**-fanen
+2. Trykk «Din uke»-knappen øverst
 
-Voice-to-event works for all modules:
-- **Events**: Creates a calendar event
-- **Health**: Creates a health appointment
-- **Pets**: Creates a vet visit
-- **School**: Creates a school activity (tur/aktivitet/møte)
-- **Kindergarten**: Creates a kindergarten activity
+### Hva som vises
 
-### Photo-to-Event/Activity
+- Sammendragsheader med ukenummer og datoperiode
+- Dagkort med vær for hjemmeadressen
+- Statistikk-piller (antall avtaler, reiser, skole-/barnehageaktiviteter)
+- Kronologisk agenda per dag som kombinerer alle kilder: avtaler, Spond, reiser (inkl. transport/hotell/restaurant), helsetimer, medisiner, vaksiner, veterinærbesøk og vaksiner for kjæledyr, skole/barnehage (aktiviteter og fridager), bursdager, hjemmeservice og ukemeny-slots
 
-Create events or activities from photos:
+### Tilpasse
 
-1. Tap the **+** button > "Foto" in any module section
-2. Take a photo or pick from gallery
-3. AI extracts all visible events/activities with titles, dates, and times
-4. Review the extracted events
-5. Save individually or save all
-
-### Photo-to-Recipe
-
-Import recipes from photos:
-
-1. Go to Meal Plan > tap camera icon
-2. Snap a photo of a recipe from a cookbook or screen
-3. AI extracts: name, ingredients with amounts, instructions
-4. Review and save to your recipe book
+Under Profil → «Min uke»:
+- **Ukemeny**: vis/skjul måltidsdelen i Din uke
+- **Matsenter-innstillingene** (Frokost 🥞 / Lunsj 🥪 / Middag 🍽️) styrer hvilke måltider som vises og telles
 
 ---
 
-## DatePicker & Reminders
+## Våre steder (moduler)
+
+Alle moduler nås fra **Våre steder**-fanen. Hvert kort viser ikon, navn og antall elementer.
+
+| Modul | Farge |
+|-------|-------|
+| Våre reiser | #7EC8E3 |
+| Vår helse | #C67B5C |
+| Vår skole | #6B8F71 |
+| Vår barnehage | #E8836A |
+| Våre bursdager | #E6A817 |
+| Våre kjæledyr | #9B7DB8 |
+| Vår mat (Matsenter) | #E8906C |
+| Våre hjem | #6B7B8D |
+
+### Våre reiser
+
+Planlegg og organiser familieturer:
+
+- **Reiseoversikt**: reiser med by, land, datoer, tider og familiemedlemmer (påkrevd); reisekort viser statisk kart og værpille per by
+- **Vær**: 10-dagers værmelding + time-for-time (morgen/lunsj/ettermiddag/kveld/natt) per dag med temperatur, UV-index, regnsjans, vind; historisk gjennomsnitt på fremtidige reiser; paginering og oppfrisking
+- **Valutakalkulator**: live valutakurser (Frankfurter API), land→valuta autovalg, bytt retning
+- **Transport**: fly, tog, leiebil, båt, ferje og taxi med egen skjema per type (flyplass/terminal, flightnr, bookingnr, sete, vogn, sjåfør, reg.nr.) og avreise/hjemreise-tekstfelt med «En vei»-bryter; transportskjemaet støtter også kart, lenker til flyselskap/operatør (Norwegian, SAS, Vy, Hertz osv.)
+- **Hoteller, restauranter, aktiviteter**: skjema for dato/tid, adresse (Google Maps) og notater
+- **Pakk boekelister**: sjekkbar pakkeliste, gi nytt navn, kopier liste, slett
+- **Dokumenter**: last opp og lagre reisedokumenter
+- **Nyttige lenker**: lagre lenker med favicon-forhåndsvisning
+- **Mål-tips (AI)**: AI-genererte tips per by (ting å gjøre, restauranter, lokale fraser, advarsler)
+
+**Transport-skjema**: hvert transportmiddel (fly/tog/bil/båt/ferje/taxi) bruker dobbelt-skjema med **Utreise/Hjemreise**-faner og «En vei»-bryter som skjuler hjemreise-fanen.
+
+### Vår helse
+
+Hold oversikt over familiens helse:
+
+- **Timer (avtaler)**: dato, klokkeslett, legenavn, adresse/kart, notater
+  - **Person**: velg familiemedlem (mer enn én person kan velges)
+  - **Påminnelser**: vennlige etiketter (30 min, 1 time, 2 timer, 1 dag, 1 uke)
+- **Medisiner**: navn, styrke/dosering, frekvens (1–4× daglig) med separate tidspunkter per slot og egne påminnelsestider per slot
+- **Vaksiner**: dato og neste due-dato
+- **Allergier**: med alvorlighetsgrad (mild/moderat/alvorlig)
+- **Vekst**: logg høyde og vekt over tid
+- Personvelger: alle elementer kan tilordnes familiemedlemmer
+- Dokumenter kan lastes opp
+- Timer med sted viser kart som åpner Google Maps
+- Badges: «I dag», «Om N dager»
+- Alle nyheter pushes til familien (Cloud Function `notifyHealthItem`)
+- Tale/foto-oppretting fungerer også for helsetimer
+
+### Vår skole
+
+Organiser skoleinformasjon per barn:
+
+- **Barn**: legg til barn med skolenavn, årstrinn, kontaktinfo
+- **År-faner**: opprett/rediger/slett skoleår
+- **Fliser**: Kontakter, Timeplan, Aktiviteter, Fridager
+- **Kontakter**: lærere, helsepersonell (rektor m.fl.), klassekamerater med telefon/e-post/foreldreinfo — direkte ring/e-post-knapper
+- **Timeplan**: per semester, dag/tid/fag/lærer
+- **Aktiviteter**: tur/aktivitet/møte med datoperiode, påminnelse, dokumenter, bilder og Google-kalendersynk
+- **Fridager**: manuell, import via AI fra bilde, eller importer fra URL (skolens nettside)
+- **AI-import**: foto av kontaktliste eller fridager → AI trekker ut → velg/fra velg alle → lagre
+- Aktiviteter med repetisjon støtter gruppekopiering
+
+### Vår barnehage
+
+Samme funksjonssett som Skole, men for barnehagen (barn, kontakter, timeplan, aktiviteter, fridager, AI-import).
+
+### Våre bursdager
+
+Aldri glem en bursdag:
+
+- **Bursdagsliste**: navn + dato, med nedtelling («I dag» / «Om N dager») og alder
+- **Gaveid idéer**: per bursdag — legg til gaver, huk av kjøpte, se forrige års gaver
+- **Varsler**: push 7 dager før og på dagen (kl. 08:00 lokal tid)
+- Maks 50 bursdager
+
+### Våre kjæledyr
+
+Administrer kjæledyrpleie:
+
+- **Kjæledyr**: navn, type (katt, hund, fisk, fugl, kanin, skilpadde, hamster, hest, anna), kjønn, rase, bursdag, ID-nummer, pass, chip-ID + chipdato, bilde
+- **Veterinærbesøk**: dato, veterinær, sted (kart), påminnelse, dokumenter
+- **Medisiner**: navn, dosering, frekvens
+- **Fôring**: mengde/type
+- **Stell**: sist gjort / neste
+- **Vaksiner**: dato + neste due-dato
+- **Forsikring**: selskap, policenr, utløpsdato, dokument
+- Tale/foto-oppretting fungerer også her
+
+### Vår mat (Matsenter)
+
+Planlegg familiens måltider med tre underfaner:
+
+- **Ukemeny**: ukemeny man–søn, med frokost/lunsj/middag-slots fra profilen din; tildel oppskrifter til slots; naviger uker; «Kopier fra forrige uke»; «Tilbake til inneværende uke»; tilfeldig forslag («Denne uken…»)
+- **Oppskrifter**: samle oppskrifter (maks 200) med kategorier (favoritter ❤️, kylling, kjøtt, fisk, vegetar, pasta, gryte, suppe, frokost, dessert); søk; AI-oppskriftssøk på 22 språk; importer fra URL; foto→oppskrift (OCR); tid/porsjoner/variant/kjøkken med landsflagg; automatisk kalorierestimaton (AI) hvis ikke oppgitt
+- **Handleliste**: realtids-sjekkbar handleliste; kopier, gi nytt navn, slett — varer kan legges direkte fra oppskrift (ingredienser)
+
+### Handlelister
+
+- Opprett og administrer sjekkbare handlelister (maks 100)
+- Varer kan sjekkes av/på
+- Gi nytt navn, kopier, slett lister
+- Varer kan legges direkte fra oppskrifter i Matsenteret
+
+### Våre hjem
+
+Administrer hjem og hytter:
+
+- **Hjem**: type (hus, sommerhytte, vinterhytte, leilighet), adresse (Google Places), postnummer/sted, beskrivelse, bilde, statisk kart
+- **Instruksjoner**: «Komme hjem»- og «Forlate hjem»-seksjoner med foto-scan (OCR trekker ut instruksjonstekst og fargeetiketter)
+- **Vedlikehold Serviceavtaler**: dato/tid/frekvens (engang/månedlig/kvartalsvis/årlig), gjentakelse (dager/uker), kalendersynk + push til familien
+- **Fargekoder**: foto av etikett/vegg → AI trekker ut navn/kode/hex; merke, rom
+- **Prosjekter**: status (aktiv/på vent/ferdig), budsjett (budsjett/forbrukt/gjenstående), fargekoder med OCR, interne handlelister (navn, antall, enhetspris, totalsum), tilbud (leverandør, pris, kvittering-OCR), oppgaver (todo/under arbeid/ferdig), «Koble til handleliste», AI-forslag til prosjektoppgaver og prosjektanalyse
+
+---
+
+## Tale- og fotooppretting
+
+### Tale → element
+
+Opprett elementer ved å snakke:
+
+1. Trykk **+** → «Tale» → velg modul
+2. Trykk mikrofonen for å starte opptak
+3. Snakk naturlig, f.eks. «Møte med barnehagen på onsdag klokka 14»
+4. Trykk stopp
+5. AI transkriberer og trekker ut: tittel, dato (forstår «i morgen», «på mandag»), tid (forstår «halv tre», «kvart over to»), beskrivelse
+6. Se gjennom og rediger
+7. Lagre — avtaler legges også i telefonkalender og pushes til familien
+
+Fungerer for: Avtale, Helsetime, Veterinærtime, Skoleaktivitet, Barnehageaktivitet, Serviceavtale (hjem), Reise.
+
+### Foto → element
+
+1. Trykk **+** → «Foto» → velg modul
+2. Ta foto eller velg fra bibliotek
+3. AI trekker ut alle synlige elementer med tittel, datoer og tider
+4. Se gjennom, rediger, velg de du vil beholde
+5. Lagre én og én eller alle på én gang
+
+### Foto → oppskrift
+
+1. Matsenter → foto-ikon
+2. Foto av oppskrift fra kokebok eller skjerm
+3. AI trekker ut navn, ingredienser med mengder, fremgangsmåte
+4. Lagre i oppskriftsboken
+
+---
+
+## Datovelger og påminnelser
 
 ### DatePickerModal
 
-All date and time inputs use a custom DatePickerModal with these features:
+Alle dato-/tid-felter bruker en egendefinert picker:
 
-- **Scrollable list**: Browse through dates (365 days) or times (30-minute intervals)
-- **Search bar**: Type a date (YYYY-MM-DD) or time (HH:MM) to jump directly
-- **Manual date entry**: At the bottom of the date picker, type any date manually — useful for historical dates (birthdays, past vaccinations, etc.)
-- **Auto-scroll**: When a date is typed or selected, the list scrolls to show it
+- **Rullbar liste**: datoforslag (760 dager) eller tider (30-min-intervaller)
+- **Søkefelt**: skriv dato (YYYY-MM-DD) eller tid (HH:MM) for å hoppe direkte
+- **Manuell inntasting**: skriv inn hvilken som helst dato — nyttig for historiske datoer (bursdager, tidligere vaksiner)
+- **Auto-scroll**: listen scroller til valgt/skrevet dato
 
-### dateFrom/dateTo Auto-Sync
+### dateFrom/dateTo auto-synk
 
-For activities with date ranges (school, kindergarten, health, vet):
-- Changing **dateFrom** automatically updates **dateTo** to match
-- **dateTo** is never set before **dateFrom**
-- You can set different end dates manually
+For aktiviteter med datoperiode (skole, barnehage, helse, vet):
+- Endring av **dateFrom** oppdaterer **dateTo** automatisk
+- **dateTo** settes aldri før **dateFrom**
+- Du kan sette annen sluttdato manuelt
 
-### Reminder Options
+### Påminnelsesvalg
 
-All modules use the same reminder options:
-
-| Label | Minutes |
-|-------|---------|
+| Etikett | Minutter |
+|---------|----------|
 | Ingen | 0 |
 | 30 min | 30 |
 | 1 time | 60 |
@@ -441,166 +423,200 @@ All modules use the same reminder options:
 | 1 dag | 1440 |
 | 1 uke | 10080 |
 
-Reminders are sent as phone notifications with friendly labels (not "60 minutes" but "1 time").
+Påminnelser sendes som telefonvarsler med vennlige etiketter. Standard: **1 time**. Standardtid for nye elementer: **10:00–11:00**.
 
-Default reminder: **1 time** (60 minutes)
-Default time for new items: **10:00–11:00**
-
----
-
-## Profile & Settings
-
-The Profile tab contains all your personal and family settings.
-
-### Personal Settings
-
-- **Name**: Edit your display name
-- **Phone**: Add your phone number
-- **Avatar**: Upload a profile photo (used in chat)
-- **Language**: Choose between Norwegian, Swedish, Danish, English, and Finnish
-
-### Family Management
-
-- **Create family**: Start a new family group
-- **Join family**: Enter a 6-character invite code
-- **Invite member**: Generate a shareable invite code (Admin/Owner only)
-- **Remove member**: Remove someone from the family (Admin/Owner only)
-- **Change role**: Promote/demote between Admin and Member (Admin/Owner only)
-- **Leave family**: Leave the current family (non-owners only)
-
-### Calendar Integration
-
-1. Connect your Google or Outlook calendar
-2. Select which calendar to sync events to
-3. When creating events with "Add to calendar" enabled, events are exported
-4. Google Calendar sync works for all activity types: events, school activities, kindergarten activities, health appointments, vet visits
-
-### Notifications
-
-- Toggle push notifications on/off
-- Configure which sections appear in "Min uke" weekly summary
-- Birthday reminders are sent automatically at 08:00 Oslo time
-- Activity reminders use friendly Norwegian labels (not raw minute counts)
-
-### Spond Integration
-
-1. Enter your Spond email and password
-2. Select which Spond groups to sync
-3. Map Spond members to family members for RSVP tracking
-4. Spond events appear automatically in your calendar
+Medisiner støtter egne tidspunkter per dosering (1–4× daglig), med separate påminnelsestider per tidspunkt.
 
 ---
 
-## Themes
+## Profil og innstillinger
 
-fampad offers 9 visual themes accessible from Profile settings:
+Profil-fanen inneholder alle personlige og familieinnstillinger.
 
-| Theme | Description |
-|-------|-------------|
-| **Light** | Clean white background |
-| **Dark** | Easy on the eyes for evening use |
-| **System** | Follows your device's light/dark setting |
-| **Orange** | Warm orange accents |
-| **Deep Blue** | Professional deep blue palette |
-| **Silver** | Elegant silver tones |
-| **Purple** | Creative purple theme |
-| **Pink** | Vibrant pink accents |
-| **Teal** | Calming teal color scheme |
+### Personlig
 
-Your theme preference is saved and persists between sessions.
+- **Navn**: rediger visningsnavn
+- **Telefon**: legg til telefonnummer
+- **Avatar**: last opp profilbilde (brukes i chat)
+- **E-post**: (read-only)
+
+### Familie
+
+- **Familiekort**: se medlemmer og roller
+- **Inviter medlem**: generer invitasjonskode (gyldig 1 time, engangsbruk) / del lenke
+- **Endre rolle**: promover/demoter mellom admin og medlem (eier/admin)
+- **Fjern medlem** (eier/admin)
+- **Forlate familien** (ikke eier)
+- **Opprett familie** hvis du ikke har en
+
+### Kalender
+
+- **Kalendertype**: velg **telefonkalender** eller **Google-kalender**
+- **Google-tilkobling**: OAuth-kobling («Koblet til ✓») og frakobling
+- **Google Sync-panel**: Kjør/Dry-run med sammendrag (skannet, opprettet, oversprong finnes, gjenskapt, feilet, ikke tilkoblet) og feilliste
+- **Telefonkalender**: iOS (via expo-calendar) setter inn avtaler i telefonens kalender
+- Web: «Legg til i Google/Outlook-kalender»-knapper per element
+
+### Varsler
+
+- Slå push-varsler på/av (tillatelse forespørres)
+- Medisinpåminnelser per tidspunkt (timeSlots), bursdagsvarsler (7 dager før + på dagen, kl. 08:00 lokal tid), aktivitetspåminnelser
+- Web: viser banner for tapte påminnelser siste 7 dager (kan skjules)
+
+### Min uke
+
+- Vis/skjul «Ukemeny»-delen (måltider) i Din uke
+- Matsenter-toggles: Frokost 🥞 / Lunsj 🥪 / Middag 🍽️
+
+### Matsenter
+
+- Slot-brytere: Frokost 🥞 / Lunsj 🥪 / Middag 🍽️
+- Styrer ukemenyen og «Din uke»
+
+### Spond (eier/admin)
+
+1. Skriv inn Spond e-post og passord (kryptert ved lagring)
+2. Velg hvilke grupper som skal synkes
+3. Last opp/valg logo per gruppe (bildebibliotek eller kamera)
+4. Velg hvem som kan svare («respondenter»)
+5. Spond-arrangementer vises automatisk i kalenderen (synk hvert 30. minutt)
+6. Frakoble Spond-konto
+
+### Tema
+
+Se [Temaer](#temaer)-seksjonen for detaljer.
+
+### Språk
+
+Se [Språk](#språk)-seksjonen.
+
+### App (kun web)
+
+- «Last inn på nytt» — fjern service workers og cache for å håndheve oppdatering
 
 ---
 
-## Language Support
+## Kalendersynk
 
-fampad supports 5 languages:
+fampad støtter toveis kalendersynkronisering:
 
-1. **Norsk (Bokmal)** — Default
+**Google Calendar (via Cloud Functions):** Avtaler, reiser, transport, medisiner, helsetimer, veterinærbesøk, skole-/barnehageaktiviteter, hjemmeservice-avtaler — opprettelse, oppdatering og sletting synkroniseres automatisk for brukere som har koblet til Google-kalender.
+
+**Phone Calendar**: iOS-appen kan sette inn avtaler direkte i telefonens kalender (velg telefonkalender i Profil). Web-brukere bruker «Legg til i Google/Outlook»-knapper per element.
+
+**Backfill**: Kjør manuell synkronisering av eksisterende data via Google Sync-panel (Dry-run viser hva som vil skje).
+
+---
+
+## Temaer
+
+fampad tilbyr fleksibel theming via Profil-innstillingene:
+
+**Rad 1 — Modulfarger** (endrer app-aksent til modulens farge):
+- Skole (#6B8F71), Barnehage (#E8836A), Reiser (#7EC8E3), Bursdager (#E6A817), Kjæledyr (#9B7DB8), Måltider (#E8906C), Helse (#C67B5C)
+
+**Rad 2 — App-farger**:
+- Slategray (#3b5a75), Dustyrose (#A37B85)
+
+**Rad 3 — Mørk modus**:
+- Mørk (#333) toggle
+
+Lys/Skygge/System-utvalg følger enhetens lyse/mørke innstilling når «system» er valgt. Temapreferanse lagres og vedvarer mellom økter.
+
+---
+
+## Språk
+
+fampad støtter 5 grensesnittspråk:
+
+1. **Norsk (Bokmål)** — standard
 2. **Svenska**
 3. **Dansk**
 4. **English**
-5. **Suomi (Finnish)**
+5. **Suomi**
 
-### Changing Language
+### Bytte språk
 
-1. Go to Profile
-2. Scroll to "Sprak" (Language)
-3. Select your preferred language
-4. The entire interface updates immediately
+1. Gå til Profil
+2. Bla til «Språk»
+3. Velg språk med flagg-knapper
+4. Hele grensesnittet oppdateres umiddelbart
 
-### Recipe Translation
+### Oppskriftssøk og oversettelse
 
-Recipes can be translated to all 5 languages:
-1. Open a recipe
-2. Tap the translate button
-3. AI translates the recipe name, description, ingredients, and instructions
-4. Tap a language tab to view in that language
+- AI-oppskriftssøk støtter 17+ AI-søksmål og 22 språk (inkludert de 5 grensesnittspråkene)
+- Oppskrifter kan oversettes til alle 5 språk (navn, beskrivelse, ingredienser, fremgangsmåte)
 
 ---
 
-## PWA & Install
+## PWA og installasjon
 
-### Installing fampad
+### Installere fampad
 
-fampad is a Progressive Web App (PWA) that can be installed on your device:
+fampad er en Progressive Web App (PWA):
 
-**On iOS (Safari):**
-1. Open fampad in Safari
-2. Tap the Share button (square with arrow)
-3. Tap "Legg til på hjemskjerm" (Add to Home Screen)
-4. Name it and tap "Legg til"
+**iOS (Safari):**
+1. Åpne fampad i Safari
+2. Trykk Del-knappen
+3. «Legg til på hjemskjerm»
+4. Bekreft
 
-**On Android (Chrome):**
-1. Open fampad in Chrome
-2. Tap the three-dot menu
-3. Tap "Legg til på hjemskjerm" (Add to Home Screen)
-4. Confirm installation
+**Android (Chrome):**
+1. Åpne fampad i Chrome
+2. Trykk tre-punkts menyen
+3. «Legg til på hjemskjerm»
+4. Bekreft
 
-**On Desktop:**
-1. Look for the install icon in the address bar
-2. Click to install fampad as a desktop app
+**Desktop:**
+1. Se etter installasjonsikonet i adressefeltet
+2. Klikk for å installere
 
-### Update Banner
+### Oppdateringsbanner
 
-When a new version is available, fampad shows an update banner. Tap to refresh and get the latest version.
-
----
-
-## Tips & Tricks
-
-### Quick Navigation
-
-- Use the **+** button to quickly create events, health items, pet visits, school/kindergarten activities, or trips
-- Long-press items for edit/delete options
-- Tap calendar dots in calendar view to see that day's events
-
-### Spond Integration
-
-- Connect Spond to see all club events alongside family events
-- RSVP directly from the fampad app
-- See which family members are attending
-
-### Meal Planning
-
-- Use AI suggestions to discover new recipes
-- Import recipes from any website by pasting the URL
-- Photo-scan recipes from cookbooks
-- Generate shopping lists from your weekly meal plan
-
-### Trip Planning
-
-- Add weather forecasts for your destination
-- Get AI-powered destination tips and local phrases
-- Use transport tabs (utreise/hjemreise) for round trips
-- Track packing lists with checkboxes
-
-### Data Safety
-
-- All data is stored in your family's private Firestore database
-- Only family members can see your data
-- Invite codes expire after 1 hour for security
-- You can leave a family at any time (removes your access)
+Når ny versjon er tilgjengelig vises et banner («Ny versjon tilgjengelig») — trykk for å laste ny versjon. Sjekkes hvert 5. minutt. Web: «Last inn på nytt» i Profilen fjerner cache/service workers manuelt.
 
 ---
 
-*fampad v1.0.0 — Your family, organized.*
+## Tips og triks
+
+### Hurtignavigasjon
+
+- Bruk **+**-knappen for å raskt opprette avtaler, helsetimer, veterinarbesøk, aktiviteter, serviceavtaler eller reiser
+- Lang-trykk elementer for rediger/slett-meny
+- Trykk på kalenderdager for å se dagens avtaler
+- Bruk AI-assistenten fra + -menyen for naturlige spørsmål og handlinger
+
+### Spond
+
+- Koble til Spond for å se klubbeventer sammen med familieavtaler
+- Svar på invitasjoner direkte i appen (aksept/avslå), inkl. for barn
+- Se hvem som kommer per arrangement (stempel-status)
+- Spond logoer vises på arrangementer og filterpanel
+
+### Måltidsplanlegging
+
+- Bruk AI-forslag til å oppdage nye oppskrifter
+- Importer fra URL eller foto
+- Generer handleliste direkte fra oppskrifts-ingredienser
+- Planlegg ukemeny med frokost/lunsj/middag; «Kopier fra forrige uke»
+- Kalorier estimeres automatisk med AI hvis ikke oppgitt
+
+### Reiseplanlegging
+
+- Vær: 10-dagers + time-for-time + historisk data per by
+- AI-destinasjonstips: ting å gjøre, restauranter, fraser, advarsel
+- Valutakalkulator med live kurser
+- Transport med Utreise/Hjemreise-faner og «En vei»-bryter
+- Pakkelister med avkrysningsbokser
+- Spond logoer vises på arrangementer og filterpanelet
+
+### datasikkerhet
+
+- All data lagres privat per familie (Firestore, familyId-scoping)
+- Kun familiemedlemmer kan se data
+- Invitasjonskoder utløper etter 1 time og kan bare brukes én gang
+- Du kan forlate familien når som helst (fjerner tilgangen din)
+
+---
+
+*fampad v1.0.0 — Din familie, organisert.*

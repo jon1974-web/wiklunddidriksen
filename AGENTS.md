@@ -179,8 +179,8 @@ const [showHelp, setShowHelp] = useState(false);
 When adding or modifying calendar sync for any module (events, trips, health, pet), **both** Google Calendar (Cloud Functions) AND Phone Calendar (`CalendarSync`) must be updated. Never implement one without the other.
 
 - **Google Calendar**: Cloud Functions (`onXxxCreatedForCalendar`, `onXxxUpdatedForCalendar`, `onXxxDeletedForCalendar`) — triggers on Firestore write
-- **Phone Calendar**: `CalendarSync.native.tsx` (expo-calendar) + `CalendarSync.web.tsx` (no-op) — called from screens on create/edit/delete
-- Modules: Events ✅, Trips ✅, Health ✅, Pet vet visits ✅
+- **Phone Calendar**: `CalendarSync.native.tsx` (expo-calendar) + `CalendarSync.web.tsx` (no-op) — currently called from Events screens only (`EventDetailScreen`, `AddEventModal`, `VoiceEventScreen`, `PhotoEventScreen`) and `HomeMaintenanceScreen` (services)
+- Modules Google sync: Events ✅, Trips ✅, Health ✅, Pet vet visits ✅ — Phone calendar: Events ✅ only (Trips/Health/Pet phone-calendar sync NOT implemented)
 - See `docs/PLAN-phone-calendar-sync.md` for details
 
 ## PWA / iOS (CRITICAL)

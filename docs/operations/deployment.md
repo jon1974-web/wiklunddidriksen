@@ -77,7 +77,7 @@ firebase use familiesenter-837bb
 
 | Service | Status | Configuration |
 |---------|--------|---------------|
-| Firebase Auth | Active | Email/Password, Google |
+| Firebase Auth | Active | Email/Password |
 | Cloud Firestore | Active | Native mode |
 | Firebase Hosting | Active | SPA with rewrites |
 | Cloud Functions | Active | Node.js 22, us-central1 |
@@ -94,6 +94,10 @@ firebase use familiesenter-837bb
 
 ```bash
 OPENAI_API_KEY=sk-your-openai-api-key-here
+GOOGLE_CLIENT_ID=your-google-oauth-client-id
+GOOGLE_CLIENT_SECRET=your-google-oauth-client-secret
+GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+SPOND_ENCRYPTION_KEY=32-byte-key-for-spond-password-encryption
 ```
 
 This file is loaded by `dotenv` at the top of `functions/index.js`:
@@ -132,6 +136,14 @@ export const GOOGLE_MAPS_API_KEY = '...';
 npx expo export --platform web --output-dir dist/web
 ```
 
+### Step 1b: Inject Version Manifest (PWA update banner)
+
+```bash
+node scripts/inject-manifest.js
+```
+
+This writes `version.json` used by the UpdateBanner to detect new versions (checked every 5 minutes in the app).
+
 This generates the production PWA bundle in `dist/web/`.
 
 ### Step 2: Deploy to Firebase Hosting
@@ -140,12 +152,20 @@ This generates the production PWA bundle in `dist/web/`.
 npx firebase-tools deploy --only hosting --project familiesenter-837bb
 ```
 
+### Full Web Deploy Command (AGENTS.md canonical)
+
+```bash
+npx expo export --platform web --output-dir dist/web && node scripts/inject-manifest.js && npx firebase-tools deploy --only hosting --project familiesenter-837bb
+```
+
 ### What Gets Deployed
 
 - `dist/web/index.html` — SPA entry point
 - `dist/web/assets/` — JS bundles, CSS, images
 - `dist/web/manifest.json` — PWA manifest
+- `dist/web/version.json` — PWA update banner version file
 - `dist/web/firebase-messaging-sw.js` — Push notification service worker
+- `dist/web/docs/privacy-*.html` and `terms-*.html` — published legal documents (linked from the login screen)
 
 ### Hosting Configuration
 
@@ -157,9 +177,26 @@ From `firebase.json`:
     "public": "dist/web",
     "rewrites": [
       { "source": "/firebase-messaging-sw.js", "destination": "/firebase-messaging-sw.js" },
+      { "source": "/docs/privacy-nb.html", "destination": "/docs/privacy-nb.html" },
+      { "source": "/docs/terms-nb.html", "destination": "/docs/terms-nb.html" },
+      { "source": "/docs/privacy-en.html", "destination": "/docs/privacy-en.html" },
+      { "source": "/docs/terms-en.html", "destination": "/docs/terms-en.html" },
+      { "source": "/docs/privacy-sv.html", "destination": "/docs/privacy-sv.html" },
+      { "source": "/docs/terms-sv.html", "destination": "/docs/terms-sv.html" },
+      { "source": "/docs/privacy-da.html", "destination": "/docs/privacy-da.html" },
+      { "source": "/docs/terms-da.html", "destination": "/docs/terms-da.html" },
+      { "source": "/docs/privacy-fi.html", "destination": "/docs/privacy-fi.html" },
+      { "source": "/docs/terms-fi.html", "destination": "/docs/terms-fi.html" },
       { "source": "**", "destination": "/index.html" }
     ],
     "headers": [
+      { "source": "**", "headers": [
+        { "key": "X-Frame-Options", "value": "DENY" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" },
+        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+        { "key": "Permissions-Policy", "value": "camera=(), microphone=(self), geolocation=(self), payment=()" },
+        { "key": "X-XSS-Protection", "value": "1; mode=block" }
+      ]},
       { "source": "index.html", "headers": [{ "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }] },
       { "source": "**/*.@(js|css)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] },
       { "source": "**/*.@(jpg|jpeg|gif|png|svg|webp|ico)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
@@ -198,27 +235,20 @@ echo "OPENAI_API_KEY=sk-your-key-here" > functions/.env
 npx firebase-tools deploy --only functions --project familiesenter-837bb
 ```
 
-### Deployed Functions
+### Deployed Functions (grouped)
 
-| Function | Memory | Region | Schedule |
-|----------|--------|--------|----------|
-| `spondProxy` | 256MB | us-central1 | HTTP |
-| `voiceToEvent` | 256MB | us-central1 | HTTP |
-| `photoToData` | 256MB | us-central1 | HTTP |
-| `destinationTips` | 256MB | us-central1 | HTTP |
-| `aiRecipeSuggestions` | 256MB | us-central1 | HTTP |
-| `importRecipeFromUrl` | 256MB | us-central1 | HTTP |
-| `translateRecipe` | 256MB | us-central1 | HTTP |
-| `createFamily` | 256MB | us-central1 | HTTP |
-| `generateInviteCode` | 256MB | us-central1 | HTTP |
-| `joinFamilyByInviteCode` | 256MB | us-central1 | HTTP |
-| `leaveFamily` | 256MB | us-central1 | HTTP |
-| `removeFamilyMember` | 256MB | us-central1 | HTTP |
-| `updateMemberRole` | 256MB | us-central1 | HTTP |
-| `notifyNewEvent` | 256MB | us-central1 | HTTP |
-| `notifyHealthItem` | 256MB | us-central1 | HTTP |
-| `checkReminders` | 256MB | us-central1 | Every 1 minute |
-| `checkBirthdayReminders` | 256MB | us-central1 | Daily 08:00 Oslo |
+There are 70+ functions deployed to `us-central1` with 256MB memory. Overview by group:
+
+| Group | Functions | Trigger |
+|-------|-----------|---------|
+| AI features | `spondProxy`, `voiceToEvent`, `photoToData`, `destinationTips`, `aiRecipeSuggestions`, `importRecipeFromUrl`, `importHolidaysFromUrl`, `estimateRecipeCalories`, `translateRecipe`, `aiAssistant`, `homeExtractColor/Instruction/Receipt/Offer`, `homeSuggestTasks`, `transcribeAudio` | HTTP |
+| Family management | `createFamily`, `generateInviteCode`, `joinFamilyByInviteCode`, `leaveFamily`, `removeFamilyMember`, `updateMemberRole`, `encryptSpondPassword`, `decryptSpondPassword` | HTTP |
+| Notifications | `notifyNewEvent`, `notifyHealthItem` | HTTP |
+| Push to family | `notifyNewChatMessage` | Firestore `onDocumentCreated(chat)` |
+| Calendar sync (Google) | `googleCalendarAuth`, `googleCalendarCallback`, `onEvent/Trip/HealthAppointment/Medication/PetVetVisit/SchoolActivity/KindergartenActivity/HomeService Created/Updated/Deleted ForCalendar`, `backfillCalendarSync` | HTTP + Firestore document triggers |
+| Schedulers | `checkReminders` (every 1 min), `checkBirthdayReminders` (every 5 min, sends at 08:00 in the family's timezone), `checkMedicationReminders` (every 5 min), `updateAdminStats` (hourly) | onSchedule |
+| Admin panel | `grantAppOwner`, `revokeAppOwner`, `getAdminStats`, `updateAdminStats`, `triggerAdminStats`, `trackUsage`, `getUsageStats`, `getFamilyList`, `getFamilyDetail`, `getRateLimits`, `updateRateLimits` | HTTP |
+| Migration (one-time) | `migrateFamilyMembers`, `migrateRecipeTranslations`, `migrateTransportData` | HTTP |
 
 ### Function URL Pattern
 
@@ -276,35 +306,22 @@ Contains composite indexes across all collections.
 npx firebase-tools deploy --only firestore:indexes --project familiesenter-837bb
 ```
 
-### Current Indexes
+### Current Indexes (38 composite indexes)
 
-| Collection | Fields | Purpose |
-|------------|--------|---------|
-| `events` | familyId ASC, date ASC | List events by family and date |
-| `events` | familyId ASC, createdBy ASC, date DESC | Filter by creator |
-| `chat` | familyId ASC, timestamp DESC | Chat message ordering |
-| `shoppingLists` | familyId ASC, createdAt DESC | Shopping list ordering |
-| `trips` | familyId ASC, startDate DESC | Trip listing |
-| `birthdays` | familyId ASC, date ASC | Birthday sorting |
-| `gifts` | familyId ASC, birthdayId ASC, createdAt ASC | Gift listing per birthday |
-| `pets` | familyId ASC, createdAt ASC | Pet listing |
-| `petVetVisits` | familyId ASC, petId ASC, date DESC | Vet visits per pet |
-| `petVetVisits` | familyId ASC, date DESC | All vet visits by date |
-| `petMedications` | familyId ASC, petId ASC, createdAt DESC | Medications per pet |
-| `petMedications` | familyId ASC, createdAt DESC | All medications by date |
-| `petFood` | familyId ASC, petId ASC, createdAt DESC | Food schedule per pet |
-| `petGrooming` | familyId ASC, petId ASC, lastDate DESC | Grooming per pet |
-| `petVaccinations` | familyId ASC, petId ASC, date DESC | Vaccinations per pet |
-| `petVaccinations` | familyId ASC, date DESC | All vaccinations by date |
-| `petInsurance` | familyId ASC, petId ASC, createdAt DESC | Insurance per pet |
-| `schoolChildren` | familyId ASC, createdAt ASC | School children listing |
-| `schoolActivities` | familyId ASC, dateFrom ASC | School activities by date |
-| `schoolContacts` | familyId ASC, createdAt ASC | School contacts listing |
-| `schoolSchedules` | familyId ASC, createdAt ASC | School schedules listing |
-| `kindergartenChildren` | familyId ASC, createdAt ASC | Kindergarten children listing |
-| `kindergartenActivities` | familyId ASC, dateFrom ASC | Kindergarten activities by date |
-| `kindergartenContacts` | familyId ASC, createdAt ASC | Kindergarten contacts listing |
-| `kindergartenSchedules` | familyId ASC, createdAt ASC | Kindergarten schedules listing |
+Verified from `firestore.indexes.json`:
+
+| Collection | Fields |
+|------------|--------|
+| `events` | familyId+date, familyId+scheduleGroupId, familyId+createdBy+date |
+| `chat` | familyId+timestamp |
+| `shoppingLists` | familyId+createdAt |
+| `trips` | familyId+startDate |
+| `birthdays` / `gifts` | familyId+date / familyId+birthdayId+createdAt |
+| `pets` etc. | familyId+petId (+date/createdAt) for petVetVisits, petMedications, petFood, petGrooming, petVaccinations, petInsurance |
+| `school*`, `kindergarten*` | Children/Years/Contacts/Schedules: familyId+createdAt |
+| `homes` + home subcollections | familyId+homeId(+projectId)+createdAt/dateFrom for homeProjects, homePaintColors, homeInstructions, homeServices, homeShoppingItems, homeOffers, homeTasks |
+| `activities` | childId+dateFrom |
+| `aiLearnedCorrections` | familyId+createdAt |
 
 ### Adding New Indexes
 
@@ -343,10 +360,13 @@ npx firebase-tools deploy --only storage --project familiesenter-837bb
 ### Storage Usage
 
 - Chat images: `chat/{timestamp}_{random}`
+- User avatars: Profile pictures
 - Pet photos: Pet profile images
+- Spond group logos: Custom group logos
 - School schedules: Schedule document uploads
 - School/kindergarten activity documents: Permission slips, forms
 - Trip documents: Travel document uploads
+- Home photos: Home and project images
 
 ---
 
@@ -362,6 +382,9 @@ git commit -m "Release: feature description"
 
 # 2. Build the web app
 npx expo export --platform web --output-dir dist/web
+
+# 2b. Inject version manifest
+node scripts/inject-manifest.js
 
 # 3. Deploy web app
 npx firebase-tools deploy --only hosting --project familiesenter-837bb
