@@ -68,7 +68,7 @@ export const PetGroomDetailScreen: React.FC<Props> = ({ navigation, route }) => 
 
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: PET_COLOR, backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionLabel, { color: PET_COLOR }]}>Detaljer</Text>
+        <Text style={[styles.sectionLabel, { color: PET_COLOR }]}>{t('common.details')}</Text>
         {petName && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>🐾</Text>
@@ -77,19 +77,19 @@ export const PetGroomDetailScreen: React.FC<Props> = ({ navigation, route }) => 
         )}
         <View style={styles.detailRow}>
           <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📅</Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>Sist: {formatDate(grooming.lastDate)}</Text>
+          <Text style={[styles.detailValue, { color: colors.text }]}>{t('pets.lastDone')} {formatDate(grooming.lastDate)}</Text>
         </View>
         {grooming.nextDate && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📅</Text>
-            <Text style={[styles.detailValue, { color: isOverdue ? '#E53935' : colors.text }]}>Neste: {formatDate(grooming.nextDate)}</Text>
+            <Text style={[styles.detailValue, { color: isOverdue ? '#E53935' : colors.text }]}>{t('pets.next')} {formatDate(grooming.nextDate)}</Text>
           </View>
         )}
         {grooming.note && (
           <View style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <Text style={{ fontSize: 14 }}>📝</Text>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: PET_COLOR }}>Notat</Text>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: PET_COLOR }}>{t('common.note')}</Text>
             </View>
             <View style={{ paddingLeft: 22 }}>
               <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
@@ -98,7 +98,7 @@ export const PetGroomDetailScreen: React.FC<Props> = ({ navigation, route }) => 
               {grooming.note.length > 60 && (
                 <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
                   <Text style={{ fontSize: 12, color: PET_COLOR, fontWeight: '600', marginTop: 4 }}>
-                    {showFullNote ? t('common.back') : 'Les mer'}
+                    {showFullNote ? t('common.showLess') : t('common.readMore')}
                   </Text>
                 </TouchableOpacity>
               )}

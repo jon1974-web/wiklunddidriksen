@@ -872,7 +872,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                         >
                           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 2 }}>
                             <AppIcon name="oppgaver" size={12} color={HOME_THEME} />
-                            <Text style={{ fontSize: 10, fontWeight: '600', color: HOME_THEME }}>Oppgave</Text>
+                            <Text style={{ fontSize: 10, fontWeight: '600', color: HOME_THEME }}>{t('homes.typeTask')}</Text>
                           </View>
                         </TouchableOpacity>
                       </View>

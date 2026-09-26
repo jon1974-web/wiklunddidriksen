@@ -55,7 +55,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
 
   const handleCreateList = useCallback(async () => {
     if (!newListTitle.trim()) {
-      crossAlert('Error', 'Vennligst skriv en tittel');
+      crossAlert(t('common.error'), t('common.enterTitle'));
       return;
     }
 
@@ -209,7 +209,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
               style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
               value={newListTitle}
               onChangeText={setNewListTitle}
-              placeholder="F.eks.handle til helgen"
+              placeholder={t('shopping.placeholderNewList')}
               placeholderTextColor={colors.textDisabled}
               autoFocus
             />
@@ -242,12 +242,12 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Kopier liste</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('shopping.copyList')}</Text>
             <TextInput
               style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
               value={copyListTitle}
               onChangeText={setCopyListTitle}
-              placeholder="Listetittel"
+              placeholder={t('shopping.listName')}
               placeholderTextColor={colors.textDisabled}
               autoFocus
             />
@@ -260,13 +260,13 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
                   setCopyListTitle('');
                 }}
               >
-                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Avbryt</Text>
+                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalCreateButton, { backgroundColor: colors.accent }]}
                 onPress={handleConfirmCopy}
               >
-                <Text style={styles.modalCreateText}>Kopier</Text>
+                <Text style={styles.modalCreateText}>{t('shopping.copyButton')}</Text>
               </TouchableOpacity>
             </View>
           </View>

@@ -170,7 +170,7 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
       <AppIcon name={item.icon as any} size={36} color={item.disabled ? '#ccc' : item.iconColor} />
       <Text style={[styles.spaceName, { color: item.disabled ? '#aaa' : colors.text }]}>{item.name}</Text>
       <Text style={[styles.spaceCount, { color: item.disabled ? '#ccc' : colors.textSecondary }]}>{item.count}</Text>
-      {item.disabled && <Text style={{ color: '#E53935', fontSize: 10, fontWeight: '600', marginTop: 4 }}>Kommer snart</Text>}
+      {item.disabled && <Text style={{ color: '#E53935', fontSize: 10, fontWeight: '600', marginTop: 4 }}>{t('spaces.comingSoon')}</Text>}
     </TouchableOpacity>
   ), [colors, navigation]);
 

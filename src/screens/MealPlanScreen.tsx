@@ -898,7 +898,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 <View style={[styles.langDropdown, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                   <TextInput
                     style={[styles.langSearchInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
-                    placeholder="Søk etter land..."
+                    placeholder={t('mealPlanner.cuisinePlaceholder')}
                     placeholderTextColor={colors.textDisabled}
                     value={langSearchQuery}
                     onChangeText={setLangSearchQuery}
@@ -1154,7 +1154,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                     value={newListTitle}
                     onChangeText={setNewListTitle}
-                    placeholder="F.eks. Fredagsinnkjøp"
+                    placeholder={t('mealPlanner.placeholderListName')}
                     placeholderTextColor={colors.textDisabled}
                     autoFocus
                   />
@@ -1186,6 +1186,13 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <AppIcon name="utensils" size={28} color={colors.accent} />
             <Text style={[styles.title, { color: colors.text }]}>{t('mealPlanner.title')}</Text>
+            <TouchableOpacity style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }} onPress={() => setShowHelp(true)}>
+              <View style={{ width: 15, height: 15, borderRadius: 7.5, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center' }}>
+                <View style={{ width: 11, height: 11, borderRadius: 5.5, backgroundColor: '#0097A7', alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ color: '#fff', fontSize: 8, fontWeight: '800' }}>i</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
           </View>
           {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
         </View>
@@ -1222,11 +1229,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 <ScrollView>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.recipeName')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.name} onChangeText={v => setRecipeForm(f => ({ ...f, name: v }))} placeholder="F.eks. Spaghetti Bolognese" placeholderTextColor={colors.textDisabled} />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.name} onChangeText={v => setRecipeForm(f => ({ ...f, name: v }))} placeholder={t('mealPlanner.placeholderRecipeName')} placeholderTextColor={colors.textDisabled} />
                   </View>
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.description')}</Text>
-                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.description} onChangeText={v => setRecipeForm(f => ({ ...f, description: v }))} placeholder="Kort beskrivelse" placeholderTextColor={colors.textDisabled} multiline />
+                    <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipeForm.description} onChangeText={v => setRecipeForm(f => ({ ...f, description: v }))} placeholder={t('mealPlanner.placeholderDescription')} placeholderTextColor={colors.textDisabled} multiline />
                   </View>
                   <View style={{ flexDirection: 'row', gap: 8 }}>
                     <View style={[styles.field, { flex: 1 }]}>
@@ -1328,9 +1335,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.ingredients')}</Text>
                     {recipeForm.ingredients.map((ing, i) => (
                       <View key={i} style={{ flexDirection: 'row', gap: 6, marginBottom: 6 }}>
-                        <TextInput style={[styles.input, { flex: 2, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 16 }]} value={ing.name} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], name: v }; return { ...f, ingredients: ings }; })} placeholder="Ingrediens" placeholderTextColor={colors.textDisabled} />
-                        <TextInput style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 16 }]} value={ing.amount} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], amount: v }; return { ...f, ingredients: ings }; })} placeholder="Mengde" placeholderTextColor={colors.textDisabled} />
-                        <TextInput style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 16 }]} value={ing.unit} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], unit: v }; return { ...f, ingredients: ings }; })} placeholder="Enhet" placeholderTextColor={colors.textDisabled} />
+                        <TextInput style={[styles.input, { flex: 2, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 16 }]} value={ing.name} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], name: v }; return { ...f, ingredients: ings }; })} placeholder={t('mealPlanner.ingredientName')} placeholderTextColor={colors.textDisabled} />
+                        <TextInput style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 16 }]} value={ing.amount} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], amount: v }; return { ...f, ingredients: ings }; })} placeholder={t('common.amount')} placeholderTextColor={colors.textDisabled} />
+                        <TextInput style={[styles.input, { flex: 1, backgroundColor: colors.inputBackground, color: colors.text, fontSize: 16 }]} value={ing.unit} onChangeText={v => setRecipeForm(f => { const ings = [...f.ingredients]; ings[i] = { ...ings[i], unit: v }; return { ...f, ingredients: ings }; })} placeholder={t('common.unit')} placeholderTextColor={colors.textDisabled} />
                         {recipeForm.ingredients.length > 1 && (
                           <TouchableOpacity onPress={() => setRecipeForm(f => ({ ...f, ingredients: f.ingredients.filter((_, idx) => idx !== i) }))}>
                             <Text style={{ color: '#E53935', fontSize: 18, padding: 8 }}>×</Text>
@@ -1600,7 +1607,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.modalTitle, { color: colors.text }]}>{t('mealPlanner.importURL')}</Text>
                 <View style={styles.field}>
-                  <Text style={[styles.label, { color: colors.text }]}>URL</Text>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.importUrlLabel')}</Text>
                   <TextInput
                     style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                     value={importUrl}
@@ -1631,7 +1638,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           <View style={styles.modalOverlay}>
             <TouchableWithoutFeedback>
               <View style={[styles.modalContent, { backgroundColor: colors.surface, maxHeight: '80%' }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>🤖 Forhåndsvisning</Text>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>🤖 {t('common.preview')}</Text>
                 <ScrollView>
                   <Text style={[styles.cardTitle, { color: colors.text, marginBottom: 8 }]}>{importedRecipe?.name}</Text>
                   {importedRecipe?.description && (
@@ -1642,7 +1649,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   )}
                   {importedRecipe?.ingredients?.length > 0 && (
                     <View style={{ marginTop: 8 }}>
-                      <Text style={{ fontWeight: '600', color: colors.text, marginBottom: 4 }}>Ingredienser:</Text>
+                      <Text style={{ fontWeight: '600', color: colors.text, marginBottom: 4 }}>{t('mealPlanner.ingredientsColon')}</Text>
                       {importedRecipe.ingredients.map((ing: any, i: number) => (
                         <Text key={i} style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 2 }}>• {ing.amount} {ing.unit} {ing.name}</Text>
                       ))}
@@ -1650,7 +1657,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   )}
                   {importedRecipe?.instructions?.length > 0 && (
                     <View style={{ marginTop: 8 }}>
-                      <Text style={{ fontWeight: '600', color: colors.text, marginBottom: 4 }}>Fremgangsmåte:</Text>
+                      <Text style={{ fontWeight: '600', color: colors.text, marginBottom: 4 }}>{t('mealPlanner.instructionsColon')}</Text>
                       {importedRecipe.instructions.map((step: string, i: number) => (
                         <Text key={i} style={{ color: colors.textSecondary, fontSize: 13, marginBottom: 2 }}>{i + 1}. {step}</Text>
                       ))}

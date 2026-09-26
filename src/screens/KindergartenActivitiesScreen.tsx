@@ -289,7 +289,7 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
                     <GooglePlacesInput
                       value={activityForm.location}
                       onChangeText={(v) => setActivityForm(f => ({ ...f, location: v }))}
-                      placeholder="Søk etter adresse..."
+                      placeholder={t('common.placeholderAddress')}
                       onSelect={(v) => setActivityForm(f => ({ ...f, location: v }))}
                     />
                   </View>

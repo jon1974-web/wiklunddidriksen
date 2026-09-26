@@ -1,6 +1,6 @@
 # PLAN — Hardcoded Text Cleanup (i18n sweep)
 
-> Created: 2026-09-25. Status: **planned, not implemented.**
+> Created: 2026-09-25. Status: **implemented (2026-09-26).**
 > Goal: remove remaining hardcoded user-visible strings so ALL text uses the
 > i18n `t()` function with keys in all 5 language files
 > (`src/i18n/{nb,en,sv,da,fi}.json`).
@@ -43,6 +43,30 @@
   map URLs.
 - `console.log` and developer-only strings.
 - Norwegian *content* a user themselves typed (e.g. preset labels that are data).
+- Brand/proper-noun badges: `Spond`, `Google`, `Outlook`, `URL`, `OK`, `AI`
+  (same text in all languages).
+- Date-format placeholder codes in date inputs: `YYYY-MM-DD`,
+  `YYYY-MM-DD (optional)`, `DD`, `MM`, `ÅÅÅÅ`, and example URLs like
+  `https://www.matprat.no/...`.
+
+**Implemented exceptions:** the scanner
+(`scripts/find-hardcoded-text.js`) now whitelists the brand nouns and
+date-format codes above (exact matches only). All other user-visible strings
+were converted to `t()` keys across all 47 files (components + screens).
+
+## Sweep result (2026-09-26)
+
+- Scanner report: **0 candidates** across `src/screens` + `src/components`.
+- ~280 of i18n keys reviewed, new keys added to all 5 language files
+  (namespaces touched: `common`, `events`, `profile`, `spond` (new),
+  `schedule`, `trips`, `transport`, `shopping`, `packing`, `birthdays`,
+  `homes`, `chat`, `aiAssistant` (new), `helpCenter` (new),
+  `offlineBanner` (new), `updateBanner` (new), `missedReminders` (new),
+  `searchableDropdown` (new), `components` (new), `health`, `pets`,
+  `school`, `kindergarten`, `spaces`, `voice`, `photoEvent`,
+  `photoRecipe`, `photoActivity`, `mealPlanner`).
+- i18n sync checker passes for all 5 languages.
+- TypeScript check: same error count as pre-sweep baseline (all pre-existing).
 
 ## Suggested pass order (largest UI impact first)
 

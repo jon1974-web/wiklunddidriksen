@@ -83,7 +83,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
   const takePhoto = useCallback(async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      crossAlert('Tilgang', 'Kameratilgang er nødvendig for å ta bilder.');
+      crossAlert(t('common.permission'), t('common.cameraPermissionNeeded'));
       return;
     }
 
@@ -331,7 +331,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
       )}
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.icon')}</Text>
         <View style={styles.iconGrid}>
           {EVENT_ICONS.map((item) => (
             <TouchableOpacity
@@ -351,7 +351,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
           style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
           value={event.title}
           onChangeText={(text) => updateEvent(index, { title: text })}
-          placeholder="Tittel"
+          placeholder={t('common.title')}
           placeholderTextColor={colors.textDisabled}
         />
       </View>
@@ -362,7 +362,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
           style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }, styles.textArea]}
           value={event.description}
           onChangeText={(text) => updateEvent(index, { description: text })}
-          placeholder="Beskrivelse..."
+          placeholder={t('common.placeholderDescription')}
           placeholderTextColor={colors.textDisabled}
           multiline
           numberOfLines={3}
@@ -375,13 +375,13 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
           style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
           value={event.address}
           onChangeText={(text) => updateEvent(index, { address: text })}
-          placeholder="Adresse..."
+          placeholder={t('common.placeholderAddressShort')}
           placeholderTextColor={colors.textDisabled}
         />
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Start dato</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('photoEvent.startLabel')}</Text>
         <TouchableOpacity
           style={[styles.input, { backgroundColor: colors.inputBackground }]}
           onPress={() => setActivePicker({ eventIndex: index, field: 'date' })}
@@ -396,12 +396,12 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
         </TouchableOpacity>
       ) : (
         <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>Sluttdato</Text>
+          <Text style={[styles.label, { color: colors.text }]}>{t('common.endDate')}</Text>
           <TouchableOpacity
             style={[styles.input, { backgroundColor: colors.inputBackground }]}
             onPress={() => setActivePicker({ eventIndex: index, field: 'endDate' })}
           >
-            <Text style={[styles.dateText, { color: colors.text }]}>{event.endDate || 'Velg dato'}</Text>
+            <Text style={[styles.dateText, { color: colors.text }]}>{event.endDate || t('common.selectDate')}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => updateEvent(index, { showEndDate: false, endDate: null })}>
             <Text style={[styles.removeLink, { color: colors.danger }]}>{t('events.removeEndDate')}</Text>
@@ -410,7 +410,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
       )}
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Starttid</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('photoActivity.startTimeLabel')}</Text>
         <TouchableOpacity
           style={[styles.input, { backgroundColor: colors.inputBackground }]}
           onPress={() => setActivePicker({ eventIndex: index, field: 'time' })}
@@ -425,7 +425,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
         </TouchableOpacity>
       ) : (
         <View style={styles.field}>
-          <Text style={[styles.label, { color: colors.text }]}>Sluttid</Text>
+          <Text style={[styles.label, { color: colors.text }]}>{t('photoActivity.endTimeLabel')}</Text>
           <TouchableOpacity
             style={[styles.input, { backgroundColor: colors.inputBackground }]}
             onPress={() => setActivePicker({ eventIndex: index, field: 'endTime' })}

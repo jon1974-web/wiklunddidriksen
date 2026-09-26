@@ -44,7 +44,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
   const handleSave = useCallback(async () => {
     if (!title.trim()) {
-      crossAlert('Error', 'Vennligst skriv en tittel');
+      crossAlert(t('common.error'), t('common.enterTitle'));
       return;
     }
     if (selectedPersons.length === 0) {
@@ -52,11 +52,11 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
       return;
     }
     if (!city.trim()) {
-      crossAlert('Error', 'Vennligst skriv en by');
+      crossAlert(t('common.error'), t('events.enterCity'));
       return;
     }
     if (endDate < startDate) {
-      crossAlert('Error', 'Sluttdato kan ikke være før startdato');
+      crossAlert(t('common.error'), t('common.endDateBeforeStart'));
       return;
     }
 
@@ -95,7 +95,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
       {/* Icon selection - at top */}
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.icon')}</Text>
         <View style={styles.iconGrid}>
           {TRIP_ICONS.map((i) => (
             <TouchableOpacity
@@ -111,12 +111,12 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
 
       {/* Title */}
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Tittel</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
         <TextInput
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
           value={title}
           onChangeText={setTitle}
-          placeholder="F.eks. Sommerferie i Spania"
+          placeholder={t('common.placeholderTripTitle')}
           placeholderTextColor={colors.textDisabled}
         />
       </View>
@@ -144,7 +144,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
         <GooglePlacesInput
           value={city}
           onChangeText={setCity}
-          placeholder="F.eks. Barcelona"
+          placeholder={t('common.placeholderCity')}
           types={['(cities)']}
           onSelect={(address) => {
             const parts = address.split(',').map((p) => p.trim());
@@ -170,14 +170,14 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
             style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
             value={country}
             onChangeText={setCountry}
-            placeholder="F.eks. Spania"
+            placeholder={t('common.placeholderCountry')}
             placeholderTextColor={colors.textDisabled}
           />
         )}
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Fra dato</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.dateFrom')}</Text>
         <TouchableOpacity
           style={[styles.input, { backgroundColor: colors.surface }]}
           onPress={() => setActivePicker('start')}
@@ -187,7 +187,7 @@ export const AddTripScreen: React.FC<AddTripScreenProps> = ({ navigation }) => {
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Til dato</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('common.dateTo')}</Text>
         <TouchableOpacity
           style={[styles.input, { backgroundColor: colors.surface }]}
           onPress={() => setActivePicker('end')}

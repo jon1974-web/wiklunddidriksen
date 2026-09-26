@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, Modal, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface SearchableDropdownProps {
   options: { key: string; label: string; color: string }[];
@@ -9,8 +10,10 @@ interface SearchableDropdownProps {
   placeholder?: string;
 }
 
-export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options, value, onSelect, placeholder = 'Velg...' }) => {
+export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options, value, onSelect, placeholder }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
+  const placeholderText = placeholder ?? t('searchableDropdown.choose');
   const [visible, setVisible] = useState(false);
   const [search, setSearch] = useState('');
   const [showCustom, setShowCustom] = useState(false);
@@ -41,7 +44,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
             <Text style={styles.selectedText}>{value}</Text>
           </View>
         ) : (
-          <Text style={[styles.placeholder, { color: colors.textDisabled }]}>{placeholder}</Text>
+          <Text style={[styles.placeholder, { color: colors.textDisabled }]}>{placeholderText}</Text>
         )}
         <Text style={{ color: colors.textSecondary, fontSize: 12 }}>▼</Text>
       </TouchableOpacity>
@@ -55,7 +58,7 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
                 style={[styles.searchInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
                 value={search}
                 onChangeText={setSearch}
-                placeholder="Søk eller skriv ny rolle..."
+                placeholder={t('searchableDropdown.placeholderSearchRole')}
                 placeholderTextColor={colors.textDisabled}
               />
               <FlatList
@@ -81,11 +84,11 @@ export const SearchableDropdown: React.FC<SearchableDropdownProps> = ({ options,
                       }}
                     >
                       <View style={[styles.optionDot, { backgroundColor: colors.accent }]} />
-                      <Text style={[styles.optionText, { color: colors.accent, fontWeight: '600' }]}>+ Legg til "{search}"</Text>
+                      <Text style={[styles.optionText, { color: colors.accent, fontWeight: '600' }]}>{t('searchableDropdown.addNew', { value: search })}</Text>
                     </TouchableOpacity>
                   ) : null
                 }
-                ListEmptyComponent={<Text style={[styles.empty, { color: colors.textSecondary }]}>Ingen treff</Text>}
+                ListEmptyComponent={<Text style={[styles.empty, { color: colors.textSecondary }]}>{t('searchableDropdown.noMatch')}</Text>}
               />
             </TouchableOpacity>
           </TouchableOpacity>

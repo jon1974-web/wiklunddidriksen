@@ -76,7 +76,7 @@ export const HealthMedDetailScreen: React.FC<Props> = ({ navigation, route }) =>
 
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>Detaljer</Text>
+        <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>{t('common.details')}</Text>
         {medication.person && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👤</Text>
@@ -85,13 +85,13 @@ export const HealthMedDetailScreen: React.FC<Props> = ({ navigation, route }) =>
         )}
         <View style={styles.detailRow}>
           <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📊</Text>
-          <Text style={[styles.detailValue, { color: colors.text }]}>{medication.frequency}x daglig</Text>
+          <Text style={[styles.detailValue, { color: colors.text }]}>{medication.frequency}{t('health.dailyTimes')}</Text>
         </View>
         {medication.dateFrom && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📅</Text>
             <Text style={[styles.detailValue, { color: colors.text }]}>
-              Fra: {formatDate(medication.dateFrom)}{medication.dateTo ? ` — Til: ${formatDate(medication.dateTo)}` : ''}
+              {t('health.dateFromLabel')} {formatDate(medication.dateFrom)}{medication.dateTo ? ` - ${t('health.dateToLabel')} ${formatDate(medication.dateTo)}` : ''}
             </Text>
           </View>
         )}
@@ -99,7 +99,7 @@ export const HealthMedDetailScreen: React.FC<Props> = ({ navigation, route }) =>
           <View style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <Text style={{ fontSize: 14 }}>📝</Text>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: HEALTH_COLOR }}>Notat</Text>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: HEALTH_COLOR }}>{t('common.note')}</Text>
             </View>
             <View style={{ paddingLeft: 22 }}>
               <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
@@ -108,7 +108,7 @@ export const HealthMedDetailScreen: React.FC<Props> = ({ navigation, route }) =>
               {medication.note.length > 60 && (
                 <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
                   <Text style={{ fontSize: 12, color: HEALTH_COLOR, fontWeight: '600', marginTop: 4 }}>
-                    {showFullNote ? t('common.back') : 'Les mer'}
+                    {showFullNote ? t('common.showLess') : t('common.readMore')}
                   </Text>
                 </TouchableOpacity>
               )}

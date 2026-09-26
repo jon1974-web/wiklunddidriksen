@@ -338,7 +338,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   const handleSaveContact = async () => {
     if (!familyId || !selectedChild || !selectedYear) return;
     if (!contactForm.name.trim()) { crossAlert('Error', t('kindergarten.enterContactName')); return; }
-    if (contactForm.role === 'teacher' && !contactForm.teacherType) { crossAlert('Error', 'Velg en lærertype'); return; }
+    if (contactForm.role === 'teacher' && !contactForm.teacherType) { crossAlert(t('common.error'), t('school.selectTeacherType')); return; }
     try {
       const rawData: Record<string, any> = {
         role: contactForm.role,
@@ -486,7 +486,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   const handleSaveHoliday = async () => {
     if (!familyId || !selectedYear || !selectedChild) return;
     if (!holidayForm.title.trim()) { crossAlert('Error', t('kindergarten.enterContactName')); return; }
-    if (!holidayForm.dateFrom || !holidayForm.dateTo) { crossAlert('Error', 'Velg fra og til dato'); return; }
+    if (!holidayForm.dateFrom || !holidayForm.dateTo) { crossAlert(t('common.error'), t('school.selectDates')); return; }
     try {
       const data = {
         title: holidayForm.title.trim(),
@@ -558,7 +558,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
               }
             }
             if (deletedCount > 0) {
-              crossAlert('Gjentakelse oppdatert', `${deletedCount} aktiviteter ble slettet for fjernede dager.`);
+              crossAlert(t('events.recurrenceUpdated'), t('kindergarten.activitiesDeleted', { count: deletedCount }));
             }
           }
         }
@@ -1492,7 +1492,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                       <View style={[styles.field, { flex: 1 }]}>
                         <Text style={[styles.label, { color: colors.text }]}>{t('school.activityEndTime')}</Text>
                         <TouchableOpacity style={[styles.input, { backgroundColor: colors.inputBackground }]} onPress={() => setActiveActivityPicker('endTime')}>
-                          <Text style={{ color: activityForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.endTime || 'Velg tid'}</Text>
+                          <Text style={{ color: activityForm.endTime ? colors.text : colors.textDisabled, fontSize: 16 }}>{activityForm.endTime || t('common.pickTime')}</Text>
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -1501,7 +1501,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                       <GooglePlacesInput
                         value={activityForm.location}
                         onChangeText={(v) => setActivityForm(f => ({ ...f, location: v }))}
-                        placeholder="Søk etter adresse..."
+                        placeholder={t('common.placeholderAddress')}
                         onSelect={(v) => setActivityForm(f => ({ ...f, location: v }))}
                       />
                     </View>
@@ -1548,13 +1548,13 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                       <View style={{ padding: 12, borderRadius: 10, backgroundColor: colors.accent + '15', borderWidth: 1, borderColor: colors.accent + '40' }}>
                         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                           <AppIcon name="schedule" size={18} color={KINDERGARTEN_THEME} />
-                          <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>Gjentakelse</Text>
+                          <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>{t('events.recurrenceCard')}</Text>
                         </View>
                         <Text style={{ color: colors.text, fontSize: 13, marginBottom: 4 }}>
-                          {repeatScheduleConfig.days.map(d => ['Søn','Man','Tir','Ons','Tor','Fre','Lør'][d]).join(', ')} i {repeatScheduleConfig.weeks} {repeatScheduleConfig.weeks === 1 ? 'uke' : 'uker'}
+                          {repeatScheduleConfig.days.map(d => [t('calendar.sunday'), t('calendar.monday'), t('calendar.tuesday'), t('calendar.wednesday'), t('calendar.thursday'), t('calendar.friday'), t('calendar.saturday')][d]).join(', ')} i {repeatScheduleConfig.weeks} {repeatScheduleConfig.weeks === 1 ? t('common.weekSingular') : t('common.weeks')}
                         </Text>
                         <TouchableOpacity onPress={() => setRepeatScheduleConfig(null)}>
-                          <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>Fjern gjentakelse</Text>
+                          <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>{t('events.removeRecurrence')}</Text>
                         </TouchableOpacity>
                       </View>
                     ) : (

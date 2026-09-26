@@ -1328,21 +1328,21 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
               {tipsLoading ? (
                 <View style={[styles.generateButton, { backgroundColor: MODULE_COLORS.trips, flexDirection: 'row', alignItems: 'center', gap: 8 }]}>
                   <ActivityIndicator size="small" color="#fff" />
-                  <Text style={styles.generateButtonText}>Genererer...</Text>
+                  <Text style={styles.generateButtonText}>{t('trips.generating')}</Text>
                 </View>
               ) : (
                 <TouchableOpacity
                   style={[styles.generateButton, { backgroundColor: MODULE_COLORS.trips }]}
                   onPress={() => handleGenerateTips(stagedCity)}
                 >
-                  <Text style={styles.generateButtonText}>Generer</Text>
+                  <Text style={styles.generateButtonText}>{t('trips.generate')}</Text>
                 </TouchableOpacity>
               )}
             </View>
           )}
 
           {tipsLoading && !stagedCity && (
-            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Genererer tips...</Text>
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('trips.generatingTips')}</Text>
           )}
           {tipsError && (
             <Text style={[styles.emptySection, { color: '#E53935' }]}>{tipsError}</Text>
@@ -1451,7 +1451,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         {renderSectionHeader(t('links.title'), 'links', () => openAddModal('link'))}
         <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
           {links.length === 0 ? (
-            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen lenker lagt til</Text>
+            <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('trips.noLinks')}</Text>
           ) : (
             links.map((l) => (
               <LinkPreviewCard
@@ -1497,7 +1497,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         {docsExpanded && (
           <View style={{ paddingHorizontal: 16, paddingBottom: 14 }}>
             {documents.length === 0 ? (
-              <Text style={[styles.emptySection, { color: colors.textDisabled }]}>Ingen dokumenter lagt til</Text>
+              <Text style={[styles.emptySection, { color: colors.textDisabled }]}>{t('trips.noDocuments')}</Text>
             ) : (
               documents.map((d) => (
                 <TouchableOpacity
@@ -1630,7 +1630,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
 
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.icon')}</Text>
                     <View style={styles.iconGrid}>
                       {TRIP_ICONS.map((i) => (
                         <TouchableOpacity
@@ -1645,7 +1645,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
 
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Fra dato</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.dateFrom')}</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('tripStart')}
@@ -1657,7 +1657,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   </View>
 
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Til dato</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.dateTo')}</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
                       onPress={() => setActivePicker('tripEnd')}
@@ -1697,7 +1697,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     <Text style={[styles.modalButtonText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalButton, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleSaveTripEdit}>
-                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>Lagre</Text>
+                    <Text style={[styles.modalButtonText, { color: '#fff' }]}>{t('common.save')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -1741,7 +1741,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.placeholderNameRequiredStar')}</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={hotelForm.name}
@@ -1850,7 +1850,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                 </Text>
                 <ScrollView style={styles.modalScroll}>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Navn *</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.placeholderNameRequiredStar')}</Text>
                     <TextInput
                       style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                       value={restForm.name}
@@ -2046,7 +2046,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     />
                   </View>
                   <View style={styles.field}>
-                    <Text style={[styles.label, { color: colors.text }]}>Fil</Text>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('trips.file')}</Text>
                     <TripDocumentUpload
                       tripId={trip.id}
                       onUploaded={(url, name) => {

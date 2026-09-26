@@ -25,19 +25,19 @@ interface ScheduleModalProps {
 }
 
 const WEEK_DAYS = [
-  { key: 1, label: 'Man' },
-  { key: 2, label: 'Tir' },
-  { key: 3, label: 'Ons' },
-  { key: 4, label: 'Tor' },
-  { key: 5, label: 'Fre' },
-  { key: 6, label: 'Lør' },
-  { key: 0, label: 'Søn' },
+  { key: 1, calendarKey: 'monday' },
+  { key: 2, calendarKey: 'tuesday' },
+  { key: 3, calendarKey: 'wednesday' },
+  { key: 4, calendarKey: 'thursday' },
+  { key: 5, calendarKey: 'friday' },
+  { key: 6, calendarKey: 'saturday' },
+  { key: 0, calendarKey: 'sunday' },
 ];
 
-const WEEK_OPTIONS = [
-  { label: 'Oddetall', value: 'odd' },
-  { label: 'Partall', value: 'even' },
-  { label: 'Alle', value: 'all' },
+const WEEK_OPTIONS: { value: string; labelKey: string }[] = [
+  { value: 'odd', labelKey: 'schedule.oddWeeks' },
+  { value: 'even', labelKey: 'schedule.evenWeeks' },
+  { value: 'all', labelKey: 'schedule.allWeeks' },
 ];
 
 const WEEK_COUNTS = [2, 4, 8, 12];
@@ -113,7 +113,6 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
     });
   }, [selectedDays, effectiveWeeks, previewDates, onConfirm]);
 
-  const DAY_NAMES = ['Søn', 'Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør'];
 
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
@@ -131,7 +130,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
                   <View style={{ width: 36 }} />
                 </View>
                 <ScrollView style={styles.content} contentContainerStyle={{ padding: 16 }}>
-                  <Text style={[styles.sectionLabel, { color: colors.text }]}>Dager</Text>
+                  <Text style={[styles.sectionLabel, { color: colors.text }]}>{t('schedule.sectionDays')}</Text>
                   <View style={styles.dayRow}>
                     {WEEK_DAYS.map((day) => {
                       const isSelected = selectedDays.includes(day.key);
@@ -141,13 +140,13 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
                           style={[styles.dayBtn, { borderColor: isSelected ? moduleColor : colors.border, backgroundColor: isSelected ? moduleColor + '20' : 'transparent' }]}
                           onPress={() => toggleDay(day.key)}
                         >
-                          <Text style={[styles.dayBtnText, { color: isSelected ? moduleColor : colors.text }]}>{day.label}</Text>
+                          <Text style={[styles.dayBtnText, { color: isSelected ? moduleColor : colors.text }]}>{t(`calendar.${day.calendarKey}`)}</Text>
                         </TouchableOpacity>
                       );
                     })}
                   </View>
 
-                  <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 20 }]}>Uker</Text>
+                  <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 20 }]}>{t('schedule.weeksType')}</Text>
                   <View style={styles.weekTypeRow}>
                     {WEEK_OPTIONS.map((opt) => {
                       const isSelected = weekType === opt.value;
@@ -157,13 +156,13 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
                           style={[styles.weekTypeBtn, { borderColor: isSelected ? moduleColor : colors.border, backgroundColor: isSelected ? moduleColor + '20' : 'transparent' }]}
                           onPress={() => setWeekType(opt.value)}
                         >
-                          <Text style={[styles.weekTypeBtnText, { color: isSelected ? moduleColor : colors.text }]}>{opt.label}</Text>
+                          <Text style={[styles.weekTypeBtnText, { color: isSelected ? moduleColor : colors.text }]}>{t(opt.labelKey)}</Text>
                         </TouchableOpacity>
                       );
                     })}
                   </View>
 
-                  <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 20 }]}>Antall uker</Text>
+                  <Text style={[styles.sectionLabel, { color: colors.text, marginTop: 20 }]}>{t('schedule.weeksCount')}</Text>
                   <View style={styles.weekCountRow}>
                     {WEEK_COUNTS.map((count) => {
                       const isSelected = weekCount === count && !showCustom;
@@ -195,7 +194,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
 
                   {previewDates.length > 0 && (
                     <View style={[styles.previewBox, { backgroundColor: moduleColor + '10' }]}>
-                      <Text style={[styles.previewTitle, { color: moduleColor }]}>Forhåndsvisning ({previewDates.length} {t('schedule.events')})</Text>
+                      <Text style={[styles.previewTitle, { color: moduleColor }]}>{t('schedule.previewTitle', { count: previewDates.length, events: t('schedule.events') })}</Text>
                       <Text style={[styles.previewDates, { color: colors.text }]}>
                         {previewDates.slice(0, 10).join(', ')}{previewDates.length > 10 ? ` ... +${previewDates.length - 10}` : ''}
                       </Text>
@@ -220,7 +219,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
                       style={[styles.btn, { backgroundColor: '#D32F2F', marginTop: 12 }]}
                       onPress={onDeleteSchedule}
                     >
-                      <Text style={[styles.btnText, { color: '#fff' }]}>Fjern gjentakelse</Text>
+                      <Text style={[styles.btnText, { color: '#fff' }]}>{t('schedule.removeRecurrence')}</Text>
                     </TouchableOpacity>
                   )}
                 </ScrollView>

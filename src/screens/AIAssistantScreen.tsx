@@ -393,7 +393,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
               </Svg>
             </TouchableOpacity>
             <AppIcon name="ai" size={24} color={HOME_COLOR} />
-            <Text style={[styles.headerTitle, { color: colors.text }]}>AI-assistent</Text>
+            <Text style={[styles.headerTitle, { color: colors.text }]}>{t('aiAssistant.title')}</Text>
             <View style={{ width: 32 }} />
           </View>
 
@@ -406,9 +406,9 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
             {messages.length === 0 && (
               <View style={styles.emptyState}>
                 <AppIcon name="ai" size={48} color={HOME_COLOR} />
-                <Text style={[styles.emptyTitle, { color: colors.text }]}>Hei! 👋</Text>
-                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>Hva kan jeg hjelpe deg med?</Text>
-                <Text style={[styles.emptyHint, { color: colors.textDisabled }]}>Prøv: "Når er neste tannlegetime?" eller "Legg til fotballtrening for Mina på fredag"</Text>
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>{t('aiAssistant.greetingTitle')}</Text>
+                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>{t('aiAssistant.greetingSubtitle')}</Text>
+                <Text style={[styles.emptyHint, { color: colors.textDisabled }]}>{t('aiAssistant.greetingHint')}</Text>
               </View>
             )}
 
@@ -418,7 +418,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
                   {msg.role === 'assistant' && (
                     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
                       <AppIcon name="ai" size={14} color={HOME_COLOR} />
-                      <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>AI-assistent</Text>
+                      <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>{t('aiAssistant.title')}</Text>
                     </View>
                   )}
                   <Text style={{ fontSize: 14, color: msg.role === 'user' ? '#fff' : colors.text, lineHeight: 20 }}>{msg.content}</Text>
@@ -437,7 +437,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
                         }}
                         style={{ paddingVertical: 2, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
                       >
-                        <Text style={{ fontSize: 10, color: colors.textSecondary }}>Var dette riktig?</Text>
+                        <Text style={{ fontSize: 10, color: colors.textSecondary }}>{t('aiAssistant.wasCorrect')}</Text>
                       </TouchableOpacity>
                     )}
                     {correctionMsgId === msg.id && (
@@ -446,7 +446,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
                           style={{ flex: 1, fontSize: 13, paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: colors.inputBackground, color: colors.text }}
                           value={correctionText}
                           onChangeText={setCorrectionText}
-                          placeholder="Skriv riktig svar..."
+                          placeholder={t('aiAssistant.writeCorrectAnswer')}
                           placeholderTextColor={colors.textDisabled}
                         />
                         <TouchableOpacity
@@ -472,7 +472,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
               <View style={[styles.messageBubble, styles.assistantBubble, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
                   <AppIcon name="ai" size={14} color={HOME_COLOR} />
-                  <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>AI-assistent</Text>
+                  <Text style={{ fontSize: 10, color: HOME_COLOR, fontWeight: '600' }}>{t('aiAssistant.title')}</Text>
                 </View>
                 <ActivityIndicator size="small" color={HOME_COLOR} />
               </View>
@@ -505,7 +505,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
                 >
                   <AppIcon name="microphone" size={20} color="#fff" />
                   <Text style={{ color: '#fff', fontSize: 12, fontWeight: '600', marginLeft: 6 }}>
-                    {transcribing ? 'Transkriberer...' : 'Trykk for å stoppe'}
+                    {transcribing ? t('aiAssistant.transcribing') : t('aiAssistant.tapToStop')}
                   </Text>
                 </TouchableOpacity>
               ) : (
@@ -520,7 +520,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
                     style={[styles.textInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
                     value={input}
                     onChangeText={setInput}
-                    placeholder="Skriv en melding..."
+                    placeholder={t('aiAssistant.writeMessage')}
                     placeholderTextColor={colors.textDisabled}
                     onSubmitEditing={() => sendMessage(input)}
                     returnKeyType="send"

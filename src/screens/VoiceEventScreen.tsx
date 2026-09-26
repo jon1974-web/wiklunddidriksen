@@ -76,7 +76,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         const { Audio } = await import('expo-av');
         const { status } = await Audio.requestPermissionsAsync();
         if (status !== 'granted') {
-          crossAlert('Tilgang', 'Mikrofontilgang er nødvendig for å ta opp lyd.');
+          crossAlert(t('common.permission'), t('common.micPermissionNeeded'));
           return;
         }
         await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
@@ -296,11 +296,11 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
 
         {parsedEvent && !processing && (
           <View style={styles.resultContainer}>
-            <Text style={[styles.resultTitle, { color: colors.text }]}>Forslag:</Text>
+            <Text style={[styles.resultTitle, { color: colors.text }]}>{t('voice.suggestion')}:</Text>
 
             {transcript && (
               <View style={[styles.transcriptCard, { backgroundColor: colors.inputBackground }]}>
-                <Text style={[styles.transcriptLabel, { color: colors.textSecondary }]}>Du sa:</Text>
+                <Text style={[styles.transcriptLabel, { color: colors.textSecondary }]}>{t('voice.youSaid')}</Text>
                 <Text style={[styles.transcriptText, { color: colors.text }]}>&quot;{transcript}&quot;</Text>
               </View>
             )}
@@ -369,19 +369,19 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
                 onPress={handleCreateEvent}
                 disabled={creating}
               >
-                <Text style={styles.primaryButtonText}>{creating ? 'Oppretter...' : 'Opprett arrangement'}</Text>
+                <Text style={styles.primaryButtonText}>{creating ? t('common.creating') : t('photoEvent.createEvent')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.secondaryButton, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}
                 onPress={handleEditManually}
               >
-                <Text style={[styles.secondaryButtonText, { color: colors.text }]}>Rediger manuelt</Text>
+                <Text style={[styles.secondaryButtonText, { color: colors.text }]}>{t('photoEvent.editManually')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.textButton]}
                 onPress={handleReset}
               >
-                <Text style={[styles.textButtonText, { color: colors.accent }]}>Prøv igjen</Text>
+                <Text style={[styles.textButtonText, { color: colors.accent }]}>{t('voice.tryAgain')}</Text>
               </TouchableOpacity>
             </View>
           </View>

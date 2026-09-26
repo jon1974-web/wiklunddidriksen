@@ -27,7 +27,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
   if (!routeList || !tripId) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Ingen liste valgt</Text>
+        <Text>{t('packing.noSelectedList')}</Text>
       </View>
     );
   }
@@ -104,7 +104,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) {
-      crossAlert('Error', 'Vennligst skriv et navn');
+      crossAlert(t('common.error'), t('common.enterName'));
       return;
     }
 
@@ -244,7 +244,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
               style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
               value={renameValue}
               onChangeText={setRenameValue}
-              placeholder="Navn"
+              placeholder={t('common.name')}
               placeholderTextColor={colors.textDisabled}
               autoFocus
             />
@@ -279,7 +279,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
               style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
               value={copyTitle}
               onChangeText={setCopyTitle}
-              placeholder="Liste_navn"
+              placeholder={t('packing.placeholderListName')}
               placeholderTextColor={colors.textDisabled}
               autoFocus
             />

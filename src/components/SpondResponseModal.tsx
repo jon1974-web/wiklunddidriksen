@@ -11,6 +11,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { SpondMember } from '../types';
 
 interface SpondResponseModalProps {
@@ -29,6 +30,7 @@ export const SpondResponseModal: React.FC<SpondResponseModalProps> = React.memo(
   onClose,
 }) => {
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
   const [sending, setSending] = useState(false);
@@ -85,8 +87,8 @@ export const SpondResponseModal: React.FC<SpondResponseModalProps> = React.memo(
 
   const isAccept = type === 'accept';
   const buttonColor = isAccept ? colors.accent : colors.danger;
-  const title = isAccept ? 'Aksepter' : 'Avslå';
-  const buttonText = isAccept ? 'Aksepter for valgte' : 'Avslå for valgte';
+  const title = isAccept ? t('profile.acceptEvent') : t('profile.declineEvent');
+  const buttonText = isAccept ? t('profile.acceptForSelected') : t('profile.declineForSelected');
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -95,13 +97,13 @@ export const SpondResponseModal: React.FC<SpondResponseModalProps> = React.memo(
           <TouchableWithoutFeedback>
             <View style={[styles.container, { backgroundColor: colors.surface }]}>
               <Text style={[styles.title, { color: colors.text, borderBottomColor: colors.border }]}>
-                {title} arrangement
+                {title} {t('components.eventWord')}
               </Text>
 
               <View style={[styles.searchContainer, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
                 <TextInput
                   style={[styles.searchInput, { color: colors.text }]}
-                  placeholder="Søk medlemmer..."
+                  placeholder={t('common.placeholderSearchMembers')}
                   placeholderTextColor={colors.textDisabled}
                   value={search}
                   onChangeText={setSearch}
@@ -113,10 +115,10 @@ export const SpondResponseModal: React.FC<SpondResponseModalProps> = React.memo(
                 onPress={toggleAll}
               >
                 <Text style={[styles.selectAllText, { color: colors.accent }]}>
-                  {allFilteredSelected ? 'Fjern alle' : 'Velg alle'}
+                  {allFilteredSelected ? t('profile.deselectAll') : t('profile.selectAll')}
                 </Text>
                 <Text style={[styles.selectCount, { color: colors.textSecondary }]}>
-                  {selected.size} valgt
+                  {t('profile.selectedCount', { count: selected.size })}
                 </Text>
               </TouchableOpacity>
 
@@ -144,7 +146,7 @@ export const SpondResponseModal: React.FC<SpondResponseModalProps> = React.memo(
 
               <View style={[styles.footer, { borderTopColor: colors.border }]}>
                 <TouchableOpacity style={[styles.cancelButton, { borderColor: colors.border }]} onPress={onClose}>
-                  <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Avbryt</Text>
+                  <Text style={[styles.cancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.sendButton, { backgroundColor: buttonColor, opacity: selected.size === 0 || sending ? 0.5 : 1 }]}

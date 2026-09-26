@@ -257,7 +257,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
               <Image source={{ uri: getStaticMapUrl(item.departureAddress, 15, '600x200') }} style={[styles.mapImage, { height: 160 }]} />
               <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.departureAddress}</Text>
-                <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Maps →</Text>
+                <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>{t('transport.openInMaps')}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -277,7 +277,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
               <Image source={{ uri: getStaticMapUrl(item.arrivalAddress, 15, '600x200') }} style={[styles.mapImage, { height: 160 }]} />
               <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
                 <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.arrivalAddress}</Text>
-                <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Maps →</Text>
+                <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>{t('transport.openInMaps')}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -291,7 +291,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           <Image source={{ uri: getStaticMapUrl(item.address, 15, '600x300') }} style={styles.mapImage} />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
             <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {item.address}</Text>
-            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Google Maps →</Text>
+            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>{t('tips.openGoogleMaps')}</Text>
           </View>
         </TouchableOpacity>
       ) : null}

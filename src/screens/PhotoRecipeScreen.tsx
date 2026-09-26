@@ -84,7 +84,7 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
   const takePhoto = useCallback(async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      crossAlert('Tilgang', 'Kameratilgang er nødvendig for å ta bilder.');
+      crossAlert(t('common.permission'), t('common.cameraPermissionNeeded'));
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -256,12 +256,12 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('common.title')}</Text>
-        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipe.name} onChangeText={(text) => updateRecipe(index, { name: text })} placeholder="Navn på oppskrift" placeholderTextColor={colors.textDisabled} />
+        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={recipe.name} onChangeText={(text) => updateRecipe(index, { name: text })} placeholder={t('photoRecipe.recipeName')} placeholderTextColor={colors.textDisabled} />
       </View>
 
       <View style={styles.field}>
         <Text style={[styles.label, { color: colors.text }]}>{t('common.notes')}</Text>
-        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }, styles.textArea]} value={recipe.description} onChangeText={(text) => updateRecipe(index, { description: text })} placeholder="Beskrivelse..." placeholderTextColor={colors.textDisabled} multiline numberOfLines={3} />
+        <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }, styles.textArea]} value={recipe.description} onChangeText={(text) => updateRecipe(index, { description: text })} placeholder={t('photoRecipe.descriptionPlaceholder')} placeholderTextColor={colors.textDisabled} multiline numberOfLines={3} />
       </View>
 
       <View style={styles.row}>
@@ -276,7 +276,7 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Kategori</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('photoRecipe.categoryLabel')}</Text>
         <View style={styles.chipRow}>
           {CATEGORIES.map((cat) => (
             <TouchableOpacity key={cat.key} style={[styles.chip, { backgroundColor: colors.inputBackground, borderColor: colors.border }, recipe.category === cat.key && { backgroundColor: colors.accent, borderColor: colors.accent }]} onPress={() => updateRecipe(index, { category: cat.key })}>
@@ -287,7 +287,7 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Variasjon</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('photoRecipe.variationLabel')}</Text>
         <View style={styles.chipRow}>
           {VARIATIONS.map((v) => (
             <TouchableOpacity key={v} style={[styles.chip, { backgroundColor: colors.inputBackground, borderColor: colors.border }, recipe.variation === v && { backgroundColor: colors.accent, borderColor: colors.accent }]} onPress={() => updateRecipe(index, { variation: recipe.variation === v ? '' : v })}>
@@ -298,12 +298,12 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Ingredienser</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('photoRecipe.ingredientsLabel')}</Text>
         {recipe.ingredients.map((ing, ingIdx) => (
           <View key={ingIdx} style={styles.ingredientRow}>
-            <TextInput style={[styles.input, styles.ingredientName, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ing.name} onChangeText={(text) => updateIngredient(index, ingIdx, 'name', text)} placeholder="Navn" placeholderTextColor={colors.textDisabled} />
-            <TextInput style={[styles.input, styles.ingredientAmount, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ing.amount} onChangeText={(text) => updateIngredient(index, ingIdx, 'amount', text)} placeholder="Mengde" placeholderTextColor={colors.textDisabled} />
-            <TextInput style={[styles.input, styles.ingredientUnit, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ing.unit} onChangeText={(text) => updateIngredient(index, ingIdx, 'unit', text)} placeholder="Enhet" placeholderTextColor={colors.textDisabled} />
+            <TextInput style={[styles.input, styles.ingredientName, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ing.name} onChangeText={(text) => updateIngredient(index, ingIdx, 'name', text)} placeholder={t('photoRecipe.nameLabel')} placeholderTextColor={colors.textDisabled} />
+            <TextInput style={[styles.input, styles.ingredientAmount, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ing.amount} onChangeText={(text) => updateIngredient(index, ingIdx, 'amount', text)} placeholder={t('photoRecipe.amountLabel')} placeholderTextColor={colors.textDisabled} />
+            <TextInput style={[styles.input, styles.ingredientUnit, { backgroundColor: colors.inputBackground, color: colors.text }]} value={ing.unit} onChangeText={(text) => updateIngredient(index, ingIdx, 'unit', text)} placeholder={t('photoRecipe.unitLabel')} placeholderTextColor={colors.textDisabled} />
             {recipe.ingredients.length > 1 && (
               <TouchableOpacity onPress={() => removeIngredient(index, ingIdx)}>
                 <Text style={{ color: colors.danger, fontSize: 18, padding: 8 }}>×</Text>
@@ -317,7 +317,7 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
       </View>
 
       <View style={styles.field}>
-        <Text style={[styles.label, { color: colors.text }]}>Fremgangsmåte</Text>
+        <Text style={[styles.label, { color: colors.text }]}>{t('mealPlanner.instructions')}</Text>
         {recipe.instructions.map((inst, instIdx) => (
           <View key={instIdx} style={styles.instructionRow}>
             <Text style={[styles.instructionNumber, { color: colors.textSecondary }]}>{instIdx + 1}.</Text>

@@ -61,6 +61,9 @@ function scanFile(file, results) {
         if (!text) continue;
         // Skip entities, icon-ish, short codes
         if (/&[a-z]+;/i.test(text)) continue;
+        // Whitelisted exceptions (see PLAN-hardcoded-text-cleanup.md):
+        // brand/proper-noun badges and pure date-format placeholder codes
+        if (/^(Spond|Google|Outlook|URL|OK|AI|YYYY-MM-DD|YYYY-MM-DD \([^)]+\)( \(optional\))?|DD|MM|ÅÅÅÅ|https?:\/\/\S+)$/.test(text)) continue;
         if (text.length < 3 && cand.name !== 'placeholder literal') continue;
         if (!NORWG.test(text) && !/^[A-Z]/.test(text)) continue;
         if (/~|^\d|px|%|°|—|–/.test(text)) continue;   // data-only strings

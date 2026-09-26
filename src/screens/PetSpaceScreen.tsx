@@ -305,7 +305,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                 }
               }
               if (deletedCount > 0) {
-                crossAlert('Gjentakelse oppdatert', `${deletedCount} veterinærbesøk ble slettet for fjernede dager.`);
+                crossAlert(t('events.recurrenceUpdated'), t('pets.vetVisitsDeleted', { count: deletedCount }));
               }
             }
           }
@@ -1187,13 +1187,13 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                     <View style={{ padding: 12, borderRadius: 10, backgroundColor: colors.accent + '15', borderWidth: 1, borderColor: colors.accent + '40' }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                         <AppIcon name="schedule" size={18} color={MODULE_COLORS.pets} />
-                        <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>Gjentakelse</Text>
+                        <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>{t('events.recurrenceCard')}</Text>
                       </View>
                       <Text style={{ color: colors.text, fontSize: 13, marginBottom: 4 }}>
-                        {repeatScheduleConfig.days.map(d => ['Søn','Man','Tir','Ons','Tor','Fre','Lør'][d]).join(', ')} i {repeatScheduleConfig.weeks} {repeatScheduleConfig.weeks === 1 ? 'uke' : 'uker'}
+                        {repeatScheduleConfig.days.map(d => [t('calendar.sunday'), t('calendar.monday'), t('calendar.tuesday'), t('calendar.wednesday'), t('calendar.thursday'), t('calendar.friday'), t('calendar.saturday')][d]).join(', ')} i {repeatScheduleConfig.weeks} {repeatScheduleConfig.weeks === 1 ? t('common.weekSingular') : t('common.weeks')}
                       </Text>
                       <TouchableOpacity onPress={() => setRepeatScheduleConfig(null)}>
-                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>Fjern gjentakelse</Text>
+                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>{t('events.removeRecurrence')}</Text>
                       </TouchableOpacity>
                     </View>
                   ) : (

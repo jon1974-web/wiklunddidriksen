@@ -4,6 +4,7 @@ import { collection, query, where, orderBy, limit, getDocs, doc, getDoc } from '
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 interface MissedEvent {
   id: string;
@@ -44,6 +45,7 @@ export const MissedRemindersBanner: React.FC<MissedRemindersBannerProps> = ({ na
   const user = useUserStore((state) => state.user);
   const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     setDismissedIds(getDismissedIds());
@@ -181,7 +183,7 @@ export const MissedRemindersBanner: React.FC<MissedRemindersBannerProps> = ({ na
           ))}
 
           <TouchableOpacity onPress={dismissAll} style={styles.dismissAll}>
-            <Text style={[styles.dismissAllText, { color: colors.accent }]}>Avvis alle</Text>
+            <Text style={[styles.dismissAllText, { color: colors.accent }]}>{t('missedReminders.dismissAll')}</Text>
           </TouchableOpacity>
         </View>
       )}

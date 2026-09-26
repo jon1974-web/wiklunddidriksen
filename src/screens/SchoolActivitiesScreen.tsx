@@ -290,7 +290,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
                     <GooglePlacesInput
                       value={activityForm.location}
                       onChangeText={(v) => setActivityForm(f => ({ ...f, location: v }))}
-                      placeholder="Søk etter adresse..."
+                      placeholder={t('common.placeholderAddress')}
                       onSelect={(v) => setActivityForm(f => ({ ...f, location: v }))}
                     />
                   </View>

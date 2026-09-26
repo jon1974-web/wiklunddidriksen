@@ -25,7 +25,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
   if (!routeList) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Ingen liste valgt</Text>
+        <Text>{t('shopping.noSelectedList')}</Text>
       </View>
     );
   }
@@ -94,7 +94,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
 
   const handleAddItem = async () => {
     if (!newItemName.trim()) {
-      crossAlert('Error', 'Vennligst skriv et varenavn');
+      crossAlert(t('common.error'), t('shopping.enterItemName'));
       return;
     }
 
@@ -229,12 +229,12 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       >
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Gi nytt navn</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('shopping.renameItem')}</Text>
             <TextInput
               style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
               value={renameValue}
               onChangeText={setRenameValue}
-              placeholder="Varenavn"
+              placeholder={t('shopping.itemName')}
               placeholderTextColor={colors.textDisabled}
               autoFocus
             />
@@ -247,13 +247,13 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
                   setRenameValue('');
                 }}
               >
-                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Avbryt</Text>
+                <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>{t('common.cancel')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.modalCreateButton, { backgroundColor: colors.accent }]}
                 onPress={handleConfirmRename}
               >
-                <Text style={styles.modalCreateText}>Lagre</Text>
+                <Text style={styles.modalCreateText}>{t('common.save')}</Text>
               </TouchableOpacity>
             </View>
           </View>

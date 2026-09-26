@@ -4,6 +4,7 @@ import { SpondEvent, SpondRespondent, SpondGroupMember } from '../types';
 import { SpondResponseModal } from '../components/SpondResponseModal';
 import { changeSpondResponse, getSpondMembers } from '../services/spondService';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 import { formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
 import { getEventRespondents, getModalRespondents, getSpondStampStatus } from './EventsScreen';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -19,6 +20,7 @@ interface SpondEventDetailParams {
 export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
   const { event, spondRespondents, spondConfig, groupLogos = {}, spondAllMembers = [] } = route.params as SpondEventDetailParams;
   const { colors } = useTheme();
+  const { t } = useTranslation();
   const [responseModal, setResponseModal] = useState<{ type: 'accept' | 'decline' } | null>(null);
   const [showFullNote, setShowFullNote] = useState(false);
   const [expandedResponse, setExpandedResponse] = useState<'accepted' | 'declined' | 'unanswered' | null>(null);
@@ -144,7 +146,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
                 ) : (
                   <Text style={{ fontSize: 11 }}>⚽</Text>
                 )}
-                <Text style={{ fontSize: 11, fontWeight: '600', color: '#fff' }}>Spond</Text>
+                <Text style={{ fontSize: 11, fontWeight: '600', color: '#fff' }}>{t('spond.title')}</Text>
               </View>
             </View>
           </View>
@@ -153,14 +155,14 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
 
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
-        <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Detaljer</Text>
+        <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>{t('spond.details')}</Text>
         {myStatus && (
           <View style={styles.viewDetailRow}>
             <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>📋</Text>
             <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
               <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8, backgroundColor: myStatus === 'accepted' ? '#E8F5E9' : myStatus === 'declined' ? '#FFEBEE' : '#FFF8E1' }}>
                 <Text style={{ fontSize: 12, fontWeight: '600', color: myStatus === 'accepted' ? '#43A047' : myStatus === 'declined' ? '#E53935' : '#F9A825' }}>
-                  {myStatus === 'accepted' ? 'Akseptert' : myStatus === 'declined' ? 'Avslått' : 'Ikke svart'}
+                  {myStatus === 'accepted' ? t('profile.eventAccepted') : myStatus === 'declined' ? t('profile.eventDeclined') : t('profile.eventNotAnswered')}
                 </Text>
               </View>
             </View>
@@ -194,7 +196,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
               {event.description.length > 60 && (
                 <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
                   <Text style={{ fontSize: 12, color: '#E53935', fontWeight: '600', marginTop: 4 }}>
-                    {showFullNote ? 'Vis mindre' : 'Les mer'}
+                    {showFullNote ? t('common.showLess') : t('common.readMore')}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -210,7 +212,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
             <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 140, borderRadius: 0 }} resizeMode="cover" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(event.address!))} style={{ padding: 12, alignItems: 'center' }}>
-            <Text style={{ fontSize: 12, color: '#E53935', fontWeight: '600' }}>Åpne i Google Maps →</Text>
+            <Text style={{ fontSize: 12, color: '#E53935', fontWeight: '600' }}>{t('tips.openGoogleMaps')}</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -218,19 +220,19 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
       {/* Din status */}
       {event.groupId && (
         <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: '#E53935', backgroundColor: colors.surface }]}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>Din status</Text>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#E53935', marginBottom: 8 }}>{t('spond.myStatus')}</Text>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity
               style={[styles.responseButton, { backgroundColor: '#43A047', flex: 1 }]}
               onPress={() => setResponseModal({ type: 'accept' })}
             >
-              <Text style={styles.responseButtonText}>✓ Aksepter</Text>
+              <Text style={styles.responseButtonText}>✓ {t('profile.acceptShort')}</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.responseButton, { backgroundColor: '#E53935', flex: 1 }]}
               onPress={() => setResponseModal({ type: 'decline' })}
             >
-              <Text style={styles.responseButtonText}>✕ Avslå</Text>
+              <Text style={styles.responseButtonText}>✕ {t('profile.declineShort')}</Text>
             </TouchableOpacity>
           </View>
         </View>

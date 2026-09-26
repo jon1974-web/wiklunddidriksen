@@ -169,12 +169,12 @@ const handleCopy = useCallback(() => {
 
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: SCHOOL_COLOR, backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionLabel, { color: SCHOOL_COLOR }]}>Detaljer</Text>
+        <Text style={[styles.sectionLabel, { color: SCHOOL_COLOR }]}>{t('common.details')}</Text>
         {activity.scheduleGroupId && (
           <View style={styles.viewDetailRow}>
             <View style={[styles.viewDetailLabel, { alignItems: 'center', justifyContent: 'center' }]}><AppIcon name="schedule" size={18} color={colors.textSecondary} /></View>
             <Text style={[styles.viewDetailValue, { color: colors.text }]}>
-              {scheduleInfo ? `Gjentakelse · ${scheduleInfo.weekType === 'odd' ? 'Oddetall uker' : scheduleInfo.weekType === 'even' ? 'Partall uker' : 'Alle uker'} · ${scheduleInfo.startDate} – ${scheduleInfo.endDate}` : 'Gjentakelse'}
+              {scheduleInfo ? `${t('school.recurrenceInfo')} · ${scheduleInfo.weekType === 'odd' ? t('school.recurrenceOdd') : scheduleInfo.weekType === 'even' ? t('school.recurrenceEven') : t('school.recurrenceAll')} · ${scheduleInfo.startDate} – ${scheduleInfo.endDate}` : t('school.recurrenceInfo')}
             </Text>
           </View>
         )}
@@ -207,7 +207,7 @@ const handleCopy = useCallback(() => {
           <View style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <Text style={{ fontSize: 14 }}>📝</Text>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: SCHOOL_COLOR }}>Notat</Text>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: SCHOOL_COLOR }}>{t('common.note')}</Text>
             </View>
             <View style={{ paddingLeft: 22 }}>
               <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
@@ -216,7 +216,7 @@ const handleCopy = useCallback(() => {
               {activity.note.length > 60 && (
                 <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
                   <Text style={{ fontSize: 12, color: SCHOOL_COLOR, fontWeight: '600', marginTop: 4 }}>
-                    {showFullNote ? t('common.back') : 'Les mer'}
+                    {showFullNote ? t('common.back') : t('common.readMore')}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -232,7 +232,7 @@ const handleCopy = useCallback(() => {
             <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 140 }} resizeMode="cover" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(activity.location!))} style={{ padding: 12, alignItems: 'center' }}>
-            <Text style={{ fontSize: 12, color: SCHOOL_COLOR, fontWeight: '600' }}>Åpne i Google Maps →</Text>
+            <Text style={{ fontSize: 12, color: SCHOOL_COLOR, fontWeight: '600' }}>{t('tips.openGoogleMaps')}</Text>
           </TouchableOpacity>
         </View>
       )}

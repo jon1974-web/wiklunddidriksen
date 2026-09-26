@@ -100,7 +100,7 @@ export const ChatScreen: React.FC = () => {
   const handleTakePhoto = useCallback(async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Tillatelse', 'Vi trenger tilgang til kameraet for å ta bilder.');
+      Alert.alert(t('chat.cameraPermissionTitle'), t('chat.cameraPermissionBody'));
       return;
     }
 

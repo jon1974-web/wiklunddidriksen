@@ -341,15 +341,15 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
             <View style={{ flexDirection: 'row', gap: 12 }}>
               <View style={[styles.field, { flex: 1 }]}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('birthdays.day')}</Text>
-                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newDay} onChangeText={setNewDay} placeholder="DD" placeholderTextColor={colors.textDisabled} keyboardType="numeric" maxLength={2} />
+                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newDay} onChangeText={setNewDay} placeholder={t('birthdays.dayPlaceholder')} placeholderTextColor={colors.textDisabled} keyboardType="numeric" maxLength={2} />
               </View>
               <View style={[styles.field, { flex: 1 }]}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('birthdays.month')}</Text>
-                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newMonth} onChangeText={setNewMonth} placeholder="MM" placeholderTextColor={colors.textDisabled} keyboardType="numeric" maxLength={2} />
+                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newMonth} onChangeText={setNewMonth} placeholder={t('birthdays.monthPlaceholder')} placeholderTextColor={colors.textDisabled} keyboardType="numeric" maxLength={2} />
               </View>
               <View style={[styles.field, { flex: 1 }]}>
                 <Text style={[styles.label, { color: colors.text }]}>{t('birthdays.year')}</Text>
-                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newYear} onChangeText={setNewYear} placeholder="ÅÅÅÅ" placeholderTextColor={colors.textDisabled} keyboardType="numeric" maxLength={4} />
+                <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newYear} onChangeText={setNewYear} placeholder={t('birthdays.yearPlaceholder')} placeholderTextColor={colors.textDisabled} keyboardType="numeric" maxLength={4} />
               </View>
             </View>
             <View style={styles.modalActions}>

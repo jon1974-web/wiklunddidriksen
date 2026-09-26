@@ -224,7 +224,7 @@ export const ProfileScreen: React.FC = () => {
               setCalendarEmail(profile.calendarEmail || '');
               setCalendarProvider(profile.calendarProvider || 'google');
               setProfile(profile);
-              crossAlert('Suksess', 'Google Kalender er koblet til!');
+              crossAlert(t('common.success'), t('profile.calendarConnected'));
             }
           });
         }
@@ -242,7 +242,7 @@ export const ProfileScreen: React.FC = () => {
       }
       setUser({ ...user!, displayName: newName.trim() });
       setEditingName(false);
-      Alert.alert('Suksess', 'Navnet er oppdatert');
+      Alert.alert(t('common.success'), t('profile.nameUpdated'));
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
@@ -254,7 +254,7 @@ export const ProfileScreen: React.FC = () => {
       await createOrUpdateUser(user.uid, { phoneNumber: newPhone.trim() || undefined });
       setProfile((prev: UserProfile | null) => prev ? { ...prev, phoneNumber: newPhone.trim() || undefined } : prev);
       setEditingPhone(false);
-      Alert.alert('Suksess', 'Telefonnummer er oppdatert');
+      Alert.alert(t('common.success'), t('profile.phoneUpdated'));
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
@@ -267,7 +267,7 @@ export const ProfileScreen: React.FC = () => {
       setFamily(id, newFamilyName.trim(), 'owner');
       setNewFamilyName('');
       setShowCreateFamily(false);
-      Alert.alert('Suksess', `Familie "${newFamilyName.trim()}" er opprettet`);
+      Alert.alert(t('common.success'), t('profile.familyCreated', { name: newFamilyName.trim() }));
     } catch (error) {
       Alert.alert('Error', getErrorMessage(error));
     }
@@ -293,17 +293,17 @@ export const ProfileScreen: React.FC = () => {
     if (Platform.OS === 'web') {
       if (navigator.share) {
         try {
-          await navigator.share({ title: 'Invitasjon', text: message });
+          await navigator.share({ title: t('profile.inviteTitle'), text: message });
         } catch {}
       } else if (navigator.clipboard) {
         try {
           await navigator.clipboard.writeText(message);
-          Alert.alert('Kopiert', 'Lenken er kopiert til utklippstavlen.');
+          Alert.alert(t('common.copied'), t('common.copiedBody'));
         } catch {
-          window.prompt('Kopier lenken:', message);
+          window.prompt(t('profile.copyLinkPrompt'), message);
         }
       } else {
-        window.prompt('Kopier lenken:', message);
+        window.prompt(t('profile.copyLinkPrompt'), message);
       }
     } else {
       await Share.share({ message });
@@ -323,7 +323,7 @@ export const ProfileScreen: React.FC = () => {
           onPress: async () => {
             await leaveFamily(user.uid);
             setFamily(null, null);
-            crossAlert('Suksess', 'Du har forlatt familien');
+            crossAlert(t('common.success'), t('profile.leftFamily'));
           },
         },
       ]
@@ -395,7 +395,7 @@ export const ProfileScreen: React.FC = () => {
   const handleTakePhoto = async () => {
     const { status } = await ImagePicker.requestCameraPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Tillatelse', 'Vi trenger tilgang til kameraet.');
+      Alert.alert(t('common.permission'), t('common.cameraForPhoto'));
       return;
     }
     const result = await ImagePicker.launchCameraAsync({
@@ -413,7 +413,7 @@ export const ProfileScreen: React.FC = () => {
     if (!user) return;
     const currentUser = auth.currentUser;
     if (!currentUser) {
-      Alert.alert('Feil', 'Du må være logget inn for å laste opp bilder.');
+      Alert.alert(t('common.error'), t('common.loginRequired'));
       return;
     }
     setUploading(true);
@@ -448,7 +448,7 @@ export const ProfileScreen: React.FC = () => {
       setUser({ ...user, avatarUrl: downloadUrl });
     } catch (error) {
       console.error('Avatar upload failed:', error);
-      Alert.alert('Error', 'Kunne ikke laste opp bildet.');
+      Alert.alert(t('common.error'), t('common.uploadFailed'));
     } finally {
       setUploading(false);
     }
@@ -458,7 +458,7 @@ export const ProfileScreen: React.FC = () => {
     if (!user) return;
     const hasPermission = await requestCalendarPermission();
     if (!hasPermission) {
-      Alert.alert('Tillatelse', 'Du må gi tillatelse til å bruke kalenderen.');
+      Alert.alert(t('common.permission'), t('common.calendarPermission'));
       return;
     }
     const calendar = await pickCalendar();
@@ -467,24 +467,24 @@ export const ProfileScreen: React.FC = () => {
     await createOrUpdateUser(user.uid, { calendarId: calendar.id });
     setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarId: calendar.id } : prev);
     setCalendarName(calendar.title);
-    Alert.alert('Suksess', `Koblet til "${calendar.title}"`);
+    Alert.alert(t('common.success'), t('profile.calendarConnectedName', { name: calendar.title }));
   };
 
   const handleDisconnectCalendar = async () => {
     if (!user) return;
     crossAlert(
-      'Koble fra kalender',
-      'Avtaler vil ikke lenger synkroniseres med kalenderen din.',
+      t('profile.disconnectCalendarTitle'),
+      t('profile.disconnectCalendarBody'),
       [
         { text: 'Avbryt', style: 'cancel' },
         {
-          text: 'Koble fra',
+          text: t('profile.disconnectButton'),
           style: 'destructive',
           onPress: async () => {
             await createOrUpdateUser(user.uid, { calendarId: null });
             setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarId: null } : prev);
             setCalendarName(null);
-            crossAlert('Suksess', 'Kalender frakoblet');
+            crossAlert(t('common.success'), t('profile.calendarDisconnected'));
           },
         },
       ]
@@ -506,7 +506,7 @@ export const ProfileScreen: React.FC = () => {
       });
       setCalendarProvider(provider);
       setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarEmail: calendarEmail.trim(), calendarProvider: provider } : prev);
-      crossAlert('Suksess', `Kalender koblet til ${provider === 'google' ? 'Google' : 'Outlook'}`);
+      crossAlert(t('common.success'), t('profile.connectedTo', { provider: provider === 'google' ? 'Google' : 'Outlook' }));
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -574,7 +574,7 @@ export const ProfileScreen: React.FC = () => {
 
   const handleConnectSpond = useCallback(async () => {
     if (!spondEmail.trim() || !spondPassword.trim()) {
-      crossAlert('Error', 'Vennligst fyll inn e-post og passord for Spond.');
+      crossAlert(t('common.error'), t('profile.enterSpondCredentials'));
       return;
     }
     setSpondLoading(true);
@@ -601,7 +601,7 @@ export const ProfileScreen: React.FC = () => {
       }
       setSpondAllMembers(allMembers);
 
-      crossAlert('Suksess', `Koblet til Spond. ${groups.length} gruppe(r) funnet.`);
+      crossAlert(t('common.success'), t('profile.spondConnectedGroups', { count: groups.length }));
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     } finally {
@@ -623,7 +623,7 @@ export const ProfileScreen: React.FC = () => {
 
   const handleSaveSpondConfig = useCallback(async () => {
     if (!familyId) {
-      crossAlert('Error', 'Du må være med i en familie for å lagre Spond-konfigurasjon.');
+      crossAlert(t('common.error'), t('profile.spondNeedFamily'));
       return;
     }
     try {
@@ -642,7 +642,7 @@ export const ProfileScreen: React.FC = () => {
         respondents,
       });
       clearSpondToken();
-      crossAlert('Suksess', `Spond konfigurasjon lagret. ${selectedGroups.length} gruppe(r) aktivert, ${respondents.length} respondenter.`);
+      crossAlert(t('common.success'), t('profile.spondConfigSaved', { groups: selectedGroups.length, respondents: respondents.length }));
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
@@ -679,7 +679,7 @@ export const ProfileScreen: React.FC = () => {
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }]} edges={['top']}>
-        <Text style={{ color: colors.textSecondary }}>Laster...</Text>
+        <Text style={{ color: colors.textSecondary }}>{t('common.loading')}</Text>
       </SafeAreaView>
     );
   }
@@ -740,7 +740,7 @@ export const ProfileScreen: React.FC = () => {
                 style={[styles.saveButton, { backgroundColor: colors.accent }]}
                 onPress={handleUpdateName}
               >
-                <Text style={styles.saveButtonText}>Lagre</Text>
+                <Text style={styles.saveButtonText}>{t('common.save')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.cancelButton, { backgroundColor: colors.surfaceVariant }]}
@@ -775,7 +775,7 @@ export const ProfileScreen: React.FC = () => {
                 style={[styles.valueRow, { backgroundColor: colors.inputBackground, color: colors.text }]}
                 value={newPhone}
                 onChangeText={setNewPhone}
-                placeholder="Legg til telefonnummer"
+                placeholder={t('profile.addPhone')}
                 placeholderTextColor={colors.textDisabled}
                 keyboardType="phone-pad"
                 autoFocus
@@ -785,7 +785,7 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.saveButton, { backgroundColor: colors.accent }]}
                   onPress={handleUpdatePhone}
                 >
-                  <Text style={styles.saveButtonText}>Lagre</Text>
+                  <Text style={styles.saveButtonText}>{t('common.save')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={[styles.cancelButton, { borderColor: colors.border }]}
@@ -827,13 +827,13 @@ export const ProfileScreen: React.FC = () => {
             style={[styles.calendarTypeBtn, { backgroundColor: calendarType === 'phone' ? '#3b5a75' : colors.inputBackground, borderColor: calendarType === 'phone' ? '#3b5a75' : colors.border }]}
             onPress={() => { setCalendarType('phone'); createOrUpdateUser(user!.uid, { calendarType: 'phone' }); }}
           >
-            <Text style={{ color: calendarType === 'phone' ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>📱 Telefon-kalender</Text>
+            <Text style={{ color: calendarType === 'phone' ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>{t('profile.calendarTypePhone')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.calendarTypeBtn, { backgroundColor: calendarType === 'google' ? '#4285F4' : colors.inputBackground, borderColor: calendarType === 'google' ? '#4285F4' : colors.border }]}
             onPress={() => { setCalendarType('google'); createOrUpdateUser(user!.uid, { calendarType: 'google' }); }}
           >
-            <Text style={{ color: calendarType === 'google' ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>📧 Google Kalender</Text>
+            <Text style={{ color: calendarType === 'google' ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>{t('profile.calendarTypeGoogle')}</Text>
           </TouchableOpacity>
         </View>
 
@@ -841,7 +841,7 @@ export const ProfileScreen: React.FC = () => {
         {calendarType === 'phone' && (
           <View>
             <Text style={[styles.noFamily, { color: colors.textSecondary }]}>
-              Arrangementer, timer, vaksiner og reiser legges automatisk til i telefonens kalender.
+              {t('profile.phoneCalendarInfo')}
             </Text>
           </View>
         )}
@@ -853,7 +853,7 @@ export const ProfileScreen: React.FC = () => {
               <View>
                 <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
                   <Text style={[styles.value, { color: colors.text }]}>📧 {calendarEmail || 'Google Kalender'}</Text>
-                  <Text style={[styles.editIcon, { color: colors.accent }]}>Koblet til ✓</Text>
+                  <Text style={[styles.editIcon, { color: colors.accent }]}>{t('profile.connectedBadgeCheck')}</Text>
                 </View>
                 <TouchableOpacity
                   style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
@@ -868,7 +868,7 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
                   value={calendarEmail}
                   onChangeText={setCalendarEmail}
-                  placeholder="Din e-post (f.eks. navn@gmail.com)"
+                  placeholder={t('common.yourEmailPlaceholder')}
                   placeholderTextColor={colors.textDisabled}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -878,7 +878,7 @@ export const ProfileScreen: React.FC = () => {
                   onPress={() => handleSaveCalendarPreference('google')}
                   disabled={!calendarEmail.trim()}
                 >
-                  <Text style={styles.familyButtonText}>Koble til Google</Text>
+                  <Text style={styles.familyButtonText}>{t('profile.connectGoogleButton')}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -960,7 +960,7 @@ export const ProfileScreen: React.FC = () => {
       <View style={[styles.section, { backgroundColor: colors.surface }]}>
         <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>{t('profile.theme')}</Text>
         {/* Row 1: Module colors */}
-        <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 6, textAlign: 'center' }}>Modulfarger</Text>
+        <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 6, textAlign: 'center' }}>{t('common.moduleName')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
           {([
             { key: 'school' as const, color: '#6B8F71' },
@@ -988,7 +988,7 @@ export const ProfileScreen: React.FC = () => {
           ))}
         </View>
         {/* Row 2: App accent colors */}
-        <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 6, textAlign: 'center' }}>App-farger</Text>
+        <Text style={{ fontSize: 12, color: colors.textSecondary, marginBottom: 6, textAlign: 'center' }}>{t('common.appColors')}</Text>
         <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 10, marginBottom: 12 }}>
           {([
             { key: 'slategray' as const, color: '#3b5a75' },
@@ -1245,7 +1245,7 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.leaveButton, { borderColor: colors.danger, marginTop: 12 }]}
                   onPress={handleLeaveFamily}
                 >
-                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>Forlat familie</Text>
+                  <Text style={[styles.leaveButtonText, { color: colors.danger }]}>{t('profile.leaveFamily')}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -1259,7 +1259,7 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.familyButton, { backgroundColor: colors.accent }]}
                   onPress={() => setShowCreateFamily(true)}
                 >
-                  <Text style={styles.familyButtonText}>Opprett familie</Text>
+                  <Text style={styles.familyButtonText}>{t('profile.createFamily')}</Text>
                 </TouchableOpacity>
               </View>
               <Text style={{ color: colors.textDisabled, fontSize: 13, marginTop: 8, textAlign: 'center' }}>
@@ -1286,7 +1286,7 @@ export const ProfileScreen: React.FC = () => {
             <View>
               <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
                 <Text style={[styles.value, { color: colors.text }]}>{spondEmail}</Text>
-                <Text style={[styles.editIcon, { color: colors.accent }]}>Koblet til</Text>
+                <Text style={[styles.editIcon, { color: colors.accent }]}>{t('profile.spondConnectedShort')}</Text>
               </View>
 
               <Text style={[styles.label, { color: colors.textSecondary, marginTop: 12 }]}>{t('profile.members')}</Text>
@@ -1327,7 +1327,7 @@ export const ProfileScreen: React.FC = () => {
                         }
                       }}
                     >
-                      <Text style={{ color: colors.accent, fontSize: 12 }}>📷 Last opp logo</Text>
+                      <Text style={{ color: colors.accent, fontSize: 12 }}>📷 {t('common.uploadLogo')}</Text>
                     </TouchableOpacity>
                   )}
                 </View>
@@ -1339,8 +1339,8 @@ export const ProfileScreen: React.FC = () => {
                     style={{ flexDirection: 'row', alignItems: 'center', marginTop: 16, gap: 8 }}
                     onPress={() => setShowRespondents(!showRespondents)}
                   >
-                    <Text style={[styles.label, { color: colors.textSecondary, marginTop: 0, marginBottom: 0 }]}>Velg respondenter (hvem kan svare)</Text>
-                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{spondRespondents.length} valgt</Text>
+                    <Text style={[styles.label, { color: colors.textSecondary, marginTop: 0, marginBottom: 0 }]}>{t('profile.selectRespondents')}</Text>
+                    <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{t('profile.selectedCount', { count: spondRespondents.length })}</Text>
                     <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{showRespondents ? '▲' : '▼'}</Text>
                   </TouchableOpacity>
                   {showRespondents && spondAllMembers.map((member) => (
@@ -1386,7 +1386,7 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
                   value={spondEmail}
                   onChangeText={setSpondEmail}
-                  placeholder="Spond e-post"
+                  placeholder={t('profile.spondEmailPlaceholder')}
                   placeholderTextColor={colors.textDisabled}
                   keyboardType="email-address"
                   autoCapitalize="none"
@@ -1397,7 +1397,7 @@ export const ProfileScreen: React.FC = () => {
                   style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
                   value={spondPassword}
                   onChangeText={setSpondPassword}
-                  placeholder="Spond passord"
+                  placeholder={t('profile.spondPasswordPlaceholder')}
                   placeholderTextColor={colors.textDisabled}
                   secureTextEntry
                 />
@@ -1430,12 +1430,12 @@ export const ProfileScreen: React.FC = () => {
       <Modal visible={showCreateFamily} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>Opprett familie</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('profile.createFamily')}</Text>
             <TextInput
               style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]}
               value={newFamilyName}
               onChangeText={setNewFamilyName}
-              placeholder="Familienavn"
+              placeholder={t('auth.familyName')}
               placeholderTextColor={colors.textDisabled}
               autoFocus
             />
@@ -1449,7 +1449,7 @@ export const ProfileScreen: React.FC = () => {
                 style={[styles.modalCreateButton, { backgroundColor: colors.accent }]}
                 onPress={handleCreateFamily}
               >
-                <Text style={styles.modalCreateText}>Opprett</Text>
+                <Text style={styles.modalCreateText}>{t('common.create')}</Text>
               </TouchableOpacity>
             </View>
           </View>

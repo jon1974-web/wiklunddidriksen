@@ -160,7 +160,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 
   const handleUpdate = useCallback(async () => {
     if (!editTitle.trim()) {
-      crossAlert('Error', 'Vennligst skriv en tittel');
+      crossAlert(t('common.error'), t('common.enterTitle'));
       return;
     }
     if (editPersons.length === 0) {
@@ -231,7 +231,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
           }
         }
         if (deletedCount > 0) {
-          crossAlert('Gjentakelse oppdatert', `${deletedCount} hendelser ble slettet for fjernede dager.`);
+          crossAlert(t('events.recurrenceUpdated'), t('events.recurrenceDeletedForDays', { count: deletedCount }));
         }
       }
 
@@ -363,7 +363,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               <Text style={{ fontSize: 14, fontWeight: '700', color: '#333', marginTop: 2 }}>{timeText}</Text>
               <View style={{ flexDirection: 'row', gap: 6, marginTop: 6 }}>
                 <View style={{ paddingHorizontal: 6, paddingVertical: 2, borderRadius: 8, backgroundColor: '#E8F5E9' }}>
-                  <Text style={{ fontSize: 10, fontWeight: '600', color: '#43A047' }}>Avtale</Text>
+                  <Text style={{ fontSize: 10, fontWeight: '600', color: '#43A047' }}>{t('events.typeAppointment')}</Text>
                 </View>
               </View>
             </View>
@@ -372,7 +372,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
 
         {/* Detail card */}
         <View style={[styles.detailCard, { borderLeftWidth: 4, borderLeftColor: '#3b5a75' }]}>
-          <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>Detaljer</Text>
+          <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75', marginBottom: 8 }}>{t('common.details')}</Text>
           {eventData.scheduleGroupId && (
             <View style={styles.viewDetailRow}>
               <View style={[styles.viewDetailLabel, { alignItems: 'center', justifyContent: 'center' }]}>
@@ -423,7 +423,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             <View style={{ marginBottom: 12 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                 <Text style={{ fontSize: 14 }}>📝</Text>
-                <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75' }}>Notat</Text>
+                <Text style={{ fontSize: 12, fontWeight: '700', color: '#3b5a75' }}>{t('common.note')}</Text>
               </View>
               <View style={{ paddingLeft: 22 }}>
                 <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
@@ -432,7 +432,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                 {eventData.description.length > 60 && (
                   <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
                     <Text style={{ fontSize: 12, color: '#3b5a75', fontWeight: '600', marginTop: 4 }}>
-                      {showFullNote ? 'Vis mindre' : 'Les mer'}
+                      {showFullNote ? t('common.showLess') : t('common.readMore')}
                     </Text>
                   </TouchableOpacity>
                 )}
@@ -448,7 +448,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 140, borderRadius: 0 }} resizeMode="cover" />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(eventData.address!))} style={{ padding: 12, alignItems: 'center' }}>
-              <Text style={{ fontSize: 12, color: '#3b5a75', fontWeight: '600' }}>Åpne i Google Maps →</Text>
+              <Text style={{ fontSize: 12, color: '#3b5a75', fontWeight: '600' }}>{t('tips.openGoogleMaps')}</Text>
             </TouchableOpacity>
           </View>
         )}
@@ -490,11 +490,11 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
         <View style={[styles.detailCard, { marginTop: 10 }]}>
           <View style={{ flexDirection: 'row', gap: 8 }}>
             <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent, flex: 1 }]} onPress={() => setIsEditing(true)}>
-              <Text style={[styles.actionButtonText, { color: '#fff' }]}>Rediger</Text>
+              <Text style={[styles.actionButtonText, { color: '#fff' }]}>{t('detail.edit')}</Text>
             </TouchableOpacity>
             {canDelete && (
               <TouchableOpacity style={[styles.actionButton, { backgroundColor: '#fff', borderColor: colors.danger, borderWidth: 1.5, flex: 1 }]} onPress={handleDelete}>
-                <Text style={[styles.actionButtonText, { color: colors.danger }]}>Slett</Text>
+                <Text style={[styles.actionButtonText, { color: colors.danger }]}>{t('detail.delete')}</Text>
               </TouchableOpacity>
             )}
           </View>
@@ -512,11 +512,11 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             <View style={styles.modalHandleBar} />
 
             <ScrollView showsVerticalScrollIndicator={false}>
-              <Text style={[styles.title, { color: colors.text }]}>Rediger avtale</Text>
+              <Text style={[styles.title, { color: colors.text }]}>{t('events.editAppointment')}</Text>
 
               {/* Icon */}
               <View style={styles.field}>
-                <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+                <Text style={[styles.label, { color: colors.text }]}>{t('common.icon')}</Text>
                 <View style={styles.iconGrid}>
                   {EVENT_ICONS.map((item) => (
                     <TouchableOpacity
@@ -538,7 +538,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                   style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
                   value={editTitle}
                   onChangeText={setEditTitle}
-                  placeholder="F.eks. Familiemiddag"
+                  placeholder={t('events.placeholderTitle')}
                   placeholderTextColor={colors.textDisabled}
                 />
               </View>
@@ -599,7 +599,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                 <GooglePlacesInput
                   value={editAddress}
                   onChangeText={setEditAddress}
-                  placeholder="Søk etter adresse..."
+                  placeholder={t('common.placeholderAddress')}
                   onSelect={setEditAddress}
                 />
               </View>
@@ -611,7 +611,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                   style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, styles.textArea]}
                   value={editNote}
                   onChangeText={setEditNote}
-                  placeholder="Legg til en beskrivelse..."
+                  placeholder={t('common.placeholderDescription')}
                   placeholderTextColor={colors.textDisabled}
                   multiline
                   numberOfLines={3}
@@ -661,14 +661,14 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
               {/* Schedule editing */}
               {eventData.scheduleGroupId && (
                 <View style={{ marginBottom: 12 }}>
-                  <Text style={[styles.label, { color: colors.text }]}>Gjentakelse</Text>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('events.recurrenceCard')}</Text>
                   {editScheduleConfig ? (
                     <View style={{ padding: 12, borderRadius: 10, backgroundColor: colors.accent + '15', borderWidth: 1, borderColor: colors.accent + '40' }}>
                       <Text style={{ color: colors.text, fontSize: 13, marginBottom: 4 }}>
                         {editScheduleConfig.days.map(d => DAY_NAMES_FULL[d]).join(', ')} i {editScheduleConfig.weeks} {editScheduleConfig.weeks === 1 ? 'uke' : 'uker'}
                       </Text>
                       <TouchableOpacity onPress={() => setEditScheduleConfig(null)}>
-                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>Fjern endringer</Text>
+                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>{t('events.removeRecurrenceChanges')}</Text>
                       </TouchableOpacity>
                     </View>
                   ) : (
@@ -712,7 +712,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
                       }}
                     >
                       <AppIcon name="schedule" size={18} color={colors.accent} />
-                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>Rediger gjentakelse</Text>
+                      <Text style={{ color: colors.text, fontSize: 14, fontWeight: '600' }}>{t('events.editRecurrence')}</Text>
                       <Text style={{ color: colors.textSecondary, fontSize: 12, marginLeft: 'auto' }}>›</Text>
                     </TouchableOpacity>
                   )}
@@ -762,17 +762,17 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
             <TouchableWithoutFeedback>
               <View style={{ backgroundColor: colors.surface, borderRadius: 20, padding: 24, width: '100%', maxWidth: 320, alignItems: 'center' }}>
                 <Image source={require('../../assets/icon.png')} style={{ width: 56, height: 56, borderRadius: 14, marginBottom: 16 }} />
-                <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text, textAlign: 'center', marginBottom: 4 }}>Gjentakelse</Text>
-                <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center', marginBottom: 20 }}>Hva vil du gjøre?</Text>
+                <Text style={{ fontSize: 18, fontWeight: 'bold', color: colors.text, textAlign: 'center', marginBottom: 4 }}>{t('events.recurrenceCard')}</Text>
+                <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center', marginBottom: 20 }}>{t('events.recurrenceWhat')}</Text>
 
                 <TouchableOpacity style={{ width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginBottom: 8, backgroundColor: colors.accent }} onPress={() => { setShowScheduleDeleteModal(false); handleDeleteThisEvent(); }}>
-                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}>Slett denne hendelsen</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}>{t('events.deleteThisEvent')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center', marginBottom: 8, backgroundColor: '#E53935' }} onPress={() => { setShowScheduleDeleteModal(false); handleDeleteAllSchedule(); }}>
-                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}>Slett hele gjentakelsen</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: '#fff' }}>{t('events.deleteWholeRecurrence')}</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={{ width: '100%', paddingVertical: 14, borderRadius: 12, alignItems: 'center', backgroundColor: colors.inputBackground }} onPress={() => setShowScheduleDeleteModal(false)}>
-                  <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textSecondary }}>Avbryt</Text>
+                  <Text style={{ fontSize: 16, fontWeight: '600', color: colors.textSecondary }}>{t('common.cancel')}</Text>
                 </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>

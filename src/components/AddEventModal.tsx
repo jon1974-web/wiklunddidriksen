@@ -136,7 +136,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
   const handleSave = useCallback(async () => {
     if (saving) return;
     if (!title.trim()) {
-      crossAlert('Error', 'Vennligst skriv en tittel');
+      crossAlert(t('common.error'), t('common.enterTitle'));
       return;
     }
     if (selectedPersons.length === 0) {
@@ -277,11 +277,11 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
             <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
               <View style={styles.modalHandleBar} />
               <ScrollView style={{ flex: 1, paddingHorizontal: 20 }} contentContainerStyle={{ paddingBottom: 40 }}>
-                <Text style={[styles.title, { color: colors.text }]}>Ny avtale</Text>
+                <Text style={[styles.title, { color: colors.text }]}>{t('events.newAppointment')}</Text>
 
                 {/* Icon section */}
                 <View style={styles.field}>
-                  <Text style={[styles.label, { color: colors.text }]}>Ikon</Text>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('common.icon')}</Text>
                   <View style={styles.iconGrid}>
                     {EVENT_ICONS.map((item) => {
                       const isSelected = icon === item.icon;
@@ -308,7 +308,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                     style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
                     value={title}
                     onChangeText={setTitle}
-                    placeholder="F.eks. Familiemiddag"
+                    placeholder={t('events.placeholderTitle')}
                     placeholderTextColor={colors.textDisabled}
                   />
                 </View>
@@ -371,7 +371,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                   <GooglePlacesInput
                     value={address}
                     onChangeText={setAddress}
-                    placeholder="Søk etter adresse..."
+                    placeholder={t('common.placeholderAddress')}
                     onSelect={setAddress}
                   />
                 </View>
@@ -383,7 +383,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                     style={[styles.input, { backgroundColor: colors.surface, color: colors.text }, styles.textArea]}
                     value={note}
                     onChangeText={setNote}
-                    placeholder="Legg til en beskrivelse..."
+                    placeholder={t('common.placeholderDescription')}
                     placeholderTextColor={colors.textDisabled}
                     multiline
                     numberOfLines={3}
@@ -436,11 +436,11 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                     <View style={{ padding: 12, borderRadius: 10, backgroundColor: colors.accent + '15', borderWidth: 1, borderColor: colors.accent + '40' }}>
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
                         <AppIcon name="schedule" size={18} color={colors.accent} />
-                        <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>Gjentakelse</Text>
+                        <Text style={{ color: colors.accent, fontSize: 14, fontWeight: '700' }}>{t('events.recurrenceCard')}</Text>
                       </View>
                       <Text style={{ color: colors.text, fontSize: 13, marginBottom: 8 }}>{schedulePreview}</Text>
                       <TouchableOpacity onPress={() => { setScheduleConfig(null); }}>
-                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>Fjern gjentakelse</Text>
+                        <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '600' }}>{t('schedule.removeRecurrence')}</Text>
                       </TouchableOpacity>
                     </View>
                   ) : (

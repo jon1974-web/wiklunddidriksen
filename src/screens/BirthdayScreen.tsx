@@ -78,12 +78,12 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       return;
     }
     if (birthdays.length >= MAX_BIRTHDAYS) {
-      crossAlert('Error', `Maks ${MAX_BIRTHDAYS} bursdager`);
+      crossAlert(t('common.error'), t('birthdays.maxReached', { count: MAX_BIRTHDAYS }));
       return;
     }
     try {
       if (!familyId) {
-        crossAlert('Error', 'Du må være med i en familie for å legge til bursdager');
+        crossAlert(t('common.error'), t('birthdays.needFamily'));
         return;
       }
       await addDoc(collection(db, 'birthdays'), {
@@ -231,7 +231,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]}
                     value={newName}
                     onChangeText={setNewName}
-                    placeholder="F.eks. Emma Wiklund"
+                    placeholder={t('birthdays.memberNamePlaceholder')}
                     placeholderTextColor={colors.textDisabled}
                   />
                 </View>

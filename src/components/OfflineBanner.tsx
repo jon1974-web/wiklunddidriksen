@@ -2,11 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { useNetworkStatus } from '../platform/NetworkStatus';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 export const OfflineBanner: React.FC = () => {
   const isConnected = useNetworkStatus();
   const [animValue] = useState(new Animated.Value(0));
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     Animated.timing(animValue, {
@@ -28,7 +30,7 @@ export const OfflineBanner: React.FC = () => {
         },
       ]}
     >
-      <Text style={styles.text}>Ingen internettforbindelse</Text>
+      <Text style={styles.text}>{t('offlineBanner.noConnection')}</Text>
     </Animated.View>
   );
 };

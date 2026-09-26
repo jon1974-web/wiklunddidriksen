@@ -32,7 +32,7 @@ export const HelpCenter: React.FC<HelpCenterProps> = React.memo(({ visible, onCl
             <View style={[styles.container, { backgroundColor: '#fff' }]}>
               <View style={[styles.header, { backgroundColor: ACCENT }]}>
                 <Image source={require('../../assets/icon.png')} style={styles.logo} />
-                <Text style={styles.headerTitle}>Hjelpesenter</Text>
+                <Text style={styles.headerTitle}>{t('helpCenter.title')}</Text>
                 <Text style={styles.headerSubtitle}>{title}</Text>
               </View>
 
@@ -46,7 +46,7 @@ export const HelpCenter: React.FC<HelpCenterProps> = React.memo(({ visible, onCl
                       <Text style={[styles.sectionText, { color: '#333' }]}>{section.text}</Text>
                       {section.tip && (
                         <View style={[styles.tip, { backgroundColor: ACCENT_LIGHT, borderLeftColor: ACCENT }]}>
-                          <Text style={[styles.tipText, { color: '#1a3a4a' }]}>💡 <Text style={{ fontWeight: '600' }}>Tips:</Text> {section.tip}</Text>
+                          <Text style={[styles.tipText, { color: '#1a3a4a' }]}>💡 <Text style={{ fontWeight: '600' }}>{t('helpCenter.tips')}</Text> {section.tip}</Text>
                         </View>
                       )}
                     </View>

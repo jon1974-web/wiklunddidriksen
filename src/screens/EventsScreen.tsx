@@ -1250,7 +1250,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
             <View style={styles.spondCardContent}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 2 }}>
                 <AppIcon name="fest" size={16} color={BIRTHDAY_COLOR} />
-                <Text style={{ fontSize: 16, fontWeight: '600', color: BIRTHDAY_COLOR }}>Bursdag</Text>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: BIRTHDAY_COLOR }}>{t('events.typeBirthday')}</Text>
               </View>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
                 <AppIcon name="person" size={14} color={BIRTHDAY_COLOR} />

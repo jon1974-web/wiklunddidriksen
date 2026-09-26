@@ -42,7 +42,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
   const logoUrl = carrierDomain ? getFaviconUrl(carrierDomain) : null;
 
   const handleDelete = useCallback(() => {
-    crossAlert('Slett transport', 'Er du sikker?', [
+    crossAlert(t('trips.deleteTransportTitle'), t('common.deleteConfirm'), [
       { text: 'Avbryt', style: 'cancel' },
       {
         text: t('common.delete'),
@@ -52,7 +52,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
             await deleteTripTransport(tripId, f.id);
             navigation.goBack();
           } catch {
-            crossAlert('Error', 'Kunne ikke slette transport');
+            crossAlert(t('common.error'), t('transport.deleteFailed'));
           }
         },
       },
@@ -158,7 +158,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
           />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
             <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.departureAddress}</Text>
-            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Maps →</Text>
+            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>{t('transport.openInMaps')}</Text>
           </View>
         </TouchableOpacity>
       )}
@@ -184,7 +184,7 @@ export const TransportDetailScreen: React.FC<TransportDetailScreenProps> = ({ na
           />
           <View style={[styles.mapOverlay, { backgroundColor: colors.surface }]}>
             <Text style={[styles.mapOverlayText, { color: colors.text }]}>📍 {f.arrivalAddress}</Text>
-            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>Åpne i Maps →</Text>
+            <Text style={[styles.mapOverlayLink, { color: MODULE_COLORS.trips }]}>{t('transport.openInMaps')}</Text>
           </View>
         </TouchableOpacity>
       )}

@@ -80,7 +80,7 @@ export const HealthVaccDetailScreen: React.FC<Props> = ({ navigation, route }) =
 
       {/* Detail card */}
       <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>Detaljer</Text>
+        <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>{t('common.details')}</Text>
         {vaccination.person && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>👤</Text>
@@ -90,14 +90,14 @@ export const HealthVaccDetailScreen: React.FC<Props> = ({ navigation, route }) =
         {vaccination.nextDue && (
           <View style={styles.detailRow}>
             <Text style={[styles.detailLabel, { color: colors.textSecondary }]}>📅</Text>
-            <Text style={[styles.detailValue, { color: colors.text }]}>Neste dose: {formatDate(vaccination.nextDue)}</Text>
+            <Text style={[styles.detailValue, { color: colors.text }]}>{t('health.nextDose')} {formatDate(vaccination.nextDue)}</Text>
           </View>
         )}
         {vaccination.note && (
           <View style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <Text style={{ fontSize: 14 }}>📝</Text>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: HEALTH_COLOR }}>Notat</Text>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: HEALTH_COLOR }}>{t('common.note')}</Text>
             </View>
             <View style={{ paddingLeft: 22 }}>
               <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
@@ -106,7 +106,7 @@ export const HealthVaccDetailScreen: React.FC<Props> = ({ navigation, route }) =
               {vaccination.note.length > 60 && (
                 <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
                   <Text style={{ fontSize: 12, color: HEALTH_COLOR, fontWeight: '600', marginTop: 4 }}>
-                    {showFullNote ? t('common.back') : 'Les mer'}
+                    {showFullNote ? t('common.showLess') : t('common.readMore')}
                   </Text>
                 </TouchableOpacity>
               )}

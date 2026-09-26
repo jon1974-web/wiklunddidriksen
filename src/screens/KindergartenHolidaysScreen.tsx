@@ -166,8 +166,8 @@ export const KindergartenHolidaysScreen: React.FC<Props> = ({ navigation, route 
           <TouchableOpacity activeOpacity={1} style={[styles.modalContent, { backgroundColor: colors.surface }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>{editingId ? t('common.edit') : t('common.add')} {t('school.holiday')}</Text>
             <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.title} onChangeText={(v) => setForm(f => ({ ...f, title: v }))} placeholder={t('common.title')} placeholderTextColor={colors.textDisabled} />
-            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.dateFrom} onChangeText={(v) => setForm(f => ({ ...f, dateFrom: v }))} placeholder="YYYY-MM-DD" placeholderTextColor={colors.textDisabled} />
-            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.dateTo} onChangeText={(v) => setForm(f => ({ ...f, dateTo: v }))} placeholder="YYYY-MM-DD (valgfritt)" placeholderTextColor={colors.textDisabled} />
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.dateFrom} onChangeText={(v) => setForm(f => ({ ...f, dateFrom: v }))} placeholder={t('kindergarten.placeholderDateFrom')} placeholderTextColor={colors.textDisabled} />
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.dateTo} onChangeText={(v) => setForm(f => ({ ...f, dateTo: v }))} placeholder={t('kindergarten.placeholderDateTo')} placeholderTextColor={colors.textDisabled} />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => setShowAddModal(false)}>
                 <Text style={{ color: colors.text, fontWeight: '600' }}>{t('common.cancel')}</Text>

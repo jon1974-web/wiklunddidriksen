@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
 
 export const UpdateBanner: React.FC = () => {
   const [show, setShow] = useState(false);
   const { colors } = useTheme();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const checkForUpdate = async () => {
@@ -30,9 +32,9 @@ export const UpdateBanner: React.FC = () => {
 
   return (
     <View style={[styles.banner, { backgroundColor: colors.accent }]}>
-      <Text style={styles.text}>En ny versjon er tilgjengelig</Text>
+      <Text style={styles.text}>{t('updateBanner.available')}</Text>
       <TouchableOpacity style={styles.button} onPress={() => window.location.reload()}>
-        <Text style={styles.buttonText}>Oppdater</Text>
+        <Text style={styles.buttonText}>{t('updateBanner.update')}</Text>
       </TouchableOpacity>
     </View>
   );
