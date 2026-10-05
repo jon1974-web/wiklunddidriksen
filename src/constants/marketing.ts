@@ -22,12 +22,6 @@ export const INTRO_VIDEO: { duration: string; src: string | null } = {
   src: null,
 };
 
-export const DESKTOP_BENEFITS = [
-  { icon: '✅', titleKey: 'desktop.benefit1Title', textKey: 'desktop.benefit1Text' },
-  { icon: '🔒', titleKey: 'desktop.benefit2Title', textKey: 'desktop.benefit2Text' },
-  { icon: '📱', titleKey: 'desktop.benefit3Title', textKey: 'desktop.benefit3Text' },
-] as const;
-
 export interface LandingFeature {
   icon: AppIconName;
   color: string;
@@ -128,23 +122,21 @@ export const docUrls = {
   terms: (lang: string) => `/docs/terms-${normalizeDocLang(lang)}.html`,
 };
 
-export interface GuideSpace {
-  key: string;
-  icon: string;
+export interface GuideTile {
+  icon: AppIconName;
   color: string;
-  colorBg: string;
+  tint: string;
+  titleKey: string;
+  hintKey: string;
 }
 
-export const GUIDE_SPACES: GuideSpace[] = [
-  { key: 'Health', icon: '❤️', color: MODULE_COLORS.health, colorBg: MODULE_COLORS.healthBg },
-  { key: 'Birthdays', icon: '🎂', color: MODULE_COLORS.birthdays, colorBg: MODULE_COLORS.birthdaysBg },
-  { key: 'Pets', icon: '🐾', color: MODULE_COLORS.pets, colorBg: MODULE_COLORS.petsBg },
-  { key: 'Home', icon: '🏠', color: MODULE_COLORS.home, colorBg: MODULE_COLORS.homeBg },
-  { key: 'School', icon: '🎒', color: MODULE_COLORS.school, colorBg: MODULE_COLORS.schoolBg },
-  { key: 'Kindergarten', icon: '🧸', color: MODULE_COLORS.kindergarten, colorBg: MODULE_COLORS.kindergartenBg },
-  { key: 'Trips', icon: '✈️', color: MODULE_COLORS.trips, colorBg: MODULE_COLORS.tripsBg },
-  { key: 'Meals', icon: '🍽️', color: MODULE_COLORS.mealplan, colorBg: MODULE_COLORS.mealplanBg },
+export const GUIDE_TILES: GuideTile[] = [
+  { icon: 'birthday', color: MODULE_COLORS.birthdays, tint: MODULE_COLORS.birthdaysBg, titleKey: 'spaces.birthdays', hintKey: 'desktop.spaceBirthdaysHint' },
+  { icon: 'medication', color: MODULE_COLORS.health, tint: MODULE_COLORS.healthBg, titleKey: 'spaces.health', hintKey: 'desktop.spaceHealthHint' },
+  { icon: 'pet', color: MODULE_COLORS.pets, tint: MODULE_COLORS.petsBg, titleKey: 'spaces.pets', hintKey: 'desktop.spacePetsHint' },
+  { icon: 'house', color: MODULE_COLORS.home, tint: MODULE_COLORS.homeBg, titleKey: 'spaces.home', hintKey: 'desktop.spaceHomeHint' },
+  { icon: 'school', color: MODULE_COLORS.school, tint: MODULE_COLORS.schoolBg, titleKey: 'spaces.school', hintKey: 'desktop.spaceSchoolHint' },
+  { icon: 'kindergarten', color: MODULE_COLORS.kindergarten, tint: MODULE_COLORS.kindergartenBg, titleKey: 'spaces.kindergarten', hintKey: 'desktop.spaceKindergartenHint' },
+  { icon: 'compass', color: MODULE_COLORS.trips, tint: MODULE_COLORS.tripsBg, titleKey: 'spaces.trips', hintKey: 'desktop.spaceTripsHint' },
+  { icon: 'utensils', color: MODULE_COLORS.mealplan, tint: MODULE_COLORS.mealplanBg, titleKey: 'spaces.mealplan', hintKey: 'desktop.spaceMealsHint' },
 ];
-
-export const guideSpaceNameKey = (space: GuideSpace) => `desktop.space${space.key}`;
-export const guideSpaceHintKey = (space: GuideSpace) => `desktop.space${space.key}Hint`;
