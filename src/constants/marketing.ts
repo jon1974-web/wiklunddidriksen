@@ -1,4 +1,5 @@
 import { MODULE_COLORS } from './moduleColors';
+import type { AppIconName } from '../components/AppIcon';
 
 export const BRAND = {
   name: 'fampad',
@@ -40,11 +41,54 @@ export const LANDING_FEATURES = [
 
 export const TRUST_FLAGS = '🇳🇴 🇸🇪 🇩🇰 🇫🇮 🇬🇧';
 
-export const LANDING_SAMPLES = [
-  { icon: '⚽', tint: 'rgba(59, 90, 117, 0.12)', titleKey: 'landing.sample1Title', textKey: 'landing.sample1Text', spond: true },
-  { icon: '🎉', tint: 'rgba(230, 168, 23, 0.14)', titleKey: 'landing.sample2Title', textKey: 'landing.sample2Text' },
-  { icon: '🍕', tint: 'rgba(232, 131, 106, 0.14)', titleKey: 'landing.sample3Title', textKey: 'landing.sample3Text' },
-] as const;
+export interface LandingSample {
+  type: 'general' | 'school' | 'birthday';
+  color?: string;
+  icon: AppIconName;
+  weekdayKey: string;
+  day: string;
+  month: string;
+  titleKey: string;
+  timeKey?: string;
+  addressKey?: string;
+  nameKey?: string;
+  ageKey?: string;
+}
+
+export const LANDING_SAMPLES: LandingSample[] = [
+  {
+    type: 'general',
+    icon: 'utensils',
+    weekdayKey: 'days.fri',
+    day: '16',
+    month: 'OKT',
+    titleKey: 'landing.sample1Title',
+    timeKey: 'landing.sample1Time',
+    addressKey: 'landing.sample1Address',
+  },
+  {
+    type: 'school',
+    color: MODULE_COLORS.school,
+    icon: 'pencil',
+    weekdayKey: 'days.wed',
+    day: '21',
+    month: 'OKT',
+    titleKey: 'landing.sample2Title',
+    timeKey: 'landing.sample2Time',
+    addressKey: 'landing.sample2Address',
+  },
+  {
+    type: 'birthday',
+    color: MODULE_COLORS.birthdays,
+    icon: 'fest',
+    weekdayKey: 'days.sat',
+    day: '24',
+    month: 'OKT',
+    titleKey: 'landing.sample3Title',
+    nameKey: 'landing.sample3Name',
+    ageKey: 'landing.sample3Text',
+  },
+];
 
 export const LANDING_FAQ = [
   { qKey: 'landing.faqCostQ', aKey: 'landing.faqCostA' },

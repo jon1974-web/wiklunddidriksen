@@ -2046,12 +2046,15 @@
     "footerRights": "Kaikki oikeudet pidätetään.",
     "linkPrivacy": "Tietosuoja",
     "linkTerms": "Ehdot",
-    "sample1Title": "G14-ottelu — Ready vs VIF",
-    "sample1Text": "Sunnuntai 16. heinäkuuta — 14:00 · Marienlyst",
-    "sample2Title": "Jonin 40-vuotispäivä",
-    "sample2Text": "Lauantai 15. heinäkuuta — 15:00 · Jonin talo, Oslo",
-    "sample3Title": "Perjantai-ilta pizzalla",
-    "sample3Text": "Perjantai 14. heinäkuuta — 18:00 · Meillä kotona",
-    "linkContact": "Yhteystiedot"
+    "sample1Title": "Perjantai-ilta pizzalla",
+    "sample2Title": "Vanhempainilta — 6B",
+    "sample3Title": "Syntymäpäivä",
+    "sample3Text": "8 vuotta",
+    "linkContact": "Yhteystiedot",
+    "sample1Time": "18:00 – 21:00",
+    "sample1Address": "Peppes Pizza, Oslo",
+    "sample2Time": "18:00 – 19:30",
+    "sample2Address": "Bekkelaget skole, Oslo",
+    "sample3Name": "Ida"
   }
 }

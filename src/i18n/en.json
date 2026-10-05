@@ -2046,12 +2046,15 @@
     "footerRights": "All rights reserved.",
     "linkPrivacy": "Privacy",
     "linkTerms": "Terms",
-    "sample1Title": "G14 match — Ready vs VIF",
-    "sample1Text": "Sunday 16 July — 14:00 · Marienlyst",
-    "sample2Title": "Jon's 40th birthday",
-    "sample2Text": "Saturday 15 July — 15:00 · Jon's house, Oslo",
-    "sample3Title": "Friday night with pizza",
-    "sample3Text": "Friday 14 July — 18:00 · At our house",
-    "linkContact": "Contact"
+    "sample1Title": "Friday night with pizza",
+    "sample2Title": "Parent meeting — 6B",
+    "sample3Title": "Birthday",
+    "sample3Text": "8 years old",
+    "linkContact": "Contact",
+    "sample1Time": "18:00 – 21:00",
+    "sample1Address": "Peppes Pizza, Oslo",
+    "sample2Time": "18:00 – 19:30",
+    "sample2Address": "Bekkelaget skole, Oslo",
+    "sample3Name": "Ida"
   }
 }
