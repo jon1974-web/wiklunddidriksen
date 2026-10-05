@@ -526,7 +526,10 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   };
 
   const handleSaveActivity = async () => {
-    if (!familyId || !selectedYear || !selectedChild) return;
+    if (!familyId || !selectedYear || !selectedChild) {
+      crossAlert(t('common.error'), t('school.needChildAndYear'));
+      return;
+    }
     if (!activityForm.title.trim() || !activityForm.dateFrom) {
       crossAlert(t('common.error'), t('health.enterTitleAndDate'));
       return;
