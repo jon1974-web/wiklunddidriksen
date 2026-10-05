@@ -96,11 +96,11 @@ export const LandingScreen: React.FC = () => {
           <View style={styles.sectionWrap}>
             <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('desktop.watchSection')}</Text>
             <View style={styles.mediaRow}>
-              <View style={styles.videoCol}>
-                <VideoIntroCard />
+                  <View style={styles.videoCol}>
+                <VideoIntroCard grow />
               </View>
               <View style={styles.visualCol}>
-                <HeroVisual />
+                <HeroVisual style={{ flex: 1 }} />
               </View>
             </View>
           </View>
@@ -279,17 +279,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 24,
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
   },
   videoCol: {
-    flexBasis: '38%',
+    flexBasis: '50%',
     flexGrow: 1,
-    minWidth: 280,
-    maxWidth: 460,
+    minWidth: 300,
+    maxWidth: 640,
     marginTop: 26,
   },
   visualCol: {
-    flexBasis: '54%',
+    flexBasis: '44%',
     flexGrow: 1,
     minWidth: 320,
   },

@@ -1980,7 +1980,8 @@
     "familyTitle": "Perheemme",
     "upcomingTitle": "Tulossa",
     "noUpcoming": "Ei tapahtumia tulossa",
-    "helpTitle": "Ohjeet ja tuki"
+    "helpTitle": "Ohjeet ja tuki",
+    "visualCaption": "Näin tapahtumalista näkyy selaimessa — sama sovellus, samat tiedot."
   },
   "landing": {
     "heroEyebrow": "Beta · kaikki ilmaista",

@@ -1980,7 +1980,8 @@
     "familyTitle": "Vår familie",
     "upcomingTitle": "Neste opp",
     "noUpcoming": "Ingen avtaler de neste dagene",
-    "helpTitle": "Hjelp og support"
+    "helpTitle": "Hjelp og support",
+    "visualCaption": "Slik ser avtalelisten ut i nettleseren — samme app, samme data."
   },
   "landing": {
     "heroEyebrow": "Betaperiode · alt gratis",

@@ -4,13 +4,13 @@ import { useTheme } from '../../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { INTRO_VIDEO } from '../../constants/marketing';
 
-export const VideoIntroCard: React.FC = () => {
+export const VideoIntroCard: React.FC<{ grow?: boolean }> = ({ grow = false }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
 
   return (
-    <View>
-      <View style={styles.card}>
+    <View style={grow && styles.growRoot}>
+      <View style={[styles.card, grow ? styles.growCard : styles.fixedCard]}>
         <View style={styles.play}>
           <Text style={styles.playIcon}>▶</Text>
         </View>
@@ -21,14 +21,24 @@ export const VideoIntroCard: React.FC = () => {
           <Text style={styles.durText}>{INTRO_VIDEO.duration}</Text>
         </View>
       </View>
-      <Text style={[styles.caption, { color: colors.textSecondary }]}>{t('desktop.videoCaption')}</Text>
+      <Text style={[styles.caption, { color: colors.textSecondary }]} numberOfLines={2}>
+        {t('desktop.videoCaption')}
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  card: {
+  growRoot: {
+    flex: 1,
+  },
+  growCard: {
+    flex: 1,
+  },
+  fixedCard: {
     aspectRatio: 16 / 9,
+  },
+  card: {
     borderRadius: 18,
     overflow: 'hidden',
     backgroundColor: '#2D485E',

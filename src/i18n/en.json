@@ -1980,7 +1980,8 @@
     "familyTitle": "Our family",
     "upcomingTitle": "Coming up",
     "noUpcoming": "No events coming up",
-    "helpTitle": "Help & support"
+    "helpTitle": "Help & support",
+    "visualCaption": "The event list as it looks in your browser — same app, same data."
   },
   "landing": {
     "heroEyebrow": "Beta · everything free",

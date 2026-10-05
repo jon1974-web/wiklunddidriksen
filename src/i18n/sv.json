@@ -1980,7 +1980,8 @@
     "familyTitle": "Vår familj",
     "upcomingTitle": "Kommande",
     "noUpcoming": "Inga evenemang på gång",
-    "helpTitle": "Hjälp och support"
+    "helpTitle": "Hjälp och support",
+    "visualCaption": "Så här ser evenemangslistan ut i webbläsaren — samma app, samma data."
   },
   "landing": {
     "heroEyebrow": "Beta · allt gratis",
