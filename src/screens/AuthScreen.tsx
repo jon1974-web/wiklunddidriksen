@@ -16,7 +16,7 @@ const ACCENT = '#3b5a75';
 
 type Step = 'account' | 'language' | 'family';
 
-export const AuthScreen: React.FC = () => {
+export const AuthScreen: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
   const { t } = useTranslation();
   const setUser = useUserStore((state) => state.setUser);
   const setFamily = useUserStore((state) => state.setFamily);
@@ -173,9 +173,11 @@ export const AuthScreen: React.FC = () => {
 
   const renderAccountStep = () => (
     <>
-        <Text style={[styles.welcomeText, { color: ACCENT }]}>
-          {t('auth.welcomeText')}
-        </Text>
+        {!compact && (
+          <Text style={[styles.welcomeText, { color: ACCENT }]}>
+            {t('auth.welcomeText')}
+          </Text>
+        )}
 
       {hasInvite && (
         <View style={[styles.inviteBanner, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
@@ -316,9 +318,17 @@ export const AuthScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: '#F6F7F9' }]}>
-      <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-        <Image source={require('../../assets/icon.png')} style={{ width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }} />
-        <Text style={[styles.title, { color: ACCENT }]}>fampad</Text>
+      <ScrollView
+        contentContainerStyle={[styles.scrollContent, compact && styles.compactScroll]}
+        showsVerticalScrollIndicator={false}
+      >
+        <Image
+          source={require('../../assets/icon.png')}
+          style={compact
+            ? { width: 56, height: 56, borderRadius: 14, marginBottom: 10, alignSelf: 'center' }
+            : { width: 100, height: 100, borderRadius: 24, marginBottom: 16, alignSelf: 'center' }}
+        />
+        <Text style={[styles.title, compact && styles.compactTitle, { color: ACCENT }]}>fampad</Text>
 
         {step !== 'account' && (
           <View style={styles.progressRow}>
@@ -380,6 +390,14 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     flexGrow: 1,
     justifyContent: 'center',
+  },
+  compactScroll: {
+    padding: 16,
+    paddingTop: 20,
+    paddingBottom: 24,
+  },
+  compactTitle: {
+    fontSize: 26,
   },
   title: {
     fontSize: 38,

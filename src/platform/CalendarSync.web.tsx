@@ -19,13 +19,13 @@ const generateICS = (event: SyncEventParams): string => {
   let ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//Familiesenter//NO',
+    'PRODID:-//fampad//NO',
     'BEGIN:VEVENT',
     `DTSTART:${start}`,
     `DTEND:${end}`,
     `SUMMARY:${event.title}`,
     `DTSTAMP:${now}`,
-    `UID:${Date.now()}@familiesenter.web`,
+    `UID:${Date.now()}@fampad.web`,
   ];
 
   if (event.description) {

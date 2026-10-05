@@ -27,7 +27,7 @@ export const configureNotifications = () => {
   // Listen for foreground messages
   onMessage(m, (payload) => {
     if (payload.notification) {
-      new Notification(payload.notification.title || 'Familiesenter', {
+      new Notification(payload.notification.title || 'fampad', {
         body: payload.notification.body,
         icon: '/favicon.ico',
       });

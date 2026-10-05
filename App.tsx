@@ -9,6 +9,11 @@ import Svg, { Rect, Line, Path, Circle, Polygon, Polyline } from 'react-native-s
 import { useNavigation } from '@react-navigation/native';
 import { CustomTabBar } from './src/components/CustomTabBar';
 import { QuickCreateModal } from './src/components/QuickCreateModal';
+import { DesktopShell } from './src/components/desktop/DesktopShell';
+import { TopTabBar } from './src/components/desktop/TopTabBar';
+import { RightPanel } from './src/components/desktop/RightPanel';
+import { LeftPanel } from './src/components/desktop/LeftPanel';
+import { useDesktopLayout } from './src/hooks/useDesktopLayout';
 
 import './src/i18n';
 import i18n from './src/i18n';
@@ -22,6 +27,7 @@ import { configureNotifications, requestNotificationPermission } from './src/ser
 import { crossAlert } from './src/utils/alert';
 
 import { AuthScreen } from './src/screens/AuthScreen';
+import { LandingScreen } from './src/screens/LandingScreen';
 import { EventsScreen } from './src/screens/EventsScreen';
 import { ShoppingListsScreen } from './src/screens/ShoppingListsScreen';
 import { ChatScreen } from './src/screens/ChatScreen';
@@ -640,6 +646,8 @@ const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showQuickCreate, setShowQuickCreate] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [desktopActiveTab, setDesktopActiveTab] = useState(0);
+  const { isDesktop } = useDesktopLayout();
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
@@ -767,9 +775,38 @@ const AppContent = () => {
         <OfflineBanner />
         <UpdateBanner />
         {user ? (
-          <>
+          <DesktopShell
+            isDesktop={isDesktop}
+            leftPanel={<LeftPanel />}
+            rightPanel={<RightPanel />}
+            topTabBar={
+              <TopTabBar
+                activeIndex={desktopActiveTab}
+                onSelect={(name) => {
+                  if (name === 'Trips') {
+                    (navigationRef as any).navigate('Trips', { screen: 'SpacesList' });
+                  } else {
+                    (navigationRef as any).navigate(name);
+                  }
+                }}
+                onCreatePress={() => setShowQuickCreate(true)}
+                userInitial={(user.displayName || 'U').charAt(0).toUpperCase()}
+                onProfilePress={() => (navigationRef as any).navigate('Profile')}
+              />
+            }
+          >
             <Tab.Navigator
-              tabBar={(props) => <ChatTabBarWrapper {...props} onCreatePress={() => setShowQuickCreate(true)} />}
+              tabBar={(props) =>
+                isDesktop
+                  ? null
+                  : <ChatTabBarWrapper {...props} onCreatePress={() => setShowQuickCreate(true)} />
+              }
+              screenListeners={{
+                state: (e: any) => {
+                  const idx = e?.data?.state?.index;
+                  if (typeof idx === 'number') setDesktopActiveTab(idx);
+                },
+              }}
               screenOptions={{
                 headerShown: false,
               }}
@@ -799,7 +836,9 @@ const AppContent = () => {
               onClose={() => setShowAIAssistant(false)}
               navigation={navigationRef}
             />
-          </>
+          </DesktopShell>
+        ) : isDesktop ? (
+          <LandingScreen />
         ) : (
           <AuthScreen />
         )}

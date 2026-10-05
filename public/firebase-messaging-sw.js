@@ -14,12 +14,12 @@ try {
   const messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {
-    const notificationTitle = payload.notification?.title || 'Familiesenter';
+    const notificationTitle = payload.notification?.title || 'fampad';
     const notificationOptions = {
       body: payload.notification?.body || '',
       icon: '/favicon.ico',
       badge: '/favicon.ico',
-      tag: payload.data?.eventId || 'familiesenter',
+      tag: payload.data?.eventId || 'fampad',
       data: payload.data || {},
       requireInteraction: true,
     };

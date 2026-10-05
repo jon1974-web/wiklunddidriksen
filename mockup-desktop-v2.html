@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FamPad — Desktop & Landing Mockup (v2)</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #e8f0f1;
+    --panel-bg: #f4f8f9;
+    --panel-text: #1a2b33;
+    --panel-muted: #5a7076;
+    --panel-border: rgba(0, 131, 143, 0.12);
+    --teal: #0097A7;
+    --teal-dark: #00838F;
+    --teal-gradient: linear-gradient(135deg, #0097A7 0%, #00838F 100%);
+    --slate: #3b5a75;
+    --slate-soft: rgba(59, 90, 117, 0.10);
+    --card: #ffffff;
+    --text: #1a2b33;
+    --text-muted: #5a7076;
+    --shadow-app: 0 8px 40px rgba(0, 40, 50, 0.10);
+    --shadow-card: 0 2px 10px rgba(0, 40, 50, 0.05);
+    --radius: 16px;
+  }
+
+  html.dark {
+    --bg: #10161a;
+    --panel-bg: #151d22;
+    --panel-text: #e0e6e8;
+    --panel-muted: #8aa0a8;
+    --panel-border: rgba(77, 208, 225, 0.15);
+    --slate: #4dd0e1;
+    --slate-soft: rgba(77, 208, 225, 0.12);
+    --card: #1a2228;
+    --text: #e0e6e8;
+    --text-muted: #8aa0a8;
+    --shadow-app: 0 8px 40px rgba(0, 0, 0, 0.45);
+    --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.35);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  button { font: inherit; cursor: pointer; }
+  a { color: var(--teal); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ============ Mock control pill ============ */
+  .mock-controls {
+    position: fixed;
+    bottom: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(23, 32, 37, 0.88);
+    backdrop-filter: blur(10px);
+    border-radius: 999px;
+    padding: 6px 10px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+  }
+  .mock-controls .seg {
+    border: none;
+    background: transparent;
+    color: #b9c8cd;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mock-controls .seg.active { background: #0097A7; color: #fff; }
+  .mock-controls .bp-label {
+    color: #7e94a0;
+    font-size: 11px;
+    padding: 0 8px 0 10px;
+    border-left: 1px solid rgba(255,255,255,0.14);
+    margin-left: 4px;
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .mock-controls .theme-btn {
+    border: none;
+    background: transparent;
+    border-radius: 999px;
+    width: 32px; height: 32px;
+    display: grid; place-items: center;
+    font-size: 15px;
+    transition: background 0.15s;
+  }
+  .mock-controls .theme-btn:hover { background: rgba(255,255,255,0.1); }
+
+  /* ============ Shared bits ============ */
+  .logo-row { display: flex; align-items: center; gap: 10px; }
+  .logo-mark { width: 44px; height: 44px; flex: none; }
+  .brand-name { font-size: 20px; font-weight: 800; letter-spacing: -0.3px; }
+  .brand-name .fam { color: var(--teal); }
+  .tagline { font-size: 13px; color: var(--panel-muted); line-height: 1.45; margin-top: 4px; }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-card);
+  }
+
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--panel-muted);
+    margin: 22px 0 10px;
+  }
+
+  /* ============ VIEW: app shell ============ */
+  .desktop-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 26px;
+    min-height: 100vh;
+    padding: 26px 30px 90px;
+  }
+
+  .side-panel {
+    width: clamp(280px, 23vw, 350px);
+    flex-shrink: 0;
+    position: sticky;
+    top: 24px;
+    display: flex;
+    flex-direction: column;
+    padding: 6px 4px;
+    max-height: calc(100vh - 48px);
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+  .side-panel::-webkit-scrollbar { display: none; }
+
+  /* ---- Video card (the ONE glass element on the left) ---- */
+  .video-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background:
+      radial-gradient(120% 120% at 80% 10%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 45%),
+      var(--teal-gradient);
+    box-shadow: 0 10px 30px rgba(0, 131, 143, 0.28);
+  }
+  .video-card .play {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: #fff;
+    font-size: 22px;
+    display: grid; place-items: center;
+    box-shadow: inset 0 0 0 1.5px rgba(255,255,255,0.45), 0 4px 18px rgba(0,0,0,0.18);
+    transition: transform 0.18s ease;
+  }
+  .video-card .play:hover { transform: scale(1.07); }
+  .video-card .play:active { transform: scale(0.96); }
+  .video-card .dur {
+    position: absolute;
+    right: 10px; bottom: 10px;
+    background: rgba(0,0,0,0.45);
+    color: #fff;
+    font-size: 11px; font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .video-card .hint {
+    position: absolute;
+    left: 12px; bottom: 12px;
+    color: rgba(255,255,255,0.92);
+    font-size: 12px;
+    font-weight: 600;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+  }
+  .video-caption { font-size: 12.5px; color: var(--panel-muted); margin-top: 8px; text-align: center; line-height: 1.45; }
+
+  /* ---- benefits ---- */
+  .benefit { display: flex; gap: 10px; align-items: flex-start; padding: 7px 0; }
+  .benefit .ic {
+    width: 26px; height: 26px; flex-shrink: 0;
+    border-radius: 8px;
+    background: var(--slate-soft);
+    color: var(--slate);
+    display: grid; place-items: center;
+    font-size: 13px;
+  }
+  .benefit b { font-size: 13.5px; font-weight: 650; display: block; }
+  .benefit span { font-size: 12.5px; color: var(--panel-muted); line-height: 1.4; }
+
+  /* ---- pricing (glass, single CTA) ---- */
+  .pricing-card {
+    margin-top: 4px;
+    border-radius: 18px;
+    padding: 18px 18px 16px;
+    background: linear-gradient(160deg, rgba(0,151,167,0.10), rgba(0,131,143,0.05));
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0,151,167,0.28);
+    box-shadow: 0 8px 26px rgba(0,131,143,0.12);
+  }
+  .pricing-card .tier-row { display: flex; align-items: center; justify-content: space-between; }
+  .pricing-card .tier { font-size: 15px; font-weight: 800; color: var(--teal-dark); }
+  .pricing-card .badge {
+    background: var(--teal-gradient);
+    color: #fff;
+    font-size: 10.5px; font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 3px 9px;
+    border-radius: 999px;
+  }
+  .pricing-card .price { font-size: 30px; font-weight: 800; margin: 8px 0 2px; }
+  .pricing-card .price small { font-size: 13px; font-weight: 600; color: var(--panel-muted); }
+  .pricing-card .fine { font-size: 12px; color: var(--panel-muted); line-height: 1.5; margin-bottom: 12px; }
+  .btn-primary {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    background: var(--teal-gradient);
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 700;
+    box-shadow: 0 6px 18px rgba(0,131,143,0.30);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0,131,143,0.36); }
+  .microcopy {
+    text-align: center;
+    font-size: 11.5px;
+    color: var(--panel-muted);
+    margin-top: 9px;
+    line-height: 1.5;
+  }
+
+  /* ---- middle: app column ---- */
+  .app-column {
+    width: 500px;
+    flex-shrink: 0;
+    background: var(--card);
+    border-radius: 22px;
+    box-shadow: var(--shadow-app);
+    padding: 18px 20px 30px;
+    min-height: 80vh;
+  }
+
+  /* top tab bar */
+  .top-tabbar {
+    position: sticky;
+    top: 14px;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--card);
+    padding: 8px 10px;
+    margin: -8px -10px 16px;
+    border-radius: 16px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9px 13px;
+    border-radius: 999px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .tab:hover { background: rgba(0,0,0,0.045); color: var(--text); }
+  html.dark .tab:hover { background: rgba(255,255,255,0.06); }
+  .tab.active {
+    background: var(--slate-soft);
+    color: var(--slate);
+  }
+  .tab .t-ic { font-size: 15px; line-height: 1; }
+  .tabbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+  .btn-ny {
+    border: none;
+    border-radius: 999px;
+    padding: 9px 16px;
+    background: var(--teal-gradient);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    box-shadow: 0 4px 14px rgba(0,131,143,0.30);
+    transition: transform 0.15s ease;
+  }
+  .btn-ny:hover { transform: translateY(-1px); }
+  .avatar {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: var(--teal-gradient);
+    color: #fff;
+    display: grid; place-items: center;
+    font-size: 13px; font-weight: 800;
+    border: none;
+  }
+
+  /* events content */
+  .list-head { display: flex; align-items: center; justify-content: space-between; margin: 6px 0 12px; }
+  .list-head h2 { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+  .seg-toggle {
+    display: flex;
+    gap: 3px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 999px;
+    padding: 3px;
+  }
+  html.dark .seg-toggle { background: rgba(255,255,255,0.07); }
+  .seg-toggle button {
+    border: none; background: transparent;
+    font-size: 11.5px; font-weight: 650;
+    color: var(--text-muted);
+    padding: 6px 11px;
+    border-radius: 999px;
+  }
+  .seg-toggle button.on { background: #fff; color: var(--slate); box-shadow: 0 1px 4px rgba(0,0,0,0.12); }
+
+  .event-card {
+    background: var(--panel-bg);
+    border: 1px solid var(--panel-border);
+    border-radius: 14px;
+    padding: 13px 14px;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .event-card:hover { box-shadow: 0 4px 14px rgba(0,40,50,0.08); }
+  .event-emoji {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: grid; place-items: center;
+    font-size: 19px;
+    flex-shrink: 0;
+  }
+  .event-card h3 { font-size: 14.5px; font-weight: 700; margin-bottom: 3px; }
+  .event-meta { font-size: 12.5px; color: var(--text-muted); line-height: 1.5; }
+  .badge-spond {
+    display: inline-block;
+    margin-top: 6px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    color: #fff;
+    background: var(--teal-gradient);
+    border-radius: 6px;
+    padding: 2.5px 7px;
+  }
+
+  /* ---- right panel ---- */
+  .steps { list-style: none; }
+  .steps li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    padding: 6px 0;
+    font-size: 12.5px;
+    color: var(--panel-muted);
+    line-height: 1.45;
+  }
+  .steps li b { color: var(--panel-text); font-weight: 650; }
+  .step-num {
+    width: 20px; height: 20px; flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--teal-gradient);
+    color: #fff;
+    font-size: 10.5px; font-weight: 800;
+    display: grid; place-items: center;
+    margin-top: 1px;
+  }
+  .os-head {
+    display: flex; align-items: center; gap: 7px;
+    font-size: 13px; font-weight: 750; margin-bottom: 2px;
+  }
+  .os-head .os-ic { font-size: 14px; }
+
+  .bento {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .bento-tile {
+    background: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    padding: 11px 10px 9px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
+    cursor: pointer;
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
+    position: relative;
+  }
+  .bento-tile:hover { transform: translateY(-2px); box-shadow: 0 5px 14px rgba(0,40,50,0.10); }
+  .bento-tile .b-ic {
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-size: 13px;
+    margin-bottom: 3px;
+  }
+  .bento-tile b { font-size: 12px; font-weight: 700; }
+  .bento-tile span { font-size: 10.5px; color: var(--panel-muted); line-height: 1.35; }
+
+  .ad-slot {
+    margin-top: 8px;
+    border: 1.5px dashed rgba(0,131,143,0.35);
+    border-radius: 14px;
+    padding: 22px 16px;
+    text-align: center;
+    background: rgba(0,151,167,0.03);
+  }
+  .ad-slot .ad-title { font-size: 12.5px; font-weight: 700; color: var(--panel-muted); }
+  .ad-slot .ad-sub { font-size: 10.5px; color: var(--panel-muted); margin-top: 3px; opacity: 0.75; }
+
+  /* ============ VIEW: landing ============ */
+  .landing { min-height: 100vh; display: flex; flex-direction: column; }
+  .landing-nav {
+    max-width: 1160px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px 34px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .landing-nav .spacer { flex: 1; }
+  .btn-ghost {
+    border: 1.5px solid var(--panel-border);
+    background: transparent;
+    color: var(--text);
+    border-radius: 999px;
+    padding: 9px 18px;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+  .landing-hero {
+    max-width: 1160px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 30px 34px 60px;
+    display: grid;
+    grid-template-columns: 1.25fr 0.9fr;
+    gap: 60px;
+    align-items: start;
+  }
+  .hero-copy .eyebrow {
+    display: inline-block;
+    font-size: 11.5px;
+    font-weight: 800;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: rgba(0,151,167,0.10);
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 16px;
+  }
+  .hero-copy h1 {
+    font-size: clamp(34px, 4.2vw, 52px);
+    line-height: 1.06;
+    letter-spacing: -0.03em;
+    font-weight: 800;
+    margin-bottom: 16px;
+  }
+  .hero-copy h1 .grad {
+    background: var(--teal-gradient);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .hero-copy .sub { font-size: 16.5px; color: var(--panel-muted); line-height: 1.55; max-width: 46ch; margin-bottom: 22px; }
+  .hero-ctas { display: flex; align-items: center; gap: 14px; }
+  .btn-hero {
+    border: none;
+    border-radius: 12px;
+    padding: 14px 26px;
+    background: var(--teal-gradient);
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 700;
+    box-shadow: 0 6px 20px rgba(0,131,143,0.32);
+    transition: transform 0.15s ease;
+  }
+  .btn-hero:hover { transform: translateY(-1px); }
+  .hero-micro { font-size: 12px; color: var(--panel-muted); margin-top: 10px; }
+  .trust-row {
+    display: flex;
+    gap: 18px;
+    margin-top: 28px;
+    font-size: 12px;
+    color: var(--panel-muted);
+    flex-wrap: wrap;
+  }
+  .trust-row .t-item { display: flex; align-items: center; gap: 6px; font-weight: 600; }
+
+  /* auth card on the right (sticky) */
+  .auth-rail { position: sticky; top: 34px; }
+  .auth-card {
+    background: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    box-shadow: var(--shadow-app);
+    padding: 24px 24px 20px;
+  }
+  .auth-card .a-logo { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
+  .auth-card .a-logo .logo-mark { width: 32px; height: 32px; }
+  .auth-card .a-logo .brand-name { font-size: 17px; }
+  .auth-card label { font-size: 12px; font-weight: 700; color: var(--text-muted); display: block; margin: 12px 0 5px; }
+  .auth-card input {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px 13px;
+    border-radius: 11px;
+    border: 1.5px solid var(--panel-border);
+    background: var(--panel-bg);
+    color: var(--text);
+    outline: none;
+  }
+  .auth-card input:focus { border-color: var(--teal); }
+  .btn-auth {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 13px 16px;
+    background: var(--teal-gradient);
+    color: #fff;
+    font-size: 14.5px;
+    font-weight: 700;
+    margin-top: 18px;
+    box-shadow: 0 5px 16px rgba(0,131,143,0.30);
+  }
+  .auth-alt { text-align: center; font-size: 12.5px; color: var(--panel-muted); margin-top: 12px; line-height: 1.6; }
+  .auth-fine { font-size: 10.5px; color: var(--panel-muted); text-align: center; margin-top: 12px; line-height: 1.5; opacity: 0.8; }
+  .auth-fine a { color: var(--panel-muted); text-decoration: underline; }
+
+  /* hero visual placeholder — product-first */
+  .hero-visual {
+    margin-top: 26px;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid var(--panel-border);
+    box-shadow: var(--shadow-app);
+    background: var(--panel-bg);
+  }
+  .hero-visual .hv-bar {
+    display: flex; gap: 6px; align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .hv-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(0,0,0,0.14); }
+  html.dark .hv-dot { background: rgba(255,255,255,0.18); }
+  .hv-body { padding: 14px; display: flex; flex-direction: column; gap: 9px; }
+  .hv-card { background: var(--card); border: 1px solid var(--panel-border); border-radius: 12px; padding: 11px 13px; display: flex; gap: 10px; align-items: center; }
+  .hv-card .event-emoji { width: 34px; height: 34px; font-size: 16px; }
+  .hv-card h4 { font-size: 13px; font-weight: 700; }
+  .hv-card p { font-size: 11.5px; color: var(--text-muted); }
+
+  /* landing split hero */
+  .landing-split { max-width: 1160px; width: 100%; margin: 0 auto; padding: 30px 34px 64px; display: grid; grid-template-columns: 1.25fr 0.9fr; gap: 56px; align-items: start; }
+
+  /* landing sections */
+  .land-section { max-width: 1160px; width: 100%; margin: 0 auto; padding: 34px; }
+  .land-section h2.sec { font-size: 26px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 6px; }
+  .land-section p.sec-sub { color: var(--panel-muted); font-size: 14px; margin-bottom: 22px; }
+  .land-bento {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+  .land-tile {
+    background: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 18px 16px 15px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .land-tile:hover { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,40,50,0.10); }
+  .land-tile .b-ic {
+    width: 38px; height: 38px;
+    border-radius: 11px;
+    display: grid; place-items: center;
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  .land-tile b { font-size: 13.5px; display: block; margin-bottom: 3px; }
+  .land-tile span { font-size: 12px; color: var(--panel-muted); line-height: 1.45; }
+
+  .land-pricing {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 26px;
+    align-items: center;
+    background: linear-gradient(120deg, rgba(0,151,167,0.10), rgba(0,131,143,0.04));
+    border: 1px solid rgba(0,151,167,0.25);
+    border-radius: 20px;
+    padding: 26px 30px;
+  }
+  .land-pricing h3 { font-size: 20px; font-weight: 800; margin-bottom: 6px; }
+  .land-pricing ul { list-style: none; margin-top: 8px; }
+  .land-pricing li { font-size: 13px; color: var(--panel-muted); padding: 3px 0; }
+  .land-pricing .p-price { font-size: 38px; font-weight: 800; }
+  .land-pricing .p-price small { font-size: 13px; color: var(--panel-muted); font-weight: 600; }
+
+  .faq-item { border-bottom: 1px solid var(--panel-border); padding: 14px 2px; }
+  .faq-item summary { font-size: 14px; font-weight: 700; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+  .faq-item summary::after { content: '+'; color: var(--teal); font-size: 17px; font-weight: 700; }
+  .faq-item[open] summary::after { content: '–'; }
+  .faq-item p { font-size: 13px; color: var(--panel-muted); padding: 9px 2px 4px; line-height: 1.55; max-width: 70ch; }
+
+  .landing-foot {
+    border-top: 1px solid var(--panel-border);
+    margin-top: 26px;
+    padding: 26px 34px 96px;
+    font-size: 12px;
+    color: var(--panel-muted);
+    display: flex;
+    gap: 22px;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 1160px;
+    width: 100%;
+    margin-left: auto; margin-right: auto;
+  }
+  .landing-foot .f-links { display: flex; gap: 18px; margin-left: auto; }
+  .landing-foot a { color: var(--panel-muted); }
+  .landing-foot a:hover { color: var(--teal); }
+
+  /* install strip on landing */
+  .install-strip { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .inst-card {
+    background: var(--card);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    padding: 16px 18px;
+  }
+  .inst-card .os-head { margin-bottom: 6px; }
+
+  /* ============ Responsive ============ */
+  /* tablet & below: hide panels, center column only */
+  @media (max-width: 1099px) {
+    .side-panel { display: none; }
+    .app-column { width: min(560px, 100%); }
+  }
+  /* mobile: full width, compact top bar, hide labels */
+  @media (max-width: 767px) {
+    .desktop-wrapper { padding: 0 0 80px; }
+    .app-column { width: 100%; border-radius: 0; min-height: 100vh; padding: 10px 14px 30px; }
+    .top-tabbar { top: 0; margin: -10px -14px 14px; border-radius: 0; }
+    .tab .t-label { display: none; }
+    .btn-ny { padding: 9px 12px; }
+    .seg-toggle { display: none; }
+    .landing-nav { padding: 16px 20px; }
+    .landing-split { padding: 18px 20px 46px; grid-template-columns: 1fr; gap: 34px; }
+    .auth-card { position: static; }
+    .hero-copy h1 { font-size: 34px; }
+    .land-bento { grid-template-columns: 1fr 1fr; }
+    .land-pricing { grid-template-columns: 1fr; gap: 14px; }
+    .install-strip { grid-template-columns: 1fr; }
+    .land-section { padding: 26px 20px; }
+  }
+
+  /* reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  .hidden { display: none !important; }
+
+  :focus-visible { outline: 2.5px solid var(--teal); outline-offset: 2px; border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<!-- Shared SVG gradient defs (always rendered so hidden views can reference it) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lgTeal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0097A7"/><stop offset="1" stop-color="#00838F"/>
+    </linearGradient>
+  </defs>
+</svg>
+
+<!-- =============== MOCK CONTROLS =============== -->
+<div class="mock-controls" id="mockControls">
+  <button class="seg active" id="btnViewApp" onclick="switchView('app')">App · innlogget</button>
+  <button class="seg" id="btnViewLanding" onclick="switchView('landing')">Landing · utlogget</button>
+  <button class="theme-btn" id="btnTheme" onclick="toggleTheme()" title="Lys / mørk">🌙</button>
+  <span class="bp-label" id="bpLabel">—</span>
+</div>
+
+<!-- =============== VIEW 1: Logged-in desktop shell =============== -->
+<section id="viewApp">
+  <div class="desktop-wrapper">
+
+    <!-- LEFT PANEL: why -->
+    <aside class="side-panel">
+      <div class="logo-row">
+        <svg class="logo-mark" viewBox="0 0 1024 1024" aria-hidden="true">
+          <rect width="1024" height="1024" rx="230" fill="url(#lgTeal)"/>
+          <path d="M512 268 L806 520 L806 796 L218 796 L218 520 Z" fill="none" stroke="#ffffff" stroke-width="58" stroke-linejoin="round"/>
+          <path d="M512 690c-64-44-118-92-118-152 0-40 30-70 68-70 22 0 40 10 50 26 10-16 28-26 50-26 38 0 68 30 68 70 0 60-54 108-118 152Z" fill="#E53935"/>
+        </svg>
+        <div>
+          <div class="brand-name"><span class="fam">fam</span>pad</div>
+          <div class="tagline">Alt familien har på ett sted — i appen og i nettleseren</div>
+        </div>
+      </div>
+
+      <div class="section-label">Se fampad i bruk</div>
+      <div class="video-card">
+        <button class="play" title="Spill av intro">▶</button>
+        <span class="hint">FamPad på 60 sekunder</span>
+        <span class="dur">0:60</span>
+      </div>
+      <div class="video-caption">En kort video som viser hvordan familien bruker fampad hver dag.</div>
+
+      <div class="section-label">Hvorfor fampad?</div>
+      <div class="benefit">
+        <div class="ic">✅</div>
+        <div><b>Alt samlet</b><span>Avtaler, chat, handlelister, helse og mer — ett sted for hele familien.</span></div>
+      </div>
+      <div class="benefit">
+        <div class="ic">🔒</div>
+        <div><b>Trygt og privat</b><span>Dataene eies av familien din, og deles bare med dem.</span></div>
+      </div>
+      <div class="benefit">
+        <div class="ic">📱</div>
+        <div><b>App og nettleser</b><span>Bruk PWA-en på telefonen, eller fampad i nettleseren på PCen.</span></div>
+      </div>
+
+      <div class="section-label">Priser</div>
+      <div class="pricing-card">
+        <div class="tier-row">
+          <span class="tier">Familie</span>
+          <span class="badge">BETA</span>
+        </div>
+        <div class="price">0 kr <small>/ måned</small></div>
+        <div class="fine">Alle funksjoner er gratis i betaperioden. Ingen kort kreves — vi varsler deg godt i forveien.</div>
+        <button class="btn-primary">Kom i gang gratis</button>
+      </div>
+    </aside>
+
+    <!-- CENTER: the app, as it looks today -->
+    <main class="app-column">
+      <nav class="top-tabbar" aria-label="Hovednavigasjon">
+        <button class="tab active"><span class="t-ic">📅</span><span class="t-label">Avtaler</span></button>
+        <button class="tab"><span class="t-ic">💬</span><span class="t-label">Chat</span></button>
+        <button class="tab"><span class="t-ic">🏡</span><span class="t-label">Steder</span></button>
+        <button class="tab"><span class="t-ic">👤</span><span class="t-label">Profil</span></button>
+        <div class="tabbar-right">
+          <button class="btn-ny">+ Ny</button>
+          <button class="avatar" title="Jon">J</button>
+        </div>
+      </nav>
+
+      <div class="list-head">
+        <h2>📅 Arrangementer</h2>
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div class="seg-toggle">
+            <button class="on">Liste</button>
+            <button>Kalender</button>
+            <button>Min uke</button>
+          </div>
+          <button class="avatar" style="width:30px;height:30px;font-size:12px; border-radius:9px;">+</button>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-emoji" style="background:rgba(230,168,23,0.14);">🎉</div>
+        <div>
+          <h3>Jons 40-årsdag</h3>
+          <div class="event-meta">Lørdag 15. juli — 15:00<br>📍 Jons hus, Oslo</div>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-emoji" style="background:rgba(0,151,167,0.12);">⚽</div>
+        <div>
+          <h3>G14 kamp — Ready vs VIF</h3>
+          <div class="event-meta">Søndag 16. juli — 14:00<br>📍 Marienlyst</div>
+          <span class="badge-spond">SPOND</span>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-emoji" style="background:rgba(232,131,106,0.14);">🍕</div>
+        <div>
+          <h3>Fredagskveld med pizza</h3>
+          <div class="event-meta">Fredag 14. juli — 18:00<br>📍 Hjemme hos oss</div>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-emoji" style="background:rgba(107,143,113,0.14);">🎓</div>
+        <div>
+          <h3>Foreldremøte — 6B</h3>
+          <div class="event-meta">Tirsdag 18. juli — 17:30<br>📍 Bekkelaget skole</div>
+        </div>
+      </div>
+      <div class="event-card">
+        <div class="event-emoji" style="background:rgba(155,125,184,0.13);">🎂</div>
+        <div>
+          <h3>Idas bursdag</h3>
+          <div class="event-meta">Onsdag 19. juli — hele dagen</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT PANEL: how + ads -->
+    <aside class="side-panel">
+      <div class="section-label" style="margin-top:6px;">Installer som app</div>
+      <div class="os-head"><span class="os-ic"></span> iPhone / iPad</div>
+      <ul class="steps">
+        <li><span class="step-num">1</span><span><b>Åpne fampad.no</b> i Safari.</span></li>
+        <li><span class="step-num">2</span><span>Trykk <b>Del-knappen</b> (⬆️) nederst.</span></li>
+        <li><span class="step-num">3</span><span>Velg <b>«Legg til på hjemskjermen»</b>.</span></li>
+      </ul>
+
+      <div class="os-head" style="margin-top:14px;"><span class="os-ic">🤖</span> Android</div>
+      <ul class="steps">
+        <li><span class="step-num">1</span><span><b>Åpne fampad.no</b> i Chrome.</span></li>
+        <li><span class="step-num">2</span><span>Trykk <b>meny-knappen</b> (⋮) oppe til høyre.</span></li>
+        <li><span class="step-num">3</span><span>Velg <b>«Installer app»</b>.</span></li>
+      </ul>
+
+      <div class="section-label">Kort guide</div>
+      <div class="bento">
+        <div class="bento-tile"><div class="b-ic" style="background:rgba(198,123,92,0.14);">❤️</div><b>Helse</b><span>Medisiner og veterinær</span></div>
+        <div class="bento-tile"><div class="b-ic" style="background:rgba(230,168,23,0.14);">🎂</div><b>Bursdager</b><span>Husk alle datoer</span></div>
+        <div class="bento-tile"><div class="b-ic" style="background:rgba(155,125,184,0.14);">🐾</div><b>Kæledyr</b><span>Dyrenes info og helse</span></div>
+        <div class="bento-tile"><div class="b-ic" style="background:rgba(59,90,117,0.12);">🏠</div><b>Hjem</b><span>Vedlikehold og prosjekter</span></div>
+        <div class="bento-tile"><div class="b-ic" style="background:rgba(107,143,113,0.14);">🎒</div><b>Skole</b><span>Skoletimer og lekser</span></div>
+        <div class="bento-tile"><div class="b-ic" style="background:rgba(232,131,106,0.14);">🧸</div><b>Barnehage</b><span>Dager og døgntider</span></div>
+        <div class="bento-tile"><div class="b-ic" style="background:rgba(126,200,227,0.16);">✈️</div><b>Turer</b><span>Reiser og pakkelister</span></div>
+        <div class="bento-tile"><div class="b-ic" style="background:rgba(232,144,108,0.14);">🍽️</div><b>Matplan</b><span>Ukesmeny og oppskrifter</span></div>
+      </div>
+
+      <div class="section-label">Underveis</div>
+      <div class="ad-slot">
+        <div class="ad-title">📢 Annonseplass</div>
+        <div class="ad-sub">Kommer i en senere versjon</div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- =============== VIEW 2: Landing (logged out) =============== -->
+<section id="viewLanding" class="landing hidden">
+  <nav class="landing-nav">
+    <svg class="logo-mark" viewBox="0 0 1024 1024" aria-hidden="true">
+      <rect width="1024" height="1024" rx="230" fill="url(#lgTeal)"/>
+      <path d="M512 268 L806 520 L806 796 L218 796 L218 520 Z" fill="none" stroke="#ffffff" stroke-width="58" stroke-linejoin="round"/>
+      <path d="M512 690c-64-44-118-92-118-152 0-40 30-70 68-70 22 0 40 10 50 26 10-16 28-26 50-26 38 0 68 30 68 70 0 60-54 108-118 152Z" fill="#E53935"/>
+    </svg>
+    <div class="brand-name" style="font-size:19px;"><span class="fam" style="color:var(--teal);">fam</span>pad</div>
+    <div class="spacer"></div>
+    <button class="btn-ghost">Logg inn</button>
+    <button class="btn-primary" style="width:auto; padding:10px 20px;">Kom i gang</button>
+  </nav>
+
+  <!-- split hero: marketing left, auth right -->
+  <div class="landing-split">
+    <div class="hero-copy">
+      <span class="eyebrow">Betaperiode · alt gratis</span>
+      <h1>Allt familien har, <span class="grad">samlet på ett sted</span></h1>
+      <p class="sub">Avtaler, chat, handlelister, helse, bursdager og turer. fampad er den trygge familie-appen som fungerer både som app på telefonen og i nettleseren.</p>
+      <div class="hero-ctas">
+        <button class="btn-hero">Kom i gang gratis</button>
+        <span class="hero-micro" style="margin-top:0;">Ingen kort kreves · tilgjengelig i 5 språk</span>
+      </div>
+      <div class="trust-row">
+        <span class="t-item">🔒 Dataene eies av familien</span>
+        <span class="t-item">🇳🇴 🇸🇪 🇩🇰 🇫🇮 🇬🇧 Norsk, svensk, dansk, finsk og engelsk</span>
+      </div>
+
+      <!-- product-first visual (browser in-browser) -->
+      <div class="hero-visual">
+        <div class="hv-bar">
+          <span class="hv-dot"></span><span class="hv-dot"></span><span class="hv-dot"></span>
+          <span style="font-size:11px; color:var(--text-muted); margin-left:8px;">fampad.no — Avtaler</span>
+        </div>
+        <div class="hv-body">
+          <div class="hv-card"><div class="event-emoji" style="background:rgba(0,151,167,0.12);">⚽</div><div><h4>G14 kamp — Ready vs VIF</h4><p>Søndag 16. juli — 14:00 · Marienlyst</p></div><span class="badge-spond" style="margin-left:auto;">SPOND</span></div>
+          <div class="hv-card"><div class="event-emoji" style="background:rgba(230,168,23,0.14);">🎉</div><div><h4>Jons 40-årsdag</h4><p>Lørdag 15. juli — 15:00 · Jons hus, Oslo</p></div></div>
+          <div class="hv-card"><div class="event-emoji" style="background:rgba(232,131,106,0.14);">🍕</div><div><h4>Fredagskveld med pizza</h4><p>Fredag 14. juli — 18:00 · Hjemme hos oss</p></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-rail">
+      <div class="auth-card">
+        <div class="a-logo">
+          <svg class="logo-mark" viewBox="0 0 1024 1024" aria-hidden="true">
+            <rect width="1024" height="1024" rx="230" fill="url(#lgTeal)"/>
+            <path d="M512 268 L806 520 L806 796 L218 796 L218 520 Z" fill="none" stroke="#ffffff" stroke-width="58" stroke-linejoin="round"/>
+            <path d="M512 690c-64-44-118-92-118-152 0-40 30-70 68-70 22 0 40 10 50 26 10-16 28-26 50-26 38 0 68 30 68 70 0 60-54 108-118 152Z" fill="#E53935"/>
+          </svg>
+          <div>
+            <div class="brand-name" style="font-size:16px;"><span class="fam">fam</span>pad</div>
+            <div style="font-size:11px; color:var(--panel-muted);">Steg 1 av 3 · opprett konto</div>
+          </div>
+        </div>
+        <label for="mEmail">E-post</label>
+        <input id="mEmail" type="email" placeholder="din@epost.no">
+        <label for="mPass">Passord</label>
+        <input id="mPass" type="password" placeholder="Minst 8 tegn">
+        <button class="btn-auth" style="margin-top:16px;">Neste</button>
+        <div class="auth-alt">Har du allerede en konto? <a href="#">Logg inn</a><br>Fikk du en invitasjonskode? <a href="#">Bruk koden her</a></div>
+        <div class="auth-fine">Ved å fortsette godtar du <a href="#">vilkårene</a> og <a href="#">personvernserklæringen</a>.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- feature bento -->
+  <div class="land-section">
+    <h2 class="sec">Ett sted for hele familien</h2>
+    <p class="sec-sub">Alle familie-modulene du kjenner — trygt samlet.</p>
+    <div class="land-bento">
+      <div class="land-tile"><div class="b-ic" style="background:rgba(0,151,167,0.12);">📅</div><b>Avtaler</b><span>Visning som liste eller kalender, synkronisering og Google-kalender.</span></div>
+      <div class="land-tile"><div class="b-ic" style="background:rgba(0,151,167,0.12);">💬</div><b>Chat</b><span>Prat med hele familien i sikker chat.</span></div>
+      <div class="land-tile"><div class="b-ic" style="background:rgba(230,168,23,0.14);">🎂</div><b>Bursdager</b><span>Ingen bursdag glemmes — med telling ned til dagen.</span></div>
+      <div class="land-tile"><div class="b-ic" style="background:rgba(198,123,92,0.14);">❤️</div><b>Helse</b><span>Medisiner og påminnelser for hver person.</span></div>
+      <div class="land-tile"><div class="b-ic" style="background:rgba(59,90,117,0.12);">🏠</div><b>Hjem</b><span>Husoppgaver og vedlikehold som holder huset i orden.</span></div>
+      <div class="land-tile"><div class="b-ic" style="background:rgba(107,143,113,0.14);">🎒</div><b>Skole & barnehage</b><span>Skjema, lekser og døgntider for barna.</span></div>
+      <div class="land-tile"><div class="b-ic" style="background:rgba(126,200,227,0.16);">✈️</div><b>Turer</b><span>Reiser med pakkelister og transport.</span></div>
+      <div class="land-tile"><div class="b-ic" style="background:rgba(232,144,108,0.14);">🍽️</div><b>Matplan</b><span>Ukesmeny, oppskrifter og handleliste.</span></div>
+    </div>
+  </div>
+
+  <!-- pricing -->
+  <div class="land-section">
+    <h2 class="sec">Priser</h2>
+    <p class="sec-sub">Start gratis nå — betal først når betaperioden er over (og hvis du vil).</p>
+    <div class="land-pricing">
+      <div>
+        <h3>Familie · Beta</h3>
+        <ul>
+          <li>✓ Alle funksjoner i betaperioden</li>
+          <li>✓ Egen familie med opp til alle medlemmer</li>
+          <li>✓ 5 språk — norsk, engelsk, svensk, dansk, finsk</li>
+          <li>✓ Du bestemmer — data kan fjernes når som helst</li>
+        </ul>
+      </div>
+      <div style="text-align:right;">
+        <div class="p-price">0 kr <small>/ mnd</small></div>
+        <button class="btn-primary" style="margin-top:12px; width:auto;">Kom i gang gratis</button>
+        <div class="hero-micro" style="text-align:center;">Ingen kort kreves</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- install -->
+  <div class="land-section">
+    <h2 class="sec">Installer på telefonen</h2>
+    <p class="sec-sub">fampad fungerer best som installert app — fin å ha, gratis å ha.</p>
+    <div class="install-strip">
+      <div class="inst-card">
+        <div class="os-head"><span class="os-ic"></span> iPhone / iPad</div>
+        <ul class="steps">
+          <li><span class="step-num">1</span><span>Åpne <b>fampad.no</b> i Safari</span></li>
+          <li><span class="step-num">2</span><span>Trykk Del-knappen ⬆️</span></li>
+          <li><span class="step-num">3</span><span>«Legg til på hjemskjermen»</span></li>
+        </ul>
+      </div>
+      <div class="inst-card">
+        <div class="os-head"><span class="os-ic">🤖</span> Android</div>
+        <ul class="steps">
+          <li><span class="step-num">1</span><span>Åpne <b>fampad.no</b> i Chrome</span></li>
+          <li><span class="step-num">2</span><span>Trykk meny-knappen ⋮</span></li>
+          <li><span class="step-num">3</span><span>«Installer app»</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="land-section">
+    <h2 class="sec">Vanlige spørsmål</h2>
+    <p class="sec-sub">Kort svar på det folk spør om.</p>
+    <details class="faq-item" open>
+      <summary>Hva koster fampad?</summary>
+      <p>Så lenge vi er i betaperiode er alt gratis. Når vi lanserer prisene varsler vi deg i god tid — og du bestemmer selv om du vil fortsette.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Må jeg installere en app?</summary>
+      <p>Nei — fampad fungerer i nettleseren direkte. Men som installert app (PWA) får du varsel og et app-ikon på telefonen, og vi anbefaler det.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Kan jeg prøve med familien min?</summary>
+      <p>Ja! Opprett en konto og en egen familie, eller bruk en invitasjonskode du får fra et familiemedlem. Hver familie har sin egen, helt atskilte plass med egne data.</p>
+    </details>
+    <details class="faq-item">
+      <summary>Er dataene mine trygge?</summary>
+      <p>Ja. Dataene dine er knyttet til familien din, deles aldri med andre familier, og du kan slette dem når som helst.</p>
+    </details>
+  </div>
+
+  <footer class="landing-foot">
+    <svg class="logo-mark" style="width:26px;height:26px;" viewBox="0 0 1024 1024" aria-hidden="true">
+      <rect width="1024" height="1024" rx="230" fill="url(#lgTeal)"/>
+      <path d="M512 268 L806 520 L806 796 L218 796 L218 520 Z" fill="none" stroke="#ffffff" stroke-width="58" stroke-linejoin="round"/>
+      <path d="M512 690c-64-44-118-92-118-152 0-40 30-70 68-70 22 0 40 10 50 26 10-16 28-26 50-26 38 0 68 30 68 70 0 60-54 108-118 152Z" fill="#E53935"/>
+    </svg>
+    <span>© 2026 fampad</span>
+    <div class="f-links">
+      <a href="#">Personvern</a>
+      <a href="#">Vilkår</a>
+      <a href="#">Kontakt</a>
+    </div>
+  </footer>
+</section>
+
+<script>
+  // ---- view switching ----
+  const viewApp = document.getElementById('viewApp');
+  const viewLanding = document.getElementById('viewLanding');
+  const btnApp = document.getElementById('btnViewApp');
+  const btnLanding = document.getElementById('btnViewLanding');
+
+  function switchView(v) {
+    const isApp = v === 'app';
+    viewApp.classList.toggle('hidden', !isApp);
+    viewLanding.classList.toggle('hidden', isApp);
+    btnApp.classList.toggle('active', isApp);
+    btnLanding.classList.toggle('active', !isApp);
+    // remember
+    localStorage.setItem('mockView', v);
+  }
+
+  // restore last view
+  const lastView = localStorage.getItem('mockView');
+  if (lastView === 'landing') switchView('landing');
+
+  // ---- theme ----
+  function toggleTheme() {
+    document.documentElement.classList.toggle('dark');
+    const dark = document.documentElement.classList.contains('dark');
+    document.getElementById('btnTheme').textContent = dark ? '☀️' : '🌙';
+  }
+
+  // ---- breakpoint indicator ----
+  const mqDesktop = matchMedia('(min-width: 1100px)');
+  const mqTablet = matchMedia('(min-width: 768px) and (max-width: 1099px)');
+  const bpLabel = document.getElementById('bpLabel');
+  function updateBp() {
+    if (mqDesktop.matches) bpLabel.textContent = '≥1100px · 3 kolonner';
+    else if (mqTablet.matches) bpLabel.textContent = '768–1099px · midtkolonne';
+    else bpLabel.textContent = '<768px · mobil';
+  }
+  [mqDesktop, mqTablet].forEach(m => m.addEventListener('change', () => requestAnimationFrame(updateBp)));
+  addEventListener('resize', () => requestAnimationFrame(updateBp));
+  updateBp();
+</script>
+</body>
+</html>

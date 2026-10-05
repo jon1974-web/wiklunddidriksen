@@ -12,7 +12,7 @@ interface TabBarProps {
   onCreatePress: () => void;
 }
 
-const TabIcon = ({ icon, focused, accentColor }: { icon: string; focused: boolean; accentColor: string }) => {
+export const TabIcon = ({ icon, focused, accentColor }: { icon: string; focused: boolean; accentColor: string }) => {
   const color = focused ? accentColor : '#999';
   const size = 24;
 

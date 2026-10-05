@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Familiesenter",
-    "slug": "Familiesenter",
+    "name": "fampad",
+    "slug": "fampad",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -10,8 +10,8 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.anonymous.Familiesenter",
       "infoPlist": {
-        "NSCameraUsageDescription": "Familiesenter bruker kameraet til å ta bilder som kan deles i chatten.",
-        "NSPhotoLibraryUsageDescription": "Familiesenter bruker bildebiblioteket til å velge bilder som kan deles i chatten."
+        "NSCameraUsageDescription": "fampad bruker kameraet til å ta bilder som kan deles i chatten.",
+        "NSPhotoLibraryUsageDescription": "fampad bruker bildebiblioteket til å velge bilder som kan deles i chatten."
       }
     },
     "android": {
@@ -26,20 +26,20 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
-      "name": "Familiesenter",
-      "shortName": "Familiesenter",
-      "description": "Familie arrangement administrasjon",
+      "name": "fampad",
+      "shortName": "fampad",
+      "description": "Alt familien har på ett sted",
       "lang": "no",
       "startUrl": "/",
       "display": "standalone",
       "backgroundColor": "#f5f5f5",
-      "themeColor": "#0097A7",
+      "themeColor": "#2D485E",
       "manifest": "./public/manifest.json",
       "headTags": {
         "meta": [
           { "name": "apple-mobile-web-app-capable", "content": "yes" },
           { "name": "apple-mobile-web-app-status-bar-style", "content": "default" },
-          { "name": "apple-mobile-web-app-title", "content": "Familiesenter" }
+          { "name": "apple-mobile-web-app-title", "content": "fampad" }
         ],
         "link": [
           { "rel": "manifest", "href": "/manifest.json" }
@@ -50,7 +50,7 @@
       [
         "expo-calendar",
         {
-          "calendarPermission": "Familiesenter trenger tilgang til kalenderen din for a legge til arrangementer."
+          "calendarPermission": "fampad trenger tilgang til kalenderen din for å legge til arrangementer."
         }
       ],
       "expo-localization"
