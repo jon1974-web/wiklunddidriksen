@@ -3779,9 +3779,6 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
     const payload = {
       title: after.title,
       description: buildCalendarDescription(after, after.description || ""),
-      allDay: !after.startTime,
-      startDate: after.startDate,
-      endDate: after.endDate || after.startDate,
       startDateTime,
       endDateTime,
       location: after.address || "",
