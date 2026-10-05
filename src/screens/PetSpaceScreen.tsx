@@ -29,7 +29,7 @@ import { HelpCenter } from '../components/HelpCenter';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
-import { getTodayLocal } from '../utils/dateUtils';
+import { getTodayLocal, addOneHour } from '../utils/dateUtils';
 import { ScheduleModal } from '../components/ScheduleModal';
 
 const PET_ICONS: Record<string, string> = { 'Katt': '🐱', 'Hund': '🐶', 'Fisk': '🐟', 'Fugl': '🐦', 'Kanin': '🐰', 'Hamster': '🐹', 'Skilpadde': '🐢', 'Hest': '🐴', 'Anna': '🐾' };
@@ -1586,9 +1586,9 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         onSelect={(value) => {
           if (activePicker === 'petBirthday') setPetForm(f => ({ ...f, birthday: value }));
           else if (activePicker === 'petChipDate') setPetForm(f => ({ ...f, chipDate: value }));
-          else if (activePicker === 'vetDateFrom') { setVetForm(f => ({ ...f, dateFrom: value, dateTo: f.dateTo && f.dateTo >= value ? f.dateTo : value })); }
+          else if (activePicker === 'vetDateFrom') { setVetForm(f => ({ ...f, dateFrom: value, dateTo: value })); }
           else if (activePicker === 'vetDateTo') { if (value >= vetForm.dateFrom) setVetForm(f => ({ ...f, dateTo: value })); }
-          else if (activePicker === 'vetStartTime') { const [h, m] = value.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setVetForm(f => ({ ...f, startTime: value, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); }
+          else if (activePicker === 'vetStartTime') setVetForm(f => ({ ...f, startTime: value, endTime: addOneHour(value) }));
           else if (activePicker === 'vetEndTime') setVetForm(f => ({ ...f, endTime: value }));
           else if (activePicker === 'medDateFrom') setMedForm(f => ({ ...f, dateFrom: value }));
           else if (activePicker === 'medDateTo') setMedForm(f => ({ ...f, dateTo: value }));

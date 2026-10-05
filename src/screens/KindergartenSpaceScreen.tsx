@@ -30,7 +30,7 @@ import { DocumentUpload } from '../components/DocumentUpload';
 import { ScheduleModal } from '../components/ScheduleModal';
 import { addDoc, collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
-import { getTodayLocal } from '../utils/dateUtils';
+import { getTodayLocal, addOneHour } from '../utils/dateUtils';
 
 
 function getWeekNumber(date: Date): number {
@@ -1630,7 +1630,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
           dateOffset={editingActivityId ? -365 : -30}
           dateCount={editingActivityId ? 730 : 760}
           selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
-          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo && f.dateTo >= v ? f.dateTo : v })); } else if (activeActivityPicker === 'dateTo') { setActivityForm(f => ({ ...f, dateTo: v >= f.dateFrom ? v : f.dateTo })); } else if (activeActivityPicker === 'startTime') { const [h, m] = v.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setActivityForm(f => ({ ...f, startTime: v, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
+          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: v })); } else if (activeActivityPicker === 'dateTo') { setActivityForm(f => ({ ...f, dateTo: v >= f.dateFrom ? v : f.dateTo })); } else if (activeActivityPicker === 'startTime') { setActivityForm(f => ({ ...f, startTime: v, endTime: addOneHour(v) })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
           onClose={() => setActiveActivityPicker(null)}
         />
 

@@ -26,7 +26,7 @@ import { HelpCenter } from '../components/HelpCenter';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
-import { getTodayLocal } from '../utils/dateUtils';
+import { getTodayLocal, addOneHour } from '../utils/dateUtils';
 import { ScheduleModal } from '../components/ScheduleModal';
 import { addDoc, collection, query, where, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { db } from '../services/firebase';
@@ -1211,9 +1211,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               setMedForm(f => ({ ...f, timeSlots: newSlots }));
             }
           }
-          else if (activePicker === 'apptDateFrom') { setApptForm(f => ({ ...f, dateFrom: value, dateTo: f.dateTo && f.dateTo >= value ? f.dateTo : value })); }
+          else if (activePicker === 'apptDateFrom') { setApptForm(f => ({ ...f, dateFrom: value, dateTo: value })); }
           else if (activePicker === 'apptDateTo') { if (value >= apptForm.dateFrom) setApptForm(f => ({ ...f, dateTo: value })); }
-          else if (activePicker === 'apptStartTime') { const [h, m] = value.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setApptForm(f => ({ ...f, startTime: value, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); }
+          else if (activePicker === 'apptStartTime') setApptForm(f => ({ ...f, startTime: value, endTime: addOneHour(value) }));
           else if (activePicker === 'apptEndTime') setApptForm(f => ({ ...f, endTime: value }));
           else if (activePicker === 'vaccDate') setVaccForm(f => ({ ...f, date: value }));
           else if (activePicker === 'vaccNextDue') setVaccForm(f => ({ ...f, nextDue: value }));

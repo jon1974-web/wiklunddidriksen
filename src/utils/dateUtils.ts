@@ -67,3 +67,10 @@ export const sortEventsByDateTime = <T extends { date: string; time: string }>(
     return dateA.getTime() - dateB.getTime();
   });
 };
+
+// Adds one hour to a "HH:MM" string, wrapping past midnight (e.g. "23:30" -> "00:30")
+export const addOneHour = (time: string): string => {
+  const [h, m] = time.split(':').map(Number);
+  const total = h * 60 + m + 60;
+  return `${String(Math.floor(total / 60) % 24).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+};

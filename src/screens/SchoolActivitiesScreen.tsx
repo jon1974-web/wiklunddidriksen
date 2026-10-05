@@ -14,6 +14,8 @@ import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { getFamilyMembersWithRoles } from '../services/familyService';
+import { addOneHour } from '../utils/dateUtils';
+import { getErrorMessage } from '../utils/validation';
 
 const SCHOOL_THEME = MODULE_COLORS.school;
 
@@ -93,7 +95,10 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
   }, [route?.params?.editActivityId]);
 
   const handleSave = async () => {
-    if (!familyId || !selectedYear || !child) return;
+    if (!familyId || !selectedYear || !child) {
+      crossAlert(t('common.error'), t('school.needChildAndYear'));
+      return;
+    }
     if (!activityForm.title.trim() || !activityForm.dateFrom) {
       crossAlert(t('common.error'), t('health.enterTitleAndDate'));
       return;
@@ -130,7 +135,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
       setEditingActivityId(null);
       loadActivities();
     } catch (e) {
-      crossAlert(t('common.error'), t('common.error'));
+      crossAlert(t('common.error'), getErrorMessage(e));
     }
   };
 
@@ -331,7 +336,9 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
         dateCount={isTimePicker ? 48 : 730}
         selectedValue={getPickerValue()}
         onSelect={(v) => {
-          if (activePicker) setActivityForm(f => ({ ...f, [activePicker]: v }));
+          if (activePicker === 'dateFrom') setActivityForm(f => ({ ...f, dateFrom: v, dateTo: v }));
+          else if (activePicker === 'startTime') setActivityForm(f => ({ ...f, startTime: v, endTime: addOneHour(v) }));
+          else if (activePicker) setActivityForm(f => ({ ...f, [activePicker]: v }));
           setActivePicker(null);
         }}
         onClose={() => setActivePicker(null)}

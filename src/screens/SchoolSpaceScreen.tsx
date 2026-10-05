@@ -14,7 +14,7 @@ import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { getErrorMessage } from '../utils/validation';
-import { getTodayLocal } from '../utils/dateUtils';
+import { getTodayLocal, addOneHour } from '../utils/dateUtils';
 import { notifyHealthItem } from '../services/familyService';
 import {
   getSchoolChildren, addSchoolChild, updateSchoolChild, deleteSchoolChild,
@@ -526,7 +526,6 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   };
 
   const handleSaveActivity = async () => {
-    crossAlert('[activitySave] click', `family=${!!familyId} year=${selectedYear?.id || 'MISSING'} child=${selectedChild?.id || 'MISSING'} title=${activityForm.title || 'EMPTY'} date=${activityForm.dateFrom || 'EMPTY'} repeat=${repeatScheduleConfig ? 'yes' : 'no'}`);
     if (!familyId || !selectedYear || !selectedChild) {
       crossAlert(t('common.error'), t('school.needChildAndYear'));
       return;
@@ -817,6 +816,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
               onPress={() => {
                 if (route?.params?.openAddSection === 'activities') {
                   navigation.navigate('SchoolActivities', { child, selectedYear, years, openAddSection: 'activities' });
+                  navigation.setParams({ openAddSection: undefined } as any);
                 } else if (route?.params?.openVoiceForType || route?.params?.openPhotoForType) {
                   // Voice/photo: just select child, modal will open via useEffect
                   setSelectedChild(child);
@@ -1695,7 +1695,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
           dateOffset={editingActivityId ? -365 : -30}
           dateCount={editingActivityId ? 730 : 760}
           selectedValue={activeActivityPicker ? activityForm[activeActivityPicker] || '' : ''}
-          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: f.dateTo && f.dateTo >= v ? f.dateTo : v })); } else if (activeActivityPicker === 'dateTo') { setActivityForm(f => ({ ...f, dateTo: v >= f.dateFrom ? v : f.dateTo })); } else if (activeActivityPicker === 'startTime') { const [h, m] = v.split(':').map(Number); const endH = String((h + 1) % 24).padStart(2, '0'); setActivityForm(f => ({ ...f, startTime: v, endTime: f.endTime || `${endH}:${String(m).padStart(2, '0')}` })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
+          onSelect={(v) => { if (activeActivityPicker === 'dateFrom') { setActivityForm(f => ({ ...f, dateFrom: v, dateTo: v })); } else if (activeActivityPicker === 'dateTo') { setActivityForm(f => ({ ...f, dateTo: v >= f.dateFrom ? v : f.dateTo })); } else if (activeActivityPicker === 'startTime') { setActivityForm(f => ({ ...f, startTime: v, endTime: addOneHour(v) })); } else if (activeActivityPicker) { setActivityForm(f => ({ ...f, [activeActivityPicker]: v })); } setActiveActivityPicker(null); }}
           onClose={() => setActiveActivityPicker(null)}
         />
 

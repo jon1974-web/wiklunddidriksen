@@ -135,7 +135,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
   const handlePickerSelect = (value: string) => {
     if (editActivePicker === 'dateFrom') {
       setEditDateFrom(value);
-      if (!editDateTo || editDateTo < value) setEditDateTo(value);
+      setEditDateTo(value);
     } else if (editActivePicker === 'dateTo') {
       if (value >= editDateFrom) setEditDateTo(value);
     } else if (editActivePicker === 'time') {

@@ -14,6 +14,7 @@ import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { getFamilyMembersWithRoles } from '../services/familyService';
+import { addOneHour } from '../utils/dateUtils';
 
 const KG_THEME = MODULE_COLORS.kindergarten;
 
@@ -330,7 +331,9 @@ export const KindergartenActivitiesScreen: React.FC<Props> = ({ navigation, rout
         dateCount={isTimePicker ? 48 : 730}
         selectedValue={getPickerValue()}
         onSelect={(v) => {
-          if (activePicker) setActivityForm(f => ({ ...f, [activePicker]: v }));
+          if (activePicker === 'dateFrom') setActivityForm(f => ({ ...f, dateFrom: v, dateTo: v }));
+          else if (activePicker === 'startTime') setActivityForm(f => ({ ...f, startTime: v, endTime: addOneHour(v) }));
+          else if (activePicker) setActivityForm(f => ({ ...f, [activePicker]: v }));
           setActivePicker(null);
         }}
         onClose={() => setActivePicker(null)}

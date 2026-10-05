@@ -15,6 +15,7 @@ import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
 import { DatePickerModal } from '../components/DatePickerModal';
+import { addOneHour } from '../utils/dateUtils';
 import { ActionModal } from '../components/ActionModal';
 import { sanitizeInput } from '../utils/validation';
 import { IMAGE_QUALITY } from '../constants/limits';
@@ -315,8 +316,8 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
     if (!activePicker) return;
     const { eventIndex, field } = activePicker;
     const event = events[eventIndex];
-    if (field === 'date') updateEvent(eventIndex, { date: value });
-    else if (field === 'time') updateEvent(eventIndex, { time: value });
+    if (field === 'date') updateEvent(eventIndex, { date: value, endDate: value });
+    else if (field === 'time') updateEvent(eventIndex, { time: value, endTime: addOneHour(value) });
     else if (field === 'endDate') updateEvent(eventIndex, { endDate: value });
     else if (field === 'endTime') updateEvent(eventIndex, { endTime: value });
     setActivePicker(null);
