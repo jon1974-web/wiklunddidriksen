@@ -1705,7 +1705,7 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
   }
 
   // Process school activity reminders
-  const schoolActivitiesSnap = await db.collectionGroup("activities").where("familyId", "!=", null).limit(200).get();
+  const schoolActivitiesSnap = await db.collectionGroup("activities").limit(200).get();
   for (const doc of schoolActivitiesSnap.docs) {
     const actData = doc.data();
     if (!actData.reminderAt || !actData.familyId) continue;
