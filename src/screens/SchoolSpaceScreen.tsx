@@ -526,6 +526,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   };
 
   const handleSaveActivity = async () => {
+    crossAlert('[activitySave] click', `family=${!!familyId} year=${selectedYear?.id || 'MISSING'} child=${selectedChild?.id || 'MISSING'} title=${activityForm.title || 'EMPTY'} date=${activityForm.dateFrom || 'EMPTY'} repeat=${repeatScheduleConfig ? 'yes' : 'no'}`);
     if (!familyId || !selectedYear || !selectedChild) {
       crossAlert(t('common.error'), t('school.needChildAndYear'));
       return;
@@ -592,7 +593,9 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         }
         notifyHealthItem(familyId, activityForm.title, activityForm.dateFrom, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
       } else {
+        
         await addSchoolActivity(activityData);
+        
         notifyHealthItem(familyId, activityForm.title, activityForm.dateFrom, activityForm.startTime || '', activityForm.location || '', 'appointment', user?.displayName || '', selectedChild.name).catch(() => {});
       }
       setActivityForm({ title: '', activityType: 'tur', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
@@ -601,7 +604,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setRepeatScheduleConfig(null);
       loadYearData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert('Error', String(error));
     }
   };
 

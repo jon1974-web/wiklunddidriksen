@@ -111,13 +111,21 @@ export const getFamilyMembersWithRoles = async (familyId: string): Promise<{ pro
   if (!family || !family.members) return [];
   const entries = Object.entries(family.members);
   if (entries.length === 0) return [];
+
+  // Deterministic order: owner first, then admin, then member, alphabetical
+  const roleRank: Record<string, number> = { owner: 0, admin: 1, member: 2 };
   const results = await Promise.all(
     entries.map(async ([uid, memberInfo]) => {
       const profile = await getUserProfile(uid);
       return profile ? { profile, role: memberInfo.role } : null;
     })
   );
-  return results.filter((r): r is { profile: UserProfile; role: FamilyMember['role'] } => r !== null);
+  return results
+    .filter((r): r is { profile: UserProfile; role: FamilyMember['role'] } => r !== null)
+    .sort((a, b) =>
+      (roleRank[a.role] ?? 3) - (roleRank[b.role] ?? 3) ||
+      (a.profile.displayName || '').localeCompare(b.profile.displayName || '', 'nb')
+    );
 };
 
 export const listenToFamily = (familyId: string, callback: (family: Family | null) => void) => {
