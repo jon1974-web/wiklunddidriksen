@@ -7,7 +7,7 @@ import { AppIcon } from '../components/AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { SchoolChild, SchoolYear, SchoolActivity } from '../types';
 import { useUserStore } from '../store/userStore';
-import { getSchoolActivities, addSchoolActivity, updateSchoolActivity } from '../services/schoolService';
+import { getSchoolActivities, addSchoolActivity, updateSchoolActivity, getSchoolYears } from '../services/schoolService';
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { crossAlert } from '../utils/alert';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
@@ -95,7 +95,19 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
   }, [route?.params?.editActivityId]);
 
   const handleSave = async () => {
-    if (!familyId || !selectedYear || !child) {
+    if (!familyId || !child) {
+      crossAlert(t('common.error'), t('school.needChildAndYear'));
+      return;
+    }
+    // Self-heal: in the quick-create flow selectedYear arrives as null even
+    // when the child has years — load them instead of failing silently.
+    let year = selectedYear;
+    if (!year) {
+      const ys = await getSchoolYears(familyId, child.id);
+      year = ys[0] || null;
+      if (year) navigation.setParams({ selectedYear: year } as any);
+    }
+    if (!year) {
       crossAlert(t('common.error'), t('school.needChildAndYear'));
       return;
     }
@@ -112,7 +124,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
         await updateSchoolActivity(familyId, editingActivityId, {
           ...activityForm,
           childId: child.id,
-          yearId: selectedYear.id,
+          yearId: year.id,
           familyId,
           createdBy: user?.uid || '',
           selectedPersons,
@@ -122,7 +134,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
         await addSchoolActivity({
           ...activityForm,
           childId: child.id,
-          yearId: selectedYear.id,
+          yearId: year.id,
           familyId,
           createdBy: user?.uid || '',
           selectedPersons,
