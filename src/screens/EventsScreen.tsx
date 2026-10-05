@@ -201,7 +201,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
   const familyRole = useUserStore((state) => state.familyRole);
   const { colors } = useTheme();
   const listBg = isDesktop ? colors.surface : colors.background;
-  const cardOutline = isDesktop ? { borderWidth: 1, borderColor: colors.border } : null;
+  const cardOutline = isDesktop ? { borderWidth: 1, borderColor: colors.border, borderLeftWidth: 4 } : null;
   const calOutline = isDesktop ? { borderWidth: 1, borderColor: colors.border } : null;
   const compactToggle = isDesktop ? { paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999 } : null;
   const compactToggleText = isDesktop ? { fontSize: 12.5 } : null;

@@ -75,7 +75,7 @@ export const EventCard: React.FC<EventCardProps> = React.memo(({ event, onPress,
   };
 
   return (
-    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderLeftColor: colors.accent }, outlined && { borderWidth: 1, borderColor: colors.border }]} onPress={onPress} onLongPress={canDelete ? onLongPress : undefined}>
+    <TouchableOpacity style={[styles.card, { backgroundColor: colors.surface, borderLeftColor: colors.accent }, outlined && { borderWidth: 1, borderColor: colors.border, borderLeftWidth: 4 }]} onPress={onPress} onLongPress={canDelete ? onLongPress : undefined}>
       <View style={styles.row}>
         <View style={[styles.calIcon, { backgroundColor: colors.surface }, outlined && { borderWidth: 1, borderColor: colors.border }]}>
           <View style={[styles.calTopBar, { backgroundColor: colors.accent }]}>
