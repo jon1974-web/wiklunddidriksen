@@ -2051,6 +2051,13 @@
     "sample2Address": "Bekkelaget skole, Oslo",
     "sample3Name": "Ida",
     "featureKindergartenText": "Keep track of parent meetings, trips and schedules and easily access all contacts",
-    "featurePetsText": "Keep track of vet visits, vaccinations and grooming"
+    "featurePetsText": "Keep track of vet visits, vaccinations and grooming",
+    "stepsTitle": "How to get started",
+    "step1Title": "Create an account",
+    "step1Text": "With email and password — no card required",
+    "step2Title": "Choose your language",
+    "step2Text": "Norwegian, English, Swedish, Danish or Finnish",
+    "step3Title": "Create or join a family",
+    "step3Text": "Start your own family, or use the invite code you received"
   }
 }

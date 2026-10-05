@@ -2051,6 +2051,13 @@
     "sample2Address": "Bekkelaget skole, Oslo",
     "sample3Name": "Ida",
     "featureKindergartenText": "Hold styr på forældremøder, ture og skemaer og hav nem adgang til alle kontakter",
-    "featurePetsText": "Hold styr på dyrlægebesøg, vaccinationer og pelspleje"
+    "featurePetsText": "Hold styr på dyrlægebesøg, vaccinationer og pelspleje",
+    "stepsTitle": "Sådan kommer du i gang",
+    "step1Title": "Opret en konto",
+    "step1Text": "Med e-mail og adgangskode — intet kort kræves",
+    "step2Title": "Vælg sprog",
+    "step2Text": "Norsk, engelsk, svensk, dansk eller finsk",
+    "step3Title": "Opret eller bliv en del af en familie",
+    "step3Text": "Start din egen familie, eller brug invitationskoden du fik"
   }
 }

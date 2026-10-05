@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile, User } from 'firebase/auth';
@@ -16,7 +16,7 @@ const ACCENT = '#3b5a75';
 
 type Step = 'account' | 'language' | 'family';
 
-export const AuthScreen: React.FC<{ compact?: boolean }> = ({ compact = false }) => {
+export const AuthScreen: React.FC<{ compact?: boolean; focusSignal?: number; focusMode?: 'login' | 'register' }> = ({ compact = false, focusSignal = 0, focusMode = 'register' }) => {
   const { t } = useTranslation();
   const setUser = useUserStore((state) => state.setUser);
   const setFamily = useUserStore((state) => state.setFamily);
@@ -36,6 +36,19 @@ export const AuthScreen: React.FC<{ compact?: boolean }> = ({ compact = false })
   const [selectedLanguage, setSelectedLanguage] = useState('nb');
   const [familyName, setFamilyName] = useState('');
   const [authUser, setAuthUser] = useState<User | null>(null);
+  const nameInputRef = useRef<TextInput>(null);
+  const emailInputRef = useRef<TextInput>(null);
+
+  useEffect(() => {
+    if (!focusSignal) return;
+    const register = focusMode === 'register';
+    setIsLogin(!register);
+    const timer = setTimeout(() => {
+      if (register) nameInputRef.current?.focus();
+      else emailInputRef.current?.focus();
+    }, 80);
+    return () => clearTimeout(timer);
+  }, [focusSignal, focusMode]);
 
   useEffect(() => {
     if (hasInvite) setStep('language');
@@ -192,6 +205,7 @@ export const AuthScreen: React.FC<{ compact?: boolean }> = ({ compact = false })
 
       {!isLogin && (
         <TextInput
+          ref={nameInputRef}
           style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
           placeholder={t('auth.name')}
           placeholderTextColor={colors.textDisabled}
@@ -202,6 +216,7 @@ export const AuthScreen: React.FC<{ compact?: boolean }> = ({ compact = false })
       )}
 
       <TextInput
+        ref={emailInputRef}
         style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]}
         placeholder={t('auth.email')}
         placeholderTextColor={colors.textDisabled}

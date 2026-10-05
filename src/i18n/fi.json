@@ -2051,6 +2051,13 @@
     "sample2Address": "Bekkelaget skole, Oslo",
     "sample3Name": "Ida",
     "featureKindergartenText": "Pidä kirjaa vanhempainilloista, retkistä ja lukujärjestyksistä ja näe helposti kaikki yhteystiedot",
-    "featurePetsText": "Pidä kirjaa eläinlääkärikäynneistä, rokotuksista ja turkinhoidosta"
+    "featurePetsText": "Pidä kirjaa eläinlääkärikäynneistä, rokotuksista ja turkinhoidosta",
+    "stepsTitle": "Näin pääset alkuun",
+    "step1Title": "Luo tili",
+    "step1Text": "Sähköpostilla ja salasanalla — korttia ei tarvita",
+    "step2Title": "Valitse kieli",
+    "step2Text": "Norja, englanti, ruotsi, tanska tai suomi",
+    "step3Title": "Luo perhe tai liity perheeseen",
+    "step3Text": "Perusta oma perheesi tai käytä saamaasi kutsukoodia"
   }
 }

@@ -1,13 +1,15 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { AuthScreen } from './AuthScreen';
 import { HeroVisual } from '../components/landing/HeroVisual';
+import { VideoIntroCard } from '../components/desktop/VideoIntroCard';
 import { FeatureBento } from '../components/landing/FeatureBento';
 import { LandingPricing } from '../components/landing/LandingPricing';
 import { LandingFaq } from '../components/landing/LandingFaq';
 import { LandingFooter } from '../components/landing/LandingFooter';
+import { GetStartedSteps } from '../components/landing/GetStartedSteps';
 import { InstallPanel } from '../components/desktop/InstallPanel';
 import { BRAND, BRAND_COLORS, TRUST_FLAGS } from '../constants/marketing';
 
@@ -18,7 +20,13 @@ export const LandingScreen: React.FC = () => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const scrollRef = useRef<ScrollView>(null);
-  const goAuth = () => scrollRef.current?.scrollTo({ y: 0, animated: true });
+  const [authSignal, setAuthSignal] = useState(0);
+  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+  const goAuth = (mode: 'login' | 'register') => {
+    setAuthMode(mode);
+    setAuthSignal((s) => s + 1);
+    scrollRef.current?.scrollTo({ y: 0, animated: true });
+  };
 
   return (
     <View style={[styles.shell, { backgroundColor: colors.background }]}>
@@ -33,10 +41,10 @@ export const LandingScreen: React.FC = () => {
               </Text>
             </View>
             <View style={styles.navRight}>
-              <TouchableOpacity style={[styles.btnGhost, { borderColor: colors.border }]} onPress={goAuth} activeOpacity={0.8}>
+              <TouchableOpacity style={[styles.btnGhost, { borderColor: colors.border }]} onPress={() => goAuth('login')} activeOpacity={0.8}>
                 <Text style={[styles.btnGhostText, { color: colors.text }]}>{t('auth.loginButton')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.btnNav, { backgroundColor: BRAND_COLORS.blueDark }]} onPress={goAuth} activeOpacity={0.8}>
+              <TouchableOpacity style={[styles.btnNav, { backgroundColor: BRAND_COLORS.blueDark }]} onPress={() => goAuth('register')} activeOpacity={0.8}>
                 <Text style={styles.btnNavText}>{t('common.startFree')}</Text>
               </TouchableOpacity>
             </View>
@@ -58,7 +66,7 @@ export const LandingScreen: React.FC = () => {
               <Text style={[styles.sub, { color: colors.textSecondary }]}>{t('landing.heroSub')}</Text>
 
               <View style={styles.ctaRow}>
-                <TouchableOpacity style={[styles.btnHero, { backgroundColor: BRAND_COLORS.blueDark }]} onPress={goAuth} activeOpacity={0.8}>
+                <TouchableOpacity style={[styles.btnHero, { backgroundColor: BRAND_COLORS.blueDark }]} onPress={() => goAuth('register')} activeOpacity={0.8}>
                   <Text style={[styles.btnHeroText, { color: '#fff' }]}>{t('common.startFree')}</Text>
                 </TouchableOpacity>
                 <Text style={[styles.heroMicro, { color: colors.textSecondary }]}>{t('landing.heroMicro')}</Text>
@@ -69,13 +77,13 @@ export const LandingScreen: React.FC = () => {
                 <Text style={[styles.trustItem, { color: colors.textSecondary }]}>{TRUST_FLAGS} {t('landing.trustLanguages')}</Text>
               </View>
 
-              <HeroVisual />
+              <GetStartedSteps />
             </View>
 
             <View style={styles.railCol}>
               <View style={Platform.OS === 'web' ? ([styles.sticky, { position: 'sticky' }] as any) : styles.railColInner}>
                 <View style={[styles.authCard, { borderColor: colors.border }]}>
-                  <AuthScreen compact />
+                  <AuthScreen compact focusSignal={authSignal} focusMode={authMode} />
                 </View>
               </View>
             </View>
@@ -86,7 +94,19 @@ export const LandingScreen: React.FC = () => {
           </View>
 
           <View style={styles.sectionWrap}>
-            <LandingPricing onCtaPress={goAuth} />
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('desktop.watchSection')}</Text>
+            <View style={styles.mediaRow}>
+              <View style={styles.videoCol}>
+                <VideoIntroCard />
+              </View>
+              <View style={styles.visualCol}>
+                <HeroVisual />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.sectionWrap}>
+            <LandingPricing onCtaPress={() => goAuth('register')} />
           </View>
 
           <View style={styles.sectionWrap}>
@@ -254,6 +274,24 @@ const styles = StyleSheet.create({
   },
   sectionWrap: {
     marginTop: 24,
+  },
+  mediaRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 24,
+    alignItems: 'flex-start',
+  },
+  videoCol: {
+    flexBasis: '38%',
+    flexGrow: 1,
+    minWidth: 280,
+    maxWidth: 460,
+    marginTop: 26,
+  },
+  visualCol: {
+    flexBasis: '54%',
+    flexGrow: 1,
+    minWidth: 320,
   },
   sectionTitle: {
     fontSize: 26,
