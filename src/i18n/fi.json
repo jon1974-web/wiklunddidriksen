@@ -286,7 +286,9 @@
     "helpBirthdaysHow": "Näin teet sen",
     "helpBirthdaysHowText": "Napauta '+' lisätäksesi uuden syntymäpäivän (nimi ja päivämäärä). Pidä painettuna syntymäpäivää muokataksesi tai poistaaksesi sen. Napauta syntymäpäivää laajentaaksesi lahjalistan ja napauta '+ Lisää lahjaidea' uusia lahjoja varten.",
     "helpBirthdaysTip": "Lahjalistat säilytetään vuodesta toiseen, jotta näet, mitä annoit viimeksi.",
-    "comingSoon": "Tulossa pian"
+    "comingSoon": "Tulossa pian",
+    "avtaler": "Tapahtumamme",
+    "chat": "Chatimme"
   },
   "school": {
     "title": "Vår skola",
@@ -2006,22 +2008,14 @@
     "heroMicro": "Korttia ei tarvita · saatavilla 5 kielellä",
     "featuresTitle": "Yksi paikka koko perheelle",
     "featuresSub": "Kaikki tutut perhemoduulit — turvallisesti koottuna.",
-    "featureEventsTitle": "Tapahtumat",
-    "featureEventsText": "Lista- tai kalenterinäkymä, Spond- ja Google-synkronoinnilla.",
-    "featureChatTitle": "Chat",
+    "featureEventsText": "Valitse lista- tai kalenterinäkymä. Kaikki synkronoituu kalenteriisi",
     "featureChatText": "Turvallinen chat koko perheelle.",
-    "featureBirthdaysTitle": "Syntymäpäivät",
-    "featureBirthdaysText": "Mikään syntymäpäivä ei unohdu — lähtölaskenta mukana.",
-    "featureHealthTitle": "Terveys",
-    "featureHealthText": "Lääkkeet ja muistutukset jokaiselle henkilölle.",
-    "featureHomeTitle": "Koti",
-    "featureHomeText": "Kunnossapito ja projektit, jotka pitävät kodin kunnossa.",
-    "featureSchoolTitle": "Koulu & päiväkoti",
-    "featureSchoolText": "Tiedot, lukujärjestykset ja vapaat lapsille.",
-    "featureTripsTitle": "Matkat",
-    "featureTripsText": "Matkat pakkauslistoilla ja kuljetuksilla.",
-    "featureMealsTitle": "Ruokalista",
-    "featureMealsText": "Viikon ateriat, reseptit ja ostoslista",
+    "featureBirthdaysText": "Nyt mikään syntymäpäivä ei unohdu - lähtölaskenta ja lahjalistat mukana",
+    "featureHealthText": "Pidä kirjaa käynneistä, rokotuksista ja lääkityksestä",
+    "featureHomeText": "Pidä kirjaa huoltosopimuksista, kunnossapidosta ja käyistä oma remonttiprojektisi",
+    "featureSchoolText": "Pidä kirjaa vanhempainilloista, retkistä ja lukujärjestyksistä ja näe helposti kaikki yhteystiedot",
+    "featureTripsText": "Kokoa kaikki matkan tiedot yhteen paikkaan",
+    "featureMealsText": "Luo viikkomenut, kerää reseptit ja luo ostoslistat",
     "pricingTitle": "Hinnat",
     "pricingSub": "Aloita ilmaiseksi nyt — maksa vasta beta-kauden päätyttyä (ja vain jos haluat).",
     "pricingTier": "Perhe · Beta",
@@ -2055,6 +2049,8 @@
     "sample1Address": "Peppes Pizza, Oslo",
     "sample2Time": "18:00 – 19:30",
     "sample2Address": "Bekkelaget skole, Oslo",
-    "sample3Name": "Ida"
+    "sample3Name": "Ida",
+    "featureKindergartenText": "Pidä kirjaa vanhempainilloista, retkistä ja lukujärjestyksistä ja näe helposti kaikki yhteystiedot",
+    "featurePetsText": "Pidä kirjaa eläinlääkärikäynneistä, rokotuksista ja turkinhoidosta"
   }
 }

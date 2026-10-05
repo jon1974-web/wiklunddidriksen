@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { AppIcon } from '../AppIcon';
 import { LANDING_FEATURES } from '../../constants/marketing';
 
 export const FeatureBento: React.FC = () => {
@@ -16,7 +17,7 @@ export const FeatureBento: React.FC = () => {
         {LANDING_FEATURES.map((feature) => (
           <View key={feature.titleKey} style={[styles.tile, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={[styles.tileIcon, { backgroundColor: feature.tint }]}>
-              <Text style={styles.tileIconText}>{feature.icon}</Text>
+              <AppIcon name={feature.icon} size={18} color={feature.color} />
             </View>
             <Text style={[styles.tileTitle, { color: colors.text }]}>{t(feature.titleKey)}</Text>
             <Text style={[styles.tileText, { color: colors.textSecondary }]}>{t(feature.textKey)}</Text>
@@ -47,31 +48,28 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   tile: {
-    flexBasis: '23%',
+    flexBasis: '18%',
     flexGrow: 1,
     borderWidth: 1,
     borderRadius: 16,
-    padding: 16,
+    padding: 14,
     alignItems: 'flex-start',
   },
   tileIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 11,
+    width: 34,
+    height: 34,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
-  },
-  tileIconText: {
-    fontSize: 17,
+    marginBottom: 8,
   },
   tileTitle: {
-    fontSize: 13.5,
+    fontSize: 13,
     fontWeight: '700',
     marginBottom: 3,
   },
   tileText: {
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 11.5,
+    lineHeight: 16,
   },
 });

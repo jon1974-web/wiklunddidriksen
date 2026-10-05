@@ -286,7 +286,9 @@
     "helpBirthdaysHow": "Sådan gør du",
     "helpBirthdaysHowText": "Tryk '+' for at tilføje en ny fødselsdag (navn og dato). Hold inde på en fødselsdag for at redigere eller slette den. Tryk på en fødselsdag for at udvide gavelisten, og tryk '+ Tilføj gaveidé' til nye gaver.",
     "helpBirthdaysTip": "Gavelister bevares fra år til år, så du kan se, hvad du gav sidst.",
-    "comingSoon": "Kommer snart"
+    "comingSoon": "Kommer snart",
+    "avtaler": "Vore aftaler",
+    "chat": "Vores chat"
   },
   "school": {
     "title": "Vores skole",
@@ -2006,22 +2008,14 @@
     "heroMicro": "Intet kort kræves · tilgængelig på 5 sprog",
     "featuresTitle": "Ét sted for hele familien",
     "featuresSub": "Alle familie-modulerne, du kender — trygt samlet.",
-    "featureEventsTitle": "Aftaler",
-    "featureEventsText": "Liste- eller kalendervisning, med Spond- og Google-synk.",
-    "featureChatTitle": "Chat",
+    "featureEventsText": "Vælg liste eller kalendervisning. Alt synkroniseres til din kalender",
     "featureChatText": "Tryg chat for hele familien.",
-    "featureBirthdaysTitle": "Fødselsdage",
-    "featureBirthdaysText": "Ingen fødselsdag glemmes — med nedtælling.",
-    "featureHealthTitle": "Sundhed",
-    "featureHealthText": "Medicin og påmindelser for hver person.",
-    "featureHomeTitle": "Hjem",
-    "featureHomeText": "Vedligehold og projekter, der holder huset i orden.",
-    "featureSchoolTitle": "Skole & børnehave",
-    "featureSchoolText": "Info, skema og fridage for børnene.",
-    "featureTripsTitle": "Rejser",
-    "featureTripsText": "Rejser med pakkelister og transport.",
-    "featureMealsTitle": "Madplan",
-    "featureMealsText": "Ugesmenu, opskrifter og indkøbsliste.",
+    "featureBirthdaysText": "Nu glemmes ingen fødselsdag - med nedtælling og gavelister",
+    "featureHealthText": "Hold styr på aftaler, vaccinationer og medicinering",
+    "featureHomeText": "Hold styr på serviceaftaler, vedligehold og kør dit eget renoveringsprojekt",
+    "featureSchoolText": "Hold styr på forældremøder, ture og skemaer og hav nem adgang til alle kontakter",
+    "featureTripsText": "Saml al info om rejsen ét sted",
+    "featureMealsText": "Opret ugesmenuer, saml opskrifter og opret indkøbslister",
     "pricingTitle": "Priser",
     "pricingSub": "Start gratis nu — betal først, når beta-perioden er slut (og hvis du vil).",
     "pricingTier": "Familie · Beta",
@@ -2055,6 +2049,8 @@
     "sample1Address": "Peppes Pizza, Oslo",
     "sample2Time": "18:00 – 19:30",
     "sample2Address": "Bekkelaget skole, Oslo",
-    "sample3Name": "Ida"
+    "sample3Name": "Ida",
+    "featureKindergartenText": "Hold styr på forældremøder, ture og skemaer og hav nem adgang til alle kontakter",
+    "featurePetsText": "Hold styr på dyrlægebesøg, vaccinationer og pelspleje"
   }
 }

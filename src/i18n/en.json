@@ -286,7 +286,9 @@
     "helpBirthdaysHow": "How to use it",
     "helpBirthdaysHowText": "Tap '+' to add a new birthday (name and date). Long-press a birthday to edit or delete it. Tap a birthday to expand the gift list, and tap '+ Add gift idea' to add new gifts.",
     "helpBirthdaysTip": "Gift lists are kept from year to year, so you can see what you gave last time.",
-    "comingSoon": "Coming soon"
+    "comingSoon": "Coming soon",
+    "avtaler": "Our Events",
+    "chat": "Our Chat"
   },
   "school": {
     "title": "Our School",
@@ -2006,22 +2008,14 @@
     "heroMicro": "No card required · available in 5 languages",
     "featuresTitle": "One place for the whole family",
     "featuresSub": "All the family modules you know — safely gathered.",
-    "featureEventsTitle": "Events",
-    "featureEventsText": "List or calendar view, with Spond and Google sync.",
-    "featureChatTitle": "Chat",
+    "featureEventsText": "Choose list or calendar view. Everything syncs to your calendar",
     "featureChatText": "A safe chat for the whole family.",
-    "featureBirthdaysTitle": "Birthdays",
-    "featureBirthdaysText": "No birthday forgotten — with countdown.",
-    "featureHealthTitle": "Health",
-    "featureHealthText": "Medications and reminders for each person.",
-    "featureHomeTitle": "Home",
-    "featureHomeText": "Maintenance and projects that keep your home in shape.",
-    "featureSchoolTitle": "School & kindergarten",
-    "featureSchoolText": "Info, schedules and days off for the kids.",
-    "featureTripsTitle": "Trips",
-    "featureTripsText": "Trips with packing lists and transport.",
-    "featureMealsTitle": "Meal plan",
-    "featureMealsText": "Weekly menu, recipes and shopping list.",
+    "featureBirthdaysText": "No birthday is forgotten - with countdowns and gift lists",
+    "featureHealthText": "Keep track of appointments, vaccinations and medications",
+    "featureHomeText": "Keep track of service contracts, maintenance and run your own renovation project",
+    "featureSchoolText": "Keep track of parent meetings, trips and schedules and easily access all contacts",
+    "featureTripsText": "Gather all the trip info in one place",
+    "featureMealsText": "Create weekly menus, collect recipes and make shopping lists",
     "pricingTitle": "Pricing",
     "pricingSub": "Start free now — pay first when the beta period ends (and only if you want to).",
     "pricingTier": "Family · Beta",
@@ -2055,6 +2049,8 @@
     "sample1Address": "Peppes Pizza, Oslo",
     "sample2Time": "18:00 – 19:30",
     "sample2Address": "Bekkelaget skole, Oslo",
-    "sample3Name": "Ida"
+    "sample3Name": "Ida",
+    "featureKindergartenText": "Keep track of parent meetings, trips and schedules and easily access all contacts",
+    "featurePetsText": "Keep track of vet visits, vaccinations and grooming"
   }
 }

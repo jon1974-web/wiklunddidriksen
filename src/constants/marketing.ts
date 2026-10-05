@@ -28,16 +28,28 @@ export const DESKTOP_BENEFITS = [
   { icon: '📱', titleKey: 'desktop.benefit3Title', textKey: 'desktop.benefit3Text' },
 ] as const;
 
-export const LANDING_FEATURES = [
-  { icon: '📅', tint: 'rgba(59, 90, 117, 0.12)', titleKey: 'landing.featureEventsTitle', textKey: 'landing.featureEventsText' },
-  { icon: '💬', tint: 'rgba(59, 90, 117, 0.12)', titleKey: 'landing.featureChatTitle', textKey: 'landing.featureChatText' },
-  { icon: '🎂', tint: 'rgba(230, 168, 23, 0.14)', titleKey: 'landing.featureBirthdaysTitle', textKey: 'landing.featureBirthdaysText' },
-  { icon: '❤️', tint: 'rgba(198, 123, 92, 0.14)', titleKey: 'landing.featureHealthTitle', textKey: 'landing.featureHealthText' },
-  { icon: '🏠', tint: 'rgba(59, 90, 117, 0.12)', titleKey: 'landing.featureHomeTitle', textKey: 'landing.featureHomeText' },
-  { icon: '🎒', tint: 'rgba(107, 143, 113, 0.14)', titleKey: 'landing.featureSchoolTitle', textKey: 'landing.featureSchoolText' },
-  { icon: '✈️', tint: 'rgba(126, 200, 227, 0.16)', titleKey: 'landing.featureTripsTitle', textKey: 'landing.featureTripsText' },
-  { icon: '🍽️', tint: 'rgba(232, 144, 108, 0.14)', titleKey: 'landing.featureMealsTitle', textKey: 'landing.featureMealsText' },
-] as const;
+export interface LandingFeature {
+  icon: AppIconName;
+  color: string;
+  tint: string;
+  titleKey: string;
+  textKey: string;
+}
+
+const ACCENT_TINT = 'rgba(59, 90, 117, 0.12)';
+
+export const LANDING_FEATURES: LandingFeature[] = [
+  { icon: 'calendar', color: BRAND_COLORS.accent, tint: ACCENT_TINT, titleKey: 'spaces.avtaler', textKey: 'landing.featureEventsText' },
+  { icon: 'chat', color: BRAND_COLORS.accent, tint: ACCENT_TINT, titleKey: 'spaces.chat', textKey: 'landing.featureChatText' },
+  { icon: 'birthday', color: MODULE_COLORS.birthdays, tint: MODULE_COLORS.birthdaysBg, titleKey: 'spaces.birthdays', textKey: 'landing.featureBirthdaysText' },
+  { icon: 'medication', color: MODULE_COLORS.health, tint: MODULE_COLORS.healthBg, titleKey: 'spaces.health', textKey: 'landing.featureHealthText' },
+  { icon: 'house', color: MODULE_COLORS.home, tint: MODULE_COLORS.homeBg, titleKey: 'spaces.home', textKey: 'landing.featureHomeText' },
+  { icon: 'school', color: MODULE_COLORS.school, tint: MODULE_COLORS.schoolBg, titleKey: 'spaces.school', textKey: 'landing.featureSchoolText' },
+  { icon: 'kindergarten', color: MODULE_COLORS.kindergarten, tint: MODULE_COLORS.kindergartenBg, titleKey: 'spaces.kindergarten', textKey: 'landing.featureKindergartenText' },
+  { icon: 'pet', color: MODULE_COLORS.pets, tint: MODULE_COLORS.petsBg, titleKey: 'spaces.pets', textKey: 'landing.featurePetsText' },
+  { icon: 'compass', color: MODULE_COLORS.trips, tint: MODULE_COLORS.tripsBg, titleKey: 'spaces.trips', textKey: 'landing.featureTripsText' },
+  { icon: 'utensils', color: MODULE_COLORS.mealplan, tint: MODULE_COLORS.mealplanBg, titleKey: 'spaces.mealplan', textKey: 'landing.featureMealsText' },
+];
 
 export const TRUST_FLAGS = '🇳🇴 🇸🇪 🇩🇰 🇫🇮 🇬🇧';
 
