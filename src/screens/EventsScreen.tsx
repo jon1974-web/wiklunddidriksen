@@ -28,6 +28,7 @@ import { getAllKindergartenHolidays, getKindergartenChildren } from '../services
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { WeeklySummary } from '../components/WeeklySummary';
+import { useDesktopLayout } from '../hooks/useDesktopLayout';
 import { MissedRemindersBanner } from '../components/MissedRemindersBanner';
 import Svg, { Circle, Line } from 'react-native-svg';
 import { useTranslation } from 'react-i18next';
@@ -196,8 +197,15 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
 
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
+  const { isDesktop } = useDesktopLayout();
   const familyRole = useUserStore((state) => state.familyRole);
   const { colors } = useTheme();
+  const listBg = isDesktop ? colors.surface : colors.background;
+  const cardOutline = isDesktop ? { borderWidth: 1, borderColor: colors.border } : null;
+  const calOutline = isDesktop ? { borderWidth: 1, borderColor: colors.border } : null;
+  const compactToggle = isDesktop ? { paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999 } : null;
+  const compactToggleText = isDesktop ? { fontSize: 12.5 } : null;
+  const compactMinUke = isDesktop ? { paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999 } : null;
 
   useEffect(() => {
     if (!familyId) return;
@@ -877,11 +885,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const dateText = item.endDate ? `${formatDate(item.startDate)} – ${formatDate(item.endDate)}` : formatDate(item.startDate);
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: TRIP_COLOR }]}
+          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftColor: TRIP_COLOR }]}
           onPress={() => navigation.navigate('Trips', { screen: 'TripDetail', params: { trip: item } })}
         >
           <View style={styles.spondCardRow}>
-            <View style={styles.spondCalIcon}>
+            <View style={[styles.spondCalIcon, { backgroundColor: colors.surface }, calOutline]}>
               <View style={[styles.spondCalTopBar, { backgroundColor: TRIP_COLOR }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
@@ -940,7 +948,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
 
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: SPOND_COLOR }]}
+          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftColor: SPOND_COLOR }]}
           activeOpacity={0.7}
           onPress={() => navigation.navigate('EventDetail_Spond', {
             event: item,
@@ -951,7 +959,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
           })}
         >
           <View style={styles.spondCardRow}>
-            <View style={styles.spondCalIcon}>
+            <View style={[styles.spondCalIcon, { backgroundColor: colors.surface }, calOutline]}>
               <View style={[styles.spondCalTopBar, { backgroundColor: SPOND_COLOR }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
@@ -1017,11 +1025,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.health }]}
+          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.health }]}
           onPress={() => navigation.navigate('Trips', { screen: 'HealthApptDetail', params: { appointment: item, source: 'events' } })}
         >
           <View style={styles.spondCardRow}>
-            <View style={styles.spondCalIcon}>
+            <View style={[styles.spondCalIcon, { backgroundColor: colors.surface }, calOutline]}>
               <View style={[styles.spondCalTopBar, { backgroundColor: MODULE_COLORS.health }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
@@ -1074,11 +1082,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const typeLabel = (item as any).activityType === 'tur' ? t('school.activityTypeTur') : (item as any).activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.school }]}
+          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.school }]}
           onPress={() => navigation.navigate('Trips', { screen: 'SchoolActivityDetail', params: { activity: item, source: 'events' } })}
         >
           <View style={styles.spondCardRow}>
-            <View style={styles.spondCalIcon}>
+            <View style={[styles.spondCalIcon, { backgroundColor: colors.surface }, calOutline]}>
               <View style={[styles.spondCalTopBar, { backgroundColor: MODULE_COLORS.school }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
@@ -1132,11 +1140,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const typeLabel = (item as any).activityType === 'tur' ? t('school.activityTypeTur') : (item as any).activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.kindergarten }]}
+          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.kindergarten }]}
           onPress={() => navigation.navigate('Trips', { screen: 'KindergartenActivityDetail', params: { activity: item, source: 'events' } })}
         >
           <View style={styles.spondCardRow}>
-            <View style={styles.spondCalIcon}>
+            <View style={[styles.spondCalIcon, { backgroundColor: colors.surface }, calOutline]}>
               <View style={[styles.spondCalTopBar, { backgroundColor: MODULE_COLORS.kindergarten }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
@@ -1189,11 +1197,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftColor: HOME_COLOR }]}
+          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftColor: HOME_COLOR }]}
           onPress={() => navigation.navigate('Trips', { screen: 'HomeServiceDetail', params: { service: item, home: homes.find((h) => h.id === (item as any).homeId) } })}
         >
           <View style={styles.spondCardRow}>
-            <View style={styles.spondCalIcon}>
+            <View style={[styles.spondCalIcon, { backgroundColor: colors.surface }, calOutline]}>
               <View style={[styles.spondCalTopBar, { backgroundColor: HOME_COLOR }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
@@ -1236,11 +1244,11 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const age = today.getFullYear() - birth.getFullYear();
       return (
         <TouchableOpacity
-          style={[styles.spondCard, { backgroundColor: colors.surface, borderLeftWidth: 4, borderLeftColor: BIRTHDAY_COLOR }]}
+          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftWidth: 4, borderLeftColor: BIRTHDAY_COLOR }]}
           onPress={() => navigation.navigate('Bursdager')}
         >
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <View style={styles.spondCalIcon}>
+            <View style={[styles.spondCalIcon, { backgroundColor: colors.surface }, calOutline]}>
               <View style={[styles.spondCalTopBar, { backgroundColor: BIRTHDAY_COLOR }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
@@ -1268,6 +1276,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     return (
       <EventCard
         event={item}
+        outlined={isDesktop}
         onPress={() => navigation.navigate('EventDetail', { event: item })}
         onLongPress={() => handleDelete(item.id, item.title)}
         canDelete={item.createdBy === user?.uid || familyRole === 'owner' || familyRole === 'admin'}
@@ -1289,60 +1298,81 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     loadSpondEvents();
   }, [responseModal, spondConfig, loadSpondEvents]);
 
+  const handleOpenWeeklySummary = () => {
+    if (familyId) {
+      const now = new Date();
+      const day = now.getDay();
+      const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(now);
+      monday.setDate(diff);
+      const ws = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
+      const q = query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', ws));
+      getDocs(q).then(snap => {
+        if (snap.docs.length > 0) setMealPlan({ id: snap.docs[0].id, ...snap.docs[0].data() });
+      }).catch(() => {});
+      const recipesQ = query(collection(db, 'recipes'), where('familyId', '==', familyId));
+      getDocs(recipesQ).then(snap => {
+        setRecipes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+      }).catch(() => {});
+    }
+    if (user) {
+      getUserProfile(user.uid).then(profile => {
+        if (profile?.minUkeSections) setMinUkeSections(profile.minUkeSections);
+      }).catch(() => {});
+    }
+    setShowWeeklySummary(true);
+  };
+
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: listBg }]} edges={['top']}>
       <Animated.View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border, opacity: headerAnim, transform: [{ translateY: headerAnim.interpolate({ inputRange: [0, 1], outputRange: [-100, 0] }) }], overflow: 'hidden', maxHeight: headerAnim.interpolate({ inputRange: [0, 1], outputRange: [0, 200] }) }]}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <AppIcon name="calendar" size={28} color={colors.accent} />
             <Text style={[styles.title, { color: colors.text }]}>{t('events.title')}</Text>
           </View>
-          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
+          {!isDesktop && <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />}
         </View>
-        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}
+        {!isDesktop && familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}
         <View style={styles.viewToggle}>
+          {isDesktop ? (
+            <View style={styles.segTrack}>
+              <TouchableOpacity style={[styles.segItem, viewMode === 'list' && { backgroundColor: colors.surface }, viewMode === 'list' && styles.segItemActive]} onPress={() => setViewMode('list')}>
+                <Text style={[styles.segText, { color: colors.textSecondary }, viewMode === 'list' && { color: colors.accent, fontWeight: '700' }]}>{t('events.listView')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.segItem, viewMode === 'calendar' && { backgroundColor: colors.surface }, viewMode === 'calendar' && styles.segItemActive]} onPress={() => setViewMode('calendar')}>
+                <Text style={[styles.segText, { color: colors.textSecondary }, viewMode === 'calendar' && { color: colors.accent, fontWeight: '700' }]}>{t('events.calendarView')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.segItem} onPress={handleOpenWeeklySummary}>
+                <AppIcon name="calendar" size={14} color={MODULE_COLORS.mealplan} />
+                <Text style={[styles.segText, { color: MODULE_COLORS.mealplan, fontWeight: '700' }]}>{t('events.weeklySummary')}</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
           <TouchableOpacity
-            style={[styles.toggleButton, viewMode === 'list' && { backgroundColor: colors.accent }]}
+            style={[styles.toggleButton, compactToggle, viewMode === 'list' && { backgroundColor: colors.accent }]}
             onPress={() => setViewMode('list')}
           >
-            <Text style={[styles.toggleText, { color: viewMode === 'list' ? '#fff' : colors.textSecondary }]}>{t('events.listView')}</Text>
+            <Text style={[styles.toggleText, compactToggleText, { color: viewMode === 'list' ? '#fff' : colors.textSecondary }]}>{t('events.listView')}</Text>
           </TouchableOpacity>
+          )}
+          {!isDesktop && (
           <TouchableOpacity
-            style={[styles.toggleButton, viewMode === 'calendar' && { backgroundColor: colors.accent }]}
+            style={[styles.toggleButton, compactToggle, viewMode === 'calendar' && { backgroundColor: colors.accent }]}
             onPress={() => setViewMode('calendar')}
           >
-            <Text style={[styles.toggleText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>{t('events.calendarView')}</Text>
+            <Text style={[styles.toggleText, compactToggleText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>{t('events.calendarView')}</Text>
           </TouchableOpacity>
+          )}
+          {!isDesktop && (
           <TouchableOpacity
-            style={[styles.minUkeButton, { borderColor: MODULE_COLORS.mealplan }]}
-            onPress={() => {
-              if (familyId) {
-                const now = new Date();
-                const day = now.getDay();
-                const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-                const monday = new Date(now);
-                monday.setDate(diff);
-                const ws = `${monday.getFullYear()}-${String(monday.getMonth() + 1).padStart(2, '0')}-${String(monday.getDate()).padStart(2, '0')}`;
-                const q = query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', ws));
-                getDocs(q).then(snap => {
-                  if (snap.docs.length > 0) setMealPlan({ id: snap.docs[0].id, ...snap.docs[0].data() });
-                }).catch(() => {});
-                const recipesQ = query(collection(db, 'recipes'), where('familyId', '==', familyId));
-                getDocs(recipesQ).then(snap => {
-                  setRecipes(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-                }).catch(() => {});
-              }
-              if (user) {
-                getUserProfile(user.uid).then(profile => {
-                  if (profile?.minUkeSections) setMinUkeSections(profile.minUkeSections);
-                }).catch(() => {});
-              }
-              setShowWeeklySummary(true);
-            }}
+            style={[styles.minUkeButton, compactMinUke, { borderColor: MODULE_COLORS.mealplan }]}
+            onPress={handleOpenWeeklySummary}
           >
             <AppIcon name="calendar" size={16} color={MODULE_COLORS.mealplan} />
-            <Text style={[styles.minUkeText, { color: MODULE_COLORS.mealplan }]}>{t('events.weeklySummary')}</Text>
+            <Text style={[styles.minUkeText, compactToggleText, { color: MODULE_COLORS.mealplan }]}>{t('events.weeklySummary')}</Text>
           </TouchableOpacity>
+          )}
           <TouchableOpacity
             style={[styles.sortIconButton, { borderColor: colors.accent }, showSortPanel && { backgroundColor: colors.accent }]}
             onPress={() => setShowSortPanel(!showSortPanel)}
@@ -1562,6 +1592,33 @@ const styles = StyleSheet.create({
   viewToggle: {
     flexDirection: 'row',
     gap: 8,
+  },
+  segTrack: {
+    flexDirection: 'row',
+    backgroundColor: 'rgba(59, 90, 117, 0.08)',
+    borderRadius: 999,
+    padding: 3,
+    gap: 2,
+    alignSelf: 'flex-start',
+  },
+  segItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 5,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+  },
+  segItemActive: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  segText: {
+    fontSize: 12.5,
+    fontWeight: '600',
   },
   toggleButton: {
     paddingVertical: 8,

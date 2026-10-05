@@ -9,6 +9,7 @@ import { useUserStore } from '../store/userStore';
 import { ChatMessage, MessageReaction } from '../types';
 import { MessageBubble } from '../components/MessageBubble';
 import { useTheme } from '../theme/ThemeContext';
+import { useDesktopLayout } from '../hooks/useDesktopLayout';
 import { useTranslation } from 'react-i18next';
 import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_MAX_DIMENSION, IMAGE_QUALITY, SCROLL_DELAY_MS, LOCALE } from '../constants/limits';
 import { getErrorMessage } from '../utils/validation';
@@ -30,6 +31,7 @@ export const ChatScreen: React.FC = () => {
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const { colors } = useTheme();
+  const { isDesktop } = useDesktopLayout();
   const setInputFocused = useChatStore((state) => state.setInputFocused);
   const inputFocused = useChatStore((state) => state.inputFocused);
 
@@ -269,9 +271,9 @@ export const ChatScreen: React.FC = () => {
             <AppIcon name="chat" size={28} color={colors.accent} />
             <Text style={[styles.title, { color: colors.text }]}>{t('chat.title')}</Text>
           </View>
-          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
+          {!isDesktop && <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />}
         </View>
-        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
+        {!isDesktop && familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
       <FlatList

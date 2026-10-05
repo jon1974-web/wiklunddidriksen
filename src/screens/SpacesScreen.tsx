@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
+import { useDesktopLayout } from '../hooks/useDesktopLayout';
 import { useTranslation } from 'react-i18next';
 import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
@@ -30,6 +31,7 @@ interface SpacesScreenProps {
 export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
+  const { isDesktop } = useDesktopLayout();
   const familyId = useUserStore((state) => state.familyId);
   const familyName = useUserStore((state) => state.familyName);
   const [tripCount, setTripCount] = useState(0);
@@ -182,9 +184,9 @@ export const SpacesScreen: React.FC<SpacesScreenProps> = ({ navigation }) => {
             <AppIcon name="house" size={28} color={colors.accent} />
             <Text style={[styles.screenTitle, { color: colors.text }]}>{t('spaces.title')}</Text>
           </View>
-          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
+          {!isDesktop && <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />}
         </View>
-        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
+        {!isDesktop && familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
       <FlatList

@@ -782,6 +782,7 @@ const AppContent = () => {
             topTabBar={
               <TopTabBar
                 activeIndex={desktopActiveTab}
+                profileActive={desktopActiveTab === 3}
                 onSelect={(name) => {
                   if (name === 'Trips') {
                     (navigationRef as any).navigate('Trips', { screen: 'SpacesList' });

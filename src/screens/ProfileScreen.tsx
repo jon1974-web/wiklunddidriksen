@@ -22,6 +22,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { auth, storage } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
+import { useDesktopLayout } from '../hooks/useDesktopLayout';
 import {
   createOrUpdateUser,
   getUserProfile,
@@ -65,6 +66,7 @@ export const ProfileScreen: React.FC = () => {
   const appRole = useUserStore((state) => state.appRole);
   const setFamily = useUserStore((state) => state.setFamily);
   const { colors, mode, setMode } = useTheme();
+  const { isDesktop } = useDesktopLayout();
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [newName, setNewName] = useState(user?.displayName || '');
@@ -693,9 +695,9 @@ export const ProfileScreen: React.FC = () => {
             <AppIcon name="person" size={28} color={colors.accent} />
             <Text style={[styles.title, { color: colors.text }]}>{t('profile.title')}</Text>
           </View>
-          <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />
+          {!isDesktop && <Image source={require('../../assets/icon.png')} style={{ width: 36, height: 36, borderRadius: 9 }} />}
         </View>
-        {familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
+        {!isDesktop && familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary }]}>{familyName}</Text> : null}
       </View>
 
       <View style={[styles.section, { backgroundColor: colors.surface, alignItems: 'center' }]}>

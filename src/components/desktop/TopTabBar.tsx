@@ -6,6 +6,7 @@ import { TabIcon } from '../CustomTabBar';
 
 interface TopTabBarProps {
   activeIndex: number;
+  profileActive?: boolean;
   onSelect: (name: string) => void;
   onCreatePress: () => void;
   userInitial: string;
@@ -14,9 +15,8 @@ interface TopTabBarProps {
 
 const TABS = [
   { name: 'Events', labelKey: 'tabs.events', icon: 'calendar' },
-  { name: 'Chat', labelKey: 'tabs.chat', icon: 'chat' },
+  { name: 'Chat', labelKey: 'spaces.chat', icon: 'chat' },
   { name: 'Trips', labelKey: 'tabs.trips', icon: 'house' },
-  { name: 'Profile', labelKey: 'tabs.profile', icon: 'person' },
 ];
 
 const hexToRgba = (hex: string, alpha: number): string => {
@@ -35,7 +35,7 @@ const hexToRgba = (hex: string, alpha: number): string => {
  * when useDesktopLayout() reports isDesktop.
  */
 export const TopTabBar: React.FC<TopTabBarProps> = React.memo(
-  ({ activeIndex, onSelect, onCreatePress, userInitial, onProfilePress }) => {
+  ({ activeIndex, profileActive = false, onSelect, onCreatePress, userInitial, onProfilePress }) => {
     const { colors } = useTheme();
     const { t } = useTranslation();
 
@@ -68,9 +68,11 @@ export const TopTabBar: React.FC<TopTabBarProps> = React.memo(
           >
             <Text style={styles.createText}>+ {t('common.newShort')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.avatar, { backgroundColor: colors.accent }]} onPress={onProfilePress} activeOpacity={0.8}>
-            <Text style={styles.avatarText}>{userInitial}</Text>
-          </TouchableOpacity>
+          <View style={[styles.avatarRing, { borderColor: profileActive ? colors.accent : 'transparent' }]}>
+            <TouchableOpacity style={[styles.avatar, { backgroundColor: colors.accent }]} onPress={onProfilePress} activeOpacity={0.8}>
+              <Text style={styles.avatarText}>{userInitial}</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     );
@@ -125,6 +127,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '700',
+  },
+  avatarRing: {
+    padding: 2.5,
+    borderRadius: 20,
+    borderWidth: 2,
   },
   avatar: {
     width: 34,
