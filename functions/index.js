@@ -1133,6 +1133,14 @@ ${typePrompts[activityType] || typePrompts.event}`;
   }
 });
 
+// Add one hour to a "HH:MM" string, handling midnight rollover
+const addOneHourJs = (time) => {
+  if (!time || !time.includes(":")) return time;
+  const [h, m] = time.split(":").map((n) => parseInt(n, 10));
+  const total = (h + 1) % 24;
+  return `${String(total).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+};
+
 exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
 
@@ -1524,61 +1532,81 @@ Important: day must be exactly one of: Mandag, Tirsdag, Onsdag, Torsdag, Fredag`
       return res.status(200).json({ holidays: normalized });
     } else if (type === "healthAppointment") {
       const items = Array.isArray(result.events) ? result.events : [];
-      const normalized = items.map((e) => ({
-        title: e.title || "",
-        person: e.person || "",
-        doctor: e.doctor || "",
-        dateFrom: e.dateFrom || today,
-        dateTo: e.dateTo || null,
-        startTime: e.startTime || "09:00",
-        endTime: e.endTime || null,
-        location: e.location || "",
-        note: e.note || "",
-      }));
+      const normalized = items.map((e) => {
+        const dateFrom = e.dateFrom || e.date || today;
+        const startTime = e.startTime || "10:00";
+        return {
+          title: e.title || "",
+          person: e.person || "",
+          doctor: e.doctor || "",
+          dateFrom,
+          dateTo: e.dateTo || dateFrom,
+          startTime,
+          endTime: e.endTime || addOneHourJs(startTime),
+          location: e.location || "",
+          note: e.note || "",
+          reminderMinutes: typeof e.reminderMinutes === "number" ? e.reminderMinutes : 60,
+        };
+      });
       return res.status(200).json({ events: normalized });
     } else if (type === "vetVisit") {
       const items = Array.isArray(result.events) ? result.events : [];
-      const normalized = items.map((e) => ({
-        title: e.title || "",
-        doctor: e.doctor || "",
-        dateFrom: e.dateFrom || today,
-        dateTo: e.dateTo || null,
-        startTime: e.startTime || "09:00",
-        endTime: e.endTime || null,
-        location: e.location || "",
-        reason: e.reason || "",
-      }));
+      const normalized = items.map((e) => {
+        const dateFrom = e.dateFrom || e.date || today;
+        const startTime = e.startTime || "10:00";
+        return {
+          title: e.title || "",
+          doctor: e.doctor || "",
+          dateFrom,
+          dateTo: e.dateTo || dateFrom,
+          startTime,
+          endTime: e.endTime || addOneHourJs(startTime),
+          location: e.location || "",
+          reason: e.reason || "",
+          reminderMinutes: typeof e.reminderMinutes === "number" ? e.reminderMinutes : 60,
+        };
+      });
       return res.status(200).json({ events: normalized });
     } else if (type === "schoolActivity") {
       const items = Array.isArray(result.events) ? result.events : [];
-      const normalized = items.map((e) => ({
-        title: e.title || "",
-        activityType: e.activityType || "aktivitet",
-        dateFrom: e.dateFrom || today,
-        dateTo: e.dateTo || null,
-        startTime: e.startTime || "10:00",
-        endTime: e.endTime || null,
-        location: e.location || "",
-      }));
+      const normalized = items.map((e) => {
+        const dateFrom = e.dateFrom || e.date || today;
+        const startTime = e.startTime || "10:00";
+        return {
+          title: e.title || "",
+          activityType: e.activityType || "aktivitet",
+          dateFrom,
+          dateTo: e.dateTo || dateFrom,
+          startTime,
+          endTime: e.endTime || addOneHourJs(startTime),
+          location: e.location || "",
+          reminderMinutes: typeof e.reminderMinutes === "number" ? e.reminderMinutes : 60,
+        };
+      });
       return res.status(200).json({ events: normalized });
     } else if (type === "kindergartenActivity") {
       const items = Array.isArray(result.events) ? result.events : [];
-      const normalized = items.map((e) => ({
-        title: e.title || "",
-        activityType: e.activityType || "aktivitet",
-        dateFrom: e.dateFrom || today,
-        dateTo: e.dateTo || null,
-        startTime: e.startTime || "10:00",
-        endTime: e.endTime || null,
-        location: e.location || "",
-      }));
+      const normalized = items.map((e) => {
+        const dateFrom = e.dateFrom || e.date || today;
+        const startTime = e.startTime || "10:00";
+        return {
+          title: e.title || "",
+          activityType: e.activityType || "aktivitet",
+          dateFrom,
+          dateTo: e.dateTo || dateFrom,
+          startTime,
+          endTime: e.endTime || addOneHourJs(startTime),
+          location: e.location || "",
+          reminderMinutes: typeof e.reminderMinutes === "number" ? e.reminderMinutes : 60,
+        };
+      });
       return res.status(200).json({ events: normalized });
     } else if (type === "homeService") {
       const items = Array.isArray(result.events) ? result.events : [];
       const normalized = items.map((e) => ({
         title: e.title || "",
         description: e.description || "",
-        dateFrom: e.dateFrom || today,
+        dateFrom: e.dateFrom || e.date || today,
         startTime: e.startTime || "09:00",
         frequency: e.frequency || "once",
       }));

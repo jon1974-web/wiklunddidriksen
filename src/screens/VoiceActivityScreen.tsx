@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { auth } from '../services/firebase';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
+import { addOneHour } from '../utils/dateUtils';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
@@ -235,7 +236,17 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           data.data.person = matches.join(', ');
         }
       }
-      setParsedData(data.data);
+      setParsedData({
+        ...data.data,
+        person: data.data.person || '',
+        dateFrom: data.data.dateFrom || data.data.date || '',
+        dateTo: data.data.dateTo || data.data.dateFrom || data.data.date || '',
+        startTime: data.data.startTime || '10:00',
+        endTime: data.data.endTime || addOneHour(data.data.startTime || '10:00'),
+        reminder: typeof data.data.reminder === 'number'
+          ? data.data.reminder
+          : (typeof data.data.reminderMinutes === 'number' ? data.data.reminderMinutes : 60),
+      });
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
@@ -244,7 +255,16 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
   }, [recording, type]);
 
   const handleFieldChange = useCallback((field: keyof ParsedData, value: string) => {
-    setParsedData((prev) => (prev ? { ...prev, [field]: value } : null));
+    setParsedData((prev) => {
+      if (!prev) return null;
+      const next = { ...prev, [field]: value } as ParsedData;
+      if (field === 'dateFrom') {
+        next.dateTo = value;
+      } else if (field === 'startTime' && (!next.endTime || next.endTime === addOneHour(prev.startTime))) {
+        next.endTime = addOneHour(value);
+      }
+      return next;
+    });
   }, []);
 
   const handlePickerSelect = useCallback((value: string) => {

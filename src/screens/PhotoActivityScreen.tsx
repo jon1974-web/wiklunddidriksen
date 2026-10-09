@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { ActionModal } from '../components/ActionModal';
 import { sanitizeInput } from '../utils/validation';
+import { addOneHour } from '../utils/dateUtils';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { auth } from '../services/firebase';
 import { getFamilyMembersWithRoles } from '../services/familyService';
@@ -145,12 +146,20 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
     }
   }, [familyId]);
 
-  const toEditableActivity = (a: ParsedActivity): EditableActivity => ({
-    ...a,
-    showEndDate: !!a.dateTo,
-    showEndTime: !!a.endTime,
-    checked: true,
-  });
+  const toEditableActivity = (a: ParsedActivity): EditableActivity => {
+    const dateFrom = a.dateFrom;
+    const startTime = a.startTime || '10:00';
+    return {
+      ...a,
+      dateFrom,
+      startTime,
+      dateTo: a.dateTo || dateFrom,
+      endTime: a.endTime || addOneHour(startTime),
+      showEndDate: true,
+      showEndTime: true,
+      checked: true,
+    };
+  };
 
   const pickImage = useCallback(async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -414,10 +423,20 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
   const handlePickerSelect = (value: string) => {
     if (!activePicker) return;
     const { activityIndex, field } = activePicker;
-    if (field === 'dateFrom') updateActivity(activityIndex, { dateFrom: value });
-    else if (field === 'startTime') updateActivity(activityIndex, { startTime: value });
-    else if (field === 'dateTo') updateActivity(activityIndex, { dateTo: value });
-    else if (field === 'endTime') updateActivity(activityIndex, { endTime: value });
+    const activity = activities[activityIndex];
+    if (field === 'dateFrom') {
+      updateActivity(activityIndex, { dateFrom: value, dateTo: value });
+    } else if (field === 'startTime') {
+      const updates: Partial<EditableActivity> = { startTime: value };
+      if (!activity.endTime || activity.endTime === addOneHour(activity.startTime)) {
+        updates.endTime = addOneHour(value);
+      }
+      updateActivity(activityIndex, updates);
+    } else if (field === 'dateTo') {
+      updateActivity(activityIndex, { dateTo: value });
+    } else if (field === 'endTime') {
+      updateActivity(activityIndex, { endTime: value });
+    }
     setActivePicker(null);
   };
 
