@@ -36,7 +36,7 @@ export function useStandaloneMode(): boolean {
   return standalone;
 }
 
-export const DESKTOP_MIN_WIDTH = 1100;
+export const DESKTOP_MIN_WIDTH = 1240;
 
 /**
  * The browser/desktop experience (top tab bar + side panels) is shown only when:

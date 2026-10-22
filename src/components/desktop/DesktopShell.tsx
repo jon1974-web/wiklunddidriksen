@@ -10,14 +10,14 @@ interface DesktopShellProps {
   children: React.ReactNode;
 }
 
-export const APP_COLUMN_WIDTH = 500;
+export const APP_COLUMN_WIDTH = 640;
 export const PANEL_WIDTH = 340;
 
 /**
  * Browser-only 3-column showcase shell:
  *   [left panel: why] [app column: the app, unchanged] [right panel: how + ads]
  *
- * When isDesktop is false (native apps, installed PWA, window < 1100px)
+ * When isDesktop is false (native apps, installed PWA, window < 1240px)
  * this renders ONLY the children — the app is pixel-identical to today.
  */
 export const DesktopShell: React.FC<DesktopShellProps> = ({
