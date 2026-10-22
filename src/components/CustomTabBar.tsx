@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import Svg, { Rect, Line, Path, Circle, Polyline } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeContext';
-import { useTranslation } from 'react-i18next';
+import { AppIcon } from './AppIcon';
 import { useChatStore } from '../store/chatStore';
 
 interface TabBarProps {
@@ -56,16 +56,8 @@ const TAB_ICONS: Record<string, string> = {
   Profile: 'person',
 };
 
-const TAB_KEYS: Record<string, string> = {
-  Events: 'tabs.events',
-  Chat: 'tabs.chat',
-  Trips: 'tabs.trips',
-  Profile: 'tabs.profile',
-};
-
 export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descriptors, navigation, onCreatePress }) => {
   const { colors } = useTheme();
-  const { t } = useTranslation();
   const chatInputFocused = useChatStore((s) => s.inputFocused);
 
   return (
@@ -73,7 +65,6 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
       {state.routes.map((route: any, index: number) => {
         const isFocused = state.index === index;
         const icon = TAB_ICONS[route.name] || 'calendar';
-        const label = t(TAB_KEYS[route.name] || route.name);
 
         const onPress = () => {
           if (route.name === 'Trips') {
@@ -88,20 +79,17 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
         return (
           <TouchableOpacity key={route.key} style={[styles.tabItem, shiftStyle]} onPress={onPress} activeOpacity={0.7}>
             <TabIcon icon={icon} focused={isFocused} accentColor={colors.accent} />
-            <Text style={[styles.tabLabel, { color: isFocused ? colors.accent : colors.textDisabled }, isFocused && styles.tabLabelActive]}>
-              {label}
-            </Text>
           </TouchableOpacity>
         );
       })}
 
       <TouchableOpacity
-        style={[styles.centerBtn, { backgroundColor: colors.accent }, chatInputFocused && styles.centerBtnHidden]}
+        style={[styles.centerBtn, { backgroundColor: colors.surface, borderColor: colors.accent }, chatInputFocused && styles.centerBtnHidden]}
         onPress={onCreatePress}
         activeOpacity={0.8}
         disabled={chatInputFocused}
       >
-        <Text style={styles.plus}>+</Text>
+        <AppIcon name="sparkles" size={26} color={colors.accent} />
       </TouchableOpacity>
     </View>
   );
@@ -110,9 +98,7 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
 const styles = StyleSheet.create({
   tabBar: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingTop: 6,
-    paddingBottom: 4,
+    alignItems: 'center',
     borderWidth: 1.5,
     borderRadius: 28,
     height: 62,
@@ -128,30 +114,25 @@ const styles = StyleSheet.create({
   tabItem: {
     flex: 1,
     alignItems: 'center',
-    gap: 3,
-    paddingTop: 4,
-  },
-  tabLabel: {
-    fontSize: 10,
-  },
-  tabLabelActive: {
-    fontWeight: '600',
+    justifyContent: 'center',
   },
   centerBtn: {
     position: 'absolute',
-    top: -14,
+    top: '50%',
     left: '50%',
+    marginTop: -26,
     marginLeft: -26,
     width: 52,
     height: 52,
     borderRadius: 26,
+    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+    elevation: 4,
     opacity: 1,
     transform: [{ scale: 1 }],
   },
@@ -159,11 +140,5 @@ const styles = StyleSheet.create({
     opacity: 0,
     transform: [{ scale: 0.5 }],
     pointerEvents: 'none' as const,
-  },
-  plus: {
-    color: '#fff',
-    fontSize: 30,
-    fontWeight: '300',
-    lineHeight: 32,
   },
 });
