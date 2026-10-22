@@ -203,9 +203,6 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
   const listBg = isDesktop ? colors.surface : colors.background;
   const cardOutline = isDesktop ? { borderWidth: 1, borderColor: colors.border, borderLeftWidth: 4 } : null;
   const calOutline = isDesktop ? { borderWidth: 1, borderColor: colors.border } : null;
-  const compactToggle = isDesktop ? { paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999 } : null;
-  const compactToggleText = isDesktop ? { fontSize: 12.5 } : null;
-  const compactMinUke = isDesktop ? { paddingVertical: 5, paddingHorizontal: 12, borderRadius: 999 } : null;
 
   useEffect(() => {
     if (!familyId) return;
@@ -1335,44 +1332,24 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         </View>
         {!isDesktop && familyName ? <Text style={[styles.familySubtitle, { color: colors.textSecondary, marginTop: 2 }]}>{familyName}</Text> : null}
         <View style={styles.viewToggle}>
-          {isDesktop ? (
-            <View style={styles.segTrack}>
-              <TouchableOpacity style={[styles.segItem, viewMode === 'list' && { backgroundColor: colors.surface }, viewMode === 'list' && styles.segItemActive]} onPress={() => setViewMode('list')}>
-                <Text style={[styles.segText, { color: colors.textSecondary }, viewMode === 'list' && { color: colors.accent, fontWeight: '700' }]}>{t('events.listView')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.segItem, viewMode === 'calendar' && { backgroundColor: colors.surface }, viewMode === 'calendar' && styles.segItemActive]} onPress={() => setViewMode('calendar')}>
-                <Text style={[styles.segText, { color: colors.textSecondary }, viewMode === 'calendar' && { color: colors.accent, fontWeight: '700' }]}>{t('events.calendarView')}</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.segItem} onPress={handleOpenWeeklySummary}>
-                <AppIcon name="calendar" size={14} color={MODULE_COLORS.mealplan} />
-                <Text style={[styles.segText, { color: MODULE_COLORS.mealplan, fontWeight: '700' }]}>{t('events.weeklySummary')}</Text>
-              </TouchableOpacity>
-            </View>
-          ) : (
-          <TouchableOpacity
-            style={[styles.toggleButton, compactToggle, viewMode === 'list' && { backgroundColor: colors.accent }]}
-            onPress={() => setViewMode('list')}
-          >
-            <Text style={[styles.toggleText, compactToggleText, { color: viewMode === 'list' ? '#fff' : colors.textSecondary }]}>{t('events.listView')}</Text>
-          </TouchableOpacity>
-          )}
-          {!isDesktop && (
-          <TouchableOpacity
-            style={[styles.toggleButton, compactToggle, viewMode === 'calendar' && { backgroundColor: colors.accent }]}
-            onPress={() => setViewMode('calendar')}
-          >
-            <Text style={[styles.toggleText, compactToggleText, { color: viewMode === 'calendar' ? '#fff' : colors.textSecondary }]}>{t('events.calendarView')}</Text>
-          </TouchableOpacity>
-          )}
-          {!isDesktop && (
-          <TouchableOpacity
-            style={[styles.minUkeButton, compactMinUke, { borderColor: MODULE_COLORS.mealplan }]}
-            onPress={handleOpenWeeklySummary}
-          >
-            <AppIcon name="calendar" size={16} color={MODULE_COLORS.mealplan} />
-            <Text style={[styles.minUkeText, compactToggleText, { color: MODULE_COLORS.mealplan }]}>{t('events.weeklySummary')}</Text>
-          </TouchableOpacity>
-          )}
+          <View style={styles.segTrack}>
+            <TouchableOpacity
+              style={[styles.segItem, viewMode === 'list' && { backgroundColor: colors.surface }, viewMode === 'list' && styles.segItemActive]}
+              onPress={() => setViewMode('list')}
+            >
+              <Text style={[styles.segText, viewMode === 'list' ? { color: colors.accent, fontWeight: '700' } : { color: colors.textSecondary }]}>{t('events.listView')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.segItem, viewMode === 'calendar' && { backgroundColor: colors.surface }, viewMode === 'calendar' && styles.segItemActive]}
+              onPress={() => setViewMode('calendar')}
+            >
+              <Text style={[styles.segText, viewMode === 'calendar' ? { color: colors.accent, fontWeight: '700' } : { color: colors.textSecondary }]}>{t('events.calendarView')}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.segItem} onPress={handleOpenWeeklySummary}>
+              <AppIcon name="sparkles" size={13} color={colors.textSecondary} />
+              <Text style={[styles.segText, { color: colors.textSecondary }]}>{t('events.weeklySummary')}</Text>
+            </TouchableOpacity>
+          </View>
           <TouchableOpacity
             style={[styles.sortIconButton, { borderColor: colors.accent }, showSortPanel && { backgroundColor: colors.accent }]}
             onPress={() => setShowSortPanel(!showSortPanel)}
@@ -1596,7 +1573,7 @@ const styles = StyleSheet.create({
   segTrack: {
     flexDirection: 'row',
     backgroundColor: 'rgba(59, 90, 117, 0.08)',
-    borderRadius: 999,
+    borderRadius: 12,
     padding: 3,
     gap: 2,
     alignSelf: 'flex-start',
@@ -1605,9 +1582,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingVertical: 5,
-    paddingHorizontal: 12,
-    borderRadius: 999,
+    paddingVertical: 7,
+    paddingHorizontal: 13,
+    borderRadius: 9,
   },
   segItemActive: {
     shadowColor: '#000',
@@ -1617,28 +1594,6 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   segText: {
-    fontSize: 12.5,
-    fontWeight: '600',
-  },
-  toggleButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 20,
-    backgroundColor: '#eee',
-  },
-  toggleText: {
-    fontSize: 14,
-  },
-  minUkeButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
-    borderRadius: 20,
-    borderWidth: 1.5,
-  },
-  minUkeText: {
     fontSize: 13,
     fontWeight: '600',
   },
