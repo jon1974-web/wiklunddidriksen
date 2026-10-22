@@ -129,7 +129,7 @@ const handleCopy = useCallback(() => {
   const typeLabel = activity.activityType === 'tur' ? t('school.activityTypeTur') : activity.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.schoolBg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: SCHOOL_COLOR }]}>
           <Text style={{ color: SCHOOL_COLOR, fontSize: 18 }}>←</Text>

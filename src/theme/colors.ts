@@ -1,6 +1,6 @@
 // Helper to generate a theme from an accent color
 function makeTheme(accent: string) {
-  // Generate a light background tint from the accent color
+  // Tinted background for inputs (page background is always white)
   const r = parseInt(accent.slice(1, 3), 16);
   const g = parseInt(accent.slice(3, 5), 16);
   const b = parseInt(accent.slice(5, 7), 16);
@@ -22,7 +22,7 @@ function makeTheme(accent: string) {
   const chatBg = `#${Math.round(chatBgR).toString(16).padStart(2, '0')}${Math.round(chatBgG).toString(16).padStart(2, '0')}${Math.round(chatBgB).toString(16).padStart(2, '0')}`;
 
   return {
-    background: bg,
+    background: '#fff',
     surface: '#fff',
     surfaceVariant: accentLight,
     text: '#333',

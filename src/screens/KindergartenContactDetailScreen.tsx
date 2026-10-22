@@ -40,7 +40,7 @@ export const KindergartenContactDetailScreen: React.FC<Props> = ({ navigation, r
   const isTeacher = contact.role === 'teacher';
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.kindergartenBg }]} contentContainerStyle={{ padding: 16 }}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={{ padding: 16 }}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: KG }]}>
         <Text style={{ color: KG, fontSize: 18 }}>←</Text>
       </TouchableOpacity>

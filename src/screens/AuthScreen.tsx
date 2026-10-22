@@ -332,7 +332,7 @@ export const AuthScreen: React.FC<{ compact?: boolean; focusSignal?: number; foc
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: '#F6F7F9' }]}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={[styles.scrollContent, compact && styles.compactScroll]}
         showsVerticalScrollIndicator={false}

@@ -81,7 +81,7 @@ export const HomeServiceDetailScreen: React.FC<Props> = ({ navigation, route }) 
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.homeBg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: HOME_COLOR }]}>
           <Text style={{ color: HOME_COLOR, fontSize: 18 }}>←</Text>

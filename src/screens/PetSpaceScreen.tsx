@@ -1540,7 +1540,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.petsBg }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {selectedPet ? renderDetail() : renderGrid()}
 
       <DatePickerModal

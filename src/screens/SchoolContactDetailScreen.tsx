@@ -51,7 +51,7 @@ export const SchoolContactDetailScreen: React.FC<SchoolContactDetailScreenProps>
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.schoolBg }]} contentContainerStyle={{ padding: 16 }}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]} contentContainerStyle={{ padding: 16 }}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { borderColor: MODULE_COLORS.school }]}>
         <Text style={{ color: MODULE_COLORS.school, fontSize: 18 }}>←</Text>
       </TouchableOpacity>

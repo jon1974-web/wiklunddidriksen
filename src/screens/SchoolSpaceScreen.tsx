@@ -1719,7 +1719,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.schoolBg }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {renderGrid()}
 
       {/* Full-screen image viewer */}

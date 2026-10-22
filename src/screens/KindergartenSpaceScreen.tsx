@@ -1654,7 +1654,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
   };
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: MODULE_COLORS.kindergartenBg }]} edges={['top']}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
       {renderGrid()}
 
       {/* Full-screen image viewer */}

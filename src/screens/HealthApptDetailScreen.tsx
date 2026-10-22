@@ -129,7 +129,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   }, [appointment, navigation]);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.healthBg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: HEALTH_COLOR }]}>
           <Text style={{ color: HEALTH_COLOR, fontSize: 18 }}>←</Text>

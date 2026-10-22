@@ -127,7 +127,7 @@ export const PetVetDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   }, [visit, navigation]);
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.petsBg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: PET_COLOR }]}>
           <Text style={{ color: PET_COLOR, fontSize: 18 }}>←</Text>

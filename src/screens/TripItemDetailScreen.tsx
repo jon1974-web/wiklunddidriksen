@@ -90,7 +90,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.tripsBg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={{ width: 36, height: 36, borderRadius: 18, borderWidth: 1.5, borderColor: MODULE_COLORS.trips, alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
         <Text style={{ color: MODULE_COLORS.trips, fontSize: 18 }}>←</Text>
       </TouchableOpacity>

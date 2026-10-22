@@ -42,7 +42,7 @@ export const PetGroomDetailScreen: React.FC<Props> = ({ navigation, route }) => 
   };
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.petsBg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: PET_COLOR }]}>
         <Text style={{ color: PET_COLOR, fontSize: 18 }}>←</Text>
       </TouchableOpacity>

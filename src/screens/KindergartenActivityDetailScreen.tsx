@@ -129,7 +129,7 @@ export const KindergartenActivityDetailScreen: React.FC<Props> = ({ navigation, 
   const typeLabel = activity.activityType === 'tur' ? t('school.activityTypeTur') : activity.activityType === 'aktivitet' ? t('school.activityTypeAktivitet') : t('school.activityTypeMøte');
 
   return (
-    <ScrollView style={[styles.container, { backgroundColor: MODULE_COLORS.kindergartenBg }]}>
+    <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: KINDERGARTEN_COLOR }]}>
           <Text style={{ color: KINDERGARTEN_COLOR, fontSize: 18 }}>←</Text>
