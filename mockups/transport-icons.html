@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>Transport icons mockup</title>
+<style>
+  :root {
+    --trips: #7EC8E3;
+    --trips-bg: #EDF6FB;
+    --accent: #3b5a75;
+    --text: #1d2b36;
+    --muted: #6b7c88;
+    --border: #d9e4ec;
+  }
+  body { font-family: -apple-system, system-ui, sans-serif; background: #f5f8fa; color: var(--text); margin: 0; padding: 24px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 32px 0 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .5px; }
+  p.note { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+  .card svg { display: block; margin: 0 auto 8px; }
+  .card .name { font-size: 13px; font-weight: 600; }
+  .card .code { font-size: 11px; color: var(--muted); }
+  .row { display: flex; align-items: center; gap: 12px; padding: 14px; border-radius: 10px; background: var(--trips-bg); margin-bottom: 8px; max-width: 360px; }
+  .row .label { font-size: 16px; font-weight: 600; color: var(--text); }
+  .tile { background: var(--trips-bg); border-left: 4px solid var(--trips); border-radius: 12px; width: 160px; overflow: hidden; }
+  .tile .top { height: 3px; background: var(--trips); }
+  .tile .cal { text-align: center; padding: 6px 0 4px; position: relative; }
+  .tile .day { font-size: 22px; font-weight: 700; line-height: 26px; }
+  .tile .mon { font-size: 11px; font-weight: 500; text-transform: uppercase; color: var(--muted); }
+  .tile .mode { display: flex; align-items: center; gap: 4px; padding: 6px 8px 0; color: var(--trips); font-weight: 700; font-size: 14px; }
+  .tile .body { padding: 6px 10px 10px; font-size: 12px; color: var(--muted); }
+  .tile .body strong { color: var(--text); font-size: 14px; display: block; margin-bottom: 2px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { display: flex; align-items: center; gap: 6px; padding: 10px 14px; border-radius: 10px; background: #fff; border: 1.5px solid var(--border); font-size: 14px; font-weight: 600; }
+  .chip.on { border-color: var(--trips); background: var(--trips-bg); }
+  .sizes { display: flex; align-items: flex-end; gap: 24px; background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+  .sizes div { text-align: center; font-size: 11px; color: var(--muted); }
+  .sizes svg { display: block; margin: 0 auto 6px; }
+  .modal-head { display: flex; align-items: center; justify-content: center; gap: 6px; background: #fff; border-radius: 16px; padding: 16px; max-width: 360px; font-size: 18px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<h1>Transport icons: mockup</h1>
+<p class="note">Stroke 2.5, round caps and joins, 0.15 accent fill, same 24×24 grid as the existing icons in AppIcon.tsx. Colour follows the trips module (#7EC8E3). Not yet wired into the app.</p>
+
+<!-- SVG symbol library (same geometry the React components will use) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- Personal car: sedan outline, lighter than rental car -->
+    <symbol id="personalCar" viewBox="0 0 24 24">
+      <path d="M3 13.5l1.8-5A2 2 0 0 1 6.7 7.2h10.6a2 2 0 0 1 1.9 1.3l1.8 5V18a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-.5H6V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill="currentColor" fill-opacity="0.15"/>
+      <line x1="3" y1="13.5" x2="21" y2="13.5"/>
+      <line x1="10.5" y1="7.5" x2="10.5" y2="13.5"/>
+      <circle cx="7" cy="18" r="1.6" fill="currentColor" stroke="none"/>
+      <circle cx="17" cy="18" r="1.6" fill="currentColor" stroke="none"/>
+    </symbol>
+
+    <!-- Bus: front-facing body, windscreen band, wheels -->
+    <symbol id="bus" viewBox="0 0 24 24">
+      <rect x="3" y="3.5" width="18" height="15" rx="3" fill="currentColor" fill-opacity="0.15"/>
+      <rect x="5.5" y="6" width="13" height="5" rx="1"/>
+      <line x1="3" y1="14.5" x2="21" y2="14.5"/>
+      <circle cx="7.5" cy="19.5" r="1.8" fill="currentColor" stroke="none"/>
+      <circle cx="16.5" cy="19.5" r="1.8" fill="currentColor" stroke="none"/>
+    </symbol>
+
+    <!-- Tram: rounded body, pantograph, windows, rail -->
+    <symbol id="tram" viewBox="0 0 24 24">
+      <path d="M9 4.5l3-2.5 3 2.5"/>
+      <rect x="5" y="4.5" width="14" height="13" rx="3" fill="currentColor" fill-opacity="0.15"/>
+      <rect x="7.5" y="7" width="9" height="4.5" rx="1"/>
+      <circle cx="8.5" cy="14.5" r="0.9" fill="currentColor" stroke="none"/>
+      <circle cx="15.5" cy="14.5" r="0.9" fill="currentColor" stroke="none"/>
+      <circle cx="8.5" cy="19.5" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="15.5" cy="19.5" r="1.5" fill="currentColor" stroke="none"/>
+      <line x1="3" y1="21.5" x2="21" y2="21.5"/>
+    </symbol>
+
+    <!-- Existing icons for comparison (copied from AppIcon.tsx geometry) -->
+    <symbol id="car" viewBox="0 0 24 24">
+      <path d="M5 14l1.5-5.5a2 2 0 011.9-1.4h7.1a2 2 0 011.9 1.4L19 14" fill="currentColor"/>
+      <rect x="3" y="14" width="18" height="4" rx="1" fill="currentColor"/>
+      <circle cx="7" cy="18" r="2" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <circle cx="17" cy="18" r="2" fill="#fff" stroke="currentColor" stroke-width="2"/>
+      <line x1="7" y1="12" x2="17" y2="12" stroke="#fff" stroke-width="2"/>
+    </symbol>
+    <symbol id="train" viewBox="0 0 24 24">
+      <rect x="4" y="3" width="16" height="16" rx="2" fill="currentColor" fill-opacity="0.15"/>
+      <line x1="4" y1="11" x2="20" y2="11"/>
+      <line x1="12" y1="3" x2="12" y2="11"/>
+      <circle cx="8" cy="15" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="16" cy="15" r="1" fill="currentColor" stroke="none"/>
+      <line x1="8" y1="19" x2="6" y2="22"/>
+      <line x1="16" y1="19" x2="18" y2="22"/>
+    </symbol>
+    <symbol id="fly" viewBox="0 0 24 24">
+      <path d="M22 2L11 13"/>
+      <path d="M22 2l-7 20-4-9-9-4z" fill="currentColor" fill-opacity="0.15"/>
+    </symbol>
+    <symbol id="ferry" viewBox="0 0 24 24">
+      <path d="M2 20c2-1 4-1 6 0s4 1 6 0 4-1 6 0"/>
+      <rect x="4" y="10" width="16" height="6" rx="1" fill="currentColor" fill-opacity="0.15"/>
+      <line x1="4" y1="16" x2="4" y2="13"/>
+      <line x1="20" y1="16" x2="20" y2="13"/>
+      <circle cx="8" cy="13" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="16" cy="13" r="1" fill="currentColor" stroke="none"/>
+    </symbol>
+  </defs>
+</svg>
+
+<h2>1. New icons (large)</h2>
+<div class="grid">
+  <div class="card" style="color: var(--trips)">
+    <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#personalCar"/></svg>
+    <div class="name">Personal car</div><div class="code">personalCar</div>
+  </div>
+  <div class="card" style="color: var(--trips)">
+    <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#bus"/></svg>
+    <div class="name">Bus</div><div class="code">bus</div>
+  </div>
+  <div class="card" style="color: var(--trips)">
+    <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#tram"/></svg>
+    <div class="name">Tram</div><div class="code">tram</div>
+  </div>
+</div>
+
+<h2>2. Comparison with existing icons</h2>
+<div class="grid">
+  <div class="card" style="color: var(--trips)">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#car"/></svg>
+    <div class="name">Car (rental, existing)</div><div class="code">car</div>
+  </div>
+  <div class="card" style="color: var(--trips)">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#personalCar"/></svg>
+    <div class="name">Personal car (new)</div><div class="code">personalCar</div>
+  </div>
+  <div class="card" style="color: var(--trips)">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#train"/></svg>
+    <div class="name">Train</div><div class="code">train</div>
+  </div>
+  <div class="card" style="color: var(--trips)">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ferry"/></svg>
+    <div class="name">Ferry</div><div class="code">ferry</div>
+  </div>
+  <div class="card" style="color: var(--trips)">
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#fly"/></svg>
+    <div class="name">Fly</div><div class="code">fly</div>
+  </div>
+</div>
+
+<h2>3. Size check (icons render at 20, 22, 28 px in the app)</h2>
+<div class="sizes">
+  <div><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#personalCar"/></svg>16</div>
+  <div><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#bus"/></svg>20</div>
+  <div><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#tram"/></svg>22</div>
+  <div><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#personalCar"/></svg>28</div>
+  <div><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#bus"/></svg>28</div>
+  <div><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#tram"/></svg>28</div>
+</div>
+
+<h2>4. Picker list (Add transport)</h2>
+<div style="background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;max-width:360px">
+  <div class="row"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#fly"/></svg><span class="label">Fly</span></div>
+  <div class="row"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#train"/></svg><span class="label">Tog</span></div>
+  <div class="row"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#car"/></svg><span class="label">Leiebil</span></div>
+  <div class="row"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ferry"/></svg><span class="label">Ferje</span></div>
+  <div class="row">
+    <span style="display:flex;gap:2px;align-items:center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#personalCar"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#bus"/></svg>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#tram"/></svg>
+    </span>
+    <span class="label">Generelt</span>
+  </div>
+  <p class="note" style="margin:8px 0 0">Generic entry shows the three mode icons together. Alternative: a single icon.</p>
+</div>
+
+<h2>5. Mode chips (inside the General form)</h2>
+<div class="chips">
+  <div class="chip on" style="color:#3b5a75"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#personalCar"/></svg>Egen bil</div>
+  <div class="chip" style="color:#3b5a75"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#bus"/></svg>Buss</div>
+  <div class="chip" style="color:#3b5a75"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#tram"/></svg>Trikk</div>
+</div>
+<p class="note">Labels are placeholders. Final wording will come from the i18n keys in all five languages.</p>
+
+<h2>6. Timeline tile (as it would look in the trip list)</h2>
+<div class="tile">
+  <div class="top"></div>
+  <div class="cal">
+    <div class="day">14</div>
+    <div class="mon">jun</div>
+    <div class="mode" style="justify-content:flex-start;padding-left:10px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#bus"/></svg>
+      Buss
+    </div>
+  </div>
+  <div style="height:1px;background:var(--border);margin:6px 10px"></div>
+  <div class="body">
+    <strong>Flybussen</strong>
+    Linje A2<br>
+    🛫 08:15
+  </div>
+</div>
+
+</body>
+</html>

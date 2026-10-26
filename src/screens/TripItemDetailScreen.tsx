@@ -12,7 +12,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { crossAlert } from '../utils/alert';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { formatDate } from '../utils/dateUtils';
-import { deleteTripHotel, deleteTripRestaurant, deleteTripActivity, deleteTripBoat, deleteTripTaxi, deleteTripFerry } from '../services/tripService';
+import { deleteTripHotel, deleteTripRestaurant, deleteTripActivity, deleteTripBoat, deleteTripTaxi, deleteTripFerry, deleteTripTransport } from '../services/tripService';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { useTranslation } from 'react-i18next';
 
@@ -21,7 +21,7 @@ interface TripItemDetailScreenProps {
   route: any;
 }
 
-type ItemType = 'hotel' | 'restaurant' | 'activity' | 'boat' | 'taxi' | 'ferry';
+type ItemType = 'hotel' | 'restaurant' | 'activity' | 'boat' | 'taxi' | 'ferry' | 'general';
 
 const deleteHandlers: Record<ItemType, (tripId: string, itemId: string) => Promise<void>> = {
   hotel: deleteTripHotel,
@@ -30,6 +30,7 @@ const deleteHandlers: Record<ItemType, (tripId: string, itemId: string) => Promi
   boat: deleteTripBoat,
   taxi: deleteTripTaxi,
   ferry: deleteTripFerry,
+  general: deleteTripTransport,
 };
 
 export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navigation, route }) => {
@@ -48,6 +49,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
     boat: { icon: '⛵', label: t('transport.boatCruise'), editParam: 'openBoatEditId' },
     taxi: { icon: '🚕', label: t('transport.taxi'), editParam: 'openTaxiEditId' },
     ferry: { icon: '⛴️', label: t('transport.ferry'), editParam: 'openFerryEditId' },
+    general: { icon: '🚌', label: t('transport.general'), editParam: 'openGeneralEditId' },
   };
   const config = typeConfig[itemType];
 
@@ -102,7 +104,9 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           <View style={styles.headerText}>
             <Text style={[styles.headerDir, { color: MODULE_COLORS.trips }]}>{config.label}</Text>
             <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={2}>
-              {item.name}
+              {itemType === 'general'
+                ? (item.transportMode === 'personalCar' ? (item.carType || config.label) : (item.airline || config.label))
+                : item.name}
             </Text>
           </View>
         </View>
@@ -222,6 +226,34 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           </>
         )}
 
+        {itemType === 'general' && (
+          <>
+            {item.transportMode !== 'personalCar' && renderRow(t('transport.operator'), item.airline)}
+            {item.transportMode !== 'personalCar' && renderRow(t('transport.lineNumber'), item.flightNumber)}
+            {item.transportMode !== 'personalCar' && renderRow(t('common.reference'), item.reference)}
+            {item.transportMode === 'personalCar' && renderRow(t('transport.carType'), item.carType)}
+            {(item.departureDate || item.departureTime) && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>🕐 {t('transport.departure')}</Text>
+                {item.departureDate && renderRow(t('common.date'), formatDate(item.departureDate))}
+                {item.departureTime && renderRow(t('common.time'), item.departureTime)}
+              </View>
+            )}
+            {(item.arrivalDate || item.arrivalTime) && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: '#E53935' }]}>🏁 {t('transport.arrival')}</Text>
+                {item.arrivalDate && renderRow(t('common.date'), formatDate(item.arrivalDate))}
+                {item.arrivalTime && renderRow(t('common.time'), item.arrivalTime)}
+              </View>
+            )}
+            {renderRow(t('common.phone'), item.phone)}
+            {item.transportMode === 'personalCar' && renderRow(t('transport.carRegNr'), item.carRegistration)}
+            {item.transportMode === 'personalCar' && renderRow(t('common.driver'), item.driver)}
+
+            {renderNotesRow(t('common.note'), item.note)}
+          </>
+        )}
+
         {itemType === 'ferry' && (
           <>
             {renderRow(t('transport.routeName'), item.routeName)}
@@ -254,7 +286,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
       </View>
 
       {/* Maps */}
-      {(itemType === 'boat' || itemType === 'ferry' || itemType === 'taxi') && (item.departureAddress || item.arrivalAddress) ? (
+      {(itemType === 'boat' || itemType === 'ferry' || itemType === 'taxi' || itemType === 'general') && (item.departureAddress || item.arrivalAddress) ? (
         <View>
           {item.departureAddress && (
             <TouchableOpacity
@@ -272,7 +304,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           {item.departureAddress && item.arrivalAddress && (
             <View style={[styles.arrowContainer, { backgroundColor: colors.surface }]}>
               <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
-              <Text style={[styles.arrowIcon, { color: MODULE_COLORS.trips }]}>⛵ →</Text>
+              <Text style={[styles.arrowIcon, { color: MODULE_COLORS.trips }]}>{itemType === 'boat' ? '⛵ →' : '→'}</Text>
               <View style={[styles.arrowLine, { backgroundColor: colors.border }]} />
             </View>
           )}

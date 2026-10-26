@@ -184,9 +184,12 @@ export interface TripHotel {
   createdAt: number;
 }
 
+export type TransportMode = 'personalCar' | 'bus' | 'tram' | 'other';
+
 export interface TripTransport {
   id: string;
-  transportType?: 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry';
+  transportType?: 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry' | 'general';
+  transportMode?: TransportMode;
   type?: 'utreise' | 'hjemreise';
   isOneWay?: boolean;
   airline?: string;
@@ -209,6 +212,7 @@ export interface TripTransport {
   cabin?: string;
   hasCar?: boolean;
   carRegistration?: string;
+  carType?: string;
   createdAt: number;
 }
 

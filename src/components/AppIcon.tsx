@@ -1,7 +1,7 @@
 import React from 'react';
 import Svg, { Rect, Line, Path, Circle, Polygon, Polyline, Ellipse } from 'react-native-svg';
 
-export type AppIconName = 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email' | 'send' | 'school' | 'kindergarten' | 'file' | 'pencil' | 'microphone' | 'middag' | 'bursdag' | 'fest' | 'sport' | 'restaurant' | 'kino' | 'konsert' | 'trening' | 'hoytid' | 'barnedag' | 'hjemme' | 'spill' | 'kaffe' | 'loping' | 'sykling' | 'fjelltur' | 'fiske' | 'cheerleading' | 'racketsport' | 'tur' | 'schedule' | 'vedlikehold' | 'paintColor' | 'ai' | 'instruksjon' | 'oppgaver' | 'summerCabin' | 'winterCabin' | 'apartment' | 'comingHome' | 'leavingHome' | 'sparkles' | 'contacts' | 'fri';
+export type AppIconName = 'calendar' | 'utensils' | 'chat' | 'compass' | 'person' | 'birthday' | 'shopping' | 'transport' | 'hotel' | 'activities' | 'destination' | 'packing' | 'links' | 'documents' | 'weather' | 'currency' | 'fly' | 'train' | 'car' | 'boat' | 'ferry' | 'taxi' | 'personalCar' | 'bus' | 'tram' | 'menu' | 'house' | 'medication' | 'vaccination' | 'allergy' | 'growth' | 'pet' | 'camera' | 'image' | 'phone' | 'email' | 'send' | 'school' | 'kindergarten' | 'file' | 'pencil' | 'microphone' | 'middag' | 'bursdag' | 'fest' | 'sport' | 'restaurant' | 'kino' | 'konsert' | 'trening' | 'hoytid' | 'barnedag' | 'hjemme' | 'spill' | 'kaffe' | 'loping' | 'sykling' | 'fjelltur' | 'fiske' | 'cheerleading' | 'racketsport' | 'tur' | 'schedule' | 'vedlikehold' | 'paintColor' | 'ai' | 'instruksjon' | 'oppgaver' | 'summerCabin' | 'winterCabin' | 'apartment' | 'comingHome' | 'leavingHome' | 'sparkles' | 'contacts' | 'fri';
 
 interface AppIconProps {
   name: AppIconName;
@@ -201,6 +201,39 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5
       <Line x1="20" y1="16" x2="20" y2="13"/>
       <Circle cx="8" cy="13" r="1" fill={color} stroke="none"/>
       <Circle cx="16" cy="13" r="1" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'personalCar') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M3 13.5l1.8-5A2 2 0 0 1 6.7 7.2h10.6a2 2 0 0 1 1.9 1.3l1.8 5V18a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-.5H6V18a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z" fill={color} fillOpacity="0.15"/>
+      <Line x1="3" y1="13.5" x2="21" y2="13.5"/>
+      <Line x1="10.5" y1="7.5" x2="10.5" y2="13.5"/>
+      <Circle cx="7" cy="18" r="1.6" fill={color} stroke="none"/>
+      <Circle cx="17" cy="18" r="1.6" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'bus') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Rect x="3" y="3.5" width="18" height="15" rx="3" fill={color} fillOpacity="0.15"/>
+      <Rect x="5.5" y="6" width="13" height="5" rx="1"/>
+      <Line x1="3" y1="14.5" x2="21" y2="14.5"/>
+      <Circle cx="7.5" cy="19.5" r="1.8" fill={color} stroke="none"/>
+      <Circle cx="16.5" cy="19.5" r="1.8" fill={color} stroke="none"/>
+    </Svg>
+  );
+
+  if (name === 'tram') return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <Path d="M9 4.5l3-2.5 3 2.5"/>
+      <Rect x="5" y="4.5" width="14" height="13" rx="3" fill={color} fillOpacity="0.15"/>
+      <Rect x="7.5" y="7" width="9" height="4.5" rx="1"/>
+      <Circle cx="8.5" cy="14.5" r="0.9" fill={color} stroke="none"/>
+      <Circle cx="15.5" cy="14.5" r="0.9" fill={color} stroke="none"/>
+      <Circle cx="8.5" cy="19.5" r="1.5" fill={color} stroke="none"/>
+      <Circle cx="15.5" cy="19.5" r="1.5" fill={color} stroke="none"/>
+      <Line x1="3" y1="21.5" x2="21" y2="21.5"/>
     </Svg>
   );
 

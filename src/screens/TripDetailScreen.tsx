@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip, TripHotel, TripTransport, TripRestaurant, TripActivity, TripDocument, TripLink, TripBoat, TripTaxi, TripFerry, DestinationTips, CityTips } from '../types';
+import { Trip, TripHotel, TripTransport, TripRestaurant, TripActivity, TripDocument, TripLink, TripBoat, TripTaxi, TripFerry, DestinationTips, CityTips, TransportMode } from '../types';
 import { crossAlert } from '../utils/alert';
 import {
   getTripHotels,
@@ -60,7 +60,7 @@ import { TransportItemTile } from '../components/TransportItemTile';
 import { HelpCenter } from '../components/HelpCenter';
 import { AppIcon } from '../components/AppIcon';
 import { AddressItemCard } from '../components/AddressItemCard';
-import { TransportFormModal } from '../components/TransportFormModal';
+import { TransportFormModal, TransportForm, GENERAL_TRANSPORT_MODES } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
 import { ActionModal } from '../components/ActionModal';
 import { CurrencyConverter } from '../components/CurrencyConverter';
@@ -126,7 +126,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
 
   // Form state (consolidated)
   const emptyHotel = { name: '', address: '', phone: '', email: '', startDate: '', endDate: '', checkInTime: '', checkOutTime: '', cancelBy: '', cancelByTime: '', note: '' };
-  const emptyTransport = { transportType: 'fly' as 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry', type: 'utreise' as 'utreise' | 'hjemreise', isOneWay: false, airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '', routeName: '', cabin: '', hasCar: false, carRegistration: '', departureAddress: '', arrivalAddress: '' };
+  const emptyTransport = { transportType: 'fly' as TransportForm['transportType'], transportMode: undefined as TransportMode | undefined, type: 'utreise' as 'utreise' | 'hjemreise', isOneWay: false, airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '', routeName: '', cabin: '', hasCar: false, carRegistration: '', carType: '', departureAddress: '', arrivalAddress: '' };
   const emptyRest = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
@@ -502,7 +502,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     }
   }, [trip, tripTitle, tripCity, tripCountry, tripStartDate, tripEndDate, tripStartTime, tripEndTime, tripIcon, tripPersons]);
 
-  const openAddModal = (modal: ModalType, transportType?: 'fly' | 'tog' | 'bil' | 'boat' | 'ferry' | 'taxi') => {
+  const openAddModal = (modal: ModalType, transportType?: TransportForm['transportType']) => {
     resetForms();
     if (transportType) {
       setFlightFormUtreise(f => ({ ...f, transportType }));
@@ -519,6 +519,12 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     } else if (modal === 'flight') {
       const formData = {
         transportType: item.transportType || 'fly',
+        transportMode: item.transportMode,
+        carRegistration: item.carRegistration || '',
+        carType: item.carType || '',
+        routeName: item.routeName || '',
+        cabin: item.cabin || '',
+        hasCar: item.hasCar || false,
         type: item.type || 'utreise',
         isOneWay: item.isOneWay || false,
         airline: item.airline || '',
@@ -594,11 +600,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     const editId = route.params?.openItemEditId;
     const itemType = route.params?.openItemType;
     if (editId && itemType) {
-      const collections: Record<string, any[]> = { hotel: hotels, restaurant: restaurants, activity: activities, boat: flights, taxi: flights, ferry: flights };
+      const collections: Record<string, any[]> = { hotel: hotels, restaurant: restaurants, activity: activities, boat: flights, taxi: flights, ferry: flights, general: flights };
       const items = collections[itemType] || [];
       const found = items.find((i: any) => i.id === editId);
       if (found) {
-        openEditModal(itemType === 'boat' || itemType === 'taxi' || itemType === 'ferry' ? 'flight' : itemType as ModalType, found);
+        openEditModal(itemType === 'boat' || itemType === 'taxi' || itemType === 'ferry' || itemType === 'general' ? 'flight' : itemType as ModalType, found);
         navigation.setParams({ openItemEditId: undefined, openItemType: undefined });
       }
     }
@@ -648,6 +654,19 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           phone: form.phone.trim() ? sanitizeInput(form.phone) : undefined,
           note: form.note.trim() ? sanitizeInput(form.note) : undefined,
         };
+        if (form.transportType === 'general') {
+          const mode = form.transportMode || 'other';
+          rawData.transportMode = mode;
+          if (mode === 'personalCar') {
+            // Operator, line number and reference are not used for personal car.
+            // Set to '' (not undefined) so an edit clears old values in Firestore.
+            rawData.airline = '';
+            rawData.flightNumber = '';
+            rawData.reference = '';
+            rawData.carType = form.carType.trim() ? sanitizeInput(form.carType) : undefined;
+            rawData.carRegistration = form.carRegistration?.trim() ? sanitizeInput(form.carRegistration) : undefined;
+          }
+        }
         if (form.transportType === 'bil') {
           if (type === 'utreise') {
             rawData.departureDate = form.departureDate || undefined;
@@ -674,7 +693,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         await updateTripTransport(trip.id, editingId, data);
       } else {
         await addTripTransport(trip.id, buildDataFrom('utreise', transportFormUtreise));
-        if (!transportFormUtreise.isOneWay) {
+        // General transport is a single entry (no return leg)
+        if (transportFormUtreise.transportType !== 'general' && !transportFormUtreise.isOneWay) {
           await addTripTransport(trip.id, buildDataFrom('hjemreise', transportFormHjemreise));
         }
       }
@@ -918,10 +938,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   };
 
   const sortedTransportRows = useMemo(() => {
-    const typeOrder: Record<string, number> = { fly: 0, tog: 1, bil: 2, boat: 3, ferry: 4, taxi: 5 };
-    // Filter out boat/ferry/taxi (handled by otherTransportItems) and blank records
+    const typeOrder: Record<string, number> = { fly: 0, tog: 1, bil: 2, boat: 3, ferry: 4, taxi: 5, general: 6 };
+    // Filter out boat/ferry/taxi/general (handled by otherTransportItems) and blank records
     const valid = flights.filter(f => {
-      if (f.transportType === 'boat' || f.transportType === 'ferry' || f.transportType === 'taxi') return false;
+      if (f.transportType === 'boat' || f.transportType === 'ferry' || f.transportType === 'taxi' || f.transportType === 'general') return false;
       const hasAnyData = f.airline || f.flightNumber || f.departureAddress || f.arrivalAddress || f.address || f.note || f.reference || f.wagon || f.driver || f.passengers || f.phone || f.seatNumber;
       return !!hasAnyData;
     });
@@ -1000,6 +1020,20 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         onPress: () => navigation.navigate('TripItemDetail', { item: fer, tripId: trip.id, trip, itemType: 'ferry' }),
         onLongPress: canDelete ? () => setActionModal({ visible: true, title: fer.airline || fer.name || t('transport.ferry'), onEdit: () => openEditModal('flight', fer), onDelete: () => handleDeleteFlight(fer.id) }) : undefined,
         sortKey: `ferry_${fer.departureDate || ''}_${fer.departureTime || ''}`,
+      });
+    });
+    flights.filter(f => f.transportType === 'general').forEach(gen => {
+      const modeLabelKey = GENERAL_TRANSPORT_MODES.find(m => m.mode === gen.transportMode)?.labelKey ?? 'transport.modeOther';
+      const modeIcon = GENERAL_TRANSPORT_MODES.find(m => m.mode === gen.transportMode)?.icon ?? 'transport';
+      allItems.push({
+        id: gen.id, icon: modeIcon, label: t(modeLabelKey), typeLabel: undefined,
+        name: gen.transportMode === 'personalCar' ? (gen.carType || t(modeLabelKey)) : (gen.airline || t(modeLabelKey)),
+        detail: gen.transportMode === 'personalCar' ? gen.carRegistration : gen.flightNumber, isHjemreise: false,
+        departureDate: gen.departureDate, departureTime: gen.departureTime, arrivalTime: gen.arrivalTime, hasCar: false,
+        transportType: 'general', docType: 'utreise',
+        onPress: () => navigation.navigate('TripItemDetail', { item: gen, tripId: trip.id, trip, itemType: 'general' }),
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: gen.airline || t(modeLabelKey), onEdit: () => openEditModal('flight', gen), onDelete: () => handleDeleteFlight(gen.id) }) : undefined,
+        sortKey: `general_${gen.departureDate || ''}_${gen.departureTime || ''}`,
       });
     });
     // Pair utreise with hjemreise, drop unpaired hjemreise
@@ -2172,6 +2206,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   { iconName: 'boat' as const, label: t('transport.boatCruise'), type: 'flight' as ModalType, transportType: 'boat' as const },
                   { iconName: 'ferry' as const, label: t('transport.ferry'), type: 'flight' as ModalType, transportType: 'ferry' as const },
                   { iconName: 'taxi' as const, label: t('transport.taxi'), type: 'flight' as ModalType, transportType: 'taxi' as const },
+                  { iconName: 'transport' as const, label: t('transport.general'), type: 'flight' as ModalType, transportType: 'general' as const },
                 ].map((opt) => (
                   <TouchableOpacity
                     key={opt.label}
@@ -2181,7 +2216,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                       openAddModal(opt.type, opt.transportType);
                     }}
                   >
-                    <AppIcon name={opt.iconName} size={22} color={MODULE_COLORS.trips} />
+                    {opt.transportType === 'general' ? (
+                      <View style={{ flexDirection: 'row', gap: 2 }}>
+                        {GENERAL_TRANSPORT_MODES.filter(m => m.mode !== 'other').map(m => (
+                          <AppIcon key={m.mode} name={m.icon} size={20} color={MODULE_COLORS.trips} />
+                        ))}
+                      </View>
+                    ) : (
+                      <AppIcon name={opt.iconName} size={22} color={MODULE_COLORS.trips} />
+                    )}
                     <Text style={[styles.modalButtonText, { color: colors.text, textAlign: 'left' }]}>{opt.label}</Text>
                   </TouchableOpacity>
                 ))}
