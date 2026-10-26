@@ -712,7 +712,9 @@
     "checkIn": "Sisäänkirjautumisaika",
     "checkOut": "Uloskirjautumisaika",
     "stay": "Majoitus",
-    "times": "Ajat"
+    "times": "Ajat",
+    "cancelBy": "Peruuta viimeistään",
+    "cancelByTime": "Peruutuksen aika"
   },
   "restaurants": {
     "title": "Ravintolat",

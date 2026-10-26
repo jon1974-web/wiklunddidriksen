@@ -125,7 +125,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   }, []);
 
   // Form state (consolidated)
-  const emptyHotel = { name: '', address: '', phone: '', startDate: '', endDate: '', checkInTime: '', checkOutTime: '', note: '' };
+  const emptyHotel = { name: '', address: '', phone: '', email: '', startDate: '', endDate: '', checkInTime: '', checkOutTime: '', cancelBy: '', cancelByTime: '', note: '' };
   const emptyTransport = { transportType: 'fly' as 'fly' | 'tog' | 'bil' | 'boat' | 'taxi' | 'ferry', type: 'utreise' as 'utreise' | 'hjemreise', isOneWay: false, airline: '', flightNumber: '', reference: '', seatNumber: '', wagon: '', driver: '', passengers: '', address: '', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', phone: '', note: '', routeName: '', cabin: '', hasCar: false, carRegistration: '', departureAddress: '', arrivalAddress: '' };
   const emptyRest = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
@@ -183,7 +183,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [showHelpDocuments, setShowHelpDocuments] = useState(false);
 
   // Unified picker state
-  type PickerField = 'tripStart' | 'tripEnd' | 'tripStartTime' | 'tripEndTime' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDepDate' | 'taxiDepTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
+  type PickerField = 'tripStart' | 'tripEnd' | 'tripStartTime' | 'tripEndTime' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'hotelCancelBy' | 'hotelCancelByTime' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDepDate' | 'taxiDepTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
   const [activePicker, setActivePicker] = useState<PickerField>(null);
 
   const handlePickerSelect = (value: string) => {
@@ -207,6 +207,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     else if (activePicker === 'hotelEndDate') setHotelForm(f => ({ ...f, endDate: value }));
     else if (activePicker === 'hotelCheckIn') setHotelForm(f => ({ ...f, checkInTime: value }));
     else if (activePicker === 'hotelCheckOut') setHotelForm(f => ({ ...f, checkOutTime: value }));
+    else if (activePicker === 'hotelCancelBy') setHotelForm(f => ({ ...f, cancelBy: value }));
+    else if (activePicker === 'hotelCancelByTime') setHotelForm(f => ({ ...f, cancelByTime: value }));
     else if (activePicker === 'boatDepDate') handleBoatFormChange(f => ({ ...f, departureDate: value }));
     else if (activePicker === 'boatDepTime') handleBoatFormChange(f => ({ ...f, departureTime: value }));
     else if (activePicker === 'boatArrDate') handleBoatFormChange(f => ({ ...f, arrivalDate: value }));
@@ -231,7 +233,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       actStartDate: t('pickers.startDate'), actEndDate: t('pickers.endDate'), actStartTime: t('pickers.startTime'), actEndTime: t('pickers.endTime'),
       restStartDate: t('pickers.startDate'), restEndDate: t('pickers.endDate'), restStartTime: t('pickers.startTime'), restEndTime: t('pickers.endTime'),
       hotelStartDate: t('pickers.startDate'), hotelEndDate: t('pickers.endDate'),
-      hotelCheckIn: t('pickers.checkInTime'), hotelCheckOut: t('pickers.checkOutTime'),
+      hotelCheckIn: t('pickers.checkInTime'), hotelCheckOut: t('pickers.checkOutTime'), hotelCancelBy: t('hotels.cancelBy'), hotelCancelByTime: t('hotels.cancelByTime'),
       boatDepDate: t('pickers.departureDate'), boatDepTime: t('pickers.departureTime'), boatArrDate: t('pickers.arrivalDate'), boatArrTime: t('pickers.arrivalTime'),
       taxiDepDate: t('pickers.departureDate'), taxiDepTime: t('pickers.departureTime'), taxiArrDate: t('pickers.arrivalDate'), taxiArrTime: t('pickers.arrivalTime'),
       ferryDepDate: t('pickers.departureDate'), ferryDepTime: t('pickers.departureTime'), ferryArrDate: t('pickers.arrivalDate'), ferryArrTime: t('pickers.arrivalTime'),
@@ -247,7 +249,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       flightDepTime: transportForm.departureTime, flightArrTime: transportForm.arrivalTime,
       actStartDate: actForm.startDate, actEndDate: actForm.endDate, actStartTime: actForm.startTime, actEndTime: actForm.endTime,
       restStartDate: restForm.startDate, restEndDate: restForm.endDate, restStartTime: restForm.startTime, restEndTime: restForm.endTime,
-      hotelStartDate: hotelForm.startDate, hotelEndDate: hotelForm.endDate, hotelCheckIn: hotelForm.checkInTime, hotelCheckOut: hotelForm.checkOutTime,
+      hotelStartDate: hotelForm.startDate, hotelEndDate: hotelForm.endDate, hotelCheckIn: hotelForm.checkInTime, hotelCheckOut: hotelForm.checkOutTime, hotelCancelBy: hotelForm.cancelBy, hotelCancelByTime: hotelForm.cancelByTime,
       boatDepDate: boatForm.departureDate, boatDepTime: boatForm.departureTime, boatArrDate: boatForm.arrivalDate, boatArrTime: boatForm.arrivalTime,
       taxiDepDate: taxiForm.departureDate, taxiDepTime: taxiForm.departureTime, taxiArrDate: taxiForm.arrivalDate, taxiArrTime: taxiForm.arrivalTime,
       ferryDepDate: ferryForm.departureDate, ferryDepTime: ferryForm.departureTime, ferryArrDate: ferryForm.arrivalDate, ferryArrTime: ferryForm.arrivalTime,
@@ -255,8 +257,8 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     return activePicker ? values[activePicker] || '' : '';
   };
 
-  const isDatePicker = activePicker && activePicker.includes('Date') || activePicker === 'tripStart' || activePicker === 'tripEnd';
-  const isTimePicker = activePicker && (activePicker.includes('Time') || activePicker === 'hotelCheckIn' || activePicker === 'hotelCheckOut' || activePicker === 'tripStartTime' || activePicker === 'tripEndTime');
+  const isDatePicker = activePicker && activePicker.includes('Date') || activePicker === 'tripStart' || activePicker === 'tripEnd' || activePicker === 'hotelCancelBy';
+  const isTimePicker = activePicker && (activePicker.includes('Time') || activePicker === 'hotelCheckIn' || activePicker === 'hotelCheckOut' || activePicker === 'hotelCancelByTime' || activePicker === 'tripStartTime' || activePicker === 'tripEndTime');
 
   const loadSubData = useCallback(async () => {
     try {
@@ -513,7 +515,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     resetForms();
     setEditingId(item.id);
     if (modal === 'hotel') {
-      setHotelForm({ name: item.name || '', address: item.address || '', phone: item.phone || '', startDate: item.startDate || '', endDate: item.endDate || '', checkInTime: item.checkInTime || '', checkOutTime: item.checkOutTime || '', note: item.note || '' });
+      setHotelForm({ name: item.name || '', address: item.address || '', phone: item.phone || '', email: item.email || '', startDate: item.startDate || '', endDate: item.endDate || '', checkInTime: item.checkInTime || '', checkOutTime: item.checkOutTime || '', cancelBy: item.cancelBy || '', cancelByTime: item.cancelByTime || '', note: item.note || '' });
     } else if (modal === 'flight') {
       const formData = {
         transportType: item.transportType || 'fly',
@@ -611,7 +613,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       return;
     }
     try {
-      const data = cleanData({ name: sanitizeInput(hotelForm.name), address: hotelForm.address.trim() ? sanitizeInput(hotelForm.address) : undefined, phone: hotelForm.phone.trim() ? sanitizeInput(hotelForm.phone) : undefined, startDate: hotelForm.startDate || undefined, endDate: hotelForm.endDate || undefined, checkInTime: hotelForm.checkInTime || undefined, checkOutTime: hotelForm.checkOutTime || undefined, note: hotelForm.note.trim() ? sanitizeInput(hotelForm.note) : undefined });
+      const data = cleanData({ name: sanitizeInput(hotelForm.name), address: hotelForm.address.trim() ? sanitizeInput(hotelForm.address) : undefined, phone: hotelForm.phone.trim() ? sanitizeInput(hotelForm.phone) : undefined, email: hotelForm.email.trim() ? sanitizeInput(hotelForm.email) : undefined, startDate: hotelForm.startDate || undefined, endDate: hotelForm.endDate || undefined, checkInTime: hotelForm.checkInTime || undefined, checkOutTime: hotelForm.checkOutTime || undefined, cancelBy: hotelForm.cancelBy || undefined, cancelByTime: hotelForm.cancelByTime || undefined, note: hotelForm.note.trim() ? sanitizeInput(hotelForm.note) : undefined });
       if (editingId) {
         await updateTripHotel(trip.id, editingId, data);
       } else {
@@ -1771,6 +1773,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     />
                   </View>
                   <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('common.email')}</Text>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
+                      value={hotelForm.email}
+                      onChangeText={(v) => setHotelForm(f => ({ ...f, email: v }))}
+                      placeholder={t('common.email')}
+                      placeholderTextColor={colors.textDisabled}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                    />
+                  </View>
+                  <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('common.startDate')}</Text>
                     <TouchableOpacity
                       style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
@@ -1811,6 +1825,28 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     >
                       <Text style={{ color: hotelForm.checkOutTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
                         {hotelForm.checkOutTime || t('common.pickTime')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('hotels.cancelBy')}</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
+                      onPress={() => setActivePicker('hotelCancelBy')}
+                    >
+                      <Text style={{ color: hotelForm.cancelBy ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {hotelForm.cancelBy || t('common.selectDate')}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <View style={styles.field}>
+                    <Text style={[styles.label, { color: colors.text }]}>{t('hotels.cancelByTime')}</Text>
+                    <TouchableOpacity
+                      style={[styles.input, { backgroundColor: MODULE_COLORS.tripsBg }]}
+                      onPress={() => setActivePicker('hotelCancelByTime')}
+                    >
+                      <Text style={{ color: hotelForm.cancelByTime ? colors.text : colors.textDisabled, fontSize: 16 }}>
+                        {hotelForm.cancelByTime || t('common.pickTime')}
                       </Text>
                     </TouchableOpacity>
                   </View>

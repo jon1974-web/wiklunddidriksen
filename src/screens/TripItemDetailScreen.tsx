@@ -114,6 +114,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
           <>
             {renderRow(t('common.address'), item.address)}
             {renderRow(t('common.phone'), item.phone)}
+            {renderRow(t('common.email'), item.email)}
             {(item.startDate || item.endDate) && (
               <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
                 <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>📅 {t('hotels.stay')}</Text>
@@ -126,6 +127,13 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
                 <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>🕐 {t('hotels.times')}</Text>
                 {item.checkInTime && renderRow(t('hotels.checkIn'), item.checkInTime)}
                 {item.checkOutTime && renderRow(t('hotels.checkOut'), item.checkOutTime)}
+              </View>
+            )}
+            {item.cancelBy && renderRow(t('hotels.cancelBy'), item.cancelByTime ? `${formatDate(item.cancelBy)} ${item.cancelByTime}` : formatDate(item.cancelBy))}
+            {item.note && (
+              <View style={[styles.timeSection, { borderTopColor: colors.border }]}>
+                <Text style={[styles.timeSectionTitle, { color: MODULE_COLORS.trips }]}>📝 {t('common.notes')}</Text>
+                <Text style={[styles.notesValue, { color: colors.text, marginTop: 4 }]}>{item.note}</Text>
               </View>
             )}
           </>

@@ -712,7 +712,9 @@
     "checkIn": "Innsjekkingstid",
     "checkOut": "Utsjekkingstid",
     "stay": "Opphold",
-    "times": "Tider"
+    "times": "Tider",
+    "cancelBy": "Avbestille innen",
+    "cancelByTime": "Kl. avbestilling"
   },
   "restaurants": {
     "title": "Restauranter",

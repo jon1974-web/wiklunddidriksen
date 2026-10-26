@@ -712,7 +712,9 @@
     "checkIn": "Check-in time",
     "checkOut": "Check-out time",
     "stay": "Stay",
-    "times": "Times"
+    "times": "Times",
+    "cancelBy": "Cancel by",
+    "cancelByTime": "Cancel time"
   },
   "restaurants": {
     "title": "Restaurants",

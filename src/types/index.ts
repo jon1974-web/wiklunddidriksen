@@ -173,10 +173,13 @@ export interface TripHotel {
   name?: string;
   address?: string;
   phone?: string;
+  email?: string;
   startDate?: string;
   endDate?: string;
   checkInTime?: string;
   checkOutTime?: string;
+  cancelBy?: string;
+  cancelByTime?: string;
   note?: string;
   createdAt: number;
 }
