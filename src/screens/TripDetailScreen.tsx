@@ -59,6 +59,8 @@ import { TransportTile } from '../components/TransportTile';
 import { TransportItemTile } from '../components/TransportItemTile';
 import { HelpCenter } from '../components/HelpCenter';
 import { AppIcon } from '../components/AppIcon';
+import { ListImportModal } from '../components/ListImportModal';
+import { generateId } from '../utils/generateId';
 import { AddressItemCard } from '../components/AddressItemCard';
 import { TransportFormModal, TransportForm, GENERAL_TRANSPORT_MODES } from '../components/TransportFormModal';
 import { LinkPreviewCard } from '../components/LinkPreviewCard';
@@ -101,6 +103,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [packingLists, setPackingLists] = useState<any[]>([]);
   const [showAddPackingList, setShowAddPackingList] = useState(false);
   const [newPackingListTitle, setNewPackingListTitle] = useState('');
+  const [showImportPackingList, setShowImportPackingList] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -892,6 +895,19 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       crossAlert('Error', getErrorMessage(error));
     }
   }, [trip.id, newPackingListTitle, user, loadSubData]);
+
+  const handleImportPackingList = useCallback(async (names: string[]) => {
+    const title = newPackingListTitle.trim() || t('packing.importDefaultTitle');
+    await addTripPackingList(trip.id, {
+      title,
+      items: names.map((name) => ({ id: generateId(), name, checked: false })),
+      createdBy: user?.uid || '',
+    });
+    setNewPackingListTitle('');
+    setShowImportPackingList(false);
+    setShowAddPackingList(false);
+    loadSubData();
+  }, [trip.id, newPackingListTitle, user, loadSubData, t]);
 
   const renderSectionHeader = (title: string, iconName: string, onAdd: () => void, onHelp?: () => void) => (
     <View style={styles.sectionHeader}>
@@ -2302,6 +2318,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                   <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20 }} onPress={() => { setShowAddPackingList(false); setNewPackingListTitle(''); }}>
                     <Text style={{ color: colors.textSecondary, fontSize: 16 }}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, backgroundColor: MODULE_COLORS.tripsBg }} onPress={() => { setShowAddPackingList(false); setShowImportPackingList(true); }}>
+                    <Text style={{ color: MODULE_COLORS.trips, fontSize: 16, fontWeight: '600' }}>{t('packing.createFromPhoto')}</Text>
+                  </TouchableOpacity>
                     <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, backgroundColor: MODULE_COLORS.trips }} onPress={handleCreatePackingList}>
                     <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>{t('common.add')}</Text>
                   </TouchableOpacity>
@@ -2311,6 +2330,15 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
+      {/* Create packing list from photo */}
+      <ListImportModal
+        visible={showImportPackingList}
+        kind="packing"
+        accentColor={MODULE_COLORS.trips}
+        onClose={() => { setShowImportPackingList(false); setShowAddPackingList(true); }}
+        onSave={handleImportPackingList}
+      />
 
     </ScrollView>
   );

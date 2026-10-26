@@ -754,7 +754,24 @@
     "placeholderTitle": "Esim. Hotellivaraus",
     "placeholderNote": "Esim. Vahvistusnumero"
   },
+  "listImport": {
+    "title": "Luo lista kuvasta",
+    "subtitlePacking": "Ota kuva tai lataa kuva pakkauslistasta. Tekoäly löytää kohteet.",
+    "subtitleShopping": "Ota kuva tai lataa kuva ostoslistasta. Tekoäly löytää tuotteet.",
+    "takePhoto": "Ota kuva",
+    "pickGallery": "Valitse galleriasta",
+    "processing": "Luetaan listaa…",
+    "reviewHint": "Tarkista kohteet. Poista tai muokkaa virheelliset.",
+    "retake": "Ota uusi kuva",
+    "addItems": "Lisää {{count}} kohdetta",
+    "itemPlaceholder": "Kohde",
+    "noItems": "Kuvasta ei löytynyt kohteita. Kokeile selkeämpää kuvaa.",
+    "error": "Kuvaa ei voitu lukea",
+    "timeout": "Aikakatkaisu. Yritä uudelleen pienemmällä kuvalla."
+  },
   "packing": {
+    "createFromPhoto": "Kuvasta",
+    "importDefaultTitle": "Pakkauslista kuvasta",
     "title": "Pakkauslistat",
     "noLists": "Ei pakkauslistoja lisätty",
     "addList": "Uusi pakkauslista",
@@ -1267,6 +1284,8 @@
     "yearPlaceholder": "VVVV"
   },
   "mealPlanner": {
+    "createFromPhoto": "Kuvasta",
+    "importDefaultTitle": "Ostoslista kuvasta",
     "title": "Vår mat",
     "weeklyPlan": "Viikkoasuunnitelma",
     "recipes": "Reseptit",

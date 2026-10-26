@@ -754,7 +754,24 @@
     "placeholderTitle": "T.ex. Hotellbokning",
     "placeholderNote": "T.ex. Bekräftelsenummer"
   },
+  "listImport": {
+    "title": "Skapa lista från bild",
+    "subtitlePacking": "Ta en bild eller ladda upp en lista över saker att packa. AI:n hittar sakerna.",
+    "subtitleShopping": "Ta en bild eller ladda upp en inköpslista. AI:n hittar varorna.",
+    "takePhoto": "Ta bild",
+    "pickGallery": "Välj från galleri",
+    "processing": "Läser listan…",
+    "reviewHint": "Kontrollera varorna. Ta bort eller ändra det som inte stämmer.",
+    "retake": "Ta ny bild",
+    "addItems": "Lägg till {{count}} varor",
+    "itemPlaceholder": "Vara",
+    "noItems": "Hittade inga varor på bilden. Prova en tydligare bild.",
+    "error": "Kunde inte läsa bilden",
+    "timeout": "Tidsgräns överskriden. Försök igen med en mindre bild."
+  },
   "packing": {
+    "createFromPhoto": "Från bild",
+    "importDefaultTitle": "Packlista från bild",
     "title": "Packlistor",
     "noLists": "Inga packlistor tillagda",
     "addList": "Ny packlista",
@@ -1267,6 +1284,8 @@
     "yearPlaceholder": "ÅÅÅÅ"
   },
   "mealPlanner": {
+    "createFromPhoto": "Från bild",
+    "importDefaultTitle": "Inköpslista från bild",
     "title": "Vår mat",
     "weeklyPlan": "Veckomeny",
     "recipes": "Recept",

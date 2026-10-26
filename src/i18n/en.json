@@ -754,7 +754,24 @@
     "placeholderTitle": "E.g. Hotel booking",
     "placeholderNote": "E.g. Confirmation number"
   },
+  "listImport": {
+    "title": "Create list from photo",
+    "subtitlePacking": "Take a photo or upload a picture of your packing list. The AI will find the items.",
+    "subtitleShopping": "Take a photo or upload a picture of your shopping list. The AI will find the items.",
+    "takePhoto": "Take photo",
+    "pickGallery": "Choose from gallery",
+    "processing": "Reading the list…",
+    "reviewHint": "Check the items. Remove or edit anything that is wrong.",
+    "retake": "Take a new photo",
+    "addItems": "Add {{count}} items",
+    "itemPlaceholder": "Item",
+    "noItems": "No items found in the picture. Try a clearer photo.",
+    "error": "Could not read the picture",
+    "timeout": "Timed out. Try again with a smaller picture."
+  },
   "packing": {
+    "createFromPhoto": "From photo",
+    "importDefaultTitle": "Packing list from photo",
     "title": "Packing lists",
     "noLists": "No packing lists added",
     "addList": "New packing list",
@@ -1267,6 +1284,8 @@
     "yearPlaceholder": "YYYY"
   },
   "mealPlanner": {
+    "createFromPhoto": "From photo",
+    "importDefaultTitle": "Shopping list from photo",
     "title": "Our Meals",
     "weeklyPlan": "Weekly Plan",
     "recipes": "Recipes",

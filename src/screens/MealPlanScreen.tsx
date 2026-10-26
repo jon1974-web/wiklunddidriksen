@@ -18,6 +18,7 @@ import { getErrorMessage } from '../utils/validation';
 import { getUserProfile } from '../services/familyService';
 import { MAX_RECIPES } from '../constants/limits';
 import { generateId } from '../utils/generateId';
+import { ListImportModal } from '../components/ListImportModal';
 
 type SubTab = 'ukemeny' | 'oppskrifter' | 'handleliste';
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -82,6 +83,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const [infoModal, setInfoModal] = useState<{ visible: boolean; title: string; message?: string }>({ visible: false, title: '' });
   const [showAddList, setShowAddList] = useState(false);
   const [newListTitle, setNewListTitle] = useState('');
+  const [showImportList, setShowImportList] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<{ day: string; meal: string } | null>(null);
   const [selectedRecipeForSlot, setSelectedRecipeForSlot] = useState<Recipe | null>(null);
   const [randomRecipe, setRandomRecipe] = useState<Recipe | null>(null);
@@ -386,32 +388,40 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
     }
   };
 
+  // Shared save path for title-only and photo-imported lists
+  const createShoppingList = async (title: string, items: { id: string; name: string; checked: boolean }[]) => {
+    const createdAt = Date.now();
+    const docRef = await addDoc(collection(db, 'shoppingLists'), {
+      title,
+      items,
+      createdBy: user?.uid || '',
+      createdAt,
+      familyId,
+    });
+    // Navigate directly with the newly created list
+    navigation.navigate('ShoppingListDetail', {
+      list: { id: docRef.id, title, items, createdBy: user?.uid || '', createdAt, familyId },
+    });
+  };
+
   const handleCreateList = async () => {
     if (!newListTitle.trim() || !familyId) return;
     try {
-      const docRef = await addDoc(collection(db, 'shoppingLists'), {
-        title: newListTitle.trim(),
-        items: [],
-        createdBy: user?.uid || '',
-        createdAt: Date.now(),
-        familyId,
-      });
+      await createShoppingList(newListTitle.trim(), []);
       setNewListTitle('');
       setShowAddList(false);
-      // Navigate directly with the newly created list
-      navigation.navigate('ShoppingListDetail', {
-        list: {
-          id: docRef.id,
-          title: newListTitle.trim(),
-          items: [],
-          createdBy: user?.uid || '',
-          createdAt: Date.now(),
-          familyId,
-        },
-      });
     } catch (error) {
       crossAlert('Error', getErrorMessage(error));
     }
+  };
+
+  const handleImportShoppingList = async (names: string[]) => {
+    if (!familyId) return;
+    const title = newListTitle.trim() || t('mealPlanner.importDefaultTitle');
+    await createShoppingList(title, names.map((name) => ({ id: generateId(), name, checked: false })));
+    setNewListTitle('');
+    setShowAddList(false);
+    setShowImportList(false);
   };
 
   const handleDeleteList = async (listId: string) => {
@@ -1163,6 +1173,9 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddList(false); setNewListTitle(''); }}>
                     <Text style={[styles.modalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
+                  <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent + '1A' }]} onPress={() => { setShowAddList(false); setShowImportList(true); }}>
+                    <Text style={[styles.modalBtnText, { color: colors.accent }]}>{t('mealPlanner.createFromPhoto')}</Text>
+                  </TouchableOpacity>
                   <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.accent }]} onPress={handleCreateList}>
                     <Text style={[styles.modalBtnText, { color: '#fff' }]}>{t('common.add')}</Text>
                   </TouchableOpacity>
@@ -1172,6 +1185,15 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           </View>
         </TouchableWithoutFeedback>
       </Modal>
+
+      {/* Create shopping list from photo */}
+      <ListImportModal
+        visible={showImportList}
+        kind="shopping"
+        accentColor={colors.accent}
+        onClose={() => { setShowImportList(false); setShowAddList(true); }}
+        onSave={handleImportShoppingList}
+      />
     </ScrollView>
   );
 

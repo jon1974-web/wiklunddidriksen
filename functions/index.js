@@ -89,6 +89,7 @@ function decryptSpondPassword(encrypted) {
 const RATE_LIMITS = {
   spondProxy: { maxRequests: 30, windowMinutes: 1 },
   photoToData: { maxRequests: 5, windowMinutes: 1 },
+  listImageToItems: { maxRequests: 5, windowMinutes: 1 },
   voiceToEvent: { maxRequests: 5, windowMinutes: 1 },
   destinationTips: { maxRequests: 10, windowMinutes: 1 },
   notifyNewEvent: { maxRequests: 10, windowMinutes: 1 },
@@ -97,11 +98,31 @@ const RATE_LIMITS = {
   importRecipeFromUrl: { maxRequests: 5, windowMinutes: 1 },
   translateRecipe: { maxRequests: 10, windowMinutes: 1 },
   backfillCalendarSync: { maxRequests: 3, windowMinutes: 10 },
+  aiAssistant: { maxRequests: 10, windowMinutes: 1 },
+  estimateRecipeCalories: { maxRequests: 10, windowMinutes: 1 },
+  importHolidaysFromUrl: { maxRequests: 5, windowMinutes: 1 },
+  homeExtractColor: { maxRequests: 5, windowMinutes: 1 },
+  homeExtractInstruction: { maxRequests: 5, windowMinutes: 1 },
+  homeExtractReceipt: { maxRequests: 5, windowMinutes: 1 },
+  homeExtractOffer: { maxRequests: 5, windowMinutes: 1 },
+  homeSuggestTasks: { maxRequests: 5, windowMinutes: 1 },
 };
 
 let rateLimitsCache = null;
 let rateLimitsCacheTime = 0;
 const RATE_LIMITS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+// Defaults merged with admin overrides, so functions added after the
+// config document was saved still get a limit and show up in the admin page.
+function mergeRateLimits(stored) {
+  return { ...RATE_LIMITS, ...(stored || {}) };
+}
+
+async function getStoredRateLimits() {
+  const db = getFirestore();
+  const snap = await db.collection("systemConfig").doc("rateLimits").get();
+  return snap.exists && snap.data().limits ? snap.data() : null;
+}
 
 async function getRateLimitsConfig() {
   const now = Date.now();
@@ -109,19 +130,14 @@ async function getRateLimitsConfig() {
     return rateLimitsCache;
   }
   try {
-    const db = getFirestore();
-    const snap = await db.collection("systemConfig").doc("rateLimits").get();
-    if (snap.exists && snap.data().limits) {
-      rateLimitsCache = snap.data().limits;
-      rateLimitsCacheTime = now;
-      return rateLimitsCache;
-    }
+    const stored = await getStoredRateLimits();
+    rateLimitsCache = mergeRateLimits(stored ? stored.limits : null);
   } catch (error) {
-    // Fall back to defaults
+    // Fall back to defaults if Firestore is unavailable
+    rateLimitsCache = mergeRateLimits(null);
   }
-  rateLimitsCache = RATE_LIMITS;
   rateLimitsCacheTime = now;
-  return RATE_LIMITS;
+  return rateLimitsCache;
 }
 
 async function checkRateLimit(uid, functionName) {
@@ -404,6 +420,7 @@ exports.getUsageStats = onRequest({ region: "us-central1", memory: "256MB" }, as
   const COST_PER_CALL = {
     voiceToEvent: 0.01,
     photoToData: 0.005,
+    listImageToItems: 0.005,
     spondProxy: 0.001,
     destinationTips: 0.002,
     aiRecipeSuggestions: 0.003,
@@ -590,28 +607,16 @@ exports.getRateLimits = onRequest({ region: "us-central1", memory: "256MB" }, as
   const uid = await verifyAppOwner(req);
   if (!uid) return res.status(403).json({ error: "Forbidden: App owner access required" });
 
-  const db = getFirestore();
-  const configSnap = await db.collection("systemConfig").doc("rateLimits").get();
-
-  if (configSnap.exists) {
-    return res.status(200).json(configSnap.data());
+  try {
+    const stored = await getStoredRateLimits();
+    return res.status(200).json({
+      limits: mergeRateLimits(stored ? stored.limits : null),
+      source: stored ? "config" : "default",
+    });
+  } catch (error) {
+    console.error("getRateLimits error:", error);
+    return res.status(500).json({ error: "Could not load rate limits" });
   }
-
-  // Return default hardcoded limits
-  return res.status(200).json({
-    limits: {
-      spondProxy: { maxRequests: 30, windowMinutes: 1 },
-      photoToData: { maxRequests: 5, windowMinutes: 1 },
-      voiceToEvent: { maxRequests: 5, windowMinutes: 1 },
-      destinationTips: { maxRequests: 10, windowMinutes: 1 },
-      notifyNewEvent: { maxRequests: 10, windowMinutes: 1 },
-      notifyHealthItem: { maxRequests: 10, windowMinutes: 1 },
-      aiRecipeSuggestions: { maxRequests: 10, windowMinutes: 1 },
-      importRecipeFromUrl: { maxRequests: 5, windowMinutes: 1 },
-      translateRecipe: { maxRequests: 10, windowMinutes: 1 },
-    },
-    source: "default",
-  });
 });
 
 // Admin: Update rate limits
@@ -1140,6 +1145,102 @@ const addOneHourJs = (time) => {
   const total = (h + 1) % 24;
   return `${String(total).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
 };
+
+// Extracts a list of item names (packing or shopping) from a photo of a handwritten or printed list.
+exports.listImageToItems = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!(await checkRateLimit(uid, "listImageToItems"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    const { imageBase64, kind } = req.body || {};
+
+    if (!imageBase64 || typeof imageBase64 !== "string") {
+      return res.status(400).json({ error: "No image data received" });
+    }
+    if (kind !== "packing" && kind !== "shopping") {
+      return res.status(400).json({ error: "Invalid kind." });
+    }
+
+    const listDescription = kind === "packing"
+      ? "a packing list (things to bring on a trip, e.g. clothes, toiletries, documents, chargers)"
+      : "a shopping list (groceries and household items to buy)";
+
+    const systemPrompt = `You are a list parser. The image shows ${listDescription}. It may be handwritten, printed, or a photo of a note.
+
+Extract every item on the list as a short item name. Rules:
+- One entry per item. Split items written on the same line by commas, "og", "and", or bullets.
+- Keep the item name in the language used on the list. Do not translate.
+- Remove bullets, checkboxes, numbering and quantities that are not part of the name, but keep useful quantities like "2 stk" inside the name.
+- Skip headings, dates and decorative text.
+- Fix obvious spelling mistakes in handwriting only when you are confident.
+
+Return ONLY valid JSON with this exact structure:
+{"items": ["item 1", "item 2"]}
+
+If no items can be identified, return {"items": []}.`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: systemPrompt },
+        {
+          role: "user",
+          content: [
+            { type: "image_url", image_url: { url: `data:image/jpeg;base64,${imageBase64}`, detail: "high" } },
+            { type: "text", text: "Extract all items from this list." },
+          ],
+        },
+      ],
+      response_format: { type: "json_object" },
+      max_tokens: 2048,
+    });
+
+    const parsed = JSON.parse(completion.choices[0].message.content || "{}");
+    const rawItems = Array.isArray(parsed.items) ? parsed.items : [];
+
+    // Normalize: strings only, trimmed, length-limited, de-duplicated (case-insensitive), capped
+    const seen = new Set();
+    const items = [];
+    for (const raw of rawItems) {
+      if (typeof raw !== "string") continue;
+      const name = raw.trim().slice(0, 100);
+      const key = name.toLowerCase();
+      if (!name || seen.has(key)) continue;
+      seen.add(key);
+      items.push(name);
+      if (items.length >= 200) break;
+    }
+
+    trackUsageLog(uid, "listImageToItems", req.body.familyId || null);
+
+    return res.status(200).json({ items });
+  } catch (error) {
+    console.error("listImageToItems error:", error);
+    return res.status(500).json({ error: "Could not read the list. Please try again." });
+  }
+});
 
 exports.photoToData = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);

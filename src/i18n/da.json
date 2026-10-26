@@ -754,7 +754,24 @@
     "placeholderTitle": "F.eks. Hotel booking",
     "placeholderNote": "F.eks. Bekræftelsesnummer"
   },
+  "listImport": {
+    "title": "Opret liste fra billede",
+    "subtitlePacking": "Tag et billede eller upload en liste over ting, du skal pakke. AI'en finder tingene.",
+    "subtitleShopping": "Tag et billede eller upload en indkøbsliste. AI'en finder varerne.",
+    "takePhoto": "Tag billede",
+    "pickGallery": "Vælg fra galleri",
+    "processing": "Læser listen…",
+    "reviewHint": "Kontrollér varerne. Fjern eller ret det, der ikke stemmer.",
+    "retake": "Tag nyt billede",
+    "addItems": "Tilføj {{count}} varer",
+    "itemPlaceholder": "Vare",
+    "noItems": "Fandt ingen varer på billedet. Prøv et tydeligere billede.",
+    "error": "Kunne ikke læse billedet",
+    "timeout": "Timeout. Prøv igen med et mindre billede."
+  },
   "packing": {
+    "createFromPhoto": "Fra billede",
+    "importDefaultTitle": "Pakkeliste fra billede",
     "title": "Pakkelister",
     "noLists": "Ingen pakkelister tilføjet",
     "addList": "Ny pakkeliste",
@@ -1267,6 +1284,8 @@
     "yearPlaceholder": "ÅÅÅÅ"
   },
   "mealPlanner": {
+    "createFromPhoto": "Fra billede",
+    "importDefaultTitle": "Indkøbsliste fra billede",
     "title": "Vores mad",
     "weeklyPlan": "Ugeplan",
     "recipes": "Opskrifter",
