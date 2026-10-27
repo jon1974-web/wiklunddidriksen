@@ -183,6 +183,21 @@ export const saveSpondConfig = async (familyId: string, config: SpondConfig): Pr
   }
 };
 
+// Removes the stored Spond config. Does not read the stored password, so it works even if
+// the stored credential can no longer be decrypted.
+export const disconnectSpondConfig = async (familyId: string): Promise<void> => {
+  const headers = await getAuthHeaders();
+  const response = await fetch(SPOND_CONFIG_URL, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ familyId, action: 'disconnect' }),
+  });
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({}));
+    throw new Error(result?.error || 'Could not disconnect Spond');
+  }
+};
+
 export const getSpondConfig = async (familyId: string): Promise<SpondConfig | null> => {
   const headers = await getAuthHeaders();
   const response = await fetch(`${SPOND_CONFIG_URL}?familyId=${encodeURIComponent(familyId)}`, { headers });

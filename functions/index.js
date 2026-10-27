@@ -3205,6 +3205,7 @@ exports.migrateTransportData = onRequest({ region: "us-central1" }, async (req, 
 // Clients cannot read or write families/{id}/config directly (see firestore.rules).
 //   GET  ?familyId=...  -> { email, password (owner/admin only, else ""), hasPassword, groups, respondents }
 //   POST { familyId, email, password?, groups, respondents }  (owner/admin only)
+//   POST { familyId, action: "disconnect" }  deletes the stored config (owner/admin only)
 //   - password omitted or empty on POST keeps the stored password (email change without re-typing)
 exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
@@ -3257,6 +3258,13 @@ exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, asyn
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   if (member.role !== "owner" && member.role !== "admin") {
     return res.status(403).json({ error: "Only the family owner or an admin can change Spond settings" });
+  }
+
+  // Disconnect: delete the stored config. Must not read or decrypt the stored password,
+  // so it also works when the stored credential is unreadable.
+  if ((req.body || {}).action === "disconnect") {
+    await ref.delete();
+    return res.status(200).json({ success: true });
   }
 
   const { email, password, groups, respondents } = req.body || {};

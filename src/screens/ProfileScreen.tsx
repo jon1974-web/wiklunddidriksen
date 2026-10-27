@@ -45,7 +45,7 @@ import { crossAlert } from '../utils/alert';
 import { uriToBlob } from '../utils/upload';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { SpondGroup, SpondMember, SpondGroupMember, UserProfile, Family } from '../types';
-import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, clearSpondToken } from '../services/spondService';
+import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, disconnectSpondConfig, clearSpondToken } from '../services/spondService';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '../i18n';
 import { LANGUAGES } from '../constants/languages';
@@ -684,7 +684,7 @@ export const ProfileScreen: React.FC = () => {
   const performDisconnectSpond = useCallback(async () => {
     if (!familyId) return;
     try {
-      await saveSpondConfig(familyId, { email: '', password: '', groups: [], respondents: [] });
+      await disconnectSpondConfig(familyId);
       setSpondEmail('');
       setSpondPassword('');
       setSpondGroups([]);
