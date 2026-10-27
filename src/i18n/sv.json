@@ -1046,7 +1046,8 @@
     "spondDisconnectConfirm": "Spond-inloggningen och grupperna tas bort från familjen.",
     "spondPasswordRequired": "Ange Spond-lösenordet igen för att spara.",
     "spondPasswordKeep": "Spond-lösenord (lämna tomt för att behålla det sparade)",
-    "googleConnectedNoEmail": "Ansluten till Google Kalender"
+    "googleConnectedNoEmail": "Ansluten till Google Kalender",
+    "spondMembersLoadFailed": "Kunde inte hämta deltagare från Spond. Försök igen."
   },
   "chat": {
     "title": "Familjechatt",

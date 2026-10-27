@@ -1061,7 +1061,8 @@
     "spondDisconnectConfirm": "Spond-innloggingen og gruppene fjernes fra familien.",
     "spondPasswordRequired": "Skriv inn Spond-passordet på nytt for å lagre.",
     "spondPasswordKeep": "Spond-passord (la stå tomt for å beholde det lagrede)",
-    "googleConnectedNoEmail": "Tilkoblet Google Kalender"
+    "googleConnectedNoEmail": "Tilkoblet Google Kalender",
+    "spondMembersLoadFailed": "Kunne ikke hente deltakere fra Spond. Prøv igjen."
   },
   "voice": {
     "title": "Tal til arrangement",

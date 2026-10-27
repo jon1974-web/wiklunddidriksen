@@ -1061,7 +1061,8 @@
     "spondDisconnectConfirm": "The Spond login and groups will be removed from the family.",
     "spondPasswordRequired": "Enter the Spond password again to save.",
     "spondPasswordKeep": "Spond password (leave empty to keep the saved one)",
-    "googleConnectedNoEmail": "Connected to Google Calendar"
+    "googleConnectedNoEmail": "Connected to Google Calendar",
+    "spondMembersLoadFailed": "Could not load Spond members. Try again."
   },
   "voice": {
     "title": "Talk to event",

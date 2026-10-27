@@ -176,13 +176,23 @@ export const ProfileScreen: React.FC = () => {
               )
             ).then((results) => {
               const allMembers: any[] = [];
+              let failed = 0;
               results.forEach((result) => {
                 if (result.status === 'fulfilled') {
                   result.value.forEach((m: any) => allMembers.push(m));
+                } else {
+                  failed++;
+                  console.log('Spond members load failed:', result.reason);
                 }
               });
               setSpondAllMembers(allMembers);
               setSpondLoading(false);
+              // Tell the user why the respondents list is empty instead of showing nothing
+              if (failed > 0 && allMembers.length === 0) {
+                const reason = results.find((r) => r.status === 'rejected') as PromiseRejectedResult | undefined;
+                const code = (reason?.reason as { code?: string } | undefined)?.code;
+                crossAlert(t('common.error'), code === 'PASSWORD_REQUIRED' ? t('profile.spondPasswordRequired') : t('profile.spondMembersLoadFailed'));
+              }
             });
           }
         }).catch((e) => {
