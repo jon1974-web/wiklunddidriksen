@@ -96,6 +96,7 @@ export const ProfileScreen: React.FC = () => {
   const [uploading, setUploading] = useState(false);
   const [spondEmail, setSpondEmail] = useState('');
   const [spondPassword, setSpondPassword] = useState('');
+  const [spondPasswordStatus, setSpondPasswordStatus] = useState<'ok' | 'missing' | 'unreadable'>('missing');
   const [spondGroups, setSpondGroups] = useState<SpondGroup[]>([]);
   const [spondSelectedGroups, setSpondSelectedGroups] = useState<string[]>([]);
   const [spondConnected, setSpondConnected] = useState(false);
@@ -160,6 +161,7 @@ export const ProfileScreen: React.FC = () => {
           if (spondConfig) {
             setSpondEmail(spondConfig.email);
             setSpondPassword(spondConfig.password);
+            setSpondPasswordStatus(spondConfig.passwordStatus || 'missing');
             setSpondConnected(true);
             setSpondGroups(spondConfig.groups);
             setSpondSelectedGroups(spondConfig.groups.map((g) => g.id));
@@ -654,6 +656,11 @@ export const ProfileScreen: React.FC = () => {
       crossAlert(t('common.error'), t('profile.spondNeedFamily'));
       return;
     }
+    // The stored password cannot be used: ask for it before saving
+    if (spondPasswordStatus !== 'ok' && !spondPassword.trim()) {
+      crossAlert(t('common.error'), t('profile.spondPasswordRequired'));
+      return;
+    }
     try {
       const selectedGroups = spondGroups.filter((g) => spondSelectedGroups.includes(g.id));
       const respondents = spondAllMembers
@@ -670,11 +677,17 @@ export const ProfileScreen: React.FC = () => {
         respondents,
       });
       clearSpondToken();
+      if (spondPassword.trim()) setSpondPasswordStatus('ok');
       crossAlert(t('common.success'), t('profile.spondConfigSaved', { groups: selectedGroups.length, respondents: respondents.length }));
     } catch (error) {
+      if ((error as { code?: string }).code === 'PASSWORD_REQUIRED') {
+        setSpondPasswordStatus('unreadable');
+        crossAlert(t('common.error'), t('profile.spondPasswordRequired'));
+        return;
+      }
       crossAlert(t('common.error'), getErrorMessage(error));
     }
-  }, [familyId, spondEmail, spondPassword, spondGroups, spondSelectedGroups, spondAllMembers, spondRespondents]);
+  }, [familyId, spondEmail, spondPassword, spondPasswordStatus, spondGroups, spondSelectedGroups, spondAllMembers, spondRespondents, t]);
 
   const handleDisconnectSpond = useCallback(async () => {
     if (!familyId) return;
@@ -1399,6 +1412,20 @@ export const ProfileScreen: React.FC = () => {
                   ))}
                 </>
               )}
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.textSecondary }]}>
+                  {spondPasswordStatus === 'ok' ? t('profile.spondPasswordKeep') : t('profile.spondPasswordRequired')}
+                </Text>
+                <TextInput
+                  style={[styles.calendarInput, { backgroundColor: colors.inputBackground, color: colors.text, borderColor: colors.border }]}
+                  value={spondPassword}
+                  onChangeText={setSpondPassword}
+                  placeholder={t('profile.spondPasswordPlaceholder')}
+                  placeholderTextColor={colors.textDisabled}
+                  secureTextEntry
+                />
+              </View>
 
               <View style={{ flexDirection: 'row', gap: 8, marginTop: 12 }}>
                 <TouchableOpacity

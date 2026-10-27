@@ -179,7 +179,9 @@ export const saveSpondConfig = async (familyId: string, config: SpondConfig): Pr
   });
   if (!response.ok) {
     const result = await response.json().catch(() => ({}));
-    throw new Error(result?.error || 'Could not save Spond settings');
+    const error = new Error(result?.error || 'Could not save Spond settings') as Error & { code?: string };
+    error.code = result?.code;
+    throw error;
   }
 };
 

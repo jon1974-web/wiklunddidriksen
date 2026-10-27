@@ -1057,7 +1057,9 @@
     "connectedBadgeCheck": "Koblet til ✓",
     "connectGoogleButton": "Koble til Google",
     "shareLinkTitle": "Invitasjon",
-    "spondDisconnectConfirm": "Spond-innloggingen og gruppene fjernes fra familien."
+    "spondDisconnectConfirm": "Spond-innloggingen og gruppene fjernes fra familien.",
+    "spondPasswordRequired": "Skriv inn Spond-passordet på nytt for å lagre.",
+    "spondPasswordKeep": "Spond-passord (la stå tomt for å beholde det lagrede)"
   },
   "voice": {
     "title": "Tal til arrangement",

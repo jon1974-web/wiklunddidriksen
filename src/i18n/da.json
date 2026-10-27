@@ -1042,7 +1042,9 @@
     "connectedBadgeCheck": "Tilsluttet ✓",
     "connectGoogleButton": "Tilslut Google",
     "shareLinkTitle": "Invitation",
-    "spondDisconnectConfirm": "Spond-login og grupperne fjernes fra familien."
+    "spondDisconnectConfirm": "Spond-login og grupperne fjernes fra familien.",
+    "spondPasswordRequired": "Indtast Spond-adgangskoden igen for at gemme.",
+    "spondPasswordKeep": "Spond-adgangskode (lad være tom for at beholde den gemte)"
   },
   "chat": {
     "title": "Familiechat",

@@ -242,6 +242,8 @@ export interface SpondGroup {
 export interface SpondConfig {
   email: string;
   password: string;
+  /** ok: usable password; missing: none stored; unreadable: stored but cannot be decrypted (re-enter) */
+  passwordStatus?: 'ok' | 'missing' | 'unreadable';
   groups: SpondGroup[];
   respondents?: SpondRespondent[];
 }

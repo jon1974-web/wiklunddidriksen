@@ -3231,15 +3231,22 @@ exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, asyn
     const data = snap.data();
     // Only owners and admins receive the Spond password (they manage the connection).
     // Other members get the schedule data but never the credential.
+    // passwordStatus: "ok" (usable), "missing" (none stored), "unreadable" (stored but cannot be decrypted)
     let password = "";
+    let passwordStatus = data.password ? "ok" : "missing";
     if (data.password && (member.role === "owner" || member.role === "admin")) {
       try {
         const { plaintext, needsReencrypt } = spondCrypto.decryptStoredPassword(data.password);
         password = plaintext;
         if (needsReencrypt) {
-          await ref.update({ password: spondCrypto.encryptSpondPassword(plaintext) });
+          try {
+            await ref.update({ password: spondCrypto.encryptSpondPassword(plaintext) });
+          } catch (error) {
+            console.error("spondConfig: re-encrypt failed", error.message);
+          }
         }
       } catch (error) {
+        passwordStatus = "unreadable";
         console.error("spondConfig: stored password unreadable", error.message);
       }
     }
@@ -3247,6 +3254,7 @@ exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       config: {
         email: data.email || "",
         password,
+        passwordStatus,
         hasPassword: !!data.password,
         groups: data.groups || [],
         respondents: data.respondents || [],
@@ -3294,8 +3302,9 @@ exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, asyn
       const { plaintext, needsReencrypt } = spondCrypto.decryptStoredPassword(existing.password);
       update.password = needsReencrypt ? spondCrypto.encryptSpondPassword(plaintext) : existing.password;
     } catch (error) {
+      // Stored value cannot be decrypted (e.g. written under an old key). Ask for the password again.
       console.error("spondConfig: stored password unreadable", error.message);
-      return res.status(500).json({ error: "Stored Spond credentials could not be read. Enter the password again." });
+      return res.status(409).json({ code: "PASSWORD_REQUIRED", error: "Spond password must be entered again." });
     }
   }
 
