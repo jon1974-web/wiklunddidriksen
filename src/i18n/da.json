@@ -240,7 +240,8 @@
     "endDateBeforeStart": "Slutdato kan ikke være før startdato",
     "enterCity": "Indtast venligst en by",
     "placeholderTitle": "F.eks. Familiefestmiddag",
-    "editRecurrence": "Rediger gentagelse"
+    "editRecurrence": "Rediger gentagelse",
+    "spondReconnect": "Spond-adgangskoden skal indtastes igen under Profil → Spond."
   },
   "trips": {
     "title": "Vore rejser",

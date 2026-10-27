@@ -708,6 +708,35 @@ async function sendNotification({ familyId, title, body, notifKey, excludeUid })
   return sent;
 }
 
+// Resolves a family's stored Spond credentials for any member of that family.
+// Returns { email, password } or { status, code, error }.
+async function resolveFamilySpondCredentials(uid, familyId) {
+  const db = getFirestore();
+  const familySnap = await db.collection("families").doc(familyId).get();
+  const members = familySnap.exists ? (familySnap.data().members || {}) : {};
+  if (!members[uid]) return { status: 403, error: "Not a family member" };
+
+  const configRef = db.collection("families").doc(familyId).collection("config").doc("spond");
+  const data = (await configRef.get()).data();
+  if (!data?.email || !data?.password) {
+    return { status: 404, code: "NOT_CONNECTED", error: "Spond is not connected for this family" };
+  }
+  try {
+    const { plaintext, needsReencrypt } = spondCrypto.decryptStoredPassword(data.password);
+    if (needsReencrypt) {
+      try {
+        await configRef.update({ password: spondCrypto.encryptSpondPassword(plaintext) });
+      } catch (error) {
+        console.error("resolveFamilySpondCredentials: re-encrypt failed", error.message);
+      }
+    }
+    return { email: data.email, password: plaintext };
+  } catch (error) {
+    console.error("resolveFamilySpondCredentials: stored password unreadable", error.message);
+    return { status: 409, code: "PASSWORD_REQUIRED", error: "Spond password must be entered again." };
+  }
+}
+
 exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
 
@@ -729,16 +758,27 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
     return res.status(429).json({ error: "Too many requests. Please try again later." });
   }
 
-  const { action, email, password, token, groupId, groupIds, max, eventId, memberId, accepted } = req.body || {};
-
-  // Accept an encrypted stored value ("enc:" prefix) or the plaintext typed by the user
+  const { action, familyId, token, groupId, groupIds, max, eventId, memberId, accepted } = req.body || {};
+  let email = req.body?.email;
+  const password = req.body?.password;
   let decryptedPassword = password;
-  if (password && (password.startsWith("enc:") || password.startsWith("v1:"))) {
+
+  if (familyId && !email) {
+    // Family mode: the server uses the family's stored credentials. Any family member may use
+    // them (read events, respond), so the password never has to reach the client.
+    const resolved = await resolveFamilySpondCredentials(uid, familyId);
+    if (resolved.error) {
+      return res.status(resolved.status).json({ error: resolved.error, code: resolved.code });
+    }
+    email = resolved.email;
+    decryptedPassword = resolved.password;
+  } else if (password && (password.startsWith("enc:") || password.startsWith("v1:"))) {
+    // Accept an encrypted stored value ("enc:" prefix) or the plaintext typed by the user
     try {
       decryptedPassword = spondCrypto.decryptStoredPassword(password).plaintext;
     } catch (error) {
       console.error("spondProxy: could not decrypt stored password", error.message);
-      return res.status(400).json({ error: "Stored Spond credentials could not be read. Please reconnect Spond." });
+      return res.status(400).json({ error: "Stored Spond credentials could not be read. Please reconnect Spond.", code: "PASSWORD_REQUIRED" });
     }
   }
 
@@ -3203,7 +3243,7 @@ exports.migrateTransportData = onRequest({ region: "us-central1" }, async (req, 
 
 // Spond configuration for a family. The password is encrypted here and never returned.
 // Clients cannot read or write families/{id}/config directly (see firestore.rules).
-//   GET  ?familyId=...  -> { email, password (owner/admin only, else ""), hasPassword, groups, respondents }
+//   GET  ?familyId=...  -> { email, password: "" (never returned), passwordStatus, hasPassword, groups, respondents }
 //   POST { familyId, email, password?, groups, respondents }  (owner/admin only)
 //   POST { familyId, action: "disconnect" }  deletes the stored config (owner/admin only)
 //   - password omitted or empty on POST keeps the stored password (email change without re-typing)
@@ -3231,13 +3271,12 @@ exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, asyn
     const data = snap.data();
     // Only owners and admins receive the Spond password (they manage the connection).
     // Other members get the schedule data but never the credential.
-    // passwordStatus: "ok" (usable), "missing" (none stored), "unreadable" (stored but cannot be decrypted)
-    let password = "";
+    // passwordStatus: "ok" (usable), "missing" (none stored), "unreadable" (stored but cannot be decrypted).
+    // The password itself is never returned; the server uses it through spondProxy in family mode.
     let passwordStatus = data.password ? "ok" : "missing";
     if (data.password && (member.role === "owner" || member.role === "admin")) {
       try {
-        const { plaintext, needsReencrypt } = spondCrypto.decryptStoredPassword(data.password);
-        password = plaintext;
+        const { needsReencrypt, plaintext } = spondCrypto.decryptStoredPassword(data.password);
         if (needsReencrypt) {
           try {
             await ref.update({ password: spondCrypto.encryptSpondPassword(plaintext) });
@@ -3253,7 +3292,7 @@ exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, asyn
     return res.status(200).json({
       config: {
         email: data.email || "",
-        password,
+        password: "",
         passwordStatus,
         hasPassword: !!data.password,
         groups: data.groups || [],

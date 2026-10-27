@@ -2,7 +2,8 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { SpondEvent, SpondRespondent, SpondGroupMember } from '../types';
 import { SpondResponseModal } from '../components/SpondResponseModal';
-import { changeSpondResponse, getSpondMembers } from '../services/spondService';
+import { changeFamilySpondResponse, getFamilySpondMembers } from '../services/spondService';
+import { useUserStore } from '../store/userStore';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { formatSpondTimestamp, formatSpondDate } from '../utils/dateUtils';
@@ -12,13 +13,14 @@ import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 interface SpondEventDetailParams {
   event: SpondEvent;
   spondRespondents: SpondRespondent[];
-  spondConfig: { email: string; password: string } | null;
+  spondConfig: { email: string } | null;
   groupLogos?: Record<string, string>;
   spondAllMembers?: SpondGroupMember[];
 }
 
 export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> = ({ route, navigation }) => {
   const { event, spondRespondents, spondConfig, groupLogos = {}, spondAllMembers = [] } = route.params as SpondEventDetailParams;
+  const familyId = useUserStore((state) => state.familyId);
   const { colors } = useTheme();
   const { t } = useTranslation();
   const [responseModal, setResponseModal] = useState<{ type: 'accept' | 'decline' } | null>(null);
@@ -31,14 +33,15 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
     let cancelled = false;
     (async () => {
       try {
-        const members = await getSpondMembers(spondConfig.email, spondConfig.password, event.groupId ?? '');
+        if (!familyId) return;
+        const members = await getFamilySpondMembers(familyId, event.groupId ?? '');
         if (!cancelled) {
           setLocalMembers(members.map((m) => ({ ...m, groupId: event.groupId!, groupName: event.groupName || '' })));
         }
       } catch {}
     })();
     return () => { cancelled = true; };
-  }, [spondAllMembers, event.groupId, event.groupName, spondConfig]);
+  }, [spondAllMembers, event.groupId, event.groupName, spondConfig, familyId]);
 
   const dateText = useMemo(() => {
     const startStr = formatSpondDate(event.startTimestamp);
@@ -60,17 +63,17 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const groupLogo = useMemo(() => event.groupName ? groupLogos[event.groupName] : undefined, [event.groupName, groupLogos]);
 
   const handleSendResponse = useCallback(async (memberIds: string[]) => {
-    if (!responseModal || !spondConfig) return;
+    if (!responseModal || !spondConfig || !familyId) return;
     const accepted = responseModal.type === 'accept';
     for (const memberId of memberIds) {
       try {
-        await changeSpondResponse(spondConfig.email, spondConfig.password, event.id, memberId, accepted);
+        await changeFamilySpondResponse(familyId, event.id, memberId, accepted);
       } catch {
         // Continue with next member
       }
     }
     setResponseModal(null);
-  }, [responseModal, spondConfig, event.id]);
+  }, [responseModal, spondConfig, familyId, event.id]);
 
   const acceptedNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'accepted') || [], [stampStatus]);
   const declinedNames = useMemo(() => stampStatus?.details.filter((d) => d.status === 'declined') || [], [stampStatus]);

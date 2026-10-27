@@ -240,7 +240,8 @@
     "endDateBeforeStart": "Slutdatum kan inte vara före startdatum",
     "enterCity": "Vänligen ange en stad",
     "placeholderTitle": "T.ex. Familjemiddag",
-    "editRecurrence": "Redigera upprepning"
+    "editRecurrence": "Redigera upprepning",
+    "spondReconnect": "Spond-lösenordet måste anges igen under Profil → Spond."
   },
   "trips": {
     "title": "Våra resor",

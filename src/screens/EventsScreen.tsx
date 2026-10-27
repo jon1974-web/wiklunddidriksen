@@ -15,7 +15,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { getTrips, getTripTransport, getTripHotels, getTripRestaurants, getTripActivities, getTripPackingLists } from '../services/tripService';
-import { getSpondConfig, getSpondEvents, getSpondMembers, changeSpondResponse, clearSpondToken } from '../services/spondService';
+import { getSpondConfig, getFamilySpondEvents, getFamilySpondMembers, changeFamilySpondResponse, isSpondReconnectRequired } from '../services/spondService';
 import { getHealthAppointments, getHealthMedications, getHealthVaccinations } from '../services/healthService';
 import { getPets, getAllVetVisits, getAllPetVaccinations, getAllPetMedications } from '../services/petService';
 import { getUserProfile } from '../services/familyService';
@@ -170,7 +170,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
   const [kindergartenActivities, setKindergartenActivities] = useState<KindergartenActivity[]>([]);
   const [homeServices, setHomeServices] = useState<HomeService[]>([]);
   const [homes, setHomes] = useState<Home[]>([]);
-  const [spondConfig, setSpondConfig] = useState<{ email: string; password: string } | null>(null);
+  const [spondConfig, setSpondConfig] = useState<{ email: string } | null>(null);
   const [spondGroupLogos, setSpondGroupLogos] = useState<Record<string, string>>({});
   const [spondAllMembers, setSpondAllMembers] = useState<SpondGroupMember[]>([]);
   const [responseModal, setResponseModal] = useState<{ event: SpondEvent; groupId: string; type: 'accept' | 'decline' } | null>(null);
@@ -365,23 +365,14 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     if (!familyId) { console.log('Spond: no familyId'); return; }
     try {
       const config = await getSpondConfig(familyId);
-      console.log('Spond config:', config ? `${config.groups.length} groups, email: ${!!config.email}, pass: ${!!config.password}` : 'null');
-      if (config && config.email && config.password && config.groups.length > 0) {
-        setSpondConfig({ email: config.email, password: config.password });
+      if (config && config.email && config.groups.length > 0) {
+        // Credentials stay on the server: events, members and responses are fetched in family mode
+        setSpondConfig({ email: config.email });
         const groupIds = config.groups.map((g) => g.id);
-        console.log('Spond groupIds:', groupIds);
         const logos: Record<string, string> = {};
         config.groups.forEach(g => { if (g.logoUrl) logos[g.name] = g.logoUrl; });
         setSpondGroupLogos(logos);
-        console.log('Spond logos:', Object.keys(logos));
-        let events;
-        try {
-          events = await getSpondEvents(config.email, config.password, groupIds);
-        } catch {
-          clearSpondToken();
-          events = await getSpondEvents(config.email, config.password, groupIds);
-        }
-        console.log('Spond events:', events.length);
+        const events = await getFamilySpondEvents(familyId, groupIds);
         const withGroupNames = events.map((e) => {
           const group = config.groups.find((g) => g.id === e.groupId);
           return { ...e, groupName: group?.name };
@@ -395,18 +386,22 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         const allMembers: SpondGroupMember[] = [];
         for (const group of config.groups) {
           try {
-            const members = await getSpondMembers(config.email, config.password, group.id);
+            const members = await getFamilySpondMembers(familyId, group.id);
             members.forEach((m) => allMembers.push({ ...m, groupId: group.id, groupName: group.name }));
           } catch {
-            // Continue
+            // Continue with the other groups
           }
         }
         setSpondAllMembers(allMembers);
       }
     } catch (e) {
       console.error('Spond load error:', e);
+      // Only owners and admins can fix a stored password, so only they are told
+      if (isSpondReconnectRequired(e) && (familyRole === 'owner' || familyRole === 'admin')) {
+        crossAlert(t('common.error'), t('events.spondReconnect'));
+      }
     }
-  }, [familyId]);
+  }, [familyId, familyRole, t]);
 
   useEffect(() => {
     loadSpondEvents();
@@ -1295,7 +1290,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     const accepted = type === 'accept';
     for (const memberId of memberIds) {
       try {
-        await changeSpondResponse(spondConfig.email, spondConfig.password, spondEvent.id, memberId, accepted);
+        await changeFamilySpondResponse(familyId!, spondEvent.id, memberId, accepted);
       } catch {
         // Continue with next member
       }

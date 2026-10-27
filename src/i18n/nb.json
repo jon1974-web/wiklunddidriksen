@@ -240,7 +240,8 @@
     "endDateBeforeStart": "Sluttdato kan ikke være før startdato",
     "enterCity": "Vennligst skriv en by",
     "placeholderTitle": "F.eks. Familiemiddag",
-    "editRecurrence": "Rediger gjentakelse"
+    "editRecurrence": "Rediger gjentakelse",
+    "spondReconnect": "Spond-passordet må skrives inn på nytt under Profil → Spond."
   },
   "trips": {
     "title": "Våre reiser",

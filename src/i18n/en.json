@@ -240,7 +240,8 @@
     "endDateBeforeStart": "End date cannot be before start date",
     "enterCity": "Please enter a city",
     "placeholderTitle": "E.g. Family dinner",
-    "editRecurrence": "Edit repeat"
+    "editRecurrence": "Edit repeat",
+    "spondReconnect": "The Spond password must be entered again under Profile → Spond."
   },
   "trips": {
     "title": "Our Trips",

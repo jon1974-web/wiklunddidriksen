@@ -45,7 +45,7 @@ import { crossAlert } from '../utils/alert';
 import { uriToBlob } from '../utils/upload';
 import { IMAGE_QUALITY } from '../constants/limits';
 import { SpondGroup, SpondMember, SpondGroupMember, UserProfile, Family } from '../types';
-import { loginSpond, getSpondGroups, getSpondMembers, saveSpondConfig, getSpondConfig, disconnectSpondConfig, clearSpondToken } from '../services/spondService';
+import { loginSpond, getSpondGroups, getSpondMembers, getFamilySpondMembers, saveSpondConfig, getSpondConfig, disconnectSpondConfig, clearSpondToken } from '../services/spondService';
 import { useTranslation } from 'react-i18next';
 import { setLanguage } from '../i18n';
 import { LANGUAGES } from '../constants/languages';
@@ -160,7 +160,6 @@ export const ProfileScreen: React.FC = () => {
         getSpondConfig(userProfile.familyId).then((spondConfig) => {
           if (spondConfig) {
             setSpondEmail(spondConfig.email);
-            setSpondPassword(spondConfig.password);
             setSpondPasswordStatus(spondConfig.passwordStatus || 'missing');
             setSpondConnected(true);
             setSpondGroups(spondConfig.groups);
@@ -171,7 +170,7 @@ export const ProfileScreen: React.FC = () => {
             setSpondLoading(true);
             Promise.allSettled(
               spondConfig.groups.map((group) =>
-                getSpondMembers(spondConfig.email, spondConfig.password, group.id).then((members) =>
+                getFamilySpondMembers(userProfile.familyId!, group.id).then((members) =>
                   members.map((m: any) => ({ ...m, groupId: group.id, groupName: group.name }))
                 )
               )

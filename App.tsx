@@ -104,7 +104,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 type RootStackParamList = {
   EventsList: { openAddEvent?: boolean; prefill?: any } | undefined;
   EventDetail: { event: Event };
-  EventDetail_Spond: { event: SpondEvent; spondRespondents: SpondRespondent[]; spondConfig: { email: string; password: string } | null };
+  EventDetail_Spond: { event: SpondEvent; spondRespondents: SpondRespondent[]; spondConfig: { email: string } | null };
   VoiceEvent: undefined;
   PhotoEvent: undefined;
   PhotoRecipe: undefined;

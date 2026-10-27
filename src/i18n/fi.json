@@ -240,7 +240,8 @@
     "endDateBeforeStart": "Loppupäivä ei voi olla ennen alkupäivää",
     "enterCity": "Anna kaupunki",
     "placeholderTitle": "Esim. Perheillallinen",
-    "editRecurrence": "Muokkaa toistoa"
+    "editRecurrence": "Muokkaa toistoa",
+    "spondReconnect": "Spond-salasana on syötettävä uudelleen kohdassa Profiili → Spond."
   },
   "trips": {
     "title": "Matkamme",

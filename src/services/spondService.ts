@@ -51,6 +51,20 @@ const getAuthHeaders = async (): Promise<Record<string, string>> => {
   return headers;
 };
 
+type SpondErrorCode = 'PASSWORD_REQUIRED' | 'NOT_CONNECTED';
+
+// Either typed credentials (used while connecting) or the family's stored credentials,
+// which the server resolves for any family member. The password never reaches the client in family mode.
+export type SpondCreds = { email: string; password: string } | { familyId: string };
+
+const credsBody = (creds: SpondCreds): Record<string, string> =>
+  'familyId' in creds ? { familyId: creds.familyId } : { email: creds.email, password: creds.password };
+
+const isCredentialError = (error: unknown): boolean => {
+  const code = (error as { code?: SpondErrorCode }).code;
+  return code === 'PASSWORD_REQUIRED' || code === 'NOT_CONNECTED';
+};
+
 const proxyCall = async (body: Record<string, any>): Promise<any> => {
   const headers = await getAuthHeaders();
   const response = await fetch(SPOND_PROXY_URL, {
@@ -60,13 +74,15 @@ const proxyCall = async (body: Record<string, any>): Promise<any> => {
   });
   const result = await response.json();
   if (!response.ok) {
-    throw new Error(result?.error || 'Spond API-feil.');
+    const error = new Error(result?.error || 'Spond API-feil.') as Error & { code?: string };
+    error.code = result?.code;
+    throw error;
   }
   return result;
 };
 
-export const loginSpond = async (email: string, password: string): Promise<string> => {
-  const result = await proxyCall({ action: 'login', email, password });
+const loginWith = async (creds: SpondCreds): Promise<string> => {
+  const result = await proxyCall({ action: 'login', ...credsBody(creds) });
   const accessToken = result?.accessToken?.token;
   if (!accessToken) {
     throw new Error('Spond innlogging feilet. Ingen token mottatt.');
@@ -75,41 +91,63 @@ export const loginSpond = async (email: string, password: string): Promise<strin
   return accessToken;
 };
 
-const getToken = async (email: string, password: string): Promise<string> => {
+const getToken = async (creds: SpondCreds): Promise<string> => {
   const existing = getPersistedToken();
   if (existing) return existing;
-  return await loginSpond(email, password);
+  return await loginWith(creds);
 };
 
-export const getSpondGroups = async (email: string, password: string): Promise<SpondGroup[]> => {
-  const token = await getToken(email, password);
+// Runs a proxy action with a cached token; on any non-credential failure, logs in again once.
+const withToken = async <T>(creds: SpondCreds, run: (token: string) => Promise<T>): Promise<T> => {
+  const token = await getToken(creds);
   try {
-    const groups = await proxyCall({ action: 'groups', token });
-    return (groups || []).map((g: any) => ({ id: g.id, name: g.name, logoUrl: g.logoUrl || g.imageUrl || g.image || undefined }));
-  } catch {
+    return await run(token);
+  } catch (error) {
+    if (isCredentialError(error)) throw error;
     clearPersistedToken();
-    const newToken = await loginSpond(email, password);
-    const groups = await proxyCall({ action: 'groups', token: newToken });
-    return (groups || []).map((g: any) => ({ id: g.id, name: g.name, logoUrl: g.logoUrl || g.imageUrl || g.image || undefined }));
+    const newToken = await loginWith(creds);
+    return await run(newToken);
   }
 };
 
-export const getSpondEvents = async (
-  email: string,
-  password: string,
-  groupIds: string[]
-): Promise<SpondEvent[]> => {
-  const token = await getToken(email, password);
-  let events: any[];
-  try {
-    events = await proxyCall({ action: 'events', token, groupIds });
-  } catch {
-    clearPersistedToken();
-    const newToken = await loginSpond(email, password);
-    events = await proxyCall({ action: 'events', token: newToken, groupIds });
-  }
+export const loginSpond = async (email: string, password: string): Promise<string> =>
+  loginWith({ email, password });
+
+const groupsWith = async (creds: SpondCreds): Promise<SpondGroup[]> => {
+  const groups = await withToken(creds, (token) => proxyCall({ action: 'groups', token, ...(('familyId' in creds) ? { familyId: creds.familyId } : {}) }));
+  return (groups || []).map((g: any) => ({ id: g.id, name: g.name, logoUrl: g.logoUrl || g.imageUrl || g.image || undefined }));
+};
+
+const eventsWith = async (creds: SpondCreds, groupIds: string[]): Promise<SpondEvent[]> => {
+  const events = await withToken(creds, (token) => proxyCall({ action: 'events', token, groupIds, ...(('familyId' in creds) ? { familyId: creds.familyId } : {}) }));
   return (events || []).map((e: any) => mapSpondEvent(e));
 };
+
+const membersWith = async (creds: SpondCreds, groupId: string): Promise<SpondMember[]> => {
+  const members = await withToken(creds, (token) => proxyCall({ action: 'members', token, groupId, ...(('familyId' in creds) ? { familyId: creds.familyId } : {}) }));
+  return members || [];
+};
+
+const changeResponseWith = async (creds: SpondCreds, eventId: string, memberId: string, accepted: boolean): Promise<void> => {
+  await withToken(creds, (token) => proxyCall({ action: 'changeResponse', token, eventId, memberId, accepted, ...(('familyId' in creds) ? { familyId: creds.familyId } : {}) }));
+};
+
+// Typed-credentials variants (used during connect in the profile)
+export const getSpondGroups = (email: string, password: string) => groupsWith({ email, password });
+export const getSpondEvents = (email: string, password: string, groupIds: string[]) => eventsWith({ email, password }, groupIds);
+export const getSpondMembers = (email: string, password: string, groupId: string) => membersWith({ email, password }, groupId);
+export const changeSpondResponse = (email: string, password: string, eventId: string, memberId: string, accepted: boolean) =>
+  changeResponseWith({ email, password }, eventId, memberId, accepted);
+
+// Family-mode variants: the server uses the family's stored credentials
+export const getFamilySpondGroups = (familyId: string) => groupsWith({ familyId });
+export const getFamilySpondEvents = (familyId: string, groupIds: string[]) => eventsWith({ familyId }, groupIds);
+export const getFamilySpondMembers = (familyId: string, groupId: string) => membersWith({ familyId }, groupId);
+export const changeFamilySpondResponse = (familyId: string, eventId: string, memberId: string, accepted: boolean) =>
+  changeResponseWith({ familyId }, eventId, memberId, accepted);
+
+export const isSpondReconnectRequired = (error: unknown): boolean =>
+  (error as { code?: string }).code === 'PASSWORD_REQUIRED';
 
 const mapSpondEvent = (e: any): SpondEvent => ({
   id: e.id,
@@ -128,40 +166,6 @@ const mapSpondEvent = (e: any): SpondEvent => ({
       }
     : undefined,
 });
-
-export const getSpondMembers = async (
-  email: string,
-  password: string,
-  groupId: string
-): Promise<SpondMember[]> => {
-  const token = await getToken(email, password);
-  try {
-    const members = await proxyCall({ action: 'members', token, groupId });
-    return members || [];
-  } catch {
-    clearPersistedToken();
-    const newToken = await loginSpond(email, password);
-    const members = await proxyCall({ action: 'members', token: newToken, groupId });
-    return members || [];
-  }
-};
-
-export const changeSpondResponse = async (
-  email: string,
-  password: string,
-  eventId: string,
-  memberId: string,
-  accepted: boolean
-): Promise<void> => {
-  const token = await getToken(email, password);
-  try {
-    await proxyCall({ action: 'changeResponse', token, eventId, memberId, accepted });
-  } catch {
-    clearPersistedToken();
-    const newToken = await loginSpond(email, password);
-    await proxyCall({ action: 'changeResponse', token: newToken, eventId, memberId, accepted });
-  }
-};
 
 // Spond config is stored server-side with the password encrypted (see spondConfig endpoint).
 export const saveSpondConfig = async (familyId: string, config: SpondConfig): Promise<void> => {
