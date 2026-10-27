@@ -13,6 +13,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
+import { buildReminderFields } from '../utils/reminders';
 import { getErrorMessage } from '../utils/validation';
 import { getTodayLocal, addOneHour } from '../utils/dateUtils';
 import { notifyHealthItem } from '../services/familyService';
@@ -24,7 +25,7 @@ import {
   getSchoolHolidays, addSchoolHoliday, updateSchoolHoliday, deleteSchoolHoliday,
   getSchoolActivities, addSchoolActivity, updateSchoolActivity, deleteSchoolActivity,
 } from '../services/schoolService';
-import { SchoolChild, SchoolYear, SchoolContact, SchoolSchedule, SchoolHoliday, SchoolActivity } from '../types';
+import { SchoolChild, SchoolYear, SchoolContact, SchoolSchedule, SchoolHoliday, SchoolActivity, SchoolActivityDocument } from '../types';
 import { ActionModal } from '../components/ActionModal';
 import { HelpCenter } from '../components/HelpCenter';
 import { DocumentUpload } from '../components/DocumentUpload';
@@ -43,9 +44,33 @@ function getWeekNumber(date: Date): number {
 
 const SCHOOL_THEME = MODULE_COLORS.school;
 
+interface SchoolActivityFormData {
+  title: string;
+  activityType: 'tur' | 'aktivitet' | 'møte';
+  dateFrom: string;
+  dateTo: string;
+  startTime: string;
+  endTime: string;
+  location: string;
+  note: string;
+  reminder: number;
+  documents: SchoolActivityDocument[];
+}
+
+interface SchoolSpaceRouteParams {
+  editContactId?: string;
+  openAddSection?: string;
+  editActivityId?: string;
+  editActivityData?: SchoolActivityFormData;
+  childId?: string;
+  openVoiceForType?: string;
+  openPhotoForType?: string;
+  moduleColor?: string;
+}
+
 interface SchoolSpaceScreenProps {
   navigation: any;
-  route?: { params?: { editContactId?: string; openAddSection?: string; editActivityId?: string } };
+  route?: { params?: SchoolSpaceRouteParams };
 }
 
 const ADMIN_ROLES: Record<string, { label: string; color: string }> = {
@@ -131,7 +156,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
   const [editingYearId, setEditingYearId] = useState<string | null>(null);
 
   const [showAddContactModal, setShowAddContactModal] = useState(false);
-  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate', teacherType: '' as string, adminType: [] as string[], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+  const [contactForm, setContactForm] = useState({ role: 'teacher' as 'teacher' | 'classmate' | 'admin', teacherType: '' as string, adminType: [] as string[], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
   const [editingContactId, setEditingContactId] = useState<string | null>(null);
   const [contactActionModal, setContactActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
   const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
@@ -148,7 +173,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       const data = await getSchoolChildren(familyId);
       setChildren(data);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [familyId]);
 
@@ -160,7 +185,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       if (data.length > 0 && !selectedYear) setSelectedYear(data[0]);
       else if (data.length === 0) setSelectedYear(null);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [selectedChild, familyId]);
 
@@ -178,7 +203,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setHolidays(h);
       setActivities(a);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [selectedYear, familyId, selectedChild]);
 
@@ -217,11 +242,11 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
   useEffect(() => {
     if (route?.params?.openVoiceForType && familyId && selectedYear && selectedChild) {
-      navigation.navigate('VoiceActivity', { type: route.params.openVoiceForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, returnTo: 'SchoolActivities', child, selectedYear, _t: Date.now() });
+      navigation.navigate('VoiceActivity', { type: route.params.openVoiceForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, returnTo: 'SchoolActivities', child: selectedChild, selectedYear, _t: Date.now() });
       navigation.setParams({ openVoiceForType: undefined });
     }
     if (route?.params?.openPhotoForType && familyId && selectedYear && selectedChild) {
-      navigation.navigate('PhotoActivity', { type: route.params.openPhotoForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, returnTo: 'SchoolActivities', child, selectedYear, _t: Date.now() });
+      navigation.navigate('PhotoActivity', { type: route.params.openPhotoForType, childId: selectedChild.id, yearId: selectedYear.id, moduleColor: route.params.moduleColor, returnTo: 'SchoolActivities', child: selectedChild, selectedYear, _t: Date.now() });
       navigation.setParams({ openPhotoForType: undefined });
     }
   }, [route?.params?.openVoiceForType, route?.params?.openPhotoForType, familyId, selectedYear, selectedChild]);
@@ -247,7 +272,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         if (editId && selectedChild) {
           const activityData = route?.params?.editActivityData;
           setEditingActivityId(editId);
-          setActivityForm(activityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: '', documents: [] });
+          setActivityForm(activityData || { title: '', activityType: 'tur', dateFrom: '', dateTo: '', startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
           setShowAddActivityModal(true);
           navigation.setParams({ editActivityId: undefined, editActivityData: undefined, childId: undefined } as any);
         }
@@ -265,7 +290,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
   const handleSaveChild = async () => {
     if (!familyId) return;
-    if (!childForm.name.trim()) { crossAlert('Error', t('school.enterChildName')); return; }
+    if (!childForm.name.trim()) { crossAlert(t('common.error'), t('school.enterChildName')); return; }
     try {
       let photoUrl = childForm.photoUrl;
       if (photoUrl && !photoUrl.startsWith('http')) {
@@ -294,7 +319,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setShowAddChildModal(false);
       loadChildren();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -306,7 +331,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setSelectedChild(null);
       loadChildren();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -321,7 +346,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
 
   const handleAddYear = async () => {
     if (!familyId || !selectedChild) return;
-    if (!yearForm.year.trim()) { crossAlert('Error', t('school.enterYear')); return; }
+    if (!yearForm.year.trim()) { crossAlert(t('common.error'), t('school.enterYear')); return; }
     try {
       if (editingYearId) {
         await updateSchoolYear(editingYearId, yearForm);
@@ -333,13 +358,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setShowAddYearModal(false);
       loadYears();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
   const handleSaveContact = async () => {
     if (!familyId || !selectedChild || !selectedYear) return;
-    if (!contactForm.name.trim()) { crossAlert('Error', t('school.enterContactName')); return; }
+    if (!contactForm.name.trim()) { crossAlert(t('common.error'), t('school.enterContactName')); return; }
     if (contactForm.role === 'teacher' && !contactForm.teacherType) { crossAlert(t('common.error'), t('school.selectTeacherType')); return; }
     try {
       const rawData: Record<string, any> = {
@@ -377,7 +402,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setShowAddContactModal(false);
       loadYearData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -388,7 +413,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setContactActionModal({ visible: false, id: '', title: '' });
       loadYearData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -400,7 +425,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setSelectedYear(null);
       loadYears();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -472,7 +497,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       loadYearData();
     } catch (error) {
       setLoading(false);
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -481,13 +506,13 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       await deleteSchoolSchedule(id);
       loadYearData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
   const handleSaveHoliday = async () => {
     if (!familyId || !selectedYear || !selectedChild) return;
-    if (!holidayForm.title.trim()) { crossAlert('Error', t('kindergarten.enterContactName')); return; }
+    if (!holidayForm.title.trim()) { crossAlert(t('common.error'), t('kindergarten.enterContactName')); return; }
     if (!holidayForm.dateFrom || !holidayForm.dateTo) { crossAlert(t('common.error'), t('school.selectDates')); return; }
     try {
       const data = {
@@ -510,7 +535,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setShowAddHolidayModal(false);
       loadYearData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -521,7 +546,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setHolidayActionModal({ visible: false, id: '', title: '' });
       loadYearData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -537,13 +562,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     try {
       const user = useUserStore.getState().user;
       const activityData: any = { ...activityForm, childId: selectedChild.id, yearId: selectedYear.id, familyId, createdBy: user?.uid || '' };
-      // Compute reminderAt
-      if (activityForm.reminder > 0 && activityForm.dateFrom) {
-        const time = activityForm.startTime || '09:00';
-        const eventTime = new Date(`${activityForm.dateFrom}T${time}:00`);
-        const reminderMs = activityForm.reminder * 60 * 1000;
-        activityData.reminderAt = new Date(eventTime.getTime() - reminderMs).toISOString();
-      }
+      Object.assign(activityData, buildReminderFields(activityForm.dateFrom, activityForm.startTime, activityForm.reminder));
       if (editingActivityId) {
         await updateSchoolActivity(familyId, editingActivityId, activityData);
         if (repeatScheduleConfig) {
@@ -603,7 +622,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setRepeatScheduleConfig(null);
       loadYearData();
     } catch (error) {
-      crossAlert('Error', String(error));
+      crossAlert(t('common.error'), String(error));
     }
   };
 
@@ -614,7 +633,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setActivityActionModal({ visible: false, id: '', title: '' });
       loadYearData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -637,7 +656,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       const data = await res.json();
       setUrlResults((data.holidays || []).map((h: any) => ({ ...h, checked: true })));
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setUrlLoading(false);
     }
@@ -664,7 +683,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
       setUrlResults([]);
       loadYearData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -1070,7 +1089,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                     <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.classmates ? '▼' : '▶'}</Text>
                   </View>
                   <View style={{ flexDirection: 'row', gap: 8 }}>
-                    <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingContactId(null); setContactForm({ role: 'classmate', name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
+                    <TouchableOpacity style={[styles.addButton, { backgroundColor: SCHOOL_THEME }]} onPress={(e) => { e.stopPropagation?.(); setEditingContactId(null); setContactForm({ role: 'classmate', teacherType: '', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' }); setShowAddContactModal(true); }}>
                       <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
                     </TouchableOpacity>
                   </View>
@@ -1399,7 +1418,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         <ActionModal visible={scheduleActionModal.visible} title={scheduleActionModal.title} onDelete={() => { handleDeleteSchedule(scheduleActionModal.id); setScheduleActionModal({ visible: false, id: '', title: '' }); }} onCancel={() => setScheduleActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
         <ActionModal visible={holidayActionModal.visible} title={holidayActionModal.title} onEdit={() => { setEditingHolidayId(holidayActionModal.id); const h = holidays.find(h => h.id === holidayActionModal.id); if (h) setHolidayForm({ title: h.title, dateFrom: h.dateFrom, dateTo: h.dateTo, timeFrom: h.timeFrom || '', timeTo: h.timeTo || '' }); setShowAddHolidayModal(true); setHolidayActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteHoliday} onCancel={() => setHolidayActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
 
-        <ActionModal visible={activityActionModal.visible} title={activityActionModal.title} onEdit={() => { const a = activities.find(a => a.id === activityActionModal.id); if (a) { setEditingActivityId(a.id); setActivityForm({ title: a.title, activityType: a.activityType, dateFrom: a.dateFrom, dateTo: a.dateTo || '', startTime: a.startTime || '', endTime: a.endTime || '', location: a.location || '', note: a.note || '', documents: a.documents || [] }); setShowAddActivityModal(true); } setActivityActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteActivity} onCancel={() => setActivityActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
+        <ActionModal visible={activityActionModal.visible} title={activityActionModal.title} onEdit={() => { const a = activities.find(a => a.id === activityActionModal.id); if (a) { setEditingActivityId(a.id); setActivityForm({ title: a.title, activityType: a.activityType, dateFrom: a.dateFrom, dateTo: a.dateTo || '', startTime: a.startTime || '', endTime: a.endTime || '', location: a.location || '', note: a.note || '', reminder: Number(a.reminder) || 0, documents: a.documents || [] }); setShowAddActivityModal(true); } setActivityActionModal({ visible: false, id: '', title: '' }); }} onDelete={handleDeleteActivity} onCancel={() => setActivityActionModal({ visible: false, id: '', title: '' })} accentColor={SCHOOL_THEME} />
 
         {/* Add/Edit Holiday Modal */}
         <Modal visible={showAddHolidayModal} transparent animationType="slide">
@@ -1774,7 +1793,6 @@ const styles = StyleSheet.create({
   contactCard: { padding: 12, borderRadius: 10, marginBottom: 8, borderBottomWidth: 1, borderBottomColor: '#ddd' },
   teacherTypeBadge: { alignSelf: 'flex-start', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6, marginTop: 4, marginBottom: 2 },
   contactName: { fontSize: 15, fontWeight: '600' },
-  contactActionBtn: { width: 36, height: 36, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
   contactActionBtn: { paddingVertical: 4, paddingHorizontal: 10, borderRadius: 12 },
   semesterTabs: { flexDirection: 'row', gap: 8, marginBottom: 12 },
   semesterTab: { flex: 1, paddingVertical: 10, borderRadius: 10, alignItems: 'center' },

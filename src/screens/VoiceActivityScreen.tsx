@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { buildReminderFields } from '../utils/reminders';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, Platform, ScrollView, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { addHealthAppointment } from '../services/healthService';
@@ -19,12 +20,13 @@ import { addOneHour } from '../utils/dateUtils';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
+import type { SchoolChild, SchoolYear, KindergartenChild, KindergartenYear } from '../types';
 
 type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService' | 'trip';
 
 interface VoiceActivityScreenProps {
   navigation: any;
-  route: { params: { type: ActivityType; moduleColor: string; petId?: string; childId?: string; yearId?: string; homeId?: string; home?: any } };
+  route: { params: { type: ActivityType; moduleColor: string; petId?: string; childId?: string; yearId?: string; homeId?: string; home?: any; returnTo?: string; child?: SchoolChild | KindergartenChild; selectedYear?: SchoolYear | KindergartenYear | null; _t?: number } };
 }
 
 interface ParsedData {
@@ -39,7 +41,7 @@ interface ParsedData {
   note?: string;
   reminder: number;
   activityType?: 'tur' | 'aktivitet' | 'møte';
-  frequency?: string;
+  frequency?: 'once' | 'monthly' | 'quarterly' | 'yearly';
 }
 
 const CLOUD_FUNCTION_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent';
@@ -317,7 +319,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           endTime: parsedData.endTime,
           location: parsedData.location,
           note: parsedData.note || '',
-          reminder: parsedData.reminder,
+          ...buildReminderFields(parsedData.dateFrom, parsedData.startTime, parsedData.reminder),
           addToCalendar: true,
           status: 'planned',
         }, user.uid);
@@ -333,7 +335,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           endTime: parsedData.endTime,
           location: parsedData.location,
           note: parsedData.note || '',
-          reminder: parsedData.reminder,
+          ...buildReminderFields(parsedData.dateFrom, parsedData.startTime, parsedData.reminder),
           addToCalendar: true,
           status: 'planned',
         }, user.uid);
@@ -350,7 +352,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           endTime: parsedData.endTime,
           location: parsedData.location,
           note: parsedData.note || '',
-          reminder: parsedData.reminder,
+          ...buildReminderFields(parsedData.dateFrom, parsedData.startTime, parsedData.reminder),
           createdBy: user.uid,
         });
       } else if (type === 'kindergartenActivity') {
@@ -366,7 +368,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           endTime: parsedData.endTime,
           location: parsedData.location,
           note: parsedData.note || '',
-          reminder: parsedData.reminder,
+          ...buildReminderFields(parsedData.dateFrom, parsedData.startTime, parsedData.reminder),
           createdBy: user.uid,
         });
       } else if (type === 'homeService') {
@@ -390,7 +392,6 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
           endDate: parsedData.dateTo || parsedData.dateFrom,
           startTime: parsedData.startTime,
           endTime: parsedData.endTime,
-          familyId: familyId || '',
           createdBy: user.uid,
         }, familyId || '');
       }
@@ -601,6 +602,7 @@ export const VoiceActivityScreen: React.FC<VoiceActivityScreenProps> = ({ naviga
                 placeholder={t('common.location')}
                 value={parsedData.location || ''}
                 onChangeText={(v: string) => handleFieldChange('location', v)}
+                onSelect={(v: string) => handleFieldChange('location', v)}
               />
 
               {type === 'homeService' ? (

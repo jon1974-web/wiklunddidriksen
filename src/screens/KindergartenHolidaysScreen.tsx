@@ -76,7 +76,7 @@ export const KindergartenHolidaysScreen: React.FC<Props> = ({ navigation, route 
       const data = await res.json();
       setUrlResults((data.holidays || []).map((h: any) => ({ ...h, checked: true })));
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setUrlLoading(false);
     }
@@ -94,7 +94,7 @@ export const KindergartenHolidaysScreen: React.FC<Props> = ({ navigation, route 
       setUrlResults([]);
       loadHolidays();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 

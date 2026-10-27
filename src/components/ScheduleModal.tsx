@@ -234,7 +234,7 @@ export const ScheduleModal: React.FC<ScheduleModalProps> = ({ visible, onClose, 
 
 const styles = StyleSheet.create({
   overlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "flex-end" as const },
-  sheet: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%' },
+  sheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%' },
   handle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ddd', alignSelf: 'center' as const, marginTop: 10, marginBottom: 4 },
   header: { flexDirection: 'row' as const, alignItems: 'center' as const, justifyContent: 'space-between' as const, paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
   closeBtn: { width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, alignItems: 'center' as const, justifyContent: 'center' as const },

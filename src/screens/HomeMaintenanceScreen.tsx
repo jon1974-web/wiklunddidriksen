@@ -14,7 +14,7 @@ import { getErrorMessage } from '../utils/validation';
 import { getTodayLocal, formatDate } from '../utils/dateUtils';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { Home, HomeService, HomePaintColor, HomeProject } from '../types';
-import { getHomeServices, addHomeService, updateHomeService, deleteHomeService, getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeProjects } from '../services/homeService';
+import { getHomeServices, addHomeService, updateHomeService, deleteHomeService, getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeProjects } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { HelpCenter } from '../components/HelpCenter';
@@ -874,7 +874,7 @@ const styles = StyleSheet.create({
   reminderOption: { paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10, borderWidth: 1.5 },
   personChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 16 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%', padding: 20 },
   modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginBottom: 16 },
   modalTitle: { fontSize: 22, fontWeight: '700', marginBottom: 16 },
   field: { marginBottom: 16 },

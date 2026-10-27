@@ -57,12 +57,12 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
 
   const filteredTeachers = contacts.filter(c => c.role === 'teacher' && (!search || c.name.toLowerCase().includes(search.toLowerCase()) || (c.subject || '').toLowerCase().includes(search.toLowerCase())));
   const filteredAdmins = contacts.filter(c => c.role === 'admin' && (!search || c.name.toLowerCase().includes(search.toLowerCase())));
-  const filteredClassmates = contacts.filter(c => c.role === 'classmate' && (!search || c.name.toLowerCase().includes(search.toLowerCase()) || (c.childName || '').toLowerCase().includes(search.toLowerCase())));
+  const filteredClassmates = contacts.filter(c => c.role === 'child' && (!search || c.name.toLowerCase().includes(search.toLowerCase()) || (c.childName || '').toLowerCase().includes(search.toLowerCase())));
 
   const handleSave = async () => {
     if (!familyId || !selectedYear || !form.name.trim()) return;
     try {
-      const data = { ...form, yearId: selectedYear.id, childId: child.id, familyId };
+      const data = { ...form, role: form.role as KindergartenContact['role'], teacherType: form.teacherType as KindergartenContact['teacherType'], yearId: selectedYear.id, childId: child.id, familyId };
       if (editingId) { await updateKindergartenContact(editingId, data); }
       else { await addKindergartenContact(data); }
       setShowAddModal(false);
@@ -95,7 +95,7 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
     </TouchableOpacity>
   );
 
-  const toggleSection = (key: string) => setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleSection = (key: keyof typeof expandedSections) => setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
 
   useEffect(() => {
     if (!search.trim()) return;

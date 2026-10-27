@@ -1797,61 +1797,87 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
     }
   }
 
-  // Process pet vet visit reminders
-  const petVetVisitsSnap = await db.collectionGroup("petVetVisits").limit(200).get();
-  for (const doc of petVetVisitsSnap.docs) {
+  // All non-event reminders share one pattern: the client stores reminderAt (ISO),
+  // and this job sends a push when reminderAt falls inside the window.
+  // Requires a COLLECTION_GROUP index on reminderAt (firestore.indexes.json fieldOverrides).
+  const dueReminderDocs = async (groupName) => {
+    const snap = await db.collectionGroup(groupName)
+      .where("reminderAt", ">=", thirtyMinAgo.toISOString())
+      .where("reminderAt", "<=", fiveMinFromNow.toISOString())
+      .get();
+    return snap.docs;
+  };
+
+  const runReminderGroup = async (groupName, handle) => {
+    try {
+      const docs = await dueReminderDocs(groupName);
+      for (const doc of docs) {
+        try {
+          totalSent += await handle(doc);
+        } catch (error) {
+          console.error(`checkReminders ${groupName} ${doc.id} error:`, error);
+        }
+      }
+    } catch (error) {
+      console.error(`checkReminders ${groupName} query error:`, error);
+    }
+  };
+
+  // Pet vet visits: petVetVisits/{id}
+  await runReminderGroup("petVetVisits", async (doc) => {
     const vetData = doc.data();
-    if (!vetData.reminderAt || !vetData.familyId) continue;
+    if (!vetData.familyId) return 0;
+    return sendNotification({
+      familyId: vetData.familyId,
+      title: `🐾 ${vetData.title}`,
+      body: `Påminnelse om veterinærbesøk`,
+      notifKey: `vetvisit_${doc.id}_${vetData.reminderAt}`,
+    });
+  });
 
-    const reminderTime = new Date(vetData.reminderAt);
-    if (reminderTime >= thirtyMinAgo && reminderTime <= fiveMinFromNow) {
-      const sent = await sendNotification({
-        familyId: vetData.familyId,
-        title: `🐾 ${vetData.title}`,
-        body: `Påminnelse om veterinærbesøk`,
-        notifKey: `vetvisit_${doc.id}`,
-      });
-      totalSent += sent;
-    }
-  }
-
-  // Process pet vaccination reminders
-  const petVaccinationsSnap = await db.collectionGroup("petVaccinations").limit(200).get();
-  for (const doc of petVaccinationsSnap.docs) {
+  // Pet vaccinations: petVaccinations/{id}
+  await runReminderGroup("petVaccinations", async (doc) => {
     const vaccData = doc.data();
-    if (!vaccData.reminderAt || !vaccData.familyId) continue;
+    if (!vaccData.familyId) return 0;
+    return sendNotification({
+      familyId: vaccData.familyId,
+      title: `💉 ${vaccData.name}`,
+      body: `Påminnelse om vaksine`,
+      notifKey: `petvacc_${doc.id}_${vaccData.reminderAt}`,
+    });
+  });
 
-    const reminderTime = new Date(vaccData.reminderAt);
-    if (reminderTime >= thirtyMinAgo && reminderTime <= fiveMinFromNow) {
-      const sent = await sendNotification({
-        familyId: vaccData.familyId,
-        title: `💉 ${vaccData.name}`,
-        body: `Påminnelse om vaksine`,
-        notifKey: `petvacc_${doc.id}`,
-      });
-      totalSent += sent;
-    }
-  }
-
-  // Process school activity reminders
-  const schoolActivitiesSnap = await db.collectionGroup("activities").limit(200).get();
-  for (const doc of schoolActivitiesSnap.docs) {
+  // School and kindergarten activities: {schoolActivities|kindergartenActivities}/{familyId}/activities/{id}
+  await runReminderGroup("activities", async (doc) => {
     const actData = doc.data();
-    if (!actData.reminderAt || !actData.familyId) continue;
+    const collectionId = doc.ref.parent.parent?.parent?.id;
+    if (!actData.familyId) return 0;
+    if (collectionId !== "schoolActivities" && collectionId !== "kindergartenActivities") return 0;
+    const typeLabel = actData.activityType === "tur" ? "Tur" : actData.activityType === "aktivitet" ? "Aktivitet" : "Møte";
+    const icon = collectionId === "schoolActivities" ? "📚" : "🎨";
+    const when = actData.startTime ? ` kl. ${actData.startTime}` : "";
+    return sendNotification({
+      familyId: actData.familyId,
+      title: `${icon} ${typeLabel}: ${actData.title}`,
+      body: `Påminnelse: ${actData.dateFrom || ""}${when}`,
+      notifKey: `activity_${doc.id}_${actData.reminderAt}`,
+    });
+  });
 
-    const reminderTime = new Date(actData.reminderAt);
-    if (reminderTime >= thirtyMinAgo && reminderTime <= fiveMinFromNow) {
-      const typeLabel = actData.activityType === "tur" ? "Tur" : actData.activityType === "aktivitet" ? "Aktivitet" : "Møte";
-      const icon = doc.ref.parent.parent?.parent?.id === "schoolActivities" ? "📚" : "🎨";
-      const sent = await sendNotification({
-        familyId: actData.familyId,
-        title: `${icon} ${typeLabel}: ${actData.title}`,
-        body: `Påminnelse om ${actData.date}`,
-        notifKey: `activity_${doc.id}`,
-      });
-      totalSent += sent;
-    }
-  }
+  // Health appointments: health/{familyId}/appointments/{id}
+  await runReminderGroup("appointments", async (doc) => {
+    if (doc.ref.parent.parent?.parent?.id !== "health") return 0;
+    const apptData = doc.data();
+    const familyId = doc.ref.parent.parent.id;
+    if (!familyId) return 0;
+    const when = apptData.startTime ? ` kl. ${apptData.startTime}` : "";
+    return sendNotification({
+      familyId,
+      title: `🩺 ${apptData.title || "Helseavtale"}`,
+      body: `Påminnelse: ${apptData.dateFrom || ""}${when}`,
+      notifKey: `appointment_${doc.id}_${apptData.reminderAt}`,
+    });
+  });
 
   console.log(`checkReminders: ${totalSent} sent`);
   if (totalSent > 0) {

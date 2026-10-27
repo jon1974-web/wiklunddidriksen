@@ -27,7 +27,7 @@ const HOME_TYPES: { type: HomeType; icon: string; label: string }[] = [
 
 interface HomeSpaceScreenProps {
   navigation: any;
-  route?: { params?: { editHomeId?: string } };
+  route?: { params?: { editHomeId?: string; openAddSection?: string; openVoiceForType?: string; openPhotoForType?: string; moduleColor?: string } };
 }
 
 export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, route }) => {
@@ -309,7 +309,7 @@ export const HomeSpaceScreen: React.FC<HomeSpaceScreenProps> = ({ navigation, ro
                         const url = await webUploadFile(path, blob);
                         setFormPhotoUrl(url);
                       } catch (err) {
-                        crossAlert('Error', getErrorMessage(err));
+                        crossAlert(t('common.error'), getErrorMessage(err));
                       }
                     }
                   }}
@@ -439,7 +439,7 @@ const styles = StyleSheet.create({
   homeCardMap: { width: '100%', height: 60, marginTop: 2 },
   homeCardAdd: { borderWidth: 2, borderStyle: 'dashed', backgroundColor: 'transparent', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', padding: 12 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%', padding: 20 },
   modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginBottom: 16 },
   modalTitle: { fontSize: 22, fontWeight: '700', marginBottom: 16 },
   field: { marginBottom: 16 },

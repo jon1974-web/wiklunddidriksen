@@ -142,7 +142,10 @@
     "uploadLogo": "Lataa logo",
     "weekSingular": "viikko",
     "startFree": "Aloita ilmaiseksi",
-    "newShort": "Uusi"
+    "newShort": "Uusi",
+    "info": "Tiedot",
+    "unknown": "Tuntematon",
+    "aiError": "Tekoälyvirhe: {{detail}}"
   },
   "auth": {
     "title": "Fampad",
@@ -182,7 +185,8 @@
     "legalPrefix": "Käyttämällä fampadia hyväksyt",
     "termsLink": "ehdot",
     "legalAnd": "ja",
-    "privacyLink": "tietosuojakäytännön"
+    "privacyLink": "tietosuojakäytännön",
+    "familyFallback": "perhe"
   },
   "events": {
     "title": "Tapahtumat",
@@ -676,7 +680,7 @@
     "modeBus": "Bussi",
     "modeTram": "Raitiovaunu",
     "modeOther": "Muu",
-    "operator": "Yhtiö/operaattori",
+    "operator": "Liikennöitsijä",
     "lineNumber": "Linjanumero",
     "carType": "Autotyyppi",
     "fromPlace": "Mistä (pysäkki/osoite)",
@@ -697,7 +701,6 @@
     "cabin": "Hytti",
     "hasCar": "Auto mukana",
     "carRegNr": "Auton rek. nro",
-    "operator": "Liikennöitsijä",
     "departureAirport": "Lähtöasema",
     "arrivalAirport": "Saapumisasema",
     "routeName": "Reittinimi",
@@ -772,6 +775,7 @@
   "packing": {
     "createFromPhoto": "Kuvasta",
     "importDefaultTitle": "Pakkauslista kuvasta",
+    "createList": "Lisää pakkauslista",
     "title": "Pakkauslistat",
     "noLists": "Ei pakkauslistoja lisätty",
     "addList": "Uusi pakkauslista",
@@ -1461,7 +1465,10 @@
     "placeholderRecipeName": "Esim. Spaghetti Bolognese",
     "placeholderDescription": "Lyhyt kuvaus",
     "ingredientName": "Ainesosa",
-    "unitLabel": "Yksikkö"
+    "unitLabel": "Yksikkö",
+    "noShoppingListFirst": "Luo ensin ostoslista",
+    "ingredientsAddedToList": "{{count}} ainesosaa lisätty ostoslistalle",
+    "ingredientsAddedToNamed": "{{count}} ainesosaa lisätty kohteeseen \"{{name}}\""
   },
   "pets": {
     "title": "Lemmikit",

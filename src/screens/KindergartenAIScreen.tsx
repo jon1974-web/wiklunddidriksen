@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { auth } from '../services/firebase';
 import { useTheme } from '../theme/ThemeContext';
 import { addKindergartenContact, addKindergartenHoliday } from '../services/kindergartenService';
+import type { KindergartenContact } from '../types';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
@@ -109,7 +110,7 @@ export const KindergartenAIScreen: React.FC<Props> = ({ navigation, route }) => 
     setSaving(true);
     try {
       for (const c of selected) {
-        const data: Record<string, any> = {
+        const data: Omit<KindergartenContact, 'id' | 'createdAt'> = {
           name: c.name, role: 'child', childId, yearId, familyId,
         };
         if (c.childPhone) data.childPhone = c.childPhone;

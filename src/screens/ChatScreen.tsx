@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Image, Alert, ActivityIndicator, TextStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { collection, query, where, orderBy, limit, onSnapshot, addDoc, updateDoc, doc, runTransaction } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -11,12 +11,15 @@ import { MessageBubble } from '../components/MessageBubble';
 import { useTheme } from '../theme/ThemeContext';
 import { useDesktopLayout } from '../hooks/useDesktopLayout';
 import { useTranslation } from 'react-i18next';
-import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_MAX_DIMENSION, IMAGE_QUALITY, SCROLL_DELAY_MS, LOCALE } from '../constants/limits';
+import { CHAT_MESSAGE_LIMIT, MAX_MESSAGE_LENGTH, IMAGE_QUALITY, SCROLL_DELAY_MS, LOCALE } from '../constants/limits';
 import { getErrorMessage } from '../utils/validation';
 import { uriToBlob } from '../utils/upload';
 import { getUserProfile } from '../services/familyService';
 import { AppIcon } from '../components/AppIcon';
 import { useChatStore } from '../store/chatStore';
+
+// Web-only style (removes the browser focus outline); not part of RN's TextStyle typings.
+const WEB_NO_OUTLINE = { outlineStyle: 'none' } as unknown as TextStyle;
 
 export const ChatScreen: React.FC = () => {
   const { t } = useTranslation();
@@ -88,8 +91,6 @@ export const ChatScreen: React.FC = () => {
       mediaTypes: ['images'],
       allowsEditing: true,
       quality: IMAGE_QUALITY,
-      maxWidth: IMAGE_MAX_DIMENSION,
-      maxHeight: IMAGE_MAX_DIMENSION,
       base64: true,
     });
 
@@ -109,8 +110,6 @@ export const ChatScreen: React.FC = () => {
     const result = await ImagePicker.launchCameraAsync({
       allowsEditing: true,
       quality: IMAGE_QUALITY,
-      maxWidth: IMAGE_MAX_DIMENSION,
-      maxHeight: IMAGE_MAX_DIMENSION,
       base64: true,
     });
 
@@ -220,7 +219,7 @@ export const ChatScreen: React.FC = () => {
     return date.toLocaleDateString(LOCALE, { day: 'numeric', month: 'long', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
   }, [t]);
 
-  type ChatListItem = { type: 'message'; message: ChatMessage } | { type: 'date'; date: string; key: string };
+  type ChatListItem = { type: 'message'; message: ChatMessage; key: string } | { type: 'date'; date: string; key: string };
 
   const chatData = useMemo<ChatListItem[]>(() => {
     const items: ChatListItem[] = [];
@@ -321,7 +320,7 @@ export const ChatScreen: React.FC = () => {
         )}
         <View style={[styles.inputWrapper, { borderColor: colors.border }, inputFocused && styles.inputWrapperFocused]}>
           <TextInput
-            style={[styles.input, { color: colors.text, outlineStyle: 'none' }]}
+            style={[styles.input, { color: colors.text }, WEB_NO_OUTLINE]}
             value={newMessage}
             onChangeText={setNewMessage}
             placeholder={t('chat.sendMessage')}

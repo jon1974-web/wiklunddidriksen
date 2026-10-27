@@ -8,8 +8,12 @@ import {
 
 type ThemeMode = 'light' | 'dark' | 'system' | 'slategray' | 'dustyrose' | 'school' | 'kindergarten' | 'trips' | 'birthdays' | 'pets' | 'meals' | 'health';
 
+// Palettes differ in statusBar literal ('dark' for light themes, 'light' for dark theme),
+// so widen statusBar to the union of both.
+type AppColors = Omit<Colors, 'statusBar'> & { statusBar: 'light' | 'dark' };
+
 interface ThemeContextValue {
-  colors: Colors;
+  colors: AppColors;
   mode: ThemeMode;
   isDark: boolean;
   setMode: (mode: ThemeMode) => void;
@@ -41,7 +45,7 @@ function storeMode(mode: ThemeMode) {
   try { localStorage.setItem('themeMode', mode); } catch {}
 }
 
-function resolveColors(mode: ThemeMode, systemScheme: string | null | undefined): { colors: Colors; isDark: boolean } {
+function resolveColors(mode: ThemeMode, systemScheme: string | null | undefined): { colors: AppColors; isDark: boolean } {
   if (mode === 'slategray') return { colors: slateGrayColors, isDark: false };
   if (mode === 'dustyrose') return { colors: dustyRoseColors, isDark: false };
   if (mode === 'school') return { colors: schoolColors, isDark: false };

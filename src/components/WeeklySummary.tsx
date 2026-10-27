@@ -193,13 +193,13 @@ export const WeeklySummary: React.FC<WeeklySummaryProps> = React.memo(({ visible
     let homeServiceCount = 0;
 
     // Build days with items
-    const days: { date: Date; dayName: string; dayNameShort: string; dateNum: number; monthStr: string; items: { type: string; icon: string; iconBg: string; title: string; time: string }[] }[] = [];
+    const days: { date: Date; dayName: string; dayNameShort: string; dateNum: number; monthStr: string; items: { type: string; icon: string; iconBg: string; title: string; time: string; logoUrl?: string }[] }[] = [];
 
     for (let i = 0; i < 7; i++) {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
       const dateStr = toLocalDateStr(d);
-      const items: { type: string; icon: string; iconBg: string; title: string; time: string }[] = [];
+      const items: { type: string; icon: string; iconBg: string; title: string; time: string; logoUrl?: string }[] = [];
 
       // Events + Spond
       events.forEach((e) => {

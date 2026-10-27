@@ -31,7 +31,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
     let cancelled = false;
     (async () => {
       try {
-        const members = await getSpondMembers(spondConfig.email, spondConfig.password, event.groupId);
+        const members = await getSpondMembers(spondConfig.email, spondConfig.password, event.groupId ?? '');
         if (!cancelled) {
           setLocalMembers(members.map((m) => ({ ...m, groupId: event.groupId!, groupName: event.groupName || '' })));
         }
@@ -99,7 +99,7 @@ export const SpondEventDetailScreen: React.FC<{ route: any; navigation: any }> =
   const myStatus = useMemo(() => {
     if (!event.responses) return null;
     for (const r of spondRespondents) {
-      const ids = [r.spondId, r.profileId, r.childId].filter(Boolean);
+      const ids = [r.spondId, r.profileId, r.childId].filter((id): id is string => Boolean(id));
       if (ids.some((id) => event.responses!.acceptedIds?.includes(id))) return 'accepted';
       if (ids.some((id) => event.responses!.declinedIds?.includes(id))) return 'declined';
       if (ids.some((id) => event.responses!.unansweredIds?.includes(id))) return 'unanswered';

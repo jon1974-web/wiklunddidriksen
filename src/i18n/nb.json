@@ -9,7 +9,7 @@
     "close": "Lukk",
     "back": "Tilbake",
     "add": "Legg til",
-    "error": "Error",
+    "error": "Feil",
     "success": "Suksess",
     "loading": "Laster...",
     "search": "Søk",
@@ -142,7 +142,10 @@
     "uploadLogo": "Last opp logo",
     "weekSingular": "uke",
     "startFree": "Kom i gang gratis",
-    "newShort": "Ny"
+    "newShort": "Ny",
+    "info": "Info",
+    "unknown": "Ukjent",
+    "aiError": "AI-feil: {{detail}}"
   },
   "auth": {
     "title": "Fampad",
@@ -182,7 +185,8 @@
     "legalPrefix": "Ved å bruke fampad godtar du våre",
     "termsLink": "vilkår",
     "legalAnd": "og",
-    "privacyLink": "personvernerklæring"
+    "privacyLink": "personvernerklæring",
+    "familyFallback": "en familie"
   },
   "events": {
     "title": "Våre avtaler",
@@ -676,7 +680,7 @@
     "modeBus": "Buss",
     "modeTram": "Trikk",
     "modeOther": "Annet",
-    "operator": "Selskap/operatør",
+    "operator": "Selskap/rederi",
     "lineNumber": "Linjenummer",
     "carType": "Biltype",
     "fromPlace": "Fra (stopp/adresse)",
@@ -697,7 +701,6 @@
     "cabin": "Kabin/kupe",
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
-    "operator": "Selskap/rederi",
     "departureAirport": "Avgangsflyplass",
     "arrivalAirport": "Ankomstflyplass",
     "routeName": "Rutenavn",
@@ -772,6 +775,7 @@
   "packing": {
     "createFromPhoto": "Fra bilde",
     "importDefaultTitle": "Pakkeliste fra bilde",
+    "createList": "Legg til pakkeliste",
     "title": "Pakkelister",
     "noLists": "Ingen pakkelister lagt til",
     "addList": "Ny pakkeliste",
@@ -1461,7 +1465,10 @@
     "placeholderRecipeName": "F.eks. Spaghetti Bolognese",
     "placeholderDescription": "Kort beskrivelse",
     "ingredientName": "Ingrediens",
-    "unitLabel": "Enhet"
+    "unitLabel": "Enhet",
+    "noShoppingListFirst": "Opprett en handleliste først",
+    "ingredientsAddedToList": "{{count}} ingredienser lagt til i handlelisten",
+    "ingredientsAddedToNamed": "{{count}} ingredienser lagt til i \"{{name}}\""
   },
   "pets": {
     "title": "Kjæledyr",

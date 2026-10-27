@@ -10,7 +10,7 @@ import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
 import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer, HomeTask, HomeTaskStatus } from '../types';
-import { getHomePaintColors, addHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask } from '../services/homeService';
+import { getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 const HOME_THEME = MODULE_COLORS.home;
 
@@ -1454,7 +1454,7 @@ const styles = StyleSheet.create({
   aiButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12, borderRadius: 10, borderWidth: 1 },
   fetchButton: { paddingHorizontal: 16, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%', padding: 20 },
   modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginBottom: 16 },
   modalTitle: { fontSize: 22, fontWeight: '700', marginBottom: 16 },
   field: { marginBottom: 16 },

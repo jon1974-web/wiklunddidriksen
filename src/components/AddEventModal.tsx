@@ -15,7 +15,7 @@ import { EVENT_ICONS } from '../constants/eventIcons';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
 import { DocumentUpload } from './DocumentUpload';
-import { AppIcon } from './AppIcon';
+import { AppIcon, AppIconName } from './AppIcon';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { MODULE_COLORS } from '../constants/moduleColors';
@@ -140,7 +140,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
       return;
     }
     if (selectedPersons.length === 0) {
-      crossAlert('Error', t('health.personRequired'));
+      crossAlert(t('common.error'), t('health.personRequired'));
       return;
     }
 
@@ -248,7 +248,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
       onSaved?.();
       onClose();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setSaving(false);
     }
@@ -292,7 +292,7 @@ export const AddEventModal: React.FC<AddEventModalProps> = ({ visible, onClose, 
                           onPress={() => setIcon(isSelected ? '' : item.icon)}
                         >
                           <View style={styles.iconEmoji}>
-                            <AppIcon name={item.icon} size={22} color={isSelected ? '#fff' : colors.textSecondary} />
+                            <AppIcon name={item.icon as AppIconName} size={22} color={isSelected ? '#fff' : colors.textSecondary} />
                           </View>
                           <Text style={[styles.iconLabel, { color: isSelected ? '#fff' : colors.textSecondary }]}>{item.label}</Text>
                         </TouchableOpacity>

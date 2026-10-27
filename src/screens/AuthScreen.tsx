@@ -166,8 +166,8 @@ export const AuthScreen: React.FC<{ compact?: boolean; focusSignal?: number; foc
     }
     setLoading(true);
     try {
-      const result = await createFamily(familyName.trim());
-      setFamily(result.familyId, familyName.trim(), 'owner');
+      const familyId = await createFamily(familyName.trim(), authUser?.uid ?? '');
+      setFamily(familyId, familyName.trim(), 'owner');
       if (authUser) {
         const userProfile = await getUserProfile(authUser.uid);
         setUser({
@@ -195,7 +195,7 @@ export const AuthScreen: React.FC<{ compact?: boolean; focusSignal?: number; foc
       {hasInvite && (
         <View style={[styles.inviteBanner, { backgroundColor: colors.inputBackground, borderColor: colors.border }]}>
           <Text style={[styles.inviteBannerText, { color: colors.text }]}>
-            {t('auth.inviteBanner')} <Text style={{ fontWeight: 'bold' }}>{pendingInviteFamilyName || 'en familie'}</Text>
+            {t('auth.inviteBanner')} <Text style={{ fontWeight: 'bold' }}>{pendingInviteFamilyName || t('auth.familyFallback')}</Text>
           </Text>
           <Text style={[styles.inviteBannerSubtext, { color: colors.textSecondary }]}>
             {isLogin ? t('auth.inviteLoginHint') : t('auth.inviteRegisterHint')}

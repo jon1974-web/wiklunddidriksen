@@ -15,7 +15,7 @@ const SCHOOL_THEME = MODULE_COLORS.school;
 
 interface SchoolDetailScreenProps {
   navigation: any;
-  route: { params: { child: SchoolChild; selectedYear?: SchoolChild | null } };
+  route: { params: { child: SchoolChild; selectedYear?: SchoolYear | null } };
 }
 
 export const SchoolDetailScreen: React.FC<SchoolDetailScreenProps> = ({ navigation, route }) => {
@@ -48,7 +48,7 @@ export const SchoolDetailScreen: React.FC<SchoolDetailScreenProps> = ({ navigati
       if (editingYearId) {
         await updateSchoolYear(editingYearId, { year: yearForm.year, grade: yearForm.grade, school: yearForm.school });
       } else {
-        const id = await addSchoolYear({ year: yearForm.year, grade: yearForm.grade, school: yearForm.school, childId: child.id, familyId, createdAt: Date.now() });
+        const id = await addSchoolYear({ year: yearForm.year, grade: yearForm.grade, school: yearForm.school, childId: child.id, familyId });
         const newYear = { id, year: yearForm.year, grade: yearForm.grade, school: yearForm.school, childId: child.id, familyId, createdAt: Date.now() };
         setSelectedYear(newYear);
       }

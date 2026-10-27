@@ -15,7 +15,7 @@ import {
   Share,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, NavigationProp, ParamListBase } from '@react-navigation/native';
 import { signOut, updateProfile } from 'firebase/auth';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
@@ -54,9 +54,13 @@ import { HelpCenter } from '../components/HelpCenter';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
 
+
+// createOrUpdateUser converts null values to deleteField() before writing.
+const saveCalendarFields = (uid: string, fields: Partial<UserProfile>) => createOrUpdateUser(uid, fields);
+
 export const ProfileScreen: React.FC = () => {
   const { t } = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<ParamListBase>>();
   const [langKey, setLangKey] = useState(0);
   const user = useUserStore((state) => state.user);
   const setUser = useUserStore((state) => state.setUser);
@@ -114,7 +118,7 @@ export const ProfileScreen: React.FC = () => {
     if (!user) return;
 
     const loadProfile = async () => {
-      let userProfile = await getUserProfile(user.uid);
+      let userProfile: UserProfile | null = await getUserProfile(user.uid);
       if (!userProfile) {
         await createOrUpdateUser(user.uid, {
           uid: user.uid,
@@ -220,7 +224,8 @@ export const ProfileScreen: React.FC = () => {
       // Wait a bit for user to be loaded, then reload profile
       const timer = setTimeout(() => {
         if (user) {
-          getUserProfile(user.uid).then((profile) => {
+          getUserProfile(user.uid).then((userProfileResult) => {
+            const profile = userProfileResult as UserProfile | null;
             if (profile) {
               setCalendarType(profile.calendarType || 'google');
               setCalendarEmail(profile.calendarEmail || '');
@@ -246,7 +251,7 @@ export const ProfileScreen: React.FC = () => {
       setEditingName(false);
       Alert.alert(t('common.success'), t('profile.nameUpdated'));
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      Alert.alert(t('common.error'), getErrorMessage(error));
     }
   }, [newName, user, setUser]);
 
@@ -258,7 +263,7 @@ export const ProfileScreen: React.FC = () => {
       setEditingPhone(false);
       Alert.alert(t('common.success'), t('profile.phoneUpdated'));
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      Alert.alert(t('common.error'), getErrorMessage(error));
     }
   }, [newPhone, user]);
 
@@ -271,7 +276,7 @@ export const ProfileScreen: React.FC = () => {
       setShowCreateFamily(false);
       Alert.alert(t('common.success'), t('profile.familyCreated', { name: newFamilyName.trim() }));
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      Alert.alert(t('common.error'), getErrorMessage(error));
     }
   }, [newFamilyName, user, setFamily]);
 
@@ -283,7 +288,7 @@ export const ProfileScreen: React.FC = () => {
       setInviteCode(result.code);
       setInviteFamilyName(result.familyName);
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      Alert.alert(t('common.error'), getErrorMessage(error));
     } finally {
       setInviteLoading(false);
     }
@@ -348,7 +353,7 @@ export const ProfileScreen: React.FC = () => {
               const updated = await getFamilyMembersWithRoles(familyId);
               setFamilyMembers(updated);
             } catch (error) {
-              Alert.alert('Error', getErrorMessage(error));
+              Alert.alert(t('common.error'), getErrorMessage(error));
             }
           },
         },
@@ -373,7 +378,7 @@ export const ProfileScreen: React.FC = () => {
               const updated = await getFamilyMembersWithRoles(familyId);
               setFamilyMembers(updated);
             } catch (error) {
-              Alert.alert('Error', getErrorMessage(error));
+              Alert.alert(t('common.error'), getErrorMessage(error));
             }
           },
         },
@@ -508,9 +513,9 @@ export const ProfileScreen: React.FC = () => {
       });
       setCalendarProvider(provider);
       setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarEmail: calendarEmail.trim(), calendarProvider: provider } : prev);
-      crossAlert(t('common.success'), t('profile.connectedTo', { provider: provider === 'google' ? 'Google' : 'Outlook' }));
+      crossAlert(t('common.success'), t('profile.connectedTo', { provider: 'Outlook' }));
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [user, calendarEmail]);
 
@@ -545,21 +550,20 @@ export const ProfileScreen: React.FC = () => {
   const handleDisconnectCalendarEmail = useCallback(async () => {
     if (!user) return;
     try {
-      const { deleteField } = await import('firebase/firestore');
-      await createOrUpdateUser(user.uid, {
-        calendarEmail: deleteField(),
-        calendarProvider: deleteField(),
-        calendarType: deleteField(),
-        calendarAccessToken: deleteField(),
-        calendarRefreshToken: deleteField(),
-        calendarTokenExpiry: deleteField(),
+      await saveCalendarFields(user.uid, {
+        calendarEmail: null,
+        calendarProvider: null,
+        calendarType: null,
+        calendarAccessToken: null,
+        calendarRefreshToken: null,
+        calendarTokenExpiry: null,
       });
       setCalendarEmail('');
       setCalendarProvider(null);
       setCalendarType(null);
-      setProfile((prev: UserProfile | null) => prev ? { ...prev, calendarEmail: '', calendarProvider: '', calendarType: '' } : prev);
+      setProfile((prev) => prev ? { ...prev, calendarEmail: '', calendarProvider: null, calendarType: null } : prev);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [user]);
 
@@ -570,7 +574,7 @@ export const ProfileScreen: React.FC = () => {
       setNotificationsEnabled(value);
       setProfile((prev: UserProfile | null) => prev ? { ...prev, notificationsEnabled: value } : prev);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [user]);
 
@@ -605,7 +609,7 @@ export const ProfileScreen: React.FC = () => {
 
       crossAlert(t('common.success'), t('profile.spondConnectedGroups', { count: groups.length }));
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setSpondLoading(false);
     }
@@ -646,7 +650,7 @@ export const ProfileScreen: React.FC = () => {
       clearSpondToken();
       crossAlert(t('common.success'), t('profile.spondConfigSaved', { groups: selectedGroups.length, respondents: respondents.length }));
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [familyId, spondEmail, spondPassword, spondGroups, spondSelectedGroups, spondAllMembers, spondRespondents]);
 
@@ -827,13 +831,13 @@ export const ProfileScreen: React.FC = () => {
         <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
           <TouchableOpacity
             style={[styles.calendarTypeBtn, { backgroundColor: calendarType === 'phone' ? '#3b5a75' : colors.inputBackground, borderColor: calendarType === 'phone' ? '#3b5a75' : colors.border }]}
-            onPress={() => { setCalendarType('phone'); createOrUpdateUser(user!.uid, { calendarType: 'phone' }); }}
+            onPress={() => { setCalendarType('phone'); saveCalendarFields(user!.uid, { calendarType: 'phone' }); }}
           >
             <Text style={{ color: calendarType === 'phone' ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>{t('profile.calendarTypePhone')}</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.calendarTypeBtn, { backgroundColor: calendarType === 'google' ? '#4285F4' : colors.inputBackground, borderColor: calendarType === 'google' ? '#4285F4' : colors.border }]}
-            onPress={() => { setCalendarType('google'); createOrUpdateUser(user!.uid, { calendarType: 'google' }); }}
+            onPress={() => { setCalendarType('google'); saveCalendarFields(user!.uid, { calendarType: 'google' }); }}
           >
             <Text style={{ color: calendarType === 'google' ? '#fff' : colors.text, fontSize: 13, fontWeight: '600' }}>{t('profile.calendarTypeGoogle')}</Text>
           </TouchableOpacity>
@@ -930,7 +934,7 @@ export const ProfileScreen: React.FC = () => {
                       {showGoogleSyncIssues ? '▼' : '▶'} {t('profile.syncIssues')}
                     </Text>
                   </TouchableOpacity>
-                  {showGoogleSyncIssues && (googleSyncReport.items || []).filter((it: any) => Object.values(it.perMember).some((v: string) => v.startsWith('failed') || v === 'verifyFailed')).map((it: any) => (
+                  {showGoogleSyncIssues && (googleSyncReport.items || []).filter((it: any) => Object.values(it.perMember).some((v: unknown) => typeof v === 'string' && (v.startsWith('failed') || v === 'verifyFailed'))).map((it: any) => (
                     <View key={`${it.type}_${it.id}`} style={{ paddingVertical: 4, borderBottomWidth: 1, borderBottomColor: colors.border }}>
                       <Text style={{ fontSize: 12, fontWeight: '600', color: colors.text }}>{it.title}</Text>
                       {Object.entries(it.perMember).filter(([, v]: any) => v.startsWith('failed') || v === 'verifyFailed').map(([m, v]: any) => (
@@ -1324,6 +1328,7 @@ export const ProfileScreen: React.FC = () => {
                             const updated = spondGroups.map(g => g.id === group.id ? { ...g, logoUrl: url } : g);
                             setSpondGroups(updated);
                             const selected = updated.filter(g => spondSelectedGroups.includes(g.id));
+                            if (!familyId) return;
                             await saveSpondConfig(familyId, { email: spondEmail, password: spondPassword, groups: selected, respondents: spondAllMembers.filter(m => spondRespondents.includes(m.id)).map(m => ({ uid: '', spondId: m.id, profileId: m.profileId || m.id, firstName: m.firstName, lastName: m.lastName, groupId: m.groupId, groupName: m.groupName })) });
                           } catch (e) { console.error('Logo upload failed:', e); }
                         }

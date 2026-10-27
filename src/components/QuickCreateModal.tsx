@@ -90,7 +90,7 @@ function getPhotoNav(mod: ModuleOption): (n: any) => void {
   return mod.nav;
 }
 
-const MODE_LABELS: Record<Mode, string> = {
+const MODE_LABELS: Record<NonNullable<Mode>, string> = {
   manual: 'quickCreate.modeManual',
   voice: 'quickCreate.modeVoice',
   photo: 'quickCreate.modePhoto',

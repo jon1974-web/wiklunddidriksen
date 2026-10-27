@@ -11,6 +11,7 @@ import { getSchoolActivities, addSchoolActivity, updateSchoolActivity, getSchool
 import { formatDate, getTodayLocal } from '../utils/dateUtils';
 import { crossAlert } from '../utils/alert';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
+import { buildReminderFields } from '../utils/reminders';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { getFamilyMembersWithRoles } from '../services/familyService';
@@ -84,7 +85,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
         endTime: data.endTime || '11:00',
         location: data.location || '',
         note: data.note || '',
-        reminder: data.reminder || 0,
+        reminder: Number(data.reminder) || 0,
         documents: data.documents || [],
       });
       setSelectedPersons(data.selectedPersons || []);
@@ -128,7 +129,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
           familyId,
           createdBy: user?.uid || '',
           selectedPersons,
-          reminder: String(activityForm.reminder),
+          ...buildReminderFields(activityForm.dateFrom, activityForm.startTime, activityForm.reminder),
         } as Partial<SchoolActivity>);
       } else {
         await addSchoolActivity({
@@ -138,7 +139,7 @@ export const SchoolActivitiesScreen: React.FC<Props> = ({ navigation, route }) =
           familyId,
           createdBy: user?.uid || '',
           selectedPersons,
-          reminder: String(activityForm.reminder),
+          ...buildReminderFields(activityForm.dateFrom, activityForm.startTime, activityForm.reminder),
         });
       }
       setShowAddModal(false);

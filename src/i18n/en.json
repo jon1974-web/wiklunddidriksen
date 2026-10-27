@@ -142,7 +142,10 @@
     "uploadLogo": "Upload logo",
     "weekSingular": "week",
     "startFree": "Get started free",
-    "newShort": "New"
+    "newShort": "New",
+    "info": "Info",
+    "unknown": "Unknown",
+    "aiError": "AI error: {{detail}}"
   },
   "auth": {
     "title": "Fampad",
@@ -182,7 +185,8 @@
     "legalPrefix": "By using fampad you agree to our",
     "termsLink": "terms",
     "legalAnd": "and",
-    "privacyLink": "privacy policy"
+    "privacyLink": "privacy policy",
+    "familyFallback": "a family"
   },
   "events": {
     "title": "Events",
@@ -676,7 +680,7 @@
     "modeBus": "Bus",
     "modeTram": "Tram",
     "modeOther": "Other",
-    "operator": "Operator/company",
+    "operator": "Operator",
     "lineNumber": "Line number",
     "carType": "Car type",
     "fromPlace": "From (stop/address)",
@@ -697,7 +701,6 @@
     "cabin": "Cabin",
     "hasCar": "Car included",
     "carRegNr": "Car reg. no.",
-    "operator": "Operator",
     "departureAirport": "Departure airport",
     "arrivalAirport": "Arrival airport",
     "routeName": "Route name",
@@ -772,6 +775,7 @@
   "packing": {
     "createFromPhoto": "From photo",
     "importDefaultTitle": "Packing list from photo",
+    "createList": "Add packing list",
     "title": "Packing lists",
     "noLists": "No packing lists added",
     "addList": "New packing list",
@@ -1461,7 +1465,10 @@
     "placeholderRecipeName": "E.g. Spaghetti Bolognese",
     "placeholderDescription": "Short description",
     "ingredientName": "Ingredient",
-    "unitLabel": "Unit"
+    "unitLabel": "Unit",
+    "noShoppingListFirst": "Create a shopping list first",
+    "ingredientsAddedToList": "{{count}} ingredients added to the shopping list",
+    "ingredientsAddedToNamed": "{{count}} ingredients added to \"{{name}}\""
   },
   "pets": {
     "title": "Pets",

@@ -1,4 +1,4 @@
-import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
+import { doc, getDoc, setDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import { Platform } from 'react-native';
 import { db, auth } from './firebase';
 import { SpondEvent, SpondGroup, SpondConfig, SpondMember } from '../types';
@@ -209,7 +209,7 @@ export const getSpondResponses = async (familyId: string): Promise<Record<string
   const snap = await getDocs(q);
   const responses: Record<string, boolean> = {};
   snap.forEach((doc) => {
-    const data = doc.data();
+    const data = doc.data() as { eventId: string; response: boolean };
     responses[data.eventId] = data.response;
   });
   return responses;

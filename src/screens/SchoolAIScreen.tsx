@@ -5,6 +5,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { auth } from '../services/firebase';
 import { useTheme } from '../theme/ThemeContext';
 import { addSchoolContact, addSchoolHoliday } from '../services/schoolService';
+import type { SchoolContact } from '../types';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { useTranslation } from 'react-i18next';
@@ -110,7 +111,7 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
     setSaving(true);
     try {
       for (const c of selected) {
-        const data: Record<string, any> = {
+        const data: Omit<SchoolContact, 'id' | 'createdAt'> = {
           name: c.name, role: 'classmate', childId, yearId, familyId,
         };
         if (c.childPhone) data.childPhone = c.childPhone;
@@ -159,7 +160,7 @@ export const SchoolAIScreen: React.FC<SchoolAIScreenProps> = ({ navigation, rout
           ].map(({ label, key }) => (
             <View key={key} style={styles.field}>
               <Text style={[styles.label, { color: colors.text }]}>{label}</Text>
-              <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={(contact as any)[key]} onChangeText={(text) => updateContact(index, { [key]: text })} placeholderTextColor={colors.textDisabled} fontSize={16} />
+              <TextInput style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text }]} value={(contact as any)[key]} onChangeText={(text) => updateContact(index, { [key]: text })} placeholderTextColor={colors.textDisabled} />
             </View>
           ))}
         </View>

@@ -140,6 +140,33 @@ type RootStackParamList = {
   HealthVaccDetail: { vaccination: import('./src/types').HealthVaccination };
   SchoolSpace: undefined;
   SchoolDetail: { child: import('./src/types').SchoolChild; selectedYear?: import('./src/types').SchoolYear | null };
+  VoiceActivity: {
+    type: 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService' | 'trip';
+    moduleColor: string;
+    petId?: string;
+    childId?: string;
+    yearId?: string;
+    homeId?: string;
+    home?: import('./src/types').Home;
+    child?: import('./src/types').SchoolChild | import('./src/types').KindergartenChild;
+    selectedYear?: import('./src/types').SchoolYear | import('./src/types').KindergartenYear | null;
+    returnTo?: string;
+    _t?: number;
+  };
+  PhotoActivity: {
+    type: 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService' | 'trip';
+    moduleColor: string;
+    petId?: string;
+    childId?: string;
+    yearId?: string;
+    homeId?: string;
+    home?: import('./src/types').Home;
+    child?: import('./src/types').SchoolChild | import('./src/types').KindergartenChild;
+    selectedYear?: import('./src/types').SchoolYear | import('./src/types').KindergartenYear | null;
+    returnTo?: string;
+    _t?: number;
+  };
+  Admin: undefined;
   SchoolContacts: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null; years: import('./src/types').SchoolYear[] };
   SchoolSchedule: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null };
   SchoolActivities: { child: import('./src/types').SchoolChild; selectedYear: import('./src/types').SchoolYear | null };
@@ -154,7 +181,7 @@ type RootStackParamList = {
   SchoolContactDetail: { contact: any };
   AddTrip: undefined;
   TripDetail: { trip: Trip };
-  TransportDetail: { flight: import('./src/types').TripFlight; tripId: string };
+  TransportDetail: { flight: import('./src/types').TripTransport; tripId: string };
   TripItemDetail: { item: any; tripId: string; trip: Trip; itemType: 'hotel' | 'restaurant' | 'activity' };
   PackingListDetail: { list: any; tripId: string };
   ProfileMain: undefined;
@@ -633,7 +660,14 @@ const TabIcon = ({ icon, focused, accentColor }: { icon: string; focused: boolea
   return null;
 };
 
-const navigationRef = createNavigationContainerRef();
+type RootTabParamList = {
+  Events: undefined;
+  Chat: undefined;
+  Trips: undefined;
+  Profile: undefined;
+};
+
+const navigationRef = createNavigationContainerRef<RootTabParamList>();
 
 const ChatTabBarWrapper = (props: any) => {
   const chatInputFocused = useChatStore((s) => s.inputFocused);

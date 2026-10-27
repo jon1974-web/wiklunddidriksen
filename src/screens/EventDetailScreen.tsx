@@ -164,7 +164,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       return;
     }
     if (editPersons.length === 0) {
-      crossAlert('Error', t('health.personRequired'));
+      crossAlert(t('common.error'), t('health.personRequired'));
       return;
     }
 
@@ -243,7 +243,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       setEditScheduleConfig(null);
       setIsEditing(false);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [editTitle, editAddress, editDateFrom, editDateTo, editTime, editEndTime, editNote, editReminderMinutes, editIcon, editDocuments, editPersons, user, event, editScheduleConfig]);
 
@@ -282,7 +282,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       await deleteDoc(doc(db, 'events', event.id));
       navigation.goBack();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [event, navigation]);
 
@@ -295,7 +295,7 @@ export const EventDetailScreen: React.FC<EventDetailScreenProps> = ({ navigation
       }
       navigation.goBack();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [event.scheduleGroupId, navigation]);
 

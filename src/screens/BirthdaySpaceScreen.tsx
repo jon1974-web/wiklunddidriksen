@@ -78,7 +78,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       }
       setGiftIdeas(giftsMap);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [familyId]);
 
@@ -86,8 +86,8 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
 
   const handleAddBirthday = async () => {
     if (!familyId || !user) return;
-    if (!newName.trim()) { crossAlert('Error', t('birthdays.enterName')); return; }
-    if (!newYear || !newMonth || !newDay) { crossAlert('Error', t('birthdays.enterDate')); return; }
+    if (!newName.trim()) { crossAlert(t('common.error'), t('birthdays.enterName')); return; }
+    if (!newYear || !newMonth || !newDay) { crossAlert(t('common.error'), t('birthdays.enterDate')); return; }
     try {
       const date = `${newYear}-${newMonth.padStart(2, '0')}-${newDay.padStart(2, '0')}`;
       if (editingId) {
@@ -109,7 +109,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       setShowAddModal(false);
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -120,7 +120,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       setActionModal({ visible: false, id: '', title: '' });
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -138,7 +138,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
   };
 
   const handleAddGift = async () => {
-    if (!selectedBirthday || !newGiftText.trim()) return;
+    if (!selectedBirthday || !newGiftText.trim() || !familyId) return;
     try {
       await addGiftIdea({
         birthdayId: selectedBirthday.id,
@@ -150,7 +150,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       setNewGiftText('');
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -159,7 +159,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       await updateGiftIdea(gift.id, { purchased: !gift.purchased });
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -168,7 +168,7 @@ export const BirthdaySpaceScreen: React.FC<BirthdaySpaceScreenProps> = ({ naviga
       await deleteGiftIdea(giftId);
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 

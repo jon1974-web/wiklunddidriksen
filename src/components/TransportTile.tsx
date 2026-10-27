@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { TripFlight } from '../types';
+import { TripTransport } from '../types';
 import { useTheme } from '../theme/ThemeContext';
 import { getCarrierDomain } from '../constants/carrierDomains';
 import { MODULE_COLORS } from '../constants/moduleColors';
@@ -11,7 +11,7 @@ import { getLocale } from '../constants/languages';
 import { AppIcon } from './AppIcon';
 
 interface TransportTileProps {
-  flight: TripFlight;
+  flight: TripTransport;
   onPress: () => void;
   onLongPress?: () => void;
 }

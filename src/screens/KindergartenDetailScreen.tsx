@@ -46,7 +46,7 @@ export const KindergartenDetailScreen: React.FC<Props> = ({ navigation, route })
       if (editingYearId) {
         await updateKindergartenYear(editingYearId, { year: yearForm.year, group: yearForm.group, kindergarten: yearForm.kindergarten });
       } else {
-        const id = await addKindergartenYear({ year: yearForm.year, group: yearForm.group, kindergarten: yearForm.kindergarten, childId: child.id, familyId, createdAt: Date.now() });
+        const id = await addKindergartenYear({ year: yearForm.year, group: yearForm.group, kindergarten: yearForm.kindergarten, childId: child.id, familyId });
         setSelectedYear({ id, year: yearForm.year, group: yearForm.group, kindergarten: yearForm.kindergarten, childId: child.id, familyId, createdAt: Date.now() });
       }
       setShowAddYearModal(false);
@@ -80,8 +80,8 @@ export const KindergartenDetailScreen: React.FC<Props> = ({ navigation, route })
           )}
           <View style={{ flex: 1 }}>
             <Text style={[styles.screenTitle, { color: colors.text }]}>{child.name}</Text>
-            {(selectedYear?.kindergarten || child.kindergartenName) && (
-              <Text style={{ color: colors.textSecondary, fontSize: 13 }}>🏫 {selectedYear?.kindergarten || child.kindergartenName}</Text>
+            {(selectedYear?.kindergarten || child.kindergarten) && (
+              <Text style={{ color: colors.textSecondary, fontSize: 13 }}>🏫 {selectedYear?.kindergarten || child.kindergarten}</Text>
             )}
             {selectedYear?.group && (
               <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📋 {selectedYear.group}</Text>

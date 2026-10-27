@@ -120,6 +120,7 @@ export interface Trip {
   startTime?: string;
   endTime?: string;
   icon?: string;
+  persons?: string[];
   latitude?: number;
   longitude?: number;
   weatherSummary?: WeatherDay[];
@@ -289,6 +290,12 @@ export interface UserProfile {
   avatarUrl: string | null;
   notificationsEnabled: boolean;
   minUkeSections?: { [key: string]: boolean };
+  timezone?: string; // IANA timezone, e.g. "Europe/Oslo"
+  /** Google Calendar connection. Tokens are written by Cloud Functions only. */
+  calendarType?: 'phone' | 'google' | null;
+  calendarAccessToken?: string | null;
+  calendarRefreshToken?: string | null;
+  calendarTokenExpiry?: number | null;
   createdAt: number;
 }
 
@@ -341,17 +348,21 @@ export interface PetVetVisit {
   title: string;
   doctor?: string;
   dateFrom: string;
+  /** Legacy field: older documents may store the date as `date`. */
+  date?: string;
   dateTo?: string;
   startTime: string;
   endTime?: string;
   location?: string;
   note?: string;
-  reminder?: string;
+  reminder?: number;
+  reminderAt?: string | null;
   notificationId?: string;
   status: 'planned' | 'completed';
   addToCalendar?: boolean;
   documents?: SchoolActivityDocument[];
   scheduleGroupId?: string;
+  persons?: string[];
   createdAt: number;
 }
 
@@ -397,8 +408,12 @@ export interface PetVaccination {
   familyId: string;
   name: string;
   date: string;
+  /** Legacy field: older documents may store the date as `dateFrom`. */
+  dateFrom?: string;
   nextDue?: string;
-  reminder?: string;
+  reminder?: number;
+  reminderAt?: string | null;
+  location?: string;
   notificationId?: string;
   status: 'completed' | 'pending';
   note?: string;
@@ -475,7 +490,7 @@ export interface Family {
 }
 
 export interface TripSubcollections {
-  flights: TripFlight[];
+  flights: TripTransport[];
   hotels: TripHotel[];
   restaurants: TripRestaurant[];
   activities: TripActivity[];
@@ -507,13 +522,19 @@ export interface HealthAppointment {
   person: string;
   doctor?: string;
   dateFrom: string;
+  /** Legacy field: older documents may store the date as `date`. */
+  date?: string;
   dateTo?: string;
   startTime: string;
   endTime?: string;
   location?: string;
+  address?: string;
+  icon?: string;
   note?: string;
-  reminder?: string;
+  reminder?: number;
+  reminderAt?: string | null;
   addToCalendar?: boolean;
+  status?: 'planned' | 'completed';
   notificationId?: string;
   documents?: SchoolActivityDocument[];
   scheduleGroupId?: string;
@@ -525,6 +546,8 @@ export interface HealthVaccination {
   name: string;
   person: string;
   date: string;
+  /** Legacy field: older documents may store the date as `dateFrom`. */
+  dateFrom?: string;
   nextDue?: string;
   status: 'completed' | 'pending' | 'overdue';
   reminder?: string;
@@ -588,6 +611,7 @@ export interface SchoolContact {
   phone?: string;
   email?: string;
   address?: string;
+  childName?: string;
   childPhone?: string;
   childEmail?: string;
   parentName?: string;
@@ -652,8 +676,9 @@ export interface SchoolActivity {
   endTime?: string;
   location?: string;
   note?: string;
-  reminder?: string;
-  reminderAt?: string;
+  /** Minutes before the event. Some screens persist this as a string; read via Number(). */
+  reminder?: number;
+  reminderAt?: string | null;
   documents?: SchoolActivityDocument[];
   createdBy?: string;
   scheduleGroupId?: string;
@@ -675,8 +700,9 @@ export interface KindergartenActivity {
   endTime?: string;
   location?: string;
   note?: string;
-  reminder?: string;
-  reminderAt?: string;
+  /** Minutes before the event. Some screens persist this as a string; read via Number(). */
+  reminder?: number;
+  reminderAt?: string | null;
   documents?: SchoolActivityDocument[];
   createdBy?: string;
   scheduleGroupId?: string;
@@ -718,6 +744,7 @@ export interface KindergartenContact {
   phone?: string;
   email?: string;
   address?: string;
+  childName?: string;
   childPhone?: string;
   childEmail?: string;
   parentName?: string;
@@ -809,6 +836,7 @@ export interface HomeService {
   status: 'planned' | 'completed';
   documents?: SchoolActivityDocument[];
   scheduleGroupId?: string;
+  persons?: string[];
   familyId: string;
   createdAt: number;
 }

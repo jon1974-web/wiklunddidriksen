@@ -69,12 +69,12 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   const handleAdd = async () => {
     if (!newName.trim()) {
-      crossAlert('Error', t('birthdays.name') + ' er påkrevd');
+      crossAlert(t('common.error'), t('birthdays.name') + ' er påkrevd');
       return;
     }
     const dateStr = newYear && newMonth && newDay ? `${newYear}-${newMonth}-${newDay}` : '';
     if (!dateStr) {
-      crossAlert('Error', t('birthdays.date') + ' er påkrevd');
+      crossAlert(t('common.error'), t('birthdays.date') + ' er påkrevd');
       return;
     }
     if (birthdays.length >= MAX_BIRTHDAYS) {
@@ -82,7 +82,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       return;
     }
     try {
-      if (!familyId) {
+      if (!familyId || !user) {
         crossAlert(t('common.error'), t('birthdays.needFamily'));
         return;
       }
@@ -90,7 +90,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         name: newName.trim(),
         date: dateStr,
         addedBy: user.uid,
-        addedByName: user.displayName || 'Ukjent',
+        addedByName: user.displayName || t('common.unknown'),
         familyId: familyId,
         createdAt: Date.now(),
       });
@@ -102,7 +102,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       loadBirthdays();
     } catch (error) {
       console.error('Failed to add birthday:', error);
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -114,18 +114,18 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setSelectedBirthday(null);
       loadBirthdays();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
   const handleEdit = async () => {
     if (!editingId || !newName.trim()) {
-      crossAlert('Error', t('birthdays.name') + ' er påkrevd');
+      crossAlert(t('common.error'), t('birthdays.name') + ' er påkrevd');
       return;
     }
     const dateStr = newYear && newMonth && newDay ? `${newYear}-${newMonth}-${newDay}` : '';
     if (!dateStr) {
-      crossAlert('Error', t('birthdays.date') + ' er påkrevd');
+      crossAlert(t('common.error'), t('birthdays.date') + ' er påkrevd');
       return;
     }
     try {
@@ -142,7 +142,7 @@ export const BirthdayScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       loadBirthdays();
     } catch (error) {
       console.error('Failed to edit birthday:', error);
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 

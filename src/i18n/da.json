@@ -142,7 +142,10 @@
     "uploadLogo": "Upload logo",
     "weekSingular": "uge",
     "startFree": "Kom i gang gratis",
-    "newShort": "Ny"
+    "newShort": "Ny",
+    "info": "Info",
+    "unknown": "Ukendt",
+    "aiError": "AI-fejl: {{detail}}"
   },
   "auth": {
     "title": "Fampad",
@@ -182,7 +185,8 @@
     "legalPrefix": "Ved at bruge fampad accepterer du vores",
     "termsLink": "vilkår",
     "legalAnd": "og",
-    "privacyLink": "privatlivspolitik"
+    "privacyLink": "privatlivspolitik",
+    "familyFallback": "en familie"
   },
   "events": {
     "title": "Begivenheder",
@@ -676,7 +680,7 @@
     "modeBus": "Bus",
     "modeTram": "Sporvogn",
     "modeOther": "Andet",
-    "operator": "Selskab/operatør",
+    "operator": "Operatør/rederi",
     "lineNumber": "Linjenummer",
     "carType": "Biltype",
     "fromPlace": "Fra (stop/adresse)",
@@ -697,7 +701,6 @@
     "cabin": "Kahyt",
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
-    "operator": "Operatør/rederi",
     "departureAirport": "Afgangslufthavn",
     "arrivalAirport": "Ankomstlufthavn",
     "routeName": "Rutenavn",
@@ -772,6 +775,7 @@
   "packing": {
     "createFromPhoto": "Fra billede",
     "importDefaultTitle": "Pakkeliste fra billede",
+    "createList": "Tilføj pakkeliste",
     "title": "Pakkelister",
     "noLists": "Ingen pakkelister tilføjet",
     "addList": "Ny pakkeliste",
@@ -1461,7 +1465,10 @@
     "placeholderRecipeName": "F.eks. Spaghetti Bolognese",
     "placeholderDescription": "Kort beskrivelse",
     "ingredientName": "Ingrediens",
-    "unitLabel": "Enhed"
+    "unitLabel": "Enhed",
+    "noShoppingListFirst": "Opret en indkøbsliste først",
+    "ingredientsAddedToList": "{{count}} ingredienser tilføjet til indkøbslisten",
+    "ingredientsAddedToNamed": "{{count}} ingredienser tilføjet til \"{{name}}\""
   },
   "pets": {
     "title": "Kæledyr",

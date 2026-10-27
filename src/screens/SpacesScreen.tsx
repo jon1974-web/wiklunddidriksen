@@ -22,6 +22,7 @@ interface Space {
   iconColor: string;
   count: string;
   screen: string;
+  disabled?: boolean;
 }
 
 interface SpacesScreenProps {

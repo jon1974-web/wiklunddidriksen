@@ -62,7 +62,7 @@ export const SchoolContactsScreen: React.FC<Props> = ({ navigation, route }) => 
   const handleSave = async () => {
     if (!familyId || !selectedYear || !form.name.trim()) return;
     try {
-      const data = { ...form, yearId: selectedYear.id, childId: child.id, familyId };
+      const data = { ...form, role: form.role as SchoolContact['role'], teacherType: form.teacherType as SchoolContact['teacherType'], yearId: selectedYear.id, childId: child.id, familyId };
       if (editingId) { await updateSchoolContact(editingId, data); }
       else { await addSchoolContact(data); }
       setShowAddModal(false);
@@ -95,7 +95,7 @@ export const SchoolContactsScreen: React.FC<Props> = ({ navigation, route }) => 
     </TouchableOpacity>
   );
 
-  const toggleSection = (key: string) => setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleSection = (key: keyof typeof expandedSections) => setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
 
   // Auto-expand sections when search has results
   useEffect(() => {

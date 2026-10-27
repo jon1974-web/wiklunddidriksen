@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   instructionImage: { width: '100%', height: 120, borderRadius: 8, marginTop: 8 },
   aiButton: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, padding: 12, borderRadius: 10, borderWidth: 1 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%', padding: 20 },
   modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginBottom: 16 },
   modalTitle: { fontSize: 22, fontWeight: '700', marginBottom: 16 },
   field: { marginBottom: 16 },

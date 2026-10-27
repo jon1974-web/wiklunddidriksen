@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { buildReminderFields } from '../utils/reminders';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, TextInput, Modal, Alert, Image, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
@@ -43,13 +44,14 @@ type SectionType = 'medications' | 'appointments' | 'vaccinations' | 'allergies'
 
 interface HealthSpaceScreenProps {
   navigation: any;
-  route?: { params?: { openAddSection?: SectionType } };
+  route?: { params?: { openAddSection?: SectionType; editId?: string; editSection?: string; returnToEvents?: boolean } };
 }
 
 export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const familyId = useUserStore((state) => state.familyId);
+  const user = useUserStore((state) => state.user);
 
   const [medications, setMedications] = useState<HealthMedication[]>([]);
   const [appointments, setAppointments] = useState<HealthAppointment[]>([]);
@@ -111,7 +113,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         }
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [familyId]);
 
@@ -157,20 +159,15 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
     try {
       const isEditing = editingItem !== null;
       if (activeSection === 'medications') {
-        if (!medForm.name.trim()) { crossAlert('Error', t('health.enterName')); return; }
+        if (!medForm.name.trim()) { crossAlert(t('common.error'), t('health.enterName')); return; }
         if (isEditing) await updateHealthMedication(familyId, editingItem.id, medForm);
         else await addHealthMedication(familyId, medForm);
         setMedForm({ name: '', person: persons[0] || '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
       } else if (activeSection === 'appointments') {
-        if (!apptForm.title.trim() || !apptForm.dateFrom) { crossAlert('Error', t('health.enterTitleAndDate')); return; }
-        if (!Array.isArray(apptForm.person) || apptForm.person.length === 0) { crossAlert('Error', t('health.personRequired')); return; }
+        if (!apptForm.title.trim() || !apptForm.dateFrom) { crossAlert(t('common.error'), t('health.enterTitleAndDate')); return; }
+        if (!Array.isArray(apptForm.person) || apptForm.person.length === 0) { crossAlert(t('common.error'), t('health.personRequired')); return; }
         const user = useUserStore.getState().user;
-        const apptData: any = { ...apptForm };
-        if (apptForm.reminder > 0 && apptForm.dateFrom) {
-          const time = apptForm.startTime || '09:00';
-          const eventTime = new Date(`${apptForm.dateFrom}T${time}:00`);
-          apptData.reminderAt = new Date(eventTime.getTime() - apptForm.reminder * 60 * 1000).toISOString();
-        }
+        const apptData: any = { ...apptForm, ...buildReminderFields(apptForm.dateFrom, apptForm.startTime, apptForm.reminder) };
         if (isEditing) {
           await updateHealthAppointment(familyId, editingItem.id, apptData);
           if (repeatScheduleConfig) {
@@ -218,15 +215,15 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
               }
             }
           }
-          notifyHealthItem(familyId, apptForm.title, apptForm.dateFrom, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
+          notifyHealthItem(familyId, apptForm.title, apptForm.dateFrom, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person.join(', ')).catch(() => {});
         } else {
           const id = await addHealthAppointment(familyId, apptData, user?.uid);
-          notifyHealthItem(familyId, apptForm.title, apptForm.dateFrom, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person).catch(() => {});
+          notifyHealthItem(familyId, apptForm.title, apptForm.dateFrom, apptForm.startTime, apptForm.location || '', 'appointment', user?.displayName || '', apptForm.person.join(', ')).catch(() => {});
         }
         setApptForm({ title: '', person: [], doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, documents: [] });
         setRepeatScheduleConfig(null);
       } else if (activeSection === 'vaccinations') {
-        if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('health.enterNameAndDate')); return; }
+        if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert(t('common.error'), t('health.enterNameAndDate')); return; }
         let savedVacc;
         if (isEditing) {
           await updateHealthVaccination(familyId, editingItem.id, vaccForm);
@@ -241,12 +238,12 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         }
         setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', location: '', note: '' });
       } else if (activeSection === 'allergies') {
-        if (!allergyForm.allergen.trim()) { crossAlert('Error', t('health.enterAllergen')); return; }
+        if (!allergyForm.allergen.trim()) { crossAlert(t('common.error'), t('health.enterAllergen')); return; }
         if (isEditing) await updateHealthAllergy(familyId, editingItem.id, allergyForm);
         else await addHealthAllergy(familyId, allergyForm);
         setAllergyForm({ allergen: '', person: persons[0] || '', severity: 'mild', note: '' });
       } else if (activeSection === 'growth') {
-        if (!growthForm.height || !growthForm.weight || !growthForm.date) { crossAlert('Error', t('health.enterHeightWeightDate')); return; }
+        if (!growthForm.height || !growthForm.weight || !growthForm.date) { crossAlert(t('common.error'), t('health.enterHeightWeightDate')); return; }
         const growthData = { ...growthForm, height: Number(growthForm.height), weight: Number(growthForm.weight) };
         if (isEditing) await updateHealthGrowth(familyId, editingItem.id, growthData);
         else await addHealthGrowth(familyId, growthData);
@@ -260,7 +257,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         navigation.setParams({ returnToEvents: undefined });
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -275,13 +272,13 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       setActionModal({ visible: false, id: '', title: '', section: 'medications' });
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
   const handleEdit = () => {
     if (!actionModal.id || !actionModal.section) return;
-    setActionModal({ visible: false, id: '', title: '' });
+    setActionModal({ visible: false, id: '', title: '', section: 'medications' });
     setActiveSection(actionModal.section);
     setEditingItem({ id: actionModal.id, section: actionModal.section });
     setShowAddModal(true);

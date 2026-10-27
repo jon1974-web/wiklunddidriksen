@@ -90,7 +90,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
         setParsedEvent(null);
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, []);
 
@@ -152,7 +152,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
       setTranscript(data.transcript);
       setParsedEvent(data.event);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setProcessing(false);
     }
@@ -224,7 +224,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
       crossAlert(t('common.success'), `"${eventData.title}" ${t('events.addEvent')}!`);
       navigation.goBack();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
       setCreating(false);
     }
   }, [parsedEvent, user, navigation, creating]);
@@ -350,6 +350,7 @@ export const VoiceEventScreen: React.FC<VoiceEventScreenProps> = ({ navigation }
                 placeholder={t('common.location')}
                 value={parsedEvent.address}
                 onChangeText={(v: string) => setParsedEvent((p) => p ? { ...p, address: v } : null)}
+                onSelect={(v: string) => setParsedEvent((p) => p ? { ...p, address: v } : null)}
               />
 
               <Text style={[styles.fieldLabel, { color: colors.textSecondary }]}>{t('common.description')}</Text>

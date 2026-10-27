@@ -73,7 +73,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       await deleteDoc(doc(db, 'shoppingLists', routeList.id));
       navigation.goBack();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [routeList?.id, navigation]);
 
@@ -88,7 +88,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       });
       navigation.goBack();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [currentList, user, familyId, navigation]);
 
@@ -111,7 +111,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       });
       setNewItemName('');
     } catch (error: any) {
-      crossAlert('Error', error.message);
+      crossAlert(t('common.error'), error.message);
     }
   };
 
@@ -151,7 +151,7 @@ export const ShoppingListDetailScreen: React.FC<ShoppingListDetailScreenProps> =
       setRenamingItem(null);
       setRenameValue('');
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 

@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { buildReminderFields } from '../utils/reminders';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, TextInput, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -22,6 +23,7 @@ import { IMAGE_QUALITY } from '../constants/limits';
 import { auth } from '../services/firebase';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { MODULE_COLORS } from '../constants/moduleColors';
+import type { SchoolChild, SchoolYear, KindergartenChild, KindergartenYear } from '../types';
 
 type ActivityType = 'healthAppointment' | 'vetVisit' | 'schoolActivity' | 'kindergartenActivity' | 'homeService' | 'trip';
 
@@ -36,6 +38,10 @@ interface PhotoActivityScreenProps {
       yearId?: string;
       homeId?: string;
       home?: any;
+      returnTo?: string;
+      child?: SchoolChild | KindergartenChild;
+      selectedYear?: SchoolYear | KindergartenYear | null;
+      _t?: number;
     };
   };
 }
@@ -275,7 +281,7 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           endTime: activity.showEndTime && activity.endTime ? activity.endTime : undefined,
           location: activity.location ? sanitizeInput(activity.location) : undefined,
           note: activity.description ? sanitizeInput(activity.description) : undefined,
-          reminder: activity.reminder || undefined,
+          ...buildReminderFields(activity.dateFrom, activity.startTime, activity.reminder),
           addToCalendar: true,
           status: 'planned',
         }, user.uid);
@@ -291,7 +297,7 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           endTime: activity.showEndTime && activity.endTime ? activity.endTime : undefined,
           location: activity.location ? sanitizeInput(activity.location) : undefined,
           note: activity.description ? sanitizeInput(activity.description) : undefined,
-          reminder: activity.reminder || undefined,
+          ...buildReminderFields(activity.dateFrom, activity.startTime, activity.reminder),
           addToCalendar: true,
           status: 'planned',
         }, user.uid);
@@ -308,7 +314,7 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           endTime: activity.showEndTime && activity.endTime ? activity.endTime : undefined,
           location: activity.location ? sanitizeInput(activity.location) : undefined,
           note: activity.description ? sanitizeInput(activity.description) : undefined,
-          reminder: activity.reminder || undefined,
+          ...buildReminderFields(activity.dateFrom, activity.startTime, activity.reminder),
           createdBy: user.uid,
         });
       } else if (type === 'kindergartenActivity') {
@@ -324,7 +330,7 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           endTime: activity.showEndTime && activity.endTime ? activity.endTime : undefined,
           location: activity.location ? sanitizeInput(activity.location) : undefined,
           note: activity.description ? sanitizeInput(activity.description) : undefined,
-          reminder: activity.reminder || undefined,
+          ...buildReminderFields(activity.dateFrom, activity.startTime, activity.reminder),
           createdBy: user.uid,
         });
       } else if (type === 'homeService') {
@@ -348,7 +354,6 @@ export const PhotoActivityScreen: React.FC<PhotoActivityScreenProps> = ({ naviga
           endDate: activity.showEndDate && activity.dateTo ? activity.dateTo : activity.dateFrom,
           startTime: activity.startTime,
           endTime: activity.showEndTime && activity.endTime ? activity.endTime : undefined,
-          familyId: familyId || '',
           createdBy: user.uid,
         }, familyId || '');
       }

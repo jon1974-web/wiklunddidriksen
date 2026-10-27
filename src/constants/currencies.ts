@@ -1,17 +1,13 @@
 import { getDefaultCurrency } from './languages';
 
-export interface CurrencyInfo {
-  code: string;
-  name: string;
-  symbol: string;
-  flag: string;
-}
-
 export interface CountryCurrency {
   code: string;
   name: string;
   flag: string;
 }
+
+// Single shape for all currency entries (no symbol field is used anywhere).
+export type CurrencyInfo = CountryCurrency;
 
 const COUNTRIES: Record<string, CountryCurrency> = {
   EUR: { code: 'EUR', name: 'Euro', flag: '🇪🇺' },
@@ -61,33 +57,33 @@ export const CURRENCY_INFO: Record<string, CurrencyInfo> = COUNTRIES;
 
 const COUNTRY_NAME_MAP: Record<string, string> = {
   // Eurozone countries
-  spania: 'EUR', spain: 'EUR', españa: 'EUR', espanja: 'EUR', spanien: 'EUR', españa: 'EUR',
+  spania: 'EUR', spain: 'EUR', españa: 'EUR', espanja: 'EUR', spanien: 'EUR',
   kroatia: 'EUR', croatia: 'EUR', kroatien: 'EUR', hrvatska: 'EUR',
   frankrike: 'EUR', france: 'EUR', frankrig: 'EUR', ranska: 'EUR',
   tyskland: 'EUR', germany: 'EUR', deutschland: 'EUR', saksa: 'EUR',
-  italia: 'EUR', italy: 'EUR', italien: 'EUR', italia: 'EUR',
+  italia: 'EUR', italy: 'EUR', italien: 'EUR',
   portugal: 'EUR', hellas: 'EUR', greece: 'EUR', nederland: 'EUR', netherlands: 'EUR',
   belgia: 'EUR', belgium: 'EUR', østerrike: 'EUR', austria: 'EUR',
   irland: 'EUR', ireland: 'EUR', finland: 'EUR', estland: 'EUR', latvia: 'EUR', litauen: 'EUR',
   slovakia: 'EUR', slovenia: 'EUR', kypros: 'EUR', luxembourg: 'EUR', malta: 'EUR',
   // Nordic
   norge: 'NOK', norway: 'NOK', norwegen: 'NOK', norja: 'NOK',
-  sverige: 'SEK', sweden: 'SEK', sverige: 'SEK', ruotsi: 'SEK',
-  danmark: 'DKK', denmark: 'DKK', danmark: 'DKK', tanska: 'DKK',
-  island: 'ISK', iceland: 'ISK', island: 'ISK',
+  sverige: 'SEK', sweden: 'SEK', ruotsi: 'SEK',
+  danmark: 'DKK', denmark: 'DKK', tanska: 'DKK',
+  island: 'ISK', iceland: 'ISK',
   // UK
   storbritannia: 'GBP', 'storbritannien': 'GBP', 'united kingdom': 'GBP', 'england': 'GBP', uk: 'GBP', 'britannia': 'GBP',
   // Switzerland
   sveits: 'CHF', switzerland: 'CHF', schweiz: 'CHF', sveitsi: 'CHF',
   // USA/Canada/Australia
-  usa: 'USD', 'usa': 'USD', 'forente stater': 'USD', 'amerikas forente stater': 'USD',
-  canada: 'CAD', australia: 'CAD', australia: 'AUD', 'new zealand': 'NZD',
+  usa: 'USD', 'forente stater': 'USD', 'amerikas forente stater': 'USD',
+  canada: 'CAD', australia: 'AUD', 'new zealand': 'NZD',
   // Asia
-  thailand: 'THB', 'thailand': 'THB', thaailand: 'THB',
-  japan: 'JPY', 'japan': 'JPY', japani: 'JPY',
-  kina: 'CNY', china: 'CNY', 'kina': 'CNY', kiina: 'CNY',
+  thailand: 'THB', thaailand: 'THB',
+  japan: 'JPY', japani: 'JPY',
+  kina: 'CNY', china: 'CNY', kiina: 'CNY',
   'sør-korea': 'KRW', 'south korea': 'KRW', korea: 'KRW',
-  india: 'INR', 'india': 'INR', intia: 'INR',
+  india: 'INR', intia: 'INR',
   indonesia: 'IDR', filippinene: 'PHP', philippines: 'PHP',
   vietnam: 'VND', malaysia: 'MYR', singapore: 'SGD',
   'hong kong': 'HKD', taiwan: 'TWD',
@@ -97,18 +93,18 @@ const COUNTRY_NAME_MAP: Record<string, string> = {
   israel: 'ILS', 'saudi-arabia': 'SAR', 'saudi arabia': 'SAR',
   egypt: 'EGP', egypten: 'EGP',
   // Africa
-  'sør-afrika': 'ZAR', 'south africa': 'ZAR', 'sør-afrika': 'ZAR',
+  'sør-afrika': 'ZAR', 'south africa': 'ZAR',
   marokko: 'MAD', morocco: 'MAD', marocko: 'MAD',
   kenya: 'KES',
   // South America
   brasil: 'BRL', brazil: 'BRL', brasilien: 'BRL',
-  mexico: 'MXN', mexico: 'MXN',
+  mexico: 'MXN',
   argentina: 'ARS', chile: 'CLP', colombia: 'COP', peru: 'PEN',
   // Eastern Europe
-  polen: 'PLN', poland: 'PLN', polen: 'PLN', puola: 'PLN',
+  polen: 'PLN', poland: 'PLN', puola: 'PLN',
   tsjekkia: 'CZK', 'czech republic': 'CZK', tjekkiet: 'CZK', tsekki: 'CZK',
-  ungarn: 'HUF', hungary: 'HUF', ungarn: 'HUF', unkar: 'HUF',
-  russland: 'RUB', russia: 'RUB', russland: 'RUB', venäjä: 'RUB',
+  ungarn: 'HUF', hungary: 'HUF', unkar: 'HUF',
+  russland: 'RUB', russia: 'RUB', venäjä: 'RUB',
 };
 
 export function getCurrencyForCountry(countryName: string): CountryCurrency | null {

@@ -330,6 +330,26 @@
         { "queryScope": "COLLECTION", "order": "ASCENDING" },
         { "queryScope": "COLLECTION_GROUP", "order": "ASCENDING" }
       ]
+    },
+    {
+      "collectionGroup": "activities",
+      "fieldPath": "reminderAt",
+      "indexes": [{ "queryScope": "COLLECTION_GROUP", "order": "ASCENDING" }]
+    },
+    {
+      "collectionGroup": "appointments",
+      "fieldPath": "reminderAt",
+      "indexes": [{ "queryScope": "COLLECTION_GROUP", "order": "ASCENDING" }]
+    },
+    {
+      "collectionGroup": "petVetVisits",
+      "fieldPath": "reminderAt",
+      "indexes": [{ "queryScope": "COLLECTION_GROUP", "order": "ASCENDING" }]
+    },
+    {
+      "collectionGroup": "petVaccinations",
+      "fieldPath": "reminderAt",
+      "indexes": [{ "queryScope": "COLLECTION_GROUP", "order": "ASCENDING" }]
     }
   ]
 }

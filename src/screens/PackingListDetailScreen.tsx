@@ -74,7 +74,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
           await deleteDoc(doc(db, 'trips', tripId, 'packingLists', routeList.id));
           navigation.goBack();
         } catch (error) {
-          crossAlert('Error', getErrorMessage(error));
+          crossAlert(t('common.error'), getErrorMessage(error));
         }
       },
     });
@@ -98,7 +98,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
       setCopyTitle('');
       navigation.goBack();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [currentList, copyTitle, user, tripId, navigation]);
 
@@ -121,7 +121,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
       });
       setNewItemName('');
     } catch (error: any) {
-      crossAlert('Error', error.message);
+      crossAlert(t('common.error'), error.message);
     }
   };
 
@@ -161,7 +161,7 @@ export const PackingListDetailScreen: React.FC<PackingListDetailScreenProps> = (
       setRenamingItem(null);
       setRenameValue('');
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 

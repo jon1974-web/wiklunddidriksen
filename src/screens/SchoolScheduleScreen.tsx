@@ -171,11 +171,11 @@ export const SchoolScheduleScreen: React.FC<Props> = ({ navigation, route }) => 
         } else {
           const errorText = await aiRes.text();
           console.log('AI error response:', errorText);
-          crossAlert(t('common.error'), `AI-feil: ${aiRes.status}`);
+          crossAlert(t('common.error'), t('common.aiError', { detail: aiRes.status }));
         }
       } catch (e) {
         console.log('AI analysis error:', e);
-        crossAlert(t('common.error'), `AI-feil: ${e.message || e}`);
+        crossAlert(t('common.error'), t('common.aiError', { detail: (e as Error).message || String(e) }));
       }
 
       loadSchedules();

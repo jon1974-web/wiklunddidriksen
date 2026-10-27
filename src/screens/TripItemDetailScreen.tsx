@@ -12,7 +12,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { crossAlert } from '../utils/alert';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 import { formatDate } from '../utils/dateUtils';
-import { deleteTripHotel, deleteTripRestaurant, deleteTripActivity, deleteTripBoat, deleteTripTaxi, deleteTripFerry, deleteTripTransport } from '../services/tripService';
+import { deleteTripHotel, deleteTripRestaurant, deleteTripActivity, deleteTripTransport } from '../services/tripService';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { useTranslation } from 'react-i18next';
 
@@ -27,9 +27,9 @@ const deleteHandlers: Record<ItemType, (tripId: string, itemId: string) => Promi
   hotel: deleteTripHotel,
   restaurant: deleteTripRestaurant,
   activity: deleteTripActivity,
-  boat: deleteTripBoat,
-  taxi: deleteTripTaxi,
-  ferry: deleteTripFerry,
+  boat: deleteTripTransport,
+  taxi: deleteTripTransport,
+  ferry: deleteTripTransport,
   general: deleteTripTransport,
 };
 
@@ -64,7 +64,7 @@ export const TripItemDetailScreen: React.FC<TripItemDetailScreenProps> = ({ navi
             await deleteHandlers[itemType](tripId, item.id);
             navigation.goBack();
           } catch {
-            crossAlert('Error', t('common.deleteFailed'));
+            crossAlert(t('common.error'), t('common.deleteFailed'));
           }
         },
       },

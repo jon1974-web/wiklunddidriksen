@@ -142,7 +142,10 @@
     "uploadLogo": "Ladda upp logotyp",
     "weekSingular": "vecka",
     "startFree": "Kom igång gratis",
-    "newShort": "Ny"
+    "newShort": "Ny",
+    "info": "Info",
+    "unknown": "Okänd",
+    "aiError": "AI-fel: {{detail}}"
   },
   "auth": {
     "title": "Fampad",
@@ -182,7 +185,8 @@
     "legalPrefix": "Genom att använda fampad godkänner du våra",
     "termsLink": "villkor",
     "legalAnd": "och",
-    "privacyLink": "integritetspolicy"
+    "privacyLink": "integritetspolicy",
+    "familyFallback": "en familj"
   },
   "events": {
     "title": "Evenemang",
@@ -676,7 +680,7 @@
     "modeBus": "Buss",
     "modeTram": "Spårvagn",
     "modeOther": "Annat",
-    "operator": "Bolag/operatör",
+    "operator": "Operatör/Rederi",
     "lineNumber": "Linjenummer",
     "carType": "Biltyp",
     "fromPlace": "Från (hållplats/adress)",
@@ -697,7 +701,6 @@
     "cabin": "Kabing/läger",
     "hasCar": "Bil med",
     "carRegNr": "Bilens reg. nr",
-    "operator": "Operatör/Rederi",
     "departureAirport": "Avgångsflygplats",
     "arrivalAirport": "Ankomstflygplats",
     "routeName": "Ruttnamn",
@@ -772,6 +775,7 @@
   "packing": {
     "createFromPhoto": "Från bild",
     "importDefaultTitle": "Packlista från bild",
+    "createList": "Lägg till packlista",
     "title": "Packlistor",
     "noLists": "Inga packlistor tillagda",
     "addList": "Ny packlista",
@@ -1461,7 +1465,10 @@
     "placeholderRecipeName": "T.ex. Spaghetti Bolognese",
     "placeholderDescription": "Kort beskrivning",
     "ingredientName": "Ingrediens",
-    "unitLabel": "Enhet"
+    "unitLabel": "Enhet",
+    "noShoppingListFirst": "Skapa en inköpslista först",
+    "ingredientsAddedToList": "{{count}} ingredienser tillagda i inköpslistan",
+    "ingredientsAddedToNamed": "{{count}} ingredienser tillagda i \"{{name}}\""
   },
   "pets": {
     "title": "Husdjur",

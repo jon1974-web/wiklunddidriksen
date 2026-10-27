@@ -13,7 +13,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
-import { Trip, TripHotel, TripTransport, TripRestaurant, TripActivity, TripDocument, TripLink, TripBoat, TripTaxi, TripFerry, DestinationTips, CityTips, TransportMode } from '../types';
+import { Trip, TripHotel, TripTransport, TripRestaurant, TripActivity, TripDocument, TripLink, DestinationTips, CityTips, TransportMode } from '../types';
 import { crossAlert } from '../utils/alert';
 import {
   getTripHotels,
@@ -80,7 +80,7 @@ interface TripDetailScreenProps {
   route: any;
 }
 
-type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | 'boat' | 'taxi' | 'ferry' | 'tripEdit' | null;
+type ModalType = 'hotel' | 'flight' | 'restaurant' | 'activity' | 'document' | 'link' | 'tripEdit' | null;
 
 export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, route }) => {
   const { t } = useTranslation();
@@ -97,9 +97,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [activities, setActivities] = useState<TripActivity[]>([]);
   const [documents, setDocuments] = useState<TripDocument[]>([]);
   const [links, setLinks] = useState<TripLink[]>([]);
-  const [boats, setBoats] = useState<TripBoat[]>([]);
-  const [taxis, setTaxis] = useState<TripTaxi[]>([]);
-  const [ferries, setFerries] = useState<TripFerry[]>([]);
   const [packingLists, setPackingLists] = useState<any[]>([]);
   const [showAddPackingList, setShowAddPackingList] = useState(false);
   const [newPackingListTitle, setNewPackingListTitle] = useState('');
@@ -134,9 +131,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const emptyAct = { name: '', startDate: '', endDate: '', startTime: '', endTime: '', address: '', note: '' };
   const emptyDoc = { title: '', note: '', fileUrl: '', fileName: '' };
   const emptyLink = { title: '', url: '' };
-  const emptyBoat = { name: '', routeName: '', reference: '', cabin: '', isOneWay: false, type: 'utreise' as 'utreise' | 'hjemreise', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
-  const emptyTaxi = { name: '', reference: '', isOneWay: false, departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', driver: '', passengers: '', note: '', type: 'utreise' as 'utreise' | 'hjemreise' };
-  const emptyFerry = { name: '', routeName: '', reference: '', cabin: '', isOneWay: false, type: 'utreise' as 'utreise' | 'hjemreise', departureDate: '', departureTime: '', arrivalDate: '', arrivalTime: '', departureAddress: '', arrivalAddress: '', phone: '', hasCar: false, carRegistration: '', driver: '', passengers: '', note: '' };
 
   const [hotelForm, setHotelForm] = useState(emptyHotel);
   const [transportFormUtreise, setFlightFormUtreise] = useState(emptyTransport);
@@ -155,27 +149,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [actForm, setActForm] = useState(emptyAct);
   const [docForm, setDocForm] = useState(emptyDoc);
   const [linkForm, setLinkForm] = useState(emptyLink);
-  const [boatFormUtreise, setBoatFormUtreise] = useState(emptyBoat);
-  const [boatFormHjemreise, setBoatFormHjemreise] = useState(emptyBoat);
-  const [boatDirection, setBoatDirection] = useState<'utreise' | 'hjemreise'>('utreise');
-  const boatForm = boatDirection === 'utreise' ? boatFormUtreise : boatFormHjemreise;
-  const handleBoatFormChange = useCallback((updater: React.SetStateAction<typeof emptyBoat>) => {
-    if (boatDirection === 'utreise') { setBoatFormUtreise(updater); } else { setBoatFormHjemreise(updater); }
-  }, [boatDirection]);
-  const [taxiFormUtreise, setTaxiFormUtreise] = useState(emptyTaxi);
-  const [taxiFormHjemreise, setTaxiFormHjemreise] = useState(emptyTaxi);
-  const [taxiDirection, setTaxiDirection] = useState<'utreise' | 'hjemreise'>('utreise');
-  const taxiForm = taxiDirection === 'utreise' ? taxiFormUtreise : taxiFormHjemreise;
-  const handleTaxiFormChange = useCallback((updater: React.SetStateAction<typeof emptyTaxi>) => {
-    if (taxiDirection === 'utreise') { setTaxiFormUtreise(updater); } else { setTaxiFormHjemreise(updater); }
-  }, [taxiDirection]);
-  const [ferryFormUtreise, setFerryFormUtreise] = useState(emptyFerry);
-  const [ferryFormHjemreise, setFerryFormHjemreise] = useState(emptyFerry);
-  const [ferryDirection, setFerryDirection] = useState<'utreise' | 'hjemreise'>('utreise');
-  const ferryForm = ferryDirection === 'utreise' ? ferryFormUtreise : ferryFormHjemreise;
-  const handleFerryFormChange = useCallback((updater: React.SetStateAction<typeof emptyFerry>) => {
-    if (ferryDirection === 'utreise') { setFerryFormUtreise(updater); } else { setFerryFormHjemreise(updater); }
-  }, [ferryDirection]);
   const [showTransportPicker, setShowTransportPicker] = useState(false);
   const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; subtitle?: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
   const [showHelpTransport, setShowHelpTransport] = useState(false);
@@ -186,7 +159,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [showHelpDocuments, setShowHelpDocuments] = useState(false);
 
   // Unified picker state
-  type PickerField = 'tripStart' | 'tripEnd' | 'tripStartTime' | 'tripEndTime' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'hotelCancelBy' | 'hotelCancelByTime' | 'boatDepDate' | 'boatDepTime' | 'boatArrDate' | 'boatArrTime' | 'taxiDepDate' | 'taxiDepTime' | 'taxiArrDate' | 'taxiArrTime' | 'ferryDepDate' | 'ferryDepTime' | 'ferryArrDate' | 'ferryArrTime' | null;
+  type PickerField = 'tripStart' | 'tripEnd' | 'tripStartTime' | 'tripEndTime' | 'flightDepDate' | 'flightArrDate' | 'flightDepTime' | 'flightArrTime' | 'actStartDate' | 'actEndDate' | 'actStartTime' | 'actEndTime' | 'restStartDate' | 'restEndDate' | 'restStartTime' | 'restEndTime' | 'hotelStartDate' | 'hotelEndDate' | 'hotelCheckIn' | 'hotelCheckOut' | 'hotelCancelBy' | 'hotelCancelByTime' | null;
   const [activePicker, setActivePicker] = useState<PickerField>(null);
 
   const handlePickerSelect = (value: string) => {
@@ -212,18 +185,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     else if (activePicker === 'hotelCheckOut') setHotelForm(f => ({ ...f, checkOutTime: value }));
     else if (activePicker === 'hotelCancelBy') setHotelForm(f => ({ ...f, cancelBy: value }));
     else if (activePicker === 'hotelCancelByTime') setHotelForm(f => ({ ...f, cancelByTime: value }));
-    else if (activePicker === 'boatDepDate') handleBoatFormChange(f => ({ ...f, departureDate: value }));
-    else if (activePicker === 'boatDepTime') handleBoatFormChange(f => ({ ...f, departureTime: value }));
-    else if (activePicker === 'boatArrDate') handleBoatFormChange(f => ({ ...f, arrivalDate: value }));
-    else if (activePicker === 'boatArrTime') handleBoatFormChange(f => ({ ...f, arrivalTime: value }));
-    else if (activePicker === 'taxiDepDate') handleTaxiFormChange(f => ({ ...f, departureDate: value }));
-    else if (activePicker === 'taxiDepTime') handleTaxiFormChange(f => ({ ...f, departureTime: value }));
-    else if (activePicker === 'taxiArrDate') handleTaxiFormChange(f => ({ ...f, arrivalDate: value }));
-    else if (activePicker === 'taxiArrTime') handleTaxiFormChange(f => ({ ...f, arrivalTime: value }));
-    else if (activePicker === 'ferryDepDate') handleFerryFormChange(f => ({ ...f, departureDate: value }));
-    else if (activePicker === 'ferryDepTime') handleFerryFormChange(f => ({ ...f, departureTime: value }));
-    else if (activePicker === 'ferryArrDate') handleFerryFormChange(f => ({ ...f, arrivalDate: value }));
-    else if (activePicker === 'ferryArrTime') handleFerryFormChange(f => ({ ...f, arrivalTime: value }));
     setActivePicker(null);
   };
 
@@ -237,9 +198,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       restStartDate: t('pickers.startDate'), restEndDate: t('pickers.endDate'), restStartTime: t('pickers.startTime'), restEndTime: t('pickers.endTime'),
       hotelStartDate: t('pickers.startDate'), hotelEndDate: t('pickers.endDate'),
       hotelCheckIn: t('pickers.checkInTime'), hotelCheckOut: t('pickers.checkOutTime'), hotelCancelBy: t('hotels.cancelBy'), hotelCancelByTime: t('hotels.cancelByTime'),
-      boatDepDate: t('pickers.departureDate'), boatDepTime: t('pickers.departureTime'), boatArrDate: t('pickers.arrivalDate'), boatArrTime: t('pickers.arrivalTime'),
-      taxiDepDate: t('pickers.departureDate'), taxiDepTime: t('pickers.departureTime'), taxiArrDate: t('pickers.arrivalDate'), taxiArrTime: t('pickers.arrivalTime'),
-      ferryDepDate: t('pickers.departureDate'), ferryDepTime: t('pickers.departureTime'), ferryArrDate: t('pickers.arrivalDate'), ferryArrTime: t('pickers.arrivalTime'),
     };
     return activePicker ? titles[activePicker] : '';
   };
@@ -253,9 +211,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       actStartDate: actForm.startDate, actEndDate: actForm.endDate, actStartTime: actForm.startTime, actEndTime: actForm.endTime,
       restStartDate: restForm.startDate, restEndDate: restForm.endDate, restStartTime: restForm.startTime, restEndTime: restForm.endTime,
       hotelStartDate: hotelForm.startDate, hotelEndDate: hotelForm.endDate, hotelCheckIn: hotelForm.checkInTime, hotelCheckOut: hotelForm.checkOutTime, hotelCancelBy: hotelForm.cancelBy, hotelCancelByTime: hotelForm.cancelByTime,
-      boatDepDate: boatForm.departureDate, boatDepTime: boatForm.departureTime, boatArrDate: boatForm.arrivalDate, boatArrTime: boatForm.arrivalTime,
-      taxiDepDate: taxiForm.departureDate, taxiDepTime: taxiForm.departureTime, taxiArrDate: taxiForm.arrivalDate, taxiArrTime: taxiForm.arrivalTime,
-      ferryDepDate: ferryForm.departureDate, ferryDepTime: ferryForm.departureTime, ferryArrDate: ferryForm.arrivalDate, ferryArrTime: ferryForm.arrivalTime,
     };
     return activePicker ? values[activePicker] || '' : '';
   };
@@ -282,7 +237,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setLinks(l);
       setPackingLists(pl);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip.id]);
 
@@ -454,29 +409,20 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     setActForm(emptyAct);
     setDocForm(emptyDoc);
     setLinkForm(emptyLink);
-    setBoatFormUtreise(emptyBoat);
-    setBoatFormHjemreise(emptyBoat);
-    setBoatDirection('utreise');
-    setTaxiFormUtreise(emptyTaxi);
-    setTaxiFormHjemreise(emptyTaxi);
-    setTaxiDirection('utreise');
-    setFerryFormUtreise(emptyFerry);
-    setFerryFormHjemreise(emptyFerry);
-    setFerryDirection('utreise');
     setEditingId(null);
   };
 
   const handleSaveTripEdit = useCallback(async () => {
     if (!tripTitle.trim()) {
-      crossAlert('Error', t('common.enterTitle'));
+      crossAlert(t('common.error'), t('common.enterTitle'));
       return;
     }
     if (tripPersons.length === 0) {
-      crossAlert('Error', t('trips.personRequired'));
+      crossAlert(t('common.error'), t('trips.personRequired'));
       return;
     }
     if (tripEndDate < tripStartDate) {
-      crossAlert('Error', t('common.endDateBeforeStart'));
+      crossAlert(t('common.error'), t('common.endDateBeforeStart'));
       return;
     }
     try {
@@ -501,7 +447,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setTrip({ ...trip, ...updateData });
       setActiveModal(null);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip, tripTitle, tripCity, tripCountry, tripStartDate, tripEndDate, tripStartTime, tripEndTime, tripIcon, tripPersons]);
 
@@ -562,21 +508,6 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setDocForm({ title: item.title || '', note: item.note || '', fileUrl: item.fileUrl || '', fileName: item.fileName || '' });
     } else if (modal === 'link') {
       setLinkForm({ title: item.title || '', url: item.url || '' });
-    } else if (modal === 'boat') {
-      const isUtreise = item.type === 'utreise' || !item.type;
-      const boatData = { name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' };
-      if (isUtreise) { setBoatFormUtreise(boatData); } else { setBoatFormHjemreise(boatData); }
-      setBoatDirection(isUtreise ? 'utreise' : 'hjemreise');
-    } else if (modal === 'taxi') {
-      const isUtreise = item.type === 'utreise' || !item.type;
-      const taxiData = { name: item.name || '', reference: item.reference || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || item.address || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' };
-      if (isUtreise) { setTaxiFormUtreise(taxiData); } else { setTaxiFormHjemreise(taxiData); }
-      setTaxiDirection(isUtreise ? 'utreise' : 'hjemreise');
-    } else if (modal === 'ferry') {
-      const isUtreise = item.type === 'utreise' || !item.type;
-      const ferryData = { name: item.name || '', routeName: item.routeName || '', reference: item.reference || '', cabin: item.cabin || '', isOneWay: item.isOneWay || false, type: item.type || 'utreise', departureDate: item.departureDate || '', departureTime: item.departureTime || '', arrivalDate: item.arrivalDate || '', arrivalTime: item.arrivalTime || '', departureAddress: item.departureAddress || '', arrivalAddress: item.arrivalAddress || '', phone: item.phone || '', hasCar: item.hasCar || false, carRegistration: item.carRegistration || '', driver: item.driver || '', passengers: item.passengers || '', note: item.note || '' };
-      if (isUtreise) { setFerryFormUtreise(ferryData); } else { setFerryFormHjemreise(ferryData); }
-      setFerryDirection(isUtreise ? 'utreise' : 'hjemreise');
     }
     setActiveModal(modal);
   };
@@ -618,7 +549,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   // Hotel handlers
   const handleSaveHotel = useCallback(async () => {
     if (!hotelForm.name.trim()) {
-      crossAlert('Error', t('common.enterName'));
+      crossAlert(t('common.error'), t('common.enterName'));
       return;
     }
     try {
@@ -632,7 +563,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip.id, hotelForm, editingId, loadSubData]);
 
@@ -706,14 +637,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       loadSubData();
     } catch (error) {
       console.error('Bil transport save error:', error);
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip.id, transportFormUtreise, transportFormHjemreise, activeDirection, editingId, loadSubData, flights]);
 
   // Restaurant handlers
   const handleSaveRestaurant = useCallback(async () => {
     if (!restForm.name.trim()) {
-      crossAlert('Error', t('common.enterName'));
+      crossAlert(t('common.error'), t('common.enterName'));
       return;
     }
     try {
@@ -727,14 +658,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip.id, restForm, editingId, loadSubData]);
 
   // Activity handlers
   const handleSaveActivity = useCallback(async () => {
     if (!actForm.name.trim()) {
-      crossAlert('Error', t('common.enterName'));
+      crossAlert(t('common.error'), t('common.enterName'));
       return;
     }
     try {
@@ -748,14 +679,14 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip.id, actForm, editingId, loadSubData]);
 
   // Document handlers
   const handleSaveDocument = useCallback(async () => {
     if (!docForm.title.trim()) {
-      crossAlert('Error', t('common.enterTitle'));
+      crossAlert(t('common.error'), t('common.enterTitle'));
       return;
     }
     try {
@@ -780,18 +711,18 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip.id, docForm, editingId, loadSubData, documents]);
 
   // Link handlers
   const handleSaveLink = useCallback(async () => {
     if (!linkForm.title.trim()) {
-      crossAlert('Error', t('common.enterTitle'));
+      crossAlert(t('common.error'), t('common.enterTitle'));
       return;
     }
     if (!linkForm.url.trim()) {
-      crossAlert('Error', t('common.enterUrl'));
+      crossAlert(t('common.error'), t('common.enterUrl'));
       return;
     }
     try {
@@ -805,59 +736,9 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setActiveModal(null);
       loadSubData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip.id, linkForm, editingId, loadSubData]);
-
-  const handleSaveBoat = useCallback(async () => {
-    try {
-      const sharedUtreise = { name: boatFormUtreise.name.trim() ? sanitizeInput(boatFormUtreise.name) : undefined, routeName: boatFormUtreise.routeName.trim() ? sanitizeInput(boatFormUtreise.routeName) : undefined, reference: boatFormUtreise.reference.trim() ? sanitizeInput(boatFormUtreise.reference) : undefined, cabin: boatFormUtreise.cabin.trim() ? sanitizeInput(boatFormUtreise.cabin) : undefined, isOneWay: boatFormUtreise.isOneWay || undefined, phone: boatFormUtreise.phone.trim() ? sanitizeInput(boatFormUtreise.phone) : undefined, hasCar: boatFormUtreise.hasCar || undefined, carRegistration: boatFormUtreise.hasCar && boatFormUtreise.carRegistration.trim() ? sanitizeInput(boatFormUtreise.carRegistration) : undefined, driver: boatFormUtreise.driver.trim() ? sanitizeInput(boatFormUtreise.driver) : undefined, passengers: boatFormUtreise.passengers.trim() ? sanitizeInput(boatFormUtreise.passengers) : undefined, note: boatFormUtreise.note.trim() ? sanitizeInput(boatFormUtreise.note) : undefined };
-      const sharedHjemreise = { name: boatFormHjemreise.name.trim() ? sanitizeInput(boatFormHjemreise.name) : undefined, routeName: boatFormHjemreise.routeName.trim() ? sanitizeInput(boatFormHjemreise.routeName) : undefined, reference: boatFormHjemreise.reference.trim() ? sanitizeInput(boatFormHjemreise.reference) : undefined, cabin: boatFormHjemreise.cabin.trim() ? sanitizeInput(boatFormHjemreise.cabin) : undefined, isOneWay: boatFormUtreise.isOneWay || undefined, phone: boatFormHjemreise.phone.trim() ? sanitizeInput(boatFormHjemreise.phone) : undefined, hasCar: boatFormHjemreise.hasCar || undefined, carRegistration: boatFormHjemreise.hasCar && boatFormHjemreise.carRegistration.trim() ? sanitizeInput(boatFormHjemreise.carRegistration) : undefined, driver: boatFormHjemreise.driver.trim() ? sanitizeInput(boatFormHjemreise.driver) : undefined, passengers: boatFormHjemreise.passengers.trim() ? sanitizeInput(boatFormHjemreise.passengers) : undefined, note: boatFormHjemreise.note.trim() ? sanitizeInput(boatFormHjemreise.note) : undefined };
-      const utreiseData = cleanData({ ...sharedUtreise, type: 'utreise', departureDate: boatFormUtreise.departureDate || undefined, departureTime: boatFormUtreise.departureTime || undefined, departureAddress: boatFormUtreise.departureAddress.trim() ? sanitizeInput(boatFormUtreise.departureAddress) : undefined, arrivalAddress: boatFormUtreise.arrivalAddress.trim() ? sanitizeInput(boatFormUtreise.arrivalAddress) : undefined });
-      const hjemreiseData = cleanData({ ...sharedHjemreise, type: 'hjemreise', departureDate: boatFormHjemreise.departureDate || undefined, departureTime: boatFormHjemreise.departureTime || undefined, departureAddress: boatFormHjemreise.departureAddress.trim() ? sanitizeInput(boatFormHjemreise.departureAddress) : undefined, arrivalAddress: boatFormHjemreise.arrivalAddress.trim() ? sanitizeInput(boatFormHjemreise.arrivalAddress) : undefined });
-      if (editingId) {
-        await updateTripBoat(trip.id, editingId, boatDirection === 'hjemreise' ? hjemreiseData : utreiseData);
-        if (!boatFormUtreise.isOneWay) {
-          const currentBoats = await getTripBoats(trip.id);
-          const otherType = boatDirection === 'hjemreise' ? 'utreise' : 'hjemreise';
-          const otherExists = currentBoats.some(b => b.id !== editingId && b.type === otherType);
-          if (!otherExists) {
-            const otherData = boatDirection === 'hjemreise' ? utreiseData : hjemreiseData;
-            await addTripBoat(trip.id, otherData);
-          }
-        }
-      } else {
-        await addTripBoat(trip.id, utreiseData);
-        if (!boatFormUtreise.isOneWay) { await addTripBoat(trip.id, hjemreiseData); }
-      }
-      resetForms(); setActiveModal(null); loadSubData();
-    } catch (error) { crossAlert('Error', getErrorMessage(error)); }
-  }, [trip.id, boatFormUtreise, boatFormHjemreise, boatDirection, editingId, loadSubData]);
-
-  const handleSaveTaxi = useCallback(async () => {
-    try {
-      const sharedUtreise = { name: taxiFormUtreise.name.trim() ? sanitizeInput(taxiFormUtreise.name) : undefined, reference: taxiFormUtreise.reference.trim() ? sanitizeInput(taxiFormUtreise.reference) : undefined, isOneWay: taxiFormUtreise.isOneWay || undefined, phone: taxiFormUtreise.phone.trim() ? sanitizeInput(taxiFormUtreise.phone) : undefined, driver: taxiFormUtreise.driver.trim() ? sanitizeInput(taxiFormUtreise.driver) : undefined, passengers: taxiFormUtreise.passengers.trim() ? sanitizeInput(taxiFormUtreise.passengers) : undefined, note: taxiFormUtreise.note.trim() ? sanitizeInput(taxiFormUtreise.note) : undefined };
-      const sharedHjemreise = { name: taxiFormHjemreise.name.trim() ? sanitizeInput(taxiFormHjemreise.name) : undefined, reference: taxiFormHjemreise.reference.trim() ? sanitizeInput(taxiFormHjemreise.reference) : undefined, isOneWay: taxiFormUtreise.isOneWay || undefined, phone: taxiFormHjemreise.phone.trim() ? sanitizeInput(taxiFormHjemreise.phone) : undefined, driver: taxiFormHjemreise.driver.trim() ? sanitizeInput(taxiFormHjemreise.driver) : undefined, passengers: taxiFormHjemreise.passengers.trim() ? sanitizeInput(taxiFormHjemreise.passengers) : undefined, note: taxiFormHjemreise.note.trim() ? sanitizeInput(taxiFormHjemreise.note) : undefined };
-      const utreiseData = cleanData({ ...sharedUtreise, type: 'utreise', departureDate: taxiFormUtreise.departureDate || undefined, departureTime: taxiFormUtreise.departureTime || undefined, departureAddress: taxiFormUtreise.departureAddress.trim() ? sanitizeInput(taxiFormUtreise.departureAddress) : undefined });
-      const hjemreiseData = cleanData({ ...sharedHjemreise, type: 'hjemreise', departureDate: taxiFormHjemreise.departureDate || undefined, departureTime: taxiFormHjemreise.departureTime || undefined, departureAddress: taxiFormHjemreise.departureAddress.trim() ? sanitizeInput(taxiFormHjemreise.departureAddress) : undefined, arrivalAddress: taxiFormHjemreise.arrivalAddress.trim() ? sanitizeInput(taxiFormHjemreise.arrivalAddress) : undefined });
-      if (editingId) {
-        await updateTripTaxi(trip.id, editingId, taxiDirection === 'hjemreise' ? hjemreiseData : utreiseData);
-        if (!taxiFormUtreise.isOneWay) {
-          const currentTaxis = await getTripTaxis(trip.id);
-          const otherType = taxiDirection === 'hjemreise' ? 'utreise' : 'hjemreise';
-          const otherExists = currentTaxis.some(t => t.id !== editingId && t.type === otherType);
-          if (!otherExists) {
-            const otherData = taxiDirection === 'hjemreise' ? utreiseData : hjemreiseData;
-            await addTripTaxi(trip.id, otherData);
-          }
-        }
-      } else {
-        await addTripTaxi(trip.id, utreiseData);
-        if (!taxiFormUtreise.isOneWay) { await addTripTaxi(trip.id, hjemreiseData); }
-      }
-      resetForms(); setActiveModal(null); loadSubData();
-    } catch (error) { crossAlert('Error', getErrorMessage(error)); }
-  }, [trip.id, taxiFormUtreise, taxiFormHjemreise, taxiDirection, editingId, loadSubData]);
 
   // Delete handlers
   const confirmDelete = (title: string, onConfirm: () => void) => {
@@ -873,13 +754,10 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const handleDeleteActivity = useCallback((id: string) => confirmDelete('aktivitet', async () => { await deleteTripActivity(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteDocument = useCallback((id: string) => confirmDelete('dokument', async () => { await deleteTripDocument(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
   const handleDeleteLink = useCallback((id: string) => confirmDelete('lenke', async () => { await deleteTripLink(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
-  const handleDeleteBoat = useCallback((id: string) => confirmDelete('båt', async () => { await deleteTripBoat(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
-  const handleDeleteTaxi = useCallback((id: string) => confirmDelete('taxi', async () => { await deleteTripTaxi(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
-  const handleDeleteFerry = useCallback((id: string) => confirmDelete('ferje', async () => { await deleteTripFerry(trip.id, id); loadSubData(); }), [trip.id, loadSubData]);
 
   const handleCreatePackingList = useCallback(async () => {
     if (!newPackingListTitle.trim()) {
-      crossAlert('Error', t('common.enterName'));
+      crossAlert(t('common.error'), t('common.enterName'));
       return;
     }
     try {
@@ -892,7 +770,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       setShowAddPackingList(false);
       loadSubData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip.id, newPackingListTitle, user, loadSubData]);
 
@@ -1008,33 +886,33 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
     flights.filter(f => f.transportType === 'boat').forEach(b => {
       const typeLabel = b.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: b.id, icon: 'boat', label: t('transport.boatCruise'), typeLabel, name: b.airline || b.name, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
+        id: b.id, icon: 'boat', label: t('transport.boatCruise'), typeLabel, name: b.airline, detail: b.routeName, isHjemreise: b.type === 'hjemreise',
         departureDate: b.departureDate, departureTime: b.departureTime, arrivalTime: b.arrivalTime, hasCar: b.hasCar,
         transportType: 'boat', docType: b.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: b, tripId: trip.id, trip, itemType: 'boat' }),
-        onLongPress: canDelete ? () => setActionModal({ visible: true, title: b.airline || b.name || t('transport.boatCruise'), onEdit: () => openEditModal('flight', b), onDelete: () => handleDeleteFlight(b.id) }) : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: b.airline || t('transport.boatCruise'), onEdit: () => openEditModal('flight', b), onDelete: () => handleDeleteFlight(b.id) }) : undefined,
         sortKey: `boat_${b.departureDate || ''}_${b.departureTime || ''}`,
       });
     });
     flights.filter(f => f.transportType === 'taxi').forEach(tx => {
       const typeLabel = tx.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: tx.id, icon: 'taxi', label: t('transport.taxi'), typeLabel, name: tx.airline || tx.name, detail: tx.reference, isHjemreise: tx.type === 'hjemreise',
+        id: tx.id, icon: 'taxi', label: t('transport.taxi'), typeLabel, name: tx.airline, detail: tx.reference, isHjemreise: tx.type === 'hjemreise',
         departureDate: tx.departureDate, departureTime: tx.departureTime,
         transportType: 'taxi', docType: tx.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: tx, tripId: trip.id, trip, itemType: 'taxi' }),
-        onLongPress: canDelete ? () => setActionModal({ visible: true, title: tx.airline || tx.name || t('transport.taxi'), onEdit: () => openEditModal('flight', tx), onDelete: () => handleDeleteFlight(tx.id) }) : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: tx.airline || t('transport.taxi'), onEdit: () => openEditModal('flight', tx), onDelete: () => handleDeleteFlight(tx.id) }) : undefined,
         sortKey: `taxi_${tx.departureDate || ''}_${tx.departureTime || ''}`,
       });
     });
     flights.filter(f => f.transportType === 'ferry').forEach(fer => {
       const typeLabel = fer.type === 'hjemreise' ? t('transport.arrival') : t('transport.departure');
       allItems.push({
-        id: fer.id, icon: 'ferry', label: t('transport.ferry'), typeLabel, name: fer.airline || fer.name, detail: fer.routeName, isHjemreise: fer.type === 'hjemreise',
+        id: fer.id, icon: 'ferry', label: t('transport.ferry'), typeLabel, name: fer.airline, detail: fer.routeName, isHjemreise: fer.type === 'hjemreise',
         departureDate: fer.departureDate, departureTime: fer.departureTime, arrivalTime: fer.arrivalTime, hasCar: fer.hasCar,
         transportType: 'ferry', docType: fer.type,
         onPress: () => navigation.navigate('TripItemDetail', { item: fer, tripId: trip.id, trip, itemType: 'ferry' }),
-        onLongPress: canDelete ? () => setActionModal({ visible: true, title: fer.airline || fer.name || t('transport.ferry'), onEdit: () => openEditModal('flight', fer), onDelete: () => handleDeleteFlight(fer.id) }) : undefined,
+        onLongPress: canDelete ? () => setActionModal({ visible: true, title: fer.airline || t('transport.ferry'), onEdit: () => openEditModal('flight', fer), onDelete: () => handleDeleteFlight(fer.id) }) : undefined,
         sortKey: `ferry_${fer.departureDate || ''}_${fer.departureTime || ''}`,
       });
     });
@@ -1286,11 +1164,11 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             hotels.map((h) => (
               <AddressItemCard
                 key={h.id}
-                name={h.name}
+                name={h.name ?? ''}
                 address={h.address}
                 detail={[h.startDate ? formatDate(h.startDate) : '', h.endDate ? formatDate(h.endDate) : ''].filter(Boolean).join(' – ') || h.phone}
                 onPress={() => navigation.navigate('TripItemDetail', { item: h, tripId: trip.id, trip, itemType: 'hotel' })}
-                onLongPress={canDelete ? () => setActionModal({ visible: true, title: h.name, onEdit: () => openEditModal('hotel', h), onDelete: () => handleDeleteHotel(h.id) }) : undefined}
+                onLongPress={canDelete ? () => setActionModal({ visible: true, title: h.name ?? '', onEdit: () => openEditModal('hotel', h), onDelete: () => handleDeleteHotel(h.id) }) : undefined}
               />
             ))
           )}
@@ -1307,7 +1185,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             restaurants.map((r) => (
               <AddressItemCard
                 key={r.id}
-                name={r.name}
+                name={r.name ?? ''}
                 address={r.address}
                 detail={[
                   r.startDate ? formatDate(r.startDate) : '',
@@ -1334,7 +1212,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
             activities.map((a) => (
               <AddressItemCard
                 key={a.id}
-                name={a.name}
+                name={a.name ?? ''}
                 address={a.address}
                 detail={[a.startDate ? formatDate(a.startDate) : '', a.endDate ? formatDate(a.endDate) : ''].filter(Boolean).join(' – ') || [a.startTime, a.endTime].filter(Boolean).join(' – ') || undefined}
                 note={a.note}
@@ -1566,7 +1444,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
                     </View>
                     <View style={styles.docActions}>
                       {d.fileUrl && (
-                        <TouchableOpacity onPress={() => openFileUrl(d.fileUrl)} style={styles.docAction}>
+                        <TouchableOpacity onPress={() => openFileUrl(d.fileUrl ?? '')} style={styles.docAction}>
                           <Text style={{ color: MODULE_COLORS.trips, fontSize: 14 }}>{t('documents.open')}</Text>
                         </TouchableOpacity>
                       )}
@@ -2300,29 +2178,29 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       ]} />
 
       {/* Create Packing List Modal */}
-      <Modal visible={showAddPackingList} transparent animationType="fade">
+      <Modal visible={showAddPackingList} transparent animationType="fade" onRequestClose={() => setShowAddPackingList(false)}>
         <TouchableWithoutFeedback onPress={() => setShowAddPackingList(false)}>
-          <View style={styles.modalOverlay}>
+          <View style={styles.listModalOverlay}>
             <TouchableWithoutFeedback>
-              <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-                <Text style={[styles.modalTitle, { color: colors.text }]}>{t('packing.addList')}</Text>
+              <View style={[styles.listModalCard, { backgroundColor: colors.surface }]}>
+                <Text style={[styles.listModalTitle, { color: colors.text }]}>{t('packing.addList')}</Text>
                 <TextInput
-                  style={[styles.modalInput, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
+                  style={[styles.listModalInput, { backgroundColor: MODULE_COLORS.tripsBg, color: colors.text }]}
                   value={newPackingListTitle}
                   onChangeText={setNewPackingListTitle}
                   placeholder={t('packing.listNamePlaceholder')}
                   placeholderTextColor={colors.textDisabled}
                   autoFocus
                 />
-                <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 12 }}>
-                  <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20 }} onPress={() => { setShowAddPackingList(false); setNewPackingListTitle(''); }}>
-                    <Text style={{ color: colors.textSecondary, fontSize: 16 }}>{t('common.cancel')}</Text>
+                <View style={styles.listModalActions}>
+                  <TouchableOpacity style={[styles.listModalBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddPackingList(false); setNewPackingListTitle(''); }}>
+                    <Text style={[styles.listModalBtnText, { color: colors.text }]}>{t('common.cancel')}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, backgroundColor: MODULE_COLORS.tripsBg }} onPress={() => { setShowAddPackingList(false); setShowImportPackingList(true); }}>
-                    <Text style={{ color: MODULE_COLORS.trips, fontSize: 16, fontWeight: '600' }}>{t('packing.createFromPhoto')}</Text>
+                  <TouchableOpacity style={[styles.listModalBtn, { backgroundColor: MODULE_COLORS.tripsBg }]} onPress={() => { setShowAddPackingList(false); setShowImportPackingList(true); }}>
+                    <Text style={[styles.listModalBtnText, { color: MODULE_COLORS.trips }]}>{t('packing.createFromPhoto')}</Text>
                   </TouchableOpacity>
-                    <TouchableOpacity style={{ paddingVertical: 12, paddingHorizontal: 20, borderRadius: 8, backgroundColor: MODULE_COLORS.trips }} onPress={handleCreatePackingList}>
-                    <Text style={{ color: '#fff', fontSize: 16, fontWeight: '600' }}>{t('common.add')}</Text>
+                  <TouchableOpacity style={[styles.listModalBtn, { backgroundColor: MODULE_COLORS.trips }]} onPress={handleCreatePackingList}>
+                    <Text style={[styles.listModalBtnText, { color: '#fff' }]}>{t('packing.createList')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
@@ -2472,6 +2350,47 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 20,
     maxHeight: '80%',
     paddingBottom: 20,
+  },
+  listModalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  listModalCard: {
+    borderRadius: 20,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+  },
+  listModalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  listModalInput: {
+    padding: 12,
+    borderRadius: 8,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  listModalActions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  listModalBtn: {
+    flex: 1,
+    padding: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  listModalBtnText: {
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   modalTitle: {
     fontSize: 18,

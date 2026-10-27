@@ -5,7 +5,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import { useUserStore } from '../store/userStore';
-import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
+import { collection, query, where, getDocs, addDoc, doc, updateDoc, deleteDoc, onSnapshot, limit } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { Recipe, ShoppingList, ShoppingItem } from '../types';
 import { LANGUAGES, getAiNameForCode } from '../constants/languages';
@@ -19,16 +19,17 @@ import { getUserProfile } from '../services/familyService';
 import { MAX_RECIPES } from '../constants/limits';
 import { generateId } from '../utils/generateId';
 import { ListImportModal } from '../components/ListImportModal';
+import { normalizeRecipe, getTranslatedRecipeText, getTranslatedIngredients, getTranslatedInstructions } from '../utils/recipeNormalizers';
 
 type SubTab = 'ukemeny' | 'oppskrifter' | 'handleliste';
 const DAYS = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 const DAY_LABELS = ['mealPlanner.monday', 'mealPlanner.tuesday', 'mealPlanner.wednesday', 'mealPlanner.thursday', 'mealPlanner.friday', 'mealPlanner.saturday', 'mealPlanner.sunday'];
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  norge: '🇳🇴', norge: '🇳🇴', norway: '🇳🇴', norsk: '🇳🇴',
+  norge: '🇳🇴', norway: '🇳🇴', norsk: '🇳🇴',
   sverige: '🇸🇪', sweden: '🇸🇪', svensk: '🇸🇪',
   danmark: '🇩🇰', denmark: '🇩🇰', dansk: '🇩🇰',
-  finland: '🇫🇮', finland: '🇫🇮', finsk: '🇫🇮',
+  finland: '🇫🇮', finsk: '🇫🇮',
   italia: '🇮🇹', italy: '🇮🇹', italiensk: '🇮🇹',
   spania: '🇪🇸', spain: '🇪🇸', spansk: '🇪🇸',
   frankrike: '🇫🇷', france: '🇫🇷', fransk: '🇫🇷',
@@ -50,7 +51,7 @@ const COUNTRY_FLAGS: Record<string, string> = {
   russland: '🇷🇺', russia: '🇷🇺', russisk: '🇷🇺',
   marokko: '🇲🇦', morocco: '🇲🇦', marokkansk: '🇲🇦',
   libanon: '🇱🇧', lebanon: '🇱🇧', libanesisk: '🇱🇧',
-  Vietnam: '🇻🇳', vietnamesisk: '🇻🇳',
+  vietnam: '🇻🇳', vietnamesisk: '🇻🇳',
 };
 
 const getCountryFlag = (cuisine: string): string => {
@@ -183,11 +184,11 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
-      const recipesQ = query(collection(db, 'recipes'), where('familyId', '==', familyId));
+      const recipesQ = query(collection(db, 'recipes'), where('familyId', '==', familyId), limit(500));
       const recipesSnap = await getDocs(recipesQ);
-      setRecipes(recipesSnap.docs.map(d => ({ id: d.id, ...d.data() } as Recipe)));
+      setRecipes(recipesSnap.docs.map(d => normalizeRecipe({ id: d.id, ...d.data() } as Recipe)));
 
-      const mealPlanQ = query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', weekStart));
+      const mealPlanQ = query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', weekStart), limit(10));
       const mealPlanSnap = await getDocs(mealPlanQ);
       if (mealPlanSnap.docs.length > 0) {
         setMealPlan({ id: mealPlanSnap.docs[0].id, ...mealPlanSnap.docs[0].data() });
@@ -223,7 +224,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       for (let i = -6; i <= 6; i++) {
         const ws = getWeekStart(i);
         promises.push(
-          getDocs(query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', ws)))
+          getDocs(query(collection(db, 'mealPlans'), where('familyId', '==', familyId), where('weekStart', '==', ws), limit(10)))
             .then(snap => { if (snap.docs.length > 0) newMap.set(ws, { id: snap.docs[0].id, ...snap.docs[0].data() }); })
             .catch(() => {})
         );
@@ -236,7 +237,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
 
   useEffect(() => {
     if (!familyId) return;
-    const q = query(collection(db, 'shoppingLists'), where('familyId', '==', familyId));
+    const q = query(collection(db, 'shoppingLists'), where('familyId', '==', familyId), limit(200));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       setShoppingLists(snapshot.docs.map(d => ({ id: d.id, ...d.data() } as ShoppingList)));
     });
@@ -270,12 +271,12 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
   });
 
   const resetRecipeForm = () => {
-    setRecipeForm({ name: '', description: '', time: '', portions: '', category: 'kjoett', ingredients: [{ name: '', amount: '', unit: '' }], instructions: [''], variation: '', cuisine: '' });
+    setRecipeForm({ name: '', description: '', time: '', portions: '', category: 'kjoett', ingredients: [{ name: '', amount: '', unit: '' }], instructions: [''], variation: '', cuisine: '', caloriesPerServing: '' });
   };
 
   const handleSaveRecipe = async () => {
     if (!recipeForm.name.trim()) {
-      crossAlert('Error', t('mealPlanner.recipeName') + ' er påkrevd');
+      crossAlert(t('common.error'), t('mealPlanner.recipeName') + ' er påkrevd');
       return;
     }
     if (!familyId) return;
@@ -338,18 +339,13 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       loadData();
     } catch (error) {
       console.error('Failed to save recipe:', error);
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setRecipeSaving(false);
     }
   };
 
-  const getRecipeText = (recipe: Recipe, field: 'name' | 'description' | 'ingredients' | 'instructions') => {
-    if (recipe.translations?.[i18n.language]?.[field]) {
-      return recipe.translations[i18n.language][field];
-    }
-    return recipe[field];
-  };
+  const getRecipeText = (recipe: Recipe, field: 'name' | 'description') => getTranslatedRecipeText(recipe, i18n.language, field);
 
   const triggerRecipeTranslation = async (recipeId: string, name: string, description: string, ingredients: any[], instructions: string[]) => {
     try {
@@ -375,7 +371,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setShowDeleteRecipe(null);
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -384,7 +380,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       await updateDoc(doc(db, 'recipes', recipe.id), { isFavorite: !recipe.isFavorite });
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -411,7 +407,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setNewListTitle('');
       setShowAddList(false);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -429,7 +425,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       await deleteDoc(doc(db, 'shoppingLists', listId));
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -445,14 +441,14 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       });
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
   const handleAddToShoppingList = async (recipe: Recipe) => {
     if (!familyId) return;
     try {
-      const ingredients = getRecipeText(recipe, 'ingredients') || recipe.ingredients;
+      const ingredients = getTranslatedIngredients(recipe, i18n.language);
       const existingList = shoppingLists.find(l => l.title === recipe.name);
       if (existingList) {
         const newItems = ingredients.map(ing => ({
@@ -478,10 +474,10 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
           familyId,
         });
       }
-      setInfoModal({ visible: true, title: t('common.success'), message: `${ingredients.length} ingredienser lagt til i "${recipe.name}"` });
+      setInfoModal({ visible: true, title: t('common.success'), message: t('mealPlanner.ingredientsAddedToNamed', { count: ingredients.length, name: recipe.name }) });
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -507,7 +503,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setSelectedSlot(null);
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -525,7 +521,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setSelectedRecipeForSlot(null);
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -553,7 +549,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       const data = await res.json();
       setAiResults(data.recipes || []);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
       setShowAiResults(false);
     } finally {
       setAiLoading(false);
@@ -584,7 +580,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
       setInfoModal({ visible: true, title: t('common.success'), message: `"${aiRecipe.name}" lagt til i oppskriftsboken` });
       loadData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -639,8 +635,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
         familyId: familyId || '',
         createdAt: Date.now(),
       });
-      const detectedLang = importUrl.includes('.no') ? 'norsk' : importUrl.includes('.se') ? 'svensk' : importUrl.includes('.dk') ? 'dansk' : importUrl.includes('.fi') ? 'finsk' : 'engelsk';
-      triggerRecipeTranslation(docRef.id, importedRecipe.name, importedRecipe.description || '', importedRecipe.ingredients || [], importedRecipe.instructions || [], detectedLang);
+      triggerRecipeTranslation(docRef.id, importedRecipe.name, importedRecipe.description || '', importedRecipe.ingredients || [], importedRecipe.instructions || []);
       setInfoModal({ visible: true, title: t('common.success'), message: `"${importedRecipe.name}" lagt til i oppskriftsboken` });
       setShowImportPreview(false);
       setImportedRecipe(null);
@@ -705,7 +700,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                     setRandomRecipe(null);
                     loadData();
                   } catch (error) {
-                    crossAlert('Error', getErrorMessage(error));
+                    crossAlert(t('common.error'), getErrorMessage(error));
                   }
                 }}
               >
@@ -814,7 +809,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 }
                 loadData();
               } catch (error) {
-                crossAlert('Error', getErrorMessage(error));
+                crossAlert(t('common.error'), getErrorMessage(error));
               }
             }}
           >
@@ -996,7 +991,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                             });
                             setShowAddRecipe(true);
                           }, onDelete: async () => {
-                            try { await deleteDoc(doc(db, 'recipes', item.id)); loadData(); } catch (error) { crossAlert('Error', getErrorMessage(error)); }
+                            try { await deleteDoc(doc(db, 'recipes', item.id)); loadData(); } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
                           } })}
                         >
                           <View style={styles.recipeInfo}>
@@ -1055,7 +1050,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
               <Text style={{ fontSize: 14, color: colors.textSecondary, textAlign: 'center' }}>{t('mealPlanner.noSuggestions')}</Text>
             </View>
           ) : (
-            <View style={{ maxHeight: 500, overflowY: 'auto' }}>
+            <ScrollView style={{ maxHeight: 500 }}>
               {aiResults.map((recipe, i) => (
               <View key={i} style={[styles.aiResultItem, { borderBottomColor: colors.border }]}>
                 <View style={{ flex: 1 }}>
@@ -1094,7 +1089,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                 </View>
                 </View>
               ))}
-            </View>
+            </ScrollView>
           )}
           <TouchableOpacity style={[styles.aiBtn, { backgroundColor: colors.inputBackground, marginTop: 8 }]} onPress={() => { setShowAiResults(false); setAiResults([]); }}>
             <Text style={[styles.aiBtnText, { color: colors.text }]}>{t('mealPlanner.close')}</Text>
@@ -1437,7 +1432,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   {showRecipeDetail?.ingredients && showRecipeDetail.ingredients.length > 0 && (
                     <Text style={[styles.cardTitle, { color: colors.text }]}>{t('mealPlanner.ingredientsList')}</Text>
                   )}
-                  {(showRecipeDetail ? getRecipeText(showRecipeDetail, 'ingredients') : [])?.map((ing: any, i: number) => (
+                  {(showRecipeDetail ? getTranslatedIngredients(showRecipeDetail, i18n.language) : []).map((ing, i) => (
                     <View key={i} style={[styles.shoppingItem, { borderBottomColor: colors.border }]}>
                       <Text style={[styles.shoppingName, { color: colors.text }]}>{ing.name}</Text>
                       <Text style={[styles.shoppingQty, { color: colors.textSecondary }]}>{ing.amount} {ing.unit}</Text>
@@ -1447,7 +1442,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                   {showRecipeDetail?.instructions && showRecipeDetail.instructions.length > 0 && (
                     <>
                       <Text style={[styles.cardTitle, { color: colors.text, marginTop: 12 }]}>{t('mealPlanner.instructionsList')}</Text>
-                      {(showRecipeDetail ? getRecipeText(showRecipeDetail, 'instructions') : [])?.map((step: string, i: number) => (
+                      {(showRecipeDetail ? getTranslatedInstructions(showRecipeDetail, i18n.language) : []).map((step, i) => (
                         <View key={i} style={{ flexDirection: 'row', gap: 8, marginBottom: 8, alignItems: 'flex-start' }}>
                           <Text style={{ color: colors.accent, fontWeight: '700', width: 20, fontSize: 13 }}>{i + 1}.</Text>
                           <Text style={{ fontSize: 13, lineHeight: 20, color: colors.text, flex: 1 }}>{step}</Text>
@@ -1537,7 +1532,7 @@ export const MealPlanScreen: React.FC<{ navigation: any }> = ({ navigation }) =>
                         setPlanMeal('');
                         loadData();
                       } catch (error) {
-                        crossAlert('Error', getErrorMessage(error));
+                        crossAlert(t('common.error'), getErrorMessage(error));
                       }
                     }}
                   >

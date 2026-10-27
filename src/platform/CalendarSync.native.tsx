@@ -6,24 +6,20 @@ export const requestCalendarPermission = async (): Promise<boolean> => {
   return status === 'granted';
 };
 
-export const pickCalendar = async (): Promise<Calendar.Calendar | null> => {
+export const pickCalendar = async (): Promise<Calendar.ExpoCalendar | null> => {
   if (Platform.OS !== 'ios') return null;
   try {
-    const calendar = await Calendar.presentPickerAsync({
-      title: 'Velg kalender',
-      eventStorePreference: Calendar.EventStorePreference.WRITE_ONLY,
-    });
-    return calendar;
+    return await Calendar.presentPicker();
   } catch {
     return null;
   }
 };
 
-export const getDefaultCalendar = async (): Promise<Calendar.Calendar | null> => {
+export const getDefaultCalendar = async (): Promise<Calendar.ExpoCalendar | null> => {
   try {
-    const { status } = await Calendar.getCalendarPermissionsAsync();
+    const { status } = await Calendar.getCalendarPermissions();
     if (status !== 'granted') return null;
-    return await Calendar.getDefaultCalendarAsync();
+    return Calendar.getDefaultCalendarSync();
   } catch {
     return null;
   }
@@ -31,7 +27,7 @@ export const getDefaultCalendar = async (): Promise<Calendar.Calendar | null> =>
 
 export const getCalendarName = async (calendarId: string): Promise<string | null> => {
   try {
-    const calendars = await Calendar.getCalendarsAsync(Calendar.EntityTypes.EVENT);
+    const calendars = await Calendar.getCalendars(Calendar.EntityTypes.EVENT);
     const found = calendars.find((c) => c.id === calendarId);
     return found?.title ?? null;
   } catch {
@@ -53,12 +49,12 @@ export const syncEventToCalendar = async (
   event: SyncEventParams
 ): Promise<string | null> => {
   try {
-    const calendar = await Calendar.getCalendarAsync(calendarId);
+    const calendar = await Calendar.ExpoCalendar.get(calendarId);
     const alarms = event.reminderMinutes > 0
       ? [{ relativeOffset: -event.reminderMinutes }]
       : [];
 
-    const eventId = await Calendar.createEventAsync(calendar.id, {
+    const createdEvent = await calendar.createEvent({
       title: event.title,
       notes: event.description || undefined,
       location: event.address || undefined,
@@ -67,7 +63,7 @@ export const syncEventToCalendar = async (
       alarms,
     });
 
-    return eventId;
+    return createdEvent.id;
   } catch {
     return null;
   }
@@ -78,7 +74,8 @@ export const updateCalendarEvent = async (
   event: SyncEventParams
 ): Promise<void> => {
   try {
-    await Calendar.updateEventAsync(calendarEventId, {
+    const calendarEvent = await Calendar.ExpoCalendarEvent.get(calendarEventId);
+    await calendarEvent.update({
       title: event.title,
       notes: event.description || undefined,
       location: event.address || undefined,
@@ -95,7 +92,8 @@ export const updateCalendarEvent = async (
 
 export const deleteCalendarEvent = async (calendarEventId: string): Promise<void> => {
   try {
-    await Calendar.deleteEventAsync(calendarEventId, { thisInstance: false });
+    const calendarEvent = await Calendar.ExpoCalendarEvent.get(calendarEventId);
+    await calendarEvent.delete();
   } catch {
     // silent fail
   }

@@ -48,7 +48,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       })) as ShoppingList[];
       setLists(listsData);
     }, (error) => {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     });
     return () => unsubscribe();
   }, [familyId]);
@@ -70,7 +70,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       setNewListTitle('');
       setModalVisible(false);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [newListTitle, user, familyId]);
 
@@ -82,7 +82,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
         try {
           await deleteDoc(doc(db, 'shoppingLists', listId));
         } catch (error) {
-          crossAlert('Error', getErrorMessage(error));
+          crossAlert(t('common.error'), getErrorMessage(error));
         }
       },
     });
@@ -108,7 +108,7 @@ export const ShoppingListsScreen: React.FC<ShoppingListsScreenProps> = ({ naviga
       setCopyingList(null);
       setCopyListTitle('');
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [copyingList, copyListTitle, user, familyId]);
 

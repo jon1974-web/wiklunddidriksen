@@ -87,7 +87,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
       const data = await getTrips(familyId);
       setTrips(data);
     } catch (error) {
-      Alert.alert('Error', getErrorMessage(error));
+      Alert.alert(t('common.error'), getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -141,7 +141,7 @@ export const TripsScreen: React.FC<TripsScreenProps> = ({ navigation }) => {
                   setTripActionModal({ visible: false, title: '' });
                   loadTrips();
                 } catch (error) {
-                  crossAlert('Error', getErrorMessage(error));
+                  crossAlert(t('common.error'), getErrorMessage(error));
                 }
               },
             });

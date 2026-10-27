@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { buildReminderFields } from '../utils/reminders';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
@@ -47,9 +48,20 @@ const PET_THEME = MODULE_COLORS.pets;
 
 type PetSectionType = 'vetVisits' | 'medications' | 'food' | 'grooming' | 'vaccinations' | 'insurance';
 
+interface PetSpaceRouteParams {
+  openAddSection?: PetSectionType;
+  openVoiceForType?: string;
+  openPhotoForType?: string;
+  moduleColor?: string;
+  petId?: string;
+  editId?: string;
+  editSection?: string;
+  returnToEvents?: boolean;
+}
+
 interface PetSpaceScreenProps {
   navigation: any;
-  route?: { params?: { openAddSection?: PetSectionType } };
+  route?: { params?: PetSpaceRouteParams };
 }
 
 export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, route }) => {
@@ -118,7 +130,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         }
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [familyId]);
 
@@ -140,7 +152,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
       setVaccinations(va);
       setInsurance(i);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [familyId, selectedPet]);
 
@@ -239,7 +251,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
 
   const handleAddPet = async () => {
     if (!familyId) return;
-    if (!petForm.name.trim()) { crossAlert('Error', t('pets.enterPetName')); return; }
+    if (!petForm.name.trim()) { crossAlert(t('common.error'), t('pets.enterPetName')); return; }
     try {
       const cleanData = Object.fromEntries(
         Object.entries(petForm).filter(([_, v]) => v !== '' && v !== null && v !== undefined)
@@ -254,7 +266,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
       setShowAddPetModal(false);
       loadPets();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -265,7 +277,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
       setPetActionModal({ visible: false, id: '', title: '' });
       loadPets();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -283,10 +295,10 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
     try {
       const isEditing = editingItem !== null;
       if (activeSection === 'vetVisits') {
-        if (!vetForm.title.trim() || !vetForm.dateFrom) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
-        if (vetPersons.length === 0) { crossAlert('Error', t('health.personRequired')); return; }
+        if (!vetForm.title.trim() || !vetForm.dateFrom) { crossAlert(t('common.error'), t('pets.enterVetVisitTitle')); return; }
+        if (vetPersons.length === 0) { crossAlert(t('common.error'), t('health.personRequired')); return; }
         if (isEditing) {
-          await updateVetVisit(editingItem.id, { ...vetForm, persons: vetPersons });
+          await updateVetVisit(editingItem.id, { ...vetForm, persons: vetPersons, ...buildReminderFields(vetForm.dateFrom, vetForm.startTime, vetForm.reminder) });
           if (repeatScheduleConfig) {
             const editingVisit = vetVisits.find(v => v.id === editingItem.id);
             if (editingVisit?.scheduleGroupId) {
@@ -326,6 +338,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                   persons: vetPersons,
                   dateFrom: dateStr,
                   dateTo: dateStr,
+                  ...buildReminderFields(dateStr, vetForm.startTime, vetForm.reminder),
                   petId: selectedPet.id,
                   familyId,
                   createdBy: user?.uid || null,
@@ -337,28 +350,28 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
           }
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         } else {
-          await addVetVisit({ ...vetForm, persons: vetPersons, petId: selectedPet.id, familyId }, user?.uid);
+          await addVetVisit({ ...vetForm, persons: vetPersons, petId: selectedPet.id, familyId, ...buildReminderFields(vetForm.dateFrom, vetForm.startTime, vetForm.reminder) }, user?.uid);
           notifyHealthItem(familyId, `${selectedPet.name}: ${vetForm.title}`, vetForm.dateFrom, vetForm.startTime, vetForm.location || '', 'appointment', user?.displayName || '', selectedPet.name).catch(() => {});
         }
-        setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned' });
+        setVetForm({ title: '', doctor: '', dateFrom: getTodayLocal(), dateTo: getTodayLocal(), startTime: '10:00', endTime: '11:00', location: '', note: '', reminder: 0, status: 'planned', documents: [] });
         setRepeatScheduleConfig(null);
       } else if (activeSection === 'medications') {
-        if (!medForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
+        if (!medForm.name.trim()) { crossAlert(t('common.error'), t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetMedication(editingItem.id, medForm);
         else await addPetMedication({ ...medForm, petId: selectedPet.id, familyId });
     setMedForm({ name: '', dosage: '', frequency: 1, timeSlots: [{ time: '08:00', reminderMinutes: 15 }], dateFrom: getTodayLocal(), dateTo: getTodayLocal(), note: '' });
       } else if (activeSection === 'food') {
-        if (!foodForm.name.trim()) { crossAlert('Error', t('pets.enterMedicationName')); return; }
+        if (!foodForm.name.trim()) { crossAlert(t('common.error'), t('pets.enterMedicationName')); return; }
         if (isEditing) await updatePetFood(editingItem.id, foodForm);
         else await addPetFood({ ...foodForm, petId: selectedPet.id, familyId });
         setFoodForm({ name: '', time: '', amount: '', note: '' });
       } else if (activeSection === 'grooming') {
-        if (!groomForm.name.trim() || !groomForm.lastDate) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
+        if (!groomForm.name.trim() || !groomForm.lastDate) { crossAlert(t('common.error'), t('pets.enterVetVisitTitle')); return; }
         if (isEditing) await updatePetGrooming(editingItem.id, groomForm);
         else await addPetGrooming({ ...groomForm, petId: selectedPet.id, familyId });
         setGroomForm({ name: '', lastDate: '', nextDate: '', note: '' });
       } else if (activeSection === 'vaccinations') {
-        if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert('Error', t('pets.enterVetVisitTitle')); return; }
+        if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert(t('common.error'), t('pets.enterVetVisitTitle')); return; }
         let savedVacc;
         if (isEditing) {
           await updatePetVaccination(editingItem.id, vaccForm);
@@ -389,7 +402,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         }
         setVaccForm({ name: '', date: '', nextDue: '', reminder: 0, status: 'completed', note: '' });
       } else if (activeSection === 'insurance') {
-        if (!insForm.provider.trim()) { crossAlert('Error', t('pets.enterInsuranceInfo')); return; }
+        if (!insForm.provider.trim()) { crossAlert(t('common.error'), t('pets.enterInsuranceInfo')); return; }
         if (isEditing) await updatePetInsurance(editingItem.id, insForm);
         else await addPetInsurance({ ...insForm, petId: selectedPet.id, familyId });
         setInsForm({ provider: '', policyNumber: '', expiryDate: '', documentUrl: '', note: '' });
@@ -402,7 +415,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         navigation.setParams({ returnToEvents: undefined });
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -418,7 +431,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
       setItemActionModal({ visible: false, id: '', title: '', section: 'vetVisits' });
       loadPetData();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -569,7 +582,7 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
                         const url = await webUploadFile(path, blob);
                         setPetForm(f => ({ ...f, photoUrl: url }));
                       } catch (err) {
-                        crossAlert('Error', getErrorMessage(err));
+                        crossAlert(t('common.error'), getErrorMessage(err));
                       }
                     }
                   }}
@@ -1697,4 +1710,10 @@ const styles = StyleSheet.create({
   calendarWebButton: { padding: 14, borderRadius: 12, alignItems: 'center' },
   calendarWebButtonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
   sectionLabel: { fontSize: 13, fontWeight: '600' },
+  timeSlot: { flexDirection: 'row', alignItems: 'center', gap: 10, padding: 12, borderRadius: 10, marginBottom: 10 },
+  timeSlotLabel: { fontSize: 14, fontWeight: '600', minWidth: 55 },
+  timeInput: { padding: 10, borderRadius: 8, minWidth: 90 },
+  reminderRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginLeft: 'auto' },
+  reminderLabel: { fontSize: 12, fontWeight: '500' },
+  reminderChip: { paddingVertical: 5, paddingHorizontal: 10, borderRadius: 10 },
 });

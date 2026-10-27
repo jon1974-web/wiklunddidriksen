@@ -5,7 +5,7 @@ import { WebCalendar } from '../platform/CalendarView';
 import { collection, query, where, orderBy, onSnapshot, deleteDoc, doc, limit, getDocs } from 'firebase/firestore';
 import { db } from '../services/firebase';
 import { useUserStore } from '../store/userStore';
-import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity, HomeService } from '../types';
+import { Event, Trip, SpondEvent, SpondRespondent, SpondGroupMember, Birthday, HealthAppointment, HealthMedication, HealthVaccination, PetVetVisit, PetVaccination, PetMedication, SchoolHoliday, SchoolChild, KindergartenChild, SchoolActivity, KindergartenActivity, HomeService, Home } from '../types';
 import { EventCard } from '../components/EventCard';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
@@ -125,13 +125,25 @@ export const getSpondStampStatus = (
   return { type: 'partial', details };
 };
 
+/** Shared shape for health appointments, vaccinations and pet visits shown in the agenda. */
+type HealthAgendaItem = {
+  id: string;
+  title: string;
+  time: string;
+  date: string;
+  address?: string;
+  icon?: string;
+  description?: string;
+  startTime?: string;
+  endTime?: string;
+  dateFrom?: string;
+};
+
 type UnifiedItem =
   | (Event & { _type: 'event' })
   | (Trip & { _type: 'trip' })
   | (SpondEvent & { _type: 'spond' })
-  | (HealthAppointment & { _type: 'healthAppointment' })
-  | (PetVetVisit & { _type: 'petVetVisit'; title: string; address?: string; time: string; icon?: string })
-  | (PetVaccination & { _type: 'petVaccination'; title: string; address?: string; time: string; icon?: string })
+  | (HealthAgendaItem & { _type: 'healthAppointment' })
   | (SchoolActivity & { _type: 'schoolActivity'; time: string; address?: string; icon?: string })
   | (KindergartenActivity & { _type: 'kindergartenActivity'; time: string; address?: string; icon?: string })
   | (HomeService & { _type: 'homeService'; time: string; address?: string; icon?: string })
@@ -214,7 +226,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       })) as Event[];
       setEvents(eventsData);
     }, (error) => {
-      Alert.alert('Error', getErrorMessage(error));
+      Alert.alert(t('common.error'), getErrorMessage(error));
     });
     return () => unsubscribe();
   }, [familyId]);
@@ -448,7 +460,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         try {
           await deleteDoc(doc(db, 'events', eventId));
         } catch (error) {
-          Alert.alert('Error', getErrorMessage(error));
+          Alert.alert(t('common.error'), getErrorMessage(error));
         }
       },
     });
@@ -551,7 +563,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       }).map((s) => ({
         ...s, _type: 'homeService' as const, time: s.startTime || '09:00', title: s.title, icon: 'vedlikehold',
       }));
-      let dayItems = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities, ...dayHomeServices, ...dayBirthdays];
+      let dayItems: UnifiedItem[] = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities, ...dayHomeServices, ...dayBirthdays];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
       else if (filterModule === 'health') dayItems = dayItems.filter((i) => i._type === 'healthAppointment');
       else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
@@ -895,11 +907,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
             </View>
             <View style={styles.spondCardContent}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-                {item._type === 'event' && item.icon ? (
-                  <AppIcon name={item.icon as any} size={16} color={colors.accent} />
-                ) : (
-                  <Text>{item.icon || '✈️'}</Text>
-                )}
+                <Text>{item.icon || '✈️'}</Text>
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
               </View>
               <View style={styles.spondTimeRow}>
@@ -1059,7 +1067,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
             {mapUrl && (
               <TouchableOpacity
                 style={styles.spondMapContainer}
-                onPress={() => Linking.openURL(getGoogleMapsUrl(item.address))}
+                onPress={() => Linking.openURL(getGoogleMapsUrl(item.address ?? ''))}
               >
                 <Image source={{ uri: mapUrl }} style={styles.spondMapImage} />
               </TouchableOpacity>
@@ -1117,7 +1125,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
             {mapUrl && (
               <TouchableOpacity
                 style={styles.spondMapContainer}
-                onPress={() => Linking.openURL(getGoogleMapsUrl(item.address))}
+                onPress={() => Linking.openURL(getGoogleMapsUrl(item.address ?? ''))}
               >
                 <Image source={{ uri: mapUrl }} style={styles.spondMapImage} />
               </TouchableOpacity>
@@ -1175,7 +1183,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
             {mapUrl && (
               <TouchableOpacity
                 style={styles.spondMapContainer}
-                onPress={() => Linking.openURL(getGoogleMapsUrl(item.address))}
+                onPress={() => Linking.openURL(getGoogleMapsUrl(item.address ?? ''))}
               >
                 <Image source={{ uri: mapUrl }} style={styles.spondMapImage} />
               </TouchableOpacity>

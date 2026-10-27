@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { DatePickerModal } from '../components/DatePickerModal';
 import { addOneHour } from '../utils/dateUtils';
 import { ActionModal } from '../components/ActionModal';
+import { AppIcon, AppIconName } from '../components/AppIcon';
 import { sanitizeInput } from '../utils/validation';
 import { IMAGE_QUALITY } from '../constants/limits';
 
@@ -102,7 +103,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
 
   const sendToCloud = useCallback(async (base64: string | null) => {
     if (!base64) {
-      crossAlert('Error', t('photoEvent.error'));
+      crossAlert(t('common.error'), t('photoEvent.error'));
       return;
     }
 
@@ -155,7 +156,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
         : error?.message?.includes('Failed to fetch')
         ? 'Kunne ikke koble til serveren. Cloud Function kan mangle.'
         : getErrorMessage(error);
-      crossAlert('Error', msg);
+      crossAlert(t('common.error'), msg);
     } finally {
       setProcessing(false);
     }
@@ -238,7 +239,7 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
         });
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setCreating(false);
     }
@@ -336,11 +337,11 @@ export const PhotoEventScreen: React.FC<PhotoEventScreenProps> = ({ navigation }
         <View style={styles.iconGrid}>
           {EVENT_ICONS.map((item) => (
             <TouchableOpacity
-              key={item.emoji}
-              style={[styles.iconOption, { backgroundColor: colors.inputBackground, borderColor: colors.border }, event.icon === item.emoji && { backgroundColor: colors.accent, borderColor: colors.accent }]}
-              onPress={() => updateEvent(index, { icon: event.icon === item.emoji ? '' : item.emoji })}
+              key={item.icon}
+              style={[styles.iconOption, { backgroundColor: colors.inputBackground, borderColor: colors.border }, event.icon === item.icon && { backgroundColor: colors.accent, borderColor: colors.accent }]}
+              onPress={() => updateEvent(index, { icon: event.icon === item.icon ? '' : item.icon })}
             >
-              <Text style={styles.iconEmoji}>{item.emoji}</Text>
+              <AppIcon name={item.icon as AppIconName} size={22} color={event.icon === item.icon ? '#fff' : colors.textSecondary} />
             </TouchableOpacity>
           ))}
         </View>

@@ -100,7 +100,7 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
 
   const sendToCloud = useCallback(async (base64: string | null) => {
     if (!base64) {
-      crossAlert('Error', t('photoRecipe.error'));
+      crossAlert(t('common.error'), t('photoRecipe.error'));
       return;
     }
     setProcessing(true);
@@ -142,7 +142,7 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
         : error?.message?.includes('Failed to fetch')
         ? 'Kunne ikke koble til serveren. Cloud Function kan mangle.'
         : getErrorMessage(error);
-      crossAlert('Error', msg);
+      crossAlert(t('common.error'), msg);
     } finally {
       setProcessing(false);
     }
@@ -192,7 +192,7 @@ export const PhotoRecipeScreen: React.FC<PhotoRecipeScreenProps> = ({ navigation
         });
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setCreating(false);
     }

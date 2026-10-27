@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
@@ -13,12 +13,13 @@ import { InfoModal } from '../components/InfoModal';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
 import { generateId } from '../utils/generateId';
+import { normalizeRecipe, getTranslatedRecipeText, getTranslatedIngredients, getTranslatedInstructions } from '../utils/recipeNormalizers';
 
 const COUNTRY_FLAGS: Record<string, string> = {
-  norge: '🇳🇴', norge: '🇳🇴', norway: '🇳🇴', norsk: '🇳🇴',
+  norge: '🇳🇴', norway: '🇳🇴', norsk: '🇳🇴',
   sverige: '🇸🇪', sweden: '🇸🇪', svensk: '🇸🇪',
   danmark: '🇩🇰', denmark: '🇩🇰', dansk: '🇩🇰',
-  finland: '🇫🇮', finland: '🇫🇮', finsk: '🇫🇮',
+  finland: '🇫🇮', finsk: '🇫🇮',
   italia: '🇮🇹', italy: '🇮🇹', italiensk: '🇮🇹',
   spania: '🇪🇸', spain: '🇪🇸', spansk: '🇪🇸',
   frankrike: '🇫🇷', france: '🇫🇷', fransk: '🇫🇷',
@@ -40,7 +41,7 @@ const COUNTRY_FLAGS: Record<string, string> = {
   russland: '🇷🇺', russia: '🇷🇺', russisk: '🇷🇺',
   marokko: '🇲🇦', morocco: '🇲🇦', marokkansk: '🇲🇦',
   libanon: '🇱🇧', lebanon: '🇱🇧', libanesisk: '🇱🇧',
-  Vietnam: '🇻🇳', vietnamesisk: '🇻🇳',
+  vietnam: '🇻🇳', vietnamesisk: '🇻🇳',
 };
 
 const getCountryFlag = (cuisine: string): string => {
@@ -59,23 +60,18 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const familyId = useUserStore((state) => state.familyId);
   const user = useUserStore((state) => state.user);
-  const recipe = route.params.recipe;
+  const recipe = useMemo(() => normalizeRecipe(route.params.recipe), [route.params.recipe]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [infoModal, setInfoModal] = useState<{ visible: boolean; title: string; message?: string }>({ visible: false, title: '' });
 
-  const getRecipeText = (field: 'name' | 'description' | 'ingredients' | 'instructions') => {
-    if (recipe.translations?.[i18n.language]?.[field]) {
-      return recipe.translations[i18n.language][field];
-    }
-    return recipe[field];
-  };
+  const getRecipeText = (field: 'name' | 'description') => getTranslatedRecipeText(recipe, i18n.language, field);
 
   const toggleFavorite = async () => {
     try {
       await updateDoc(doc(db, 'recipes', recipe.id), { isFavorite: !recipe.isFavorite });
       navigation.setParams({ recipe: { ...recipe, isFavorite: !recipe.isFavorite } });
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -85,7 +81,7 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       setShowDeleteModal(false);
       navigation.goBack();
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -97,7 +93,7 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
       if (listsSnap.docs.length > 0) {
         const listDoc = listsSnap.docs[0];
         const existingItems = listDoc.data().items || [];
-        const newItems = (getRecipeText('ingredients') || recipe.ingredients).map((ing: any) => ({
+        const newItems = getTranslatedIngredients(recipe, i18n.language).map((ing) => ({
           id: generateId(),
           name: ing.amount ? `${ing.name} (${ing.amount} ${ing.unit})` : ing.name,
           checked: false,
@@ -105,12 +101,12 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         await import('firebase/firestore').then(({ updateDoc }) =>
           updateDoc(doc(db, 'shoppingLists', listDoc.id), { items: [...newItems, ...existingItems] })
         );
-        setInfoModal({ visible: true, title: t('common.success'), message: `${recipe.ingredients.length} ingredienser lagt til i handlelisten` });
+        setInfoModal({ visible: true, title: t('common.success'), message: t('mealPlanner.ingredientsAddedToList', { count: recipe.ingredients.length }) });
       } else {
-        setInfoModal({ visible: true, title: t('common.info'), message: 'Opprett en handleliste først' });
+        setInfoModal({ visible: true, title: t('common.info'), message: t('mealPlanner.noShoppingListFirst') });
       }
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     }
   };
 
@@ -168,21 +164,18 @@ export const RecipeDetailScreen: React.FC<Props> = ({ navigation, route }) => {
 
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>📋 {t('mealPlanner.ingredientsList')}</Text>
-          {recipe.ingredients.map((ing, i) => {
-            const translatedIng = getRecipeText('ingredients')?.[i] || ing;
-            return (
-              <View key={i} style={[styles.ingredientRow, { borderBottomColor: colors.border }]}>
-                <View style={styles.ingredientCheck} />
-                <Text style={[styles.ingredientName, { color: colors.text }]}>{translatedIng.name}</Text>
-                <Text style={[styles.ingredientQty, { color: colors.textSecondary }]}>{translatedIng.amount} {translatedIng.unit}</Text>
-              </View>
-            );
-          })}
+          {getTranslatedIngredients(recipe, i18n.language).map((ing, i) => (
+            <View key={i} style={[styles.ingredientRow, { borderBottomColor: colors.border }]}>
+              <View style={styles.ingredientCheck} />
+              <Text style={[styles.ingredientName, { color: colors.text }]}>{ing.name}</Text>
+              <Text style={[styles.ingredientQty, { color: colors.textSecondary }]}>{ing.amount} {ing.unit}</Text>
+            </View>
+          ))}
         </View>
 
         <View style={[styles.card, { backgroundColor: colors.surface }]}>
           <Text style={[styles.cardTitle, { color: colors.text }]}>👨‍🍳 {t('mealPlanner.instructionsList')}</Text>
-          {(getRecipeText('instructions') || recipe.instructions).map((step, i) => (
+          {getTranslatedInstructions(recipe, i18n.language).map((step, i) => (
             <View key={i} style={styles.stepRow}>
               <View style={[styles.stepNum, { backgroundColor: colors.accent }]}>
                 <Text style={{ color: '#fff', fontSize: 12, fontWeight: '700' }}>{i + 1}</Text>

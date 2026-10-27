@@ -131,7 +131,7 @@ export const ListImportModal: React.FC<ListImportModalProps> = ({ visible, kind,
     try {
       await onSave(names);
     } catch (error) {
-      crossAlert('Error', getErrorMessage(error));
+      crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
       setSaving(false);
     }

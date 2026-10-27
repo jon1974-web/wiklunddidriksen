@@ -20,9 +20,9 @@ import { HelpCenter } from '../components/HelpCenter';
 const HOME_THEME = MODULE_COLORS.home;
 
 const STATUS_OPTIONS = [
-  { value: 'active', icon: '▶', color: '#43A047' },
-  { value: 'on-hold', icon: '⏸', color: '#F9A825' },
-  { value: 'completed', icon: '✓', color: '#43A047' },
+  { value: 'active', icon: '▶', color: '#43A047', labelKey: 'homes.projectActive' },
+  { value: 'on-hold', icon: '⏸', color: '#F9A825', labelKey: 'homes.projectOnHold' },
+  { value: 'completed', icon: '✓', color: '#43A047', labelKey: 'homes.projectCompleted' },
 ] as const;
 
 interface HomeProjectListScreenProps {
@@ -95,7 +95,8 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
         familyId,
       };
       if (editingProject) {
-        if (formStatus === 'completed' && !editingProject.endDate) {
+        const existingProject = projects.find((p) => p.id === editingProject);
+        if (formStatus === 'completed' && !existingProject?.endDate) {
           data.endDate = today;
         }
         await updateHomeProject(editingProject, data);
@@ -303,7 +304,7 @@ export const HomeProjectListScreen: React.FC<HomeProjectListScreenProps> = ({ na
                         style={[styles.statusOption, { backgroundColor: colors.surface, borderColor: isSelected ? HOME_THEME : colors.border }, isSelected && { backgroundColor: HOME_THEME }]}
                         onPress={() => setFormStatus(opt.value)}
                       >
-                        <Text style={{ fontSize: 12, color: isSelected ? '#fff' : colors.text }}>{opt.icon} {opt.label}</Text>
+                        <Text style={{ fontSize: 12, color: isSelected ? '#fff' : colors.text }}>{opt.icon} {t(opt.labelKey)}</Text>
                       </TouchableOpacity>
                     );
                   })}
@@ -365,7 +366,7 @@ const styles = StyleSheet.create({
   projectCardDesc: { fontSize: 13, lineHeight: 18 },
   statusBadge: { paddingHorizontal: 8, paddingVertical: 3, borderRadius: 8 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)', justifyContent: 'flex-end' },
-  modalContent: { borderTopLeftRadius: 20, borderTopRight: 20, maxHeight: '85%', padding: 20 },
+  modalContent: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '85%', padding: 20 },
   modalHandleBar: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#ccc', alignSelf: 'center', marginBottom: 16 },
   modalTitle: { fontSize: 22, fontWeight: '700', marginBottom: 16 },
   field: { marginBottom: 16 },

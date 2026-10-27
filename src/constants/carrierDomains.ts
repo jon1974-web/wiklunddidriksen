@@ -50,7 +50,6 @@ const CARRIER_DOMAINS: Record<string, string> = {
   'norled': 'norled.no',
   'lf ferjer': 'ffferjer.no',
   'ferjeforbindelsen': 'ffferjer.no',
-  'nettbuss': 'nettbuss.no',
   'taxi': 'taxi.no',
   'oslo taxi': 'oslotaxi.no',
   'bergen taxi': 'bergentaxi.no',
