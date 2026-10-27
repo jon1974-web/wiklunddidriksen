@@ -3503,7 +3503,8 @@ exports.googleCalendarStart = onRequest({ region: "us-central1" }, async (req, r
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
-  const scopes = ["https://www.googleapis.com/auth/calendar.events"];
+  // "email" scope is required so the userinfo call returns the account email
+  const scopes = ["openid", "email", "https://www.googleapis.com/auth/calendar.events"];
   const params = new URLSearchParams({
     client_id: GOOGLE_CLIENT_ID,
     redirect_uri: GOOGLE_REDIRECT_URI,
@@ -3566,7 +3567,8 @@ exports.googleCalendarCallback = onRequest({ region: "us-central1" }, async (req
       refreshToken: tokenData.refresh_token || null,
       expiresAt: Date.now() + (tokenData.expires_in * 1000),
     });
-    const userData = { calendarType: "google" };
+    // calendarConnected is set only here (server), so the profile can show the real connection state
+    const userData = { calendarType: "google", calendarConnected: true };
     if (userInfo.email) {
       userData.calendarEmail = userInfo.email;
     }

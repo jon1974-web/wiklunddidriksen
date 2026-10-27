@@ -899,10 +899,10 @@ export const ProfileScreen: React.FC = () => {
         {/* Google Calendar View */}
         {calendarType === 'google' && (
           <View>
-            {profile?.calendarEmail ? (
+            {profile?.calendarConnected || profile?.calendarEmail ? (
               <View>
                 <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
-                  <Text style={[styles.value, { color: colors.text }]}>📧 {profile.calendarEmail}</Text>
+                  <Text style={[styles.value, { color: colors.text }]}>📧 {profile.calendarEmail || t('profile.googleConnectedNoEmail')}</Text>
                   <Text style={[styles.editIcon, { color: colors.accent }]}>{t('profile.connectedBadgeCheck')}</Text>
                 </View>
                 <TouchableOpacity

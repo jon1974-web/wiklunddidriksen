@@ -93,6 +93,7 @@ async function deleteCalendarTokens(db, uid) {
   await db.collection("users").doc(uid).update({
     calendarType: FieldValue.delete(),
     calendarEmail: FieldValue.delete(),
+    calendarConnected: FieldValue.delete(),
     ...legacyDeleteFields(),
   }).catch(() => {});
 }

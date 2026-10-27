@@ -1060,7 +1060,8 @@
     "shareLinkTitle": "Invitasjon",
     "spondDisconnectConfirm": "Spond-innloggingen og gruppene fjernes fra familien.",
     "spondPasswordRequired": "Skriv inn Spond-passordet på nytt for å lagre.",
-    "spondPasswordKeep": "Spond-passord (la stå tomt for å beholde det lagrede)"
+    "spondPasswordKeep": "Spond-passord (la stå tomt for å beholde det lagrede)",
+    "googleConnectedNoEmail": "Tilkoblet Google Kalender"
   },
   "voice": {
     "title": "Tal til arrangement",

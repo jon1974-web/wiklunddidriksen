@@ -295,6 +295,8 @@ export interface UserProfile {
   timezone?: string; // IANA timezone, e.g. "Europe/Oslo"
   /** Google Calendar connection. Tokens are stored server-side only (calendarTokens). */
   calendarType?: 'phone' | 'google' | null;
+  /** Set by the server after a successful Google connection; cleared on disconnect. */
+  calendarConnected?: boolean;
   createdAt: number;
 }
 

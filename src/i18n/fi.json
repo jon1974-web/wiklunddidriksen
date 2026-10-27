@@ -1045,7 +1045,8 @@
     "shareLinkTitle": "Kutsu",
     "spondDisconnectConfirm": "Spond-kirjautuminen ja ryhmät poistetaan perheeltä.",
     "spondPasswordRequired": "Syötä Spond-salasana uudelleen tallentaaksesi.",
-    "spondPasswordKeep": "Spond-salasana (jätä tyhjäksi säilyttääksesi tallennetun)"
+    "spondPasswordKeep": "Spond-salasana (jätä tyhjäksi säilyttääksesi tallennetun)",
+    "googleConnectedNoEmail": "Yhdistetty Google-kalenteriin"
   },
   "chat": {
     "title": "Perhekeskustelu",

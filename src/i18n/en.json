@@ -1060,7 +1060,8 @@
     "shareLinkTitle": "Invitation",
     "spondDisconnectConfirm": "The Spond login and groups will be removed from the family.",
     "spondPasswordRequired": "Enter the Spond password again to save.",
-    "spondPasswordKeep": "Spond password (leave empty to keep the saved one)"
+    "spondPasswordKeep": "Spond password (leave empty to keep the saved one)",
+    "googleConnectedNoEmail": "Connected to Google Calendar"
   },
   "voice": {
     "title": "Talk to event",
