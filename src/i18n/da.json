@@ -1041,7 +1041,8 @@
     "calendarTypeGoogle": "📧 Google Calendar",
     "connectedBadgeCheck": "Tilsluttet ✓",
     "connectGoogleButton": "Tilslut Google",
-    "shareLinkTitle": "Invitation"
+    "shareLinkTitle": "Invitation",
+    "spondDisconnectConfirm": "Spond-login og grupperne fjernes fra familien."
   },
   "chat": {
     "title": "Familiechat",

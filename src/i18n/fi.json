@@ -1041,7 +1041,8 @@
     "calendarTypeGoogle": "📧 Google-kalenteri",
     "connectedBadgeCheck": "Yhdistetty ✓",
     "connectGoogleButton": "Yhdistä Googleen",
-    "shareLinkTitle": "Kutsu"
+    "shareLinkTitle": "Kutsu",
+    "spondDisconnectConfirm": "Spond-kirjautuminen ja ryhmät poistetaan perheeltä."
   },
   "chat": {
     "title": "Perhekeskustelu",

@@ -683,25 +683,35 @@ export const ProfileScreen: React.FC = () => {
 
   const performDisconnectSpond = useCallback(async () => {
     if (!familyId) return;
-    await saveSpondConfig(familyId, { email: '', password: '', groups: [], respondents: [] });
-    setSpondEmail('');
-    setSpondPassword('');
-    setSpondGroups([]);
-    setSpondSelectedGroups([]);
-    setSpondAllMembers([]);
-    setSpondRespondents([]);
-    setSpondConnected(false);
-    clearSpondToken();
-  }, [familyId]);
+    try {
+      await saveSpondConfig(familyId, { email: '', password: '', groups: [], respondents: [] });
+      setSpondEmail('');
+      setSpondPassword('');
+      setSpondGroups([]);
+      setSpondSelectedGroups([]);
+      setSpondAllMembers([]);
+      setSpondRespondents([]);
+      setSpondConnected(false);
+      clearSpondToken();
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
+  }, [familyId, t]);
 
   const handleLogout = async () => {
     setShowLogoutModal(true);
   };
 
   const performLogout = async () => {
-    await signOut(auth);
-    setUser(null);
-    setFamily(null, null);
+    try {
+      // Spond credentials are per-device cache; clear them so the next user does not inherit them
+      clearSpondToken();
+      await signOut(auth);
+      setUser(null);
+      setFamily(null, null);
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
   };
 
   if (loading) {
@@ -1546,16 +1556,20 @@ export const ProfileScreen: React.FC = () => {
       <ActionModal
         visible={showLogoutModal}
         title={t('profile.logout')}
-        subtitle="Er du sikker på at du vil logge ut?"
+        subtitle={t('profile.logoutConfirm')}
         onDelete={performLogout}
         onCancel={() => setShowLogoutModal(false)}
+        confirmText={t('profile.logout')}
+        confirmColor={colors.accent}
       />
       <ActionModal
         visible={showDisconnectSpondModal}
-        title="Koble fra Spond"
-        subtitle="Er du sikker?"
+        title={t('profile.spondDisconnectTitle')}
+        subtitle={t('profile.spondDisconnectConfirm')}
         onDelete={performDisconnectSpond}
         onCancel={() => setShowDisconnectSpondModal(false)}
+        confirmText={t('profile.spondDisconnect')}
+        confirmColor={colors.danger}
       />
 
     </SafeAreaView>

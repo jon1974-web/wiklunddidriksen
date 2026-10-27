@@ -13,10 +13,14 @@ interface ActionModalProps {
   accentColor?: string;
   editColor?: string;
   cancelText?: string;
+  /** Label for the onDelete button. Defaults to the delete label. Use for non-delete confirmations (e.g. log out). */
+  confirmText?: string;
+  /** Background for the onDelete button. Defaults to red (danger). */
+  confirmColor?: string;
 }
 
 export const ActionModal: React.FC<ActionModalProps> = React.memo(({
-  visible, title, subtitle, onEdit, onDelete, onCancel, accentColor, editColor, cancelText,
+  visible, title, subtitle, onEdit, onDelete, onCancel, accentColor, editColor, cancelText, confirmText, confirmColor,
 }) => {
   const { colors } = useTheme();
   const { t } = useTranslation();
@@ -44,10 +48,10 @@ export const ActionModal: React.FC<ActionModalProps> = React.memo(({
 
               {onDelete && (
                 <TouchableOpacity
-                  style={[styles.button, { backgroundColor: '#E53935' }]}
+                  style={[styles.button, { backgroundColor: confirmColor || '#E53935' }]}
                   onPress={() => { onDelete(); onCancel(); }}
                 >
-                  <Text style={[styles.buttonText, { color: '#fff' }]}>🗑️ {t('actionModal.delete')}</Text>
+                  <Text style={[styles.buttonText, { color: '#fff' }]}>{confirmText ? confirmText : `🗑️ ${t('actionModal.delete')}`}</Text>
                 </TouchableOpacity>
               )}
 

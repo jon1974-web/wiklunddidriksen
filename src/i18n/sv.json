@@ -1041,7 +1041,8 @@
     "calendarTypeGoogle": "📧 Google Kalender",
     "connectedBadgeCheck": "Ansluten ✓",
     "connectGoogleButton": "Anslut till Google",
-    "shareLinkTitle": "Inbjudan"
+    "shareLinkTitle": "Inbjudan",
+    "spondDisconnectConfirm": "Spond-inloggningen och grupperna tas bort från familjen."
   },
   "chat": {
     "title": "Familjechatt",

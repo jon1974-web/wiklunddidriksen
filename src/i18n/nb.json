@@ -1056,7 +1056,8 @@
     "calendarTypeGoogle": "📧 Google Kalender",
     "connectedBadgeCheck": "Koblet til ✓",
     "connectGoogleButton": "Koble til Google",
-    "shareLinkTitle": "Invitasjon"
+    "shareLinkTitle": "Invitasjon",
+    "spondDisconnectConfirm": "Spond-innloggingen og gruppene fjernes fra familien."
   },
   "voice": {
     "title": "Tal til arrangement",

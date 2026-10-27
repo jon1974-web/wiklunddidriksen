@@ -1056,7 +1056,8 @@
     "calendarTypeGoogle": "📧 Google Calendar",
     "connectedBadgeCheck": "Connected ✓",
     "connectGoogleButton": "Connect Google",
-    "shareLinkTitle": "Invitation"
+    "shareLinkTitle": "Invitation",
+    "spondDisconnectConfirm": "The Spond login and groups will be removed from the family."
   },
   "voice": {
     "title": "Talk to event",
