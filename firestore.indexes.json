@@ -350,6 +350,11 @@
       "collectionGroup": "petVaccinations",
       "fieldPath": "reminderAt",
       "indexes": [{ "queryScope": "COLLECTION_GROUP", "order": "ASCENDING" }]
+    },
+    {
+      "collectionGroup": "vaccinations",
+      "fieldPath": "reminderAt",
+      "indexes": [{ "queryScope": "COLLECTION_GROUP", "order": "ASCENDING" }]
     }
   ]
 }

@@ -7,7 +7,9 @@ const { onDocumentDeleted } = require("firebase-functions/v2/firestore");
 const { initializeApp } = require("firebase-admin/app");
 const { getAuth } = require("firebase-admin/auth");
 const { getMessaging } = require("firebase-admin/messaging");
-const { getFirestore, FieldValue } = require("firebase-admin/firestore");
+const { getFirestore, FieldValue, FieldPath } = require("firebase-admin/firestore");
+const reminderRules = require("./reminderRules");
+const { runReminderBackfill } = require("./reminderBackfill");
 const OpenAI = require("openai");
 const functions = require("firebase-functions");
 const Busboy = require("busboy");
@@ -1830,17 +1832,18 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
   // All non-event reminders share one pattern: the client stores reminderAt (ISO),
   // and this job sends a push when reminderAt falls inside the window.
   // Requires a COLLECTION_GROUP index on reminderAt (firestore.indexes.json fieldOverrides).
-  const dueReminderDocs = async (groupName) => {
-    const snap = await db.collectionGroup(groupName)
+  const dueReminderDocs = async (groupName, topLevel) => {
+    const base = topLevel ? db.collection(groupName) : db.collectionGroup(groupName);
+    const snap = await base
       .where("reminderAt", ">=", thirtyMinAgo.toISOString())
       .where("reminderAt", "<=", fiveMinFromNow.toISOString())
       .get();
     return snap.docs;
   };
 
-  const runReminderGroup = async (groupName, handle) => {
+  const runReminderGroup = async (groupName, handle, topLevel = false) => {
     try {
-      const docs = await dueReminderDocs(groupName);
+      const docs = await dueReminderDocs(groupName, topLevel);
       for (const doc of docs) {
         try {
           totalSent += await handle(doc);
@@ -1891,6 +1894,33 @@ exports.checkReminders = onSchedule({ schedule: "every 1 minutes", timeZone: "UT
       title: `${icon} ${typeLabel}: ${actData.title}`,
       body: `Påminnelse: ${actData.dateFrom || ""}${when}`,
       notifKey: `activity_${doc.id}_${actData.reminderAt}`,
+    });
+  });
+
+  // Home services: homeServices/{id} (top-level, one reminder per service date)
+  await runReminderGroup("homeServices", async (doc) => {
+    const svc = doc.data();
+    if (!svc.familyId || svc.status === "completed") return 0;
+    const when = svc.startTime ? ` kl. ${svc.startTime}` : "";
+    return sendNotification({
+      familyId: svc.familyId,
+      title: `🔧 ${svc.title || "Hjemmeservice"}`,
+      body: `Påminnelse: ${svc.dateFrom || ""}${when}`,
+      notifKey: `homeservice_${doc.id}_${svc.reminderAt}`,
+    });
+  }, true);
+
+  // Health vaccinations: health/{familyId}/vaccinations/{id}; reminder is before nextDue
+  await runReminderGroup("vaccinations", async (doc) => {
+    if (doc.ref.parent.parent?.parent?.id !== "health") return 0;
+    const vacc = doc.data();
+    const familyId = doc.ref.parent.parent.id;
+    if (!familyId) return 0;
+    return sendNotification({
+      familyId,
+      title: `💉 ${vacc.name || "Vaksine"}`,
+      body: `Påminnelse: vaksinen forfaller ${vacc.nextDue || ""}`,
+      notifKey: `healthvacc_${doc.id}_${vacc.reminderAt}`,
     });
   });
 
@@ -3349,6 +3379,19 @@ exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, asyn
 
   await ref.set(update, { merge: true });
   return res.status(200).json({ success: true });
+});
+
+// One-time backfill of reminderAt for records saved before reminders were stored consistently.
+// Idempotent: only fills records that have a reminder but no reminderAt, and skips past reminders.
+const REMINDER_BACKFILL_DOC = "systemConfig/reminderBackfill";
+// Runs the backfill once (until it has completed), then does nothing.
+exports.backfillRemindersOnce = onSchedule({ schedule: "every 10 minutes", timeZone: "UTC", region: "us-central1", timeoutSeconds: 540, memory: "512MB" }, async () => {
+  const db = getFirestore();
+  const stateRef = db.doc(REMINDER_BACKFILL_DOC);
+  if ((await stateRef.get()).data()?.completed) return;
+  const report = await runReminderBackfill(db);
+  await stateRef.set({ completed: true, completedAt: new Date().toISOString(), report });
+  console.log("backfillRemindersOnce:", JSON.stringify(report));
 });
 
 // Helper: Create a Date object from a time string (HH:MM) in a specific timezone

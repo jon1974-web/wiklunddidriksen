@@ -12,6 +12,7 @@ import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
 import { getTodayLocal, formatDate } from '../utils/dateUtils';
+import { buildReminderFields } from '../utils/reminders';
 import { REMINDER_OPTIONS } from '../constants/reminderOptions';
 import { Home, HomeService, HomePaintColor, HomeProject } from '../types';
 import { getHomeServices, addHomeService, updateHomeService, deleteHomeService, getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeProjects } from '../services/homeService';
@@ -184,7 +185,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
         dateTo: svcDateTo,
         startTime: svcStartTime,
         endTime: svcEndTime,
-        reminder: svcReminder,
+        ...buildReminderFields(svcDateFrom, svcStartTime, svcReminder),
         frequency: svcFrequency,
         persons: svcPersons,
         status: 'planned' as const,

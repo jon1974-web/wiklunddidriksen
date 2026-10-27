@@ -551,7 +551,9 @@ export interface HealthVaccination {
   dateFrom?: string;
   nextDue?: string;
   status: 'completed' | 'pending' | 'overdue';
-  reminder?: string;
+  /** Minutes before nextDue (09:00). 0 or undefined = no reminder. */
+  reminder?: number;
+  reminderAt?: string | null;
   location?: string;
   note?: string;
   createdAt: number;

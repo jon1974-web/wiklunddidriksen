@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { buildReminderFields } from '../utils/reminders';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { buildReminderFields, legacyVaccinationReminderMinutes } from '../utils/reminders';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ScrollView, TextInput, Modal, Alert, Image, Linking, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
@@ -78,7 +78,20 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
   const [preloadedDays, setPreloadedDays] = useState<number[]>([]);
   const [preloadedWeeks, setPreloadedWeeks] = useState<number>(4);
   const [preloadedWeekType, setPreloadedWeekType] = useState<string>('all');
-  const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: '', location: '', note: '' });
+  const [vaccForm, setVaccForm] = useState({ name: '', person: '', date: '', nextDue: '', reminder: 0, location: '', note: '' });
+  // Vaccination reminders are minutes before nextDue (09:00)
+  // Label for a stored reminder in minutes (vaccination options first, then the shared options)
+  const reminderLabel = useCallback((minutes: number): string => {
+    const known = [{ value: 1440, label: t('health.reminder1Day') }, { value: 4320, label: t('health.reminder3Days') }, { value: 10080, label: t('health.reminder1Week') }, ...REMINDER_OPTIONS]
+      .find((o) => o.value === minutes);
+    return known ? known.label : String(minutes);
+  }, [t]);
+  const vaccReminderOptions = useMemo(() => [
+    { value: 0, label: t('health.noReminder') },
+    { value: 1440, label: t('health.reminder1Day') },
+    { value: 4320, label: t('health.reminder3Days') },
+    { value: 10080, label: t('health.reminder1Week') },
+  ], [t]);
   const [allergyForm, setAllergyForm] = useState({ allergen: '', person: '', severity: 'mild' as 'mild' | 'moderate' | 'severe', note: '' });
   const [growthForm, setGrowthForm] = useState({ person: '', height: '', weight: '', date: '', note: '' });
 
@@ -226,17 +239,17 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
         if (!vaccForm.name.trim() || !vaccForm.date) { crossAlert(t('common.error'), t('health.enterNameAndDate')); return; }
         let savedVacc;
         if (isEditing) {
-          await updateHealthVaccination(familyId, editingItem.id, vaccForm);
+          await updateHealthVaccination(familyId, editingItem.id, { ...vaccForm, ...buildReminderFields(vaccForm.nextDue, '09:00', vaccForm.reminder) });
           savedVacc = { ...vaccForm, id: editingItem.id, status: 'pending' };
         } else {
-          const id = await addHealthVaccination(familyId, { ...vaccForm, status: 'pending' });
+          const id = await addHealthVaccination(familyId, { ...vaccForm, status: 'pending', ...buildReminderFields(vaccForm.nextDue, '09:00', vaccForm.reminder) });
           savedVacc = { ...vaccForm, id, status: 'pending' };
         }
         // Send push notification to family members
         if (!isEditing) {
           notifyHealthItem(familyId, vaccForm.name, vaccForm.date, '', vaccForm.location || '', 'vaccination', user?.displayName || '', vaccForm.person).catch(() => {});
         }
-        setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: '', location: '', note: '' });
+        setVaccForm({ name: '', person: persons[0] || '', date: '', nextDue: '', reminder: 0, location: '', note: '' });
       } else if (activeSection === 'allergies') {
         if (!allergyForm.allergen.trim()) { crossAlert(t('common.error'), t('health.enterAllergen')); return; }
         if (isEditing) await updateHealthAllergy(familyId, editingItem.id, allergyForm);
@@ -304,7 +317,7 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
       if (item) setApptForm({ title: item.title, person: Array.isArray(item.person) ? item.person : item.person ? [item.person] : [], doctor: item.doctor || '', dateFrom: item.dateFrom, dateTo: item.dateTo || '', startTime: item.startTime, endTime: item.endTime || '', location: item.location || '', note: item.note || '', reminder: item.reminder || 0, documents: item.documents || [] });
     } else if (section === 'vaccinations') {
       const item = vaccinations.find(v => v.id === id);
-      if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: item.reminder || '', location: item.location || '', note: item.note || '' });
+      if (item) setVaccForm({ name: item.name, person: item.person, date: item.date, nextDue: item.nextDue || '', reminder: legacyVaccinationReminderMinutes(item.reminder), location: item.location || '', note: item.note || '' });
     } else if (section === 'allergies') {
       const item = allergies.find(a => a.id === id);
       if (item) setAllergyForm({ allergen: item.allergen, person: item.person, severity: item.severity, note: item.note || '' });
@@ -727,9 +740,9 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                   <View style={styles.field}>
                     <Text style={[styles.label, { color: colors.text }]}>{t('health.reminder')}</Text>
                     <View style={styles.personRow}>
-                      {['', t('health.reminder1Day'), t('health.reminder3Days'), t('health.reminder1Week')].map((r, i) => (
-                        <TouchableOpacity key={i} style={[styles.personChip, { backgroundColor: vaccForm.reminder === r ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, reminder: r }))}>
-                          <Text style={{ color: vaccForm.reminder === r ? '#fff' : colors.text, fontSize: 13 }}>{r || t('health.noReminder')}</Text>
+                      {vaccReminderOptions.map((option) => (
+                        <TouchableOpacity key={option.value} style={[styles.personChip, { backgroundColor: vaccForm.reminder === option.value ? MODULE_COLORS.health : colors.inputBackground }]} onPress={() => setVaccForm(f => ({ ...f, reminder: option.value }))}>
+                          <Text style={{ color: vaccForm.reminder === option.value ? '#fff' : colors.text, fontSize: 13 }}>{option.label}</Text>
                         </TouchableOpacity>
                       ))}
                     </View>
@@ -980,10 +993,10 @@ export const HealthSpaceScreen: React.FC<HealthSpaceScreenProps> = ({ navigation
                         <Text style={[styles.viewDetailValue, { color: colors.text }]} numberOfLines={2}>{detailModal.item.location}</Text>
                       </View>
                     )}
-                    {detailModal.item.reminder && (
+                    {Number(detailModal.item.reminder) > 0 && (
                       <View style={styles.viewDetailRow}>
                         <Text style={[styles.viewDetailLabel, { color: colors.textSecondary }]}>🔔 {t('health.reminder')}</Text>
-                        <Text style={[styles.viewDetailValue, { color: colors.text }]}>{detailModal.item.reminder}</Text>
+                        <Text style={[styles.viewDetailValue, { color: colors.text }]}>{reminderLabel(Number(detailModal.item.reminder))}</Text>
                       </View>
                     )}
                     {detailModal.item.note && (
