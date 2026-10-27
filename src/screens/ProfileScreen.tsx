@@ -54,6 +54,7 @@ import { HelpCenter } from '../components/HelpCenter';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
 
+const START_GOOGLE_CALENDAR_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/googleCalendarStart';
 const DISCONNECT_GOOGLE_CALENDAR_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/disconnectGoogleCalendar';
 
 
@@ -503,8 +504,21 @@ export const ProfileScreen: React.FC = () => {
   const handleSaveCalendarPreference = useCallback(async (provider: 'google' | 'outlook') => {
     if (!user) return;
     if (provider === 'google') {
-      // Redirect to Google OAuth
-      window.location.href = `https://us-central1-familiesenter-837bb.cloudfunctions.net/googleCalendarAuth?uid=${user.uid}`;
+      // The server issues a signed OAuth state bound to this user, then we navigate to Google
+      try {
+        const currentUser = auth.currentUser;
+        if (!currentUser) return;
+        const idToken = await currentUser.getIdToken();
+        const res = await fetch(START_GOOGLE_CALENDAR_URL, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+        if (!res.ok) throw new Error('Could not start Google Calendar connection');
+        const { url } = await res.json();
+        window.location.href = url;
+      } catch (error) {
+        crossAlert(t('common.error'), getErrorMessage(error));
+      }
       return;
     }
     if (!calendarEmail.trim()) return;
@@ -519,7 +533,7 @@ export const ProfileScreen: React.FC = () => {
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     }
-  }, [user, calendarEmail]);
+  }, [user, calendarEmail, t]);
 
   const handleGoogleCalendarBackfill = useCallback(async (dryRun: boolean) => {
     if (!user || !familyId || googleSyncBusy) return;
@@ -573,7 +587,7 @@ export const ProfileScreen: React.FC = () => {
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     }
-  }, [user]);
+  }, [user, t]);
 
   const handleToggleNotifications = useCallback(async (value: boolean) => {
     if (!user) return;

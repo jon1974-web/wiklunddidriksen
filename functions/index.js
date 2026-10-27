@@ -13,6 +13,7 @@ const functions = require("firebase-functions");
 const Busboy = require("busboy");
 const crypto = require("crypto");
 const calendarTokens = require("./calendarTokenStore");
+const oauthState = require("./oauthState");
 
 initializeApp();
 
@@ -3393,30 +3394,38 @@ const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const GOOGLE_REDIRECT_URI = "https://us-central1-familiesenter-837bb.cloudfunctions.net/googleCalendarCallback";
 
 // Step 1: Redirect to Google OAuth
-exports.googleCalendarAuth = onRequest({ region: "us-central1" }, async (req, res) => {
-  const uid = req.query.uid;
-  if (!uid) {
-    res.status(400).send("Missing uid parameter");
-    return;
-  }
+// Authenticated start of the Google Calendar connect flow.
+// The client calls this with its Firebase ID token and then navigates to the returned URL.
+exports.googleCalendarStart = onRequest({ region: "us-central1" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
   const scopes = ["https://www.googleapis.com/auth/calendar.events"];
-  const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
-    `client_id=${GOOGLE_CLIENT_ID}` +
-    `&redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI)}` +
-    `&response_type=code` +
-    `&scope=${encodeURIComponent(scopes.join(" "))}` +
-    `&access_type=offline` +
-    `&prompt=consent` +
-    `&state=${uid}`;
+  const params = new URLSearchParams({
+    client_id: GOOGLE_CLIENT_ID,
+    redirect_uri: GOOGLE_REDIRECT_URI,
+    response_type: "code",
+    scope: scopes.join(" "),
+    access_type: "offline",
+    prompt: "consent",
+    state: oauthState.createState(uid),
+  });
+  return res.status(200).json({ url: `https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}` });
+});
 
-  res.redirect(authUrl);
+// Retired: the unauthenticated redirect allowed linking any uid. Use googleCalendarStart.
+exports.googleCalendarAuth = onRequest({ region: "us-central1" }, async (req, res) => {
+  res.status(410).send("Gone. Use googleCalendarStart.");
 });
 
 // Step 2: Handle OAuth callback
 exports.googleCalendarCallback = onRequest({ region: "us-central1" }, async (req, res) => {
   const code = req.query.code;
-  const uid = req.query.state;
+  const uid = oauthState.verifyState(req.query.state);
 
   if (!code || !uid) {
     res.status(400).send("Missing code or state parameter");
