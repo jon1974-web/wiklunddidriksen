@@ -54,6 +54,8 @@ import { HelpCenter } from '../components/HelpCenter';
 import { AppIcon } from '../components/AppIcon';
 import { ActionModal } from '../components/ActionModal';
 
+const DISCONNECT_GOOGLE_CALENDAR_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/disconnectGoogleCalendar';
+
 
 // createOrUpdateUser converts null values to deleteField() before writing.
 const saveCalendarFields = (uid: string, fields: Partial<UserProfile>) => createOrUpdateUser(uid, fields);
@@ -550,13 +552,19 @@ export const ProfileScreen: React.FC = () => {
   const handleDisconnectCalendarEmail = useCallback(async () => {
     if (!user) return;
     try {
+      // Server deletes and revokes the Google tokens; the client never holds them.
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+      const idToken = await currentUser.getIdToken();
+      const res = await fetch(DISCONNECT_GOOGLE_CALENDAR_URL, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      if (!res.ok) throw new Error('Could not disconnect Google Calendar');
       await saveCalendarFields(user.uid, {
         calendarEmail: null,
         calendarProvider: null,
         calendarType: null,
-        calendarAccessToken: null,
-        calendarRefreshToken: null,
-        calendarTokenExpiry: null,
       });
       setCalendarEmail('');
       setCalendarProvider(null);
@@ -855,7 +863,7 @@ export const ProfileScreen: React.FC = () => {
         {/* Google Calendar View */}
         {calendarType === 'google' && (
           <View>
-            {profile?.calendarAccessToken ? (
+            {calendarEmail ? (
               <View>
                 <View style={[styles.valueRow, { backgroundColor: colors.inputBackground }]}>
                   <Text style={[styles.value, { color: colors.text }]}>📧 {calendarEmail || 'Google Kalender'}</Text>

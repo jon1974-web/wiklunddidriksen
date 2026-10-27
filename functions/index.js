@@ -12,6 +12,7 @@ const OpenAI = require("openai");
 const functions = require("firebase-functions");
 const Busboy = require("busboy");
 const crypto = require("crypto");
+const calendarTokens = require("./calendarTokenStore");
 
 initializeApp();
 
@@ -3450,18 +3451,24 @@ exports.googleCalendarCallback = onRequest({ region: "us-central1" }, async (req
     });
     const userInfo = await userInfoResponse.json();
 
-    // Save tokens to Firestore
+    // Save tokens encrypted in calendarTokens/{uid} (not readable by clients)
     const db = getFirestore();
-    const calendarData = {
-      calendarType: "google",
-      calendarAccessToken: tokenData.access_token,
-      calendarRefreshToken: tokenData.refresh_token,
-      calendarTokenExpiry: Date.now() + (tokenData.expires_in * 1000),
-    };
+    await calendarTokens.saveCalendarTokens(db, uid, {
+      accessToken: tokenData.access_token,
+      refreshToken: tokenData.refresh_token || null,
+      expiresAt: Date.now() + (tokenData.expires_in * 1000),
+    });
+    const userData = { calendarType: "google" };
     if (userInfo.email) {
-      calendarData.calendarEmail = userInfo.email;
+      userData.calendarEmail = userInfo.email;
     }
-    await db.collection("users").doc(uid).set(calendarData, { merge: true });
+    await db.collection("users").doc(uid).set(userData, { merge: true });
+    // Remove any legacy plaintext token fields left on the user document
+    await db.collection("users").doc(uid).update({
+      calendarAccessToken: FieldValue.delete(),
+      calendarRefreshToken: FieldValue.delete(),
+      calendarTokenExpiry: FieldValue.delete(),
+    });
 
     // Redirect back to profile
     res.redirect("https://fampad.app/profile?calendar=connected");
@@ -3471,19 +3478,52 @@ exports.googleCalendarCallback = onRequest({ region: "us-central1" }, async (req
   }
 });
 
+// Disconnect Google Calendar: deletes stored tokens (client cannot touch calendarTokens)
+exports.disconnectGoogleCalendar = onRequest({ region: "us-central1" }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  try {
+    const db = getFirestore();
+    const stored = await calendarTokens.getCalendarTokens(db, uid);
+    // Revoke at Google (best effort), then delete locally
+    if (stored?.refreshToken) {
+      await fetch("https://oauth2.googleapis.com/revoke", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({ token: stored.refreshToken }),
+      }).catch((error) => console.error("Google revoke failed:", error));
+    }
+    await calendarTokens.deleteCalendarTokens(db, uid);
+    return res.status(200).json({ success: true });
+  } catch (error) {
+    console.error("disconnectGoogleCalendar error:", error);
+    return res.status(500).json({ error: "Could not disconnect Google Calendar" });
+  }
+});
+
+// Daily sweep: move legacy plaintext tokens off user documents into the encrypted store
+exports.sweepLegacyCalendarTokens = onSchedule({ schedule: "every 24 hours", timeZone: "UTC", region: "us-central1" }, async () => {
+  const migrated = await calendarTokens.sweepLegacyCalendarTokens(getFirestore());
+  console.log(`sweepLegacyCalendarTokens: migrated ${migrated}`);
+});
+
 // Helper: Refresh Google access token
 async function refreshGoogleToken(uid) {
   const db = getFirestore();
-  const userDoc = await db.collection("users").doc(uid).get();
-  const userData = userDoc.data();
+  const stored = await calendarTokens.getCalendarTokens(db, uid);
 
-  if (!userData?.calendarRefreshToken) {
+  if (!stored?.refreshToken) {
     throw new Error("No refresh token found");
   }
 
   // Check if token is still valid
-  if (userData.calendarTokenExpiry && userData.calendarTokenExpiry > Date.now() + 60000) {
-    return userData.calendarAccessToken;
+  if (stored.accessToken && stored.expiresAt > Date.now() + 60000) {
+    return stored.accessToken;
   }
 
   // Refresh the token
@@ -3493,7 +3533,7 @@ async function refreshGoogleToken(uid) {
     body: new URLSearchParams({
       client_id: GOOGLE_CLIENT_ID,
       client_secret: GOOGLE_CLIENT_SECRET,
-      refresh_token: userData.calendarRefreshToken,
+      refresh_token: stored.refreshToken,
       grant_type: "refresh_token",
     }),
   });
@@ -3504,10 +3544,10 @@ async function refreshGoogleToken(uid) {
     throw new Error("Failed to refresh token: " + tokenData.error);
   }
 
-  // Update tokens in Firestore
-  await db.collection("users").doc(uid).update({
-    calendarAccessToken: tokenData.access_token,
-    calendarTokenExpiry: Date.now() + (tokenData.expires_in * 1000),
+  // Update the access token in the encrypted store
+  await calendarTokens.saveCalendarTokens(db, uid, {
+    accessToken: tokenData.access_token,
+    expiresAt: Date.now() + (tokenData.expires_in * 1000),
   });
 
   return tokenData.access_token;
@@ -3856,7 +3896,7 @@ async function familySyncCreate(familyId, payload) {
     try {
       const userDoc = await db.collection("users").doc(uid).get();
       const userData = userDoc.data();
-      if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) continue;
+      if (!userData || userData.calendarType !== "google" || !(await calendarTokens.hasCalendarTokens(db, uid))) continue;
       const eventId = await createGoogleCalendarEvent(uid, payload);
       calendarEventIds[uid] = eventId;
       if (!firstEventId) firstEventId = eventId;
@@ -3884,7 +3924,7 @@ async function familySyncUpdate(record, payload) {
       if (!eventIdToUpdate) continue;
       const userDoc = await db.collection("users").doc(uid).get();
       const userData = userDoc.data();
-      if (!userData || userData.calendarType !== "google" || !userData.calendarRefreshToken) continue;
+      if (!userData || userData.calendarType !== "google" || !(await calendarTokens.hasCalendarTokens(db, uid))) continue;
       await updateGoogleCalendarEvent(uid, eventIdToUpdate, payload);
       count++;
     } catch (e) {
@@ -4294,7 +4334,7 @@ exports.backfillCalendarSync = onRequest({ region: "us-central1", memory: "512MB
     for (const mUid of memberUids) {
       const uDoc = await db.collection("users").doc(mUid).get();
       const uData = uDoc.data();
-      if (uData?.calendarType === "google" && uData?.calendarRefreshToken) {
+      if (uData?.calendarType === "google" && await calendarTokens.hasCalendarTokens(db, mUid)) {
         googleConnectedUids.add(mUid);
       }
     }
@@ -4517,8 +4557,7 @@ exports.debugCheckUser = onRequest({ region: "us-central1" }, async (req, res) =
     calendarType: data.calendarType || "NOT SET",
     calendarEmail: data.calendarEmail || "NOT SET",
     calendarProvider: data.calendarProvider || "NOT SET",
-    hasAccessToken: !!data.calendarAccessToken,
-    hasRefreshToken: !!data.calendarRefreshToken,
+    hasTokens: await calendarTokens.hasCalendarTokens(db, uid),
   });
 });
 

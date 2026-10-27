@@ -291,11 +291,8 @@ export interface UserProfile {
   notificationsEnabled: boolean;
   minUkeSections?: { [key: string]: boolean };
   timezone?: string; // IANA timezone, e.g. "Europe/Oslo"
-  /** Google Calendar connection. Tokens are written by Cloud Functions only. */
+  /** Google Calendar connection. Tokens are stored server-side only (calendarTokens). */
   calendarType?: 'phone' | 'google' | null;
-  calendarAccessToken?: string | null;
-  calendarRefreshToken?: string | null;
-  calendarTokenExpiry?: number | null;
   createdAt: number;
 }
 
