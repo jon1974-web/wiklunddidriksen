@@ -4553,114 +4553,16 @@ exports.backfillCalendarSync = onRequest({ region: "us-central1", memory: "512MB
   }
 });
 
-exports.debugCheckUser = onRequest({ region: "us-central1" }, async (req, res) => {
-  const uid = req.query.uid || "jon@wiklunddidriksen.com";
-  const db = getFirestore();
-  const doc = await db.collection("users").doc(uid).get();
-  if (!doc.exists) {
-    res.json({ error: "User not found" });
-    return;
-  }
-  const data = doc.data();
-  res.json({
-    calendarType: data.calendarType || "NOT SET",
-    calendarEmail: data.calendarEmail || "NOT SET",
-    calendarProvider: data.calendarProvider || "NOT SET",
-    hasTokens: await calendarTokens.hasCalendarTokens(db, uid),
-  });
-});
 
 // DEBUG: Check event calendar data
-exports.debugCheckEvent = onRequest({ region: "us-central1" }, async (req, res) => {
-  const eventId = req.query.eventId;
-  if (!eventId) {
-    res.json({ error: "Missing eventId" });
-    return;
-  }
-  const db = getFirestore();
-  const doc = await db.collection("events").doc(eventId).get();
-  if (!doc.exists) {
-    res.json({ error: "Event not found" });
-    return;
-  }
-  const data = doc.data();
-  res.json({
-    title: data.title,
-    date: data.date,
-    time: data.time,
-    googleCalendarEventId: data.googleCalendarEventId || "NOT SET",
-    createdBy: data.createdBy,
-  });
-});
 
 // DEBUG: Check health appointments
-exports.debugCheckHealth = onRequest({ region: "us-central1" }, async (req, res) => {
-  const db = getFirestore();
-  const snapshot = await db.collection("healthAppointments").orderBy("createdAt", "desc").limit(3).get();
-  const results = [];
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    results.push({
-      id: doc.id,
-      title: data.title,
-      createdBy: data.createdBy,
-      date: data.date,
-      startTime: data.startTime,
-      endTime: data.endTime,
-    });
-  });
-  res.json(results);
-});
 
 // DEBUG: Check collections
-exports.debugCheckCollections = onRequest({ region: "us-central1" }, async (req, res) => {
-  const db = getFirestore();
-  const collections = ["healthAppointments", "health", "healthVaccinations", "petVetVisits", "petVaccinations"];
-  const results = {};
-  for (const col of collections) {
-    const snapshot = await db.collection(col).limit(1).get();
-    results[col] = snapshot.size > 0 ? "has data" : "empty";
-  }
-  res.json(results);
-});
 
 // DEBUG: Check trips
-exports.debugCheckTrips = onRequest({ region: "us-central1" }, async (req, res) => {
-  const db = getFirestore();
-  const snapshot = await db.collection("trips").orderBy("createdAt", "desc").limit(3).get();
-  const results = [];
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    results.push({
-      id: doc.id,
-      title: data.title,
-      startDate: data.startDate,
-      endDate: data.endDate,
-      createdBy: data.createdBy,
-    });
-  });
-  res.json(results);
-});
 
 // DEBUG: Check pet vet visits
-exports.debugCheckPetVet = onRequest({ region: "us-central1" }, async (req, res) => {
-  const db = getFirestore();
-  const snapshot = await db.collection("petVetVisits").orderBy("createdAt", "desc").limit(3).get();
-  const results = [];
-  snapshot.forEach(doc => {
-    const data = doc.data();
-    results.push({
-      id: doc.id,
-      title: data.title,
-      createdBy: data.createdBy,
-      date: data.date,
-      startTime: data.startTime,
-      endTime: data.endTime,
-      googleCalendarEventId: data.googleCalendarEventId || "NOT SET",
-    });
-  });
-  res.json(results);
-});
 
 exports.homeExtractColor = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);

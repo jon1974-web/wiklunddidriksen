@@ -306,7 +306,7 @@ All Cloud Functions are deployed to `us-central1` with 256MB memory. 70+ functio
 | `createFamily`, `generateInviteCode`, `joinFamilyByInviteCode`, `leaveFamily`, `removeFamilyMember`, `updateMemberRole` | Family management (auth + role verified server-side) |
 | `notifyNewEvent`, `notifyHealthItem` | Family push notifications |
 | `backfillCalendarSync` | Scan all collections for a family and (re)sync to Google Calendar; dry-run supported |
-| `grantAppOwner` / `revokeAppOwner`, `getAdminStats`, `triggerAdminStats`, `trackUsage`, `getUsageStats`, `getFamilyList`, `getFamilyDetail`, `getRateLimits`, `updateRateLimits`, `debugCheck*` | Admin panel backend |
+| `grantAppOwner` / `revokeAppOwner`, `getAdminStats`, `triggerAdminStats`, `trackUsage`, `getUsageStats`, `getFamilyList`, `getFamilyDetail`, `getRateLimits`, `updateRateLimits` | Admin panel backend |
 
 ### Scheduled Functions (onSchedule)
 
