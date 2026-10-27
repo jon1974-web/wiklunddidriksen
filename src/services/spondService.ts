@@ -1,10 +1,10 @@
-import { doc, getDoc, setDoc, getDocs, collection, query, where } from 'firebase/firestore';
+import { doc, setDoc, getDocs, collection, query, where } from 'firebase/firestore';
 import { Platform } from 'react-native';
 import { db, auth } from './firebase';
 import { SpondEvent, SpondGroup, SpondConfig, SpondMember } from '../types';
-import { encryptSpondPassword, decryptSpondPassword } from './familyService';
 
 const SPOND_PROXY_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/spondProxy';
+const SPOND_CONFIG_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/spondConfig';
 const SPOND_TOKEN_KEY = 'spond_cached_token';
 
 let cachedToken: string | null = null;
@@ -163,32 +163,35 @@ export const changeSpondResponse = async (
   }
 };
 
+// Spond config is stored server-side with the password encrypted (see spondConfig endpoint).
 export const saveSpondConfig = async (familyId: string, config: SpondConfig): Promise<void> => {
-  // Encrypt password before saving to Firestore
-  const encryptedConfig = { ...config };
-  if (config.password && !config.password.startsWith('enc:')) {
-    try {
-      encryptedConfig.password = 'enc:' + await encryptSpondPassword(config.password);
-    } catch (e) {
-      console.warn('Failed to encrypt Spond password, saving as plaintext:', e);
-    }
+  const headers = await getAuthHeaders();
+  const response = await fetch(SPOND_CONFIG_URL, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      familyId,
+      email: config.email,
+      password: config.password || undefined,
+      groups: config.groups,
+      respondents: config.respondents,
+    }),
+  });
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({}));
+    throw new Error(result?.error || 'Could not save Spond settings');
   }
-  await setDoc(doc(db, 'families', familyId, 'config', 'spond'), encryptedConfig);
 };
 
 export const getSpondConfig = async (familyId: string): Promise<SpondConfig | null> => {
-  const snap = await getDoc(doc(db, 'families', familyId, 'config', 'spond'));
-  if (!snap.exists()) return null;
-  const data = snap.data() as SpondConfig;
-  // Decrypt password if encrypted
-  if (data.password && data.password.startsWith('enc:')) {
-    try {
-      data.password = await decryptSpondPassword(data.password.substring(4));
-    } catch (e) {
-      console.warn('Failed to decrypt Spond password:', e);
-    }
+  const headers = await getAuthHeaders();
+  const response = await fetch(`${SPOND_CONFIG_URL}?familyId=${encodeURIComponent(familyId)}`, { headers });
+  if (!response.ok) {
+    const result = await response.json().catch(() => ({}));
+    throw new Error(result?.error || 'Could not load Spond settings');
   }
-  return data;
+  const { config } = await response.json();
+  return config as SpondConfig | null;
 };
 
 export const clearSpondToken = (): void => {

@@ -197,12 +197,3 @@ export const notifyHealthItem = async (familyId: string, title: string, date: st
   await callFunction('notifyHealthItem', { familyId, title, date, time, location, itemType, creatorName, personName });
 };
 
-export const encryptSpondPassword = async (password: string): Promise<string> => {
-  const result = await callFunction('encryptSpondPassword', { password });
-  return result.encrypted;
-};
-
-export const decryptSpondPassword = async (encrypted: string): Promise<string> => {
-  const result = await callFunction('decryptSpondPassword', { encrypted });
-  return result.decrypted;
-};

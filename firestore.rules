@@ -31,11 +31,9 @@ service cloud.firestore {
       );
       allow delete: if false;
 
+      // Family config (Spond credentials): server-only. Clients use the spondConfig endpoint.
       match /config/{configId} {
-        allow read, write: if request.auth != null && (
-          get(/databases/$(database)/documents/families/$(familyId)).data.members[request.auth.uid] != null ||
-          request.auth.uid in get(/databases/$(database)/documents/families/$(familyId)).data.members
-        );
+        allow read, write: if false;
       }
     }
 

@@ -14,6 +14,7 @@ const Busboy = require("busboy");
 const crypto = require("crypto");
 const calendarTokens = require("./calendarTokenStore");
 const oauthState = require("./oauthState");
+const spondCrypto = require("./spondCrypto");
 
 initializeApp();
 
@@ -64,28 +65,7 @@ async function verifyAuth(req) {
   }
 }
 
-// Spond password encryption/decryption
-const SPOND_ENCRYPTION_KEY = process.env.SPOND_ENCRYPTION_KEY || "familiesenter-default-key-change-me";
-
-function encryptSpondPassword(plaintext) {
-  const key = crypto.createHash("sha256").update(SPOND_ENCRYPTION_KEY).digest();
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv("aes-256-cbc", key, iv);
-  let encrypted = cipher.update(plaintext, "utf8", "hex");
-  encrypted += cipher.final("hex");
-  return iv.toString("hex") + ":" + encrypted;
-}
-
-function decryptSpondPassword(encrypted) {
-  if (!encrypted || !encrypted.includes(":")) return encrypted;
-  const key = crypto.createHash("sha256").update(SPOND_ENCRYPTION_KEY).digest();
-  const [ivHex, encryptedData] = encrypted.split(":");
-  const iv = Buffer.from(ivHex, "hex");
-  const decipher = crypto.createDecipheriv("aes-256-cbc", key, iv);
-  let decrypted = decipher.update(encryptedData, "hex", "utf8");
-  decrypted += decipher.final("utf8");
-  return decrypted;
-}
+// Spond password encryption lives in spondCrypto.js (AES-256-GCM, no default key)
 
 // Rate limiting - per-user, per-function
 const RATE_LIMITS = {
@@ -751,8 +731,16 @@ exports.spondProxy = onRequest({ region: "us-central1", memory: "256MB" }, async
 
   const { action, email, password, token, groupId, groupIds, max, eventId, memberId, accepted } = req.body || {};
 
-  // Decrypt password if it's encrypted
-  const decryptedPassword = password ? decryptSpondPassword(password) : password;
+  // Accept an encrypted stored value ("enc:" prefix) or the plaintext typed by the user
+  let decryptedPassword = password;
+  if (password && (password.startsWith("enc:") || password.startsWith("v1:"))) {
+    try {
+      decryptedPassword = spondCrypto.decryptStoredPassword(password).plaintext;
+    } catch (error) {
+      console.error("spondProxy: could not decrypt stored password", error.message);
+      return res.status(400).json({ error: "Stored Spond credentials could not be read. Please reconnect Spond." });
+    }
+  }
 
   try {
     if (action === "login") {
@@ -3210,46 +3198,101 @@ exports.migrateTransportData = onRequest({ region: "us-central1" }, async (req, 
   }
 });
 
-// Encrypt a Spond password before storing in Firestore
-exports.encryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+// encryptSpondPassword / decryptSpondPassword endpoints were removed: any signed-in user
+// could decrypt another family's stored password. Encryption now happens in spondConfig.
+
+// Spond configuration for a family. The password is encrypted here and never returned.
+// Clients cannot read or write families/{id}/config directly (see firestore.rules).
+//   GET  ?familyId=...  -> { email, password (owner/admin only, else ""), hasPassword, groups, respondents }
+//   POST { familyId, email, password?, groups, respondents }  (owner/admin only)
+//   - password omitted or empty on POST keeps the stored password (email change without re-typing)
+exports.spondConfig = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
   if (req.method === "OPTIONS") return res.status(204).send("");
-  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
 
-  const { password } = req.body || {};
-  if (!password) return res.status(400).json({ error: "password is required" });
+  const db = getFirestore();
+  const familyId = req.method === "GET" ? req.query.familyId : (req.body || {}).familyId;
+  if (!familyId || typeof familyId !== "string") return res.status(400).json({ error: "familyId is required" });
 
-  try {
-    const encrypted = encryptSpondPassword(password);
-    return res.status(200).json({ encrypted });
-  } catch (error) {
-    console.error("Encryption error:", error);
-    return res.status(500).json({ error: "Encryption failed" });
+  const familySnap = await db.collection("families").doc(familyId).get();
+  const members = familySnap.exists ? (familySnap.data().members || {}) : {};
+  const member = members[uid];
+  if (!member) return res.status(403).json({ error: "Not a family member" });
+
+  const ref = db.collection("families").doc(familyId).collection("config").doc("spond");
+
+  if (req.method === "GET") {
+    const snap = await ref.get();
+    if (!snap.exists) return res.status(200).json({ config: null });
+    const data = snap.data();
+    // Only owners and admins receive the Spond password (they manage the connection).
+    // Other members get the schedule data but never the credential.
+    let password = "";
+    if (data.password && (member.role === "owner" || member.role === "admin")) {
+      try {
+        const { plaintext, needsReencrypt } = spondCrypto.decryptStoredPassword(data.password);
+        password = plaintext;
+        if (needsReencrypt) {
+          await ref.update({ password: spondCrypto.encryptSpondPassword(plaintext) });
+        }
+      } catch (error) {
+        console.error("spondConfig: stored password unreadable", error.message);
+      }
+    }
+    return res.status(200).json({
+      config: {
+        email: data.email || "",
+        password,
+        hasPassword: !!data.password,
+        groups: data.groups || [],
+        respondents: data.respondents || [],
+        updatedAt: data.updatedAt || null,
+      },
+    });
   }
-});
 
-// Decrypt a Spond password (for use in Cloud Functions only)
-exports.decryptSpondPassword = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
-  setCorsHeaders(res, req);
-  if (req.method === "OPTIONS") return res.status(204).send("");
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-
-  const uid = await verifyAuth(req);
-  if (!uid) return res.status(401).json({ error: "Unauthorized" });
-
-  const { encrypted } = req.body || {};
-  if (!encrypted) return res.status(400).json({ error: "encrypted is required" });
-
-  try {
-    const decrypted = decryptSpondPassword(encrypted);
-    return res.status(200).json({ decrypted });
-  } catch (error) {
-    console.error("Decryption error:", error);
-    return res.status(500).json({ error: "Decryption failed" });
+  if (member.role !== "owner" && member.role !== "admin") {
+    return res.status(403).json({ error: "Only the family owner or an admin can change Spond settings" });
   }
+
+  const { email, password, groups, respondents } = req.body || {};
+  if (typeof email !== "string" || email.length > 200) return res.status(400).json({ error: "Invalid email" });
+  if (!Array.isArray(groups) || !Array.isArray(respondents)) return res.status(400).json({ error: "groups and respondents must be arrays" });
+
+  const existing = (await ref.get()).data() || {};
+  const update = {
+    email: email.trim(),
+    groups: groups.slice(0, 100),
+    respondents: respondents.slice(0, 200),
+    updatedAt: new Date().toISOString(),
+    updatedBy: uid,
+  };
+
+  if (password) {
+    if (typeof password !== "string" || password.length > 500) return res.status(400).json({ error: "Invalid password" });
+    try {
+      update.password = spondCrypto.encryptSpondPassword(password);
+    } catch (error) {
+      console.error("spondConfig: encryption failed", error.message);
+      return res.status(500).json({ error: "Could not store Spond credentials" });
+    }
+  } else if (existing.password) {
+    // Keep the stored (already encrypted) password; re-encrypt legacy values to v1 on the way
+    try {
+      const { plaintext, needsReencrypt } = spondCrypto.decryptStoredPassword(existing.password);
+      update.password = needsReencrypt ? spondCrypto.encryptSpondPassword(plaintext) : existing.password;
+    } catch (error) {
+      console.error("spondConfig: stored password unreadable", error.message);
+      return res.status(500).json({ error: "Stored Spond credentials could not be read. Enter the password again." });
+    }
+  }
+
+  await ref.set(update, { merge: true });
+  return res.status(200).json({ success: true });
 });
 
 // Helper: Create a Date object from a time string (HH:MM) in a specific timezone
