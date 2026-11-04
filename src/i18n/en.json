@@ -145,7 +145,8 @@
     "newShort": "New",
     "info": "Info",
     "unknown": "Unknown",
-    "aiError": "AI error: {{detail}}"
+    "aiError": "AI error: {{detail}}",
+    "you": "You"
   },
   "auth": {
     "title": "Fampad",
@@ -271,7 +272,10 @@
     "noLinks": "No links added",
     "noDocuments": "No documents added",
     "loading": "Loading...",
-    "deleteTransportTitle": "Delete transport"
+    "deleteTransportTitle": "Delete transport",
+    "createTripChat": "Create trip chat group",
+    "openTripChat": "Open trip chat",
+    "tripChatCreated": "Trip chat created 🎉"
   },
   "spaces": {
     "title": "Our Places",
@@ -1188,7 +1192,41 @@
     "yesterday": "Yesterday",
     "send": "Send",
     "cameraPermissionTitle": "Permission",
-    "cameraPermissionBody": "We need camera access to take photos."
+    "cameraPermissionBody": "We need camera access to take photos.",
+    "newChat": "New chat",
+    "newChatDesc": "Choose a person for a direct message, or create a group",
+    "directMessages": "Direct messages",
+    "groups": "Groups",
+    "familyTag": "Family",
+    "familyChat": "Family chat",
+    "noConversations": "No chats yet",
+    "searchPlaceholder": "Search chats...",
+    "groupName": "Group name",
+    "selectMembers": "Select members",
+    "createGroup": "Create group",
+    "members": "members",
+    "groupInfo": "Group info",
+    "addMembers": "Add members",
+    "removeMember": "Remove",
+    "leaveGroup": "Leave group",
+    "editGroup": "Edit group",
+    "photoMessage": "Photo",
+    "leaveGroupTitle": "Leave group",
+    "leaveGroupBody": "Are you sure you want to leave this group?",
+    "removeMemberTitle": "Remove member",
+    "removeMemberBody": "Are you sure you want to remove this member from the group?",
+    "admin": "Administrator",
+    "owner": "Owner",
+    "save": "Save",
+    "cancel": "Cancel",
+    "noMembers": "No family members found",
+    "roleMember": "Member",
+    "helpTitle": "Help — Chat",
+    "helpWhat": "What is this?",
+    "helpWhatText": "Chat lets the family message in one shared family chat, in direct messages between two members, and in groups. You can share text, photos and react with emojis. Trip chats can be created from the trip detail page by tapping the chat button next to the trip card.",
+    "helpHow": "How to use it",
+    "helpHowText": "Tap a conversation to open it. Tap “＋” in the top right for a new chat: pick a family member for a direct message, or create a group with a name and members. A trip’s chat group is created from the trip page (chat button next to the trip card) and takes its name and icon from the trip.",
+    "helpTip": "Long-press a group in the list to leave it. In a group thread, tap “i” (or the group title) to manage members."
   },
   "actionModal": {
     "edit": "Edit",
@@ -1739,7 +1777,11 @@
     "rateLimitsSource": "Source",
     "noRateLimits": "No rate limits found",
     "maxRequests": "Max Requests",
-    "windowMinutes": "Window (minutes)"
+    "windowMinutes": "Window (minutes)",
+    "migrateChatTitle": "Maintenance: chat migration",
+    "migrateChatDesc": "Copies legacy family-chat messages into the new conversation format. Safe to run multiple times (idempotent).",
+    "migrateChatButton": "Run migration",
+    "migrateChatDone": "Migration complete"
   },
   "schedule": {
     "title": "Schedule repeat",

@@ -145,7 +145,8 @@
     "newShort": "Ny",
     "info": "Info",
     "unknown": "Ukendt",
-    "aiError": "AI-fejl: {{detail}}"
+    "aiError": "AI-fejl: {{detail}}",
+    "you": "Dig"
   },
   "auth": {
     "title": "Fampad",
@@ -271,7 +272,10 @@
     "noLinks": "Ingen links tilføjet",
     "noDocuments": "Ingen dokumenter tilføjet",
     "loading": "Indlæser...",
-    "deleteTransportTitle": "Slet transport"
+    "deleteTransportTitle": "Slet transport",
+    "createTripChat": "Opret chatgruppe for rejsen",
+    "openTripChat": "Åbn chatten for rejsen",
+    "tripChatCreated": "Chatten for rejsen er oprettet 🎉"
   },
   "spaces": {
     "title": "Vores steder",
@@ -1057,7 +1061,41 @@
     "yesterday": "I går",
     "send": "Send",
     "cameraPermissionTitle": "Tilladelse",
-    "cameraPermissionBody": "Vi har brug for kameratilladelse til at tage billeder."
+    "cameraPermissionBody": "Vi har brug for kameratilladelse til at tage billeder.",
+    "newChat": "Ny chat",
+    "newChatDesc": "Vælg en person til en direkte besked, eller opret en gruppe",
+    "directMessages": "Direkte beskeder",
+    "groups": "Grupper",
+    "familyTag": "Familie",
+    "familyChat": "Familiechat",
+    "noConversations": "Ingen chats endnu",
+    "searchPlaceholder": "Søg i chats...",
+    "groupName": "Gruppenavn",
+    "selectMembers": "Vælg medlemmer",
+    "createGroup": "Opret gruppe",
+    "members": "medlemmer",
+    "groupInfo": "Gruppeinfo",
+    "addMembers": "Tilføj medlemmer",
+    "removeMember": "Fjern",
+    "leaveGroup": "Forlad gruppe",
+    "editGroup": "Rediger gruppe",
+    "photoMessage": "Billede",
+    "leaveGroupTitle": "Forlad gruppe",
+    "leaveGroupBody": "Er du sikker på, at du vil forlade denne gruppe?",
+    "removeMemberTitle": "Fjern medlem",
+    "removeMemberBody": "Er du sikker på, at du vil fjerne dette medlem fra gruppen?",
+    "admin": "Administrator",
+    "owner": "Ejer",
+    "save": "Gem",
+    "cancel": "Annuller",
+    "noMembers": "Fandt ingen familiemedlemmer",
+    "roleMember": "Medlem",
+    "helpTitle": "Hjælp — Chat",
+    "helpWhat": "Hvad er dette?",
+    "helpWhatText": "Chatten lader familien sende beskeder i én fælles familiechat, i direkte beskeder mellem to medlemmer og i grupper. Du kan dele tekst, billeder og reagere med emojis. Rejschatter kan oprettes fra rejsens detaljeside ved at trykke på chat-knappen ved rejskortet.",
+    "helpHow": "Sådan bruger du den",
+    "helpHowText": "Tryk på en samtale for at åbne den. Tryk «＋» øverst til højre for ny chat: vælg et familiemedlem til direkte besked, eller opret en gruppe med navn og medlemmer. Rejsens chatgruppe oprettes fra rejsesiden (chat-knappen ved rejskortet) og får sit navn og ikon fra rejsen.",
+    "helpTip": "Hold en gruppe nede i listen for at forlade den. I en gruppetråd trykker du på «i» (eller gruppetitlen) for at administrere medlemmer."
   },
   "actionModal": {
     "edit": "Rediger",
@@ -1739,7 +1777,11 @@
     "rateLimitsSource": "Kilde",
     "noRateLimits": "Ingen takstgrænser fundet",
     "maxRequests": "Maks forespørgsler",
-    "windowMinutes": "Vindue (minutter)"
+    "windowMinutes": "Vindue (minutter)",
+    "migrateChatTitle": "Vedligeholdelse: chat-migrering",
+    "migrateChatDesc": "Kopierer gamle familiechat-beskeder til det nye samtaleformat. Trygt at køre flere gange (idempotent).",
+    "migrateChatButton": "Kør migrering",
+    "migrateChatDone": "Migrering gennemført"
   },
   "schedule": {
     "title": "Planlæg gentagelse",

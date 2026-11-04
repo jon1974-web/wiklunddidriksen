@@ -71,6 +71,50 @@ export interface ChatMessage {
   reactions?: MessageReaction[];
 }
 
+export type ConversationType = 'family' | 'dm' | 'group';
+
+export interface ConversationMember {
+  role: 'admin' | 'member';
+  joinedAt: number;
+  addedBy?: string;
+}
+
+export type GroupIcon = string;
+
+export interface Conversation {
+  id: string;
+  type: ConversationType;
+  familyId: string;
+  title?: string;
+  icon?: GroupIcon;
+  tripId?: string;
+  members: { [uid: string]: ConversationMember };
+  memberIds: string[];
+  lastRead: { [uid: string]: number };
+  createdBy: string;
+  createdAt: number;
+}
+
+export interface ConversationListItem extends Conversation {
+  lastMessage?: {
+    text: string;
+    senderId: string;
+    senderName: string;
+    timestamp: number;
+    hasImage?: boolean;
+  };
+}
+
+export interface ConversationMessageData {
+  text: string;
+  senderId: string;
+  senderName: string;
+  senderAvatarUrl?: string;
+  timestamp: number;
+  imageUrl?: string;
+  reactions?: MessageReaction[];
+}
+
 export interface WeatherDay {
   date: string;
   tempMin: number;
@@ -120,6 +164,7 @@ export interface Trip {
   startTime?: string;
   endTime?: string;
   icon?: string;
+  chatId?: string;
   persons?: string[];
   latitude?: number;
   longitude?: number;

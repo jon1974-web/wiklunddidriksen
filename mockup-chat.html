@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Familiesenter — Chat mockup</title>
+<style>
+  :root {
+    --accent: #0097A7;
+    --accent-dark: #007A87;
+    --accent-tint: #E0F4F6;
+    --bg: #F7F9FB;
+    --surface: #FFFFFF;
+    --border: #E4E9EE;
+    --text: #1B2A34;
+    --text-secondary: #6B7A85;
+    --bubble-other: #E9F2F3;
+    --bubble-other-text: #1B2A34;
+    --danger: #D64545;
+    --unread: #0097A7;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background: linear-gradient(135deg, #10333a 0%, #0a2226 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+  .phone {
+    width: 390px;
+    height: 760px;
+    background: var(--bg);
+    border-radius: 40px;
+    box-shadow: 0 30px 80px rgba(0,0,0,.5), 0 0 0 10px #0d1c20, 0 0 0 12px #23424a;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .screen { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--bg); transition: transform .28s ease, opacity .28s ease; }
+  .screen.hidden { transform: translateX(100%); pointer-events: none; }
+
+  /* ============ Header ============ */
+  .header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px 12px;
+    padding-top: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+    z-index: 5;
+  }
+  .back-btn {
+    width: 36px; height: 36px; border-radius: 18px;
+    border: 1.5px solid var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--accent); font-size: 18px; cursor: pointer;
+    background: transparent; flex-shrink: 0;
+  }
+  .header h1 { font-size: 26px; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .header .sub { font-size: 12px; color: var(--text-secondary); font-style: italic; margin-top: 2px; }
+  .header-title-wrap { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 19px;
+    background: var(--accent); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; cursor: pointer; border: none; flex-shrink: 0;
+    font-weight: 700;
+  }
+  .info-btn { background: var(--accent-tint); color: var(--accent); border: 1px solid var(--accent); width: 32px; height: 32px; font-size: 15px; }
+
+  /* thread title in header */
+  .thread-title { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; cursor: pointer; }
+  .avatar { border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; flex-shrink: 0; overflow: hidden; }
+  .av-44 { width: 44px; height: 44px; font-size: 17px; }
+  .av-40 { width: 40px; height: 40px; font-size: 15px; }
+  .thread-title .t-name { font-size: 17px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .thread-title .t-sub { font-size: 12px; color: var(--text-secondary); }
+
+  /* ============ Chat list ============ */
+  .list { flex: 1; overflow-y: auto; padding: 8px 0; }
+  .pin-banner {
+    margin: 8px 16px; background: var(--accent-tint); border: 1px solid var(--accent);
+    border-radius: 12px; padding: 8px 12px; font-size: 12px; color: var(--accent-dark);
+    display: flex; align-items: center; gap: 8px; font-weight: 600;
+  }
+  .row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 12px 16px; cursor: pointer; position: relative;
+    transition: background .15s;
+  }
+  .row:hover { background: #EEF3F6; }
+  .row.pinned { background: var(--surface); border-bottom: 1px solid var(--border); }
+  .row.pinned:hover { background: #F4FBFC; }
+  .row .avatar { border: none; }
+  .pin-flag {
+    position: absolute; left: 4px;
+    width: 4px; height: 60%; border-radius: 4px; background: var(--accent);
+  }
+  .row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .row-top { display: flex; align-items: baseline; gap: 8px; }
+  .row-name { font-size: 16px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-name .tag { font-size: 11px; font-weight: 700; color: var(--accent-dark); background: var(--accent-tint); border-radius: 6px; padding: 1px 6px; vertical-align: 2px; margin-left: 6px; }
+  .row-time { font-size: 12px; color: var(--text-secondary); margin-left: auto; flex-shrink: 0; }
+  .row-preview { display: flex; align-items: center; gap: 6px; }
+  .row-msg { font-size: 14px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row-msg.unread { color: var(--text); font-weight: 600; }
+  .badge {
+    background: var(--unread); color: #fff; font-size: 12px; font-weight: 700;
+    border-radius: 12px; min-width: 22px; height: 22px;
+    display: flex; align-items: center; justify-content: center; padding: 0 7px;
+    margin-left: auto; flex-shrink: 0;
+  }
+  .msg-icon { font-size: 15px; flex-shrink: 0; }
+
+  /* ============ Messages ============ */
+  .messages { flex: 1; overflow-y: auto; padding: 12px 12px 4px; display: flex; flex-direction: column; gap: 6px; }
+  .date-pill {
+    align-self: center; background: var(--surface); color: var(--text-secondary);
+    font-size: 12px; font-weight: 600; border-radius: 20px;
+    padding: 4px 14px; margin: 8px 0; border: 1px solid var(--border);
+  }
+  .msg-row { display: flex; gap: 8px; max-width: 82%; }
+  .msg-row.own { align-self: flex-end; flex-direction: row-reverse; }
+  .msg-bubble {
+    padding: 9px 12px 7px; border-radius: 18px; font-size: 15px; line-height: 1.35;
+    position: relative;
+  }
+  .msg-row.own .msg-bubble { background: var(--accent); color: #fff; border-bottom-right-radius: 6px; }
+  .msg-row:not(.own) { align-self: flex-start; }
+  .msg-row:not(.own) .msg-bubble { background: var(--bubble-other); color: var(--bubble-other-text); border-bottom-left-radius: 6px; }
+  .msg-other-name { font-size: 11px; font-weight: 700; color: var(--accent-dark); margin-bottom: 3px; }
+  .msg-img { border-radius: 12px; max-width: 200px; display: block; margin-bottom: 4px; }
+  .msg-meta { font-size: 10px; opacity: .75; text-align: right; margin-top: 2px; }
+  .reactions { position: absolute; bottom: -11px; right: 8px; display: flex; gap: 2px; }
+  .reactions span {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; font-size: 10px; padding: 1px 5px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.12);
+  }
+  .reactions span.active { border-color: var(--accent); background: var(--accent-tint); }
+  .react-add { font-size: 14px; cursor: pointer; opacity: .5; padding: 2px; align-self: flex-end; }
+
+  /* typing */
+  .typing { display: flex; gap: 4px; padding: 10px 12px; background: var(--bubble-other); border-radius: 18px; border-bottom-left-radius: 6px; align-self: flex-start; }
+  .typing i { width: 7px; height: 7px; border-radius: 50%; background: var(--text-secondary); animation: blink 1.2s infinite; }
+  .typing i:nth-child(2){ animation-delay: .2s } .typing i:nth-child(3){ animation-delay: .4s }
+  @keyframes blink { 0%,80%,100%{opacity:.25} 40%{opacity:1} }
+
+  /* ============ Input bar ============ */
+  .input-bar {
+    background: var(--surface); border-top: 1px solid var(--border);
+    padding: 10px 12px 14px; display: flex; align-items: flex-end; gap: 8px; flex-shrink: 0;
+  }
+  .circle-btn { width: 36px; height: 36px; border-radius: 18px; background: var(--accent-tint); color: var(--accent); border: 1px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 17px; cursor: pointer; flex-shrink: 0; }
+  .input-wrap { flex: 1; display: flex; align-items: center; }
+  .input-wrap input {
+    flex: 1; border: 1px solid var(--border); border-radius: 20px;
+    padding: 9px 14px; font-size: 16px; outline: none; color: var(--text); background: var(--bg);
+  }
+  .send-btn { width: 36px; height: 36px; border-radius: 18px; background: var(--accent); color: #fff; border: none; display: flex; align-items: center; justify-content: center; font-size: 16px; cursor: pointer; flex-shrink: 0; }
+
+  /* ============ Sheet / modal ============ */
+  .overlay {
+    position: absolute; inset: 0; background: rgba(10,25,30,.45);
+    display: flex; align-items: flex-end; z-index: 20; opacity: 0; pointer-events: none; transition: opacity .25s;
+  }
+  .overlay.open { opacity: 1; pointer-events: auto; }
+  .sheet {
+    background: var(--surface); width: 100%; border-radius: 24px 24px 0 0;
+    padding: 10px 20px 28px; max-height: 82%; overflow-y: auto;
+    transform: translateY(100%); transition: transform .28s ease;
+  }
+  .overlay.open .sheet { transform: translateY(0); }
+  .grabber { width: 44px; height: 5px; border-radius: 3px; background: var(--border); margin: 0 auto 14px; }
+  .sheet h2 { font-size: 20px; font-weight: 800; color: var(--text); margin-bottom: 4px; text-align: center; }
+  .sheet .desc { font-size: 13px; color: var(--text-secondary); text-align: center; margin-bottom: 16px; }
+  .modal-overlay { position: absolute; inset: 0; background: rgba(10,25,30,.5); z-index: 25; display: flex; align-items: center; justify-content: center; padding: 24px; opacity: 0; pointer-events: none; transition: opacity .2s; }
+  .modal-overlay.open { opacity: 1; pointer-events: auto; }
+  .modal { background: var(--surface); border-radius: 20px; width: 100%; padding: 20px; transform: scale(.94); transition: transform .2s; }
+  .modal-overlay.open .modal { transform: scale(1); }
+  .modal h3 { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+  .modal .desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 14px; }
+
+  /* segment */
+  .segment { display: flex; background: var(--bg); border-radius: 12px; padding: 3px; margin: 4px 0 16px; }
+  .segment button { flex: 1; border: none; background: transparent; padding: 8px; border-radius: 10px; font-size: 14px; font-weight: 700; color: var(--text-secondary); cursor: pointer; }
+  .segment button.on { background: var(--accent); color: #fff; }
+  .segment button.hide { display: none; }
+
+  /* member list */
+  .member-row { display: flex; align-items: center; gap: 12px; padding: 9px 6px; border-radius: 12px; cursor: pointer; transition: background .15s; }
+  .member-row:hover { background: #F2F6F8; }
+  .member-row .info { flex: 1; min-width: 0; }
+  .member-row .m-name { font-size: 15px; font-weight: 600; color: var(--text); }
+  .member-row .m-role { font-size: 12px; color: var(--text-secondary); }
+  .check { width: 24px; height: 24px; border-radius: 8px; border: 2px solid #C6D2DA; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; flex-shrink: 0; }
+  .member-row.sel .check { background: var(--accent); border-color: var(--accent); }
+
+  .btn {
+    width: 100%; border: none; border-radius: 14px; padding: 13px;
+    font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 14px;
+    background: var(--accent); color: #fff;
+  }
+  .btn:disabled { background: #C9D8DE; cursor: not-allowed; color: rgba(255,255,255,.7); }
+  .btn.ghost { background: transparent; color: var(--text-secondary); border: 1px solid var(--border); }
+  .btn.danger { background: var(--danger); }
+  .text-input { width: 100%; border: 1px solid var(--border); border-radius: 12px; padding: 11px 14px; font-size: 16px; color: var(--text); background: var(--bg); outline: none; margin-bottom: 12px; }
+  .emoji-picker { display: flex; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 6px 10px; position: absolute; margin-top: -8px; box-shadow: 0 4px 14px rgba(0,0,0,.15); z-index: 8; }
+  .emoji-picker span { cursor: pointer; font-size: 20px; }
+  .label { font-size: 13px; font-weight: 700; color: var(--text); margin: 10px 0 6px; }
+  .avatar-stack { display: flex; }
+  .avatar-stack .avatar { margin-left: -10px; border: 2px solid var(--surface); }
+  .avatar-stack .avatar:first-child { margin-left: 0; }
+  .actions-list { border-top: 1px solid var(--border); margin-top: 14px; }
+  .action-row { display: flex; align-items: center; gap: 12px; padding: 13px 4px; font-size: 15px; color: var(--text); border-bottom: 1px solid var(--border); cursor: pointer; }
+  .action-row.danger { color: var(--danger); }
+  .action-row .ico { font-size: 19px; width: 24px; text-align: center; }
+  .desktop-note { position: fixed; top: 18px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,.85); font-size: 13px; letter-spacing: .4px; text-align: center; }
+  .floating-hint { position: absolute; bottom: 96px; left: 50%; transform: translateX(-50%); background: rgba(11,42,50,.85); color: #fff; font-size: 12px; padding: 7px 14px; border-radius: 20px; z-index: 15; white-space: nowrap; }
+</style>
+</head>
+<body>
+<div class="desktop-note">Familiesenter — Chat-mockup · klikkbare skjermer: liste → tråd → ny chat → gruppeinfo</div>
+
+<div class="phone">
+
+  <!-- ============ SCREEN 1: CHAT LIST ============ -->
+  <div class="screen" id="scr-list">
+    <div class="header">
+      <div class="header-title-wrap">
+        <h1>💬 Vår chat</h1>
+        <div class="sub">Familien Wiklund Didriksen</div>
+      </div>
+      <button class="icon-btn" onclick="openNewChat()">＋</button>
+    </div>
+    <div class="list">
+      <div class="pin-banner">📌chat familie festet — ny chat du oppretter havner under</div>
+
+      <!-- Pinned family chat -->
+      <div class="row pinned" onclick="openThread('family')" style="margin-top:4px;">
+        <div class="pin-flag"></div>
+        <div class="avatar av-44" style="background: linear-gradient(135deg,#0097A7,#134E5E); font-size: 20px;">👨‍👩‍👧‍👦</div>
+        <div class="row-main">
+          <div class="row-top">
+            <span class="row-name">Familien Wiklund Didriksen <span class="tag">Familie</span></span>
+            <span class="row-time">12:04</span>
+          </div>
+          <div class="row-preview">
+            <span class="msg-icon">Foto</span>
+            <span class="row-msg unread">Mama: Ser du hvor fint det blir i dag? 🥳</span>
+          </div>
+        </div>
+        <div class="badge">2</div>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text-secondary);padding:10px 16px 4px;letter-spacing:.6px;">DIREKTE MELDINGER</div>
+
+      <!-- DM -->
+      <div class="row" onclick="openThread('dm-ole')">
+        <div class="avatar av-44" style="background:#7E57C2;">OK</div>
+        <div class="row-main">
+          <div class="row-top">
+            <span class="row-name">Ole Strand</span>
+            <span class="row-time">11:47</span>
+          </div>
+          <div class="row-preview">
+            <span class="row-msg unread">Pappa, kan du hente meg etter fotball? ⚽</span>
+          </div>
+        </div>
+        <div class="badge">1</div>
+      </div>
+
+      <div class="row" onclick="openThread('dm-astrid')">
+        <div class="avatar av-44" style="background:#EC6A9C; font-size: 18px;">🧒</div>
+        <div class="row-main">
+          <div class="row-top">
+            <span class="row-name">Astrid</span>
+            <span class="row-time">Igår</span>
+          </div>
+          <div class="row-preview">
+            <span class="row-msg">God natt! 🌙</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text-secondary);padding:14px 16px 4px;letter-spacing:.6px;">GRUPPER</div>
+
+      <!-- Group -->
+      <div class="row" onclick="openThread('group-vacation')">
+        <div class="avatar av-44" style="background:#01579B; font-size: 20px;">🏖️</div>
+        <div class="row-main">
+          <div class="row-top">
+            <span class="row-name">Sommerferie Mallorca</span>
+            <span class="row-time">Igår</span>
+          </div>
+          <div class="row-preview">
+            <div class="avatar-stack">
+              <div class="avatar" style="width:18px;height:18px;font-size:9px;background:#7E57C2;">OK</div>
+              <div class="avatar" style="width:18px;height:18px;font-size:9px;background:#EC6A9C;">🧒</div>
+              <div class="avatar" style="width:18px;height:18px;font-size:9px;background:#43A047;">SA</div>
+            </div>
+            <span class="row-msg">Liv: Hotellen ser perfekt ut! 😍</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="avatar av-44" style="background:#EF6C00; font-size: 20px;">🎂</div>
+        <div class="row-main">
+          <div class="row-top">
+            <span class="row-name">Farsdag 2026</span>
+            <span class="row-time">Man</span>
+          </div>
+          <div class="row-preview">
+            <span class="row-msg">Astrid: Hemmelig plan 🤫 (Ole kan ikke se)</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="input-bar" style="align-items:center;">
+      <input type="text" placeholder="Søk i chater..." style="background:var(--bg); justify-self: stretch;">
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 2: FAMILY THREAD ============ -->
+  <div class="screen hidden" id="scr-family">
+    <div class="header">
+      <button class="back-btn" onclick="show('scr-list')">←</button>
+      <div class="thread-title" onclick="toast('Familiechatten er alltid festet øverst 🔒')">
+        <div class="avatar av-40" style="background: linear-gradient(135deg,#0097A7,#134E5E); font-size:18px;">👨‍👩‍👧‍👦</div>
+        <div><div class="t-name">Familjechat</div><div class="t-sub">4 medlemmer · pinned</div></div>
+      </div>
+      <button class="info-btn" onclick="toast('Familjechat kan ikke administreres')">ℹ</button>
+    </div>
+    <div class="messages" id="msgs-family"></div>
+    <div class="input-bar">
+      <div class="circle-btn" title="Velg bilde">🖼️</div>
+      <div class="circle-btn" title="Kamera">📷</div>
+      <div class="input-wrap"><input type="text" placeholder="Skriv en melding..."></div>
+      <button class="send-btn">➤</button>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 3: DM THREAD ============ -->
+  <div class="screen hidden" id="scr-dm-ole">
+    <div class="header">
+      <button class="back-btn" onclick="show('scr-list')">←</button>
+      <div class="thread-title">
+        <div class="avatar av-40" style="background:#7E57C2;">OK</div>
+        <div><div class="t-name">Ole Strand</div><div class="t-sub">Direkte melding · 14 år · Medlem</div></div>
+      </div>
+      <button class="info-btn" onclick="toast('Direkte meldinger er bare mellom deg og Ole 🔒')">ℹ</button>
+    </div>
+    <div class="messages" id="msgs-dm-ole"></div>
+    <div class="input-bar">
+      <div class="circle-btn">🖼️</div>
+      <div class="circle-btn">📷</div>
+      <div class="input-wrap"><input type="text" placeholder="Skriv en melding..."></div>
+      <button class="send-btn">➤</button>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 4: GROUP THREAD ============ -->
+  <div class="screen hidden" id="scr-group">
+    <div class="header">
+      <button class="back-btn" onclick="show('scr-list')">←</button>
+      <div class="thread-title" onclick="openGroupInfo()">
+        <div class="avatar av-40" style="background:#01579B; font-size:18px;">🏖️</div>
+        <div>
+          <div class="t-name">Sommerferie Mallorca</div>
+          <div class="t-sub">3 medlemmer · trykk for info</div>
+        </div>
+      </div>
+      <button class="info-btn" onclick="openGroupInfo()">ℹ</button>
+    </div>
+    <div class="messages" id="msgs-group"></div>
+    <div class="input-bar">
+      <div class="circle-btn">🖼️</div>
+      <div class="circle-btn">📷</div>
+      <div class="input-wrap"><input type="text" placeholder="Skriv en melding..."></div>
+      <button class="send-btn">➤</button>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN: GROUP INFO SHEET ============ -->
+  <div class="overlay" id="ov-groupinfo" onclick="if(event.target===this)closeOverlay('ov-groupinfo')">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <div style="display:flex; align-items:center; gap:14px; margin-bottom:16px;">
+        <div class="avatar av-44" style="background:#01579B; font-size:20px;">🏖️</div>
+        <div>
+          <div style="font-size:19px;font-weight:800;color:var(--text);">Sommerferie Mallorca</div>
+          <div style="font-size:12px;color:var(--text-secondary);">Basisgrunnlag har • 11. mai 2026 · 4 dager</div>
+        </div>
+      </div>
+      <div class="label">MEDLEMMER (3)</div>
+
+      <div class="member-row">
+        <div class="avatar av-40" style="background:#43A047;">SA</div>
+        <div class="info"><div class="m-name">Sara Wiklund Didriksen</div><div class="m-role">Medlem · gruppeadmin: nei</div></div>
+        <span style="font-size:11px;font-weight:700;color:var(--accent-dark);background:var(--accent-tint);padding:3px 8px;border-radius:8px;">OG</span>
+      </div>
+      <div class="member-row">
+        <div class="avatar av-40" style="background:#7E57C2;">OK</div>
+        <div class="info"><div class="m-name">Ole Strand</div><div class="m-role">Medlem · sist sett 11:47</div></div>
+        <button class="icon-btn" style="width:30px;height:30px;font-size:14px;background:var(--accent-tint);color:var(--accent);" onclick="toast('Ole fjernet fra gruppe (kun admin)')">−</button>
+      </div>
+      <div class="member-row">
+        <div class="avatar av-40" style="background:#EC6A9C; font-size:15px;">🧒</div>
+        <div class="info"><div class="m-name">Astrid</div><div class="m-role">Medlem</div></div>
+        <button class="icon-btn" style="width:30px;height:30px;font-size:14px;background:var(--accent-tint);color:var(--accent);" onclick="toast('Astrid fjernet fra gruppe (kun admin)')">−</button>
+      </div>
+
+      <button class="btn" onclick="closeOverlay('ov-groupinfo'); openAddMembers();">＋ Legg til medlemmer</button>
+      <button class="btn ghost" onclick="toast('Bytt navn eventuelt ikon')">✏ Rediger gruppen</button>
+      <button class="btn danger" onclick="closeOverlay('ov-groupinfo'); toast('Forlater du gruppe?'); ">🚪 Forlat gruppe</button>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN: NEW CHAT SHEET ============ -->
+  <div class="overlay" id="ov-newchat" onclick="if(event.target===this)closeOverlay('ov-newchat')">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <h2>Ny chat</h2>
+      <div class="desc">Velg en person for direkte melding, eller opprett en gruppe</div>
+      <div class="segment">
+        <button id="seg-dm" class="on" onclick="segSwitch('dm')">Direkte melding</button>
+        <button id="seg-grp" onclick="segSwitch('grp')">Gruppe</button>
+      </div>
+
+      <!-- DM mode -->
+      <div id="mode-dm">
+        <div class="member-row sel" onclick="closeOverlay('ov-newchat'); openThread('dm-ole');">
+          <div class="avatar av-40" style="background:#7E57C2;">OK</div>
+          <div class="info"><div class="m-name">Ole Strand</div><div class="m-role">14 år · Medlem</div></div>
+          <div class="check">✓</div>
+        </div>
+        <div class="member-row" onclick="toast('Åpner tråd med Astrid')">
+          <div class="avatar av-40" style="background:#EC6A9C; font-size:15px;">🧒</div>
+          <div class="info"><div class="m-name">Astrid</div><div class="m-role">Medlem</div></div>
+          <div class="check"></div>
+        </div>
+        <div class="member-row" onclick="toast('Åpner tråd med Sara')">
+          <div class="avatar av-40" style="background:#43A047;">SA</div>
+          <div class="info"><div class="m-name">Sara Wiklund Didriksen</div><div class="m-role">Medlem</div></div>
+          <div class="check"></div>
+        </div>
+        <button class="btn" onclick="closeOverlay('ov-newchat'); openThread('dm-ole');">Åpne chat med Ole →</button>
+      </div>
+
+      <!-- group mode -->
+      <div id="mode-grp" style="display:none;">
+        <input type="text" class="text-input" placeholder="Gruppenavn (f.eks. Farsdagsekretariat)" value="" id="grp-name" oninput="updateGrpState()">
+        <div class="label">VELG MEDLEMMER</div>
+        <div class="member-row" onclick="toggleGrpSel(this)">
+          <div class="avatar av-40" style="background:#7E57C2;">OK</div>
+          <div class="info"><div class="m-name">Ole Strand</div><div class="m-role">14 år · Medlem</div></div>
+          <div class="check">✓</div>
+        </div>
+        <div class="member-row" onclick="toggleGrpSel(this)">
+          <div class="avatar av-40" style="background:#EC6A9C; font-size:15px;">🧒</div>
+          <div class="info"><div class="m-name">Astrid</div><div class="m-role">Medlem</div></div>
+          <div class="check">✓</div>
+        </div>
+        <div class="member-row" onclick="toggleGrpSel(this)">
+          <div class="avatar av-40" style="background:#43A047;">SA</div>
+          <div class="info"><div class="m-name">Sara Wiklund Didriksen</div><div class="m-role">Medlem</div></div>
+          <div class="check"></div>
+        </div>
+        <button class="btn" id="grp-create" disabled onclick="closeOverlay('ov-newchat'); toast('Gruppe opprettet 🎉'); openThread('group-vacation');">Opprett gruppe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD MEMBERS SHEET -->
+  <div class="overlay" id="ov-addmembers" onclick="if(event.target===this)closeOverlay('ov-addmembers')">
+    <div class="sheet">
+      <div class="grabber"></div>
+      <h2>Legg til medlemmer</h2>
+      <div class="desc">Velg hvem du vil legge til i Sommerferie Mallorca</div>
+      <div class="member-row" onclick="toggleGrpSel(this)">
+        <div class="avatar av-40" style="background:#EC6A9C; font-size:15px;">🧒</div>
+        <div class="info"><div class="m-name">Astrid</div><div class="m-role">Medlem</div></div>
+        <div class="check">✓</div>
+      </div>
+      <button class="btn" onclick="closeOverlay('ov-addmembers'); toast('Astrid ble lagt til gruppen') ">Legg til valgte</button>
+    </div>
+  </div>
+
+  <div class="floating-hint" id="hint">Trykk på en samtale for å åpne tråden · ＋ for ny chat</div>
+</div>
+
+<script>
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    document.getElementById('hint').style.display = id === 'scr-list' ? 'block' : 'none';
+  }
+  function openThread(type) {
+    if (type === 'family') show('scr-family');
+    else if (type === 'dm-ole') show('scr-dm-ole');
+    else show('scr-group');
+    document.getElementById('hint').style.display = 'none';
+  }
+  function openNewChat() { document.getElementById('ov-newchat').classList.add('open'); }
+  function openGroupInfo() { document.getElementById('ov-groupinfo').classList.add('open'); }
+  function openAddMembers() { document.getElementById('ov-addmembers').classList.add('open'); }
+  function closeOverlay(id) { document.getElementById(id).classList.remove('open'); }
+  function segSwitch(m) {
+    document.getElementById('seg-dm').classList.toggle('on', m === 'dm');
+    document.getElementById('seg-grp').classList.toggle('on', m === 'grp');
+    document.getElementById('mode-dm').style.display = m === 'dm' ? 'block' : 'none';
+    document.getElementById('mode-grp').style.display = m === 'grp' ? 'block' : 'none';
+  }
+  function toggleGrpSel(row) {
+    row.classList.toggle('sel');
+    const c = row.querySelector('.check');
+    c.textContent = row.classList.contains('sel') ? '✓' : '';
+    updateGrpState();
+  }
+  function updateGrpState() {
+    const name = document.getElementById('grp-name').value.trim();
+    const sel = document.querySelectorAll('#mode-grp .member-row.sel').length;
+    document.getElementById('grp-create').disabled = !(name.length > 0 && sel > 0);
+  }
+  function toast(msg) {
+    const h = document.getElementById('hint');
+    h.textContent = msg; h.style.display = 'block';
+    clearTimeout(h._t); h._t = setTimeout(() => { h.style.display = 'none'; }, 2400);
+  }
+
+  /* ---- seed messages ---- */
+  const msgData = {
+    'msgs-family': [
+      { d: 'I dag' },
+      { o: 0, n: 'Astrid', t: 'God morgen alle sammen! ☀️' },
+      { o: 0, n: 'Sara', t: 'Husker svømmeskole kl 16 i dag, Ole! 🏊' },
+      { o: 1, n: '', t: 'Hva skal vi spise til middag i dag?' },
+      { o: 0, n: 'Sara', t: 'Ser du hvor fint det blir i dag? 🥳' },
+      { o: 1, n: '', img: 1 },
+      { o: 0, n: 'Astrid', t: 'Så fin! 😍', r: ['❤️ 3'] },
+    ],
+    'msgs-dm-ole': [
+      { d: 'I dag' },
+      { o: 0, n: 'Ole', t: 'Pappa, kan du hente meg etter fotball? ⚽' },
+      { o: 1, n: '', t: 'Selvfølgelig! Når slutter treningen?' },
+      { o: 0, n: 'O', t: 'Kl. 17:00 💪' },
+    ],
+    'msgs-group': [
+      { d: 'Igår' },
+      { o: 0, n: 'Liv', t: 'Har funnet en hotell — flyet kan gefallen uge 28! ✈️' },
+      { o: 1, n: '', t: 'Perfekt, bestiller billetter i dag 👍', r: ['👍 2', '🎉 1'] },
+      { d: 'I dag' },
+      { o: 0, n: 'Liv', t: 'Hotellen ser perfekt ut! 😍' },
+    ]
+  };
+
+  for (const [id, msgs] of Object.entries(msgData)) {
+    const wrap = document.getElementById(id);
+    if (!wrap) continue;
+    let html = '';
+    let otherFrame = id === 'msgs-dm-ole';
+    msgs.forEach(m => {
+      if (m.d) { html += `<div class="date-pill">${m.d}</div>`; return; }
+      const own = m.o === 1;
+      const inner = (m.img ? '<div class="msg-img" style="width:170px;height:110px;background:linear-gradient(135deg,#a3c4dd,#6aa3c6);display:flex;align-items:center;justify-content:center;font-size:34px;">🖼️</div>' : '') +
+        (!own && m.n && !otherFrame ? `<div class="msg-other-name">${m.n}</div>` : '') +
+        (m.t ? `<div>${m.t}</div>` : '') +
+        `<div class="msg-meta">${m.img ? '12:03' : (otherFrame ? '' : '11:5') + (own ? '1 ✓✓' : '2')}</div>`;
+      const reactions = m.r ? `<div class="reactions">${m.r.map(x => `<span>${x}</span>`).join('')}</div>` : '';
+      html += `<div class="msg-row ${own ? 'own' : ''}">
+        ${(!own && !otherFrame) ? `<div class="avatar" style="width:28px;height:28px;font-size:10px;background:${m.n.startsWith('A')?'#EC6A9C':(m.n.startsWith('O')?'#7E57C2':'#43A047')};">${m.n[0]||'👤'}</div>` : ''}
+        <div class="msg-bubble">${inner}${reactions}</div>
+      </div>`;
+    });
+    html += `<div class="typing"><i></i><i></i><i></i></div>`;
+    wrap.innerHTML = html;
+    wrap.scrollTop = wrap.scrollHeight;
+  }
+</script>
+</body>
+</html>

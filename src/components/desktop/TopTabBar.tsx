@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { useChatStore } from '../../store/chatStore';
 import { TabIcon } from '../CustomTabBar';
 
 interface TopTabBarProps {
@@ -38,6 +39,7 @@ export const TopTabBar: React.FC<TopTabBarProps> = React.memo(
   ({ activeIndex, profileActive = false, onSelect, onCreatePress, userInitial, onProfilePress }) => {
     const { colors } = useTheme();
     const { t } = useTranslation();
+    const chatUnread = useChatStore((s) => s.unreadCount) > 0;
 
     return (
       <View style={[styles.bar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
@@ -51,7 +53,12 @@ export const TopTabBar: React.FC<TopTabBarProps> = React.memo(
                 onPress={() => onSelect(tab.name)}
                 activeOpacity={0.7}
               >
-                <TabIcon icon={tab.icon} focused={isFocused} accentColor={colors.accent} />
+                <View style={styles.iconWrap}>
+                  <TabIcon icon={tab.icon} focused={isFocused} accentColor={colors.accent} />
+                  {tab.name === 'Chat' && chatUnread && (
+                    <View style={[styles.unreadDot, { backgroundColor: colors.danger }]} />
+                  )}
+                </View>
                 <Text style={[styles.tabLabel, { color: isFocused ? colors.accent : colors.textSecondary }]}>
                   {t(tab.labelKey)}
                 </Text>
@@ -94,6 +101,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     flexShrink: 1,
+  },
+  iconWrap: {
+    position: 'relative',
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: -3,
+    right: -4,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
   },
   tab: {
     flexDirection: 'row',

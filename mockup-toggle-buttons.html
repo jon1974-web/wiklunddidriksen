@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Liste / Kalender / Vår uke</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(160deg, #dfe7ee 0%, #eef2f6 60%, #d8e2eb 100%);
+    min-height: 100vh;
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: flex-start;
+    gap: 44px; padding: 50px 24px 80px;
+  }
+  .wrap { display: flex; flex-direction: column; align-items: center; gap: 13px; width: 320px; }
+  .label { font-size: 14px; font-weight: 700; color: #3b5a75; text-align: center; }
+  .desc { font-size: 11.5px; color: #6b7b8d; text-align: center; line-height: 1.5; }
+  .phone {
+    width: 320px; height: 400px; background: #fff;
+    border-radius: 34px; border: 8px solid #2b3a48; overflow: hidden;
+    box-shadow: 0 20px 44px rgba(59,90,117,.22);
+    display: flex; flex-direction: column;
+  }
+  .header {
+    padding: 16px 16px 12px; border-bottom: 1px solid #eef1f4;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .title-row { display: flex; align-items: center; justify-content: space-between; }
+  .title-left { display: flex; align-items: center; gap: 8px; }
+  .title-left h2 { font-size: 18px; font-weight: 800; color: #333; }
+  .logo { width: 30px; height: 30px; border-radius: 8px; background: linear-gradient(135deg,#3b5a75,#6b9ac0); color:#fff; font-size:13px; display:flex; align-items:center; justify-content:center; font-weight:700; }
+
+  /* shared button base */
+  .btn { display:flex; align-items:center; justify-content:center; gap:6px; cursor:pointer; }
+  .btn span.t { font-size: 13px; font-weight: 600; }
+  .ic { display:flex; }
+
+  /* ===== A: Segmentert kontroll ( iOS-stil) ===== */
+  .segA {
+    display:flex; background: rgba(59,90,117,.08); border-radius: 12px; padding: 3px;
+  }
+  .segA .btn { padding: 8px 14px; border-radius: 9px; color:#8195a7; }
+  .segA .active { background:#fff; color:#3b5a75; box-shadow: 0 1px 3px rgba(0,0,0,.12); font-weight:700; }
+  .segA .btn.wU { color:#6b7b8d; }
+
+  /* ===== B: En gruppe med ramme + delere ===== */
+  .grpB { display:flex; border:1.5px solid #3b5a75; border-radius: 12px; overflow:hidden; }
+  .grpB .btn { padding: 9px 15px; color:#8195a7; }
+  .grpB .btn + .btn { border-left: 1px solid rgba(59,90,117,.25); }
+  .grpB .active { background:#3b5a75; color:#fff; font-weight:700; }
+
+  /* ===== C: Sammenhengende fundament-gruppe (skyskraper-stil) ===== */
+  .grpC { display:flex; background: rgba(59,90,117,.06); border:1px solid rgba(59,90,117,.18); border-radius: 10px; overflow:hidden; }
+  .grpC .btn { flex:1; padding: 9px 0; color:#8195a7; }
+  .grpC .btn + .btn { border-left:1px solid rgba(59,90,117,.15); }
+  .grpC .active { background:#fff; color:#3b5a75; box-shadow: inset 0 -2.5px 0 #3b5a75; font-weight: 700; }
+
+  /* ===== D: Fylt segment med blå aktiv fane ===== */
+  .segD { display:flex; background: rgba(59,90,117,.10); border-radius: 12px; padding: 3px; }
+  .segD .btn { flex:1; padding: 8px 0; border-radius: 9px; color:#8195a7; }
+  .segD .active { background:#3b5a75; color:#fff; }
+  .segD .wU { border-left:1px solid transparent; }
+</style>
+</head>
+<body>
+
+<!-- ================= A: iOS-segment kontroll ================= -->
+<div class="wrap">
+  <div class="phone">
+    <div class="header">
+      <div class="title-row">
+        <div class="title-left">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg>
+          <h2>Begivenheter</h2>
+        </div>
+        <div class="logo">F</div>
+      </div>
+      <div class="segA">
+        <div class="btn"><span class="t">Liste</span></div>
+        <div class="btn active"><span class="t">Kalender</span></div>
+        <div class="btn wU">
+          <svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7b8d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+          <span class="t">Vår uke</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">A — Segmentert kontroll (lys sporet)</div>
+  <div class="desc">Alle tre samlet i én lys boks med 12px radius. Aktive faner har hvit bakgrunn med skygge. Vår uke ligger inn som tredje fane.</div>
+</div>
+
+<!-- ================= B: Ramme-gruppe med delere ================= -->
+<div class="wrap">
+  <div class="phone">
+    <div class="header">
+      <div class="title-row">
+        <div class="title-left">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg>
+          <h2>Begivenheter</h2>
+        </div>
+        <div class="logo">F</div>
+      </div>
+      <div class="grpB">
+        <div class="btn"><span class="t">Liste</span></div>
+        <div class="btn active"><span class="t">Kalender</span></div>
+        <div class="btn">
+          <svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+          <span class="t" style="color:#3b5a75;font-weight:700;">Vår uke</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">B — Fantastisk ramme-gruppe</div>
+  <div class="desc">Én svart/blå ramme rundt alle tre; tynne delere mellom. Aktive faner fylt blått med hvit tekst. Vår uke skiller en liten stjernikon.</div>
+</div>
+
+<!-- ================= C: Koblet med accent-understrekk ================= -->
+<div class="wrap">
+  <div class="phone">
+    <div class="header">
+      <div class="title-row">
+        <div class="title-left">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg>
+          <h2>Begivenheter</h2>
+        </div>
+        <div class="logo">F</div>
+      </div>
+      <div class="grpC">
+        <div class="btn"><span class="t">Liste</span></div>
+        <div class="btn active"><span class="t">Kalender</span></div>
+        <div class="btn wU">
+          <svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#6b7b8d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+          <span class="t">Vår uke</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">C — Understrek-row</div>
+  <div class="desc">Tre like brede kolonner i én boks; aktiv vises med blå bensin-linjeUnderstrek under teksten. Efektere 'verktøylinje'-følelse.</div>
+</div>
+
+<!-- ================= D: Fylt segment blåt aktiv ================= -->
+<div class="wrap">
+  <div class="phone">
+    <div class="header">
+      <div class="title-row">
+        <div class="title-left">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg>
+          <h2>Begivenheter</h2>
+        </div>
+        <div class="logo">F</div>
+      </div>
+      <div class="segD">
+        <div class="btn"><span class="t">Liste</span></div>
+        <div class="btn active"><span class="t">Kalender</span></div>
+        <div class="btn wU">
+          <svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2b3a48" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/></svg>
+          <span class="t">Vår uke</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="label">D — Segment med blå aktiv-fylt</div>
+  <div class="desc">iOS-stil-segment der aktiv fane er fylt mørk blå. Gjør valget tydelig; Vår uke er integrert i samme gruppe.</div>
+</div>
+
+</body>
+</html>

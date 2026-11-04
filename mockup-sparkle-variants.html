@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Sparkle-varianter</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(160deg, #dfe7ee 0%, #eef2f6 60%, #d8e2eb 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 48px;
+    padding: 50px 24px 80px;
+  }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 300px; }
+  .phone-label { font-size: 14px; font-weight: 700; color: #3b5a75; order: 3; text-align: center; }
+  .phone-desc { font-size: 11.5px; color: #6b7b8d; order: 4; text-align: center; line-height: 1.5; }
+  .phone {
+    width: 300px;
+    height: 560px;
+    background: #fff;
+    border-radius: 40px;
+    border: 9px solid #2b3a48;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 20px 44px rgba(59, 90, 117, .22);
+    display: flex;
+    flex-direction: column;
+  }
+  .screen { flex: 1; background: #fff; display: flex; flex-direction: column; overflow: hidden; }
+  .screen-top {
+    padding: 22px 18px 10px;
+    border-bottom: 1px solid #eef1f4;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .screen-top h2 { font-size: 17px; font-weight: 800; color: #333; }
+  .content { flex: 1; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+  .card {
+    border-radius: 14px;
+    padding: 12px 14px;
+    display: flex; align-items: center; gap: 11px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .card-icon {
+    width: 36px; height: 36px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 16px; flex-shrink: 0;
+  }
+  .card-title { font-size: 13px; font-weight: 700; color: #333; }
+  .card-sub { font-size: 11px; color: #999; margin-top: 2px; }
+
+  /* ---- Tab bar ---- */
+  .tabbar-layer { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 16px 16px; }
+  .tabbar {
+    position: relative;
+    height: 62px;
+    background: #fff;
+    border: 1.5px solid #3b5a75;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .tab { flex: 1; display: flex; align-items: center; justify-content: center; height: 100%; }
+  .tab svg { display: block; }
+
+  .center-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 52px;
+    height: 52px;
+    margin-top: -26px;
+    margin-left: -26px;
+    border-radius: 26px;
+    background: #fff;
+    border: 1.5px solid #3b5a75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    z-index: 2;
+    transition: transform .15s ease;
+  }
+  .center-btn:hover { transform: scale(1.05); }
+  .center-btn svg { display: block; }
+</style>
+</head>
+<body>
+
+<!-- ============ A: Fylt stor stjerne + liten glimt (valgt i forrige) ============ -->
+<div class="phone-wrap">
+  <div class="phone">
+    <div class="screen">
+      <div class="screen-top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7B8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <h2>Begivenheter</h2>
+      </div>
+      <div class="content">
+        <div class="card"><div class="card-icon" style="background:#6B7B8D;">📅</div><div><div class="card-title">Fotballtrening</div><div class="card-sub">I dag · 16:00</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#E6A817;">🎂</div><div><div class="card-title">Emil fyller 7</div><div class="card-sub">Fredag</div></div></div>
+      </div>
+    </div>
+    <div class="tabbar-layer"><div class="tabbar">
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg></div>
+      <div class="tab" style="padding-right:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <div class="tab" style="padding-left:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="center-btn">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <path d="M10.5 4l1.7 4.55L17 10.25l-4.8 1.7L10.5 16.5l-1.7-4.55L4 10.25l4.8-1.7z" fill="#3b5a75" fill-opacity="0.92"/>
+          <path d="M18 14l.95 2.55L21.5 17.5l-2.55.95L18 21l-.95-2.55L14.5 17.5l2.55-.95z" fill="#3b5a75"/>
+        </svg>
+      </div>
+    </div></div>
+  </div>
+  <div class="phone-label">A — Fylt stjerne + glimt</div>
+  <div class="phone-desc">Klassisk «AI-sparkle»: stor fylt 4-kantet stjerne med liten glimt nede til høyre. Uttrykket er mettet og tydelig.</div>
+</div>
+
+<!-- ============ B: Konturstjerne samme stil som faner ============ -->
+<div class="phone-wrap">
+  <div class="phone">
+    <div class="screen">
+      <div class="screen-top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7B8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <h2>Begivenheter</h2>
+      </div>
+      <div class="content">
+        <div class="card"><div class="card-icon" style="background:#6B7B8D;">📅</div><div><div class="card-title">Fotballtrening</div><div class="card-sub">I dag · 16:00</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#E6A817;">🎂</div><div><div class="card-title">Emil fyller 7</div><div class="card-sub">Fredag</div></div></div>
+      </div>
+    </div>
+    <div class="tabbar-layer"><div class="tabbar">
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg></div>
+      <div class="tab" style="padding-right:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <div class="tab" style="padding-left:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="center-btn">
+        <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 4l1.6 4.3L17 9.9l-4.4 1.6L11 15.8l-1.6-4.3L5 9.9l4.4-1.6z"/>
+          <path d="M18.5 14.5l.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8z" fill="#3b5a75" stroke-width="1.5"/>
+        </svg>
+      </div>
+    </div></div>
+  </div>
+  <div class="phone-label">B — Konturstjerne (samme strek som fanene)</div>
+  <div class="phone-desc">Stor stjerne outlinet med tykkere strek som matcher fanene nøyaktig; liten glimt er fylt. Konsistent med ikonstil-settet.</div>
+</div>
+
+<!-- ============ C: Lucide «sparkles» (tre stjerner) ============ -->
+<div class="phone-wrap">
+  <div class="phone">
+    <div class="screen">
+      <div class="screen-top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7B8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <h2>Begivenheter</h2>
+      </div>
+      <div class="content">
+        <div class="card"><div class="card-icon" style="background:#6B7B8D;">📅</div><div><div class="card-title">Fotballtrening</div><div class="card-sub">I dag · 16:00</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#E6A817;">🎂</div><div><div class="card-title">Emil fyller 7</div><div class="card-sub">Fredag</div></div></div>
+      </div>
+    </div>
+    <div class="tabbar-layer"><div class="tabbar">
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg></div>
+      <div class="tab" style="padding-right:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <div class="tab" style="padding-left:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="center-btn">
+        <!-- Lucide "sparkles" path -->
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+          <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
+        </svg>
+      </div>
+    </div></div>
+  </div>
+  <div class="phone-label">C — Lucide «sparkles»</div>
+  <div class="phone-desc">Standard AI-ikonet (brukes av Google/Notion m.fl.): stor stjerne med to små kryss-glimt. Gjenkjennelig som «lag med AI».</div>
+</div>
+
+<!-- ============ D: Én stor fylt stjerne bar ============ -->
+<div class="phone-wrap">
+  <div class="phone">
+    <div class="screen">
+      <div class="screen-top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7B8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <h2>Begivenheter</h2>
+      </div>
+      <div class="content">
+        <div class="card"><div class="card-icon" style="background:#6B7B8D;">📅</div><div><div class="card-title">Fotballtrening</div><div class="card-sub">I dag · 16:00</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#E6A817;">🎂</div><div><div class="card-title">Emil fyller 7</div><div class="card-sub">Fredag</div></div></div>
+      </div>
+    </div>
+    <div class="tabbar-layer"><div class="tabbar">
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg></div>
+      <div class="tab" style="padding-right:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <div class="tab" style="padding-left:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="center-btn">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+          <path d="M12 2.5c.6 3.4 2.1 6.5 4.8 9.5-2.7 3-4.2 6.1-4.8 9.5-.6-3.4-2.1-6.5-4.8-9.5 2.7-3 4.2-6.1 4.8-9.5z" fill="#3b5a75"/>
+        </svg>
+      </div>
+    </div></div>
+  </div>
+  <div class="phone-label">D — Én ren fylt stjerne</div>
+  <div class="phone-desc">Minimalistisk: én myk 4-kantet stjerne med buede kanter, ingenting annet. Størst og sterkest symbol.</div>
+</div>
+
+<!-- ============ E: Fylt stjerne + lille stjerne diagonal ============ -->
+<div class="phone-wrap">
+  <div class="phone">
+    <div class="screen">
+      <div class="screen-top">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B7B8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <h2>Begivenheter</h2>
+      </div>
+      <div class="content">
+        <div class="card"><div class="card-icon" style="background:#6B7B8D;">📅</div><div><div class="card-title">Fotballtrening</div><div class="card-sub">I dag · 16:00</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#E6A817;">🎂</div><div><div class="card-title">Emil fyller 7</div><div class="card-sub">Fredag</div></div></div>
+      </div>
+    </div>
+    <div class="tabbar-layer"><div class="tabbar">
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg></div>
+      <div class="tab" style="padding-right:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      <div class="tab" style="padding-left:34px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+      <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+      <div class="center-btn">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+          <path d="M11 4.5c.55 3.1 1.9 5.9 4.3 8.6-2.4 2.7-3.75 5.5-4.3 8.6-.55-3.1-1.9-5.9-4.3-8.6 2.4-2.7 3.75-5.5 4.3-8.6z" fill="#3b5a75"/>
+          <path d="M18.2 4.2c.2 1.15.7 2.2 1.6 3.2-.9 1-1.4 2.05-1.6 3.2-.2-1.15-.7-2.2-1.6-3.2.9-1 1.4-2.05 1.6-3.2z" fill="#3b5a75"/>
+        </svg>
+      </div>
+    </div></div>
+  </div>
+  <div class="phone-label">E — Stor + liten stjerne</div>
+  <div class="phone-desc">Mykere «stjernesterk»-form (buede kanter) i to størrelser diagonalt. Balansen mellom A og D — dynamisk men rolig.</div>
+</div>
+
+</body>
+</html>

@@ -21,6 +21,7 @@ import i18n from './src/i18n';
 import { auth } from './src/services/firebase';
 import { useUserStore } from './src/store/userStore';
 import { useChatStore } from './src/store/chatStore';
+import { useChatUnreadBadge } from './src/hooks/useChatUnread';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { getUserProfile, createOrUpdateUser } from './src/services/familyService';
 import { configureNotifications, requestNotificationPermission } from './src/services/notificationService';
@@ -31,6 +32,8 @@ import { LandingScreen } from './src/screens/LandingScreen';
 import { EventsScreen } from './src/screens/EventsScreen';
 import { ShoppingListsScreen } from './src/screens/ShoppingListsScreen';
 import { ChatScreen } from './src/screens/ChatScreen';
+import { ChatListScreen } from './src/screens/ChatListScreen';
+import type { ChatThreadParams } from './src/screens/ChatScreen';
 import { ProfileScreen } from './src/screens/ProfileScreen';
 import { BirthdayScreen } from './src/screens/BirthdayScreen';
 import { AdminScreen } from './src/screens/AdminScreen';
@@ -113,6 +116,7 @@ type RootStackParamList = {
   MealPlan: undefined;
   RecipeDetail: { recipe: import('./src/types').Recipe };
   ChatMain: undefined;
+  ChatThread: ChatThreadParams;
   TripsList: undefined;
   SpacesList: undefined;
   HealthSpace: undefined;
@@ -308,6 +312,15 @@ const ChatStack = () => {
     <Stack.Navigator>
       <Stack.Screen
         name="ChatMain"
+        component={ChatListScreen}
+        options={{
+          headerShown: false,
+          headerStyle: { backgroundColor: colors.surface },
+          headerTintColor: colors.text,
+        }}
+      />
+      <Stack.Screen
+        name="ChatThread"
         component={ChatScreen}
         options={{
           headerShown: false,
@@ -689,6 +702,7 @@ const AppContent = () => {
   const setAppRole = useUserStore((state) => state.setAppRole);
   const setPendingInviteCode = useUserStore((state) => state.setPendingInviteCode);
   const { colors } = useTheme();
+  useChatUnreadBadge();
 
   useEffect(() => {
     if (typeof window !== 'undefined') {

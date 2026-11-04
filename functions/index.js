@@ -642,15 +642,22 @@ exports.updateRateLimits = onRequest({ region: "us-central1", memory: "256MB" },
 });
 
 // Centralized notification helper - used by all notification functions
-async function sendNotification({ familyId, title, body, notifKey, excludeUid }) {
+async function sendNotification({ familyId, title, body, notifKey, excludeUid, targetUids }) {
   const db = getFirestore();
 
-  // Get family members with FCM tokens
-  const familySnap = await db.collection("families").doc(familyId).get();
-  if (!familySnap.exists) return 0;
-  const membersMap = familySnap.data().members || {};
-  const memberUids = Object.keys(membersMap).filter(uid => uid !== excludeUid);
-  console.log(`sendNotification: family ${familyId} has ${memberUids.length} members (excluded: ${excludeUid || 'none'})`);
+  // Either an explicit list of target uids (per-conversation notifications)
+  // or all members of a family
+  let memberUids;
+  if (Array.isArray(targetUids) && targetUids.length > 0) {
+    memberUids = targetUids.filter(uid => uid !== excludeUid);
+    console.log(`sendNotification: ${memberUids.length} targeted members (excluded: ${excludeUid || 'none'})`);
+  } else {
+    const familySnap = await db.collection("families").doc(familyId).get();
+    if (!familySnap.exists) return 0;
+    const membersMap = familySnap.data().members || {};
+    memberUids = Object.keys(membersMap).filter(uid => uid !== excludeUid);
+    console.log(`sendNotification: family ${familyId} has ${memberUids.length} members (excluded: ${excludeUid || 'none'})`);
+  }
 
   const tokens = [];
   for (let i = 0; i < memberUids.length; i += 10) {
@@ -3506,27 +3513,165 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
   return { sent: totalSent };
 });
 
-// Chat message notification
-exports.notifyNewChatMessage = onDocumentCreated({ region: "us-central1", document: "chat/{chatId}" }, async (event) => {
+// Chat message notification (fires for messages in conversations/{conversationId}/messages)
+exports.notifyNewChatMessage = onDocumentCreated({ region: "us-central1", document: "conversations/{conversationId}/messages/{messageId}" }, async (event) => {
+  const db = getFirestore();
   const snap = event.data;
   if (!snap) return;
   const data = snap.data();
-  const { senderId, senderName, text, familyId } = data;
+  const { senderId, senderName, text, imageUrl } = data || {};
+  const conversationId = event.params.conversationId;
 
-  if (!familyId || !senderId) return;
+  if (!senderId) return;
 
-  const preview = text ? (text.length > 50 ? text.substring(0, 50) + "..." : text) : "📷 bilde";
+  const convSnap = await db.collection("conversations").doc(conversationId).get();
+  if (!convSnap.exists) return;
+  const conv = convSnap.data();
+  const memberIds = conv.memberIds || Object.keys(conv.members || {});
+  if (!Array.isArray(memberIds) || memberIds.length === 0) return;
 
+  const preview = text ? (text.length > 50 ? text.substring(0, 50) + "..." : text) : (imageUrl ? "📷 bilde" : "");
+
+  // Recipients: conversation members only (DM/group — NOT the whole family)
   const sent = await sendNotification({
-    familyId,
+    familyId: conv.familyId,
     title: senderName || "Noen",
     body: preview,
     notifKey: `chat_${snap.id}`,
     excludeUid: senderId,
+    targetUids: memberIds,
   });
 
-  console.log(`onChatMessage: ${sent} sent`);
+  console.log(`onChatMessage: ${sent} sent (conversation ${conversationId})`);
   return { sent };
+});
+
+// One-time migration: move legacy family-wide `chat` messages into
+// conversations/{familyConvId}/messages (idempotent; safe to re-run).
+exports.migrateChatHistory = onRequest({ region: "us-central1", memory: "512MB", timeoutSeconds: 300 }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  const db = getFirestore();
+
+  // Only the app owner (or a family owner/admin) may run the migration
+  const userSnap = await db.collection("users").doc(uid).get();
+  const isAppOwner = userSnap.exists && userSnap.data().appRole === "appOwner";
+  const { familyId } = req.body || {};
+
+  if (!isAppOwner) {
+    if (!familyId) return res.status(403).json({ error: "Forbidden: app owner required for global migration, or pass familyId" });
+    const famSnap = await db.collection("families").doc(String(familyId)).get();
+    if (!famSnap.exists) return res.status(404).json({ error: "Family not found" });
+    const role = famSnap.data().members?.[uid]?.role;
+    if (role !== "owner" && role !== "admin") {
+      return res.status(403).json({ error: "Forbidden: owner/admin role required" });
+    }
+  }
+
+  try {
+    // Group legacy messages by familyId
+    let legacyQuery = db.collection("chat").orderBy("familyId");
+    if (familyId) legacyQuery = legacyQuery.where("familyId", "==", String(familyId));
+    const legacySnap = await legacyQuery.get();
+    const byFamily = new Map();
+    legacySnap.forEach((doc) => {
+      const fid = doc.data().familyId;
+      if (!fid) return;
+      if (!byFamily.has(fid)) byFamily.set(fid, []);
+      byFamily.get(fid).push(doc);
+    });
+
+    const results = [];
+    for (const [fid, docs] of byFamily) {
+      // Find or create the pinned family conversation
+      let convQuery = await db.collection("conversations")
+        .where("familyId", "==", fid)
+        .where("type", "==", "family")
+        .limit(1)
+        .get();
+      let convRef;
+      if (!convQuery.empty) {
+        convRef = convQuery.docs[0].ref;
+      } else {
+        const famSnap = await db.collection("families").doc(fid).get();
+        const famData = famSnap.exists ? famSnap.data() : { name: "Family", members: {} };
+        const memberUids = Object.keys(famData.members || {});
+        const now = Date.now();
+        const members = {};
+        memberUids.forEach((mUid) => { members[mUid] = { role: "member", joinedAt: now }; });
+        const addRef = db.collection("conversations").doc();
+        await addRef.set({
+          type: "family",
+          familyId: fid,
+          title: famData.name || "Family",
+          icon: "family",
+          memberIds: memberUids,
+          members,
+          lastRead: {},
+          createdBy: uid,
+          createdAt: now,
+        });
+        convRef = addRef;
+        results.push({ familyId: fid, conversationCreated: addRef.id });
+      }
+
+      // Idempotent copy: skip message ids that already exist
+      let copied = 0;
+      let oldest = null;
+      for (const doc of docs) {
+        const msgRef = convRef.collection("messages").doc(doc.id);
+        const existing = await msgRef.get();
+        const src = doc.data();
+        if (!existing.exists) {
+          const payload = {
+            text: src.text || "",
+            senderId: src.senderId,
+            senderName: src.senderName || "",
+            timestamp: src.timestamp || Date.now(),
+          };
+          if (src.senderAvatarUrl) payload.senderAvatarUrl = src.senderAvatarUrl;
+          if (src.imageUrl) payload.imageUrl = src.imageUrl;
+          if (Array.isArray(src.reactions)) payload.reactions = src.reactions;
+          await msgRef.set(payload);
+          copied++;
+        }
+        const ts = src.timestamp || Date.now();
+        if (!oldest || ts < oldest) oldest = ts;
+      }
+
+      // Move createdAt back to conversation start for accurate ordering context
+      if (oldest) {
+        await convRef.set({ createdAt: oldest }, { merge: true });
+      }
+
+      // Update lastMessage snapshot from the newest copied message
+      const convDoc = await convRef.get();
+      const currentLast = convDoc.data().lastMessage;
+      const candidate = { ...docs.map((d) => d.data()).sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))[0] };
+      const nextLast = {
+        text: candidate.text || "",
+        senderId: candidate.senderId,
+        senderName: candidate.senderName || "",
+        timestamp: candidate.timestamp || Date.now(),
+        hasImage: !!candidate.imageUrl,
+      };
+      if (!currentLast || (nextLast.timestamp || 0) > (currentLast.timestamp || 0)) {
+        await convRef.set({ lastMessage: nextLast }, { merge: true });
+      }
+
+      results.push({ familyId: fid, conversationId: convRef.id, legacyMessages: docs.length, copied });
+    }
+
+    return res.status(200).json({ success: true, results });
+  } catch (error) {
+    console.error("migrateChatHistory error:", error);
+    return res.status(500).json({ error: error.message });
+  }
 });
 
 // ==================== GOOGLE CALENDAR ====================

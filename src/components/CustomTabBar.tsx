@@ -5,6 +5,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { AppIcon } from './AppIcon';
 import { useChatStore } from '../store/chatStore';
 
+
 interface TabBarProps {
   state: any;
   descriptors: any;
@@ -59,6 +60,7 @@ const TAB_ICONS: Record<string, string> = {
 export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descriptors, navigation, onCreatePress }) => {
   const { colors } = useTheme();
   const chatInputFocused = useChatStore((s) => s.inputFocused);
+  const chatUnread = useChatStore((s) => s.unreadCount) > 0;
 
   return (
     <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.accent }]}>
@@ -79,6 +81,9 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
         return (
           <TouchableOpacity key={route.key} style={[styles.tabItem, shiftStyle]} onPress={onPress} activeOpacity={0.7}>
             <TabIcon icon={icon} focused={isFocused} accentColor={colors.accent} />
+            {route.name === 'Chat' && chatUnread && (
+              <View style={[styles.unreadDot, { backgroundColor: colors.danger }]} />
+            )}
           </TouchableOpacity>
         );
       })}
@@ -115,6 +120,15 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  unreadDot: {
+    position: 'absolute',
+    top: 4,
+    right: '50%',
+    marginRight: -16,
+    width: 9,
+    height: 9,
+    borderRadius: 5,
   },
   centerBtn: {
     position: 'absolute',

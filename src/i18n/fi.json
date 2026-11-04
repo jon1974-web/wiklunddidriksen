@@ -145,7 +145,8 @@
     "newShort": "Uusi",
     "info": "Tiedot",
     "unknown": "Tuntematon",
-    "aiError": "Tekoälyvirhe: {{detail}}"
+    "aiError": "Tekoälyvirhe: {{detail}}",
+    "you": "Sinä"
   },
   "auth": {
     "title": "Fampad",
@@ -271,7 +272,10 @@
     "noLinks": "Ei lisättyjä linkkejä",
     "noDocuments": "Ei lisättyjä dokumentteja",
     "loading": "Ladataan...",
-    "deleteTransportTitle": "Poista kuljetus"
+    "deleteTransportTitle": "Poista kuljetus",
+    "createTripChat": "Luo ryhmäkeskustelu matkalle",
+    "openTripChat": "Avaa matkakeskustelu",
+    "tripChatCreated": "Matkakeskustelu on luotu 🎉"
   },
   "spaces": {
     "title": "Paikkamme",
@@ -1057,7 +1061,41 @@
     "yesterday": "Eilen",
     "send": "Lähetä",
     "cameraPermissionTitle": "Lupa",
-    "cameraPermissionBody": "Tarvitsemme kameran käyttöoikeuden kuvien ottamiseen."
+    "cameraPermissionBody": "Tarvitsemme kameran käyttöoikeuden kuvien ottamiseen.",
+    "newChat": "Uusi keskustelu",
+    "newChatDesc": "Valitse henkilö yksityisviestiin tai luo ryhmä",
+    "directMessages": "Yksityisviestit",
+    "groups": "Ryhmät",
+    "familyTag": "Perhe",
+    "familyChat": "Perhekeskustelu",
+    "noConversations": "Ei keskusteluja vielä",
+    "searchPlaceholder": "Hae keskusteluja...",
+    "groupName": "Ryhmän nimi",
+    "selectMembers": "Valitse jäsenet",
+    "createGroup": "Luo ryhmä",
+    "members": "jäsentä",
+    "groupInfo": "Ryhmätiedot",
+    "addMembers": "Lisää jäseniä",
+    "removeMember": "Poista",
+    "leaveGroup": "Poistu ryhmästä",
+    "editGroup": "Muokkaa ryhmää",
+    "photoMessage": "Kuva",
+    "leaveGroupTitle": "Poistu ryhmästä",
+    "leaveGroupBody": "Haluatko varmasti poistua tästä ryhmästä?",
+    "removeMemberTitle": "Poista jäsen",
+    "removeMemberBody": "Haluatko varmasti poistaa tämän jäsenen ryhmästä?",
+    "admin": "Ylläpitäjä",
+    "owner": "Omistaja",
+    "save": "Tallenna",
+    "cancel": "Peruuta",
+    "noMembers": "Perheenjäseniä ei löytynyt",
+    "roleMember": "Jäsen",
+    "helpTitle": "Ohje — Keskustelu",
+    "helpWhat": "Mikä tämä on?",
+    "helpWhatText": "Keskustelussa perhe voi viestiä yhteisessä perhekeskustelussa, kahden jäsenen yksityisviesteissä ja ryhmissä. Voit jakaa tekstiä, kuvia ja reagoida emojeilla. Matkakeskustelut voidaan luoda matkan tietosivulta napauttamalla keskustelupainiketta matkakortin vieressä.",
+    "helpHow": "Näin käytät sitä",
+    "helpHowText": "Avaa keskustelu napauttamalla sitä. Uusi keskustelu: napauta «＋» oikeasta yläkulmasta — valitse perheenjäsen yksityisviestiin tai luo ryhmä nimellä ja jäsenillä. Matkan ryhmäkeskustelu luodaan matkasivulta (keskustelupainike matkakortin vieressä), ja se saa nimensä ja ikoninsa matkalta.",
+    "helpTip": "Paina ryhmää pitkään listassa poistuaksesi siitä. Ryhmäkeskustelussa napauta «i» (tai ryhmän otsikkoa) hallitaksesi jäseniä."
   },
   "actionModal": {
     "edit": "Muokkaa",
@@ -1739,7 +1777,11 @@
     "rateLimitsSource": "Lähde",
     "noRateLimits": "Nopeusrajoituksia ei löytynyt",
     "maxRequests": "Max pyynnöt",
-    "windowMinutes": "Ikkuna (minuuttia)"
+    "windowMinutes": "Ikkuna (minuuttia)",
+    "migrateChatTitle": "Ylläpito: keskustelujen siirto",
+    "migrateChatDesc": "Kopioi vanhat perhekeskusteluviestit uuteen keskusteluformaattiin. Turvallista ajaa useita kertoja (idempotentti).",
+    "migrateChatButton": "Suorita siirto",
+    "migrateChatDone": "Siirto valmis"
   },
   "schedule": {
     "title": "Suunnittele toisto",

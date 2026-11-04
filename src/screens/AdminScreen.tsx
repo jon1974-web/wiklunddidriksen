@@ -91,8 +91,37 @@ export const AdminScreen: React.FC<AdminScreenProps> = ({ navigation }) => {
   const [rateLimitsSaving, setRateLimitsSaving] = useState<string | null>(null);
   const [rateLimitsSource, setRateLimitsSource] = useState<string>('');
 
+  // Maintenance: chat history migration
+  const [migrating, setMigrating] = useState(false);
+  const [migrationResult, setMigrationResult] = useState<string | null>(null);
+
   const GET_USAGE_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/getUsageStats';
 const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/triggerAdminStats';
+const MIGRATE_CHAT_URL = 'https://us-central1-familiesenter-837bb.cloudfunctions.net/migrateChatHistory';
+
+  const handleMigrateChat = useCallback(async () => {
+    if (migrating) return;
+    setMigrating(true);
+    setMigrationResult(null);
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) throw new Error('Ikke innlogget');
+      const idToken = await currentUser.getIdToken();
+      const res = await fetch(MIGRATE_CHAT_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${idToken}` },
+        body: JSON.stringify({}),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Serverfeil');
+      const summary = (data.results || []).map((r: any) => `${r.familyId}: ${r.copied ?? 0}/${r.legacyMessages ?? 0}`).join(' · ');
+      setMigrationResult(summary || t('admin.migrateChatDone'));
+    } catch (error: any) {
+      setMigrationResult(`${t('common.error')}: ${error?.message || error}`);
+    } finally {
+      setMigrating(false);
+    }
+  }, [migrating, t]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -645,6 +674,28 @@ const TRIGGER_STATS_URL = 'https://us-central1-familiesenter-837bb.cloudfunction
           <Text style={[styles.settingsInfoText, { color: colors.textSecondary }]}>
             {t('admin.rateLimitsSource')}: <Text style={{ color: colors.text, fontWeight: '600' }}>{rateLimitsSource}</Text>
           </Text>
+        </View>
+
+        {/* Maintenance tools */}
+        <View style={[styles.placeholderCard, { backgroundColor: colors.surface }]}>
+          <Text style={[styles.placeholderText, { color: colors.text }]}>{t('admin.migrateChatTitle')}</Text>
+          <Text style={{ color: colors.textSecondary, fontSize: 13, marginTop: 4, marginBottom: 10 }}>{t('admin.migrateChatDesc')}</Text>
+          <TouchableOpacity
+            style={{ backgroundColor: colors.accent, borderRadius: 12, paddingVertical: 10, alignItems: 'center' }}
+            onPress={handleMigrateChat}
+            disabled={migrating}
+          >
+            {migrating ? (
+              <ActivityIndicator color="#fff" size="small" />
+            ) : (
+              <Text style={{ color: '#fff', fontWeight: '700' }}>{t('admin.migrateChatButton')}</Text>
+            )}
+          </TouchableOpacity>
+          {migrationResult && (
+            <Text style={{ color: colors.textSecondary, fontSize: 12, marginTop: 8 }} selectable>
+              {migrationResult}
+            </Text>
+          )}
         </View>
 
         {functionNames.length === 0 ? (

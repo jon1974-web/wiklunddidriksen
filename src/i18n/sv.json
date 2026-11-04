@@ -145,7 +145,8 @@
     "newShort": "Ny",
     "info": "Info",
     "unknown": "Okänd",
-    "aiError": "AI-fel: {{detail}}"
+    "aiError": "AI-fel: {{detail}}",
+    "you": "Du"
   },
   "auth": {
     "title": "Fampad",
@@ -271,7 +272,10 @@
     "noLinks": "Inga länkar tillagda",
     "noDocuments": "Inga dokument tillagda",
     "loading": "Laddar...",
-    "deleteTransportTitle": "Ta bort transport"
+    "deleteTransportTitle": "Ta bort transport",
+    "createTripChat": "Skapa chattgrupp för resan",
+    "openTripChat": "Öppna chatten för resan",
+    "tripChatCreated": "Chatten för resan är skapad 🎉"
   },
   "spaces": {
     "title": "Våra platser",
@@ -1057,7 +1061,41 @@
     "yesterday": "Igår",
     "send": "Skicka",
     "cameraPermissionTitle": "Behörighet",
-    "cameraPermissionBody": "Vi behöver kameratillgång för att ta bilder."
+    "cameraPermissionBody": "Vi behöver kameratillgång för att ta bilder.",
+    "newChat": "Ny chatt",
+    "newChatDesc": "Välj en person för direktmeddelande, eller skapa en grupp",
+    "directMessages": "Direktmeddelanden",
+    "groups": "Grupper",
+    "familyTag": "Familj",
+    "familyChat": "Familjechatt",
+    "noConversations": "Inga chattar ännu",
+    "searchPlaceholder": "Sök i chatter...",
+    "groupName": "Gruppnamn",
+    "selectMembers": "Välj medlemmar",
+    "createGroup": "Skapa grupp",
+    "members": "medlemmar",
+    "groupInfo": "Gruppinfo",
+    "addMembers": "Lägg till medlemmar",
+    "removeMember": "Ta bort",
+    "leaveGroup": "Lämna gruppen",
+    "editGroup": "Redigera grupp",
+    "photoMessage": "Bild",
+    "leaveGroupTitle": "Lämna gruppen",
+    "leaveGroupBody": "Är du säker på att du vill lämna denna grupp?",
+    "removeMemberTitle": "Ta bort medlem",
+    "removeMemberBody": "Är du säker på att du vill ta bort denna medlem från gruppen?",
+    "admin": "Administratör",
+    "owner": "Ägare",
+    "save": "Spara",
+    "cancel": "Avbryt",
+    "noMembers": "Hittade inga familjemedlemmar",
+    "roleMember": "Medlem",
+    "helpTitle": "Hjälp — Chatt",
+    "helpWhat": "Vad är detta?",
+    "helpWhatText": "Chatten låter familien skicka meddelanden i en gemensam familjechatt, i direktmeddelanden mellan två medlemmar och i grupper. Du kan dela text, bilder och reagera med emojis. Reschatter kan skapas från resans detaljsida genom att trycka på chattknappen bredvid reskortet.",
+    "helpHow": "Så här använder du den",
+    "helpHowText": "Tryck på en konversation för att öppna den. Tryck «＋» uppe till höger för ny chatt: välj en familjemedlem för direktmeddelande, eller skapa en grupp med namn och medlemmar. Resans chattgrupp skapas från ressidan (chattknappen bredvid reskortet) och får sitt namn och sin ikon från resan.",
+    "helpTip": "Håll intryckt på en grupp i listan för att lämna den. I en gruppchatt trycker du på «i» (eller grupptiteln) för att hantera medlemmar."
   },
   "actionModal": {
     "edit": "Redigera",
@@ -1739,7 +1777,11 @@
     "rateLimitsSource": "Källa",
     "noRateLimits": "Inga taxegränser hittades",
     "maxRequests": "Max förfrågningar",
-    "windowMinutes": "Fönster (minuter)"
+    "windowMinutes": "Fönster (minuter)",
+    "migrateChatTitle": "Underhåll: chattmigrering",
+    "migrateChatDesc": "Kopierar gamla familjechatt-meddelanden till det nya samtalsformatet. Tryggt att köra flera gånger (idempotent).",
+    "migrateChatButton": "Kör migrering",
+    "migrateChatDone": "Migrering klar"
   },
   "schedule": {
     "title": "Planera upprepning",

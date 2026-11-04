@@ -45,6 +45,7 @@ import {
   deleteTripPackingList,
   updateTrip,
 } from '../services/tripService';
+import { createTripGroupConversation, updateGroup } from '../services/chatService';
 import { ref, deleteObject } from 'firebase/storage';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
@@ -152,6 +153,7 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
   const [showTransportPicker, setShowTransportPicker] = useState(false);
   const [actionModal, setActionModal] = useState<{ visible: boolean; title: string; subtitle?: string; onEdit?: () => void; onDelete?: () => void }>({ visible: false, title: '' });
   const [showHelpTransport, setShowHelpTransport] = useState(false);
+  const [creatingTripChat, setCreatingTripChat] = useState(false);
   const [showHelpHotels, setShowHelpHotels] = useState(false);
   const [showHelpRestaurants, setShowHelpRestaurants] = useState(false);
   const [showHelpActivities, setShowHelpActivities] = useState(false);
@@ -446,10 +448,48 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
       await updateTrip(trip.id, updateData);
       setTrip({ ...trip, ...updateData });
       setActiveModal(null);
+      // Rename sync: trip chat group title/icon follow the trip
+      if (trip.chatId && (updateData.title !== trip.title || (updateData.icon || '') !== (trip.icon || ''))) {
+        updateGroup(trip.chatId, { title: updateData.title, icon: updateData.icon || '✈️' }).catch((e) => {
+          console.error('Failed to sync trip chat group:', e);
+        });
+      }
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     }
   }, [trip, tripTitle, tripCity, tripCountry, tripStartDate, tripEndDate, tripStartTime, tripEndTime, tripIcon, tripPersons]);
+
+  // Trip chat: opens the linked group, or creates it on first press
+  const handleTripChatPress = useCallback(async () => {
+    if (creatingTripChat) return;
+    if (trip.chatId) {
+      navigation.navigate('Chat', {
+        screen: 'ChatThread',
+        params: {
+          conversationId: trip.chatId,
+          conversationType: 'group',
+          conversationTitle: trip.title,
+        },
+      });
+      return;
+    }
+    const familyId = useUserStore.getState().familyId;
+    if (!familyId || !user) return;
+    setCreatingTripChat(true);
+    try {
+      const conv = await createTripGroupConversation(
+        familyId,
+        { id: trip.id, title: trip.title, icon: trip.icon },
+        user.uid
+      );
+      await updateTrip(trip.id, { chatId: conv.id });
+      setTrip((prev) => ({ ...prev, chatId: conv.id }));
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    } finally {
+      setCreatingTripChat(false);
+    }
+  }, [creatingTripChat, trip, user, navigation, t]);
 
   const openAddModal = (modal: ModalType, transportType?: TransportForm['transportType']) => {
     resetForms();
@@ -960,29 +1000,52 @@ export const TripDetailScreen: React.FC<TripDetailScreenProps> = ({ navigation, 
         <Text style={{ color: MODULE_COLORS.trips, fontSize: 18 }}>←</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
-        style={[styles.tripCard, { backgroundColor: colors.surface }]}
-        onPress={() => {
-          setTripTitle(trip.title);
-          setTripCity(trip.city);
-          setTripCountry(trip.country);
-          setTripStartDate(trip.startDate);
-          setTripEndDate(trip.endDate);
-          setTripStartTime(trip.startTime || '');
-          setTripEndTime(trip.endTime || '');
-          setTripIcon(trip.icon || '✈️');
-          setActiveModal('tripEdit');
-        }}
-      >
-        <Text style={styles.tripIcon}>{trip.icon || '✈️'}</Text>
-        <Text style={[styles.tripTitle, { color: colors.text }]}>{trip.title}</Text>
-        <Text style={[styles.tripLocation, { color: colors.textSecondary }]}>
-          {trip.city}{trip.country ? `, ${trip.country}` : ''}
-        </Text>
-        <Text style={[styles.tripDates, { color: colors.textSecondary }]}>
-          {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
-        </Text>
-      </TouchableOpacity>
+      <View style={styles.tripCardRow}>
+        <TouchableOpacity
+          style={[styles.tripCard, { flex: 1, backgroundColor: colors.surface }]}
+          onPress={() => {
+            setTripTitle(trip.title);
+            setTripCity(trip.city);
+            setTripCountry(trip.country);
+            setTripStartDate(trip.startDate);
+            setTripEndDate(trip.endDate);
+            setTripStartTime(trip.startTime || '');
+            setTripEndTime(trip.endTime || '');
+            setTripIcon(trip.icon || '✈️');
+            setActiveModal('tripEdit');
+          }}
+        >
+          <Text style={styles.tripIcon}>{trip.icon || '✈️'}</Text>
+          <Text style={[styles.tripTitle, { color: colors.text }]}>{trip.title}</Text>
+          <Text style={[styles.tripLocation, { color: colors.textSecondary }]}>
+            {trip.city}{trip.country ? `, ${trip.country}` : ''}
+          </Text>
+          <Text style={[styles.tripDates, { color: colors.textSecondary }]}>
+            {formatDate(trip.startDate)} - {formatDate(trip.endDate)}
+          </Text>
+        </TouchableOpacity>
+
+        {/* Trip chat: create on first press, then opens the linked group */}
+        <TouchableOpacity
+          onPress={handleTripChatPress}
+          disabled={creatingTripChat}
+          style={[styles.tripChatBtn, { backgroundColor: colors.surface, borderColor: MODULE_COLORS.trips }]}
+          accessibilityLabel={trip.chatId ? t('trips.openTripChat') : t('trips.createTripChat')}
+        >
+          {creatingTripChat ? (
+            <ActivityIndicator size="small" color={MODULE_COLORS.trips} />
+          ) : (
+            <>
+              <AppIcon name="chat" size={22} color={MODULE_COLORS.trips} />
+              {!trip.chatId && (
+                <View style={[styles.tripChatPlus, { backgroundColor: MODULE_COLORS.trips }]}>
+                  <Text style={styles.tripChatPlusText}>+</Text>
+                </View>
+              )}
+            </>
+          )}
+        </TouchableOpacity>
+      </View>
 
       {/* Vær */}
       {(trip.city || trip.latitude || trip.title) && (
@@ -2230,13 +2293,49 @@ const styles = StyleSheet.create({
   tripCard: {
     borderRadius: 12,
     padding: 20,
-    marginBottom: 24,
+    marginBottom: 0,
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
+  },
+  tripCardRow: {
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    marginBottom: 24,
+    gap: 10,
+  },
+  tripChatBtn: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    borderWidth: 1.5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tripChatPlus: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tripChatPlusText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '800',
+    lineHeight: 14,
   },
   tripIcon: {
     fontSize: 36,

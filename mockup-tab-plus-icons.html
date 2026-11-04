@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Tab bar plus-icon</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: linear-gradient(160deg, #dfe7ee 0%, #eef2f6 60%, #d8e2eb 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 60px;
+    padding: 50px 24px 80px;
+  }
+  .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .phone-label {
+    font-size: 15px; font-weight: 700; color: #3b5a75; order: 3;
+  }
+  .phone-desc { font-size: 12px; color: #6b7b8d; order: 4; max-width: 260px; text-align: center; line-height: 1.5; }
+  .phone {
+    width: 340px;
+    height: 640px;
+    background: #fff;
+    border-radius: 44px;
+    border: 10px solid #2b3a48;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 24px 50px rgba(59, 90, 117, .25);
+    display: flex;
+    flex-direction: column;
+  }
+  .screen {
+    flex: 1;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .screen-top {
+    padding: 26px 20px 12px;
+    border-bottom: 1px solid #eef1f4;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .screen-top h2 { font-size: 19px; font-weight: 800; color: #333; }
+  .content { flex: 1; padding: 16px 18px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+  .card {
+    border-radius: 14px;
+    padding: 14px 16px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06);
+  }
+  .card-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px; font-weight: 700; flex-shrink: 0;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: #333; }
+  .card-sub { font-size: 11.5px; color: #999; margin-top: 2px; }
+
+  /* ---- Tab bar (matches CustomTabBar) ---- */
+  .tabbar-layer {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    padding: 0 18px 18px;
+  }
+  .tabbar {
+    position: relative;
+    height: 62px;
+    background: #fff;
+    border: 1.5px solid #3b5a75;
+    border-radius: 28px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  }
+  .tab {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    cursor: pointer;
+  }
+  .tab svg { display: block; }
+  .tab.active svg { stroke: #3b5a75; }
+  .tab:not(.active) svg { stroke: #999; }
+
+  .center-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 52px;
+    height: 52px;
+    margin-top: -26px;
+    margin-left: -26px;
+    border-radius: 26px;
+    background: #fff;
+    border: 1.5px solid #3b5a75;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    z-index: 2;
+  }
+  /* Option 1 — drawn plus icon */
+  .opt1 .center-btn svg { stroke: #3b5a75; }
+  /* Option 2 — sparkle icon */
+  .opt2 .center-btn svg { stroke: #3b5a75; }
+
+  .spacer { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- ============================ OPTION 1 ============================ -->
+<div class="phone-wrap opt1">
+  <div class="phone">
+    <div class="screen">
+      <div class="screen-top">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6B7B8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <h2>Begivenheter</h2>
+      </div>
+      <div class="content">
+        <div class="card"><div class="card-icon" style="background:#6B7B8D;">📅</div><div><div class="card-title">Fotballtrening</div><div class="card-sub">I dag · 16:00</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#E6A817;">🎂</div><div><div class="card-title">Emil fyller 7</div><div class="card-sub">Fredag</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#C67B5C;">💊</div><div><div class="card-title">Medisin reminder</div><div class="card-sub">Kl. 08:00</div></div></div>
+      </div>
+    </div>
+    <div class="tabbar-layer">
+      <div class="tabbar">
+        <div class="tab active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg></div>
+        <div class="tab" style="padding-right:40px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="tab" style="padding-left:40px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="center-btn">
+          <!-- Drawn plus, same stroke style as tab icons -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="stroke:#3b5a75;"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="phone-label">Option 1 — Tegnet «pluss»-ikon</div>
+  <div class="phone-desc">SVG-pluss med samme strek-stil (2.5, runde ender) som de fire fanene. Tallerken-krysset matcher ikonene nøyaktig.</div>
+</div>
+
+<!-- ============================ OPTION 2 ============================ -->
+<div class="phone-wrap opt2">
+  <div class="phone">
+    <div class="screen">
+      <div class="screen-top">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#6B7B8D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <h2>Begivenheter</h2>
+      </div>
+      <div class="content">
+        <div class="card"><div class="card-icon" style="background:#6B7B8D;">📅</div><div><div class="card-title">Fotballtrening</div><div class="card-sub">I dag · 16:00</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#E6A817;">🎂</div><div><div class="card-title">Emil fyller 7</div><div class="card-sub">Fredag</div></div></div>
+        <div class="card"><div class="card-icon" style="background:#C67B5C;">💊</div><div><div class="card-title">Medisin reminder</div><div class="card-sub">Kl. 08:00</div></div></div>
+      </div>
+    </div>
+    <div class="tabbar-layer">
+      <div class="tabbar">
+        <div class="tab active"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><rect x="7" y="13" width="4" height="4" rx="1" fill="#3b5a75" stroke="none"/></svg></div>
+        <div class="tab" style="padding-right:40px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="tab" style="padding-left:40px;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+        <div class="tab"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        <div class="center-btn">
+          <!-- Sparkle icon -->
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="stroke:#3b5a75;">
+            <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z" />
+            <path d="M19 15l.95 2.55L22.5 18.5l-2.55.95L19 22l-.95-2.55L15.5 18.5l2.55-.95z" fill="#3b5a75" stroke="none" fill-opacity="0.9"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="phone-label">Option 2 — Sparkle</div>
+  <div class="phone-desc">«Skap noe nytt»-følelse, passer med AI/stemme/foto-funksjonene i QuickCreate. Stor stjerne + liten glimt.</div>
+</div>
+
+</body>
+</html>
