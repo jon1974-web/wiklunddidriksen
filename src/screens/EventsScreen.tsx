@@ -504,7 +504,10 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
         const d = new Date(item.startTimestamp);
         return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
       }
-      return '00:00';
+      // Health, pet, school, kindergarten and home rows carry their start time in `time`
+      // (set when the list is built). Only items without a time (birthdays, trips) sort at 00:00.
+      const timed = (item as { time?: string }).time;
+      return timed || '00:00';
     };
     // Sort by START date and START time. A multi-day item must not jump to its end date.
     const getStartDateStr = (item: UnifiedItem): string => {
