@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<title>AI-ikon mockup</title>
+<style>
+  :root { --accent: #3b5a75; --text: #1d2b36; --muted: #6b7c88; --border: #d9e4ec; }
+  body { font-family: -apple-system, system-ui, sans-serif; background: #f5f8fa; color: var(--text); margin: 0; padding: 24px; }
+  h1 { font-size: 20px; margin: 0 0 4px; }
+  h2 { font-size: 15px; margin: 32px 0 12px; color: var(--accent); text-transform: uppercase; letter-spacing: .5px; }
+  p.note { color: var(--muted); font-size: 13px; margin: 0 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 12px; }
+  .card { background: #fff; border: 1px solid var(--border); border-radius: 12px; padding: 16px; text-align: center; }
+  .card .name { font-size: 13px; font-weight: 600; margin-top: 8px; }
+  .card .desc { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .row { display: flex; align-items: flex-end; justify-content: center; gap: 18px; }
+  .row div { font-size: 11px; color: var(--muted); }
+  .dark { background: #1f2a33; border-radius: 12px; padding: 16px; color: #7EC8E3; }
+  .dark .row div { color: #9fb3c1; }
+  .small { display: flex; gap: 14px; align-items: center; justify-content: center; }
+  .tabbar { display: flex; justify-content: space-around; align-items: center; background: #fff; border: 1px solid var(--border); border-radius: 14px; padding: 12px; max-width: 420px; margin: 0 auto; }
+  .tabbar div { font-size: 11px; color: var(--muted); text-align: center; }
+  .pill { display: inline-flex; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 10px; background: #EDF6FB; font-size: 14px; font-weight: 600; color: #3b5a75; }
+</style>
+</head>
+<body>
+
+<h1>AI-ikon: robothode med antenne og sparkle</h1>
+<p class="note">Samme 24×24-rutenett, strek 2.5, runde ender og 0.15 fyll som de andre ikonene. Fargen følger den som sendes inn. Sparkle-ikonet i tab-linjen er <b>ikke</b> endret.</p>
+
+<!-- Symbol library. Each symbol uses currentColor so it follows the icon color -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- A: Robothode, antenne med kule, to øyne, smil, sparkle øverst til høyre -->
+    <symbol id="ai-a" viewBox="0 0 24 24">
+      <rect x="4" y="8" width="16" height="12" rx="3.5" fill="currentColor" fill-opacity="0.15"/>
+      <line x1="12" y1="8" x2="12" y2="4.5"/>
+      <circle cx="12" cy="3.5" r="1.2" fill="currentColor" stroke="none"/>
+      <circle cx="9" cy="13.5" r="1.6" fill="currentColor" stroke="none"/>
+      <circle cx="15" cy="13.5" r="1.6" fill="currentColor" stroke="none"/>
+      <path d="M9.5 17.2c1.5 1 3.5 1 5 0"/>
+      <path d="M20.5 2.5l.45 1.05 1.05.45-1.05.45-.45 1.05-.45-1.05-1.05-.45 1.05-.45z" fill="currentColor" stroke="none"/>
+    </symbol>
+
+    <!-- B: Samme hode, øyne som skjerm (pill), antenne med sparkle som topp -->
+    <symbol id="ai-b" viewBox="0 0 24 24">
+      <rect x="4" y="8" width="16" height="12" rx="3.5" fill="currentColor" fill-opacity="0.15"/>
+      <line x1="12" y1="8" x2="12" y2="5"/>
+      <path d="M12 5.2l.5 1.2 1.2.5-1.2.5-.5 1.2-.5-1.2-1.2-.5 1.2-.5z" fill="currentColor" stroke="none"/>
+      <rect x="7.2" y="12" width="3.2" height="3" rx="1.3" fill="currentColor" stroke="none"/>
+      <rect x="13.6" y="12" width="3.2" height="3" rx="1.3" fill="currentColor" stroke="none"/>
+      <line x1="9.5" y1="17.5" x2="14.5" y2="17.5"/>
+    </symbol>
+
+    <!-- C: Hode med ører (sider), antenne, liten sparkle øverst til venstre -->
+    <symbol id="ai-c" viewBox="0 0 24 24">
+      <rect x="6" y="7" width="12" height="11" rx="3" fill="currentColor" fill-opacity="0.15"/>
+      <line x1="3" y1="11" x2="6" y2="11"/>
+      <line x1="18" y1="11" x2="21" y2="11"/>
+      <line x1="12" y1="7" x2="12" y2="4"/>
+      <circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/>
+      <circle cx="9.5" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+      <circle cx="14.5" cy="12" r="1.3" fill="currentColor" stroke="none"/>
+      <path d="M10 15.5h4"/>
+      <path d="M3.2 2.6l.4.95.95.4-.95.4-.4.95-.4-.95-.95-.4.95-.4z" fill="currentColor" stroke="none"/>
+    </symbol>
+
+    <!-- D: Rundt hode med antenne, glimt i øyet som sparkle, smil -->
+    <symbol id="ai-d" viewBox="0 0 24 24">
+      <circle cx="12" cy="13" r="7.5" fill="currentColor" fill-opacity="0.15"/>
+      <line x1="12" y1="5.5" x2="12" y2="3"/>
+      <circle cx="12" cy="2.5" r="1.1" fill="currentColor" stroke="none"/>
+      <circle cx="9.3" cy="12.5" r="1.4" fill="currentColor" stroke="none"/>
+      <circle cx="14.7" cy="12.5" r="1.4" fill="currentColor" stroke="none"/>
+      <path d="M9.5 16.2c1.4 1 3.6 1 5 0"/>
+      <path d="M19.5 3.5l.4.9.9.4-.9.4-.4.9-.4-.9-.9-.4.9-.4z" fill="currentColor" stroke="none"/>
+    </symbol>
+
+    <!-- Current icon, for comparison (copied from AppIcon.tsx "ai") -->
+    <symbol id="ai-current" viewBox="0 0 24 24">
+      <rect x="3" y="8" width="18" height="12" rx="3"/>
+      <path d="M8 8V6a4 4 0 018 0v2"/>
+      <circle cx="9" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+      <circle cx="15" cy="14" r="1.5" fill="currentColor" stroke="none"/>
+      <path d="M9 17.5c1 1.5 6 1.5 6 0"/>
+      <line x1="12" y1="4" x2="12" y2="8"/>
+      <circle cx="12" cy="3" r="1" fill="currentColor" stroke="none"/>
+    </symbol>
+
+    <!-- Sparkle icon used in the tab bar (unchanged, for comparison) -->
+    <symbol id="sparkles-tab" viewBox="0 0 24 24">
+      <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+    </symbol>
+  </defs>
+</svg>
+
+<h2>1. Kandidater (store)</h2>
+<div class="grid">
+  <div class="card" style="color:#3b5a75">
+    <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-a"/></svg>
+    <div class="name">A · Antenne og glimt</div>
+    <div class="desc">Antennekule, øyne, smil, sparkle øverst til høyre</div>
+  </div>
+  <div class="card" style="color:#3b5a75">
+    <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-b"/></svg>
+    <div class="name">B · Skjerm-øyne</div>
+    <div class="desc">Lysende øyne som skjermer, sparkle som antennetopp</div>
+  </div>
+  <div class="card" style="color:#3b5a75">
+    <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-c"/></svg>
+    <div class="name">C · Hode med ører</div>
+    <div class="desc">Sidekoblinger, antenne, sparkle øverst til venstre</div>
+  </div>
+  <div class="card" style="color:#3b5a75">
+    <svg width="96" height="96" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-d"/></svg>
+    <div class="name">D · Rundt hode</div>
+    <div class="desc">Rund hodeform, antenne, sparkle i hjørnet</div>
+  </div>
+</div>
+
+<h2>2. Sammenligning med dagens ikon</h2>
+<div class="grid">
+  <div class="card" style="color:#3b5a75">
+    <div class="row">
+      <div><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-current"/></svg><br>Dagens</div>
+      <div><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-a"/></svg><br>A</div>
+    </div>
+  </div>
+  <div class="card" style="color:#3b5a75">
+    <div class="row">
+      <div><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-b"/></svg><br>B</div>
+      <div><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-d"/></svg><br>D</div>
+    </div>
+  </div>
+</div>
+
+<h2>3. Småstørrelser (brukes i knapper og overskrifter)</h2>
+<div class="grid">
+  <div class="card" style="color:#C67B5C">
+    <div class="small">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-a"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-a"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-a"/></svg>
+    </div>
+    <div class="desc">A ved 14, 18 og 24 px (farge: health-terrakotta)</div>
+  </div>
+  <div class="card" style="color:#3b5a75">
+    <div class="small">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-b"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-b"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-b"/></svg>
+    </div>
+    <div class="desc">B ved 14, 18 og 24 px</div>
+  </div>
+  <div class="card" style="color:#6B8F71">
+    <div class="small">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-c"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-c"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-c"/></svg>
+    </div>
+    <div class="desc">C ved 14, 18 og 24 px</div>
+  </div>
+  <div class="card" style="color:#3b5a75">
+    <div class="small">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-d"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-d"/></svg>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-d"/></svg>
+    </div>
+    <div class="desc">D ved 14, 18 og 24 px</div>
+  </div>
+</div>
+
+<h2>4. Mørk bakgrunn</h2>
+<div class="grid">
+  <div class="dark">
+    <div class="row">
+      <div><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-a"/></svg><br>A</div>
+      <div><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-b"/></svg><br>B</div>
+      <div><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-c"/></svg><br>C</div>
+      <div><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-d"/></svg><br>D</div>
+    </div>
+  </div>
+</div>
+
+<h2>5. I sammenheng: AI-knapp og tab-linje</h2>
+<div class="grid">
+  <div class="card">
+    <div class="pill" style="color:#3b5a75"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-a"/></svg>Spør AI</div>
+    <div class="desc">Eksempel på knapp med A</div>
+  </div>
+  <div class="card">
+    <div class="tabbar">
+      <div><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#7EC8E3" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#sparkles-tab"/></svg><br>Sparkle (uendret)</div>
+      <div><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#3b5a75" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ai-a"/></svg><br>A</div>
+    </div>
+    <div class="desc">Sparkle i tab-linjen beholdes; robot-ikonet er et eget ikon</div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -624,15 +624,19 @@ export const AppIcon: React.FC<AppIconProps> = ({ name, size = 24, color = '#3b5
     </Svg>
   );
 
+  // AI: solid robot holding a heart. Eyes and heart outline are cut out in white.
   if (name === 'ai') return (
-    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <Rect x="3" y="8" width="18" height="12" rx="3"/>
-      <Path d="M8 8V6a4 4 0 018 0v2"/>
-      <Circle cx="9" cy="14" r="1.5" fill={color}/>
-      <Circle cx="15" cy="14" r="1.5" fill={color}/>
-      <Path d="M9 17.5c1 1.5 6 1.5 6 0" strokeLinecap="round"/>
-      <Line x1="12" y1="4" x2="12" y2="8"/>
-      <Circle cx="12" cy="3" r="1" fill={color}/>
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <Rect x="11.2" y="5.5" width="1.6" height="2.5" rx="0.8" />
+      <Circle cx="12" cy="4.3" r="1.5" />
+      <Rect x="6.5" y="7" width="11" height="8.5" rx="2.5" />
+      <Circle cx="9.7" cy="11.2" r="1.3" fill="#fff" />
+      <Circle cx="14.3" cy="11.2" r="1.3" fill="#fff" />
+      <Rect x="8" y="15.5" width="8" height="4" rx="1.5" />
+      <Path d="M8.5 15.5C5.2 16.3 4.6 18.8 6.2 20L8 19C7 18.4 7.2 17 8.5 16.8Z" />
+      <Path d="M15.5 15.5C18.8 16.3 19.4 18.8 17.8 20L16 19C17 18.4 16.8 17 15.5 16.8Z" />
+      <Path d="M12 21.8L9.4 19.2C8.3 18.1 8.9 16.2 10.5 16.2C11.3 16.2 11.8 16.6 12 17.1C12.2 16.6 12.7 16.2 13.5 16.2C15.1 16.2 15.7 18.1 14.6 19.2Z" fill="#fff" />
+      <Path d="M12 21.2L9.8 19C8.9 18.1 9.4 16.9 10.5 16.9C11.2 16.9 11.7 17.3 12 17.9C12.3 17.3 12.8 16.9 13.5 16.9C14.6 16.9 15.1 18.1 14.2 19Z" />
     </Svg>
   );
 
