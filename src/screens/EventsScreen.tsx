@@ -506,8 +506,19 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       }
       return '00:00';
     };
+    // Sort by START date and START time. A multi-day item must not jump to its end date.
+    const getStartDateStr = (item: UnifiedItem): string => {
+      if (item._type === 'trip') return item.startDate;
+      if (item._type === 'spond') return formatSpondDate(item.startTimestamp);
+      if (item._type === 'event') return (item as Event).date;
+      if (item._type === 'birthday') return item.date;
+      return (item as any).dateFrom || (item as any).date || '';
+    };
+    const isPetRow = (item: UnifiedItem): boolean =>
+      item._type === 'healthAppointment' && ((item as any).icon === 'pet-visit' || (item as any).icon === 'pet-vaccination');
+    const isHealthRow = (item: UnifiedItem): boolean => item._type === 'healthAppointment' && !isPetRow(item);
     const sortByDate = (a: UnifiedItem, b: UnifiedItem) => {
-      const dateCmp = getDateStr(a).localeCompare(getDateStr(b));
+      const dateCmp = getStartDateStr(a).localeCompare(getStartDateStr(b));
       if (dateCmp !== 0) return dateCmp;
       return getTimeStr(a).localeCompare(getTimeStr(b));
     };
@@ -560,8 +571,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       }));
       let dayItems: UnifiedItem[] = [...dayEvents, ...dayTrips, ...daySpond, ...dayHealth, ...dayVaccinations, ...dayPetVetVisits, ...dayPetVaccinations, ...daySchoolActivities, ...dayKindergartenActivities, ...dayHomeServices, ...dayBirthdays];
       if (filterModule === 'event') dayItems = dayItems.filter((i) => i._type === 'event');
-      else if (filterModule === 'health') dayItems = dayItems.filter((i) => i._type === 'healthAppointment');
-      else if (filterModule === 'pet') dayItems = dayItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
+      else if (filterModule === 'health') dayItems = dayItems.filter(isHealthRow);
+      else if (filterModule === 'pet') dayItems = dayItems.filter(isPetRow);
       else if (filterModule === 'trip') dayItems = dayItems.filter((i) => i._type === 'trip');
       else if (filterModule === 'school') dayItems = dayItems.filter((i) => i._type === 'schoolActivity');
       else if (filterModule === 'kindergarten') dayItems = dayItems.filter((i) => i._type === 'kindergartenActivity');
@@ -662,8 +673,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
     ].filter((i) => getDateStr(i) >= threeMonthsAgo);
     let filtered = allItems;
     if (filterModule === 'event') filtered = allItems.filter((i) => i._type === 'event');
-    else if (filterModule === 'health') filtered = allItems.filter((i) => i._type === 'healthAppointment');
-    else if (filterModule === 'pet') filtered = allItems.filter((i) => i._type === 'healthAppointment' && ((i as any).icon === 'pet-visit' || (i as any).icon === 'pet-vaccination'));
+    else if (filterModule === 'health') filtered = allItems.filter(isHealthRow);
+    else if (filterModule === 'pet') filtered = allItems.filter(isPetRow);
     else if (filterModule === 'trip') filtered = allItems.filter((i) => i._type === 'trip');
     else if (filterModule === 'school') filtered = allItems.filter((i) => i._type === 'schoolActivity');
     else if (filterModule === 'kindergarten') filtered = allItems.filter((i) => i._type === 'kindergartenActivity');
@@ -1016,6 +1027,8 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       );
     }
     if (item._type === 'healthAppointment') {
+      const isPet = item.icon === 'pet-visit' || item.icon === 'pet-vaccination';
+      const itemColor = isPet ? MODULE_COLORS.pets : MODULE_COLORS.health;
       const mapUrl = item.address ? getStaticMapUrl(item.address) : null;
       const d = toDateSafe((item as any).dateFrom) || toDateSafe((item as any).date);
       const calDay = d ? d.getDate() : '?';
@@ -1025,12 +1038,12 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
       const timeText = item.endTime ? `${item.startTime || '09:00'} – ${item.endTime}` : item.startTime || '09:00';
       return (
         <TouchableOpacity
-          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftColor: MODULE_COLORS.health }]}
+          style={[styles.spondCard, cardOutline, { backgroundColor: colors.surface, borderLeftColor: itemColor }]}
           onPress={() => navigation.navigate('Trips', { screen: 'HealthApptDetail', params: { appointment: item, source: 'events' } })}
         >
           <View style={styles.spondCardRow}>
             <View style={[styles.spondCalIcon, { backgroundColor: colors.surface }, calOutline]}>
-              <View style={[styles.spondCalTopBar, { backgroundColor: MODULE_COLORS.health }]}>
+              <View style={[styles.spondCalTopBar, { backgroundColor: itemColor }]}>
                 <Text style={styles.spondCalYear}>{calDayName}</Text>
               </View>
               <Text style={[styles.spondCalDay, { color: colors.text }]}>{calDay}</Text>
@@ -1041,7 +1054,7 @@ export const EventsScreen: React.FC<EventsScreenProps> = ({ navigation, route })
                 <AppIcon
                   name={item.icon === 'vaccination' || item.icon === 'pet-vaccination' ? 'vaccination' : 'calendar'}
                   size={14}
-                  color={(item.icon === 'pet-visit' || item.icon === 'pet-vaccination') ? '#8E24AA' : MODULE_COLORS.health}
+                  color={itemColor}
                 />
                 <Text style={[styles.spondCardTitle, { color: colors.text, flex: 1 }]} numberOfLines={2}>{item.title}</Text>
                 {(item as any).documents && (item as any).documents.length > 0 && (
