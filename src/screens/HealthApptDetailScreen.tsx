@@ -11,6 +11,7 @@ import { formatDate, toDateSafe } from '../utils/dateUtils';
 import { ActionModal } from '../components/ActionModal';
 import { AppIcon } from '../components/AppIcon';
 import { deleteHealthAppointment, updateHealthAppointment } from '../services/healthService';
+import { deleteVetVisit, deletePetVaccination } from '../services/petService';
 import { DocumentUpload } from '../components/DocumentUpload';
 import { crossAlert } from '../utils/alert';
 import { getErrorMessage } from '../utils/validation';
@@ -22,10 +23,15 @@ interface Props {
 }
 
 const HEALTH_COLOR = MODULE_COLORS.health;
+// Pet visits and pet vaccinations are shown in the pets module colour everywhere
+const PET_ICONS = ['pet-visit', 'pet-vaccination'];
 
 export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { appointment } = route.params as { appointment: HealthAppointment };
+  const isPet = PET_ICONS.includes((appointment as { icon?: string }).icon || '');
+  const isPetVaccination = (appointment as { icon?: string }).icon === 'pet-vaccination';
+  const accentColor = isPet ? MODULE_COLORS.pets : HEALTH_COLOR;
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
   const familyRole = useUserStore((state) => state.familyRole);
@@ -103,7 +109,12 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
 
   const handleDelete = async () => {
     try {
-      await deleteHealthAppointment(familyId || '', appointment.id);
+      if (isPet) {
+        if (isPetVaccination) await deletePetVaccination(appointment.id);
+        else await deleteVetVisit(appointment.id);
+      } else {
+        await deleteHealthAppointment(familyId || '', appointment.id);
+      }
       setShowDeleteModal(false);
       navigation.goBack();
     } catch (error) {
@@ -131,20 +142,20 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
   return (
     <ScrollView style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: HEALTH_COLOR }]}>
-          <Text style={{ color: HEALTH_COLOR, fontSize: 18 }}>←</Text>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backBtn, { borderColor: accentColor }]}>
+          <Text style={{ color: accentColor, fontSize: 18 }}>←</Text>
         </TouchableOpacity>
         <View style={{ flex: 1 }} />
-        <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: HEALTH_COLOR, alignItems: 'center', justifyContent: 'center' }}>
-          <AppIcon name="links" size={16} color={HEALTH_COLOR} />
+        <TouchableOpacity onPress={handleCopy} style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 1.5, borderColor: accentColor, alignItems: 'center', justifyContent: 'center' }}>
+          <AppIcon name="links" size={16} color={accentColor} />
         </TouchableOpacity>
       </View>
 
       {/* Top card with calendar icon */}
-      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, marginBottom: 10, backgroundColor: colors.surface }]}>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: accentColor, marginBottom: 10, backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-start' }}>
           <View style={styles.calIcon}>
-            <View style={[styles.calTopBar, { backgroundColor: HEALTH_COLOR }]}>
+            <View style={[styles.calTopBar, { backgroundColor: accentColor }]}>
               <Text style={styles.calDayName}>{dayName}</Text>
             </View>
             <Text style={[styles.calDayNum, { color: colors.text }]}>{dayNum}</Text>
@@ -175,8 +186,8 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
       </View>
 
       {/* Detail card */}
-      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>{t('common.details')}</Text>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: accentColor, backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: accentColor }]}>{t('common.details')}</Text>
         {appointment.scheduleGroupId && (
           <View style={styles.viewDetailRow}>
             <View style={[styles.viewDetailLabel, { alignItems: 'center', justifyContent: 'center' }]}><AppIcon name="schedule" size={18} color={colors.textSecondary} /></View>
@@ -222,7 +233,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
           <View style={{ marginBottom: 12 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 4 }}>
               <Text style={{ fontSize: 14 }}>📝</Text>
-              <Text style={{ fontSize: 12, fontWeight: '700', color: HEALTH_COLOR }}>{t('common.note')}</Text>
+              <Text style={{ fontSize: 12, fontWeight: '700', color: accentColor }}>{t('common.note')}</Text>
             </View>
             <View style={{ paddingLeft: 22 }}>
               <Text style={{ fontSize: 14, color: colors.text }} numberOfLines={showFullNote ? undefined : 2}>
@@ -230,7 +241,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
               </Text>
               {appointment.note.length > 60 && (
                 <TouchableOpacity onPress={() => setShowFullNote(!showFullNote)}>
-                  <Text style={{ fontSize: 12, color: HEALTH_COLOR, fontWeight: '600', marginTop: 4 }}>
+                  <Text style={{ fontSize: 12, color: accentColor, fontWeight: '600', marginTop: 4 }}>
                     {showFullNote ? t('common.back') : t('common.readMore')}
                   </Text>
                 </TouchableOpacity>
@@ -242,19 +253,19 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
 
       {/* Map */}
       {appointment.location && mapUrl && (
-        <View style={[styles.card, { padding: 0, overflow: 'hidden', borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
+        <View style={[styles.card, { padding: 0, overflow: 'hidden', borderLeftWidth: 4, borderLeftColor: accentColor, backgroundColor: colors.surface }]}>
           <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(appointment.location!))} style={{ width: '100%', height: 140 }}>
             <Image source={{ uri: mapUrl }} style={{ width: '100%', height: 140 }} resizeMode="cover" />
           </TouchableOpacity>
           <TouchableOpacity onPress={() => Linking.openURL(getGoogleMapsUrl(appointment.location!))} style={{ padding: 12, alignItems: 'center' }}>
-            <Text style={{ fontSize: 12, color: HEALTH_COLOR, fontWeight: '600' }}>{t('tips.openGoogleMaps')}</Text>
+            <Text style={{ fontSize: 12, color: accentColor, fontWeight: '600' }}>{t('tips.openGoogleMaps')}</Text>
           </TouchableOpacity>
         </View>
       )}
 
       {/* Documents */}
-      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: HEALTH_COLOR, backgroundColor: colors.surface }]}>
-        <Text style={[styles.sectionLabel, { color: HEALTH_COLOR }]}>{t('homes.documents')}</Text>
+      <View style={[styles.card, { borderLeftWidth: 4, borderLeftColor: accentColor, backgroundColor: colors.surface }]}>
+        <Text style={[styles.sectionLabel, { color: accentColor }]}>{t('homes.documents')}</Text>
         {documents && documents.length > 0 && (
           documents.map((doc, i) => (
             <TouchableOpacity key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, borderBottomWidth: i < (documents?.length || 0) - 1 ? 1 : 0, borderBottomColor: colors.border }} onPress={() => Linking.openURL(doc.url)}>
@@ -267,7 +278,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
               )}
               <View style={{ flex: 1 }}>
                 <Text style={{ fontSize: 14, fontWeight: '600', color: colors.text }} numberOfLines={1}>{doc.fileName}</Text>
-                <Text style={{ fontSize: 12, color: HEALTH_COLOR }}>{t('documents.open')} →</Text>
+                <Text style={{ fontSize: 12, color: accentColor }}>{t('documents.open')} →</Text>
               </View>
             </TouchableOpacity>
           ))
@@ -280,7 +291,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
               await updateHealthAppointment(familyId || '', appointment.id, { documents: docs });
               setDocuments(docs);
             }}
-            accentColor={HEALTH_COLOR}
+            accentColor={accentColor}
           />
         </View>
       </View>
@@ -289,9 +300,14 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
       <View style={[styles.card, { marginTop: 10, backgroundColor: colors.surface }]}>
         <View style={{ flexDirection: 'row', gap: 8 }}>
           <TouchableOpacity
-            style={[styles.actionButton, { backgroundColor: HEALTH_COLOR, flex: 1 }]}
+            style={[styles.actionButton, { backgroundColor: accentColor, flex: 1 }]}
             onPress={() => {
               const source = route.params?.source || 'health';
+              if (isPet) {
+                // Pet items are edited in the pets module, not the health form
+                navigation.navigate('PetSpace', { editId: appointment.id, editSection: isPetVaccination ? 'vaccinations' : 'vetVisits' });
+                return;
+              }
               navigation.navigate('HealthSpace', { editId: appointment.id, editSection: 'appointments', returnToEvents: source === 'events' });
             }}
           >

@@ -117,7 +117,7 @@ type RootStackParamList = {
   SpacesList: undefined;
   HealthSpace: undefined;
   BirthdaySpace: undefined;
-  PetSpace: undefined;
+  PetSpace: { editId?: string; editSection?: 'vetVisits' | 'vaccinations' } | undefined;
   HomeSpace: undefined;
   HomeDetail: { home: import('./src/types').Home };
   HomeProjects: { home: import('./src/types').Home };
