@@ -1935,7 +1935,11 @@
     "prosjektHelpHowText": "Tryck '+' för att skapa ett projekt med titel, beskrivning, budget, startdatum och status. Tryck på ett projekt för att öppna det. I projektet får du AI-förslag på uppgifter och inköpslistor, kan scanna kvitton med AI, lägga in offerter och flytta uppgifter mellan 'Todo', 'Pågår' och 'Klar' med pilknapparna. Budgeten anges på projektet och visas som en översikt över förbrukning.",
     "prosjektHelpTip": "Koppla inköpslisteposter till uppgifter för att hålla koll på vad som behövs till varje uppgift. Håll in på ett projekt för att redigera eller ta bort det.",
     "typeTask": "Uppgift",
-    "tasksOne": "Uppgift"
+    "tasksOne": "Uppgift",
+    "today": "Idag",
+    "yesterday": "Igår",
+    "inXDays": "Om {{count}} dagar",
+    "xDaysAgo": "{{count}} dagar sedan"
   },
   "spond": {
     "title": "Spond",

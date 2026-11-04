@@ -1935,7 +1935,11 @@
     "prosjektHelpHowText": "Tap '+' to create a project with title, description, budget, start date and status. Tap a project to open it. In the project you get AI suggestions for tasks and shopping items, can scan receipts with AI, add supplier offers, and move tasks between 'Todo', 'In progress' and 'Done' with the arrow buttons. The budget is set on the project and shown as a spending overview.",
     "prosjektHelpTip": "Link shopping list items to tasks to keep track of what is needed for each task. Long-press a project to edit or delete it.",
     "typeTask": "Task",
-    "tasksOne": "Task"
+    "tasksOne": "Task",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "inXDays": "In {{count}} days",
+    "xDaysAgo": "{{count}} days ago"
   },
   "spond": {
     "title": "Spond",

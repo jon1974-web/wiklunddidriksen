@@ -1935,7 +1935,11 @@
     "prosjektHelpHowText": "Napauta '+' luodaksesi projektin otsikolla, kuvauksella, budjetilla, alkupäivällä ja tilalla. Napauta projektia avataksesi sen. Projektissa saat tekoälyehdotuksia tehtäviin ja ostoslistaan, voit skannata kuitteja tekoälyllä, lisätä tarjouksia ja siirtää tehtäviä 'Tekemättä', 'Käynnissä' ja 'Valmis' välillä nuolipainikkeilla. Budjetti määritetään projektiin ja näkyy kulutuskatsauksena.",
     "prosjektHelpTip": "Yhdistä ostoslistarivit tehtäviin pitääksesi kirjaa siitä, mitä kuhunkin tehtävään tarvitaan. Pidä painettuna projektia muokataksesi tai poistaaksesi sen.",
     "typeTask": "Tehtävä",
-    "tasksOne": "Tehtävä"
+    "tasksOne": "Tehtävä",
+    "today": "Tänään",
+    "yesterday": "Eilen",
+    "inXDays": "{{count}} päivän päästä",
+    "xDaysAgo": "{{count}} päivää sitten"
   },
   "spond": {
     "title": "Spond",

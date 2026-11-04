@@ -1935,7 +1935,11 @@
     "prosjektHelpHowText": "Trykk «+» for å opprette et prosjekt med tittel, beskrivelse, budsjett, startdato og status. Trykk på et prosjekt for å åpne det. I prosjektet får du AI-forslag til oppgaver og handleliste, kan skanne kvitteringer med AI, legge inn tilbud, og flytte oppgaver mellom «Todo», «Pågående» og «Ferdig» med pilknappene. Budsjettet settes på prosjektet og vises som oversikt over forbruk.",
     "prosjektHelpTip": "Koble handlelisteposter til oppgaver for å holde oversikt over hva som trengs til hver oppgave. Hold inne på et prosjekt for å redigere eller slette det.",
     "typeTask": "Oppgave",
-    "tasksOne": "Oppgave"
+    "tasksOne": "Oppgave",
+    "today": "I dag",
+    "yesterday": "I går",
+    "inXDays": "Om {{count}} dager",
+    "xDaysAgo": "{{count}} dager siden"
   },
   "spond": {
     "title": "Spond",

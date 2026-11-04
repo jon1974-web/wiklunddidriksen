@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -435,6 +435,24 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     setActivePicker(null);
   };
 
+  // Same order as health appointments: upcoming by start date/time, then past (newest first)
+  const sortedServices = useMemo(() => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const isPast = (svc: HomeService) => svc.dateFrom < todayStr;
+    return [...services].sort((a, b) => {
+      const aPast = isPast(a);
+      const bPast = isPast(b);
+      if (aPast && !bPast) return 1;
+      if (!aPast && bPast) return -1;
+      if (aPast && bPast) {
+        const byDate = b.dateFrom.localeCompare(a.dateFrom);
+        return byDate !== 0 ? byDate : (b.startTime || '').localeCompare(a.startTime || '');
+      }
+      const byDate = a.dateFrom.localeCompare(b.dateFrom);
+      return byDate !== 0 ? byDate : (a.startTime || '').localeCompare(b.startTime || '');
+    });
+  }, [services]);
+
   const getDaysUntilBadge = (dateStr: string) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -489,11 +507,11 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
           </View>
           {services.length === 0 ? (
             <Text style={{ fontSize: 13, color: colors.textDisabled, textAlign: 'center', padding: 16 }}>{t('homes.noServices')}</Text>
-          ) : services.map((svc) => {
+          ) : sortedServices.map((svc) => {
             const freqLabel = FREQUENCY_OPTIONS.find((f) => f.value === svc.frequency);
             const badge = getDaysUntilBadge(svc.dateFrom);
             return (
-              <TouchableOpacity key={svc.id} style={[styles.serviceCard, { backgroundColor: colors.inputBackground }]} onPress={() => navigation.navigate('HomeServiceDetail', { service: svc, home })} onLongPress={() => setServiceActionModal({ visible: true, id: svc.id, title: svc.title })}>
+              <TouchableOpacity key={svc.id} style={[styles.serviceCard, { backgroundColor: colors.surface, borderBottomColor: colors.border }]} onPress={() => navigation.navigate('HomeServiceDetail', { service: svc, home })} onLongPress={() => setServiceActionModal({ visible: true, id: svc.id, title: svc.title })}>
                 <View style={styles.serviceCardHeader}>
                   <Text style={[styles.serviceCardTitle, { color: colors.text }]}>{svc.title}</Text>
                   <View style={[styles.daysBadge, { backgroundColor: badge.bg }]}>

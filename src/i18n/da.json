@@ -1935,7 +1935,11 @@
     "prosjektHelpHowText": "Tryk '+' for at oprette et projekt med titel, beskrivelse, budget, startdato og status. Tryk på et projekt for at åbne det. I projektet får du AI-forslag til opgaver og indkøbsliste, kan scanne kvitteringer med AI, tilføje tilbud og flytte opgaver mellem 'Todo', 'I gang' og 'Færdig' med pileknapperne. Budgettet angives på projektet og vises som oversigt over forbrug.",
     "prosjektHelpTip": "Kobl indkøbslisteposter til opgaver for at holde styr på, hvad der skal bruges til hver opgave. Hold inde på et projekt for at redigere eller slette det.",
     "typeTask": "Opgave",
-    "tasksOne": "Opgave"
+    "tasksOne": "Opgave",
+    "today": "I dag",
+    "yesterday": "I går",
+    "inXDays": "Om {{count}} dage",
+    "xDaysAgo": "{{count}} dage siden"
   },
   "spond": {
     "title": "Spond",
