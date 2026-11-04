@@ -204,7 +204,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         familyId,
       };
       if (editingColorId) {
-        await updateHomePaintColor(editingColorId, data);
+        await updateHomePaintColor(familyId, editingColorId, data);
       } else {
         await addHomePaintColor(data);
       }
@@ -222,7 +222,8 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const handleDeleteColor = async () => {
     if (!colorActionModal.id) return;
     try {
-      await deleteHomePaintColor(colorActionModal.id);
+      if (!familyId) return;
+      await deleteHomePaintColor(familyId, colorActionModal.id);
       setColorActionModal({ visible: false, id: '', title: '' });
       loadData();
     } catch (error) {

@@ -1,5 +1,5 @@
 import {
-  collection, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, doc, where,
+  collection, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, doc, where, getDoc,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import { Home, HomePaintColor, HomeProject, HomeInstruction, HomeService, HomeShoppingItem, HomeOffer, HomeTask } from '../types';
@@ -39,12 +39,31 @@ export async function addHomePaintColor(data: Omit<HomePaintColor, 'id' | 'creat
   return docRef.id;
 }
 
-export async function updateHomePaintColor(colorId: string, data: Partial<HomePaintColor>): Promise<void> {
-  await updateDoc(doc(db, 'homePaintColors', colorId), data);
+// Loads a paint colour and throws unless it belongs to familyId. Writes must go through this check.
+async function getFamilyPaintColorRef(familyId: string, colorId: string) {
+  if (!familyId) throw new Error('familyId is required');
+  const ref = doc(db, 'homePaintColors', colorId);
+  const snap = await getDoc(ref);
+  if (!snap.exists() || snap.data().familyId !== familyId) {
+    throw new Error('Paint colour not found');
+  }
+  return ref;
 }
 
-export async function deleteHomePaintColor(colorId: string): Promise<void> {
-  await deleteDoc(doc(db, 'homePaintColors', colorId));
+// familyId is required; the colour must belong to that family. The family and home of a colour
+// cannot be changed by an update, so a colour cannot be moved to another family.
+export async function updateHomePaintColor(
+  familyId: string,
+  colorId: string,
+  data: Partial<Omit<HomePaintColor, 'id' | 'createdAt' | 'familyId'>>,
+): Promise<void> {
+  const ref = await getFamilyPaintColorRef(familyId, colorId);
+  await updateDoc(ref, data);
+}
+
+export async function deleteHomePaintColor(familyId: string, colorId: string): Promise<void> {
+  const ref = await getFamilyPaintColorRef(familyId, colorId);
+  await deleteDoc(ref);
 }
 
 // Projects

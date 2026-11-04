@@ -393,7 +393,7 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
     try {
       const data = { homeId: home.id, name: colorName.trim(), code: colorCode.trim(), brand: colorBrand.trim(), room: colorRoom.trim(), hexColor: colorHex, familyId };
       if (editingColorId) {
-        await updateHomePaintColor(editingColorId, data);
+        await updateHomePaintColor(familyId, editingColorId, data);
       } else {
         await addHomePaintColor(data);
       }
@@ -407,7 +407,8 @@ export const HomeMaintenanceScreen: React.FC<HomeMaintenanceScreenProps> = ({ na
 
   const handleDeleteColor = async () => {
     if (!colorActionModal.id) return;
-    try { await deleteHomePaintColor(colorActionModal.id); setColorActionModal({ visible: false, id: '', title: '' }); loadData(); }
+    if (!familyId) return;
+    try { await deleteHomePaintColor(familyId, colorActionModal.id); setColorActionModal({ visible: false, id: '', title: '' }); loadData(); }
     catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
   };
 
