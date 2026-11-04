@@ -305,7 +305,7 @@ export const HealthApptDetailScreen: React.FC<Props> = ({ navigation, route }) =
               const source = route.params?.source || 'health';
               if (isPet) {
                 // Pet items are edited in the pets module, not the health form
-                navigation.navigate('PetSpace', { editId: appointment.id, editSection: isPetVaccination ? 'vaccinations' : 'vetVisits' });
+                navigation.navigate('PetSpace', { editId: appointment.id, editSection: isPetVaccination ? 'vaccinations' : 'vetVisits', petId: (appointment as { petId?: string }).petId });
                 return;
               }
               navigation.navigate('HealthSpace', { editId: appointment.id, editSection: 'appointments', returnToEvents: source === 'events' });

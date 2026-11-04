@@ -202,6 +202,12 @@ export const PetSpaceScreen: React.FC<PetSpaceScreenProps> = ({ navigation, rout
         }, 500);
       }
     }
+    // Opening an item from elsewhere (e.g. Events): select the pet the item belongs to first,
+    // so its data loads and the item can be found without asking the user to pick a pet.
+    if (route?.params?.editId && route?.params?.petId && !selectedPet && pets.length > 0) {
+      const pet = pets.find(p => p.id === route.params!.petId);
+      if (pet) setSelectedPet(pet);
+    }
     if (route?.params?.editId && route?.params?.editSection && pets.length > 0) {
       const section = route.params.editSection as PetSectionType;
       const id = route.params.editId;
