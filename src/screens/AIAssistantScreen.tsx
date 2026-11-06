@@ -47,6 +47,8 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
   const [correctionMsgId, setCorrectionMsgId] = useState<string | null>(null);
   const [correctionText, setCorrectionText] = useState('');
   const [correctionQuery, setCorrectionQuery] = useState('');
+  /** Per-message thumbs feedback: 👍 recorded instantly (no text), 👎 opens the comment flow */
+  const [feedbackMap, setFeedbackMap] = useState<Record<string, 'up' | 'down'>>({});
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -363,13 +365,16 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
     }
   }, [recording, t]);
 
-  const sendCorrection = useCallback(async (originalQuery: string, correctAnswer: string) => {
-    if (!familyId || !correctAnswer.trim()) return;
-    setCorrectionMsgId(null);
-    setCorrectionText('');
-    setCorrectionQuery('');
-    setLoading(true);
-
+  const sendFeedback = useCallback(async (msgId: string, originalQuery: string, rating: 'up' | 'down', reply: string, comment: string = '') => {
+    if (!familyId) return;
+    if (rating === 'up') {
+      // 👍 — instant, silent (no correction text needed, no thanks bubble)
+      setFeedbackMap((prev) => ({ ...prev, [msgId]: 'up' }));
+    }
+    if (rating === 'down') {
+      // 👎 — comment flow, stored as a correction for the assistant to learn
+      setFeedbackMap((prev) => ({ ...prev, [msgId]: 'down' }));
+    }
     try {
       const { auth } = await import('../services/firebase');
       const idToken = await auth.currentUser?.getIdToken();
@@ -381,29 +386,65 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
           'Authorization': `Bearer ${idToken}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          message: '__CORRECTION__',
+        body: JSON.stringify(rating === 'up' ? {
+          message: '__FEEDBACK__',
           originalQuery,
-          correctAnswer,
+          rating: 'up',
+          reply,
+          familyId,
+        } : {
+          message: '__FEEDBACK__',
+          originalQuery,
+          rating: 'down',
+          reply,
+          comment,
           familyId,
         }),
       });
 
-      const thanksMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'Takk! Jeg har lært dette for fremtiden. 🧠',
-        timestamp: Date.now(),
-      };
-      setMessages((prev) => {
-        const updated = [...prev, thanksMsg];
-        messagesRef.current = updated;
-        return updated;
-      });
+      if (rating === 'down') {
+        // Learning still happens through aiLearnedCorrections when there is a comment
+        if (comment.trim()) {
+          await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/aiAssistant', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${idToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message: '__CORRECTION__',
+              originalQuery,
+              correctAnswer: comment,
+              familyId,
+            }),
+          });
+          const thanksMsg: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: 'Takk! Jeg har lært dette for fremtiden. 🧠',
+            timestamp: Date.now(),
+          };
+          setMessages((prev) => {
+            const updated = [...prev, thanksMsg];
+            messagesRef.current = updated;
+            return updated;
+          });
+        } else {
+          const thanksMsg: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: 'Takk for tilbakemeldingen.',
+            timestamp: Date.now(),
+          };
+          setMessages((prev) => {
+            const updated = [...prev, thanksMsg];
+            messagesRef.current = updated;
+            return updated;
+          });
+        }
+      }
     } catch (error) {
-      console.log('Correction error:', error);
-    } finally {
-      setLoading(false);
+      console.log('Feedback error:', error);
     }
   }, [familyId]);
 
@@ -454,20 +495,41 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
                 </View>
                 {msg.role === 'assistant' && !loading && (
                   <View style={{ flexDirection: 'row', alignItems: 'center', marginLeft: 8, marginBottom: 4, gap: 6 }}>
-                    {correctionMsgId !== msg.id && (
-                      <TouchableOpacity
-                        onPress={() => {
-                          setCorrectionMsgId(msg.id);
-                          const userMsg = messages.find((m, i) => {
-                            const msgIndex = messages.indexOf(msg);
-                            return i < msgIndex && m.role === 'user';
-                          });
-                          setCorrectionQuery(userMsg?.content || '');
-                        }}
-                        style={{ paddingVertical: 2, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
-                      >
-                        <Text style={{ fontSize: 10, color: colors.textSecondary }}>{t('aiAssistant.wasCorrect')}</Text>
-                      </TouchableOpacity>
+                    {feedbackMap[msg.id] === undefined ? (
+                      <>
+                        <TouchableOpacity
+                          onPress={() => {
+                            const userMsg = messages.find((m, i) => {
+                              const msgIndex = messages.indexOf(msg);
+                              return i < msgIndex && m.role === 'user';
+                            });
+                            sendFeedback(msg.id, userMsg?.content || '', 'up', msg.content);
+                          }}
+                          style={{ paddingVertical: 3, paddingHorizontal: 10, borderRadius: 10, borderWidth: 1, borderColor: colors.border }}
+                          accessibilityLabel={t('aiAssistant.helpful')}
+                        >
+                          <Text style={{ fontSize: 12 }}>👍</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity
+                          onPress={() => {
+                            const userMsg = messages.find((m, i) => {
+                              const msgIndex = messages.indexOf(msg);
+                              return i < msgIndex && m.role === 'user';
+                            });
+                            setCorrectionQuery(userMsg?.content || '');
+                            setCorrectionMsgId(msg.id);
+                            setFeedbackMap((prev) => ({ ...prev, [msg.id]: 'down' }));
+                          }}
+                          style={{ paddingVertical: 3, paddingHorizontal: 10, borderRadius: 10, borderWidth: 1, borderColor: colors.border }}
+                          accessibilityLabel={t('aiAssistant.notHelpful')}
+                        >
+                          <Text style={{ fontSize: 12 }}>👎</Text>
+                        </TouchableOpacity>
+                      </>
+                    ) : (
+                      feedbackMap[msg.id] === 'up' ? (
+                        <Text style={{ fontSize: 11, color: colors.textSecondary }}>✓</Text>
+                      ) : null
                     )}
                     {correctionMsgId === msg.id && (
                       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, flex: 1 }}>
@@ -479,13 +541,17 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
                           placeholderTextColor={colors.textDisabled}
                         />
                         <TouchableOpacity
-                          onPress={() => sendCorrection(correctionQuery, correctionText)}
+                          onPress={() => {
+                            sendFeedback(msg.id, correctionQuery, 'down', msg.content, correctionText);
+                            setCorrectionMsgId(null);
+                            setCorrectionText('');
+                          }}
                           style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, backgroundColor: HOME_COLOR }}
                         >
                           <Text style={{ fontSize: 11, color: '#fff', fontWeight: '600' }}>OK</Text>
                         </TouchableOpacity>
                         <TouchableOpacity
-                          onPress={() => { setCorrectionMsgId(null); setCorrectionText(''); }}
+                          onPress={() => { setCorrectionMsgId(null); setCorrectionText(''); setFeedbackMap((prev) => { const n = { ...prev }; delete n[msg.id]; return n; }); }}
                           style={{ paddingVertical: 4, paddingHorizontal: 8, borderRadius: 8, borderWidth: 1, borderColor: colors.border }}
                         >
                           <Text style={{ fontSize: 11, color: colors.textSecondary }}>✕</Text>

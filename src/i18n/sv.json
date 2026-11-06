@@ -2059,7 +2059,9 @@
     "writeCorrectAnswer": "Skriv rätt svar...",
     "writeMessage": "Skriv ett meddelande...",
     "transcribing": "Transkriberar...",
-    "tapToStop": "Tryck för att stoppa"
+    "tapToStop": "Tryck för att stoppa",
+    "helpful": "Nyttigt svar",
+    "notHelpful": "Inte nyttigt svar"
   },
   "helpCenter": {
     "title": "Hjälpcenter",

@@ -2059,7 +2059,9 @@
     "writeCorrectAnswer": "Kirjoita oikea vastaus...",
     "writeMessage": "Kirjoita viesti...",
     "transcribing": "Transkriboidaan...",
-    "tapToStop": "Paina lopettaaksesi"
+    "tapToStop": "Paina lopettaaksesi",
+    "helpful": "Hyödyllinen vastaus",
+    "notHelpful": "Ei hyödyllinen vastaus"
   },
   "helpCenter": {
     "title": "Ohjekeskus",

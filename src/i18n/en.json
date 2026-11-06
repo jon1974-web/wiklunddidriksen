@@ -2059,7 +2059,9 @@
     "writeCorrectAnswer": "Write the correct answer...",
     "writeMessage": "Type a message...",
     "transcribing": "Transcribing...",
-    "tapToStop": "Tap to stop"
+    "tapToStop": "Tap to stop",
+    "helpful": "Helpful answer",
+    "notHelpful": "Not helpful answer"
   },
   "helpCenter": {
     "title": "Help center",

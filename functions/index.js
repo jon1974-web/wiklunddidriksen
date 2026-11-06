@@ -6345,6 +6345,20 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "512MB", timeou
       return res.json({ reply: 'Takk! Jeg har lært dette for fremtiden.', actions: [] });
     }
 
+    // Handle thumbs feedback — stores rating only, no learning needed
+    if (message === '__FEEDBACK__' && req.body.originalQuery) {
+      await db.collection('aiAssistantFeedback').add({
+        familyId,
+        query: req.body.originalQuery,
+        rating: req.body.rating === 'down' ? 'down' : 'up',
+        comment: typeof req.body.comment === 'string' ? req.body.comment : '',
+        reply: typeof req.body.reply === 'string' ? req.body.reply.slice(0, 500) : '',
+        createdBy: uid,
+        createdAt: Date.now(),
+      });
+      return res.json({ reply: 'Takk for tilbakemeldingen!', actions: [] });
+    }
+
     // STEP 1: Search all family data
     const familyData = await searchFamilyData(db, familyId, message);
     const dataContext = formatDataForGPT(familyData);
