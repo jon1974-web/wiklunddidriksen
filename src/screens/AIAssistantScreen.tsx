@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, ActivityIndicator, Modal, TouchableWithoutFeedback } from 'react-native';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -24,9 +24,14 @@ interface AIAssistantScreenProps {
   visible: boolean;
   onClose: () => void;
   navigation: any;
+  /** Seeded prompt: sent automatically (once per promptKey) when the assistant opens */
+  initialPrompt?: string;
+  /** Bump to trigger a new seeded send for repeated prompts */
+  promptKey?: number;
 }
 
-export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, onClose, navigation }) => {
+export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, onClose, navigation, initialPrompt, promptKey }) => {
+  const sentPromptKeyRef = useRef<number | null>(null);
   const { t } = useTranslation();
   const { colors } = useTheme();
   const user = useUserStore((state) => state.user);
@@ -70,6 +75,9 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
     setInput('');
     setLoading(true);
 
+    const controller = new AbortController();
+    const abortTimer = setTimeout(() => controller.abort(), 120000);
+
     try {
       const { auth } = await import('../services/firebase');
       const idToken = await auth.currentUser?.getIdToken();
@@ -86,7 +94,9 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
           familyId,
           history: messagesRef.current.slice(-10).map((m) => ({ role: m.role, content: m.content })),
         }),
+        signal: controller.signal,
       });
+      clearTimeout(abortTimer);
 
       const data = await res.json();
 
@@ -153,11 +163,15 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
         setConfirmActions(allActions);
         setShowConfirm(true);
       }
-    } catch (error) {
+    } catch (error: any) {
+      clearTimeout(abortTimer);
+      const isTimeout = error?.name === 'AbortError';
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Beklager, det oppstod en feil. Prøv igjen senere.',
+        content: isTimeout
+          ? 'Forespørselen tok for lang tid. Prøv igjen om litt.'
+          : 'Beklager, det oppstod en feil. Prøv igjen senere.',
         timestamp: Date.now(),
       };
       setMessages((prev) => [...prev, errorMsg]);
@@ -165,6 +179,21 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
       setLoading(false);
     }
   }, [familyId, loading, navigation, onClose]);
+
+  // Seeded prompt: auto-send once per promptKey when the assistant opens
+  useEffect(() => {
+    if (!visible || !initialPrompt) return;
+    const key = promptKey ?? 0;
+    const timer = setTimeout(() => {
+      // Retries once per key even if an earlier in-flight send made the guard
+      // bounce the first attempt (loading was true at timer fire)
+      if (sentPromptKeyRef.current === key) return;
+      if (loading) return;
+      sentPromptKeyRef.current = key;
+      sendMessage(initialPrompt);
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [visible, initialPrompt, promptKey, sendMessage, loading]);
 
   const handleConfirm = async () => {
     setShowConfirm(false);

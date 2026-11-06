@@ -39,7 +39,7 @@ export const TopTabBar: React.FC<TopTabBarProps> = React.memo(
   ({ activeIndex, profileActive = false, onSelect, onCreatePress, userInitial, onProfilePress }) => {
     const { colors } = useTheme();
     const { t } = useTranslation();
-    const chatUnread = useChatStore((s) => s.unreadCount) > 0;
+    const chatUnreadCount = useChatStore((s) => s.unreadCount);
 
     return (
       <View style={[styles.bar, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
@@ -55,8 +55,10 @@ export const TopTabBar: React.FC<TopTabBarProps> = React.memo(
               >
                 <View style={styles.iconWrap}>
                   <TabIcon icon={tab.icon} focused={isFocused} accentColor={colors.accent} />
-                  {tab.name === 'Chat' && chatUnread && (
-                    <View style={[styles.unreadDot, { backgroundColor: colors.danger }]} />
+                  {tab.name === 'Chat' && chatUnreadCount > 0 && (
+                    <View style={[styles.unreadBadge, { backgroundColor: colors.danger }]}>
+                      <Text style={styles.unreadBadgeText}>{chatUnreadCount > 9 ? '9+' : chatUnreadCount}</Text>
+                    </View>
                   )}
                 </View>
                 <Text style={[styles.tabLabel, { color: isFocused ? colors.accent : colors.textSecondary }]}>
@@ -105,13 +107,21 @@ const styles = StyleSheet.create({
   iconWrap: {
     position: 'relative',
   },
-  unreadDot: {
+  unreadBadge: {
     position: 'absolute',
-    top: -3,
-    right: -4,
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    top: -5,
+    right: -6,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  unreadBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '800',
   },
   tab: {
     flexDirection: 'row',

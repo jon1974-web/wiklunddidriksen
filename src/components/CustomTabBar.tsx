@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Svg, { Rect, Line, Path, Circle, Polyline } from 'react-native-svg';
 import { useTheme } from '../theme/ThemeContext';
 import { AppIcon } from './AppIcon';
@@ -60,7 +60,7 @@ const TAB_ICONS: Record<string, string> = {
 export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descriptors, navigation, onCreatePress }) => {
   const { colors } = useTheme();
   const chatInputFocused = useChatStore((s) => s.inputFocused);
-  const chatUnread = useChatStore((s) => s.unreadCount) > 0;
+  const chatUnreadCount = useChatStore((s) => s.unreadCount);
 
   return (
     <View style={[styles.tabBar, { backgroundColor: colors.surface, borderColor: colors.accent }]}>
@@ -81,8 +81,10 @@ export const CustomTabBar: React.FC<TabBarProps> = React.memo(({ state, descript
         return (
           <TouchableOpacity key={route.key} style={[styles.tabItem, shiftStyle]} onPress={onPress} activeOpacity={0.7}>
             <TabIcon icon={icon} focused={isFocused} accentColor={colors.accent} />
-            {route.name === 'Chat' && chatUnread && (
-              <View style={[styles.unreadDot, { backgroundColor: colors.danger }]} />
+            {route.name === 'Chat' && chatUnreadCount > 0 && (
+              <View style={[styles.unreadBadge, { backgroundColor: colors.danger }]}>
+                <Text style={styles.unreadBadgeText}>{chatUnreadCount > 9 ? '9+' : chatUnreadCount}</Text>
+              </View>
             )}
           </TouchableOpacity>
         );
@@ -121,14 +123,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  unreadDot: {
+  unreadBadge: {
     position: 'absolute',
-    top: 4,
-    right: '50%',
-    marginRight: -16,
-    width: 9,
-    height: 9,
-    borderRadius: 5,
+    top: 2,
+    left: '50%',
+    marginLeft: 4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  unreadBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '800',
   },
   centerBtn: {
     position: 'absolute',

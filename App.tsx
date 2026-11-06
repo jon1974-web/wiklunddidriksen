@@ -22,6 +22,7 @@ import { auth } from './src/services/firebase';
 import { useUserStore } from './src/store/userStore';
 import { useChatStore } from './src/store/chatStore';
 import { useChatUnreadBadge } from './src/hooks/useChatUnread';
+import { useAIAssistantStore } from './src/store/aiAssistantStore';
 import { ThemeProvider, useTheme } from './src/theme/ThemeContext';
 import { getUserProfile, createOrUpdateUser } from './src/services/familyService';
 import { configureNotifications, requestNotificationPermission } from './src/services/notificationService';
@@ -693,6 +694,7 @@ const AppContent = () => {
   const [showSplash, setShowSplash] = useState(true);
   const [showQuickCreate, setShowQuickCreate] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const aiAssistantRequested = useAIAssistantStore();
   const [desktopActiveTab, setDesktopActiveTab] = useState(0);
   const { isDesktop } = useDesktopLayout();
   const splashOpacity = useRef(new Animated.Value(1)).current;
@@ -881,9 +883,11 @@ const AppContent = () => {
               onOpenAI={() => { setShowQuickCreate(false); setTimeout(() => setShowAIAssistant(true), 300); }}
             />
             <AIAssistantScreen
-              visible={showAIAssistant}
-              onClose={() => setShowAIAssistant(false)}
+              visible={showAIAssistant || aiAssistantRequested.open}
+              onClose={() => { setShowAIAssistant(false); aiAssistantRequested.closeAssistant(); }}
               navigation={navigationRef}
+              initialPrompt={aiAssistantRequested.prompt || undefined}
+              promptKey={aiAssistantRequested.requestId}
             />
           </DesktopShell>
         ) : isDesktop ? (

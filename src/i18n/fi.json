@@ -1094,8 +1094,67 @@
     "helpWhat": "Mikä tämä on?",
     "helpWhatText": "Keskustelussa perhe voi viestiä yhteisessä perhekeskustelussa, kahden jäsenen yksityisviesteissä ja ryhmissä. Voit jakaa tekstiä, kuvia ja reagoida emojeilla. Matkakeskustelut voidaan luoda matkan tietosivulta napauttamalla keskustelupainiketta matkakortin vieressä.",
     "helpHow": "Näin käytät sitä",
-    "helpHowText": "Avaa keskustelu napauttamalla sitä. Uusi keskustelu: napauta «＋» oikeasta yläkulmasta — valitse perheenjäsen yksityisviestiin tai luo ryhmä nimellä ja jäsenillä. Matkan ryhmäkeskustelu luodaan matkasivulta (keskustelupainike matkakortin vieressä), ja se saa nimensä ja ikoninsa matkalta.",
-    "helpTip": "Paina ryhmää pitkään listassa poistuaksesi siitä. Ryhmäkeskustelussa napauta «i» (tai ryhmän otsikkoa) hallitaksesi jäseniä."
+    "helpHowText": "Avaa keskustelu napauttamalla sitä. Uusi keskustelu: napauta «＋» oikeasta yläkulmasta — valitse perheenjäsen yksityisviestiin tai luo ryhmä nimellä ja jäsenillä. Matkan ryhmäkeskustelu luodaan matkasivulta (keskustelupainike matkakortin vieressä), ja se saa nimensä ja ikoninsa matkalta. Paina viestiä pitkään kopioidaksesi sen — tai muokataksesi/poistaaksesi omiasi. Vanhemmat viestit ladataan «Lataa vanhemmat viestit» -painikkeella ketjun yläosassa. Toiset näkevät kun kirjoitat, voit vastata viesteihin (paina pitkään → ↩), lähettää ääniviestejä mikrofonilla ja käyttää ✨-painiketta: AI-yhteenveto, älykkäät vastaukset, käännös ja «Luo tapahtuma» viestistä. Voit myös valita kenelle kotiin/lapselle/lemmikille/henkilölle merkintä kuuluu.",
+    "helpTip": "Paina ryhmää pitkään listassa poistuaksesi siitä. Ryhmäkeskustelussa napauta «i» (tai ryhmän otsikkoa) hallitaksesi jäseniä.",
+    "copy": "Kopioi",
+    "copied": "Kopioitu ✅",
+    "edit": "Muokkaa",
+    "edited": "muokattu",
+    "editing": "Muokataan:",
+    "deleteMessage": "Poista",
+    "deleteMessageTitle": "Poista viesti",
+    "deleteMessageBody": "Haluatko varmasti poistaa tämän viestin?",
+    "loadOlder": "Lataa vanhemmat viestit",
+    "messageMenu": "Viesti",
+    "isTyping": "kirjoittaa…",
+    "summaryButton": "AI-yhteenveto",
+    "summaryTitle": "Keskustelun yhteenveto",
+    "summaryEmpty": "Ei viestejä yhteenvedettäväksi vielä.",
+    "smartReplies": "Älykkäät vastaukset",
+    "noSuggestions": "Ei ehdotuksia juuri nyt",
+    "voiceMessage": "Puhelinviesti",
+    "recordingVoice": "Nauhoittaa…",
+    "voiceUploading": "Lähettää viestiä…",
+    "voiceError": "Viestin lähettäminen epäonnistui",
+    "voiceRecordError": "Nauhoitus ei käynnistynyt",
+    "micPermissionBody": "Tarvitsemme mikrofonin käyttöoikeuden ääniviesteihin.",
+    "replyAction": "Vastaa viestiin",
+    "translateAction": "Käännä",
+    "eventFromMessage": "Luo tapahtuma",
+    "entryType": {
+      "event": {
+        "prompt": "Luo tapahtuma",
+        "label": "Tapahtuma (kalenteri)"
+      },
+      "health": {
+        "prompt": "Luo lääkäriaika",
+        "label": "Lääkäriaika"
+      },
+      "vet": {
+        "prompt": "Luo eläinlääkärikäynti",
+        "label": "Eläinlääkärikäynti"
+      },
+      "school": {
+        "prompt": "Luo koulutapahtuma",
+        "label": "Koulutapahtuma"
+      },
+      "kindergarten": {
+        "prompt": "Luo päiväkotitapahtuma",
+        "label": "Päiväkotitapahtuma"
+      },
+      "homeService": {
+        "prompt": "Luo palveluaika kotityö",
+        "label": "Palveluaika (koti)"
+      },
+      "trip": {
+        "prompt": "Luo matka",
+        "label": "Matka"
+      }
+    },
+    "pickTarget": "Kenelle tämä koskee?",
+    "pickTargetDesc": "Valitse koti / lapsi / lemmikki / henkilö merkinnälle",
+    "noTargetsFound": "Koteja / lapsia / lemmikkejä ei ole vielä rekisteröity",
+    "noMessageText": "Viestissä ei ole tekstiä, josta luoda"
   },
   "actionModal": {
     "edit": "Muokkaa",

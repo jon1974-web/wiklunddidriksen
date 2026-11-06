@@ -1094,8 +1094,67 @@
     "helpWhat": "Vad är detta?",
     "helpWhatText": "Chatten låter familien skicka meddelanden i en gemensam familjechatt, i direktmeddelanden mellan två medlemmar och i grupper. Du kan dela text, bilder och reagera med emojis. Reschatter kan skapas från resans detaljsida genom att trycka på chattknappen bredvid reskortet.",
     "helpHow": "Så här använder du den",
-    "helpHowText": "Tryck på en konversation för att öppna den. Tryck «＋» uppe till höger för ny chatt: välj en familjemedlem för direktmeddelande, eller skapa en grupp med namn och medlemmar. Resans chattgrupp skapas från ressidan (chattknappen bredvid reskortet) och får sitt namn och sin ikon från resan.",
-    "helpTip": "Håll intryckt på en grupp i listan för att lämna den. I en gruppchatt trycker du på «i» (eller grupptiteln) för att hantera medlemmar."
+    "helpHowText": "Tryck på en konversation för att öppna den. Tryck «＋» uppe till höger för ny chatt: välj en familjemedlem för direktmeddelande, eller skapa en grupp med namn och medlemmar. Resans chattgrupp skapas från ressidan (chattknappen bredvid reskortet) och får sitt namn och sin ikon från resan. Håll inne ett meddelande för att kopiera det — eller redigera/ta bort dina egna. Äldre meddelanden hämtas via «Hämta äldre meddelanden» högst upp i tråden. Andra kan se när du skriver, du kan svara på meddelanden (håll intryckt → ↩), skicka röstmeddelanden med mikrofonen och använda ✨-knappen: AI-sammanfattning, smarta svar, översättning och «Skapa aktivitet» från ett meddelande. Du kan även välja vilket hem/barn/sällskapsdjur/person posten ska tillhöra.",
+    "helpTip": "Håll intryckt på en grupp i listan för att lämna den. I en gruppchatt trycker du på «i» (eller grupptiteln) för att hantera medlemmar.",
+    "copy": "Kopiera",
+    "copied": "Kopierad ✅",
+    "edit": "Redigera",
+    "edited": "redigerad",
+    "editing": "Redigerar:",
+    "deleteMessage": "Ta bort",
+    "deleteMessageTitle": "Ta bort meddelande",
+    "deleteMessageBody": "Är du säker på att du vill ta bort detta meddelande?",
+    "loadOlder": "Hämta äldre meddelanden",
+    "messageMenu": "Meddelande",
+    "isTyping": "skriver…",
+    "summaryButton": "AI-sammanfattning",
+    "summaryTitle": "Chatt summering",
+    "summaryEmpty": "Inga meddelanden att sammanfatta än.",
+    "smartReplies": "Smarta svar",
+    "noSuggestions": "Inga förslag just nu",
+    "voiceMessage": "Röstmeddelande",
+    "recordingVoice": "Spelar in…",
+    "voiceUploading": "Skickar röstmeddelande…",
+    "voiceError": "Kunde inte skicka röstmeddelandet",
+    "voiceRecordError": "Kunde inte starta inspelning",
+    "micPermissionBody": "Vi behöver mikrofonåtkomst för röstmeddelanden.",
+    "replyAction": "Svara på meddelande",
+    "translateAction": "Översätt",
+    "eventFromMessage": "Skapa aktivitet",
+    "entryType": {
+      "event": {
+        "prompt": "Skapa en aktivitet",
+        "label": "Aktivitet (kalender)"
+      },
+      "health": {
+        "prompt": "Skapa en vårdtidtering",
+        "label": "Vårdtidtering"
+      },
+      "vet": {
+        "prompt": "Skapa ett veterinärbesök",
+        "label": "Veterinärbesök"
+      },
+      "school": {
+        "prompt": "Skapa en skolaktivitet",
+        "label": "Skolaktivitet"
+      },
+      "kindergarten": {
+        "prompt": "Skapa en förskoleaktivitet",
+        "label": "Förskoleaktivitet"
+      },
+      "homeService": {
+        "prompt": "Skapa en serviceavtal hemmauppdrag",
+        "label": "Serviceavtal (hem)"
+      },
+      "trip": {
+        "prompt": "Skapa en resa",
+        "label": "Resa"
+      }
+    },
+    "pickTarget": "Vem gäller det?",
+    "pickTargetDesc": "Välj hem / barn / sällskapsdjur / person som posten ska tillhöra",
+    "noTargetsFound": "Inga hem / barn / sällskapsdjur är registrerade ännu",
+    "noMessageText": "Meddelandet har ingen text att skapa från"
   },
   "actionModal": {
     "edit": "Redigera",

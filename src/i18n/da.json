@@ -1094,8 +1094,67 @@
     "helpWhat": "Hvad er dette?",
     "helpWhatText": "Chatten lader familien sende beskeder i én fælles familiechat, i direkte beskeder mellem to medlemmer og i grupper. Du kan dele tekst, billeder og reagere med emojis. Rejschatter kan oprettes fra rejsens detaljeside ved at trykke på chat-knappen ved rejskortet.",
     "helpHow": "Sådan bruger du den",
-    "helpHowText": "Tryk på en samtale for at åbne den. Tryk «＋» øverst til højre for ny chat: vælg et familiemedlem til direkte besked, eller opret en gruppe med navn og medlemmer. Rejsens chatgruppe oprettes fra rejsesiden (chat-knappen ved rejskortet) og får sit navn og ikon fra rejsen.",
-    "helpTip": "Hold en gruppe nede i listen for at forlade den. I en gruppetråd trykker du på «i» (eller gruppetitlen) for at administrere medlemmer."
+    "helpHowText": "Tryk på en samtale for at åbne den. Tryk «＋» øverst til højre for ny chat: vælg et familiemedlem til direkte besked, eller opret en gruppe med navn og medlemmer. Rejsens chatgruppe oprettes fra rejsesiden (chat-knappen ved rejskortet) og får sit navn og ikon fra rejsen. Hold en besked nede for at kopiere den — eller redigere/slette dine egne. Ældre beskeder indlæses via «Indlæs ældre beskeder» øverst i tråden. Andre kan se, hvornår du skriver, du kan svare på beskeder (hold nede → ↩), sende talebeskeder med mikrofonen og bruge ✨-knappen: AI-opsamling, smarte svar, oversættelse og «Opret begivenhed» fra en besked. Du kan også vælge hvilket hjem/barn/kæledyr/person posten skal tilhøre.",
+    "helpTip": "Hold en gruppe nede i listen for at forlade den. I en gruppetråd trykker du på «i» (eller gruppetitlen) for at administrere medlemmer.",
+    "copy": "Kopiér",
+    "copied": "Kopieret ✅",
+    "edit": "Rediger",
+    "edited": "redigeret",
+    "editing": "Redigerer:",
+    "deleteMessage": "Slet",
+    "deleteMessageTitle": "Slet besked",
+    "deleteMessageBody": "Er du sikker på, at du vil slette denne besked?",
+    "loadOlder": "Indlæs ældre beskeder",
+    "messageMenu": "Besked",
+    "isTyping": "skriver…",
+    "summaryButton": "AI-opsamling",
+    "summaryTitle": "Chat-opsamling",
+    "summaryEmpty": "Ingen beskeder at opsamle endnu.",
+    "smartReplies": "Smart svar",
+    "noSuggestions": "Ingen forslag lige nu",
+    "voiceMessage": "Talebesked",
+    "recordingVoice": "Optager…",
+    "voiceUploading": "Sender talebesked…",
+    "voiceError": "Kunne ikke sende talebeskeden",
+    "voiceRecordError": "Kunne ikke starte optagelse",
+    "micPermissionBody": "Vi skal bruge mikrofonadgang til talebeskeder.",
+    "replyAction": "Svar på besked",
+    "translateAction": "Oversæt",
+    "eventFromMessage": "Opret begivenhed",
+    "entryType": {
+      "event": {
+        "prompt": "Opret en begivenhed",
+        "label": "Begivenhed (kalender)"
+      },
+      "health": {
+        "prompt": "Opret en lægetid",
+        "label": "Lægetid"
+      },
+      "vet": {
+        "prompt": "Opret et dyrlægebesøg",
+        "label": "Dyrlægebesøg"
+      },
+      "school": {
+        "prompt": "Opret en skoleaktivitet",
+        "label": "Skoleaktivitet"
+      },
+      "kindergarten": {
+        "prompt": "Opret en vuggestueaktivitet",
+        "label": "Vuggestueaktivitet"
+      },
+      "homeService": {
+        "prompt": "Opret en serviceaftale/hjemmeopgave",
+        "label": "Serviceaftale (hjem)"
+      },
+      "trip": {
+        "prompt": "Opret en rejse",
+        "label": "Rejse"
+      }
+    },
+    "pickTarget": "Hvem gælder det?",
+    "pickTargetDesc": "Vælg hjem / barn / kæledyr / person som posten skal tilhøre",
+    "noTargetsFound": "Ingen hjem / børn / kæledyr er registreret endnu",
+    "noMessageText": "Beskeden har ingen tekst at oprette fra"
   },
   "actionModal": {
     "edit": "Rediger",

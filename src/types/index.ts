@@ -60,7 +60,7 @@ export interface MessageReaction {
   type: 'like' | 'smile' | 'heart';
 }
 
-export interface ChatMessage {
+export interface ChatMessage extends VoiceMessageFields {
   id: string;
   text: string;
   senderId: string;
@@ -69,9 +69,25 @@ export interface ChatMessage {
   timestamp: number;
   imageUrl?: string;
   reactions?: MessageReaction[];
+  edited?: boolean;
+  replyTo?: MessageReplyRef;
+  translations?: Record<string, string>;
 }
 
 export type ConversationType = 'family' | 'dm' | 'group';
+
+export interface MessageReplyRef {
+  messageId: string;
+  senderId?: string;
+  senderName: string;
+  text: string;
+  hasImage?: boolean;
+}
+
+export interface VoiceMessageFields {
+  voiceUrl?: string;
+  voiceDuration?: number;
+}
 
 export interface ConversationMember {
   role: 'admin' | 'member';
@@ -91,11 +107,8 @@ export interface Conversation {
   members: { [uid: string]: ConversationMember };
   memberIds: string[];
   lastRead: { [uid: string]: number };
-  createdBy: string;
-  createdAt: number;
-}
-
-export interface ConversationListItem extends Conversation {
+  /** Recently typing members: uid → last "still typing" timestamp */
+  typing?: { [uid: string]: number };
   lastMessage?: {
     text: string;
     senderId: string;
@@ -103,9 +116,13 @@ export interface ConversationListItem extends Conversation {
     timestamp: number;
     hasImage?: boolean;
   };
+  createdBy: string;
+  createdAt: number;
 }
 
-export interface ConversationMessageData {
+export type ConversationListItem = Conversation;
+
+export interface ConversationMessageData extends VoiceMessageFields {
   text: string;
   senderId: string;
   senderName: string;
@@ -113,6 +130,9 @@ export interface ConversationMessageData {
   timestamp: number;
   imageUrl?: string;
   reactions?: MessageReaction[];
+  edited?: boolean;
+  replyTo?: MessageReplyRef;
+  translations?: Record<string, string>;
 }
 
 export interface WeatherDay {

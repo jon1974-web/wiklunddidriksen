@@ -1225,8 +1225,67 @@
     "helpWhat": "What is this?",
     "helpWhatText": "Chat lets the family message in one shared family chat, in direct messages between two members, and in groups. You can share text, photos and react with emojis. Trip chats can be created from the trip detail page by tapping the chat button next to the trip card.",
     "helpHow": "How to use it",
-    "helpHowText": "Tap a conversation to open it. Tap “＋” in the top right for a new chat: pick a family member for a direct message, or create a group with a name and members. A trip’s chat group is created from the trip page (chat button next to the trip card) and takes its name and icon from the trip.",
-    "helpTip": "Long-press a group in the list to leave it. In a group thread, tap “i” (or the group title) to manage members."
+    "helpHowText": "Tap a conversation to open it. Tap “＋” in the top right for a new chat: pick a family member for a direct message, or create a group with a name and members. A trip’s chat group is created from the trip page (chat button next to the trip card) and takes its name and icon from the trip. Long-press a message to copy it — or edit/delete your own. Older messages load via «Load older messages» at the top of the thread. Others can see when you type, you can reply to messages (long-press → ↩), send voice messages with the microphone, and use the ✨ button: AI summary, smart replies, translation, and «Create event» from a message. You can also choose which home/child/pet/person the entry belongs to.",
+    "helpTip": "Long-press a group in the list to leave it. In a group thread, tap “i” (or the group title) to manage members.",
+    "copy": "Copy",
+    "copied": "Copied ✅",
+    "edit": "Edit",
+    "edited": "edited",
+    "editing": "Editing:",
+    "deleteMessage": "Delete",
+    "deleteMessageTitle": "Delete message",
+    "deleteMessageBody": "Are you sure you want to delete this message?",
+    "loadOlder": "Load older messages",
+    "messageMenu": "Message",
+    "isTyping": "is typing…",
+    "summaryButton": "AI summary",
+    "summaryTitle": "Chat summary",
+    "summaryEmpty": "No messages to summarize yet.",
+    "smartReplies": "Smart replies",
+    "noSuggestions": "No suggestions right now",
+    "voiceMessage": "Voice message",
+    "recordingVoice": "Recording…",
+    "voiceUploading": "Sending voice message…",
+    "voiceError": "Could not send the voice message",
+    "voiceRecordError": "Could not start recording",
+    "micPermissionBody": "We need microphone access for voice messages.",
+    "replyAction": "Reply to message",
+    "translateAction": "Translate",
+    "eventFromMessage": "Create event",
+    "entryType": {
+      "event": {
+        "prompt": "Create an event",
+        "label": "Event (calendar)"
+      },
+      "health": {
+        "prompt": "Create a health appointment",
+        "label": "Health appointment"
+      },
+      "vet": {
+        "prompt": "Create a vet visit",
+        "label": "Vet visit"
+      },
+      "school": {
+        "prompt": "Create a school activity",
+        "label": "School activity"
+      },
+      "kindergarten": {
+        "prompt": "Create a kindergarten activity",
+        "label": "Kindergarten activity"
+      },
+      "homeService": {
+        "prompt": "Create a home service appointment",
+        "label": "Service appointment (home)"
+      },
+      "trip": {
+        "prompt": "Create a trip",
+        "label": "Trip"
+      }
+    },
+    "pickTarget": "Who is this for?",
+    "pickTargetDesc": "Pick the home / child / pet / person the entry belongs to",
+    "noTargetsFound": "No homes / children / pets are registered yet",
+    "noMessageText": "This message has no text to create from"
   },
   "actionModal": {
     "edit": "Edit",

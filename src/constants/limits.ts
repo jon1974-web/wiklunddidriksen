@@ -3,6 +3,7 @@ import i18n from '../i18n';
 
 export const CHAT_MESSAGE_LIMIT = 100;
 export const MAX_MESSAGE_LENGTH = 500;
+export const HISTORY_PAGE_SIZE = 50;
 export const IMAGE_MAX_DIMENSION = 1024;
 export const IMAGE_QUALITY = 0.7;
 export const DEBOUNCE_MS = 300;

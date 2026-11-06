@@ -8,18 +8,21 @@ import {
   setDoc,
   addDoc,
   updateDoc,
+  deleteDoc,
   onSnapshot,
   getDocs,
   query,
   where,
   orderBy,
   limit,
+  startAfter,
   runTransaction,
   arrayUnion,
 } from 'firebase/firestore';
+import { ref as ref$1 } from 'firebase/storage';
 import { UserProfile, Conversation, ConversationListItem, ConversationMessageData, MessageReaction } from '../types';
 import { getUserProfile, getFamilyById } from './familyService';
-import { CHAT_MESSAGE_LIMIT } from '../constants/limits';
+import { CHAT_MESSAGE_LIMIT, HISTORY_PAGE_SIZE } from '../constants/limits';
 
 const conversationsRef = () => collection(db, 'conversations');
 
@@ -147,6 +150,18 @@ export async function getConversation(conversationId: string): Promise<Conversat
   return null;
 }
 
+/** Live subscription to the conversation doc (typing indicator, member changes). */
+export function listenToConversation(
+  conversationId: string,
+  callback: (conversation: Conversation) => void
+): () => void {
+  return onSnapshot(doc(db, 'conversations', conversationId), (snapshot) => {
+    if (snapshot.exists()) {
+      callback({ id: snapshot.id, ...snapshot.data() } as Conversation);
+    }
+  });
+}
+
 export function listenToConversations(
   familyId: string,
   uid: string,
@@ -242,6 +257,56 @@ export async function leaveGroup(conversationId: string, uid: string): Promise<v
   await removeGroupMember(conversationId, uid);
 }
 
+// Delete a voice message's audio file from Storage (chat/voices path)
+export async function deleteVoiceFile(voiceUrl: string): Promise<void> {
+  try {
+    const path = voiceUrl.includes('/o/')
+      ? decodeURIComponent(voiceUrl.split('/o/')[1]?.split('?')[0] || '')
+      : voiceUrl;
+    if (path.startsWith('chat/')) {
+      const { deleteObject } = await import('firebase/storage');
+      const { storage } = await import('./firebase');
+      await deleteObject(ref$1(storage, path));
+    }
+  } catch (error) {
+    console.error('Failed to delete voice file:', error);
+  }
+}
+
+// --- Typing indicator ---
+
+const TYPING_REFRESH_MS = 8000;
+
+/**
+ * Signals "still typing" on the conversation doc. Throttle on the caller side —
+ * the timestamp auto-expires (listeners treat stale timestamps as stopped typing).
+ */
+export async function signalTyping(conversationId: string, uid: string): Promise<void> {
+  await updateDoc(doc(db, 'conversations', conversationId), {
+    [`typing.${uid}`]: Date.now() + TYPING_REFRESH_MS,
+  } as any);
+}
+
+export async function clearTyping(conversationId: string, uid: string): Promise<void> {
+  try {
+    await updateDoc(doc(db, 'conversations', conversationId), {
+      [`typing.${uid}`]: 0,
+    } as any);
+  } catch {
+    // non-critical
+  }
+}
+
+export const getActiveTypingUids = (
+  typing: { [uid: string]: number } | undefined,
+  now: number = Date.now()
+): string[] => {
+  if (!typing) return [];
+  return Object.entries(typing)
+    .filter(([, validUntil]) => typeof validUntil === 'number' && validUntil > now)
+    .map(([uid]) => uid);
+};
+
 // --- Messages ---
 
 export function listenToMessages(
@@ -302,6 +367,120 @@ export async function toggleReaction(
       : [...reactions.filter((r) => r.userId !== uid), { userId: uid, type }];
     tx.update(ref, { reactions: updated });
   });
+}
+
+// --- Message management (edit / delete / history) ---
+
+/**
+ * Edits a message's text (own messages only, enforced by rules).
+ * If the message is the conversation's newest, the lastMessage preview
+ * is updated in the same call.
+ */
+export async function editMessage(
+  conversationId: string,
+  messageId: string,
+  newText: string,
+  messageTimestamp: number
+): Promise<void> {
+  const convRef = doc(db, 'conversations', conversationId);
+  const convSnap = await getDoc(convRef);
+  const convData = convSnap.exists() ? convSnap.data() as Conversation | undefined : undefined;
+  const isLastMessage = convData?.lastMessage?.timestamp === messageTimestamp;
+
+  await updateDoc(doc(db, 'conversations', conversationId, 'messages', messageId), {
+    text: newText,
+    edited: true,
+  } as any);
+
+  if (isLastMessage && convData?.lastMessage) {
+    await updateDoc(convRef, {
+      lastMessage: { ...convData.lastMessage, text: newText },
+    } as any);
+  }
+}
+
+/**
+ * Hard-deletes a message. Also cleans up the image in Firebase Storage
+ * if the message carries one (chat/{...} path).
+ */
+export async function deleteMessage(
+  conversationId: string,
+  message: { id: string; imageUrl?: string; timestamp: number }
+): Promise<void> {
+  // Storage cleanup first (best effort — message delete must not fail on it)
+  if (message.imageUrl) {
+    try {
+      // The client stores images as chat/{timestamp}_{random}
+      const path = message.imageUrl.split('/o/')[1]?.split('?')[0];
+      const decoded = path ? decodeURIComponent(path) : null;
+      if (decoded && decoded.startsWith('chat/')) {
+        const { deleteObject } = await import('firebase/storage');
+        const { storage } = await import('./firebase');
+        await deleteObject(ref$1(storage, decoded));
+      }
+    } catch (error) {
+      console.error('Failed to delete chat image:', error);
+    }
+  }
+  await deleteDoc(doc(db, 'conversations', conversationId, 'messages', message.id));
+}
+
+/**
+ * After a delete: if the removed message was the conversation's newest,
+ * recompute lastMessage from the newest remaining message.
+ */
+export async function refreshLastMessage(
+  conversationId: string,
+  removedTimestamp: number
+): Promise<void> {
+  const convRef = doc(db, 'conversations', conversationId);
+  const convSnap = await getDoc(convRef);
+  if (!convSnap.exists()) return;
+  const convData = convSnap.data() as Conversation;
+  const lastMessage = convData.lastMessage;
+  if (!lastMessage || lastMessage.timestamp !== removedTimestamp) return;
+
+  const q = query(
+    collection(db, 'conversations', conversationId, 'messages'),
+    orderBy('timestamp', 'desc'),
+    limit(1)
+  );
+  const snapshot = await getDocs(q);
+  if (snapshot.empty) {
+    await updateDoc(convRef, { lastMessage: null } as any);
+    return;
+  }
+  const newest = snapshot.docs[0].data() as ConversationMessageData & { id: string };
+  await updateDoc(convRef, {
+    lastMessage: {
+      text: newest.text,
+      senderId: newest.senderId,
+      senderName: newest.senderName,
+      timestamp: newest.timestamp,
+      hasImage: !!newest.imageUrl,
+    },
+  } as any);
+}
+
+/**
+ * One-shot history fetch (older than the newest live window).
+ * Returns ascending messages; caller merges and dedupes by id.
+ */
+export async function fetchOlderMessages(
+  conversationId: string,
+  beforeTimestamp: number,
+  pageSize: number = HISTORY_PAGE_SIZE
+): Promise<(ConversationMessageData & { id: string })[]> {
+  const q = query(
+    collection(db, 'conversations', conversationId, 'messages'),
+    orderBy('timestamp', 'desc'),
+    startAfter(beforeTimestamp),
+    limit(pageSize)
+  );
+  const snapshot = await getDocs(q);
+  return snapshot.docs
+    .map((d) => ({ id: d.id, ...d.data() }) as ConversationMessageData & { id: string })
+    .reverse();
 }
 
 // --- Helpers ---

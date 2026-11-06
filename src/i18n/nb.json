@@ -1225,8 +1225,67 @@
     "helpWhat": "Hva er dette?",
     "helpWhatText": "Chatten lar familien sende meldinger i én felles familiechat, i direkte meldinger mellom to medlemmer og i grupper. Du kan dele tekst, bilder og reagere med emojis. Reisechatter kan du opprette fra reisens detaljside ved å trykke på chat-knappen ved reisekortet.",
     "helpHow": "Slik bruker du det",
-    "helpHowText": "Trykk på en samtale for å åpne den. Trykk «＋» øverst til høyre for ny chat: velg et familiemedlem for direkte melding, eller opprett en gruppe med navn og medlemmer. Reisens chatgruppe opprettes fra reisesiden (chat-knappen ved reisekortet) og får navnet og ikonet fra reisen.",
-    "helpTip": "Hold inne en gruppe i listen for å forlate den. I en gruppetråd trykker du på «i» (eller gruppetittelen) for å administrere medlemmer."
+    "helpHowText": "Trykk på en samtale for å åpne den. Trykk «＋» øverst til høyre for ny chat: velg et familiemedlem for direkte melding, eller opprett en gruppe med navn og medlemmer. Reisens chatgruppe opprettes fra reisesiden (chat-knappen ved reisekortet) og får navnet og ikonet fra reisen. Hold inne en melding for å kopiere den — eller redigere/slette dine egne. Eldre meldinger hentes med «Last inn eldre meldinger» øverst i tråden. Andre kan se når du skriver, og du kan svare på meldinger (hold inne → ↩), sende talemeldinger med mikrofonen, samt bruke ✨-knappen: AI-oppsummering, forlag til svar, oversettelse og «Opprett arrangement» fra en melding. Dessuten velger du hvilket hjem/barn/kjæledyr/person oppføringen skal høre til.",
+    "helpTip": "Hold inne en gruppe i listen for å forlate den. I en gruppetråd trykker du på «i» (eller gruppetittelen) for å administrere medlemmer.",
+    "copy": "Kopier",
+    "copied": "Kopiert ✅",
+    "edit": "Rediger",
+    "edited": "redigert",
+    "editing": "Redigerer:",
+    "deleteMessage": "Slett",
+    "deleteMessageTitle": "Slett melding",
+    "deleteMessageBody": "Er du sikker på at du vil slette denne meldingen?",
+    "loadOlder": "Last inn eldre meldinger",
+    "messageMenu": "Melding",
+    "isTyping": "skriver…",
+    "summaryButton": "AI-oppsummering",
+    "summaryTitle": "Oppsummering av chatten",
+    "summaryEmpty": "Fant ingen meldinger å oppsummere.",
+    "smartReplies": "Forslag til svar",
+    "noSuggestions": "Ingen forslag akkurat nå",
+    "voiceMessage": "Talemelding",
+    "recordingVoice": "Tar opp stemmen…",
+    "voiceUploading": "Sender talemelding…",
+    "voiceError": "Kunne ikke sende talemeldingen",
+    "voiceRecordError": "Kunne ikke starte opptak",
+    "micPermissionBody": "Vi trenger tilgang til mikrofonen for talemeldinger.",
+    "replyAction": "Svar på melding",
+    "translateAction": "Oversett",
+    "eventFromMessage": "Opprett arrangement",
+    "entryType": {
+      "event": {
+        "prompt": "Opprett et arrangement",
+        "label": "Arrangement (kalender)"
+      },
+      "health": {
+        "prompt": "Opprett en legetime",
+        "label": "Legetime (helse)"
+      },
+      "vet": {
+        "prompt": "Opprett et veterinærbesøk",
+        "label": "Veterinærbesøk"
+      },
+      "school": {
+        "prompt": "Opprett en skoleaktivitet",
+        "label": "Skoleaktivitet"
+      },
+      "kindergarten": {
+        "prompt": "Opprett en barnehageaktivitet",
+        "label": "Barnehageaktivitet"
+      },
+      "homeService": {
+        "prompt": "Opprett en serviceavtale/hjemmeoppdrag",
+        "label": "Serviceavtale (hjem)"
+      },
+      "trip": {
+        "prompt": "Opprett en tur",
+        "label": "Tur/reise"
+      }
+    },
+    "pickTarget": "Hvem gjelder det?",
+    "pickTargetDesc": "Velg hjem/barn/kjæledyr/person oppføringen skal opprettes for",
+    "noTargetsFound": "Fant ingen hjem/barn/kjæledyr registrert",
+    "noMessageText": "Meldingen har ingen tekst å opprette fra"
   },
   "actionModal": {
     "edit": "Rediger",

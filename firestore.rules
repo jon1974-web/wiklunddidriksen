@@ -99,7 +99,15 @@ service cloud.firestore {
 
         allow read: if isConvMember();
         allow create: if isConvMember() && request.resource.data.senderId == request.auth.uid;
-        allow update: if isConvMember();  // reactions
+        // Reactions: any member. Edits: sender only (text/edited fields).
+        allow update: if isConvMember() && (
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reactions']) ||
+          (
+            resource.data.senderId == request.auth.uid &&
+            request.resource.data.senderId == resource.data.senderId &&
+            request.resource.data.diff(resource.data).affectedKeys().hasOnly(['text', 'edited'])
+          )
+        );
         allow delete: if isConvMember() && resource.data.senderId == request.auth.uid;
       }
     }

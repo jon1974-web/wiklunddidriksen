@@ -22,6 +22,7 @@ import {
   getMemberProfiles,
   leaveGroup,
   ensureFamilyConversation,
+  getActiveTypingUids,
 } from '../services/chatService';
 import { getFamilyMembersWithRoles } from '../services/familyService';
 import { useUserStore } from '../store/userStore';
@@ -44,6 +45,8 @@ interface ChatRowData extends ConversationListItem {
   initials: string;
   icon?: string;
   unread: boolean;
+  /** "Ole skriver…" when a convo member is actively typing */
+  typingPreview?: string;
 }
 
 // --- Row component (memoized for list performance) ---
@@ -73,13 +76,15 @@ const ChatRow = React.memo(({ item, timeText, onPress, onLongPress }: ChatRowPro
     <Text style={styles.avatarInitials}>{item.initials}</Text>
   );
 
-  const previewText = item.lastMessage
-    ? item.lastMessage.hasImage && !item.lastMessage.text
-      ? `📷 ${t('chat.photoMessage')}`
-      : item.type !== 'dm' && item.lastMessage.senderName
-        ? `${item.lastMessage.senderName}: ${item.lastMessage.text}`
-        : item.lastMessage.text
-    : t('chat.noMessages');
+  const previewText = item.typingPreview
+    ? item.typingPreview
+    : item.lastMessage
+      ? item.lastMessage.hasImage && !item.lastMessage.text
+        ? `📷 ${t('chat.photoMessage')}`
+        : item.type !== 'dm' && item.lastMessage.senderName
+          ? `${item.lastMessage.senderName}: ${item.lastMessage.text}`
+          : item.lastMessage.text
+      : t('chat.noMessages');
 
   return (
     <TouchableOpacity
@@ -244,12 +249,19 @@ export const ChatListScreen: React.FC = () => {
           initials = 'FH';
         }
         if (search && !displayName.toLowerCase().includes(search)) return null;
+        // Typing indicator in the row preview
+        const typingUids = getActiveTypingUids(conv.typing).filter((uid) => uid !== user.uid);
+        const typeNames = Array.from(new Set(
+          typingUids.map((uid) => (uid === user.uid ? '' : profiles[uid]?.displayName || uid.slice(0, 6)))
+        ));
+        const typingPreview = typeNames.length > 0 ? `${typeNames.join(', ')} ${t('chat.isTyping')}` : undefined;
         return {
           ...conv,
           displayName,
           avatarUrl,
           initials,
           unread: hasUnreadConversation(conv, user.uid),
+          typingPreview,
         } as ChatRowData;
       })
       .filter((r): r is ChatRowData => r !== null);

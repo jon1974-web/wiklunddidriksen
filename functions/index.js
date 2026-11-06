@@ -3674,6 +3674,313 @@ exports.migrateChatHistory = onRequest({ region: "us-central1", memory: "512MB",
   }
 });
 
+// ==================== CHAT AI ====================
+
+// Verifies the caller is a member of the given conversation (server-side,
+// using Firestore data — not the request payload).
+async function verifyConversationMember(uid, conversationId) {
+  const db = getFirestore();
+  const convSnap = await db.collection("conversations").doc(String(conversationId)).get();
+  if (!convSnap.exists) return null;
+  const conv = convSnap.data();
+  const memberIds = conv.memberIds || Object.keys(conv.members || {});
+  if (!memberIds.includes(uid)) return null;
+  return { id: convSnap.id, ...conv };
+}
+
+function chatLocaleLabel(locale) {
+  const map = { nb: "norsk (bokmål)", en: "English", sv: "svenska", da: "dansk", fi: "suomi" };
+  return map[locale] || "norsk (bokmål)";
+}
+
+// AI catch-up summary: what did I miss since my last read?
+exports.chatSummary = onRequest({ region: "us-central1", memory: "512MB", timeoutSeconds: 120 }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await checkRateLimit(uid, "chatSummary"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+  if (!OPENAI_API_KEY) return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+
+  const { conversationId, sinceTimestamp, locale } = req.body || {};
+  if (!conversationId) return res.status(400).json({ error: "conversationId is required" });
+
+  let conv;
+  try {
+    conv = await verifyConversationMember(uid, conversationId);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  if (!conv) return res.status(403).json({ error: "Forbidden: not a conversation member" });
+
+  try {
+    const db = getFirestore();
+    let q = db.collection("conversations").doc(String(conversationId)).collection("messages")
+      .orderBy("timestamp", "desc").limit(50);
+    const snap = await q.get();
+
+    // Messages since lastRead (or fall back to the 50 newest if nothing unread)
+    const since = Number(sinceTimestamp) || conv.lastRead?.[uid] || 0;
+    let messages = snap.docs
+      .map((d) => d.data())
+      .filter((m) => (m.timestamp || 0) > since)
+      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+    let summary = "";
+    if (messages.length === 0) {
+      // Nothing unread: summarize the recent context instead
+      messages = snap.docs.map((d) => d.data())
+        .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+      if (messages.length === 0) {
+        return res.status(200).json({ summary: "" });
+      }
+    }
+
+    const formatted = messages
+      .map((m) => {
+        const who = m.senderName || "Ukjent";
+        const content = m.imageUrl && !m.text ? "📋 bilde" : String(m.text || "");
+        return `${who}: ${content}`;
+      })
+      .join("\n");
+
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+    const systemPrompt = `Du er en hjelpsom assistent i en familieapp. Oppsummer samtalen kort og vennlig på ${chatLocaleLabel(locale)}. Svar med 2-4 korte punkt (ny linje per punkt, start med «•»). Ingen intro eller avslutning — bare punktene.`;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: `Samtale «${conv.title || "chat"}». Nylige meldinger:\n${formatted}` },
+      ],
+      max_tokens: 300,
+      temperature: 0.4,
+    });
+
+    summary = completion.choices[0]?.message?.content?.trim() || "";
+    return res.status(200).json({ summary });
+  } catch (error) {
+    console.error("chatSummary error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Smart reply suggestions based on the newest messages in the conversation
+exports.chatSmartReplies = onRequest({ region: "us-central1", memory: "256MB", timeoutSeconds: 60 }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await checkRateLimit(uid, "chatSmartReplies"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+  if (!OPENAI_API_KEY) return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+
+  const { conversationId, locale } = req.body || {};
+  if (!conversationId) return res.status(400).json({ error: "conversationId is required" });
+
+  let conv;
+  try {
+    conv = await verifyConversationMember(uid, conversationId);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  if (!conv) return res.status(403).json({ error: "Forbidden: not a conversation member" });
+
+  try {
+    const db = getFirestore();
+    const snap = await db.collection("conversations").doc(String(conversationId)).collection("messages")
+      .orderBy("timestamp", "desc").limit(6).get();
+    const messages = snap.docs
+      .map((d) => d.data())
+      .sort((a, b) => (a.timestamp || 0) - (b.timestamp || 0));
+
+    if (messages.length === 0) {
+      return res.status(200).json({ suggestions: [] });
+    }
+
+    const formatted = messages
+      .map((m) => `${m.senderName || "Ukjent"}: ${m.imageUrl && !m.text ? "📋 bilde" : String(m.text || "")}`)
+      .join("\n");
+
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `Du foreslår korte svar til en familiesamtale. Basert på de siste meldingene, foreslå 3 naturlige korte svar (maks 6 ord hver) som den innloggede brukeren kan sende. Svar på ${chatLocaleLabel(locale)}. Returner KUN gyldig JSON: {"suggestions": ["...", "...", "..."]}`,
+        },
+        { role: "user", content: `De siste meldingene (den innloggede brukeren er den som skal svare):\n${formatted}` },
+      ],
+      max_tokens: 150,
+      temperature: 0.7,
+      response_format: { type: "json_object" },
+    });
+
+    let suggestions = [];
+    try {
+      const parsed = JSON.parse(completion.choices[0]?.message?.content || "{}");
+      if (Array.isArray(parsed.suggestions)) {
+        suggestions = parsed.suggestions.filter((s) => typeof s === "string").slice(0, 3);
+      }
+    } catch (e) {
+      console.error("chatSmartReplies parse error:", e);
+    }
+    return res.status(200).json({ suggestions });
+  } catch (error) {
+    console.error("chatSmartReplies error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Translate a message into the caller's language (result cached in the message doc)
+exports.chatTranslateMessage = onRequest({ region: "us-central1", memory: "256MB", timeoutSeconds: 60 }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await checkRateLimit(uid, "chatTranslateMessage"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+  if (!OPENAI_API_KEY) return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+
+  const { conversationId, messageId, targetLocale } = req.body || {};
+  if (!conversationId || !messageId || !targetLocale) {
+    return res.status(400).json({ error: "conversationId, messageId and targetLocale are required" });
+  }
+
+  let conv;
+  try {
+    conv = await verifyConversationMember(uid, conversationId);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+  if (!conv) return res.status(403).json({ error: "Forbidden: not a conversation member" });
+
+  try {
+    const db = getFirestore();
+    const msgRef = db.collection("conversations").doc(String(conversationId)).collection("messages").doc(String(messageId));
+    const msgSnap = await msgRef.get();
+    if (!msgSnap.exists) return res.status(404).json({ error: "Message not found" });
+    const msg = msgSnap.data();
+    if (!msg.text) return res.status(400).json({ error: "Message has no text to translate" });
+
+    // Serve from cache when present
+    if (msg.translations && msg.translations[targetLocale]) {
+      return res.status(200).json({ translated: msg.translations[targetLocale] });
+    }
+
+    const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4o-mini",
+      messages: [
+        {
+          role: "system",
+          content: `Overset meldinger i en familiechat. Overset brukerens melding til ${chatLocaleLabel(targetLocale)}. Behold tone og emojis. Returner KUN gyldig JSON: {"translated": "..."}`,
+        },
+        { role: "user", content: String(msg.text) },
+      ],
+      max_tokens: 300,
+      temperature: 0.2,
+      response_format: { type: "json_object" },
+    });
+
+    let translated = "";
+    try {
+      translated = JSON.parse(completion.choices[0]?.message?.content || "{}").translated || "";
+    } catch (e) {
+      console.error("chatTranslateMessage parse error:", e);
+    }
+    if (!translated) return res.status(500).json({ error: "Translation failed" });
+
+    // Admin-SDK write bypasses client rules; cache is shared for the conversation
+    await msgRef.set({ translations: { [targetLocale]: translated } }, { merge: true });
+
+    return res.status(200).json({ translated });
+  } catch (error) {
+    console.error("chatTranslateMessage error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Voice message transcription (chat audio → plain text; the client sends the audio to Storage)
+exports.chatVoiceTranscribe = onRequest({ region: "us-central1", memory: "512MB", timeoutSeconds: 120 }, async (req, res) => {
+  setCorsHeaders(res, req);
+  if (req.method === "OPTIONS") return res.status(204).send("");
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const uid = await verifyAuth(req);
+  if (!uid) return res.status(401).json({ error: "Unauthorized" });
+
+  if (!(await checkRateLimit(uid, "chatVoiceTranscribe"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+  if (!OPENAI_API_KEY) return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  try {
+    let audioBuffer = null;
+    let filename = 'recording.m4a';
+
+    const contentType = req.headers['content-type'] || '';
+    if (contentType.includes('multipart/form-data')) {
+      const { Readable } = require('stream');
+      audioBuffer = await new Promise((resolve, reject) => {
+        const busboy = Busboy({ headers: { 'content-type': contentType } });
+        let fileBuffer = null;
+        busboy.on('file', (fieldname, file, info) => {
+          filename = info.filename || filename;
+          const chunks = [];
+          file.on('data', (chunk) => chunks.push(chunk));
+          file.on('end', () => (fileBuffer = Buffer.concat(chunks)));
+        });
+        busboy.on('finish', () => resolve(fileBuffer));
+        busboy.on('error', reject);
+        const readable = new Readable();
+        readable.push(Buffer.isBuffer(req.rawBody) ? req.rawBody : Buffer.from(req.rawBody || []));
+        readable.push(null);
+        readable.pipe(busboy);
+      });
+    } else if (req.body && req.body.audioBase64) {
+      audioBuffer = Buffer.from(String(req.body.audioBase64), 'base64');
+      filename = req.body.filename || filename;
+    }
+
+    if (!audioBuffer || audioBuffer.length === 0) {
+      return res.status(400).json({ error: "No audio data received" });
+    }
+
+    const ext = filename.split('.').pop() || 'm4a';
+    const filetype = ext === 'm4a' ? 'audio/mp4' : `audio/${ext}`;
+    const audioFile = new File([audioBuffer], filename, { type: filetype });
+
+    const transcription = await openai.audio.transcriptions.create({
+      model: "whisper-1",
+      file: audioFile,
+    });
+
+    const transcript = (transcription.text || "").trim();
+    if (!transcript) return res.status(400).json({ error: "Could not transcribe audio" });
+    return res.status(200).json({ transcript, durationSeconds: Math.min(120, Math.ceil(audioBuffer.length / 24000)) });
+  } catch (error) {
+    console.error("chatVoiceTranscribe error:", error);
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 // ==================== GOOGLE CALENDAR ====================
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -5995,7 +6302,7 @@ function formatDataForGPT(data) {
 }
 
 // AI Assistant: Search + Actions
-exports.aiAssistant = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
+exports.aiAssistant = onRequest({ region: "us-central1", memory: "512MB", timeoutSeconds: 120 }, async (req, res) => {
   setCorsHeaders(res, req);
   if (req.method === "OPTIONS") return res.status(204).send("");
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
@@ -6139,7 +6446,7 @@ KRITISKE REGLER:
 3. Aldri legg til informasjon som ikke står i dataen.
 4. Hvis spørringen er uklar, spør om avklaring.
 5. For create-handlinger: foreslå FORHÅNDSVISNING med alle felt. Brukeren må bekrefte FØR handling utføres.
-6. For delete-handlinger: bekreft med brukeren først.
+6. For delete-handlinger: bekreft med brukeren først. For serviceavtaler (SERVICE.APPOINTMENTS) kan delete brukes uten id: send data: { title, homeName } (basert på brukerens behov).
 7. Svar alltid på norsk.
 8. Sorter svar etter dato (nærmeste først).
 
@@ -6228,12 +6535,12 @@ HEALTH.APPOINTMENTS: title, person, dateFrom, dateTo, startTime, endTime, doctor
 HEALTH.MEDICATIONS: name, person, dosage, frequency, timeSlots
 HEALTH.VACCINATIONS: name, person, date, nextDue
 HEALTH.ALLERGIES: name, person, severity, description
-SCHOOL.ACTIVITIES: name, dateFrom, dateTo, startTime, endTime, location
-KINDERGARTEN.ACTIVITIES: name, dateFrom, dateTo, startTime, endTime, location
+SCHOOL.ACTIVITIES: name, dateFrom, dateTo, startTime, endTime, location, childName (navn på barnet aktiviteten gjelder)
+KINDERGARTEN.ACTIVITIES: name, dateFrom, dateTo, startTime, endTime, location, childName (navn på barnet aktiviteten gjelder)
 PETS: name, species, breed, birthday
-PETS.VETVISITS: name, dateFrom, dateTo, doctor, reason, location
+PETS.VETVISITS: name, dateFrom, dateTo, doctor, reason, location, petName (navn på dyret besøket gjelder)
 PETS.MEDICATIONS: name, dosage, frequency
-SERVICE.APPOINTMENTS (homeServices): title, dateFrom, dateTo, startTime, endTime, frequency
+SERVICE.APPOINTMENTS (homeServices): title, dateFrom, dateTo, startTime, endTime, frequency, homeName (navn på hjemmet tjenesten gjelder)
 SHOPPING: title, items (array)
 RECIPES: name, description, ingredients, instructions, servings, prepTime, cookTime
 HOMES: name, address, type
@@ -6243,6 +6550,8 @@ HOME.PAINTCOLORS: colorName, brand, code, room
 HOME.TASKS: title, description, assignedTo, done
 HOME.SHOPPINGITEMS: name, quantity, price, purchased
 HOME.OFFERS: provider, description, price
+
+ENTITETSKOBLING (viktig): Dersom brukeren (eller prompten) sier oppføringen skal oprettes for et bestemt hjem/kjæledyr/barn/person, MÅ du alltid inkludere relatert NAME-felt i data (homeName / petName / childName / person). Systemet kobler automatisk riktig ID server-side. Kopier navnet nøyaktig som gitt.
 
 SKOLE/KINDERGARTEN DOKUMENTER: Skoletimeplaner og barnehageplaner er opplastede bilder/dokumenter. Du kan ikke vise dem direkte, men du kan navigere brukeren til riktig sted der de kan se dem.
 
@@ -6352,9 +6661,110 @@ async function executeAction(uid, familyId, action) {
   const config = MODULE_MAP[mod];
   if (!config) throw new Error(`Unknown module: ${action.module}`);
 
+  // Name → ID resolution for relation fields. The model echoes the entity
+  // NAME chosen by the user (ids are never hallucinated); the exact id is
+  // bound here, server-side, from the family's own collections.
+  async function resolveEntityRef(data) {
+    const out = { ...data };
+    const lookupName = async (snapshot, nameValue, label) => {
+      const wanted = String(nameValue || '').trim().toLowerCase();
+      if (!wanted) return null;
+      let match = null;
+      snapshot.forEach((doc) => {
+        const name = (doc.data().name || doc.data().title || '').trim().toLowerCase();
+        if (!match && name === wanted) match = doc.id;
+      });
+      return match;
+    };
+
+    // Service appointment → home
+    if (mod === 'service.appointments' && out.homeName && !out.homeId) {
+      const snap = await db.collection("homes").where("familyId", "==", familyId).get();
+      const homeId = await lookupName(snap, out.homeName, 'hjem');
+      if (homeId) { out.homeId = homeId; }
+    }
+
+    // Vet visit → pet
+    if (mod === 'pets.vetvisits' && out.petName && !out.petId) {
+      const snap = await db.collection("pets").where("familyId", "==", familyId).get();
+      const petId = await lookupName(snap, out.petName, 'kjæledyr');
+      if (petId) { out.petId = petId; }
+    }
+
+    // School / kindergarten activity → child
+    if (mod === 'school.activities' && out.childName && !out.childId) {
+      const snap = await db.collection("schoolChildren").where("familyId", "==", familyId).get();
+      const childId = await lookupName(snap, out.childName, 'skolebarn');
+      if (childId) { out.childId = childId; }
+    }
+    if (mod === 'kindergarten.activities' && out.childName && !out.childId) {
+      const snap = await db.collection("kindergartenChildren").where("familyId", "==", familyId).get();
+      const childId = await lookupName(snap, out.childName, 'barnehagebarn');
+      if (childId) { out.childId = childId; }
+    }
+
+    // Health appointment → person (family member name kept as string)
+    if (mod === 'health.appointments' && !out.person && out.personName) {
+      out.person = String(out.personName).trim();
+    }
+
+    delete out.homeName;
+    delete out.petName;
+    delete out.childName;
+    delete out.personName;
+    return out;
+  }
+
   if (type === 'create') {
+    const finalData = await resolveEntityRef(data);
+    // Relation ids are mandatory for scoping — refuse to create orphans
+    if (mod === 'service.appointments' && !finalData.homeId) {
+      throw new Error('Serviceavtalen kunne ikke opprettes: hjemmet ble ikke funnet. Spesifiser et gyldig hjem.');
+    }
+    if (mod === 'pets.vetvisits' && !finalData.petId) {
+      throw new Error('Veterinærbesøket kunne ikke opprettes: dyret ble ikke funnet. Spesifiser et gyldig dyr.');
+    }
+    if (mod === 'school.activities' && !finalData.childId) {
+      throw new Error('Skoleaktiviteten kunne ikke opprettes: barnet ble ikke funnet. Spesifiser et gyldig barn.');
+    }
+    if (mod === 'kindergarten.activities' && !finalData.childId) {
+      throw new Error('Barnehageaktiviteten kunne ikke opprettes: barnet ble ikke funnet. Spesifiser et gyldig barn.');
+    }
+    // Upsert for relation-scoped entries: an entry with the same title and the
+    // same target (home/pet/child) is UPDATED instead of duplicated. For home
+    // services this also "promotes" orphaned pre-binding entries (missing
+    // homeId) into the correct home.
+    const upsertSpec = {
+      'service.appointments': { titleField: 'title', idField: 'homeId' },
+      'pets.vetvisits': { titleField: 'name', idField: 'petId' },
+      'school.activities': { titleField: 'name', idField: 'childId' },
+      'kindergarten.activities': { titleField: 'name', idField: 'childId' },
+    }[mod];
+
+    if (upsertSpec && finalData[upsertSpec.idField]) {
+      const wantedTitle = String(finalData[upsertSpec.titleField] || '').trim().toLowerCase();
+      if (wantedTitle) {
+        const existingSnap = await config.col().where('familyId', '==', familyId).get();
+        let existingRef = null;
+        existingSnap.forEach((doc) => {
+          const s = doc.data();
+          const sameTitle = String(s[upsertSpec.titleField] || '').trim().toLowerCase() === wantedTitle;
+          const sameTarget = upsertSpec.idField === 'homeId' && !s.homeId ? true : s[upsertSpec.idField] === finalData[upsertSpec.idField];
+          if (!existingRef && sameTitle && sameTarget) existingRef = doc.ref;
+        });
+        if (existingRef) {
+          await existingRef.update({
+            ...finalData,
+            [config.field]: uid,
+            familyId,
+            updatedAt: Date.now(),
+          });
+          return { id: existingRef.id, updated: true };
+        }
+      }
+    }
     const ref = await config.col().add({
-      ...data,
+      ...finalData,
       [config.field]: uid,
       familyId,
       createdAt: Date.now(),
@@ -6363,6 +6773,35 @@ async function executeAction(uid, familyId, action) {
   }
 
   if (type === 'delete') {
+    // Name-based delete fallback for home services (also removes orphaned
+    // entries created before id-binding existed): { title, homeName? }
+    if (mod === 'service.appointments' && !data.id && data.title) {
+      const wantedTitle = String(data.title).trim().toLowerCase();
+      const snap = await config.col().where('familyId', '==', familyId).get();
+      let resolvedHomeId = null;
+      if (data.homeName) {
+        const homesSnap = await db.collection('homes').where('familyId', '==', familyId).get();
+        const wanted = String(data.homeName).trim().toLowerCase();
+        homesSnap.forEach((doc) => {
+          const name = (doc.data().name || '').trim().toLowerCase();
+          if (!resolvedHomeId && name === wanted) resolvedHomeId = doc.id;
+        });
+      }
+      let deletedCount = 0;
+      for (const doc of snap.docs) {
+        const s = doc.data();
+        const titleMatch = String(s.title || '').trim().toLowerCase() === wantedTitle;
+        const homeMatch = resolvedHomeId ? s.homeId === resolvedHomeId : !s.homeId;
+        if (titleMatch && homeMatch) {
+          await doc.ref.delete();
+          deletedCount++;
+        }
+      }
+      if (deletedCount === 0) {
+        throw new Error('Fant ingen serviceavtale med det navnet');
+      }
+      return { id: `deleted:${deletedCount}` };
+    }
     await config.col().doc(data.id).delete();
     return { id: data.id };
   }

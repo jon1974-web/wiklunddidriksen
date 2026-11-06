@@ -1,7 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Modal } from 'react-native';
-import { ChatMessage, MessageReaction } from '../types';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Modal, Pressable, ActivityIndicator, Linking } from 'react-native';
+import { ChatMessage, MessageReaction, MessageReplyRef } from '../types';
 import { useTheme } from '../theme/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 import { LOCALE } from '../constants/limits';
 
 interface MessageBubbleProps {
@@ -10,6 +12,11 @@ interface MessageBubbleProps {
   currentUserId?: string;
   onReaction?: (messageId: string, type: MessageReaction['type']) => void;
   liveAvatarUrl?: string;
+  onRequestAction?: (message: ChatMessage) => void;
+  /** Grouping: false hides the avatar + sender name (consecutive messages) */
+  showHeader?: boolean;
+  /** Newest timestamp read by any other member (read receipts for own messages) */
+  maxOtherReadTs?: number;
 }
 
 const REACTIONS = [
@@ -17,6 +24,8 @@ const REACTIONS = [
   { type: 'smile' as const, emoji: '😊' },
   { type: 'heart' as const, emoji: '❤️' },
 ];
+
+const URL_PATTERN = /(https?:\/\/[^\s]+)/g;
 
 const getInitials = (name: string): string => {
   return name
@@ -28,13 +37,123 @@ const getInitials = (name: string): string => {
     .toUpperCase();
 };
 
-export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message, isOwnMessage, currentUserId, onReaction, liveAvatarUrl }) => {
+// Renders text with plain URLs turned into clickable links
+const RichLinkText = ({ text, color, style }: { text: string; color: string; style?: object }) => {
+  const parts = text.split(URL_PATTERN);
+  return (
+    <Text style={[style, { color }]}>
+      {parts.map((part, index) =>
+        part.startsWith('http://') || part.startsWith('https://') ? (
+          <Text
+            key={`link-${index}`}
+            style={{ textDecorationLine: 'underline', color }}
+            onPress={() => Linking.openURL(part).catch(() => undefined)}
+          >
+            {part}
+          </Text>
+        ) : (
+          <Text key={`txt-${index}`}>{part}</Text>
+        )
+      )}
+    </Text>
+  );
+};
+
+// Reply quote rendered above the bubble content
+const ReplyQuote = ({ replyTo, accent }: { replyTo?: MessageReplyRef; accent: string }) => {
+  if (!replyTo) return null;
+  return (
+    <View style={[styles.replyQuote, { borderLeftColor: accent }]}>
+      <Text numberOfLines={1} style={[styles.replyQuoteName, { color: accent }]}>
+        {replyTo.senderName}
+      </Text>
+      <Text numberOfLines={2} style={styles.replyQuoteText}>
+        {replyTo.hasImage && !replyTo.text ? '📷' : replyTo.text}
+      </Text>
+    </View>
+  );
+};
+
+// Small inline audio player for voice messages
+const VoicePlayer = ({ uri, duration }: { uri: string; duration?: number }) => {
   const { colors } = useTheme();
+  const [busy, setBusy] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  const soundRef = useRef<any>(null);
+
+  useEffect(() => {
+    return () => {
+      if (soundRef.current) {
+        soundRef.current.unloadAsync?.().catch?.(() => undefined);
+      }
+    };
+  }, []);
+
+  const togglePlay = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      const { Audio } = await import('expo-av');
+      if (soundRef.current && playing) {
+        await soundRef.current.stopAsync?.();
+        await soundRef.current.unloadAsync?.();
+        soundRef.current = null;
+        setPlaying(false);
+        setBusy(false);
+        return;
+      }
+      const { sound } = await Audio.Sound.createAsync(
+        { uri },
+        { shouldPlay: true, progressUpdateIntervalMillis: 500 },
+      );
+      soundRef.current = sound;
+      setPlaying(true);
+      sound.setOnPlaybackStatusUpdate?.((status: any) => {
+        if (status?.didJustFinish) {
+          setPlaying(false);
+          sound.unloadAsync?.().catch(() => undefined);
+          soundRef.current = null;
+        }
+      });
+    } catch (error) {
+      console.error('Voice playback failed:', error);
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <View style={styles.voiceRow}>
+      <TouchableOpacity
+        onPress={togglePlay}
+        disabled={busy}
+        style={[styles.voicePlayBtn, { backgroundColor: colors.surfaceVariant }]}
+        accessibilityLabel="Play voice message"
+      >
+        {busy && !playing ? (
+          <ActivityIndicator size="small" color={colors.accent} />
+        ) : (
+          <Text style={{ fontSize: 16 }}>{playing ? '⏸' : '▶'}</Text>
+        )}
+      </TouchableOpacity>
+      <Text style={{ fontSize: 13, fontWeight: '600' }}>
+        🎙 {duration ? `${duration}s` : `~`}
+      </Text>
+    </View>
+  );
+};
+
+export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({
+  message, isOwnMessage, currentUserId, onReaction, liveAvatarUrl, onRequestAction, showHeader = true, maxOtherReadTs,
+}) => {
+  const { colors } = useTheme();
+  const { t } = useTranslation();
   const [showFullImage, setShowFullImage] = useState(false);
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
 
   const avatarUrl = liveAvatarUrl || message.senderAvatarUrl;
+  const readByOthers = !!isOwnMessage && maxOtherReadTs !== undefined && message.timestamp <= maxOtherReadTs;
 
   const formatTimestamp = (timestamp: number) => {
     const date = new Date(timestamp);
@@ -61,10 +180,16 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
     setShowReactionPicker(false);
   };
 
+  const isVoiceMessage = !!message.voiceUrl;
+
   return (
     <>
-      <View style={[styles.container, isOwnMessage ? styles.ownContainer : styles.otherContainer]}>
-        {!isOwnMessage && (
+      <Pressable
+        style={[styles.container, isOwnMessage ? styles.ownContainer : styles.otherContainer]}
+        onLongPress={onRequestAction ? () => onRequestAction(message) : undefined}
+        delayLongPress={350}
+      >
+        {!isOwnMessage && showHeader && (
           <View style={styles.avatarColumn}>
             {avatarUrl && avatarUrl.length > 0 && !avatarFailed ? (
               <Image source={{ uri: avatarUrl }} style={styles.avatar} onError={() => setAvatarFailed(true)} />
@@ -79,8 +204,14 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
         )}
         <View style={[styles.bubbleWrapper, isOwnMessage && styles.bubbleWrapperOwn]}>
           <View style={[styles.bubble, isOwnMessage ? { backgroundColor: colors.chatBubbleOwn } : { backgroundColor: colors.chatBubbleOther }]}>
-            {!isOwnMessage && (
+            {!isOwnMessage && showHeader && (
               <Text style={[styles.senderName, { color: colors.textSecondary }]}>{message.senderName}</Text>
+            )}
+            {!isOwnMessage && message.replyTo && (
+              <ReplyQuote replyTo={message.replyTo} accent={colors.accent} />
+            )}
+            {isOwnMessage && message.replyTo && (
+              <ReplyQuote replyTo={message.replyTo} accent={colors.surfaceVariant} />
             )}
             {message.imageUrl && (
               <TouchableOpacity onPress={() => setShowFullImage(true)}>
@@ -91,13 +222,33 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
                 />
               </TouchableOpacity>
             )}
-            {message.text && message.text.length > 0 ? (
-              <Text style={[styles.text, { color: isOwnMessage ? colors.chatTextOwn : colors.chatTextOther }]}>
-                {message.text}
+            {isVoiceMessage && (
+              <View style={isOwnMessage ? styles.voiceOwn : styles.voiceOther}>
+                <VoicePlayer uri={message.voiceUrl as string} duration={message.voiceDuration} />
+              </View>
+            )}
+            {message.text && message.text.length > 0 && (
+              <RichLinkText
+                text={message.text}
+                color={isOwnMessage ? colors.chatTextOwn : colors.chatTextOther}
+                style={styles.text}
+              />
+            )}
+            {!!message.translations?.[(i18n.language || 'nb').slice(0, 2)] && (
+              <Text style={[styles.translatedText, { color: isOwnMessage ? colors.chatTextOwn : colors.chatTextOther }]}>
+                🌐 {message.translations[(i18n.language || 'nb').slice(0, 2)]}
               </Text>
-            ) : null}
-            <Text style={[styles.timestamp, { color: isOwnMessage ? colors.textSecondary : colors.textDisabled }]}>
+            )}
+            <Text style={[styles.timestamp, { color: isOwnMessage ? colors.chatTextOwn : colors.textDisabled }, isOwnMessage && styles.timestampOwn]}>
               {formatTimestamp(message.timestamp)}
+              {isOwnMessage ? (
+                <Text style={[styles.tickText, { color: colors.chatTextOwn }]}>{readByOthers ? ' ✓✓' : ' ✓'}</Text>
+              ) : null}
+              {message.edited ? (
+                <Text style={[styles.editedTag, { color: isOwnMessage ? colors.chatTextOwn : colors.textDisabled }]}>
+                  {` · ${t('chat.edited')}`}
+                </Text>
+              ) : null}
             </Text>
           </View>
           {(reactionCounts.like || reactionCounts.smile || reactionCounts.heart) ? (
@@ -130,7 +281,7 @@ export const MessageBubble: React.FC<MessageBubbleProps> = React.memo(({ message
             <Text style={[styles.addReactionText, { color: colors.textDisabled }]}>+</Text>
           </TouchableOpacity>
         </View>
-      </View>
+      </Pressable>
 
       {showReactionPicker && (
         <View style={[styles.reactionPicker, isOwnMessage ? styles.reactionPickerOwn : styles.reactionPickerOther]}>
@@ -181,7 +332,6 @@ const styles = StyleSheet.create({
   },
   avatarColumn: {
     marginRight: 6,
-    justifyContent: 'flex-end',
   },
   avatar: {
     width: 24,
@@ -211,6 +361,40 @@ const styles = StyleSheet.create({
   },
   bubbleWrapperOwn: {
     alignSelf: 'flex-end',
+  },
+  replyQuote: {
+    borderLeftWidth: 3,
+    paddingLeft: 8,
+    paddingVertical: 2,
+    marginBottom: 6,
+    borderRadius: 4,
+  },
+  replyQuoteName: {
+    fontSize: 11,
+    fontWeight: '700',
+  },
+  replyQuoteText: {
+    fontSize: 13,
+    opacity: 0.85,
+  },
+  voiceRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 4,
+  },
+  voicePlayBtn: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  voiceOwn: {
+    alignSelf: 'flex-end',
+  },
+  voiceOther: {
+    alignSelf: 'flex-start',
   },
   reactionsOverlay: {
     position: 'absolute',
@@ -303,6 +487,23 @@ const styles = StyleSheet.create({
     fontSize: 10,
     marginTop: 4,
     textAlign: 'right',
+  },
+  timestampOwn: {
+    opacity: 0.75,
+  },
+  tickText: {
+    fontSize: 10,
+    fontWeight: '700',
+  },
+  editedTag: {
+    fontSize: 9,
+    fontStyle: 'italic',
+  },
+  translatedText: {
+    fontSize: 13,
+    fontStyle: 'italic',
+    marginTop: 4,
+    opacity: 0.9,
   },
   fullImageOverlay: {
     flex: 1,
