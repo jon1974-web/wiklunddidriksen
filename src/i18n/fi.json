@@ -1154,7 +1154,9 @@
     "pickTarget": "Kenelle tämä koskee?",
     "pickTargetDesc": "Valitse koti / lapsi / lemmikki / henkilö merkinnälle",
     "noTargetsFound": "Koteja / lapsia / lemmikkejä ei ole vielä rekisteröity",
-    "noMessageText": "Viestissä ei ole tekstiä, josta luoda"
+    "noMessageText": "Viestissä ei ole tekstiä, josta luoda",
+    "createEntry": "Luo ajankohta",
+    "createEntryDesc": "Mitä siitä tehdään? AI-avustaja valmistele sen puolestasi."
   },
   "actionModal": {
     "edit": "Muokkaa",

@@ -12,6 +12,7 @@ import { useTheme } from '../theme/ThemeContext';
 import { useDesktopLayout } from '../hooks/useDesktopLayout';
 import { useTranslation } from 'react-i18next';
 import { MAX_MESSAGE_LENGTH, IMAGE_QUALITY, SCROLL_DELAY_MS, LOCALE, HISTORY_PAGE_SIZE, CHAT_MESSAGE_LIMIT } from '../constants/limits';
+import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
 import { crossAlert } from '../utils/alert';
 import { uriToBlob } from '../utils/upload';
@@ -675,14 +676,14 @@ export const ChatScreen: React.FC<{ route: { params: ChatThreadParams } }> = ({ 
 
   // --- "Opprett arrangement": type chooser → seeds the AI assistant ---
 
-  const EVENT_TYPES: { key: string; emoji: string }[] = [
-    { key: 'event', emoji: '📅' },
-    { key: 'health', emoji: '🏥' },
-    { key: 'vet', emoji: '🐾' },
-    { key: 'school', emoji: '🏫' },
-    { key: 'kindergarten', emoji: '🎨' },
-    { key: 'homeService', emoji: '🏠' },
-    { key: 'trip', emoji: '✈️' },
+  const EVENT_TYPES: { key: string; icon: React.ComponentProps<typeof AppIcon>['name']; color: string; labelKey: string }[] = [
+    { key: 'event', icon: 'calendar', color: '#3b5a75', labelKey: 'quickCreate.moduleEvent' },
+    { key: 'health', icon: 'medication', color: MODULE_COLORS.health, labelKey: 'quickCreate.moduleHealth' },
+    { key: 'vet', icon: 'pet', color: MODULE_COLORS.pets, labelKey: 'quickCreate.moduleVet' },
+    { key: 'school', icon: 'school', color: MODULE_COLORS.school, labelKey: 'quickCreate.moduleSchool' },
+    { key: 'kindergarten', icon: 'kindergarten', color: MODULE_COLORS.kindergarten, labelKey: 'quickCreate.moduleKindergarten' },
+    { key: 'homeService', icon: 'house', color: MODULE_COLORS.home, labelKey: 'quickCreate.moduleService' },
+    { key: 'trip', icon: 'transport', color: MODULE_COLORS.trips, labelKey: 'quickCreate.moduleTrip' },
   ];
 
   const [eventChooserTarget, setEventChooserTarget] = useState<ChatMessage | null>(null);
@@ -1162,14 +1163,14 @@ export const ChatScreen: React.FC<{ route: { params: ChatThreadParams } }> = ({ 
             <View style={[styles.grabberBar, { backgroundColor: colors.border }]} />
             <Text style={[styles.chooserTitle, { color: colors.text }]}>{t('chat.createEntry')}</Text>
             <Text style={[styles.chooserDesc, { color: colors.textSecondary }]}>{t('chat.createEntryDesc')}</Text>
-            {EVENT_TYPES.map(({ key, emoji }) => (
+            {EVENT_TYPES.map(({ key, icon, color, labelKey }) => (
               <TouchableOpacity
                 key={key}
                 style={[styles.chooserRow, { borderBottomColor: colors.border }]}
                 onPress={() => handleSelectEventType(key)}
               >
-                <Text style={{ fontSize: 18 }}>{emoji}</Text>
-                <Text style={[styles.chooserRowText, { color: colors.text }]}>{t(`chat.entryType.${key}.label`)}</Text>
+                <AppIcon name={icon} size={22} color={color} />
+                <Text style={[styles.chooserRowText, { color: colors.text }]}>{t(labelKey)}</Text>
               </TouchableOpacity>
             ))}
           </View>

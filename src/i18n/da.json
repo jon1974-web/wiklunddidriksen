@@ -1154,7 +1154,9 @@
     "pickTarget": "Hvem gælder det?",
     "pickTargetDesc": "Vælg hjem / barn / kæledyr / person som posten skal tilhøre",
     "noTargetsFound": "Ingen hjem / børn / kæledyr er registreret endnu",
-    "noMessageText": "Beskeden har ingen tekst at oprette fra"
+    "noMessageText": "Beskeden har ingen tekst at oprette fra",
+    "createEntry": "Opret aftale",
+    "createEntryDesc": "Hvad skal det blive? AI-assistenten klargør det for dig."
   },
   "actionModal": {
     "edit": "Rediger",

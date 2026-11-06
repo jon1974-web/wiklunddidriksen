@@ -1285,7 +1285,9 @@
     "pickTarget": "Hvem gjelder det?",
     "pickTargetDesc": "Velg hjem/barn/kjæledyr/person oppføringen skal opprettes for",
     "noTargetsFound": "Fant ingen hjem/barn/kjæledyr registrert",
-    "noMessageText": "Meldingen har ingen tekst å opprette fra"
+    "noMessageText": "Meldingen har ingen tekst å opprette fra",
+    "createEntry": "Opprett avtale",
+    "createEntryDesc": "Hva skal avtalen være? AI-assistenten forbereder det for deg."
   },
   "actionModal": {
     "edit": "Rediger",

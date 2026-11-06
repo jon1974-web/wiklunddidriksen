@@ -1285,7 +1285,9 @@
     "pickTarget": "Who is this for?",
     "pickTargetDesc": "Pick the home / child / pet / person the entry belongs to",
     "noTargetsFound": "No homes / children / pets are registered yet",
-    "noMessageText": "This message has no text to create from"
+    "noMessageText": "This message has no text to create from",
+    "createEntry": "Create appointment",
+    "createEntryDesc": "What should it become? The AI assistant prepares it for you."
   },
   "actionModal": {
     "edit": "Edit",

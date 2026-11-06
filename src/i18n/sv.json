@@ -1154,7 +1154,9 @@
     "pickTarget": "Vem gäller det?",
     "pickTargetDesc": "Välj hem / barn / sällskapsdjur / person som posten ska tillhöra",
     "noTargetsFound": "Inga hem / barn / sällskapsdjur är registrerade ännu",
-    "noMessageText": "Meddelandet har ingen text att skapa från"
+    "noMessageText": "Meddelandet har ingen text att skapa från",
+    "createEntry": "Skapa avtal",
+    "createEntryDesc": "Vad ska det bli? AI-assistenten förbereder det åt dig."
   },
   "actionModal": {
     "edit": "Redigera",
