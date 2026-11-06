@@ -34,6 +34,13 @@ function reminderMinutesLabel(minutes) {
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+// Central AI model config — future swaps are .env config, not code.
+// gpt-4o-mini / gpt-4o / whisper-1 are deprecated (API shutdown 2027-01-14
+// and 2027-02-26 respectively); replacements per OpenAI: GPT-6 family.
+const AI_MODEL_FAST = process.env.AI_MODEL_FAST || "gpt-6-luna";       // cheap chat/JSON work
+const AI_MODEL_VISION = process.env.AI_MODEL_VISION || "gpt-6-luna";   // photo parsing
+const AI_TRANSCRIBE_MODEL = process.env.AI_TRANSCRIBE_MODEL || "gpt-transcribe"; // voice → text
+
 const SPOND_API_BASE = "https://api.spond.com/core/v1";
 
 const ALLOWED_ORIGINS = [
@@ -1005,9 +1012,9 @@ exports.voiceToEvent = onRequest({ region: "us-central1", memory: "256MB" }, asy
     const filetype = ext === 'm4a' ? 'audio/mp4' : `audio/${ext}`;
     const audioFile = new File([audioBuffer], filename, { type: filetype });
 
-    console.log(`Sending to Whisper API: ${filename} (${filetype}, ${audioBuffer.length} bytes)`);
+    console.log(`Sending to transcription API: ${filename} (${filetype}, ${audioBuffer.length} bytes)`);
     const transcription = await openai.audio.transcriptions.create({
-      model: "whisper-1",
+      model: AI_TRANSCRIBE_MODEL,
       file: audioFile,
       language: "no",
     });
@@ -1121,7 +1128,7 @@ Time expressions: "klokka 14" = 14:00, "halv tre" = 14:30, "kvart over to" = 14:
 ${typePrompts[activityType] || typePrompts.event}`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         {
           role: "system",
@@ -1241,7 +1248,7 @@ Return ONLY valid JSON with this exact structure:
 If no items can be identified, return {"items": []}.`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: AI_MODEL_VISION,
       messages: [
         { role: "system", content: systemPrompt },
         {
@@ -1253,7 +1260,7 @@ If no items can be identified, return {"items": []}.`;
         },
       ],
       response_format: { type: "json_object" },
-      max_tokens: 2048,
+      max_completion_tokens: 2048,
     });
 
     const parsed = JSON.parse(completion.choices[0].message.content || "{}");
@@ -1583,7 +1590,7 @@ Important: day must be exactly one of: Mandag, Tirsdag, Onsdag, Torsdag, Fredag`
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: AI_MODEL_VISION,
       messages: [
         {
           role: "system",
@@ -1607,7 +1614,7 @@ Important: day must be exactly one of: Mandag, Tirsdag, Onsdag, Torsdag, Fredag`
         },
       ],
       response_format: { type: "json_object" },
-      max_tokens: 4096,
+      max_completion_tokens: 4096,
     });
 
     const result = JSON.parse(completion.choices[0].message.content);
@@ -1993,7 +2000,7 @@ exports.destinationTips = onRequest({ region: "us-central1", memory: "256MB" }, 
     }
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         {
           role: "system",
@@ -2574,7 +2581,7 @@ exports.aiRecipeSuggestions = onRequest({ region: "us-central1", memory: "256MB"
   try {
     const existingNames = existingRecipes.map((r) => r.name).join(", ");
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         {
           role: "system",
@@ -2616,8 +2623,7 @@ Estimate caloriesPerServing based on ingredients and portions.`,
           content: `Search for ${searchLangName} recipes for: "${prompt}"\n\nIMPORTANT: Respond in ${responseLangName}. The dish name can stay in ${searchLangName}, but all descriptions, ingredient names, and instructions MUST be in ${responseLangName}.`,
         },
       ],
-      temperature: 0.7,
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
     });
 
     const content = completion.choices[0]?.message?.content;
@@ -2699,7 +2705,7 @@ exports.importHolidaysFromUrl = onRequest({ region: "us-central1", memory: "256M
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         {
           role: "system",
@@ -2734,8 +2740,7 @@ If no holidays found, return {"holidays": []}.`,
           content: `Extract all holidays and days off from this school/kindergarten calendar page:\n\n${plainText.substring(0, 100000)}`,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
     });
 
     const content = completion.choices[0]?.message?.content;
@@ -2797,7 +2802,7 @@ exports.importRecipeFromUrl = onRequest({ region: "us-central1", memory: "256MB"
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         {
           role: "system",
@@ -2832,8 +2837,7 @@ If you cannot extract a recipe from the content, return {"error": "Could not ext
           content: `Extract the recipe from this webpage content. IMPORTANT: Copy instructions EXACTLY as written - do not shorten or summarize them. Ignore all HTML tags, scripts, ads, navigation menus, and focus only on the recipe ingredients, instructions, and metadata:\n\n${html.substring(0, 12000)}`,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 3000,
+      max_completion_tokens: 3000,
     });
 
     const content = completion.choices[0]?.message?.content;
@@ -2879,7 +2883,7 @@ exports.estimateRecipeCalories = onRequest({ region: "us-central1", memory: "256
   try {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         {
           role: "system",
@@ -2897,8 +2901,7 @@ Estimate based on typical nutritional values for the ingredients listed. Be real
           content: `Estimate calories per serving for "${name || 'this recipe'}" with ${portions || 4} servings.\n\nIngredients:\n${ingredients.map((i) => `- ${i.amount || ''} ${i.unit || ''} ${i.name}`).join('\n')}`,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 100,
+      max_completion_tokens: 100,
     });
 
     const content = completion.choices[0]?.message?.content;
@@ -2951,7 +2954,7 @@ exports.translateRecipe = onRequest({ region: "us-central1", memory: "256MB" }, 
     const langList = allCodes.map(c => `${c}=${langMap[c]}`).join(', ');
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: AI_MODEL_VISION,
       messages: [
         {
           role: "system",
@@ -2978,8 +2981,7 @@ Return ONLY a JSON object with this exact structure:
 {"nb":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]},"sv":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]},"da":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]},"en":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]},"fi":{"name":"...","description":"...","ingredients":[{"name":"...","amount":"...","unit":"..."}],"instructions":["..."]}}`,
         },
       ],
-      temperature: 0.3,
-      max_tokens: 4000,
+      max_completion_tokens: 4000,
     });
 
     const content = completion.choices[0]?.message?.content;
@@ -3066,7 +3068,7 @@ exports.migrateRecipeTranslations = onRequest({ region: "us-central1", memory: "
         if (newTranslations[config.code]) continue;
         try {
           const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
+            model: AI_MODEL_FAST,
             messages: [
               {
                 role: "system",
@@ -3096,8 +3098,7 @@ Instructions:
 ${instructionText || "None"}`,
               },
             ],
-            temperature: 0.3,
-            max_tokens: 2000,
+            max_completion_tokens: 2000,
           });
 
           const content = completion.choices[0]?.message?.content;
@@ -3753,13 +3754,12 @@ exports.chatSummary = onRequest({ region: "us-central1", memory: "512MB", timeou
     const systemPrompt = `Du er en hjelpsom assistent i en familieapp. Oppsummer samtalen kort og vennlig på ${chatLocaleLabel(locale)}. Svar med 2-4 korte punkt (ny linje per punkt, start med «•»). Ingen intro eller avslutning — bare punktene.`;
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Samtale «${conv.title || "chat"}». Nylige meldinger:\n${formatted}` },
       ],
-      max_tokens: 300,
-      temperature: 0.4,
+      max_completion_tokens: 300,
     });
 
     summary = completion.choices[0]?.message?.content?.trim() || "";
@@ -3813,7 +3813,7 @@ exports.chatSmartReplies = onRequest({ region: "us-central1", memory: "256MB", t
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         {
           role: "system",
@@ -3821,8 +3821,7 @@ exports.chatSmartReplies = onRequest({ region: "us-central1", memory: "256MB", t
         },
         { role: "user", content: `De siste meldingene (den innloggede brukeren er den som skal svare):\n${formatted}` },
       ],
-      max_tokens: 150,
-      temperature: 0.7,
+      max_completion_tokens: 150,
       response_format: { type: "json_object" },
     });
 
@@ -3884,7 +3883,7 @@ exports.chatTranslateMessage = onRequest({ region: "us-central1", memory: "256MB
 
     const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         {
           role: "system",
@@ -3892,8 +3891,7 @@ exports.chatTranslateMessage = onRequest({ region: "us-central1", memory: "256MB
         },
         { role: "user", content: String(msg.text) },
       ],
-      max_tokens: 300,
-      temperature: 0.2,
+      max_completion_tokens: 300,
       response_format: { type: "json_object" },
     });
 
@@ -3968,7 +3966,7 @@ exports.chatVoiceTranscribe = onRequest({ region: "us-central1", memory: "512MB"
     const audioFile = new File([audioBuffer], filename, { type: filetype });
 
     const transcription = await openai.audio.transcriptions.create({
-      model: "whisper-1",
+      model: AI_TRANSCRIBE_MODEL,
       file: audioFile,
     });
 
@@ -5210,12 +5208,12 @@ Return your response as JSON:
 Be as accurate as possible with the hex color. If uncertain, give your best approximation.`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: AI_MODEL_FAST,
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: `Look up this paint color code and return the hex color: ${colorCode}` },
         ],
-        max_tokens: 300,
+        max_completion_tokens: 300,
       });
 
       const content = response.choices[0]?.message?.content || "";
@@ -5254,7 +5252,7 @@ If you cannot determine something, leave that field as an empty string. Always t
 Return ONLY the JSON, no other text.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         { role: "system", content: systemPrompt },
         {
@@ -5271,7 +5269,7 @@ Return ONLY the JSON, no other text.`;
           ],
         },
       ],
-      max_tokens: 500,
+      max_completion_tokens: 500,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -5358,7 +5356,7 @@ If you cannot determine if it's coming or leaving, default to "coming".
 Return ONLY the JSON, no other text.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         { role: "system", content: systemPrompt },
         {
@@ -5375,7 +5373,7 @@ Return ONLY the JSON, no other text.`;
           ],
         },
       ],
-      max_tokens: 1000,
+      max_completion_tokens: 1000,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -5458,7 +5456,7 @@ Return your response as JSON:
 Return ONLY the JSON, no other text.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         { role: "system", content: systemPrompt },
         {
@@ -5475,7 +5473,7 @@ Return ONLY the JSON, no other text.`;
           ],
         },
       ],
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -5560,7 +5558,7 @@ Return your response as JSON:
 Return ONLY the JSON, no other text.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         { role: "system", content: systemPrompt },
         {
@@ -5577,7 +5575,7 @@ Return ONLY the JSON, no other text.`;
           ],
         },
       ],
-      max_tokens: 500,
+      max_completion_tokens: 500,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -5675,12 +5673,12 @@ Guidelines:
 Return ONLY the JSON, no other text.`;
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Suggest tasks and shopping items for this project: ${title}` },
       ],
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -6607,9 +6605,9 @@ Hvis ingen handlinger: actions: []`;
     ];
 
     const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
+      model: AI_MODEL_FAST,
       messages,
-      max_tokens: 2000,
+      max_completion_tokens: 2000,
       response_format: { type: "json_object" },
     });
 
