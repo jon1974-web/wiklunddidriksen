@@ -3817,7 +3817,7 @@ exports.chatSmartReplies = onRequest({ region: "us-central1", memory: "256MB", t
       messages: [
         {
           role: "system",
-          content: `Du foreslår korte svar til en familiesamtale. Basert på de siste meldingene, foreslå 3 naturlige korte svar (maks 6 ord hver) som den innloggede brukeren kan sende. Svar på ${chatLocaleLabel(locale)}. Returner KUN gyldig JSON: {"suggestions": ["...", "...", "..."]}`,
+          content: `Du foreslår korte svar til en familiesamtale. Basert på de siste meldingene, foreslå 3 naturlige, varme og vennlige svar (maks 8 ord hver) som den innloggede brukeren kan sende. Tone skal være varm og leken — bruk gjerne lettvindig humor eller én emoji når det passer til samtalen, men hold svarene korte og relevante. Ikke overdrevet morsom, bare koselig. Svar på ${chatLocaleLabel(locale)}. Returner KUN gyldig JSON: {"suggestions": ["...", "...", "..."]}`,
         },
         { role: "user", content: `De siste meldingene (den innloggede brukeren er den som skal svare):\n${formatted}` },
       ],

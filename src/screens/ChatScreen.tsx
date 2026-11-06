@@ -1032,7 +1032,7 @@ export const ChatScreen: React.FC<{ route: { params: ChatThreadParams } }> = ({ 
                     style={[styles.smartReplyChip, { backgroundColor: colors.accent + '15', borderColor: colors.accent }]}
                     onPress={() => { handleMessageChange(suggestion); setShowSmartReplies(false); }}
                   >
-                    <Text numberOfLines={1} style={[styles.smartReplyText, { color: colors.accent }]}>{suggestion}</Text>
+                    <Text style={[styles.smartReplyText, { color: colors.accent }]}>{suggestion}</Text>
                   </TouchableOpacity>
                 ))
               )}
@@ -1269,7 +1269,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    maxWidth: '45%',
   },
   smartReplyText: {
     fontSize: 13,
