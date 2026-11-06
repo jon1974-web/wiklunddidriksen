@@ -2901,7 +2901,7 @@ Estimate based on typical nutritional values for the ingredients listed. Be real
           content: `Estimate calories per serving for "${name || 'this recipe'}" with ${portions || 4} servings.\n\nIngredients:\n${ingredients.map((i) => `- ${i.amount || ''} ${i.unit || ''} ${i.name}`).join('\n')}`,
         },
       ],
-      max_completion_tokens: 100,
+      max_completion_tokens: 1200,
     });
 
     const content = completion.choices[0]?.message?.content;
@@ -3759,7 +3759,7 @@ exports.chatSummary = onRequest({ region: "us-central1", memory: "512MB", timeou
         { role: "system", content: systemPrompt },
         { role: "user", content: `Samtale «${conv.title || "chat"}». Nylige meldinger:\n${formatted}` },
       ],
-      max_completion_tokens: 300,
+      max_completion_tokens: 1200,
     });
 
     summary = completion.choices[0]?.message?.content?.trim() || "";
@@ -3821,7 +3821,7 @@ exports.chatSmartReplies = onRequest({ region: "us-central1", memory: "256MB", t
         },
         { role: "user", content: `De siste meldingene (den innloggede brukeren er den som skal svare):\n${formatted}` },
       ],
-      max_completion_tokens: 150,
+      max_completion_tokens: 1200,
       response_format: { type: "json_object" },
     });
 
@@ -3891,7 +3891,7 @@ exports.chatTranslateMessage = onRequest({ region: "us-central1", memory: "256MB
         },
         { role: "user", content: String(msg.text) },
       ],
-      max_completion_tokens: 300,
+      max_completion_tokens: 1200,
       response_format: { type: "json_object" },
     });
 
@@ -5213,7 +5213,7 @@ Be as accurate as possible with the hex color. If uncertain, give your best appr
           { role: "system", content: systemPrompt },
           { role: "user", content: `Look up this paint color code and return the hex color: ${colorCode}` },
         ],
-        max_completion_tokens: 300,
+        max_completion_tokens: 1200,
       });
 
       const content = response.choices[0]?.message?.content || "";
@@ -5269,7 +5269,7 @@ Return ONLY the JSON, no other text.`;
           ],
         },
       ],
-      max_completion_tokens: 500,
+      max_completion_tokens: 1200,
     });
 
     const content = response.choices[0]?.message?.content || "";
@@ -5575,7 +5575,7 @@ Return ONLY the JSON, no other text.`;
           ],
         },
       ],
-      max_completion_tokens: 500,
+      max_completion_tokens: 1200,
     });
 
     const content = response.choices[0]?.message?.content || "";
