@@ -1032,11 +1032,8 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                 </TouchableOpacity>
                 {selectedChild && (
                   <TouchableOpacity style={[styles.aiCard, { backgroundColor: MODULE_COLORS.kindergartenBg }]} onPress={() => navigation.navigate('KindergartenAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
-                    <Text style={{ fontSize: 20 }}>📸</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ color: MODULE_COLORS.kindergarten, fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
-                      <Text style={{ color: MODULE_COLORS.kindergarten, fontSize: 12 }}>{t('school.aiDescription')}</Text>
-                    </View>
+                    <AppIcon name="ai" size={20} color={MODULE_COLORS.kindergarten} />
+                    <Text style={{ flex: 1, color: MODULE_COLORS.kindergarten, fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
                   </TouchableOpacity>
                 )}
                 {expandedSections.members && filteredClassmates.map(c => (

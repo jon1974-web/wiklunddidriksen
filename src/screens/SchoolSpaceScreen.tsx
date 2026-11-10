@@ -1096,11 +1096,8 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
                 </TouchableOpacity>
                 {selectedChild && (
                   <TouchableOpacity style={[styles.aiCard, { backgroundColor: MODULE_COLORS.petsBg }]} onPress={() => navigation.navigate('SchoolAI', { childId: selectedChild.id, yearId: selectedYear?.id || '', familyId: familyId || '' })}>
-                    <Text style={{ fontSize: 20 }}>📸</Text>
-                    <View style={{ flex: 1 }}>
-                      <Text style={{ color: MODULE_COLORS.pets, fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
-                      <Text style={{ color: MODULE_COLORS.pets, fontSize: 12 }}>{t('school.aiDescription')}</Text>
-                    </View>
+                    <AppIcon name="ai" size={20} color={MODULE_COLORS.pets} />
+                    <Text style={{ flex: 1, color: MODULE_COLORS.pets, fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
                   </TouchableOpacity>
                 )}
                 {expandedSections.classmates && filteredClassmates.map(c => (

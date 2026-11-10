@@ -1572,19 +1572,21 @@ For each trip found, extract:
 Return ONLY valid JSON: { "events": [ { "title", "destination", "startDate", "endDate", "startTime", "endTime" } ] }`;
       userText = "Extract all trips visible in this image.";
     } else if (type === "timetable") {
-      systemPrompt = `You are a school timetable parser. Extract the schedule from this image (could be a photo of a printed timetable, whiteboard, or digital schedule).
+      systemPrompt = `You are a school timetable parser. Extract the schedule from this image (could be a photo of a printed timetable, whiteboard, digital schedule, or a PDF page).
 
 The timetable is usually in a table format with days as columns or rows.
+
+Extract EVERY lesson/cell from the ENTIRE table. Scan the whole image systematically — every row and every column for all five days. Do NOT skip any row, cell, or partially legible text. If many lessons are found, return ALL of them.
 
 For each class/lesson found, extract:
 - day: Day of the week in Norwegian (Mandag, Tirsdag, Onsdag, Torsdag, Fredag)
 - time: Time slot (e.g. "08:00-09:00" or "08:00")
-- subject: Subject name (e.g. "Matematikk", "Norsk", "Engelsk")
-- teacher: Teacher name if visible (e.g. "Hansen", "Lærer Olsen")
+- subject: The FULL, VERBATIM text of the table cell. Copy ALL text exactly as written in the cell — do NOT shorten, abbreviate, summarize or translate. If the cell contains several lines (subject, group, room, teacher, notes), include ALL of it separated by " - ".
+- teacher: Teacher name if visible as separate information (e.g. "Hansen", "Lærer Olsen"), otherwise empty string
 
 Return ONLY valid JSON: { "schedule": [ { "day", "time", "subject", "teacher" } ] }
-Important: day must be exactly one of: Mandag, Tirsdag, Onsdag, Torsdag, Fredag`;
-      userText = "Extract the weekly timetable from this image. The timetable is likely in a table format.";
+Important: day must be exactly one of: Mandag, Tirsdag, Onsdag, Torsdag, Fredag. Never omit or merge lessons.`;
+      userText = "Extract ALL lessons from the entire weekly timetable. Copy the full text of every table cell exactly as written — do not shorten anything.";
     } else {
       return res.status(400).json({ error: "Invalid type" });
     }

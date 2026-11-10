@@ -34,7 +34,9 @@ export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route 
   const [editMode, setEditMode] = useState(false);
   const [editEntries, setEditEntries] = useState<Record<string, SchoolScheduleEntry[]>>({});
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showAddChoiceModal, setShowAddChoiceModal] = useState(false);
   const [newEntryDay, setNewEntryDay] = useState<string | null>(null);
+  const [editingEntryIndex, setEditingEntryIndex] = useState<number | null>(null);
   const [newEntryTime, setNewEntryTime] = useState('');
   const [newEntrySubject, setNewEntrySubject] = useState('');
   const [newEntryTeacher, setNewEntryTeacher] = useState('');
@@ -62,12 +64,22 @@ export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route 
     setEditMode(true);
   };
 
+  const startManualEdit = () => {
+    const grouped: Record<string, SchoolScheduleEntry[]> = {};
+    DAYS.forEach(d => { grouped[d] = []; });
+    setEditEntries(grouped);
+    setEditMode(true);
+  };
+
   const handleSaveEdit = async () => {
-    if (!currentSchedule) return;
     const allEntries: SchoolScheduleEntry[] = [];
     DAYS.forEach(d => { (editEntries[d] || []).forEach(e => allEntries.push(e)); });
     try {
-      await updateKindergartenSchedule(currentSchedule.id, { entries: allEntries });
+      if (currentSchedule) {
+        await updateKindergartenSchedule(currentSchedule.id, { entries: allEntries });
+      } else {
+        await addKindergartenSchedule({ yearId: selectedYear!.id, childId: child.id, semester, imageUrl: '', fileName: '', entries: allEntries, familyId: familyId || '' });
+      }
       setEditMode(false);
       loadSchedules();
     } catch (e) {
@@ -77,17 +89,31 @@ export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route 
 
   const handleAddToDay = (day: string) => {
     setNewEntryDay(day);
+    setEditingEntryIndex(null);
     setNewEntryTime('');
     setNewEntrySubject('');
+    setNewEntryTeacher('');
   };
 
-  const confirmAddEntry = () => {
+  const handleEditEntry = (day: string, index: number, entry: SchoolScheduleEntry) => {
+    setNewEntryDay(day);
+    setEditingEntryIndex(index);
+    setNewEntryTime(entry.time || '');
+    setNewEntrySubject(entry.subject || '');
+    setNewEntryTeacher(entry.teacher || '');
+  };
+
+  const confirmEntry = () => {
     if (!newEntryDay || !newEntryTime.trim() || !newEntrySubject.trim()) return;
+    const updated = { day: newEntryDay, time: newEntryTime, subject: newEntrySubject, teacher: newEntryTeacher };
     setEditEntries(prev => ({
       ...prev,
-      [newEntryDay]: [...(prev[newEntryDay] || []), { day: newEntryDay, time: newEntryTime, subject: newEntrySubject, teacher: newEntryTeacher }],
+      [newEntryDay]: editingEntryIndex !== null
+        ? (prev[newEntryDay] || []).map((e, i) => (i === editingEntryIndex ? updated : e))
+        : [...(prev[newEntryDay] || []), updated],
     }));
     setNewEntryDay(null);
+    setEditingEntryIndex(null);
     setNewEntryTime('');
     setNewEntrySubject('');
     setNewEntryTeacher('');
@@ -223,16 +249,29 @@ export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route 
 
         <ScrollView style={{ flex: 1, padding: 12 }}>
           <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
-            <TouchableOpacity style={[styles.uploadBtn, { backgroundColor: KG_THEME, flex: 1 }]} onPress={handleUploadPhoto} disabled={uploading || analyzing}>
-              {uploading || analyzing ? (
-                <ActivityIndicator size="small" color="#fff" />
-              ) : (
-                <>
-                  <AppIcon name="ai" size={18} color="#fff" />
-                  <Text style={styles.uploadBtnText}>{t('school.aiScheduleHint')}</Text>
-                </>
-              )}
-            </TouchableOpacity>
+            {currentSchedule ? (
+              <TouchableOpacity style={[styles.uploadBtn, { backgroundColor: KG_THEME, flex: 1 }]} onPress={handleUploadPhoto} disabled={uploading || analyzing}>
+                {uploading || analyzing ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <>
+                    <AppIcon name="ai" size={18} color="#fff" />
+                    <Text style={styles.uploadBtnText}>{t('school.aiScheduleHint')}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity style={[styles.uploadBtn, { backgroundColor: KG_THEME, flex: 1 }]} onPress={() => setShowAddChoiceModal(true)} disabled={uploading || analyzing}>
+                {uploading || analyzing ? (
+                  <ActivityIndicator size="small" color="#fff" />
+                ) : (
+                  <>
+                    <AppIcon name="schedule" size={18} color="#fff" />
+                    <Text style={styles.uploadBtnText}>{t('school.addSchedule')}</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            )}
             {currentSchedule && (
               <TouchableOpacity style={[styles.editBtn, { backgroundColor: colors.inputBackground }]} onPress={startEdit}>
                 <AppIcon name="pencil" size={18} color={colors.text} />
@@ -261,7 +300,7 @@ export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route 
             </View>
           ))}
 
-          {(currentSchedule?.entries || []).length === 0 && currentSchedule && (
+          {(currentSchedule?.entries || []).length === 0 && currentSchedule && !!currentSchedule.imageUrl && (
             <View style={[styles.imageCard, { backgroundColor: colors.surface }]}>
               <Text style={[styles.imageTitle, { color: colors.textSecondary }]}>{t('school.originalPhoto')}</Text>
               <Image source={{ uri: currentSchedule.imageUrl }} style={styles.scheduleImage} resizeMode="contain" />
@@ -278,6 +317,23 @@ export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route 
         </ScrollView>
 
         <ActionModal visible={showDeleteModal} title={t('school.deleteSchedule')} subtitle={semester === 'høst' ? t('school.autumnSchedule') : t('school.springSchedule')} onDelete={handleDeleteSchedule} onCancel={() => setShowDeleteModal(false)} />
+
+        {showAddChoiceModal && (
+          <View style={styles.choiceOverlay}>
+            <TouchableOpacity style={StyleSheet.absoluteFill} activeOpacity={1} onPress={() => setShowAddChoiceModal(false)} />
+            <View style={[styles.choiceContent, { backgroundColor: colors.surface }]}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{t('school.addSchedule')}</Text>
+              <TouchableOpacity style={[styles.choiceBtn, { backgroundColor: KG_THEME }]} onPress={() => { setShowAddChoiceModal(false); handleUploadPhoto(); }}>
+                <AppIcon name="ai" size={18} color="#fff" />
+                <Text style={{ color: '#fff', fontWeight: '600', flex: 1, textAlign: 'left' }}>{t('school.addScheduleAI')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={[styles.choiceBtn, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowAddChoiceModal(false); startManualEdit(); }}>
+                <AppIcon name="pencil" size={18} color={colors.text} />
+                <Text style={{ color: colors.text, fontWeight: '600', flex: 1, textAlign: 'left' }}>{t('school.addScheduleManual')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        )}
       </SafeAreaView>
     );
   }
@@ -305,13 +361,16 @@ export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route 
               </TouchableOpacity>
             </View>
             {(editEntries[day] || []).map((entry, i) => (
-              <View key={i} style={[styles.scheduleItem, { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
+              <TouchableOpacity key={i} onPress={() => handleEditEntry(day, i, entry)} style={[styles.scheduleItem, { borderBottomWidth: 1, borderBottomColor: colors.border }]}>
                 <Text style={[styles.scheduleTime, { color: colors.text }]}>{entry.time || ''}</Text>
-                <Text style={[styles.scheduleSubject, { color: colors.text, flex: 1 }]}>{entry.subject || ''}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.scheduleSubject, { color: colors.text }]}>{entry.subject || ''}</Text>
+                  {entry.teacher ? <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{entry.teacher}</Text> : null}
+                </View>
                 <TouchableOpacity onPress={() => removeEntry(day, i)} hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}>
                   <Text style={{ color: colors.danger, fontSize: 16, fontWeight: '600' }}>✕</Text>
                 </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
             ))}
             {(editEntries[day] || []).length === 0 && (
               <Text style={[styles.emptyText, { color: colors.textSecondary }]}>{t('school.noSchedule')}</Text>
@@ -323,19 +382,19 @@ export const KindergartenScheduleScreen: React.FC<Props> = ({ navigation, route 
       {newEntryDay && (
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
-            <Text style={[styles.modalTitle, { color: colors.text }]}>{t('school.addEntry')} — {newEntryDay}</Text>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>{editingEntryIndex !== null ? t('common.edit') : t('school.addEntry')} — {newEntryDay}</Text>
             <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>{t('common.time')}</Text>
             <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntryTime} onChangeText={setNewEntryTime} placeholder="08:00-09:00" placeholderTextColor={colors.textDisabled} autoFocus />
             <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>{t('school.subject')}</Text>
-            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntrySubject} onChangeText={setNewEntrySubject} placeholder={t('school.subject')} placeholderTextColor={colors.textDisabled} />
+            <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntrySubject} onChangeText={setNewEntrySubject} placeholder={t('school.subject')} placeholderTextColor={colors.textDisabled} multiline />
             <Text style={[styles.modalLabel, { color: colors.textSecondary }]}>{t('school.teacher')}</Text>
             <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={newEntryTeacher} onChangeText={setNewEntryTeacher} placeholder={t('school.teacher')} placeholderTextColor={colors.textDisabled} />
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
               <TouchableOpacity style={[styles.modalBtn, { backgroundColor: colors.inputBackground, flex: 1 }]} onPress={() => setNewEntryDay(null)}>
                 <Text style={{ color: colors.text, fontWeight: '600' }}>{t('common.cancel')}</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: KG_THEME, flex: 1 }]} onPress={confirmAddEntry}>
-                <Text style={{ color: '#fff', fontWeight: '600' }}>{t('common.add')}</Text>
+              <TouchableOpacity style={[styles.modalBtn, { backgroundColor: KG_THEME, flex: 1 }]} onPress={confirmEntry}>
+                <Text style={{ color: '#fff', fontWeight: '600' }}>{editingEntryIndex !== null ? t('common.save') : t('common.add')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -374,4 +433,7 @@ const styles = StyleSheet.create({
   modalLabel: { fontSize: 12, marginBottom: 4, marginTop: 8 },
   modalInput: { borderWidth: 1, borderRadius: 8, padding: 10, fontSize: 16, borderColor: '#e0e0e0' },
   modalBtn: { paddingVertical: 12, borderRadius: 10, alignItems: 'center' },
+  choiceOverlay: { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', alignItems: 'center', justifyContent: 'center', padding: 24 },
+  choiceContent: { width: '100%', maxWidth: 400, borderRadius: 16, padding: 20 },
+  choiceBtn: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 14, paddingHorizontal: 16, borderRadius: 10, marginTop: 10 },
 });

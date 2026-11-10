@@ -41,7 +41,7 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
 
   const [contacts, setContacts] = useState<KindergartenContact[]>([]);
   const [search, setSearch] = useState('');
-  const [expandedSections, setExpandedSections] = useState({ teachers: true, admins: true, classmates: true });
+  const [expandedSections, setExpandedSections] = useState({ teachers: false, admins: false, classmates: false });
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ role: 'teacher' as string, teacherType: '', adminType: [] as string[], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
@@ -55,9 +55,26 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
 
   useEffect(() => { loadContacts(); }, [loadContacts]);
 
-  const filteredTeachers = contacts.filter(c => c.role === 'teacher' && (!search || c.name.toLowerCase().includes(search.toLowerCase()) || (c.subject || '').toLowerCase().includes(search.toLowerCase())));
-  const filteredAdmins = contacts.filter(c => c.role === 'admin' && (!search || c.name.toLowerCase().includes(search.toLowerCase())));
-  const filteredClassmates = contacts.filter(c => c.role === 'child' && (!search || c.name.toLowerCase().includes(search.toLowerCase()) || (c.childName || '').toLowerCase().includes(search.toLowerCase())));
+  const sortContacts = (list: KindergartenContact[], q: string) =>
+    [...list].sort((a, b) => {
+      if (q) {
+        const rank = (c: KindergartenContact) => c.name.toLowerCase().startsWith(q) ? 0 : c.name.toLowerCase().includes(q) ? 1 : 2;
+        const ra = rank(a); const rb = rank(b);
+        if (ra !== rb) return ra - rb;
+      }
+      return a.name.localeCompare(b.name, 'nb');
+    });
+
+  const q = search.trim().toLowerCase();
+  const filteredTeachers = sortContacts(contacts.filter(c => c.role === 'teacher' && (!q || c.name.toLowerCase().includes(q) || (c.subject || '').toLowerCase().includes(q))), q);
+  const filteredAdmins = sortContacts(contacts.filter(c => c.role === 'admin' && (!q || c.name.toLowerCase().includes(q) || (c.subject || '').toLowerCase().includes(q))), q);
+  const filteredClassmates = sortContacts(contacts.filter(c => c.role === 'child' && (!q || c.name.toLowerCase().includes(q) || (c.childName || '').toLowerCase().includes(q) || (c.parentName || '').toLowerCase().includes(q))), q);
+
+  const openAddModal = (role: 'teacher' | 'admin' | 'child') => {
+    setEditingId(null);
+    setForm({ role, teacherType: '', adminType: [], name: '', subject: '', address: '', childName: '', parentName: '', parentPhone: '', parentEmail: '', parentName2: '', parentPhone2: '', parentEmail2: '', phone: '', email: '', notes: '' });
+    setShowAddModal(true);
+  };
 
   const handleSave = async () => {
     if (!familyId || !selectedYear || !form.name.trim()) return;
@@ -98,7 +115,7 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
   const toggleSection = (key: keyof typeof expandedSections) => setExpandedSections(prev => ({ ...prev, [key]: !prev[key] }));
 
   useEffect(() => {
-    if (!search.trim()) return;
+    if (!search.trim()) { setExpandedSections({ teachers: false, admins: false, classmates: false }); return; }
     setExpandedSections({
       teachers: filteredTeachers.length > 0,
       admins: filteredAdmins.length > 0,
@@ -126,6 +143,9 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
           <Text style={{ fontSize: 16 }}>👩‍🏫</Text>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.teachersAndSubjects')}</Text>
           <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({filteredTeachers.length})</Text>
+          <TouchableOpacity style={[styles.addBtn, { backgroundColor: KG_THEME }]} onPress={(e) => { e.stopPropagation?.(); openAddModal('teacher'); }}>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>+</Text>
+          </TouchableOpacity>
           <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.teachers ? '▼' : '▶'}</Text>
         </TouchableOpacity>
         {expandedSections.teachers && filteredTeachers.map(renderContactCard)}
@@ -135,6 +155,9 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
           <Text style={{ fontSize: 16 }}>🏥</Text>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.healthAdmin')}</Text>
           <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({filteredAdmins.length})</Text>
+          <TouchableOpacity style={[styles.addBtn, { backgroundColor: KG_THEME }]} onPress={(e) => { e.stopPropagation?.(); openAddModal('admin'); }}>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>+</Text>
+          </TouchableOpacity>
           <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.admins ? '▼' : '▶'}</Text>
         </TouchableOpacity>
         {expandedSections.admins && filteredAdmins.map(renderContactCard)}
@@ -144,15 +167,15 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
           <Text style={{ fontSize: 16 }}>👥</Text>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('school.classmates')}</Text>
           <Text style={{ color: colors.textSecondary, fontSize: 12 }}>({filteredClassmates.length})</Text>
+          <TouchableOpacity style={[styles.addBtn, { backgroundColor: KG_THEME }]} onPress={(e) => { e.stopPropagation?.(); openAddModal('child'); }}>
+            <Text style={{ color: '#fff', fontSize: 16, fontWeight: '700' }}>+</Text>
+          </TouchableOpacity>
           <Text style={{ fontSize: 12, color: colors.textSecondary }}>{expandedSections.classmates ? '▼' : '▶'}</Text>
         </TouchableOpacity>
         {selectedYear && (
           <TouchableOpacity style={[styles.aiCard, { backgroundColor: MODULE_COLORS.petsBg }]} onPress={() => navigation.navigate('KindergartenAI', { childId: child.id, yearId: selectedYear.id, familyId: familyId || '' })}>
-            <Text style={{ fontSize: 20 }}>📸</Text>
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: MODULE_COLORS.pets, fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
-              <Text style={{ color: MODULE_COLORS.pets, fontSize: 12 }}>{t('school.aiDescription')}</Text>
-            </View>
+            <AppIcon name="ai" size={20} color={MODULE_COLORS.pets} />
+            <Text style={{ flex: 1, color: MODULE_COLORS.pets, fontWeight: '600', fontSize: 14 }}>{t('school.importClassList')}</Text>
           </TouchableOpacity>
         )}
         {expandedSections.classmates && filteredClassmates.map(renderContactCard)}
@@ -205,6 +228,7 @@ const styles = StyleSheet.create({
   searchInput: { borderWidth: 1, borderRadius: 10, padding: 10, fontSize: 14, borderColor: '#e0e0e0' },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, marginBottom: 6 },
   sectionTitle: { fontSize: 15, fontWeight: '700', flex: 1 },
+  addBtn: { width: 26, height: 26, borderRadius: 13, alignItems: 'center', justifyContent: 'center' },
   contactCard: { padding: 12, borderRadius: 10, marginBottom: 6 },
   badge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 6, alignSelf: 'flex-start', marginTop: 4 },
   actionBtn: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
