@@ -6,7 +6,7 @@ import { SchoolChild, SchoolYear, SchoolContact, SchoolSchedule, SchoolHoliday, 
 
 // Children
 export async function getSchoolChildren(familyId: string): Promise<SchoolChild[]> {
-  const q = query(collection(db, 'schoolChildren'), where('familyId', '==', familyId), orderBy('createdAt', 'asc'));
+  const q = query(collection(db, 'schoolChildren'), where('familyId', '==', familyId), orderBy('createdAt', 'asc'), limit(50));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as SchoolChild));
 }

@@ -7,6 +7,7 @@ import { useUserStore } from '../store/userStore';
 import { AppIcon } from '../components/AppIcon';
 import { SearchableDropdown } from '../components/SearchableDropdown';
 import { SearchableMultiDropdown } from '../components/SearchableMultiDropdown';
+import { resizeImage } from '../utils/imageResize';
 import { GooglePlacesInput } from '../components/GooglePlacesInput';
 import { DatePickerModal } from '../components/DatePickerModal';
 import * as ImagePicker from 'expo-image-picker';
@@ -870,7 +871,8 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                   onPress={async () => {
                     const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.5, base64: true });
                     if (!result.canceled && result.assets[0]) {
-                      setChildForm(f => ({ ...f, photoUrl: result.assets[0].uri }));
+                      const resized = await resizeImage(result.assets[0].uri, 512, 0.7);
+                      setChildForm(f => ({ ...f, photoUrl: resized }));
                     }
                   }}
                 >

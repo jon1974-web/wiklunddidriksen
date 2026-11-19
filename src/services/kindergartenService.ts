@@ -6,7 +6,7 @@ import { KindergartenChild, KindergartenYear, KindergartenContact, KindergartenS
 
 // Children
 export async function getKindergartenChildren(familyId: string): Promise<KindergartenChild[]> {
-  const q = query(collection(db, 'kindergartenChildren'), where('familyId', '==', familyId), orderBy('createdAt', 'asc'));
+  const q = query(collection(db, 'kindergartenChildren'), where('familyId', '==', familyId), orderBy('createdAt', 'asc'), limit(50));
   const snapshot = await getDocs(q);
   return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as KindergartenChild));
 }
