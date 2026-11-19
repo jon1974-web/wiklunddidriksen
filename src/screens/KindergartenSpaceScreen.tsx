@@ -211,7 +211,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
         setEditingContactId(contact.id);
         setContactForm({
           role: contact.role || 'child',
-          teacherType: (contact as any).teacherType || 'contact',
+          teacherType: (contact as any).teacherType || '',
           adminType: Array.isArray((contact as any).adminType) ? (contact as any).adminType : (contact as any).adminType ? [(contact as any).adminType] : [],
           name: contact.name || '',
           subject: contact.subject || '',
@@ -442,7 +442,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     const isTeacher = contact.role === 'teacher' || contact.role === 'admin';
     setContactForm({
       role: contact.role,
-      teacherType: (contact as any).teacherType || 'contact',
+      teacherType: (contact as any).teacherType || '',
       adminType: Array.isArray((contact as any).adminType) ? (contact as any).adminType : (contact as any).adminType ? [(contact as any).adminType] : [],
       name: contact.name,
       subject: contact.subject || '',
@@ -996,11 +996,22 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
                     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
                       <View style={{ flex: 1 }}>
                         <Text style={[styles.contactName, { color: colors.text }]}>{c.name}</Text>
-                        {['personal', 'contact', 'subject'].includes(c.teacherType || '') && (
+                        {c.role === 'teacher' && ['personal', 'contact', 'subject'].includes(c.teacherType || '') && (
                           <View style={[styles.teacherTypeBadge, { backgroundColor: c.teacherType === 'personal' ? MODULE_COLORS.kindergartenBg : c.teacherType === 'contact' ? MODULE_COLORS.tripsBg : MODULE_COLORS.birthdaysBg }]}>
                             <Text style={{ color: c.teacherType === 'personal' ? MODULE_COLORS.kindergarten : c.teacherType === 'contact' ? MODULE_COLORS.trips : MODULE_COLORS.birthdays, fontSize: 10, fontWeight: '600' }}>
                               {c.teacherType === 'personal' ? t('kindergarten.personalTeacher') : c.teacherType === 'contact' ? t('kindergarten.contactTeacher') : t('kindergarten.subjectTeacher')}
                             </Text>
+                          </View>
+                        )}
+                        {c.role === 'admin' && Array.isArray((c as any).adminType) && (c as any).adminType.length > 0 && (
+                          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+                            {(c as any).adminType.map((role: string) => (
+                              <View key={role} style={[styles.teacherTypeBadge, { backgroundColor: getAdminRoleColor(role) + '20' }]}>
+                                <Text style={{ color: getAdminRoleColor(role), fontSize: 10, fontWeight: '600' }}>
+                                  {getAdminRoleLabel(role)}
+                                </Text>
+                              </View>
+                            ))}
                           </View>
                         )}
                         {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 13 }}>📚 {c.subject}</Text> : null}

@@ -10,6 +10,7 @@ import { useUserStore } from '../store/userStore';
 import { getKindergartenContacts, addKindergartenContact, updateKindergartenContact, deleteKindergartenContact } from '../services/kindergartenService';
 import { crossAlert } from '../utils/alert';
 import { ActionModal } from '../components/ActionModal';
+import { SearchableMultiDropdown } from '../components/SearchableMultiDropdown';
 
 const KG_THEME = MODULE_COLORS.kindergarten;
 
@@ -79,7 +80,7 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
   const handleSave = async () => {
     if (!familyId || !selectedYear || !form.name.trim()) return;
     try {
-      const data = { ...form, role: form.role as KindergartenContact['role'], teacherType: form.teacherType as KindergartenContact['teacherType'], yearId: selectedYear.id, childId: child.id, familyId };
+      const data = { ...form, role: form.role as KindergartenContact['role'], teacherType: (form.role === 'teacher' ? form.teacherType : '') as KindergartenContact['teacherType'], adminType: form.role === 'admin' ? form.adminType : [], yearId: selectedYear.id, childId: child.id, familyId };
       if (editingId) { await updateKindergartenContact(editingId, data); }
       else { await addKindergartenContact(data); }
       setShowAddModal(false);
@@ -94,11 +95,23 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <View style={{ flex: 1 }}>
           <Text style={{ color: colors.text, fontWeight: '600', fontSize: 14 }}>{c.name}</Text>
-          {c.teacherType && ['personal', 'contact', 'subject'].includes(c.teacherType) && (
+          {c.role === 'teacher' && c.teacherType && ['personal', 'contact', 'subject'].includes(c.teacherType) && (
             <View style={[styles.badge, { backgroundColor: c.teacherType === 'personal' ? MODULE_COLORS.kindergartenBg : c.teacherType === 'contact' ? MODULE_COLORS.tripsBg : MODULE_COLORS.birthdaysBg }]}>
               <Text style={{ color: c.teacherType === 'personal' ? MODULE_COLORS.kindergarten : c.teacherType === 'contact' ? MODULE_COLORS.trips : MODULE_COLORS.birthdays, fontSize: 10, fontWeight: '600' }}>
                 {c.teacherType === 'personal' ? t('school.personalTeacher') : c.teacherType === 'contact' ? t('school.contactTeacher') : t('school.subjectTeacher')}
               </Text>
+            </View>
+          )}
+          {c.role === 'admin' && Array.isArray((c as any).adminType) && (c as any).adminType.length > 0 && (
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 4, marginTop: 4 }}>
+              {((c as any).adminType as string[]).map((roleKey: string) => {
+                const info = ADMIN_ROLES[roleKey];
+                return (
+                  <View key={roleKey} style={[styles.badge, { backgroundColor: (info?.color || '#999999') + '20', marginTop: 0 }]}>
+                    <Text style={{ color: info?.color || '#999999', fontSize: 10, fontWeight: '600' }}>{info?.label || roleKey}</Text>
+                  </View>
+                );
+              })}
             </View>
           )}
           {c.subject ? <Text style={{ color: colors.textSecondary, fontSize: 12 }}>📚 {c.subject}</Text> : null}
@@ -188,6 +201,29 @@ export const KindergartenContactsScreen: React.FC<Props> = ({ navigation, route 
             <ScrollView>
               <Text style={[styles.modalTitle, { color: colors.text }]}>{editingId ? t('school.editContact') : t('school.addContact')}</Text>
               <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.name} onChangeText={(v) => setForm(f => ({ ...f, name: v }))} placeholder={t('common.name')} placeholderTextColor={colors.textDisabled} />
+              {form.role === 'teacher' && (
+                <View style={{ flexDirection: 'row', gap: 8, marginBottom: 10 }}>
+                  {([
+                    { key: 'personal', label: t('school.personalTeacher') },
+                    { key: 'contact', label: t('school.contactTeacher') },
+                    { key: 'subject', label: t('school.subjectTeacher') },
+                  ] as const).map(rt => (
+                    <TouchableOpacity key={rt.key} style={{ flex: 1, paddingVertical: 8, borderRadius: 8, backgroundColor: form.teacherType === rt.key ? KG_THEME : colors.inputBackground, borderWidth: 1, borderColor: form.teacherType === rt.key ? KG_THEME : '#e0e0e0' }} onPress={() => setForm(f => ({ ...f, teacherType: rt.key }))}>
+                      <Text style={{ color: form.teacherType === rt.key ? '#fff' : colors.text, fontSize: 12, fontWeight: '600', textAlign: 'center' }}>{rt.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
+              {form.role === 'admin' && (
+                <View style={{ marginBottom: 10 }}>
+                  <SearchableMultiDropdown
+                    options={Object.entries(ADMIN_ROLES).map(([key, val]) => ({ key, label: val.label, color: val.color }))}
+                    value={form.adminType}
+                    onChange={(keys) => setForm(f => ({ ...f, adminType: keys }))}
+                    placeholder={t('school.adminRole')}
+                  />
+                </View>
+              )}
               <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.phone} onChangeText={(v) => setForm(f => ({ ...f, phone: v }))} placeholder={t('common.phone')} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
               <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.email} onChangeText={(v) => setForm(f => ({ ...f, email: v }))} placeholder={t('common.email')} placeholderTextColor={colors.textDisabled} keyboardType="email-address" />
               <TextInput style={[styles.modalInput, { backgroundColor: colors.inputBackground, color: colors.text }]} value={form.subject} onChangeText={(v) => setForm(f => ({ ...f, subject: v }))} placeholder={t('school.subject')} placeholderTextColor={colors.textDisabled} />

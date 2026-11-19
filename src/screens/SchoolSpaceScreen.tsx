@@ -218,7 +218,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
         setEditingContactId(contact.id);
         setContactForm({
           role: contact.role || 'classmate',
-          teacherType: (contact as any).teacherType || 'contact',
+          teacherType: (contact as any).teacherType || '',
           adminType: Array.isArray((contact as any).adminType) ? (contact as any).adminType : (contact as any).adminType ? [(contact as any).adminType] : [],
           name: contact.name || '',
           subject: contact.subject || '',
@@ -444,7 +444,7 @@ export const SchoolSpaceScreen: React.FC<SchoolSpaceScreenProps> = ({ navigation
     const isTeacher = contact.role === 'teacher' || contact.role === 'admin';
     setContactForm({
       role: contact.role,
-      teacherType: (contact as any).teacherType || 'contact',
+      teacherType: (contact as any).teacherType || '',
       adminType: Array.isArray((contact as any).adminType) ? (contact as any).adminType : (contact as any).adminType ? [(contact as any).adminType] : [],
       name: contact.name,
       subject: contact.subject || '',
