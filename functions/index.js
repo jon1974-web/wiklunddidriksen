@@ -3517,7 +3517,7 @@ exports.checkMedicationReminders = onSchedule({ schedule: "every 5 minutes", tim
 });
 
 // Chat message notification (fires for messages in conversations/{conversationId}/messages)
-exports.notifyNewChatMessage = onDocumentCreated({ region: "us-central1", document: "conversations/{conversationId}/messages/{messageId}" }, async (event) => {
+exports.notifyNewChatMessage = onDocumentCreated({ region: "europe-north2", document: "conversations/{conversationId}/messages/{messageId}" }, async (event) => {
   const db = getFirestore();
   const snap = event.data;
   if (!snap) return;
@@ -4236,7 +4236,7 @@ async function createGoogleCalendarEvent(uid, event) {
 
 // Cloud Function: Auto-sync events to Google Calendar
 // Syncs to ALL family members' calendars (any member with Google Calendar connected)
-exports.onEventCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "events/{eventId}" }, async (event) => {
+exports.onEventCreatedForCalendar = onDocumentCreated({ region: "europe-north2", document: "events/{eventId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
@@ -4294,7 +4294,7 @@ function buildCalendarDescription(record, fallback = "") {
 }
 
 // Cloud Function: Auto-sync trips to Google Calendar
-exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "trips/{tripId}" }, async (event) => {
+exports.onTripCreatedForCalendar = onDocumentCreated({ region: "europe-north2", document: "trips/{tripId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
@@ -4333,7 +4333,7 @@ exports.onTripCreatedForCalendar = onDocumentCreated({ region: "us-central1", do
 });
 
 // Cloud Function: Auto-sync health appointments to Google Calendar
-exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
+exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "europe-north2", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
@@ -4372,7 +4372,7 @@ exports.onHealthAppointmentCreatedForCalendar = onDocumentCreated({ region: "us-
 });
 
 // Cloud Function: Auto-sync pet vet visits to Google Calendar
-exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "petVetVisits/{docId}" }, async (event) => {
+exports.onPetVetVisitCreatedForCalendar = onDocumentCreated({ region: "europe-north2", document: "petVetVisits/{docId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
@@ -4564,7 +4564,7 @@ async function familySyncDelete(record) {
 
 // ==================== UPDATE TRIGGERS ====================
 
-exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "events/{eventId}" }, async (event) => {
+exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "europe-north2", document: "events/{eventId}" }, async (event) => {
   const after = event.data?.after?.data();
   if (!after) return;
 
@@ -4609,7 +4609,7 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
   }
 });
 
-exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "trips/{tripId}" }, async (event) => {
+exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "europe-north2", document: "trips/{tripId}" }, async (event) => {
   const after = event.data?.after?.data();
   if (!after) return;
 
@@ -4630,7 +4630,7 @@ exports.onTripUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", do
   }
 });
 
-exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
+exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "europe-north2", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
   const after = event.data?.after?.data();
   if (!after) return;
 
@@ -4658,7 +4658,7 @@ exports.onHealthAppointmentUpdatedForCalendar = onDocumentUpdated({ region: "us-
   }
 });
 
-exports.onPetVetVisitUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "petVetVisits/{docId}" }, async (event) => {
+exports.onPetVetVisitUpdatedForCalendar = onDocumentUpdated({ region: "europe-north2", document: "petVetVisits/{docId}" }, async (event) => {
   const after = event.data?.after?.data();
   if (!after) return;
 
@@ -4688,7 +4688,7 @@ exports.onPetVetVisitUpdatedForCalendar = onDocumentUpdated({ region: "us-centra
 
 // ==================== DELETE TRIGGERS ====================
 
-exports.onEventDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "events/{eventId}" }, async (event) => {
+exports.onEventDeletedForCalendar = onDocumentDeleted({ region: "europe-north2", document: "events/{eventId}" }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
 
@@ -4700,7 +4700,7 @@ exports.onEventDeletedForCalendar = onDocumentDeleted({ region: "us-central1", d
   }
 });
 
-exports.onTripDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "trips/{tripId}" }, async (event) => {
+exports.onTripDeletedForCalendar = onDocumentDeleted({ region: "europe-north2", document: "trips/{tripId}" }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
 
@@ -4712,7 +4712,7 @@ exports.onTripDeletedForCalendar = onDocumentDeleted({ region: "us-central1", do
   }
 });
 
-exports.onHealthAppointmentDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
+exports.onHealthAppointmentDeletedForCalendar = onDocumentDeleted({ region: "europe-north2", document: "health/{familyId}/appointments/{docId}" }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
 
@@ -4724,7 +4724,7 @@ exports.onHealthAppointmentDeletedForCalendar = onDocumentDeleted({ region: "us-
   }
 });
 
-exports.onPetVetVisitDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "petVetVisits/{docId}" }, async (event) => {
+exports.onPetVetVisitDeletedForCalendar = onDocumentDeleted({ region: "europe-north2", document: "petVetVisits/{docId}" }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
 
@@ -4738,7 +4738,7 @@ exports.onPetVetVisitDeletedForCalendar = onDocumentDeleted({ region: "us-centra
 
 // ==================== SCHOOL ACTIVITY CALENDAR SYNC ====================
 
-exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
+exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "europe-north2", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
@@ -4778,7 +4778,7 @@ exports.onSchoolActivityCreatedForCalendar = onDocumentCreated({ region: "us-cen
   }
 });
 
-exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
+exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "europe-north2", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
   const after = event.data?.after?.data();
   if (!after) return;
 
@@ -4808,7 +4808,7 @@ exports.onSchoolActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-cen
   }
 });
 
-exports.onSchoolActivityDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
+exports.onSchoolActivityDeletedForCalendar = onDocumentDeleted({ region: "europe-north2", document: "schoolActivities/{familyId}/activities/{docId}" }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
 
@@ -4822,7 +4822,7 @@ exports.onSchoolActivityDeletedForCalendar = onDocumentDeleted({ region: "us-cen
 
 // ==================== KINDERGARTEN ACTIVITY CALENDAR SYNC ====================
 
-exports.onKindergartenActivityCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "kindergartenActivities/{familyId}/activities/{docId}" }, async (event) => {
+exports.onKindergartenActivityCreatedForCalendar = onDocumentCreated({ region: "europe-north2", document: "kindergartenActivities/{familyId}/activities/{docId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
@@ -4862,7 +4862,7 @@ exports.onKindergartenActivityCreatedForCalendar = onDocumentCreated({ region: "
   }
 });
 
-exports.onKindergartenActivityUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "kindergartenActivities/{familyId}/activities/{docId}" }, async (event) => {
+exports.onKindergartenActivityUpdatedForCalendar = onDocumentUpdated({ region: "europe-north2", document: "kindergartenActivities/{familyId}/activities/{docId}" }, async (event) => {
   const after = event.data?.after?.data();
   if (!after) return;
 
@@ -4892,7 +4892,7 @@ exports.onKindergartenActivityUpdatedForCalendar = onDocumentUpdated({ region: "
   }
 });
 
-exports.onKindergartenActivityDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "kindergartenActivities/{familyId}/activities/{docId}" }, async (event) => {
+exports.onKindergartenActivityDeletedForCalendar = onDocumentDeleted({ region: "europe-north2", document: "kindergartenActivities/{familyId}/activities/{docId}" }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
 
@@ -5714,7 +5714,7 @@ Return ONLY the JSON, no other text.`;
 });
 
 // Cloud Function: Auto-sync home service appointments to Google Calendar
-exports.onHomeServiceCreatedForCalendar = onDocumentCreated({ region: "us-central1", document: "homeServices/{serviceId}" }, async (event) => {
+exports.onHomeServiceCreatedForCalendar = onDocumentCreated({ region: "europe-north2", document: "homeServices/{serviceId}" }, async (event) => {
   const snap = event.data;
   if (!snap) return;
 
@@ -5752,7 +5752,7 @@ exports.onHomeServiceCreatedForCalendar = onDocumentCreated({ region: "us-centra
   }
 });
 
-exports.onHomeServiceUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", document: "homeServices/{serviceId}" }, async (event) => {
+exports.onHomeServiceUpdatedForCalendar = onDocumentUpdated({ region: "europe-north2", document: "homeServices/{serviceId}" }, async (event) => {
   const after = event.data?.after?.data();
   if (!after) return;
 
@@ -5780,7 +5780,7 @@ exports.onHomeServiceUpdatedForCalendar = onDocumentUpdated({ region: "us-centra
   }
 });
 
-exports.onHomeServiceDeletedForCalendar = onDocumentDeleted({ region: "us-central1", document: "homeServices/{serviceId}" }, async (event) => {
+exports.onHomeServiceDeletedForCalendar = onDocumentDeleted({ region: "europe-north2", document: "homeServices/{serviceId}" }, async (event) => {
   const data = event.data?.data();
   if (!data) return;
 
