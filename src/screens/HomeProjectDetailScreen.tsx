@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, TouchableWithoutFeedback, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
@@ -10,7 +10,7 @@ import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
 import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer, HomeTask, HomeTaskStatus, HomeProjectDocument, HomeContractor, ContractorWorker } from '../types';
-import { getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask, getHomeDocuments, addHomeDocument, updateHomeDocument, deleteHomeDocument, getHomeContractors, addHomeContractor, updateHomeContractor, deleteHomeContractor } from '../services/homeService';
+import { getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask, getHomeDocuments, addHomeDocument, updateHomeDocument, deleteHomeDocument, getHomeContractors, addHomeContractor, updateHomeContractor, deleteHomeContractor, updateHomeProject } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 import { TripDocumentUpload } from '../components/TripDocumentUpload';
 import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
@@ -41,6 +41,14 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [colorHex, setColorHex] = useState('');
   const [extracting, setExtracting] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  const [projectNotes, setProjectNotes] = useState(project.notes || '');
+  const [notesStatus, setNotesStatus] = useState<'' | 'saving' | 'saved'>('');
+  const lastSavedNotesRef = useRef(project.notes || '');
+  const mediaRecorderRef = useRef<any>(null);
+  const voiceChunksRef = useRef<Blob[]>([]);
+  const [recordingVoice, setRecordingVoice] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
 
   const [contractors, setContractors] = useState<HomeContractor[]>([]);
   const [showAddContractor, setShowAddContractor] = useState(false);
@@ -137,6 +145,112 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   }, [familyId, project.homeId, project.id]);
 
   useEffect(() => { loadData(); }, [loadData]);
+
+  // Autosave project notes (debounced)
+  useEffect(() => {
+    if (projectNotes === lastSavedNotesRef.current) return;
+    setNotesStatus('saving');
+    const timer = setTimeout(async () => {
+      try {
+        await updateHomeProject(project.id, { notes: projectNotes });
+        lastSavedNotesRef.current = projectNotes;
+        setNotesStatus('saved');
+      } catch (error) {
+        setNotesStatus('');
+        crossAlert(t('common.error'), getErrorMessage(error));
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [projectNotes, project.id]);
+
+  // Talk-to-text for project notes (records, then appends the transcription)
+  const startVoiceInput = async () => {
+    if (recordingVoice || transcribing) return;
+    try {
+      if (Platform.OS === 'web') {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        let mimeType = 'audio/webm';
+        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = 'audio/mp4';
+        if (!MediaRecorder.isTypeSupported(mimeType)) mimeType = '';
+        const mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+        voiceChunksRef.current = [];
+        mediaRecorder.ondataavailable = (event) => {
+          if (event.data.size > 0) voiceChunksRef.current.push(event.data);
+        };
+        mediaRecorderRef.current = mediaRecorder;
+        mediaRecorder.start();
+        setRecordingVoice(true);
+      } else {
+        const { Audio } = await import('expo-av');
+        const { status } = await Audio.requestPermissionsAsync();
+        if (status !== 'granted') {
+          crossAlert(t('common.error'), t('homes.microphonePermission'));
+          return;
+        }
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: true, playsInSilentModeIOS: true });
+        const { recording } = await Audio.Recording.createAsync(Audio.RecordingOptionsPresets.HIGH_QUALITY);
+        (globalThis as any).__noteRecording = recording;
+        (globalThis as any).__noteAudio = Audio;
+        setRecordingVoice(true);
+      }
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+      setRecordingVoice(false);
+    }
+  };
+
+  const stopVoiceInput = async () => {
+    if (!recordingVoice) return;
+    setRecordingVoice(false);
+    setTranscribing(true);
+    try {
+      let audioBlob: Blob;
+      if (Platform.OS === 'web') {
+        const mediaRecorder = mediaRecorderRef.current;
+        if (!mediaRecorder) throw new Error('No MediaRecorder');
+        await new Promise<void>((resolve) => {
+          mediaRecorder.onstop = () => resolve();
+          mediaRecorder.stop();
+        });
+        mediaRecorder.stream.getTracks().forEach((track: MediaStreamTrack) => track.stop());
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        audioBlob = new Blob(voiceChunksRef.current, { type: mimeType });
+      } else {
+        const Audio = (globalThis as any).__noteAudio;
+        const rec = (globalThis as any).__noteRecording;
+        await rec.stopAndUnloadAsync();
+        await Audio.setAudioModeAsync({ allowsRecordingIOS: false });
+        const uri = rec.getURI();
+        const response = await fetch(uri);
+        audioBlob = await response.blob();
+      }
+
+      const ext = audioBlob.type.includes('mp4') ? 'm4a' : 'webm';
+      const headers: Record<string, string> = {
+        'Content-Type': audioBlob.type || 'audio/webm',
+        'X-Filename': `note.${ext}`,
+      };
+      const { auth } = await import('../services/firebase');
+      const idToken = await auth.currentUser?.getIdToken();
+      if (idToken) headers['Authorization'] = `Bearer ${idToken}`;
+
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/voiceToEvent', {
+        method: 'POST',
+        headers,
+        body: audioBlob,
+      });
+      const data = await res.json();
+      if (data.text) {
+        setProjectNotes((prev) => (prev.trim() ? `${prev.trimEnd()} ${data.text.trim()}` : data.text.trim()));
+      } else {
+        crossAlert(t('common.error'), t('homes.transcribeFailed'));
+      }
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    } finally {
+      setTranscribing(false);
+    }
+  };
 
   const resetForm = () => {
     setColorName('');
@@ -1088,6 +1202,41 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
               );
             })
           )}
+        </View>
+
+        {/* Notes */}
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleRow}>
+              <AppIcon name="file" size={18} color={HOME_THEME} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.projectNotes')}</Text>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+              {notesStatus === 'saving' && (
+                <Text style={{ fontSize: 11, color: colors.textSecondary }}>{t('homes.notesSaving')}</Text>
+              )}
+              {notesStatus === 'saved' && (
+                <Text style={{ fontSize: 11, color: '#43A047' }}>✓ {t('homes.notesSaved')}</Text>
+              )}
+              <TouchableOpacity style={[styles.receiptBtn, { width: 36, height: 36, borderRadius: 18, backgroundColor: HOME_THEME + '20' }]} onPress={recordingVoice ? stopVoiceInput : startVoiceInput} disabled={transcribing}>
+                {transcribing ? (
+                  <ActivityIndicator size="small" color={HOME_THEME} />
+                ) : recordingVoice ? (
+                  <AppIcon name="microphone" size={20} color="#E53935" />
+                ) : (
+                  <AppIcon name="microphone" size={20} color={HOME_THEME} />
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+          <TextInput
+            style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, minHeight: 120, textAlignVertical: 'top', paddingTop: 12 }]}
+            value={projectNotes}
+            onChangeText={setProjectNotes}
+            placeholder={t('homes.projectNotesPlaceholder')}
+            placeholderTextColor={colors.textDisabled}
+            multiline
+          />
         </View>
 
         {/* Colors section */}

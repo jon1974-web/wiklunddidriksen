@@ -875,6 +875,7 @@ export interface HomeProject {
   startDate?: string;
   endDate?: string;
   status: 'active' | 'completed' | 'on-hold';
+  notes?: string;
   familyId: string;
   createdAt: number;
 }
