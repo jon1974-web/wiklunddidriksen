@@ -9,10 +9,11 @@ import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
-import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer, HomeTask, HomeTaskStatus, HomeProjectDocument } from '../types';
-import { getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask, getHomeDocuments, addHomeDocument, updateHomeDocument, deleteHomeDocument } from '../services/homeService';
+import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer, HomeTask, HomeTaskStatus, HomeProjectDocument, HomeContractor, ContractorWorker } from '../types';
+import { getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask, getHomeDocuments, addHomeDocument, updateHomeDocument, deleteHomeDocument, getHomeContractors, addHomeContractor, updateHomeContractor, deleteHomeContractor } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
 import { TripDocumentUpload } from '../components/TripDocumentUpload';
+import { getStaticMapUrl, getGoogleMapsUrl } from '../utils/maps';
 const HOME_THEME = MODULE_COLORS.home;
 
 interface HomeProjectDetailScreenProps {
@@ -41,6 +42,26 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [extracting, setExtracting] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const [contractors, setContractors] = useState<HomeContractor[]>([]);
+  const [showAddContractor, setShowAddContractor] = useState(false);
+  const [showWebsiteInput, setShowWebsiteInput] = useState(false);
+  const [websiteUrlInput, setWebsiteUrlInput] = useState('');
+  const [showContractorForm, setShowContractorForm] = useState(false);
+  const [editingContractorId, setEditingContractorId] = useState<string | null>(null);
+  const [contractorActionModal, setContractorActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [contractorName, setContractorName] = useState('');
+  const [contractorAddress, setContractorAddress] = useState('');
+  const [contractorUrl, setContractorUrl] = useState('');
+  const [contractorPhone, setContractorPhone] = useState('');
+  const [contractorEmail, setContractorEmail] = useState('');
+  const [contractorOrgNumber, setContractorOrgNumber] = useState('');
+  const [contractorNotes, setContractorNotes] = useState('');
+  const [contractorWorkers, setContractorWorkers] = useState<ContractorWorker[]>([]);
+  const [contractorRating, setContractorRating] = useState(0);
+  const [contractorRatingNote, setContractorRatingNote] = useState('');
+  const [expandedContractor, setExpandedContractor] = useState<string | null>(null);
+  const [savingContractor, setSavingContractor] = useState(false);
+
   const [shoppingItems, setShoppingItems] = useState<HomeShoppingItem[]>([]);
   const [showAddItem, setShowAddItem] = useState(false);
   const [editingItem, setEditingItem] = useState<string | null>(null);
@@ -61,6 +82,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [offerFileUrl, setOfferFileUrl] = useState('');
   const [offerFileName, setOfferFileName] = useState('');
   const [offerItemsList, setOfferItemsList] = useState<string[]>([]);
+  const [selectedOfferContractorId, setSelectedOfferContractorId] = useState('');
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
   const [savingOffer, setSavingOffer] = useState(false);
 
@@ -93,18 +115,20 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
-      const [colorData, itemData, offerData, taskData, docData] = await Promise.allSettled([
+      const [colorData, itemData, offerData, taskData, docData, contractorData] = await Promise.allSettled([
         getHomePaintColors(familyId, project.homeId, project.id),
         getHomeShoppingItems(familyId, project.id),
         getHomeOffers(familyId, project.id),
         getHomeTasks(familyId, project.id),
         getHomeDocuments(familyId, project.id),
+        getHomeContractors(familyId, project.id),
       ]);
       setPaintColors(colorData.status === 'fulfilled' ? colorData.value : []);
       setShoppingItems(itemData.status === 'fulfilled' ? itemData.value : []);
       setOffers(offerData.status === 'fulfilled' ? offerData.value : []);
       setTasks(taskData.status === 'fulfilled' ? taskData.value : []);
       setDocuments(docData.status === 'fulfilled' ? docData.value : []);
+      setContractors(contractorData.status === 'fulfilled' ? contractorData.value : []);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
@@ -260,6 +284,171 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   };
 
   const resetItemForm = () => { setItemName(''); setItemQuantity('1'); setItemUnitPrice(''); setEditingItem(null); };
+
+  const resetContractorForm = () => {
+    setContractorName('');
+    setContractorAddress('');
+    setContractorUrl('');
+    setContractorPhone('');
+    setContractorEmail('');
+    setContractorOrgNumber('');
+    setContractorNotes('');
+    setContractorWorkers([]);
+    setContractorRating(0);
+    setContractorRatingNote('');
+    setEditingContractorId(null);
+  };
+
+  const openEditContractor = (contractor: HomeContractor) => {
+    setEditingContractorId(contractor.id);
+    setContractorName(contractor.name);
+    setContractorAddress(contractor.address || '');
+    setContractorUrl(contractor.url || '');
+    setContractorPhone(contractor.phone || '');
+    setContractorEmail(contractor.email || '');
+    setContractorOrgNumber(contractor.orgNumber || '');
+    setContractorNotes(contractor.notes || '');
+    setContractorWorkers(contractor.workers || []);
+    setContractorRating(contractor.rating || 0);
+    setContractorRatingNote(contractor.ratingNote || '');
+    setShowContractorForm(true);
+  };
+
+  const handleSaveContractor = async () => {
+    if (!contractorName.trim()) { crossAlert(t('common.error'), t('homes.contractorNameRequired')); return; }
+    if (!familyId) return;
+    setSavingContractor(true);
+    try {
+      const data = {
+        projectId: project.id,
+        name: contractorName.trim(),
+        address: contractorAddress.trim(),
+        url: contractorUrl.trim(),
+        phone: contractorPhone.trim(),
+        email: contractorEmail.trim(),
+        orgNumber: contractorOrgNumber.trim(),
+        notes: contractorNotes.trim(),
+        workers: contractorWorkers.filter((w) => w.name.trim()),
+        rating: contractorRating || undefined,
+        ratingNote: contractorRatingNote.trim(),
+        familyId,
+      };
+      if (editingContractorId) { await updateHomeContractor(familyId, editingContractorId, data); }
+      else { await addHomeContractor(data); }
+      resetContractorForm();
+      setShowContractorForm(false);
+      loadData();
+    } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+    finally { setSavingContractor(false); }
+  };
+
+  const handleDeleteContractor = async () => {
+    if (!contractorActionModal.id || !familyId) return;
+    try { await deleteHomeContractor(familyId, contractorActionModal.id); setContractorActionModal({ visible: false, id: '', title: '' }); loadData(); }
+    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const handleEditContractor = () => {
+    const contractor = contractors.find((c) => c.id === contractorActionModal.id);
+    if (contractor) { openEditContractor(contractor); }
+    setContractorActionModal({ visible: false, id: '', title: '' });
+  };
+
+  const openContractorWebsite = async (url: string) => {
+    const full = url.startsWith('http') ? url : `https://${url}`;
+    try {
+      if (Platform.OS === 'web') { window.open(full, '_blank'); }
+      else { await Linking.openURL(full); }
+    } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const applyExtractedContractor = (data: { name?: string; address?: string; url?: string; phone?: string; email?: string; orgNumber?: string; workers?: ContractorWorker[] }) => {
+    resetContractorForm();
+    if (data.name) setContractorName(data.name);
+    if (data.address) setContractorAddress(data.address);
+    if (data.url) setContractorUrl(data.url);
+    if (data.phone) setContractorPhone(data.phone);
+    if (data.email) setContractorEmail(data.email);
+    if (data.orgNumber) setContractorOrgNumber(data.orgNumber);
+    if (data.workers && data.workers.length > 0) setContractorWorkers(data.workers);
+    setShowAddContractor(false);
+    setShowWebsiteInput(false);
+    setWebsiteUrlInput('');
+    setShowContractorForm(true);
+  };
+
+  const handleExtractContractorFromImage = async (fromCamera: boolean) => {
+    try {
+      let result;
+      if (fromCamera) {
+        const permission = await ImagePicker.requestCameraPermissionsAsync();
+        if (!permission.granted) {
+          crossAlert(t('common.error'), t('homes.cameraPermission'));
+          return;
+        }
+        result = await ImagePicker.launchCameraAsync({ mediaTypes: ['images'], quality: 0.8, base64: true });
+      } else {
+        result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'], quality: 0.8, base64: true });
+      }
+
+      if (result.canceled || !result.assets[0]) return;
+      setExtracting(true);
+      const asset = result.assets[0];
+
+      let imageBase64: string;
+      if (asset.base64) { imageBase64 = asset.base64; } else {
+        const response = await fetch(asset.uri); const b = await response.blob();
+        const reader = new FileReader();
+        imageBase64 = await new Promise<string>((resolve) => { reader.onloadend = () => resolve((reader.result as string).split(',')[1]); reader.readAsDataURL(b); });
+      }
+
+      const { auth } = await import('../services/firebase');
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) return;
+
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/homeExtractContractor', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imageBase64 }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        crossAlert(t('common.error'), data.error);
+        return;
+      }
+      applyExtractedContractor(data);
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    } finally {
+      setExtracting(false);
+    }
+  };
+
+  const handleExtractContractorFromWebsite = async () => {
+    if (!websiteUrlInput.trim()) { crossAlert(t('common.error'), t('homes.websiteUrlRequired')); return; }
+    setExtracting(true);
+    try {
+      const { auth } = await import('../services/firebase');
+      const idToken = await auth.currentUser?.getIdToken();
+      if (!idToken) return;
+
+      const res = await fetch('https://us-central1-familiesenter-837bb.cloudfunctions.net/homeExtractContractor', {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${idToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ websiteUrl: websiteUrlInput.trim() }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        crossAlert(t('common.error'), data.error);
+        return;
+      }
+      applyExtractedContractor(data);
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    } finally {
+      setExtracting(false);
+    }
+  };
 
   const handleSaveItem = async () => {
     if (!itemName.trim()) { crossAlert(t('common.error'), t('homes.itemNameRequired')); return; }
@@ -427,6 +616,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     setOfferFileUrl('');
     setOfferFileName('');
     setOfferItemsList([]);
+    setSelectedOfferContractorId('');
     setEditingOffer(null);
   };
 
@@ -444,6 +634,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         itemsList: offerItemsList,
         fileUrl: offerFileUrl || undefined,
         fileName: offerFileName || undefined,
+        contractorId: selectedOfferContractorId || undefined,
         familyId,
       };
       if (editingOffer) { await updateHomeOffer(editingOffer, data); }
@@ -489,6 +680,7 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       setOfferFileUrl(offer.fileUrl || '');
       setOfferFileName(offer.fileName || '');
       setOfferItemsList(offer.itemsList || []);
+      setSelectedOfferContractorId(offer.contractorId || '');
       setShowAddOffer(true);
     }
     setOfferActionModal({ visible: false, id: '', title: '' });
@@ -796,6 +988,107 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           <Text style={{ color: HOME_THEME, fontSize: 14, fontWeight: '600' }}>{t('homes.aiSuggest')}</Text>
           <Text style={{ color: colors.textSecondary, fontSize: 12 }}>{project.title}</Text>
         </TouchableOpacity>
+
+        {/* Contractors */}
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionTitleRow}>
+              <AppIcon name="links" size={18} color={HOME_THEME} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.contractors')}</Text>
+              <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({contractors.length})</Text>
+            </View>
+            <TouchableOpacity
+              style={[styles.addButton, { backgroundColor: HOME_THEME }]}
+              onPress={() => { resetContractorForm(); setShowAddContractor(true); }}
+            >
+              <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+            </TouchableOpacity>
+          </View>
+
+          {contractors.length === 0 ? (
+            <Text style={{ fontSize: 13, color: colors.textDisabled, textAlign: 'center', padding: 16 }}>{t('homes.noContractors')}</Text>
+          ) : (
+            contractors.map((contractor) => {
+              const contractorMapUrl = contractor.address ? getStaticMapUrl(contractor.address, 15, '600x300') : null;
+              const linkedOffers = offers.filter((o) => o.contractorId === contractor.id);
+              return (
+                <TouchableOpacity
+                  key={contractor.id}
+                  style={[styles.shoppingItem, { borderBottomColor: colors.border, flexDirection: 'column', alignItems: 'stretch' }]}
+                  onPress={() => setExpandedContractor(expandedContractor === contractor.id ? null : contractor.id)}
+                  onLongPress={() => setContractorActionModal({ visible: true, id: contractor.id, title: contractor.name })}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.shoppingItemName, { color: colors.text }]} numberOfLines={1}>{contractor.name}</Text>
+                      {contractor.orgNumber ? <Text style={{ fontSize: 11, color: colors.textSecondary }} numberOfLines={1}>org.nr {contractor.orgNumber}</Text> : null}
+                      {contractor.phone ? <Text style={{ fontSize: 12, color: colors.textSecondary }} numberOfLines={1}>📞 {contractor.phone}</Text> : null}
+                      {contractor.address ? <Text style={{ fontSize: 12, color: colors.textDisabled }} numberOfLines={1}>📍 {contractor.address}</Text> : null}
+                    </View>
+                    {contractor.rating ? (
+                      <View style={{ alignItems: 'flex-end' }}>
+                        <Text style={{ fontSize: 13, color: '#F9A825' }}>{'★'.repeat(contractor.rating)}{'☆'.repeat(5 - contractor.rating)}</Text>
+                        {linkedOffers.length > 0 && (
+                          <Text style={{ fontSize: 10, color: colors.textSecondary }}>{t('homes.offers')}: {linkedOffers.length}</Text>
+                        )}
+                      </View>
+                    ) : linkedOffers.length > 0 ? (
+                      <Text style={{ fontSize: 10, color: colors.textSecondary }}>{t('homes.offers')}: {linkedOffers.length}</Text>
+                    ) : null}
+                  </View>
+
+                  {expandedContractor === contractor.id && (
+                    <View style={{ marginTop: 10, paddingTop: 10, borderTopWidth: 1, borderTopColor: colors.border }}>
+                      {contractorMapUrl ? (
+                        <TouchableOpacity onPress={() => { if (contractor.address) Linking.openURL(getGoogleMapsUrl(contractor.address)); }}>
+                          <View>
+                            <Image source={{ uri: contractorMapUrl }} style={{ width: '100%', height: 130, borderRadius: 10 }} resizeMode="cover" />
+                            <View style={{ position: 'absolute', bottom: 8, right: 8, backgroundColor: 'rgba(0,0,0,0.6)', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6 }}>
+                              <Text style={{ color: '#fff', fontSize: 11, fontWeight: '600' }}>{t('transport.openInMaps')}</Text>
+                            </View>
+                          </View>
+                        </TouchableOpacity>
+                      ) : null}
+                      {contractor.url ? (
+                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }} onPress={() => openContractorWebsite(contractor.url!)}>
+                          <AppIcon name="links" size={13} color={HOME_THEME} />
+                          <Text style={{ fontSize: 13, color: HOME_THEME, flex: 1 }} numberOfLines={1}>{t('homes.visitWebsite')}</Text>
+                        </TouchableOpacity>
+                      ) : null}
+                      {contractor.email ? (
+                        <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 8 }} onPress={() => { if (contractor.email) Linking.openURL(`mailto:${contractor.email}`); }}>
+                          <Text style={{ fontSize: 13, color: colors.text, flex: 1 }} numberOfLines={1}>✉️ {contractor.email}</Text>
+                        </TouchableOpacity>
+                      ) : null}
+                      {contractor.workers && contractor.workers.length > 0 && (
+                        <View style={{ marginTop: 10 }}>
+                          <Text style={{ fontSize: 12, fontWeight: '600', color: colors.textSecondary, marginBottom: 4 }}>{t('homes.workers')}</Text>
+                          {contractor.workers.map((worker, idx) => (
+                            <View key={idx} style={{ flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 3 }}>
+                              <Text style={{ fontSize: 13, color: colors.text, flex: 1 }} numberOfLines={1}>👷 {worker.name}</Text>
+                              {worker.phone ? <Text style={{ fontSize: 13, color: colors.textSecondary }} numberOfLines={1}>📞 {worker.phone}</Text> : null}
+                            </View>
+                          ))}
+                        </View>
+                      )}
+                      {contractor.notes ? (
+                        <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 10, lineHeight: 18 }}>{contractor.notes}</Text>
+                      ) : null}
+                      {contractor.rating ? (
+                        <View style={{ marginTop: 10 }}>
+                          <Text style={{ fontSize: 13, color: '#F9A825' }}>{'★'.repeat(contractor.rating)}{'☆'.repeat(5 - contractor.rating)}</Text>
+                          {contractor.ratingNote ? (
+                            <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4, lineHeight: 18 }}>{contractor.ratingNote}</Text>
+                          ) : null}
+                        </View>
+                      ) : null}
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })
+          )}
+        </View>
 
         {/* Colors section */}
         <View style={[styles.section, { backgroundColor: colors.surface }]}>
@@ -1105,6 +1398,15 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
           )}
         </View>
       </ScrollView>
+
+      <ActionModal
+        visible={contractorActionModal.visible}
+        title={contractorActionModal.title}
+        onEdit={handleEditContractor}
+        onDelete={handleDeleteContractor}
+        onCancel={() => setContractorActionModal({ visible: false, id: '', title: '' })}
+        accentColor={HOME_THEME}
+      />
 
       <ActionModal
         visible={colorActionModal.visible}
@@ -1454,6 +1756,23 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
                 <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={offerVendor} onChangeText={setOfferVendor} placeholder={t('homes.vendorNamePlaceholder')} placeholderTextColor={colors.textDisabled} />
               </View>
 
+              {contractors.length > 0 && (
+                <View style={styles.field}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractors')}</Text>
+                  <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
+                    {contractors.map((c) => (
+                      <TouchableOpacity
+                        key={c.id}
+                        style={{ paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8, backgroundColor: selectedOfferContractorId === c.id ? HOME_THEME : colors.inputBackground, borderWidth: 1, borderColor: selectedOfferContractorId === c.id ? HOME_THEME : colors.border }}
+                        onPress={() => setSelectedOfferContractorId(selectedOfferContractorId === c.id ? '' : c.id)}
+                      >
+                        <Text style={{ fontSize: 12, color: selectedOfferContractorId === c.id ? '#fff' : colors.text }} numberOfLines={1}>{c.name}</Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              )}
+
               <View style={{ flexDirection: 'row', gap: 12 }}>
                 <View style={[styles.field, { flex: 1 }]}>
                   <Text style={[styles.label, { color: colors.text }]}>{t('homes.vendorPhone')}</Text>
@@ -1532,8 +1851,187 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         </View>
       </Modal>
 
-      {/* Add/Edit Document Modal */}
-      <Modal visible={showAddDoc} transparent animationType="slide" onRequestClose={() => setShowAddDoc(false)}>
+      {/* Add Contractor Menu Modal */}
+      <Modal visible={showAddContractor} transparent animationType="fade" onRequestClose={() => setShowAddContractor(false)}>
+        <TouchableWithoutFeedback onPress={() => setShowAddContractor(false)}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+            <TouchableWithoutFeedback>
+              <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 20, width: '100%', maxWidth: 340 }}>
+                <Text style={{ fontSize: 18, fontWeight: '700', color: colors.text, marginBottom: 16 }}>{t('homes.chooseMethod')}</Text>
+                {extracting ? (
+                  <ActivityIndicator size="large" color={HOME_THEME} style={{ marginVertical: 24 }} />
+                ) : (
+                  <>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, marginBottom: 10 }]} onPress={() => { setShowAddContractor(false); resetContractorForm(); setShowContractorForm(true); }}>
+                      <Text style={styles.buttonText}>✍️ {t('homes.methodManual')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, marginBottom: 10 }]} onPress={() => handleExtractContractorFromImage(true)}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                        <AppIcon name="ai" size={18} color="#fff" />
+                        <Text style={styles.buttonText}>{t('homes.methodAiCamera')}</Text>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, marginBottom: 10 }]} onPress={() => handleExtractContractorFromImage(false)}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                        <AppIcon name="ai" size={18} color="#fff" />
+                        <Text style={styles.buttonText}>{t('homes.methodAiLibrary')}</Text>
+                      </View>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, marginBottom: 10 }]} onPress={() => { setShowWebsiteInput(true); }}>
+                      <Text style={styles.buttonText}>🌐 {t('homes.methodWebsite')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: colors.inputBackground }]} onPress={() => setShowAddContractor(false)}>
+                      <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Website URL Input Modal */}
+      <Modal visible={showWebsiteInput} transparent animationType="fade" onRequestClose={() => { setShowWebsiteInput(false); setWebsiteUrlInput(''); }}>
+        <TouchableWithoutFeedback onPress={() => { setShowWebsiteInput(false); setWebsiteUrlInput(''); }}>
+          <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 24 }}>
+            <TouchableWithoutFeedback>
+              <View style={{ backgroundColor: colors.surface, borderRadius: 16, padding: 20, width: '100%', maxWidth: 340 }}>
+                <Text style={{ fontSize: 18, fontWeight: '700', color: colors.text, marginBottom: 16 }}>{t('homes.methodWebsite')}</Text>
+                {extracting ? (
+                  <ActivityIndicator size="large" color={HOME_THEME} style={{ marginVertical: 24 }} />
+                ) : (
+                  <>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.inputBackground, color: colors.text, marginBottom: 16 }]}
+                      value={websiteUrlInput}
+                      onChangeText={setWebsiteUrlInput}
+                      placeholder={t('homes.websiteUrlLabel')}
+                      placeholderTextColor={colors.textDisabled}
+                      autoCapitalize="none"
+                      keyboardType="url"
+                    />
+                    <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, marginBottom: 10 }]} onPress={handleExtractContractorFromWebsite}>
+                      <Text style={styles.buttonText}>{t('homes.fetchFromWebsite')}</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.button, { backgroundColor: colors.inputBackground }]} onPress={() => { setShowWebsiteInput(false); setWebsiteUrlInput(''); }}>
+                      <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                    </TouchableOpacity>
+                  </>
+                )}
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
+
+      {/* Add/Edit Contractor Form Modal */}
+      <Modal visible={showContractorForm} transparent animationType="slide" onRequestClose={() => setShowContractorForm(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHandleBar} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{editingContractorId ? t('homes.editContractor') : t('homes.addContractor')}</Text>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractorName')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={contractorName} onChangeText={setContractorName} placeholder={t('homes.contractorNamePlaceholder')} placeholderTextColor={colors.textDisabled} />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractorAddress')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={contractorAddress} onChangeText={setContractorAddress} placeholder={t('homes.contractorAddressPlaceholder')} placeholderTextColor={colors.textDisabled} />
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 12 }}>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractorPhone')}</Text>
+                  <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={contractorPhone} onChangeText={setContractorPhone} placeholder={t('homes.contractorPhone')} placeholderTextColor={colors.textDisabled} keyboardType="phone-pad" />
+                </View>
+                <View style={[styles.field, { flex: 1 }]}>
+                  <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractorOrgNumber')}</Text>
+                  <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={contractorOrgNumber} onChangeText={setContractorOrgNumber} placeholder="123456789" placeholderTextColor={colors.textDisabled} keyboardType="numeric" />
+                </View>
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractorEmail')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={contractorEmail} onChangeText={setContractorEmail} placeholder="post@bedrift.no" placeholderTextColor={colors.textDisabled} keyboardType="email-address" autoCapitalize="none" />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractorUrl')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={contractorUrl} onChangeText={setContractorUrl} placeholder={t('homes.contractorUrlPlaceholder')} placeholderTextColor={colors.textDisabled} keyboardType="url" autoCapitalize="none" />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.workers')}</Text>
+                {(contractorWorkers || []).map((worker, idx) => (
+                  <View key={idx} style={{ flexDirection: 'row', gap: 8, marginBottom: 8 }}>
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.surface, color: colors.text, flex: 1 }]}
+                      value={worker.name}
+                      onChangeText={(text) => setContractorWorkers((prev) => prev.map((w, i) => i === idx ? { ...w, name: text } : w))}
+                      placeholder={t('homes.workerNamePlaceholder')}
+                      placeholderTextColor={colors.textDisabled}
+                    />
+                    <TextInput
+                      style={[styles.input, { backgroundColor: colors.surface, color: colors.text, flex: 1 }]}
+                      value={worker.phone || ''}
+                      onChangeText={(text) => setContractorWorkers((prev) => prev.map((w, i) => i === idx ? { ...w, phone: text } : w))}
+                      placeholder={t('homes.workerPhonePlaceholder')}
+                      placeholderTextColor={colors.textDisabled}
+                      keyboardType="phone-pad"
+                    />
+                    <TouchableOpacity style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: '#E53935', alignItems: 'center', justifyContent: 'center', alignSelf: 'center' }} onPress={() => setContractorWorkers((prev) => prev.filter((_, i) => i !== idx))}>
+                      <Text style={{ color: '#fff', fontSize: 14, fontWeight: '700' }}>×</Text>
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                <TouchableOpacity style={{ padding: 10, borderRadius: 8, borderWidth: 1, borderColor: HOME_THEME, borderStyle: 'dashed', alignItems: 'center' }} onPress={() => setContractorWorkers((prev) => [...prev, { name: '', phone: '' }])}>
+                  <Text style={{ color: HOME_THEME, fontSize: 13, fontWeight: '600' }}>+ {t('homes.addWorker')}</Text>
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractorNotes')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text, minHeight: 60, textAlignVertical: 'top' }]} value={contractorNotes} onChangeText={setContractorNotes} placeholder={t('homes.contractorNotesPlaceholder')} placeholderTextColor={colors.textDisabled} multiline />
+              </View>
+
+              <View style={[styles.field, { marginTop: 8 }]}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.contractorRating')}</Text>
+                <View style={{ flexDirection: 'row', gap: 6 }}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <TouchableOpacity key={star} onPress={() => setContractorRating(contractorRating === star ? 0 : star)}>
+                      <Text style={{ fontSize: 30, color: star <= contractorRating ? '#F9A825' : colors.textDisabled }}>{star <= contractorRating ? '★' : '☆'}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                {contractorRating > 0 && (
+                  <TextInput
+                    style={[styles.input, { backgroundColor: colors.surface, color: colors.text, marginTop: 8 }]}
+                    value={contractorRatingNote}
+                    onChangeText={setContractorRatingNote}
+                    placeholder={t('homes.contractorRatingNote')}
+                    placeholderTextColor={colors.textDisabled}
+                  />
+                )}
+              </View>
+
+              <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowContractorForm(false); resetContractorForm(); }}>
+                  <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, opacity: savingContractor ? 0.5 : 1, flex: 1 }]} onPress={handleSaveContractor} disabled={savingContractor}>
+                  <Text style={styles.buttonText}>{savingContractor ? '...' : t('common.save')}</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Add/Edit Document Modal */}      <Modal visible={showAddDoc} transparent animationType="slide" onRequestClose={() => setShowAddDoc(false)}>
         <View style={styles.modalOverlay}>
           <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
             <View style={styles.modalHandleBar} />

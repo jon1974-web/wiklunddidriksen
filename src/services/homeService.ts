@@ -2,7 +2,7 @@ import {
   collection, query, orderBy, getDocs, addDoc, updateDoc, deleteDoc, doc, where, getDoc, limit,
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { Home, HomePaintColor, HomeProject, HomeProjectDocument, HomeInstruction, HomeService, HomeShoppingItem, HomeOffer, HomeTask } from '../types';
+import { Home, HomePaintColor, HomeProject, HomeProjectDocument, HomeContractor, HomeInstruction, HomeService, HomeShoppingItem, HomeOffer, HomeTask } from '../types';
 
 export async function getHomes(familyId: string): Promise<Home[]> {
   const q = query(collection(db, 'homes'), where('familyId', '==', familyId), orderBy('createdAt', 'asc'));
@@ -210,4 +210,30 @@ export async function updateHomeDocument(documentId: string, data: Partial<HomeP
 
 export async function deleteHomeDocument(documentId: string): Promise<void> {
   await deleteDoc(doc(db, 'homeDocuments', documentId));
+}
+
+// Contractors
+export async function getHomeContractors(familyId: string, projectId: string): Promise<HomeContractor[]> {
+  const q = query(collection(db, 'homeContractors'), where('familyId', '==', familyId), where('projectId', '==', projectId), orderBy('createdAt', 'asc'), limit(200));
+  const snapshot = await getDocs(q);
+  return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as HomeContractor));
+}
+
+export async function addHomeContractor(data: Omit<HomeContractor, 'id' | 'createdAt'>): Promise<string> {
+  const docRef = await addDoc(collection(db, 'homeContractors'), { ...data, createdAt: Date.now() });
+  return docRef.id;
+}
+
+export async function updateHomeContractor(familyId: string, contractorId: string, data: Partial<HomeContractor>): Promise<void> {
+  const ref = doc(db, 'homeContractors', contractorId);
+  const snap = await getDoc(ref);
+  if (!snap.exists() || snap.data().familyId !== familyId) throw new Error('Not authorized');
+  await updateDoc(ref, data);
+}
+
+export async function deleteHomeContractor(familyId: string, contractorId: string): Promise<void> {
+  const ref = doc(db, 'homeContractors', contractorId);
+  const snap = await getDoc(ref);
+  if (!snap.exists() || snap.data().familyId !== familyId) throw new Error('Not authorized');
+  await deleteDoc(ref);
 }

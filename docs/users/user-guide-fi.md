@@ -357,7 +357,7 @@ Hallitse kotia ja mökkejä:
 - **Ohjeet**: "Komme hjem" (kotia)- ja "Forlate hjem" (jättää kotiin)-osiot kuvien skannauksella (OCR poimii ohje tekstit ja väri etiketit)
 - **Vedlikehold (huolto) sopimukset Serviceavtale**: päivämäärä/aika/frekvenssi (kerran/kaksi kertaa kuukaudessakvartaaleittain/ikävuosittain)， toisto (päivät/viikot), kalenterisynk + push perheelle
 - **Fargekoder (värikoodit)**: valokuvasetikisesti seinästä → AI poimii nimen/koodin/heksan; margumentti, huone
-- **Prosjekter (projektit)**: status (aktiivinen/odottaa/valmis), budjetti (budjetti/kulutettu/jäljellä), värikoodit OCR llä, sisäiset ostoslistat (nimi, määrä, yksikköhinta, lösummat kokoinoSSAjat), tarjoukset (toimittaja, hinta, kuvit-OCR), tehtävät (tehdä/meneillään/valmis), "K quits yhdistä ostoslistaan", asiakirjat (skannattujen kuittejen ja tarjousten automaattinen keruu, omien tiedostojen kuten sopimusten ja piirustusten lataus), AI-ehdotukset projektiteehtäville ja projekti analyyseille
+- **Prosjekter (projektit)**: status (aktiivinen/odottaa/valmis), budjetti (budjetti/kulutettu/jäljellä), urakoitsijat (nimi, osoite kartalla, verkkosivusto, puhelin, sähköposti, Y-tunnus, muistiinpanot, työntekijät puhelimella, arvio; lisää manuaalisesti, tekoälyllä valokuvasta tai verkkosivustolta; tarjoukset voidaan yhdistää urakoitsijaan), värikoodit OCR llä, sisäiset ostoslistat (nimi, määrä, yksikköhinta, lösummat kokoinoSSAjat), tarjoukset (toimittaja, hinta, kuvit-OCR), tehtävät (tehdä/meneillään/valmis), "K quits yhdistä ostoslistaan", asiakirjat (skannattujen kuittejen ja tarjousten automaattinen keruu, omien tiedostojen kuten sopimusten ja piirustusten lataus), AI-ehdotukset projektiteehtäville ja projekti analyyseille
 
 ---
 

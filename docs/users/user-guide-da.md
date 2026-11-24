@@ -357,7 +357,7 @@ Administrér hjem og hytter:
 - **Instruktioner**: "Komme hjem"- og "Forlade hjem"-sektioner med fotoscan (OCR udtrækker instruktionstekst og farveetiketter)
 - **Vedligehold – Serviceaftaler**: dato/tid/frekvens (engang/månedligt/kvartalsvis/årligt), gentagelse (dage/uger), kalendersynk + push til familien
 - **Farvekoder**: foto af etiket/væg → AI udtrækker navn/kode/hex; mærke, rum
-- **Projekter**: status (aktiv/på pause/færdig), budget (budget/forbrugt/tilbage), farvekoder med OCR, interne indkøbslister (navn, antal, enhedspris, totalkr.), tilbud (leverandør, pris, kvittering-OCR), opgaver (to do/under udførelse/færdig), "Tilslut til indkøbsliste", dokumenter (automatisk samling af scannede kvitteringer og tilbud, upload af egne filer som kontrakter og tegninger), AI-forslag til projektopgaver og projektanalyse
+- **Projekter**: status (aktiv/på pause/færdig), budget (budget/forbrugt/tilbage), entreprenører (navn, adresse med kort, hjemmeside, telefon, e-mail, CVR-nr, noter, arbejdere med telefon, vurdering; tilføj manuelt, med AI fra foto eller fra hjemmesiden; tilbud kan kobles til entreprenør), farvekoder med OCR, interne indkøbslister (navn, antal, enhedspris, totalkr.), tilbud (leverandør, pris, kvittering-OCR), opgaver (to do/under udførelse/færdig), "Tilslut til indkøbsliste", dokumenter (automatisk samling af scannede kvitteringer og tilbud, upload af egne filer som kontrakter og tegninger), AI-forslag til projektopgaver og projektanalyse
 
 ---
 

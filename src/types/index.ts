@@ -932,6 +932,7 @@ export interface HomeOffer {
   itemsList?: string[];
   fileUrl?: string;
   fileName?: string;
+  contractorId?: string;
   familyId: string;
   createdAt: number;
 }
@@ -944,6 +945,28 @@ export interface HomeProjectDocument {
   fileUrl?: string;
   fileName?: string;
   source?: 'manual' | 'receipt' | 'offer';
+  familyId: string;
+  createdAt: number;
+}
+
+export interface ContractorWorker {
+  name: string;
+  phone?: string;
+}
+
+export interface HomeContractor {
+  id: string;
+  projectId: string;
+  name: string;
+  address?: string;
+  url?: string;
+  phone?: string;
+  email?: string;
+  orgNumber?: string;
+  notes?: string;
+  workers?: ContractorWorker[];
+  rating?: number;
+  ratingNote?: string;
   familyId: string;
   createdAt: number;
 }

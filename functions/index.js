@@ -93,6 +93,7 @@ const RATE_LIMITS = {
   estimateRecipeCalories: { maxRequests: 10, windowMinutes: 1 },
   importHolidaysFromUrl: { maxRequests: 5, windowMinutes: 1 },
   homeExtractColor: { maxRequests: 5, windowMinutes: 1 },
+  homeExtractContractor: { maxRequests: 5, windowMinutes: 1 },
   homeExtractInstruction: { maxRequests: 5, windowMinutes: 1 },
   homeExtractReceipt: { maxRequests: 5, windowMinutes: 1 },
   homeExtractOffer: { maxRequests: 5, windowMinutes: 1 },
@@ -5300,6 +5301,140 @@ Return ONLY the JSON, no other text.`;
   }
 });
 
+exports.homeExtractContractor = onRequest({ region: "us-central1", memory: "256MB", timeoutSeconds: 120 }, async (req, res) => {
+  setCorsHeaders(res, req);
+
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
+  const uid = await verifyAuth(req);
+  if (!uid) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  if (!(await checkRateLimit(uid, "homeExtractContractor"))) {
+    return res.status(429).json({ error: "Too many requests. Please try again later." });
+  }
+
+  if (!OPENAI_API_KEY) {
+    return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
+  }
+
+  const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
+
+  const systemPrompt = `You are a Norwegian business information extraction expert. Analyze the provided source (a photo of a business card, invoice, offer letter, van/sign, or a company website text) and extract contractor information.
+
+Return your response as JSON with these fields:
+{
+  "name": "Company name",
+  "address": "Visiting address, postal code and city if visible (e.g. 'Storgata 12, 0155 Oslo')",
+  "url": "Website URL if visible (e.g. 'https://example.no')",
+  "phone": "Main phone number if visible",
+  "email": "Main email address if visible",
+  "orgNumber": "Organization number (9 digits, 'org.nr') if visible",
+  "workers": [
+    { "name": "Worker full name", "phone": "Worker phone if visible" }
+  ]
+}
+
+Rules:
+- Only include workers you can actually see named in the source. Empty array if none.
+- If a field cannot be determined, use an empty string (workers: []).
+- For a website source, look for contact info in the text (footer, contact page content).
+- Return ONLY the JSON, no other text.`;
+
+  try {
+    const { imageBase64, websiteUrl } = req.body;
+
+    if (!imageBase64 && !websiteUrl) {
+      return res.status(400).json({ error: "No image data or website URL received" });
+    }
+
+    let userContent;
+    if (imageBase64) {
+      userContent = [
+        {
+          type: "image_url",
+          image_url: { url: `data:image/jpeg;base64,${imageBase64}`, detail: "high" },
+        },
+        {
+          type: "text",
+          text: "Analyze this image and extract contractor information. Return only JSON.",
+        },
+      ];
+    } else {
+      // Website lookup: fetch the page server-side and let the model read the text
+      let pageText = "";
+      try {
+        const parsedUrl = new URL(websiteUrl);
+        if (!/^https?:$/.test(parsedUrl.protocol) || /^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[01])\.)/.test(parsedUrl.hostname)) {
+          return res.status(400).json({ error: "Invalid website URL" });
+        }
+        const pageRes = await fetch(parsedUrl.toString(), {
+          headers: { "User-Agent": "Mozilla/5.0 (compatible; FamiliesenterApp/1.0)" },
+          signal: AbortSignal.timeout(20000),
+        });
+        const html = await pageRes.text();
+        pageText = html
+          .replace(/<script[\s\S]*?<\/script>/gi, " ")
+          .replace(/<style[\s\S]*?<\/style>/gi, " ")
+          .replace(/<[^>]+>/g, " ")
+          .replace(/&nbsp;/g, " ")
+          .replace(/&amp;/g, "&")
+          .replace(/\s+/g, " ")
+          .trim()
+          .slice(0, 15000);
+      } catch (fetchError) {
+        console.error("homeExtractContractor website fetch failed:", fetchError);
+        return res.status(400).json({ error: "Could not fetch the website. Please check the URL or use a photo instead." });
+      }
+
+      userContent = `The following is the text content of the company website ${websiteUrl}. Extract contractor information from it. Return only JSON.\n\n---\n${pageText}\n---`;
+    }
+
+    const response = await openai.chat.completions.create({
+      model: AI_MODEL_FAST,
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: userContent },
+      ],
+      max_completion_tokens: 1200,
+    });
+
+    const content = response.choices[0]?.message?.content || "";
+
+    let contractorData;
+    try {
+      const jsonMatch = content.match(/\{[\s\S]*\}/);
+      contractorData = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+    } catch (parseError) {
+      contractorData = {};
+    }
+
+    res.json({
+      name: contractorData.name || "",
+      address: contractorData.address || "",
+      url: contractorData.url || "",
+      phone: contractorData.phone || "",
+      email: contractorData.email || "",
+      orgNumber: contractorData.orgNumber || "",
+      workers: Array.isArray(contractorData.workers)
+        ? contractorData.workers
+            .filter((w) => w && w.name)
+            .map((w) => ({ name: String(w.name), phone: w.phone ? String(w.phone) : "" }))
+        : [],
+    });
+  } catch (error) {
+    console.error("homeExtractContractor error:", error);
+    res.status(500).json({ error: "Failed to extract contractor info. Please try again." });
+  }
+});
+
 exports.homeExtractInstruction = onRequest({ region: "us-central1", memory: "256MB" }, async (req, res) => {
   setCorsHeaders(res, req);
 
@@ -5825,7 +5960,7 @@ async function searchFamilyData(db, familyId, keywordText) {
   const wants = (...kws) => kws.some(kw => lower.includes(kw));
   const wantsPets = wants('hund', 'katt', 'kjæledyr', 'dyr', 'veterinær', 'veterinarian', 'vet-klinikk', 'pels', 'klipp', 'hundemat', 'kattemat', 'bur', 'flokk', 'medisin', 'vaksine', 'pet');
   const wantsHealth = wants('helse', 'lege', 'tannlege', 'tannregulering', 'vaksine', 'vaksiner', 'medisin', 'medisiner', 'resept', 'allergi', 'vekt', 'høyde', 'astma', 'blodtrykk', 'blodsukker', 'prøvesvar', 'time hos');
-  const wantsHome = wants('hjem', 'hus', 'leilighet', 'hytte', 'garasje', 'bod', 'prosjekt', 'maling', 'farge', 'tapet', 'instruks', 'manual', 'brukermanual', 'kvittering', 'tilbud', 'innkjøp', 'vedlikehold', 'oppgave', 'gjøremål', 'husoppgave', 'home');
+  const wantsHome = wants('hjem', 'hus', 'leilighet', 'hytte', 'garasje', 'bod', 'prosjekt', 'maling', 'farge', 'tapet', 'instruks', 'manual', 'brukermanual', 'kvittering', 'tilbud', 'innkjøp', 'vedlikehold', 'oppgave', 'gjøremål', 'husoppgave', 'home', 'entreprenør', 'entreprenor', 'entreprenører', 'entreprenorer', 'håndverker', 'handverker', 'rørlegger', 'rorlegger', 'elektriker', 'murer', 'tømrer', 'tomrer', 'snekker', 'malermester', 'gulvlegger', 'contractor');
   const wantsRecipes = wants('oppskrift', 'koke', 'kake', 'bak', 'baking', 'ingrediens', 'kalori', 'middagsforslag', 'middagstips', 'lunsjforslag', 'matoppr', 'hva kan jeg lage');
   const wantsGifts = wants('gave', 'gaver', 'presang', 'ønskeliste', 'ønsker', 'julegave', 'bursdagsgave', 'fødselsdagsgave', 'gift');
 
@@ -5889,6 +6024,7 @@ async function searchFamilyData(db, familyId, keywordText) {
       homeTasks: db.collection('homeTasks').where('familyId', '==', familyId).limit(30),
       homeShoppingItems: db.collection('homeShoppingItems').where('familyId', '==', familyId).limit(30),
       homeOffers: db.collection('homeOffers').where('familyId', '==', familyId).limit(20),
+      homeContractors: db.collection('homeContractors').where('familyId', '==', familyId).limit(20),
     });
   }
   if (wantsRecipes) {
@@ -6254,13 +6390,13 @@ function formatDataForGPT(data) {
     const offers = data.homeOffers || [];
     data.homeProjects.forEach(p => {
       const projectItems = items.filter(i => i.projectId === p.id);
-      const projectOffers = offers.filter(o => o.projectId === p.id);
-      const itemCost = projectItems.reduce((sum, i) => sum + ((i.unitPrice || i.price || 0) * (i.quantity || 1)), 0);
-      const offerCost = projectOffers.reduce((sum, o) => sum + (o.price || 0), 0);
-      const totalCost = itemCost + offerCost;
-      const budget = p.budget || 0;
-      const remaining = budget > 0 ? budget - totalCost : null;
-      let line = `• ${p.name || '?'} | Status: ${p.status || ''}`;
+    const projectOffers = offers.filter(o => o.projectId === p.id);
+    const itemCost = projectItems.reduce((sum, i) => sum + ((i.unitPrice || i.price || 0) * (i.quantity || 1)), 0);
+    const offerCost = projectOffers.reduce((sum, o) => sum + (o.price || 0), 0);
+    const totalCost = itemCost + offerCost;
+    const budget = p.budget || 0;
+    const remaining = budget > 0 ? budget - totalCost : null;
+    let line = `• ${p.title || p.name || '?'} | Status: ${p.status || ''}`;
       if (budget > 0) line += ` | Budget: ${budget} kr`;
       if (totalCost > 0) line += ` | Forbruk: ${totalCost} kr`;
       if (remaining !== null) line += ` | Gjenstående: ${remaining} kr`;
@@ -6279,21 +6415,21 @@ function formatDataForGPT(data) {
   if (data.homePaintColors && data.homePaintColors.length > 0) {
     lines.push('--- FARGER ---');
     data.homePaintColors.forEach(c => {
-      lines.push(`• ${c.colorName || '?'} | Merke: ${c.brand || ''} | Kode: ${c.code || ''} | Rom: ${c.room || ''}`);
+      lines.push(`• ${c.name || c.colorName || '?'} | Merke: ${c.brand || ''} | Kode: ${c.code || ''} | Rom: ${c.room || ''}`);
     });
   }
 
   if (data.homeTasks && data.homeTasks.length > 0) {
-    const undone = data.homeTasks.filter(t => !t.done);
-    const done = data.homeTasks.filter(t => t.done);
+    const undone = data.homeTasks.filter(t => t.status !== 'done' && !t.done);
+    const done = data.homeTasks.filter(t => t.status === 'done' || t.done);
     lines.push(`--- HJEMOPPGAVER (${undone.length} ugjort, ${done.length} gjort) ---`);
     undone.forEach(t => {
-      lines.push(`• ${t.title || '?'} | Tildelt: ${t.assignedTo || ''}`);
+      lines.push(`• ${t.title || '?'} | Status: ${t.status === 'in-progress' ? 'pågår' : 'todo'} | Prosjekt: ${t.projectId || ''}`);
     });
   }
 
   if (data.homeShoppingItems && data.homeShoppingItems.length > 0) {
-    const unpurchased = data.homeShoppingItems.filter(i => !i.purchased);
+    const unpurchased = data.homeShoppingItems.filter(i => !i.checked && !i.purchased);
     lines.push(`--- HJEMHANDLELISTE (${unpurchased.length} igjen) ---`);
     unpurchased.forEach(i => {
       const cost = (i.unitPrice || i.price || 0) * (i.quantity || 1);
@@ -6304,7 +6440,28 @@ function formatDataForGPT(data) {
   if (data.homeOffers && data.homeOffers.length > 0) {
     lines.push('--- TILBUD ---');
     data.homeOffers.forEach(o => {
-      lines.push(`• ${o.provider || o.vendorName || '?'} | ${o.description || o.items || ''} | Pris: ${o.price || '?'} kr | Prosjekt: ${o.projectId || 'ingen'}`);
+      const linkedContractor = (data.homeContractors || []).find(c => c.id === o.contractorId);
+      lines.push(`• ${o.provider || o.vendorName || '?'} | ${o.description || o.items || ''} | Pris: ${o.price || '?'} kr | Prosjekt: ${o.projectId || 'ingen'}${linkedContractor ? ` | Entreprenør: ${linkedContractor.name || ''}` : ''}`);
+    });
+  }
+
+  if (data.homeContractors && data.homeContractors.length > 0) {
+    const projects = data.homeProjects || [];
+    lines.push('--- ENTREPRENØRER ---');
+    data.homeContractors.forEach(c => {
+      const linkedProject = projects.find(p => p.id === c.projectId);
+      let line = `• ${c.name || '?'}${linkedProject ? ` | Prosjekt: ${linkedProject.title || linkedProject.name || ''}` : ''}`;
+      if (c.phone) line += ` | Tlf: ${c.phone}`;
+      if (c.email) line += ` | E-post: ${c.email}`;
+      if (c.orgNumber) line += ` | Org.nr: ${c.orgNumber}`;
+      if (c.address) line += ` | Adresse: ${c.address}`;
+      if (c.url) line += ` | Nettside: ${c.url}`;
+      if (c.workers && c.workers.length > 0) {
+        line += ` | Arbeidere: ${c.workers.map(w => `${w.name || '?'}${w.phone ? ' (' + w.phone + ')' : ''}`).join(', ')}`;
+      }
+      if (c.rating) line += ` | Vurdering: ${c.rating}/5${c.ratingNote ? ` (${c.ratingNote})` : ''}`;
+      if (c.notes) line += ` | Notat: ${c.notes}`;
+      lines.push(line);
     });
   }
 
@@ -6522,7 +6679,7 @@ KRITISKE REGLER:
 6. For delete-handlinger: bekreft med brukeren først. For serviceavtaler (SERVICE.APPOINTMENTS) kan delete brukes uten id: send data: { title, homeName } (basert på brukerens behov).
 7. Svar alltid på norsk.
 8. Sorter svar etter dato (nærmeste først).
-9. MODULER PÅ ETTERSPØRSEL: Noen datamoduler (kjæledyr, helseoppføringer, hjemmeprosjekter, oppskrifter, gaver) lastes bare inn når spørsmålet handler om dem. Hvis en seksjon mangler i konteksten, IKKE konkluder med at familien ikke har data der — heller si at du ikke ser dataen akkurat nå og gjerne spør om å spesifisere (da lastes den inn på neste melding).
+9. MODULER PÅ ETTERSPØRSEL: Noen datamoduler (kjæledyr, helseoppføringer, hjemmeprosjekter, entreprenører, oppskrifter, gaver) lastes bare inn når spørsmålet handler om dem. Hvis en seksjon mangler i konteksten, IKKE konkluder med at familien ikke har data der — heller si at du ikke ser dataen akkurat nå og gjerne spør om å spesifisere (da lastes den inn på neste melding).
 
 OPPRETT-REGEL (viktig for å unngå hallusinasjon):
 Når brukeren ber om å opprette noe nytt (f.eks. "Ny helsetime", "Legg til", "Opprett"):
@@ -6563,7 +6720,7 @@ SAMMENHENG (inkluder relaterte data når du svarer):
 - Reise → inkluder transport, hotell, aktiviteter for den reisen
 - Barn → inkluder neste skoledag/aktivitet, neste helseavtale, bursdag
 - Kjæledyr → inkluder neste veterinærtime, medisiner, vaksiner
-- Hjem → inkluder pågående prosjekter, ufullførte oppgaver, kommende service
+- Hjem → inkluder pågående prosjekter, ufullførte oppgaver, kommende service, og entreprenører knyttet til prosjektet når det er relevant
 - Hendelse → inkluder adresse, tid, påminnelse
 
 PROAKTIVE FORSLAG:
