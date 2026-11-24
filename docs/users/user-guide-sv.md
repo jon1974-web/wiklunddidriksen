@@ -357,7 +357,7 @@ Hantera hem och stugor:
 - **Instruktioner**: "Komme hjem" (komma hem)- och "Forlate hjem" (lämna hem)-sektioner med fotoscan (OCR extraherar instruktionstext och färgetiketter)
 - **Underhåll – Serviceavtal**: datum/tid/frekvens (engång/månadsvis/kvartalsvis/årlig), upprepning (dagar/veckor), kalendersynk + push till familjen
 - **Färgkoder**: foto av etikett/vägg → AI extraherar namn/kod/hex; märke, rum
-- **Projekt**: status (aktiv/väntar/klar), budget (budget/förbrukat/återstående), färgkoder med OCR, interna inköpslistor (namn, antal, enhetspris, summa), anbud (leverantör, pris, kvitto-OCR), uppgifter (att göra/pågår/klar), "Koppla till inköpslista", AI-förslag till projektuppgifter och projektanalys
+- **Projekt**: status (aktiv/väntar/klar), budget (budget/förbrukat/återstående), färgkoder med OCR, interna inköpslistor (namn, antal, enhetspris, summa), anbud (leverantör, pris, kvitto-OCR), uppgifter (att göra/pågår/klar), "Koppla till inköpslista", dokument (automatisk samling av skannade kvitton och offerter, uppladdning av egna filer som kontrakt och ritningar), AI-förslag till projektuppgifter och projektanalys
 
 ---
 

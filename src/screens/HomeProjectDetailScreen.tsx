@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, TextInput, Modal, Image, ActivityIndicator, Platform, TouchableWithoutFeedback, Linking } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../theme/ThemeContext';
@@ -9,9 +9,10 @@ import { AppIcon } from '../components/AppIcon';
 import { crossAlert } from '../utils/alert';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { getErrorMessage } from '../utils/validation';
-import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer, HomeTask, HomeTaskStatus } from '../types';
-import { getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask } from '../services/homeService';
+import { Home, HomeProject, HomePaintColor, HomeShoppingItem, HomeOffer, HomeTask, HomeTaskStatus, HomeProjectDocument } from '../types';
+import { getHomePaintColors, addHomePaintColor, updateHomePaintColor, deleteHomePaintColor, getHomeShoppingItems, addHomeShoppingItem, updateHomeShoppingItem, deleteHomeShoppingItem, getHomeOffers, addHomeOffer, updateHomeOffer, deleteHomeOffer, getHomeTasks, addHomeTask, updateHomeTask, deleteHomeTask, getHomeDocuments, addHomeDocument, updateHomeDocument, deleteHomeDocument } from '../services/homeService';
 import { ActionModal } from '../components/ActionModal';
+import { TripDocumentUpload } from '../components/TripDocumentUpload';
 const HOME_THEME = MODULE_COLORS.home;
 
 interface HomeProjectDetailScreenProps {
@@ -73,6 +74,17 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const [taskDescription, setTaskDescription] = useState('');
   const [savingTask, setSavingTask] = useState(false);
 
+  const [documents, setDocuments] = useState<HomeProjectDocument[]>([]);
+  const [docsExpanded, setDocsExpanded] = useState(false);
+  const [showAddDoc, setShowAddDoc] = useState(false);
+  const [editingDocId, setEditingDocId] = useState<string | null>(null);
+  const [docActionModal, setDocActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
+  const [docTitle, setDocTitle] = useState('');
+  const [docNote, setDocNote] = useState('');
+  const [docFileUrl, setDocFileUrl] = useState('');
+  const [docFileName, setDocFileName] = useState('');
+  const [savingDoc, setSavingDoc] = useState(false);
+
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [suggestedTasks, setSuggestedTasks] = useState<{ title: string; description: string; shoppingItems: string[]; selected: boolean }[]>([]);
   const [suggestedItems, setSuggestedItems] = useState<{ name: string; quantity: number; unitPrice: number; selected: boolean }[]>([]);
@@ -81,16 +93,18 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
   const loadData = useCallback(async () => {
     if (!familyId) return;
     try {
-      const [colorData, itemData, offerData, taskData] = await Promise.allSettled([
+      const [colorData, itemData, offerData, taskData, docData] = await Promise.allSettled([
         getHomePaintColors(familyId, project.homeId, project.id),
         getHomeShoppingItems(familyId, project.id),
         getHomeOffers(familyId, project.id),
         getHomeTasks(familyId, project.id),
+        getHomeDocuments(familyId, project.id),
       ]);
       setPaintColors(colorData.status === 'fulfilled' ? colorData.value : []);
       setShoppingItems(itemData.status === 'fulfilled' ? itemData.value : []);
       setOffers(offerData.status === 'fulfilled' ? offerData.value : []);
       setTasks(taskData.status === 'fulfilled' ? taskData.value : []);
+      setDocuments(docData.status === 'fulfilled' ? docData.value : []);
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     } finally {
@@ -322,6 +336,13 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       }
       const receiptUrl = await webUploadFile(`receipts/${Date.now()}.jpg`, blob);
 
+      // Add the receipt under Documents automatically
+      try {
+        if (familyId) {
+          await addHomeDocument({ projectId: project.id, title: t('homes.docSourceReceipt'), source: 'receipt', fileUrl: receiptUrl, familyId });
+        }
+      } catch (docError) { console.log('Failed to add receipt document', docError); }
+
       let imageBase64: string;
       if (asset.base64) { imageBase64 = asset.base64; } else {
         const response = await fetch(asset.uri); const b = await response.blob();
@@ -384,6 +405,14 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       }
       const url = await webUploadFile(`receipts/${Date.now()}.jpg`, blob);
       await updateHomeShoppingItem(itemId, { receiptUrl: url });
+
+      // Sync the receipt under Documents (update existing, or add a new one)
+      const item = shoppingItems.find((i) => i.id === itemId);
+      const prevDoc = item?.receiptUrl ? documents.find((d) => d.fileUrl === item.receiptUrl && d.source === 'receipt') : null;
+      try {
+        if (prevDoc) { await updateHomeDocument(prevDoc.id, { fileUrl: url }); }
+        else if (familyId) { await addHomeDocument({ projectId: project.id, title: item?.name || t('homes.docSourceReceipt'), source: 'receipt', fileUrl: url, familyId }); }
+      } catch (docError) { console.log('Failed to sync receipt document', docError); }
       loadData();
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
@@ -419,6 +448,23 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
       };
       if (editingOffer) { await updateHomeOffer(editingOffer, data); }
       else { await addHomeOffer(data); }
+
+      // Sync the offer under Documents (add on new file, update on edit)
+      if (data.fileUrl) {
+        try {
+          const prevOffer = editingOffer ? offers.find((o) => o.id === editingOffer) : null;
+          const existingDoc = documents.find((d) => d.fileUrl === data.fileUrl);
+          const prevDoc = prevOffer?.fileUrl ? documents.find((d) => d.fileUrl === prevOffer.fileUrl && d.source === 'offer') : null;
+          if (existingDoc) {
+            if (existingDoc.source === 'offer' && existingDoc.title !== data.vendorName) { await updateHomeDocument(existingDoc.id, { title: data.vendorName }); }
+          } else if (prevDoc) {
+            await updateHomeDocument(prevDoc.id, { title: data.vendorName, fileUrl: data.fileUrl, fileName: data.fileName });
+          } else if (familyId) {
+            await addHomeDocument({ projectId: project.id, title: data.vendorName, source: 'offer', fileUrl: data.fileUrl, fileName: data.fileName, familyId });
+          }
+        } catch (docError) { console.log('Failed to sync offer document', docError); }
+      }
+
       resetOfferForm();
       setShowAddOffer(false);
       loadData();
@@ -554,6 +600,67 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
     } catch (error) {
       crossAlert(t('common.error'), getErrorMessage(error));
     }
+  };
+
+  const resetDocForm = () => { setDocTitle(''); setDocNote(''); setDocFileUrl(''); setDocFileName(''); setEditingDocId(null); };
+
+  const openDocUrl = async (url: string) => {
+    try {
+      if (Platform.OS === 'web') {
+        const { webFetchAsBlob } = await import('../services/webStorage');
+        const blob = await webFetchAsBlob(url);
+        const objectUrl = URL.createObjectURL(blob);
+        window.open(objectUrl, '_blank');
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+      } else {
+        await Linking.openURL(url);
+      }
+    } catch (error) {
+      crossAlert(t('common.error'), getErrorMessage(error));
+    }
+  };
+
+  const openEditDoc = (doc: HomeProjectDocument) => {
+    setEditingDocId(doc.id);
+    setDocTitle(doc.title);
+    setDocNote(doc.note || '');
+    setDocFileUrl(doc.fileUrl || '');
+    setDocFileName(doc.fileName || '');
+    setShowAddDoc(true);
+  };
+
+  const handleSaveDoc = async () => {
+    if (!docTitle.trim()) { crossAlert(t('common.error'), t('homes.documentTitleRequired')); return; }
+    if (!familyId) return;
+    setSavingDoc(true);
+    try {
+      const data = {
+        projectId: project.id,
+        title: docTitle.trim(),
+        note: docNote.trim(),
+        fileUrl: docFileUrl || undefined,
+        fileName: docFileName || undefined,
+        familyId,
+      };
+      if (editingDocId) { await updateHomeDocument(editingDocId, data); }
+      else { await addHomeDocument({ ...data, source: 'manual' }); }
+      resetDocForm();
+      setShowAddDoc(false);
+      loadData();
+    } catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+    finally { setSavingDoc(false); }
+  };
+
+  const handleDeleteDoc = async () => {
+    if (!docActionModal.id) return;
+    try { await deleteHomeDocument(docActionModal.id); setDocActionModal({ visible: false, id: '', title: '' }); loadData(); }
+    catch (error) { crossAlert(t('common.error'), getErrorMessage(error)); }
+  };
+
+  const handleEditDoc = () => {
+    const doc = documents.find((d) => d.id === docActionModal.id);
+    if (doc) { openEditDoc(doc); }
+    setDocActionModal({ visible: false, id: '', title: '' });
   };
 
   const handleSuggest = async () => {
@@ -942,6 +1049,61 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
             })}
           </ScrollView>
         </View>
+
+        {/* Documents */}
+        <View style={[styles.section, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity style={styles.docsExpandHeader} onPress={() => setDocsExpanded(!docsExpanded)}>
+            <Text style={[styles.docsExpandIcon, { color: colors.textSecondary }]}>{docsExpanded ? '▼' : '▶'}</Text>
+            <View style={styles.sectionTitleRow}>
+              <AppIcon name="file" size={18} color={HOME_THEME} />
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('homes.documents')}</Text>
+              <Text style={[styles.sectionCount, { color: colors.textSecondary }]}>({documents.length})</Text>
+            </View>
+            {docsExpanded && (
+              <TouchableOpacity style={[styles.addButton, { backgroundColor: HOME_THEME }]} onPress={() => { resetDocForm(); setShowAddDoc(true); }}>
+                <Text style={{ color: '#fff', fontSize: 18, fontWeight: '600' }}>+</Text>
+              </TouchableOpacity>
+            )}
+          </TouchableOpacity>
+
+          {docsExpanded && (
+            <View>
+              {documents.length === 0 ? (
+                <Text style={{ fontSize: 13, color: colors.textDisabled, textAlign: 'center', padding: 16 }}>{t('homes.noDocuments')}</Text>
+              ) : (
+                documents.map((doc) => (
+                  <TouchableOpacity
+                    key={doc.id}
+                    style={[styles.shoppingItem, { borderBottomColor: colors.border }]}
+                    onPress={() => openEditDoc(doc)}
+                    onLongPress={() => setDocActionModal({ visible: true, id: doc.id, title: doc.title })}
+                  >
+                    <AppIcon name="file" size={16} color={doc.fileUrl ? '#43A047' : colors.textDisabled} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={[styles.shoppingItemName, { color: colors.text }]} numberOfLines={1}>{doc.title}</Text>
+                      {doc.note ? <Text style={{ fontSize: 11, color: colors.textSecondary }} numberOfLines={1}>{doc.note}</Text> : null}
+                    </View>
+                    {doc.source === 'receipt' && (
+                      <View style={{ backgroundColor: HOME_THEME + '20', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: HOME_THEME }}>{t('homes.docSourceReceipt')}</Text>
+                      </View>
+                    )}
+                    {doc.source === 'offer' && (
+                      <View style={{ backgroundColor: HOME_THEME + '20', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 6 }}>
+                        <Text style={{ fontSize: 10, fontWeight: '600', color: HOME_THEME }}>{t('homes.docSourceOffer')}</Text>
+                      </View>
+                    )}
+                    {doc.fileUrl ? (
+                      <TouchableOpacity style={styles.receiptBtn} onPress={() => openDocUrl(doc.fileUrl!)}>
+                        <Text style={{ color: HOME_THEME, fontSize: 12, fontWeight: '600' }}>{t('documents.open')}</Text>
+                      </TouchableOpacity>
+                    ) : null}
+                  </TouchableOpacity>
+                ))
+              )}
+            </View>
+          )}
+        </View>
       </ScrollView>
 
       <ActionModal
@@ -977,6 +1139,15 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         onEdit={handleEditTask}
         onDelete={handleDeleteTask}
         onCancel={() => setTaskActionModal({ visible: false, id: '', title: '' })}
+        accentColor={HOME_THEME}
+      />
+
+      <ActionModal
+        visible={docActionModal.visible}
+        title={docActionModal.title}
+        onEdit={handleEditDoc}
+        onDelete={handleDeleteDoc}
+        onCancel={() => setDocActionModal({ visible: false, id: '', title: '' })}
         accentColor={HOME_THEME}
       />
 
@@ -1361,6 +1532,50 @@ export const HomeProjectDetailScreen: React.FC<HomeProjectDetailScreenProps> = (
         </View>
       </Modal>
 
+      {/* Add/Edit Document Modal */}
+      <Modal visible={showAddDoc} transparent animationType="slide" onRequestClose={() => setShowAddDoc(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.background }]}>
+            <View style={styles.modalHandleBar} />
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <Text style={[styles.modalTitle, { color: colors.text }]}>{editingDocId ? t('homes.editDocument') : t('homes.addDocument')}</Text>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.documentTitle')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={docTitle} onChangeText={setDocTitle} placeholder={t('homes.documentTitlePlaceholder')} placeholderTextColor={colors.textDisabled} />
+              </View>
+
+              <View style={styles.field}>
+                <Text style={[styles.label, { color: colors.text }]}>{t('homes.documentNote')}</Text>
+                <TextInput style={[styles.input, { backgroundColor: colors.surface, color: colors.text }]} value={docNote} onChangeText={setDocNote} placeholder={t('homes.documentNotePlaceholder')} placeholderTextColor={colors.textDisabled} />
+              </View>
+
+              <TripDocumentUpload
+                tripId={project.id}
+                storagePath={`projects/${project.id}/documents`}
+                onUploaded={(url, fileName) => { setDocFileUrl(url); setDocFileName(fileName); }}
+              />
+
+              {docFileUrl ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8, padding: 12, borderRadius: 10, backgroundColor: colors.inputBackground, marginTop: 12 }}>
+                  <AppIcon name="file" size={16} color="#43A047" />
+                  <Text style={{ fontSize: 13, color: colors.text, flex: 1 }} numberOfLines={1}>{docFileName || t('homes.documentTitle')}</Text>
+                </View>
+              ) : null}
+
+              <View style={{ flexDirection: 'row', gap: 12, marginTop: 8 }}>
+                <TouchableOpacity style={[styles.button, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1, flex: 1 }]} onPress={() => { setShowAddDoc(false); resetDocForm(); }}>
+                  <Text style={[styles.buttonText, { color: colors.text }]}>{t('common.cancel')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={[styles.button, { backgroundColor: HOME_THEME, opacity: savingDoc ? 0.5 : 1, flex: 1 }]} onPress={handleSaveDoc} disabled={savingDoc}>
+                  <Text style={styles.buttonText}>{savingDoc ? '...' : t('common.save')}</Text>
+                </TouchableOpacity>
+              </View>
+            </ScrollView>
+          </View>
+        </View>
+      </Modal>
+
       {/* Suggestion Preview Modal */}
       <Modal visible={showSuggestions} transparent animationType="slide" onRequestClose={() => setShowSuggestions(false)}>
         <View style={styles.modalOverlay}>
@@ -1476,4 +1691,6 @@ const styles = StyleSheet.create({
   taskCardTitle: { fontSize: 13, fontWeight: '600' },
   taskMoveBtn: { width: 24, height: 20, borderRadius: 4, alignItems: 'center', justifyContent: 'center' },
   aiSuggestButton: { flexDirection: 'row', alignItems: 'center', gap: 8, padding: 14, borderRadius: 12, borderWidth: 1, marginBottom: 16 },
+  docsExpandHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  docsExpandIcon: { fontSize: 12 },
 });

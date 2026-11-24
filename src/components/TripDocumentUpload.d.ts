@@ -4,6 +4,7 @@ import type { FC } from 'react';
 
 interface TripDocumentUploadProps {
   tripId: string;
+  storagePath?: string;
   onUploaded: (url: string, fileName: string) => void;
 }
 

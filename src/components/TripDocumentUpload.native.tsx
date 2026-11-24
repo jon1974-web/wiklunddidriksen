@@ -10,10 +10,11 @@ import { useTranslation } from 'react-i18next';
 
 interface TripDocumentUploadProps {
   tripId: string;
+  storagePath?: string;
   onUploaded: (url: string, fileName: string) => void;
 }
 
-export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(({ tripId, onUploaded }) => {
+export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(({ tripId, storagePath, onUploaded }) => {
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const { colors } = useTheme();
@@ -29,7 +30,8 @@ export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(
 
       const asset = result.assets[0];
       const fileName = asset.fileName || `document_${Date.now()}`;
-      const storageRef = ref(storage, `trips/${tripId}/documents/${fileName}`);
+      const folder = storagePath || `trips/${tripId}/documents`;
+      const storageRef = ref(storage, `${folder}/${fileName}`);
 
       setUploading(true);
 

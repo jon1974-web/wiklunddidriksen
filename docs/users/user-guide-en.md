@@ -357,7 +357,7 @@ Manage homes and cabins:
 - **Instructions**: "Coming home" and "Leaving home" sections with photo scanning (OCR extracts instruction text and color labels)
 - **Maintenance service agreements**: date/time/frequency (once/monthly/quarterly/yearly), repeat (days/weeks), calendar sync + family push
 - **Paint colors**: photo of label/wall → AI extracts name/code/hex; brand, room
-- **Projects**: status (active/on hold/completed), budget (budget/spent/remaining), paint colors with OCR, internal shopping lists (name, quantity, unit price, totals), offers (vendor, price, receipt OCR), tasks (to do/in progress/done), "Connect to shopping list", AI suggestions for project tasks and project analysis
+- **Projects**: status (active/on hold/completed), budget (budget/spent/remaining), paint colors with OCR, internal shopping lists (name, quantity, unit price, totals), offers (vendor, price, receipt OCR), tasks (to do/in progress/done), "Connect to shopping list", documents (automatic collection of scanned receipts and offers, upload of own files such as contracts and drawings), AI suggestions for project tasks and project analysis
 
 ---
 

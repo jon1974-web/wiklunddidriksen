@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage, auth } from '../services/firebase';
 import { useTheme } from '../theme/ThemeContext';
 import { getErrorMessage } from '../utils/validation';
@@ -8,10 +7,11 @@ import { useTranslation } from 'react-i18next';
 
 interface TripDocumentUploadProps {
   tripId: string;
+  storagePath?: string;
   onUploaded: (url: string, fileName: string) => void;
 }
 
-export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(({ tripId, onUploaded }) => {
+export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(({ tripId, storagePath, onUploaded }) => {
   const { t } = useTranslation();
   const [uploading, setUploading] = useState(false);
   const { colors } = useTheme();
@@ -27,12 +27,12 @@ export const TripDocumentUpload: React.FC<TripDocumentUploadProps> = React.memo(
       if (!file) return;
 
       const fileName = file.name || `document_${Date.now()}`;
-      const storageRef = ref(storage, `trips/${tripId}/documents/${fileName}`);
+      const folder = storagePath || `trips/${tripId}/documents`;
 
       setUploading(true);
       try {
         const { webUploadFile } = await import('../services/webStorage');
-        const path = `trips/${tripId}/documents/${fileName}`;
+        const path = `${folder}/${fileName}`;
         const downloadUrl = await webUploadFile(path, file);
         onUploaded(downloadUrl, fileName);
       } catch (error) {

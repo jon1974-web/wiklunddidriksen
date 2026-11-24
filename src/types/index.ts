@@ -936,6 +936,18 @@ export interface HomeOffer {
   createdAt: number;
 }
 
+export interface HomeProjectDocument {
+  id: string;
+  projectId: string;
+  title: string;
+  note?: string;
+  fileUrl?: string;
+  fileName?: string;
+  source?: 'manual' | 'receipt' | 'offer';
+  familyId: string;
+  createdAt: number;
+}
+
 export type HomeTaskStatus = 'todo' | 'in-progress' | 'done';
 
 export interface HomeTask {
