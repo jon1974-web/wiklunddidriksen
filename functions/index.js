@@ -4594,7 +4594,7 @@ exports.onEventUpdatedForCalendar = onDocumentUpdated({ region: "us-central1", d
     const hasCalendarId = after.googleCalendarEventId ||
       (after.googleCalendarEventIds && Object.keys(after.googleCalendarEventIds).length > 0);
     if (count === 0 && !hasCalendarId && after.familyId) {
-      const db = getFirestore();
+    const db = getFirestore();
       const { calendarEventIds: newIds, firstEventId } = await familySyncCreate(after.familyId, payload);
       if (Object.keys(newIds).length > 0) {
         await db.collection("events").doc(event.params.eventId).update({
@@ -5792,7 +5792,7 @@ exports.onHomeServiceDeletedForCalendar = onDocumentDeleted({ region: "us-centra
   }
 });
 
-async function searchFamilyData(db, familyId, userMessage) {
+async function searchFamilyData(db, familyId, keywordText) {
   const today = new Date();
   const todayStr = today.toISOString().split('T')[0];
   const next30 = new Date(today);
@@ -5801,146 +5801,145 @@ async function searchFamilyData(db, familyId, userMessage) {
   const past90 = new Date(today);
   past90.setDate(past90.getDate() - 90);
   const past90Str = past90.toISOString().split('T')[0];
+  // Health appointments are often booked months ahead — wider future window
+  const next180 = new Date(today);
+  next180.setDate(next180.getDate() + 180);
+  const next180Str = next180.toISOString().split('T')[0];
+  // Past slices are fetched separately (small limits) so old items can never
+  // crowd out upcoming ones via the shared query limit
+  const past30 = new Date(today);
+  past30.setDate(past30.getDate() - 30);
+  const past30Str = past30.toISOString().split('T')[0];
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = yesterday.toISOString().split('T')[0];
   const results = {};
 
   async function safeGet(q) {
     try { const s = await q.get(); return s.docs.map(d => ({ id: d.id, ...d.data() })); } catch(e) { return []; }
   }
 
-  // FLAT COLLECTIONS
-  results.events = await safeGet(
-    db.collection('events').where('familyId', '==', familyId).where('date', '>=', past90Str).where('date', '<=', next30Str).orderBy('date', 'asc').limit(50)
-  );
-  results.trips = await safeGet(
-    db.collection('trips').where('familyId', '==', familyId).limit(30)
-  );
-  results.trips.sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''));
-  results.birthdays = await safeGet(
-    db.collection('birthdays').where('familyId', '==', familyId).orderBy('date', 'asc').limit(50)
-  );
-  results.gifts = await safeGet(
-    db.collection('gifts').where('familyId', '==', familyId).limit(50)
-  );
-  results.pets = await safeGet(
-    db.collection('pets').where('familyId', '==', familyId).limit(20)
-  );
-  results.petVetVisits = await safeGet(
-    db.collection('petVetVisits').where('familyId', '==', familyId).where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
-  );
-  results.petVetVisits.sort((a, b) => (b.dateFrom || '').localeCompare(a.dateFrom || ''));
-  results.petMedications = await safeGet(
-    db.collection('petMedications').where('familyId', '==', familyId).limit(20)
-  );
-  results.petFood = await safeGet(
-    db.collection('petFood').where('familyId', '==', familyId).limit(20)
-  );
-  results.petGrooming = await safeGet(
-    db.collection('petGrooming').where('familyId', '==', familyId).limit(20)
-  );
-  results.petVaccinations = await safeGet(
-    db.collection('petVaccinations').where('familyId', '==', familyId).limit(20)
-  );
-  results.petInsurance = await safeGet(
-    db.collection('petInsurance').where('familyId', '==', familyId).limit(20)
-  );
-  results.serviceAppointments = await safeGet(
-    db.collection('homeServices').where('familyId', '==', familyId).where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
-  );
-  results.serviceAppointments.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
-  results.shoppingLists = await safeGet(
-    db.collection('shoppingLists').where('familyId', '==', familyId).limit(10)
-  );
-  results.homes = await safeGet(
-    db.collection('homes').where('familyId', '==', familyId).limit(10)
-  );
-  results.homeProjects = await safeGet(
-    db.collection('homeProjects').where('familyId', '==', familyId).limit(20)
-  );
-  results.homeProjects.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  results.homeInstructions = await safeGet(
-    db.collection('homeInstructions').where('familyId', '==', familyId).limit(30)
-  );
-  results.homePaintColors = await safeGet(
-    db.collection('homePaintColors').where('familyId', '==', familyId).limit(30)
-  );
-  results.homeTasks = await safeGet(
-    db.collection('homeTasks').where('familyId', '==', familyId).limit(30)
-  );
-  results.homeShoppingItems = await safeGet(
-    db.collection('homeShoppingItems').where('familyId', '==', familyId).limit(30)
-  );
-  results.homeOffers = await safeGet(
-    db.collection('homeOffers').where('familyId', '==', familyId).limit(20)
-  );
-  results.schoolChildren = await safeGet(
-    db.collection('schoolChildren').where('familyId', '==', familyId).limit(20)
-  );
-  results.schoolContacts = await safeGet(
-    db.collection('schoolContacts').where('familyId', '==', familyId).limit(30)
-  );
-  results.schoolSchedules = await safeGet(
-    db.collection('schoolSchedules').where('familyId', '==', familyId).limit(50)
-  );
-  results.schoolHolidays = await safeGet(
-    db.collection('schoolHolidays').where('familyId', '==', familyId).limit(50)
-  );
-  results.kindergartenChildren = await safeGet(
-    db.collection('kindergartenChildren').where('familyId', '==', familyId).limit(20)
-  );
-  results.kindergartenContacts = await safeGet(
-    db.collection('kindergartenContacts').where('familyId', '==', familyId).limit(30)
-  );
-  results.kindergartenSchedules = await safeGet(
-    db.collection('kindergartenSchedules').where('familyId', '==', familyId).limit(50)
-  );
-  results.kindergartenHolidays = await safeGet(
-    db.collection('kindergartenHolidays').where('familyId', '==', familyId).limit(50)
-  );
-  results.recipes = await safeGet(
-    db.collection('recipes').where('familyId', '==', familyId).limit(50)
-  );
-  results.mealPlans = await safeGet(
-    db.collection('mealPlans').where('familyId', '==', familyId).limit(10)
-  );
+  // Keyword-based module loading: core data is always fetched, heavy secondary
+  // modules only when the question (or recent history) mentions them.
+  const lower = String(keywordText || '').toLowerCase();
+  const wants = (...kws) => kws.some(kw => lower.includes(kw));
+  const wantsPets = wants('hund', 'katt', 'kjæledyr', 'dyr', 'veterinær', 'veterinarian', 'vet-klinikk', 'pels', 'klipp', 'hundemat', 'kattemat', 'bur', 'flokk', 'medisin', 'vaksine', 'pet');
+  const wantsHealth = wants('helse', 'lege', 'tannlege', 'tannregulering', 'vaksine', 'vaksiner', 'medisin', 'medisiner', 'resept', 'allergi', 'vekt', 'høyde', 'astma', 'blodtrykk', 'blodsukker', 'prøvesvar', 'time hos');
+  const wantsHome = wants('hjem', 'hus', 'leilighet', 'hytte', 'garasje', 'bod', 'prosjekt', 'maling', 'farge', 'tapet', 'instruks', 'manual', 'brukermanual', 'kvittering', 'tilbud', 'innkjøp', 'vedlikehold', 'oppgave', 'gjøremål', 'husoppgave', 'home');
+  const wantsRecipes = wants('oppskrift', 'koke', 'kake', 'bak', 'baking', 'ingrediens', 'kalori', 'middagsforslag', 'middagstips', 'lunsjforslag', 'matoppr', 'hva kan jeg lage');
+  const wantsGifts = wants('gave', 'gaver', 'presang', 'ønskeliste', 'ønsker', 'julegave', 'bursdagsgave', 'fødselsdagsgave', 'gift');
 
-  // SUBCOLLECTIONS
-  results.healthAppointments = await safeGet(
-    db.collection('health').doc(familyId).collection('appointments').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(30)
-  );
+  // FLAT COLLECTIONS + SUBCOLLECTIONS — all fetched in parallel for speed
+  const queries = {
+    // CORE — always fetched
+    // EVENTS — past (recent context) + future (upcoming) fetched separately
+    eventsPast: db.collection('events').where('familyId', '==', familyId).where('date', '>=', past30Str).where('date', '<=', yesterdayStr).orderBy('date', 'desc').limit(20),
+    events: db.collection('events').where('familyId', '==', familyId).where('date', '>=', todayStr).where('date', '<=', next30Str).orderBy('date', 'asc').limit(50),
+    trips: db.collection('trips').where('familyId', '==', familyId).limit(30),
+    birthdays: db.collection('birthdays').where('familyId', '==', familyId).orderBy('date', 'asc').limit(50),
+    // SERVICE — past + future fetched separately
+    serviceAppointmentsPast: db.collection('homeServices').where('familyId', '==', familyId).where('dateFrom', '>=', past90Str).where('dateFrom', '<=', yesterdayStr).orderBy('dateFrom', 'desc').limit(10),
+    serviceAppointments: db.collection('homeServices').where('familyId', '==', familyId).where('dateFrom', '>=', todayStr).where('dateFrom', '<=', next30Str).orderBy('dateFrom', 'asc').limit(20),
+    shoppingLists: db.collection('shoppingLists').where('familyId', '==', familyId).limit(10),
+    homes: db.collection('homes').where('familyId', '==', familyId).limit(10),
+    schoolChildren: db.collection('schoolChildren').where('familyId', '==', familyId).limit(20),
+    schoolContacts: db.collection('schoolContacts').where('familyId', '==', familyId).limit(30),
+    schoolSchedules: db.collection('schoolSchedules').where('familyId', '==', familyId).limit(50),
+    schoolHolidays: db.collection('schoolHolidays').where('familyId', '==', familyId).limit(50),
+    kindergartenChildren: db.collection('kindergartenChildren').where('familyId', '==', familyId).limit(20),
+    kindergartenContacts: db.collection('kindergartenContacts').where('familyId', '==', familyId).limit(30),
+    kindergartenSchedules: db.collection('kindergartenSchedules').where('familyId', '==', familyId).limit(50),
+    kindergartenHolidays: db.collection('kindergartenHolidays').where('familyId', '==', familyId).limit(50),
+    mealPlans: db.collection('mealPlans').where('familyId', '==', familyId).limit(10),
+    // HEALTH APPOINTMENTS — past + future fetched separately (future has wide window)
+    healthAppointmentsPast: db.collection('health').doc(familyId).collection('appointments').where('dateFrom', '>=', past30Str).where('dateFrom', '<=', yesterdayStr).orderBy('dateFrom', 'desc').limit(10),
+    healthAppointments: db.collection('health').doc(familyId).collection('appointments').where('dateFrom', '>=', todayStr).where('dateFrom', '<=', next180Str).orderBy('dateFrom', 'asc').limit(30),
+    schoolActivitiesPast: db.collection('schoolActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', yesterdayStr).orderBy('dateFrom', 'desc').limit(10),
+    schoolActivities: db.collection('schoolActivities').doc(familyId).collection('activities').where('dateFrom', '>=', todayStr).where('dateFrom', '<=', next30Str).orderBy('dateFrom', 'asc').limit(20),
+    kindergartenActivitiesPast: db.collection('kindergartenActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', yesterdayStr).orderBy('dateFrom', 'desc').limit(10),
+    kindergartenActivities: db.collection('kindergartenActivities').doc(familyId).collection('activities').where('dateFrom', '>=', todayStr).where('dateFrom', '<=', next30Str).orderBy('dateFrom', 'asc').limit(20),
+  };
+
+  // ON-DEMAND MODULES — fetched only when relevant keywords are present
+  if (wantsPets) {
+    Object.assign(queries, {
+      pets: db.collection('pets').where('familyId', '==', familyId).limit(20),
+      petVetVisitsPast: db.collection('petVetVisits').where('familyId', '==', familyId).where('dateFrom', '>=', past90Str).where('dateFrom', '<=', yesterdayStr).orderBy('dateFrom', 'desc').limit(10),
+      petVetVisits: db.collection('petVetVisits').where('familyId', '==', familyId).where('dateFrom', '>=', todayStr).where('dateFrom', '<=', next30Str).orderBy('dateFrom', 'asc').limit(20),
+      petMedications: db.collection('petMedications').where('familyId', '==', familyId).limit(20),
+      petFood: db.collection('petFood').where('familyId', '==', familyId).limit(20),
+      petGrooming: db.collection('petGrooming').where('familyId', '==', familyId).limit(20),
+      petVaccinations: db.collection('petVaccinations').where('familyId', '==', familyId).limit(20),
+      petInsurance: db.collection('petInsurance').where('familyId', '==', familyId).limit(20),
+    });
+  }
+  if (wantsHealth) {
+    Object.assign(queries, {
+      healthMedications: db.collection('health').doc(familyId).collection('medications').limit(20),
+      healthVaccinations: db.collection('health').doc(familyId).collection('vaccinations').limit(20),
+      healthAllergies: db.collection('health').doc(familyId).collection('allergies').limit(20),
+      healthGrowth: db.collection('health').doc(familyId).collection('growth').limit(20),
+    });
+  }
+  if (wantsHome) {
+    Object.assign(queries, {
+      homeProjects: db.collection('homeProjects').where('familyId', '==', familyId).limit(20),
+      homeInstructions: db.collection('homeInstructions').where('familyId', '==', familyId).limit(30),
+      homePaintColors: db.collection('homePaintColors').where('familyId', '==', familyId).limit(30),
+      homeTasks: db.collection('homeTasks').where('familyId', '==', familyId).limit(30),
+      homeShoppingItems: db.collection('homeShoppingItems').where('familyId', '==', familyId).limit(30),
+      homeOffers: db.collection('homeOffers').where('familyId', '==', familyId).limit(20),
+    });
+  }
+  if (wantsRecipes) {
+    Object.assign(queries, {
+      recipes: db.collection('recipes').where('familyId', '==', familyId).limit(50),
+    });
+  }
+  if (wantsGifts) {
+    Object.assign(queries, {
+      gifts: db.collection('gifts').where('familyId', '==', familyId).limit(50),
+    });
+  }
+
+  const entries = await Promise.all(Object.entries(queries).map(async ([key, q]) => [key, await safeGet(q)]));
+  for (const [key, docs] of entries) results[key] = docs;
+
+  // Merge past + future slices (disjoint date ranges, no duplicates)
+  for (const key of ['events', 'serviceAppointments', 'healthAppointments', 'schoolActivities', 'kindergartenActivities', 'petVetVisits']) {
+    const pastKey = `${key}Past`;
+    if (results[pastKey]) {
+      results[key] = [...(results[key] || []), ...results[pastKey]];
+      delete results[pastKey];
+    }
+  }
+
+  // Sorting (guarded because gated modules may be absent)
+  results.events.sort((a, b) => (a.date || '').localeCompare(b.date || ''));
+  results.trips.sort((a, b) => (b.startDate || '').localeCompare(a.startDate || ''));
+  (results.petVetVisits || []).sort((a, b) => (b.dateFrom || '').localeCompare(a.dateFrom || ''));
+  results.serviceAppointments.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
+  (results.homeProjects || []).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   results.healthAppointments.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
-  results.healthMedications = await safeGet(
-    db.collection('health').doc(familyId).collection('medications').limit(20)
-  );
-  results.healthVaccinations = await safeGet(
-    db.collection('health').doc(familyId).collection('vaccinations').limit(20)
-  );
-  results.healthVaccinations.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-  results.healthAllergies = await safeGet(
-    db.collection('health').doc(familyId).collection('allergies').limit(20)
-  );
-  results.healthGrowth = await safeGet(
-    db.collection('health').doc(familyId).collection('growth').limit(20)
-  );
-  results.schoolActivities = await safeGet(
-    db.collection('schoolActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
-  );
+  (results.healthVaccinations || []).sort((a, b) => (b.date || '').localeCompare(a.date || ''));
   results.schoolActivities.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
-  results.kindergartenActivities = await safeGet(
-    db.collection('kindergartenActivities').doc(familyId).collection('activities').where('dateFrom', '>=', past90Str).where('dateFrom', '<=', next30Str).limit(20)
-  );
   results.kindergartenActivities.sort((a, b) => (a.dateFrom || '').localeCompare(b.dateFrom || ''));
 
-  // TRIP SUB-COLLECTIONS (for each trip)
+  // TRIP SUB-COLLECTIONS (for each trip) — all fetched in parallel for speed
   results.tripDetails = {};
-  for (const trip of results.trips) {
-    const details = {};
-    details.hotels = await safeGet(db.collection('trips').doc(trip.id).collection('hotels').limit(10));
-    details.activities = await safeGet(db.collection('trips').doc(trip.id).collection('activities').limit(20));
-    details.transport = await safeGet(db.collection('trips').doc(trip.id).collection('transport').limit(10));
-    details.restaurants = await safeGet(db.collection('trips').doc(trip.id).collection('restaurants').limit(10));
-    details.packingLists = await safeGet(db.collection('trips').doc(trip.id).collection('packingLists').limit(10));
-    results.tripDetails[trip.id] = details;
-  }
+  const tripDetailSpec = [
+    ['hotels', 10],
+    ['activities', 20],
+    ['transport', 10],
+    ['restaurants', 10],
+    ['packingLists', 10],
+  ];
+  await Promise.all(results.trips.map(async (trip) => {
+    const values = await Promise.all(tripDetailSpec.map(([key, lim]) =>
+      safeGet(db.collection('trips').doc(trip.id).collection(key).limit(lim))
+    ));
+    results.tripDetails[trip.id] = Object.fromEntries(tripDetailSpec.map(([key], i) => [key, values[i]]));
+  }));
 
   return results;
 }
@@ -6106,7 +6105,7 @@ function formatDataForGPT(data) {
   if (data.schoolChildren && data.schoolChildren.length > 0) {
     lines.push('--- SKOLEBARN ---');
     data.schoolChildren.forEach(c => {
-      lines.push(`• ${c.name || '?'} | Skole: ${c.schoolName || ''} | Trinn: ${c.grade || ''}`);
+      lines.push(`• ${c.name || '?'} | Skole: ${c.schoolName || ''} | Trinn: ${c.grade || ''} | childId: ${c.id}`);
     });
   }
 
@@ -6127,9 +6126,22 @@ function formatDataForGPT(data) {
   }
 
   if (data.schoolSchedules && data.schoolSchedules.length > 0) {
-    lines.push('--- SKOLEDAGER ---');
+    const schoolChildName = (id) => {
+      const c = (data.schoolChildren || []).find(ch => ch.id === id);
+      return (c && c.name) || 'Ukjent barn';
+    };
+    let hasScheduleLines = false;
     data.schoolSchedules.forEach(s => {
-      lines.push(`• ${s.day || '?'} | ${s.startTime || ''} → ${s.endTime || ''} | ${s.subject || ''}`);
+      const entries = s.entries || [];
+      if (entries.length === 0) return;
+      if (!hasScheduleLines) {
+        lines.push('--- SKOLETIMEPLANER ---');
+        hasScheduleLines = true;
+      }
+      lines.push(`Timeplan for ${schoolChildName(s.childId)} (${s.semester || 'ukjent semester'}):`);
+      entries.forEach(e => {
+        lines.push(`  • ${e.day || '?'} | ${e.time || ''} | ${e.subject || ''}${e.teacher ? ' | Lærer: ' + e.teacher : ''}`);
+      });
     });
   }
 
@@ -6143,7 +6155,7 @@ function formatDataForGPT(data) {
   if (data.kindergartenChildren && data.kindergartenChildren.length > 0) {
     lines.push('--- BARNEHAGEBARN ---');
     data.kindergartenChildren.forEach(c => {
-      lines.push(`• ${c.name || '?'} | Barnehage: ${c.kindergartenName || ''}`);
+      lines.push(`• ${c.name || '?'} | Barnehage: ${c.kindergartenName || ''} | childId: ${c.id}`);
     });
   }
 
@@ -6164,9 +6176,22 @@ function formatDataForGPT(data) {
   }
 
   if (data.kindergartenSchedules && data.kindergartenSchedules.length > 0) {
-    lines.push('--- BARNEHAGEDAGER ---');
+    const kindergartenChildName = (id) => {
+      const c = (data.kindergartenChildren || []).find(ch => ch.id === id);
+      return (c && c.name) || 'Ukjent barn';
+    };
+    let hasScheduleLines = false;
     data.kindergartenSchedules.forEach(s => {
-      lines.push(`• ${s.day || '?'} | ${s.startTime || ''} → ${s.endTime || ''} | ${s.activity || ''}`);
+      const entries = s.entries || [];
+      if (entries.length === 0) return;
+      if (!hasScheduleLines) {
+        lines.push('--- BARNEHAGETIMEPLANER ---');
+        hasScheduleLines = true;
+      }
+      lines.push(`Timeplan for ${kindergartenChildName(s.childId)} (${s.semester || 'ukjent semester'}):`);
+      entries.forEach(e => {
+        lines.push(`  • ${e.day || '?'} | ${e.time || ''} | ${e.subject || ''}${e.teacher ? ' | Kontakt: ' + e.teacher : ''}`);
+      });
     });
   }
 
@@ -6302,20 +6327,33 @@ function formatDataForGPT(data) {
 }
 
 // AI Assistant: Search + Actions
-exports.aiAssistant = onRequest({ region: "us-central1", memory: "512MB", timeoutSeconds: 120 }, async (req, res) => {
+exports.aiAssistant = onRequest({ region: "us-central1", memory: "512MB", timeoutSeconds: 120, minInstances: 1 }, async (req, res) => {
   setCorsHeaders(res, req);
   if (req.method === "OPTIONS") return res.status(204).send("");
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const uid = await verifyAuth(req);
   if (!uid) return res.status(401).json({ error: "Unauthorized" });
-  if (!(await checkRateLimit(uid, "aiAssistant"))) return res.status(429).json({ error: "Too many requests" });
   if (!OPENAI_API_KEY) return res.status(500).json({ error: "OPENAI_API_KEY not configured" });
 
   const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
   try {
     const { message, familyId, history, actions } = req.body;
+
+    // FAST PATH: a bare greeting needs no data or LLM call — reply instantly.
+    // Runs before rate limiting because it performs zero reads and zero LLM calls.
+    const trimmedMsg = String(message || '').trim().toLowerCase();
+    if (/^(hei|heisann|heia|hallo|hi|hello|hey|morn|morno|god morgen|god dag|god kveld|god natt|yo)[\s!,.?]*$/.test(trimmedMsg)) {
+      const greetingReplies = [
+        'Hei! Hva kan jeg hjelpe deg med? Du kan spørre om hendelser, reiser, skole, helse, kjæledyr, hjem og mer.',
+        'Hei! Hva skal jeg se på for deg i dag?',
+        'Hallo! Hva kan jeg gjøre for familien?',
+      ];
+      return res.json({ reply: greetingReplies[Math.floor(Math.random() * greetingReplies.length)], actions: [] });
+    }
+
+    if (!(await checkRateLimit(uid, "aiAssistant"))) return res.status(429).json({ error: "Too many requests" });
 
     // Handle confirmation
     if (message === '__CONFIRM__' && actions && actions.length > 0) {
@@ -6359,15 +6397,18 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "512MB", timeou
       return res.json({ reply: 'Takk for tilbakemeldingen!', actions: [] });
     }
 
-    // STEP 1: Search all family data
-    const familyData = await searchFamilyData(db, familyId, message);
+    // STEP 1: Search all family data (keyword-gated modules; include recent
+    // history so follow-up questions keep the right context loaded)
+    const keywordText = [message, ...(history || []).slice(-4).map(m => m.content)].join(' ');
+    const familyData = await searchFamilyData(db, familyId, keywordText);
     const dataContext = formatDataForGPT(familyData);
 
-    // STEP 1.5: Weather lookup for trip-related weather queries
-    let weatherContext = '';
+    // STEP 1.5 + 1.6: Weather lookup and corrections — independent, run in parallel
     const weatherKeywords = ['vær', 'weather', 'temperatur', 'regn', 'sol', 'snø', ' vind', 'skyet', 'overskyet', 'grad'];
     const isWeatherQuery = weatherKeywords.some(kw => message.toLowerCase().includes(kw));
-    if (isWeatherQuery && familyData.trips && familyData.trips.length > 0) {
+
+    const buildWeatherContext = async () => {
+      if (!isWeatherQuery || !familyData.trips || familyData.trips.length === 0) return '';
       try {
         const today = new Date().toISOString().split('T')[0];
         const upcomingTrips = familyData.trips
@@ -6375,33 +6416,39 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "512MB", timeou
           .sort((a, b) => (a.startDate || '').localeCompare(b.startDate || ''))
           .slice(0, 3);
 
-        for (const trip of upcomingTrips) {
+        const fmtDate = (day) => `${day.displayDate.year}-${String(day.displayDate.month).padStart(2, '0')}-${String(day.displayDate.day).padStart(2, '0')}`;
+
+        // Geocode + fetch weather for all trips in parallel
+        const blocks = await Promise.all(upcomingTrips.map(async (trip) => {
           const destination = trip.destination || trip.title;
-          if (!destination) continue;
+          if (!destination) return '';
 
           // Geocode destination with Google
           const geoRes = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(destination)}&key=${process.env.GOOGLE_MAPS_API_KEY}`);
           const geoData = await geoRes.json();
-          if (geoData.status !== 'OK' || !geoData.results || geoData.results.length === 0) continue;
+          if (geoData.status !== 'OK' || !geoData.results || geoData.results.length === 0) return '';
           const { lat: latitude, lng: longitude } = geoData.results[0].geometry.location;
 
           // Fetch Google Weather forecast
-          const weatherRes = await fetch(`https://weather.googleapis.com/v1/forecast/days:lookup?key=${process.env.GOOGLE_MAPS_API_KEY}&location.latitude=${latitude}&location.longitude=${longitude}&days=10&languageCode=no`);
-          if (!weatherRes.ok) continue;
+          const weatherRes = await fetch(`https://weather.googleapis.com/v1/forecast/days:lookup?key=${process.env.GOOGLE_MAPS_API_KEY}&location.latitude=${latitude}&location.longitude=${longitude}&days=10&pageSize=10&languageCode=no`);
+          if (!weatherRes.ok) return '';
           const weatherData = await weatherRes.json();
 
           const tripStart = trip.startDate;
           const tripEnd = trip.endDate;
           const forecastDays = weatherData.forecastDays || [];
+          const coverageStr = forecastDays.length > 0
+            ? `${fmtDate(forecastDays[0])} → ${fmtDate(forecastDays[forecastDays.length - 1])}`
+            : null;
           const relevantDays = forecastDays.filter(day => {
-            const d = `${day.displayDate.year}-${String(day.displayDate.month).padStart(2, '0')}-${String(day.displayDate.day).padStart(2, '0')}`;
+            const d = fmtDate(day);
             return d >= tripStart && d <= tripEnd;
           });
 
           if (relevantDays.length > 0) {
-            weatherContext += `\n--- VÆR for "${trip.title || destination}" (${tripStart} → ${tripEnd}) ---\n`;
+            let block = `\n--- VÆR for "${trip.title || destination}" (${tripStart} → ${tripEnd}) ---\n`;
             for (const day of relevantDays) {
-              const d = `${day.displayDate.year}-${String(day.displayDate.month).padStart(2, '0')}-${String(day.displayDate.day).padStart(2, '0')}`;
+              const d = fmtDate(day);
               const desc = day.daytimeForecast?.weatherCondition?.description?.text || '';
               const maxT = day.maxTemperature?.degrees || '?';
               const minT = day.minTemperature?.degrees || '?';
@@ -6409,38 +6456,50 @@ exports.aiAssistant = onRequest({ region: "us-central1", memory: "512MB", timeou
               const uv = day.daytimeForecast?.uvIndex || 0;
               const wind = day.daytimeForecast?.wind?.speed?.value || 0;
               const humidity = day.daytimeForecast?.relativeHumidity || 0;
-              weatherContext += `${d}: ${desc}, ${minT}°C → ${maxT}°C, UV: ${uv}, regn: ${rain}%, vind: ${wind} km/t, luftfuktighet: ${humidity}%\n`;
+              block += `${d}: ${desc}, ${minT}°C → ${maxT}°C, UV: ${uv}, regn: ${rain}%, vind: ${wind} km/t, luftfuktighet: ${humidity}%\n`;
             }
-          } else {
-            weatherContext += `\n--- VÆR for "${trip.title || destination}" ---\nIngen værdata tilgjengelig for disse datoene ennå (Google Weather gir opptil 10 dagers prognose).\n`;
+            const lastForecastDate = coverageStr ? coverageStr.split(' → ')[1] : null;
+            if (lastForecastDate && tripEnd > lastForecastDate) {
+              block += `(Prognosen dekker til og med ${lastForecastDate}. Dager etter dette blir tilgjengelige når de kommer innenfor 10-dagersvinduen.)\n`;
+            }
+            return block;
+          } else if (coverageStr) {
+            return `\n--- VÆR for "${trip.title || destination}" (${tripStart} → ${tripEnd}) ---\nIngen værdata for disse datoene ennå. Prognosen dekker ${coverageStr} (Google Weather gir opptil 10 dagers prognose). Datoer innenfor denne perioden vil få værdata nærmere reisen.\n`;
           }
-        }
+          return `\n--- VÆR for "${trip.title || destination}" (${tripStart} → ${tripEnd}) ---\nIngen værdata tilgjengelig for disse datoene ennå (Google Weather gir opptil 10 dagers prognose).\n`;
+        }));
+        return blocks.join('');
       } catch (e) {
         console.log('Weather lookup error (non-fatal):', e.message);
+        return '';
       }
-    }
+    };
 
-    // STEP 1.6: Load relevant corrections (top 5)
-    let correctionContext = '';
-    try {
-      const correctionsSnap = await db.collection('aiLearnedCorrections')
-        .where('familyId', '==', familyId)
-        .orderBy('createdAt', 'desc')
-        .limit(50)
-        .get();
-      const corrections = correctionsSnap.docs.map(d => d.data());
-      const msgWords = message.toLowerCase().split(/\s+/).filter(w => w.length > 2);
-      const relevant = corrections.filter(c => {
-        const cq = (c.query || '').toLowerCase();
-        return msgWords.some(w => cq.includes(w));
-      }).slice(0, 5);
-      if (relevant.length > 0) {
-        correctionContext = '\n\nTIDLIGERE KORRIGERINGER fra brukeren (BRUK DISSE når de er relevante):\n' +
-          relevant.map(c => `- Sporsmal: "${c.query}" -> Riktig svar: "${c.correctAnswer}"`).join('\n');
+    const loadCorrections = async () => {
+      try {
+        const correctionsSnap = await db.collection('aiLearnedCorrections')
+          .where('familyId', '==', familyId)
+          .orderBy('createdAt', 'desc')
+          .limit(50)
+          .get();
+        const corrections = correctionsSnap.docs.map(d => d.data());
+        const msgWords = message.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+        const relevant = corrections.filter(c => {
+          const cq = (c.query || '').toLowerCase();
+          return msgWords.some(w => cq.includes(w));
+        }).slice(0, 5);
+        if (relevant.length > 0) {
+          return '\n\nTIDLIGERE KORRIGERINGER fra brukeren (BRUK DISSE når de er relevante):\n' +
+            relevant.map(c => `- Sporsmal: "${c.query}" -> Riktig svar: "${c.correctAnswer}"`).join('\n');
+        }
+        return '';
+      } catch (e) {
+        console.log('Corrections load error (non-fatal):', e.message);
+        return '';
       }
-    } catch (e) {
-      console.log('Corrections load error (non-fatal):', e.message);
-    }
+    };
+
+    const [weatherContext, correctionContext] = await Promise.all([buildWeatherContext(), loadCorrections()]);
 
     const todayStr = new Date().toISOString().split('T')[0];
     const today = new Date();
@@ -6463,6 +6522,7 @@ KRITISKE REGLER:
 6. For delete-handlinger: bekreft med brukeren først. For serviceavtaler (SERVICE.APPOINTMENTS) kan delete brukes uten id: send data: { title, homeName } (basert på brukerens behov).
 7. Svar alltid på norsk.
 8. Sorter svar etter dato (nærmeste først).
+9. MODULER PÅ ETTERSPØRSEL: Noen datamoduler (kjæledyr, helseoppføringer, hjemmeprosjekter, oppskrifter, gaver) lastes bare inn når spørsmålet handler om dem. Hvis en seksjon mangler i konteksten, IKKE konkluder med at familien ikke har data der — heller si at du ikke ser dataen akkurat nå og gjerne spør om å spesifisere (da lastes den inn på neste melding).
 
 OPPRETT-REGEL (viktig for å unngå hallusinasjon):
 Når brukeren ber om å opprette noe nytt (f.eks. "Ny helsetime", "Legg til", "Opprett"):
@@ -6567,36 +6627,34 @@ HOME.OFFERS: provider, description, price
 
 ENTITETSKOBLING (viktig): Dersom brukeren (eller prompten) sier oppføringen skal oprettes for et bestemt hjem/kjæledyr/barn/person, MÅ du alltid inkludere relatert NAME-felt i data (homeName / petName / childName / person). Systemet kobler automatisk riktig ID server-side. Kopier navnet nøyaktig som gitt.
 
-SKOLE/KINDERGARTEN DOKUMENTER: Skoletimeplaner og barnehageplaner er opplastede bilder/dokumenter. Du kan ikke vise dem direkte, men du kan navigere brukeren til riktig sted der de kan se dem.
+SKOLETIMEPLANER: Skoletimeplaner og barnehageplaner er lest inn som tekst (via bilde-lesing) og finnes i konteksten under SKOLETIMEPLANER / BARNEHAGETIMEPLANER, med barnets navn på hver timeplan. Du KAN lese og svare ut fra denne dataen (fag, dager, tider, lærere). Filtrer på barnets navn når brukeren spør om et spesifikt barn. Hvis brukeren vil se eller redigere timeplanen, kan du navigere til barnets side (SchoolDetail/KindergartenDetail) med childId fra SKOLEBARN/BARNEHAGEBARN-seksjonen. Hvis en timeplan mangler eller er tom, si det — ikke påstå at den er et bilde du ikke kan lese.
 
-VÆR: Hvis brukeren spør om vær for en reise, er værdata allerede hentet og inkludert i konteksten under "VÆR for ...". Dataen inkluderer temperatur, UV-indeks, regnsjanse, vind og luftfuktighet. Bruk denne dataen til å svare. Hvis reisen er lenger frem i tid enn 10 dager, forklar at Google Weather gir opptil 10 dagers prognose og at du kan vise data når reisen nærmer seg.
+VÆR: Hvis brukeren spør om vær for en reise, er værdata allerede hentet og inkludert i konteksten under "VÆR for ...". Dataen inkluderer temperatur, UV-indeks, regnsjanse, vind og luftfuktighet. Bruk denne dataen til å svare. Hvis bare noen av reisedagene har værdata, er det fordi Google Weather gir opptil 10 dagers prognose frem i tid — bruk dataen som finnes og forklar at resten blir tilgjengelig nærmere reisen. Ikke si at du ikke finner værdata hvis det finnes en VÆR-seksjon i konteksten.
 
 NAVIGASJON (action type: "navigate") - brukeren kan be om å navigere til skjermer.
 Når brukeren ber om å navigere, returner en navigate-action.
 
 Tilgjengelige skjermer og riktig bruk:
-- school.children → { screen: 'SchoolSpace', childId: 'ID' } (navigerer til et barns skoleside)
-- kindergarten.children → { screen: 'KindergartenSpace', childId: 'ID' } (navigerer til et barns barnehageside)
-- pets → { screen: 'PetSpace', petId: 'ID' } (navigerer til et kjæledyrs side)
-- homes → { screen: 'HomeSpace', homeId: 'ID' } (navigerer til et hjem)
+- school.children → { screen: 'SchoolDetail', childId: 'EKTE ID fra SKOLEBARN-listen', childName: 'barnets navn' } (åpner barnets skoleside direkte)
+- kindergarten.children → { screen: 'KindergartenDetail', childId: 'EKTE ID fra BARNEHAGEBARN-listen', childName: 'barnets navn' } (åpner barnets barnehageside direkte)
+- pets → { screen: 'PetSpace', petId: 'EKTE ID', petName: 'dyrets navn' } (navigerer til et kjæledyrs side)
+- homes → { screen: 'HomeSpace', homeId: 'EKTE ID', homeName: 'hjemmets navn' } (navigerer til et hjem)
 - health → { screen: 'HealthSpace' } (navigerer til helseoversikten)
 - events → { screen: 'Events', subScreen: 'EventsList' } (navigerer til hendelseslisten - du kan IKKE navigere direkte til EventDetail uten objektet)
 - trips → { screen: 'Trips', subScreen: 'TripsList' } (navigerer til reiselisten - du kan IKKE navigere direkte til TripDetail uten objektet)
 - service → { screen: 'HomeMaintenance', home: {OBJEKT} } (navigerer til serviceoversikten)
 
+IKKE-BRYT-REGLER: Kopier ALDRI ordet "ID" bokstavelig — bruk alltid den ekte ID-en som står i konteksten (SKOLEBARN/BARNEHAGEBARN-linjene inneholder childId). Inkluder ALLTID også navnefeltet (childName/petName/homeName) — systemet finner riktig ID server-side hvis ID-en mangler.
+
 VIKTIG: For events og trips, naviger ALLTID til listen (EventsList/TripsList), aldri direkte til detaljene. Brukeren finner elementet i listen.
 
 Når du oppretter noe (create), kan du også returnere en navigate-action i tillegg.
 
-Returner JSON med denne strukturen:
-{
-  "reply": "Svaret ditt",
-  "actions": [
-    { "type": "navigate|create|delete", "module": "...", "data": {}, "description": "...",
-      "screen": { "screen": "ScreenName", "childId": "ID", "petId": "ID", ... } }
-  ]
-}
-Hvis ingen handlinger: actions: []`;
+SVARFORMAT (viktig — svaret strømmes til brukeren):
+Skriv svaret som vanlig lesbar tekst (norsk). IKKE pakk svaret inn i JSON.
+Hvis du har handlinger, avslutt svaret med ÉN enkelt siste linje på dette formatet:
+<<<ACTIONS>>>{"actions":[{"type":"navigate|create|delete","module":"...","data":{},"description":"...","screen":{"screen":"ScreenName","childId":"ID","petId":"ID"}}]}
+Hvis ingen handlinger: ingen ACTIONS-linje. ACTIONS-linjen er maskinlesbar — aldri plasser den midt i svaret, aldri flere enn én.`;
 
     const dataMessage = `Familiens data i systemet:\n${dataContext}${correctionContext}${weatherContext}\n\nBrukerens sporsmal: ${message}`;
 
@@ -6606,47 +6664,151 @@ Hvis ingen handlinger: actions: []`;
       { role: "user", content: dataMessage },
     ];
 
-    const response = await openai.chat.completions.create({
-      model: AI_MODEL_FAST,
-      messages,
-      max_completion_tokens: 2000,
-      response_format: { type: "json_object" },
-    });
-
-    const content = response.choices[0]?.message?.content || "";
-
-    let result;
-    try {
-      result = JSON.parse(content);
-      if (!result.reply) result.reply = content;
-      if (!result.actions) result.actions = [];
-    } catch (e) {
-      result = { reply: content, actions: [] };
+    // Retry transient OpenAI errors (server_error / rate limit / timeouts).
+    // The call streams: plain text reply, optional <<<ACTIONS>>>{...} final line.
+    const ACTIONS_MARKER = '<<<ACTIONS>>>';
+    let stream = null;
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        stream = await openai.chat.completions.create({
+          model: AI_MODEL_FAST,
+          messages,
+          max_completion_tokens: 2000,
+          stream: true,
+        });
+        break;
+      } catch (e) {
+        const status = e?.status || e?.response?.status;
+        const retryable = !status || status === 429 || status >= 500;
+        if (!retryable || attempt === 2) throw e;
+        console.log(`OpenAI attempt ${attempt + 1} failed (status ${status}), retrying...`);
+        await new Promise(r => setTimeout(r, 700 * (attempt + 1)));
+      }
     }
 
-    res.json(result);
+    // Stream to the client. Text from the model is forwarded immediately, but
+    // everything from the ACTIONS marker on is held back and sent once at the
+    // end, normalized, so the user never sees raw action JSON.
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.setHeader('Cache-Control', 'no-cache, no-transform');
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    let streamedLen = 0;
+    let full = '';
+    const streamToClient = (text) => {
+      if (text.length <= streamedLen) return;
+      res.write(text.slice(streamedLen));
+      streamedLen = text.length;
+    };
+
+    try {
+      for await (const chunk of stream) {
+        const delta = chunk.choices?.[0]?.delta?.content || '';
+        if (!delta) continue;
+        full += delta;
+        const markerIdx = full.indexOf(ACTIONS_MARKER, Math.max(0, streamedLen - (ACTIONS_MARKER.length - 1)));
+        if (markerIdx >= 0) {
+          streamToClient(full.slice(0, markerIdx));
+        } else if (full.length > ACTIONS_MARKER.length - 1) {
+          // Hold back a possible partial marker at the tail
+          streamToClient(full.slice(0, full.length - (ACTIONS_MARKER.length - 1)));
+        }
+      }
+      // Flush whatever is left after stream end (no marker, or marker found)
+      const markerIdx = full.indexOf(ACTIONS_MARKER);
+      if (markerIdx >= 0) {
+        streamToClient(full.slice(0, markerIdx));
+      } else {
+        streamToClient(full);
+      }
+    } catch (e) {
+      console.error('aiAssistant stream error:', e);
+      // Keep whatever was streamed; fall through to end the response
+    }
+
+    // Normalize and send the actions payload (client strips this marker line)
+    let parsedActions = [];
+    const markerIdx = full.indexOf(ACTIONS_MARKER);
+    if (markerIdx >= 0) {
+      try {
+        const payload = JSON.parse(full.slice(markerIdx + ACTIONS_MARKER.length).trim().replace(/^```(json)?|```$/g, ''));
+        parsedActions = Array.isArray(payload) ? payload : (payload.actions || []);
+      } catch (e) {
+        console.log('Actions parse error (non-fatal):', e.message);
+      }
+    }
+
+    // Navigate screens: resolve entity names (or placeholder ids) to real
+    // Firestore IDs server-side — the model must never be trusted for IDs
+    const isPlaceholderId = (id) => !id || /^(id|ukjent|unknown|\?+|null|undefined)$/i.test(String(id).trim());
+    const resolveNameToId = async (colName, nameValue) => {
+      const wanted = String(nameValue || '').trim().toLowerCase();
+      if (!wanted) return null;
+      const snap = await db.collection(colName).where('familyId', '==', familyId).get();
+      let match = null;
+      snap.forEach((doc) => {
+        const name = (doc.data().name || '').trim().toLowerCase();
+        if (!match && name === wanted) match = doc.id;
+      });
+      return match;
+    };
+    for (const a of parsedActions) {
+      if (a.type !== 'navigate' || !a.screen) continue;
+      const s = a.screen;
+      try {
+        if ((s.screen === 'SchoolSpace' || s.screen === 'SchoolDetail' || s.screen === 'KindergartenSpace' || s.screen === 'KindergartenDetail') && isPlaceholderId(s.childId)) {
+          const col = (s.screen === 'SchoolSpace' || s.screen === 'SchoolDetail') ? 'schoolChildren' : 'kindergartenChildren';
+          const resolved = await resolveNameToId(col, s.childName);
+          if (resolved) s.childId = resolved;
+        } else if (s.screen === 'PetSpace' && isPlaceholderId(s.petId)) {
+          const resolved = await resolveNameToId('pets', s.petName);
+          if (resolved) s.petId = resolved;
+        } else if ((s.screen === 'HomeSpace' || s.screen === 'HomeMaintenance') && isPlaceholderId(s.homeId)) {
+          const resolved = await resolveNameToId('homes', s.homeName);
+          if (resolved) s.homeId = resolved;
+        }
+      } catch (e) {
+        console.log('Navigate resolve error (non-fatal):', e.message);
+      }
+    }
+
+    res.write(`\n${ACTIONS_MARKER}${JSON.stringify({ actions: parsedActions })}`);
+    res.end();
   } catch (error) {
     console.error("aiAssistant error:", error);
     res.status(500).json({ error: "Failed to process request" });
   }
 });
 
-async function validateAction(action, familyData) {
+async function validateAction(action, familyData, familyId) {
   if (action.type === 'navigate' && action.screen) {
     const s = action.screen;
+    const db = getFirestore();
+    // Verify referenced docs server-side (works even if the module was not
+    // loaded into familyData by the keyword-gated context fetch)
+    const docValid = async (colName, id) => {
+      if (!id) return false;
+      const snap = await db.collection(colName).doc(id).get();
+      return snap.exists && snap.data().familyId === familyId;
+    };
     if (s.childId) {
       const exists = (familyData.schoolChildren || []).some(c => c.id === s.childId) ||
-                     (familyData.kindergartenChildren || []).some(c => c.id === s.childId);
+                     (familyData.kindergartenChildren || []).some(c => c.id === s.childId) ||
+                     await docValid('schoolChildren', s.childId) ||
+                     await docValid('kindergartenChildren', s.childId);
       if (!exists) return { valid: false, error: 'Barnet ble ikke funnet i systemet.' };
     }
     if (s.petId) {
-      const exists = (familyData.pets || []).some(p => p.id === s.petId);
+      const exists = (familyData.pets || []).some(p => p.id === s.petId) || await docValid('pets', s.petId);
       if (!exists) return { valid: false, error: 'Kjæledyret ble ikke funnet i systemet.' };
     }
     if (s.homeId) {
-      const home = (familyData.homes || []).find(h => h.id === s.homeId);
-      if (!home) return { valid: false, error: 'Hjemmet ble ikke funnet i systemet.' };
-      s.home = home;
+      const snap = await db.collection('homes').doc(s.homeId).get();
+      if (!snap.exists || snap.data().familyId !== familyId) {
+        return { valid: false, error: 'Hjemmet ble ikke funnet i systemet.' };
+      }
+      s.home = { id: snap.id, ...snap.data() };
     }
   }
   return { valid: true };

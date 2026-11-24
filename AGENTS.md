@@ -174,6 +174,46 @@ const [showHelp, setShowHelp] = useState(false);
 - Cloud Functions verify auth + role server-side before any mutation
 - Client reads direct Firestore; client writes call Cloud Functions via `callFunction()` helper
 
+## AI Assistant (CRITICAL)
+
+The AI assistant is a chat feature powered by one Cloud Function (`aiAssistant` in `functions/index.js`) and the client screen `src/screens/AIAssistantScreen.tsx`. The client sends ONLY `{ message, familyId, history }` — **all family data gathering happens server-side**. Never gather context client-side.
+
+### Architecture
+- Pipeline: gather data (parallel Firestore queries) → build Norwegian text context (`formatDataForGPT`) → optional weather lookup → learned corrections (`aiLearnedCorrections`) → OpenAI call → `{ reply, actions[] }`.
+- Actions: `navigate` | `create` | `delete`. Confirmable actions are shown to the user and re-sent as `message: '__CONFIRM__'` with the actions; execution happens server-side only after user confirmation.
+- Every request: `verifyAuth` + `checkRateLimit` + `familyId` scoping. Trust nothing from the client or model — IDs are resolved and validated server-side.
+
+### Data gathering rules (`searchFamilyData`)
+- **ALL queries must be fetched in parallel** (`Promise.all` over a queries object) — never sequential awaits.
+- **Core modules always fetched**: events, trips (+ trip subcollections), birthdays, service appointments, shopping lists, homes, school/kindergarten children + contacts + schedules + holidays + activities, mealPlans, health appointments.
+- **On-demand modules (keyword-gated)**: pets (+ pet collections), health details (medications/vaccinations/allergies/growth), home details (projects/instructions/paintColors/tasks/shoppingItems/offers), recipes, gifts. Keyword matching includes the current message AND the last 4 history messages so follow-ups keep context. Keywords must be **generous** — over-fetching is safe; under-fetching causes "I can't find data" regressions.
+- **Past/future split (CRITICAL)**: date-windowed collections MUST be fetched as two slices — a small past slice (window ending yesterday, `orderBy desc`, small limit) and a future slice (starting today, `orderBy asc`) — then merged. A single combined query with `.limit()` silently drops the nearest future items once history fills the limit (this broke "neste helsetime").
+- Use safe defaults everywhere — gated modules may be absent (`(results.x || []).sort(...)`, `if (data.x && data.x.length > 0)`).
+
+### Date field traps
+- Collections use **different date fields**: `events.date`, but `dateFrom` for health appointments, activities, services and vet visits. Some legacy health appointment docs only have `date`.
+- School/kindergarten schedules store lessons in an **`entries` array** (`{day, time, subject, teacher}`) — NOT on the schedule document. Always render from `entries` and label each schedule with the child's name (map `childId` → children collection).
+- Google Weather API: `days=10` **without** `pageSize=10` returns only 5 days. Always send `pageSize`.
+
+### IDs and grounding (CRITICAL)
+- The model must **never hallucinate or echo Firestore IDs** for entities. Exception: `childId` is included in the SKOLEBARN/BARNEHAGEBARN context lines so the model can emit navigate actions to a child's page.
+- For create/delete actions the model echoes entity **names** (`childName`, `petName`, `homeName`, `personName`); `executeAction` → `resolveEntityRef()` resolves them to real IDs via direct Firestore queries scoped by `familyId`.
+- `validateAction` verifies child/pet/home IDs against Firestore directly (with `familyId` check) — works even when the module wasn't loaded by keyword gating.
+- Data the model should answer from must be **pre-fetched into the context** (weather, OCR'd timetables). The system prompt must never claim data is "an image I can't read".
+
+### Performance
+- Bare greetings (regex fast path) return instantly with a canned reply — no data fetch, no LLM call.
+- OpenAI calls **retry up to 3×** on 429/5xx/network errors — a transient `server_error` otherwise fails the whole request.
+- All assistant calls use `AI_MODEL_FAST`. Weather is only fetched when the message matches weather keywords.
+- **Streaming**: replies stream to the client so text appears within ~1s. Contract: server streams plain text; action JSON is appended at the very end behind an `<<<ACTIONS>>>` marker line which the server holds back from the visible stream and normalizes before sending; `__CONFIRM__`/feedback paths remain plain JSON. Client reads the stream (web: `response.body.getReader()`, native: `fetch` from `expo/fetch`).
+
+### Testing checklist for assistant changes
+- "Hei" → instant canned reply (fast path, no crash when modules are gated off).
+- One question per module type (events, trip + weather, school timetable per child, health appointment upcoming + past, pet, recipe, home, shopping).
+- A create-action preview + confirm flow, and a delete flow.
+- Check Cloud Function logs for errors after deploying.
+
+
 ## Calendar Sync (CRITICAL)
 
 When adding or modifying calendar sync for any module (events, trips, health, pet), **both** Google Calendar (Cloud Functions) AND Phone Calendar (`CalendarSync`) must be updated. Never implement one without the other.

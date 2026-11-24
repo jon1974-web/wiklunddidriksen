@@ -64,6 +64,7 @@ interface KindergartenSpaceRouteParams {
   editActivityId?: string;
   editActivityData?: KindergartenActivityFormData;
   childId?: string;
+  childName?: string;
   openVoiceForType?: string;
   openPhotoForType?: string;
   moduleColor?: string;
@@ -251,16 +252,35 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
     }
   }, [years, selectedChild]);
 
+  // Reactive auto-select: runs whenever params, children or selection change,
+  // so it also fires when the children list finishes loading AFTER the focus event
+  useEffect(() => {
+    const childId = route?.params?.childId;
+    const childName = route?.params?.childName;
+    if (!childId && !childName) return;
+    if (children.length === 0) return;
+    if (childId && selectedChild?.id === childId) return;
+    if (!childId && childName && (selectedChild?.name || '').toLowerCase() === childName.toLowerCase()) return;
+    const child = childId
+      ? children.find(c => c.id === childId)
+      : children.find(c => (c.name || '').toLowerCase() === (childName || '').toLowerCase());
+    if (child) setSelectedChild(child);
+  }, [children, selectedChild, route?.params?.childId, route?.params?.childName]);
+
   // Auto-select child when navigated with childId param (from AI assistant or detail screen)
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
       const childId = route?.params?.childId;
+      const childName = route?.params?.childName;
       const editId = route?.params?.editActivityId;
       const addSection = route?.params?.openAddSection;
-      if ((childId || editId || addSection) && children.length > 0) {
-        // Auto-select child if needed
+      if ((childId || childName || editId || addSection) && children.length > 0) {
+        // Auto-select child if needed (by ID, or by name if the ID is missing)
         if (childId && (!selectedChild || selectedChild.id !== childId)) {
           const child = children.find(c => c.id === childId);
+          if (child) setSelectedChild(child);
+        } else if (!childId && childName && (!selectedChild || (selectedChild.name || '').toLowerCase() !== childName.toLowerCase())) {
+          const child = children.find(c => (c.name || '').toLowerCase() === childName.toLowerCase());
           if (child) setSelectedChild(child);
         }
         // Open edit modal if editActivityId is passed
@@ -281,7 +301,7 @@ export const KindergartenSpaceScreen: React.FC<KindergartenSpaceScreenProps> = (
       }
     });
     return unsubscribe;
-  }, [navigation, route?.params?.childId, route?.params?.editActivityId, route?.params?.openAddSection, children, selectedChild]);
+  }, [navigation, route?.params?.childId, route?.params?.childName, route?.params?.editActivityId, route?.params?.openAddSection, children, selectedChild]);
 
   const handleSaveChild = async () => {
     if (!familyId) return;

@@ -40,6 +40,8 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  /** id of the assistant message currently being streamed */
+  const [streamingMsgId, setStreamingMsgId] = useState<string | null>(null);
   const [pendingActions, setPendingActions] = useState<any[]>([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmMessage, setConfirmMessage] = useState('');
@@ -55,6 +57,59 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
   const chunksRef = useRef<Blob[]>([]);
   const scrollRef = useRef<ScrollView>(null);
   const messagesRef = useRef<Message[]>([]);
+
+  const upsertAssistantMessage = useCallback((id: string, content: string, actions?: any[]) => {
+    setMessages((prev) => {
+      const exists = prev.some((m) => m.id === id);
+      const updated = exists
+        ? prev.map((m) => (m.id === id ? { ...m, content, ...(actions !== undefined ? { actions } : {}) } : m))
+        : [...prev, { id, role: 'assistant' as const, content, timestamp: Date.now() }];
+      messagesRef.current = updated;
+      return updated;
+    });
+  }, []);
+
+  /** Post-reply behavior shared by the streamed and JSON response paths */
+  const runAssistantActions = useCallback((allActions: any[], replyText: string) => {
+    const navigateActions = allActions.filter((a: any) => a.type === 'navigate');
+    const confirmableActions = allActions.filter((a: any) => a.type !== 'navigate');
+
+    for (const nav of navigateActions) {
+      if (nav.screen) {
+        const screenConfig = nav.screen;
+        const targetScreen = screenConfig.screen;
+        onClose();
+        setTimeout(() => {
+          if (targetScreen === 'SchoolSpace' || targetScreen === 'SchoolDetail') {
+            navigation.navigate('Trips', { screen: 'SchoolDetail', params: { childId: screenConfig.childId, childName: screenConfig.childName } });
+          } else if (targetScreen === 'KindergartenSpace' || targetScreen === 'KindergartenDetail') {
+            navigation.navigate('Trips', { screen: 'KindergartenDetail', params: { childId: screenConfig.childId, childName: screenConfig.childName } });
+          } else if (targetScreen === 'PetSpace') {
+            navigation.navigate('Trips', { screen: 'PetSpace', params: { petId: screenConfig.petId } });
+          } else if (targetScreen === 'HomeSpace') {
+            navigation.navigate('Trips', { screen: 'HomeSpace', params: { homeId: screenConfig.homeId } });
+          } else if (targetScreen === 'HealthSpace') {
+            navigation.navigate('Trips', { screen: 'HealthSpace' });
+          } else if (targetScreen === 'Events') {
+            navigation.navigate('Events');
+          } else if (targetScreen === 'Trips') {
+            navigation.navigate('Trips', { screen: 'SpacesList' });
+          } else if (targetScreen === 'HomeMaintenance' && screenConfig.home) {
+            navigation.navigate('Trips', { screen: 'HomeMaintenance', params: { home: screenConfig.home } });
+          } else {
+            navigation.navigate('Trips', { screen: targetScreen });
+          }
+        }, 300);
+        return;
+      }
+    }
+
+    if (confirmableActions.length > 0) {
+      setConfirmMessage(replyText);
+      setConfirmActions(allActions);
+      setShowConfirm(true);
+    }
+  }, [navigation, onClose]);
 
   const sendMessage = useCallback(async (text: string) => {
     if (!text.trim() || loading) return;
@@ -76,6 +131,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
     });
     setInput('');
     setLoading(true);
+    let streamingStarted = false;
 
     const controller = new AbortController();
     const abortTimer = setTimeout(() => controller.abort(), 120000);
@@ -100,74 +156,65 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
       });
       clearTimeout(abortTimer);
 
-      const data = await res.json();
+      const assistantId = (Date.now() + 1).toString();
+      const contentType = res.headers.get('content-type') || '';
 
-      if (data.error) {
-        const errorMsg: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: `Beklager, det oppstod en feil: ${data.error}`,
-          timestamp: Date.now(),
-        };
-        setMessages((prev) => [...prev, errorMsg]);
+      // JSON response (greeting fast path or error before streaming started)
+      if (!res.ok || contentType.includes('application/json')) {
+        const data = await res.json();
+        if (data.error) {
+          upsertAssistantMessage(assistantId, `Beklager, det oppstod en feil: ${data.error}`);
+          return;
+        }
+        upsertAssistantMessage(assistantId, data.reply || '', data.actions || []);
+        runAssistantActions(data.actions || [], data.reply || '');
         return;
       }
 
-      const assistantMsg: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: data.reply,
-        actions: data.actions || [],
-        timestamp: Date.now(),
-      };
-      setMessages((prev) => {
-        const updated = [...prev, assistantMsg];
-        messagesRef.current = updated;
-        return updated;
-      });
+      // Streamed text reply; final <<<ACTIONS>>>{...} line is machine data
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error('No response stream');
+      const decoder = new TextDecoder();
+      const MARKER = '<<<ACTIONS>>>';
+      let full = '';
 
-      const allActions = data.actions || [];
-      const navigateActions = allActions.filter((a: any) => a.type === 'navigate');
-      const confirmableActions = allActions.filter((a: any) => a.type !== 'navigate');
-
-      for (const nav of navigateActions) {
-        if (nav.screen) {
-          const screenConfig = nav.screen;
-          const targetScreen = screenConfig.screen;
-          onClose();
-          setTimeout(() => {
-            if (targetScreen === 'SchoolSpace') {
-              navigation.navigate('Trips', { screen: 'SchoolSpace', params: { childId: screenConfig.childId } });
-            } else if (targetScreen === 'KindergartenSpace') {
-              navigation.navigate('Trips', { screen: 'KindergartenSpace', params: { childId: screenConfig.childId } });
-            } else if (targetScreen === 'PetSpace') {
-              navigation.navigate('Trips', { screen: 'PetSpace', params: { petId: screenConfig.petId } });
-            } else if (targetScreen === 'HomeSpace') {
-              navigation.navigate('Trips', { screen: 'HomeSpace', params: { homeId: screenConfig.homeId } });
-            } else if (targetScreen === 'HealthSpace') {
-              navigation.navigate('Trips', { screen: 'HealthSpace' });
-            } else if (targetScreen === 'Events') {
-              navigation.navigate('Events');
-            } else if (targetScreen === 'Trips') {
-              navigation.navigate('Trips', { screen: 'SpacesList' });
-            } else if (targetScreen === 'HomeMaintenance' && screenConfig.home) {
-              navigation.navigate('Trips', { screen: 'HomeMaintenance', params: { home: screenConfig.home } });
-            } else {
-              navigation.navigate('Trips', { screen: targetScreen });
-            }
-          }, 300);
-          return;
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        full += decoder.decode(value, { stream: true });
+        const markerIdx = full.indexOf(MARKER);
+        const visible = markerIdx >= 0 ? full.slice(0, markerIdx) : full;
+        if (visible.trim()) {
+          if (!streamingStarted) {
+            setStreamingMsgId(assistantId);
+            streamingStarted = true;
+          }
+          upsertAssistantMessage(assistantId, visible);
         }
       }
 
-      if (confirmableActions.length > 0) {
-        setConfirmMessage(data.reply);
-        setConfirmActions(allActions);
-        setShowConfirm(true);
+      let actions: any[] = [];
+      let replyText = full;
+      const markerIdx = full.indexOf(MARKER);
+      if (markerIdx >= 0) {
+        replyText = full.slice(0, markerIdx);
+        try {
+          const parsed = JSON.parse(full.slice(markerIdx + MARKER.length).trim());
+          actions = Array.isArray(parsed) ? parsed : (parsed.actions || []);
+        } catch {
+          // Malformed actions payload — reply text is still usable
+        }
       }
+      upsertAssistantMessage(assistantId, replyText || '…', actions);
+      runAssistantActions(actions, replyText || '');
     } catch (error: any) {
       clearTimeout(abortTimer);
       const isTimeout = error?.name === 'AbortError';
+      // If partial content already streamed, keep it visible instead of an error bubble
+      if (streamingStarted) {
+        console.log('Stream interrupted after partial reply');
+        return;
+      }
       const errorMsg: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -178,9 +225,10 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
       };
       setMessages((prev) => [...prev, errorMsg]);
     } finally {
+      setStreamingMsgId(null);
       setLoading(false);
     }
-  }, [familyId, loading, navigation, onClose]);
+  }, [familyId, loading, navigation, onClose, upsertAssistantMessage, runAssistantActions]);
 
   // Seeded prompt: auto-send once per promptKey when the assistant opens
   useEffect(() => {
@@ -239,10 +287,10 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
         const screenConfig = navAction.screen;
         onClose();
         setTimeout(() => {
-          if (screenConfig.screen === 'SchoolSpace') {
-            navigation.navigate('Trips', { screen: 'SchoolSpace', params: { childId: screenConfig.childId } });
-          } else if (screenConfig.screen === 'KindergartenSpace') {
-            navigation.navigate('Trips', { screen: 'KindergartenSpace', params: { childId: screenConfig.childId } });
+          if (screenConfig.screen === 'SchoolSpace' || screenConfig.screen === 'SchoolDetail') {
+            navigation.navigate('Trips', { screen: 'SchoolDetail', params: { childId: screenConfig.childId, childName: screenConfig.childName } });
+          } else if (screenConfig.screen === 'KindergartenSpace' || screenConfig.screen === 'KindergartenDetail') {
+            navigation.navigate('Trips', { screen: 'KindergartenDetail', params: { childId: screenConfig.childId, childName: screenConfig.childName } });
           } else if (screenConfig.screen === 'PetSpace') {
             navigation.navigate('Trips', { screen: 'PetSpace', params: { petId: screenConfig.petId } });
           } else if (screenConfig.screen === 'HomeSpace') {
@@ -563,7 +611,7 @@ export const AIAssistantScreen: React.FC<AIAssistantScreenProps> = ({ visible, o
               </View>
             ))}
 
-            {loading && (
+            {loading && !streamingMsgId && (
               <View style={[styles.messageBubble, styles.assistantBubble, { backgroundColor: colors.surface }]}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, marginBottom: 4 }}>
                   <AppIcon name="ai" size={14} color={HOME_COLOR} />

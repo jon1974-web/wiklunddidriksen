@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, Modal, TextInput } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image, Modal, TextInput, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme } from '../theme/ThemeContext';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +7,7 @@ import { AppIcon } from '../components/AppIcon';
 import { MODULE_COLORS } from '../constants/moduleColors';
 import { KindergartenChild, KindergartenYear } from '../types';
 import { useUserStore } from '../store/userStore';
-import { getKindergartenYears, addKindergartenYear, updateKindergartenYear } from '../services/kindergartenService';
+import { getKindergartenYears, getKindergartenChildren, addKindergartenYear, updateKindergartenYear } from '../services/kindergartenService';
 import { crossAlert } from '../utils/alert';
 import { ActionModal } from '../components/ActionModal';
 
@@ -15,33 +15,52 @@ const KG_THEME = MODULE_COLORS.kindergarten;
 
 interface Props {
   navigation: any;
-  route: { params: { child: KindergartenChild; selectedYear?: KindergartenYear | null } };
+  route: { params: { child?: KindergartenChild; childId?: string; childName?: string; selectedYear?: KindergartenYear | null } };
 }
 
 export const KindergartenDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const { t } = useTranslation();
   const { colors } = useTheme();
-  const { child } = route.params;
   const familyId = useUserStore((state) => state.familyId);
 
+  // Child can be passed as an object (from the grid) or resolved from
+  // childId/childName params (e.g. AI assistant navigation)
+  const [child, setChild] = useState<KindergartenChild | null>(route.params?.child || null);
+  const childId = route.params?.childId;
+  const childName = route.params?.childName;
+
+  useEffect(() => {
+    if (child || !familyId) return;
+    if (!childId && !childName) return;
+    let mounted = true;
+    (async () => {
+      const data = await getKindergartenChildren(familyId);
+      const found = childId
+        ? data.find(c => c.id === childId)
+        : data.find(c => (c.name || '').toLowerCase() === (childName || '').toLowerCase());
+      if (mounted && found) setChild(found);
+    })();
+    return () => { mounted = false; };
+  }, [child, childId, childName, familyId]);
+
   const [years, setYears] = useState<KindergartenYear[]>([]);
-  const [selectedYear, setSelectedYear] = useState<KindergartenYear | null>(route.params.selectedYear || null);
+  const [selectedYear, setSelectedYear] = useState<KindergartenYear | null>(route.params?.selectedYear || null);
   const [showAddYearModal, setShowAddYearModal] = useState(false);
   const [yearForm, setYearForm] = useState({ year: '', group: '', kindergarten: '' });
   const [editingYearId, setEditingYearId] = useState<string | null>(null);
   const [yearActionModal, setYearActionModal] = useState<{ visible: boolean; id: string; title: string }>({ visible: false, id: '', title: '' });
 
   const loadYears = useCallback(async () => {
-    if (!familyId) return;
+    if (!familyId || !child) return;
     const data = await getKindergartenYears(familyId, child.id);
     setYears(data);
     if (data.length > 0 && !selectedYear) setSelectedYear(data[0]);
-  }, [familyId, child.id]);
+  }, [familyId, child]);
 
   useEffect(() => { loadYears(); }, [loadYears]);
 
   const handleSaveYear = async () => {
-    if (!familyId || !yearForm.year.trim()) return;
+    if (!familyId || !child || !yearForm.year.trim()) return;
     try {
       if (editingYearId) {
         await updateKindergartenYear(editingYearId, { year: yearForm.year, group: yearForm.group, kindergarten: yearForm.kindergarten });
@@ -62,6 +81,16 @@ export const KindergartenDetailScreen: React.FC<Props> = ({ navigation, route })
     { id: 'activities', icon: 'activities' as any, label: t('school.activities'), screen: 'KindergartenActivities' },
     { id: 'holidays', icon: 'fri' as any, label: t('school.holidays'), screen: 'KindergartenHolidays' },
   ];
+
+  if (!child) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
+        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <ActivityIndicator size="small" color={KG_THEME} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]} edges={['top']}>
